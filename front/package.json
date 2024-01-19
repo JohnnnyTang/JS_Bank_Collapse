@@ -1,0 +1,26 @@
+{
+  "name": "node-tree",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ssthouse/vue3-tree-chart": "^0.2.6",
+    "axios": "^1.6.5",
+    "clipboard": "^2.0.11",
+    "element-plus": "^2.5.0",
+    "sass": "^1.69.5",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "vue": "^3.3.11",
+    "vue3-json-viewer": "^2.2.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.5.2",
+    "vite": "^5.0.8"
+  }
+}
