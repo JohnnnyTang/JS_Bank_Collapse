@@ -410,7 +410,7 @@ onMounted(async () => {
 <style lang="scss" scoped>
 div.container {
     width: 100vw;
-    height: 100vh;
+    height: 93vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -423,7 +423,7 @@ div.container {
     div.zoom-button-container {
         position: absolute;
         left: 2vw;
-        top: 3vh;
+        top: 10vh;
         z-index: 10;
         width: 240px;
         display: flex;
