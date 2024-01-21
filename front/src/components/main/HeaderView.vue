@@ -17,7 +17,10 @@
                 <div class="header-nav-downLine"></div>
             </div>
         </div>
-        <div class="header-user-container"></div>
+        <div class="header-user-container">
+            <div class="user-avatar-icon"></div>
+            <div class="drop-down-icon"></div>
+        </div>
     </div>
 </template>
 
@@ -55,13 +58,17 @@ const emitNavClick = (navItem) => {
 </script>
 
 <style lang="scss" scoped>
+$headerLineColor: #b1f6ff;
+$headerLineThick: 1.3vh;
+
+
 div.main-header-container {
     height: 7vh;
     width: 100vw;
     background-image: linear-gradient(to bottom,
-            rgba(0, 24, 68, 1) 0%,
-            rgba(0, 24, 68, 0.85) 42%,
-            rgba(0, 24, 68, 0.6) 100%);
+            rgb(0, 11, 32) 0%,
+            rgba(0, 11, 32, 0.95) 42%,
+            rgba(0, 9, 26, 0.9) 100%);
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -133,16 +140,29 @@ div.main-header-container {
 
                 div.header-nav-upLine {
                     margin-bottom: 0;
-                    margin-top: 1.2vh;
-                    background-color: #b1f6ff;
+                    margin-top: $headerLineThick;
+                    background-color: $headerLineColor;
                     transition: all 0.3s ease-in-out;
                 }
 
                 div.header-nav-downLine {
-                    margin-bottom: 1.2vh;
+                    margin-bottom: $headerLineThick;
                     margin-top: 0;
-                    background-color: #b1f6ff;
+                    background-color: $headerLineColor;
                     transition: all 0.3s ease-in-out;
+                }
+
+                div.header-nav-text {
+                    color: #ace3eb;
+
+                    text-shadow:
+                        1px -1px 0 #707a81,
+                        -1px 2px 1px rgb(92, 100, 105),
+                        -2px 4px 1px rgb(65, 75, 85);
+                        // -3px 6px 1px #787777,
+                        // -4px 8px 1px #7b7a7a,
+                    font-weight: 600;
+                    transition: all 0.1s ease-in-out;
                 }
             }
 
@@ -157,37 +177,37 @@ div.main-header-container {
                         // -3px 6px 1px #787777,
                         // -4px 8px 1px #7b7a7a,
                     font-weight: 600;
-                    
+                    transition: all 0.3s ease-in-out;
                 }
 
                 div.header-nav-upLine {
                     margin-bottom: 0;
-                    margin-top: 1.2vh;
-                    background-color: #b1f6ff;
+                    margin-top: $headerLineThick;
+                    background-color: $headerLineColor;
                     transition: all 0.3s ease-in-out;
                 }
 
                 div.header-nav-downLine {
-                    margin-bottom: 1.2vh;
+                    margin-bottom: $headerLineThick;
                     margin-top: 0;
-                    background-color: #b1f6ff;
+                    background-color: $headerLineColor;
                     transition: all 0.3s ease-in-out;
                 }
 
             }
 
             div.header-nav-upLine {
-                height: 0.3vh;
+                height: 0.2vh;
                 width: 7vw;
-                margin-bottom: 1.2vh;
+                margin-bottom: $headerLineThick;
                 background-color: transparent;
                 transition: all 0.3s ease-in-out;
             }
 
             div.header-nav-downLine {
-                height: 0.3vh;
+                height: 0.2vh;
                 width: 7vw;
-                margin-top: 1.2vh;
+                margin-top: $headerLineThick;
                 background-color: transparent;
                 transition: all 0.3s ease-in-out;
             }
@@ -202,20 +222,55 @@ div.main-header-container {
                 font-size: 1vw;
                 // font-weight: 600;
                 font-family: "Microsoft YaHei";
-                color: #e1f3f5;
+                color: #c6d6d8e1;
                 caret-color: transparent;
 
-                text-shadow: 1px -1px 0 #8a9a9e,
-                    -1px 2px 1px rgb(96, 110, 110),
-                    -2px 4px 1px rgb(68, 78, 78);
+                // text-shadow: 1px -1px 0 #8a9a9e,
+                //     -1px 1px 1px rgb(96, 110, 110);
+                    // -2px 4px 1px rgb(68, 78, 78);
                 // -3px 6px 1px #787777,
                 // -4px 8px 1px #7b7a7a,
                 text-align: center;
-
+                transition: all 0.1s ease-in-out;
 
             }
         }
 
+    }
+
+    div.header-user-container {
+        width: fit-content;
+        margin-left: calc(8vw - 6vh);
+        height: 7vh;
+        // background-color: #b1f6ff;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: end;
+        align-items: center;
+
+        div.user-avatar-icon {
+            height: 4vh;
+            width: 4vh;
+            // background-color: antiquewhite;
+            background-image: url('./user.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        div.drop-down-icon {
+            height: 1.6vh;
+            width: 1.6vh;
+            // background-color: #8a9a9e;
+            background-image: url('./down-arrow.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 }
 </style>
