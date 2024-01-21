@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IStationInfoRepo">
+    <resultMap id="stationMap" type="com.johnny.bank.model.resource.dataResource.StationInfo">
+        <result property="uid" column="uid"/>
+        <result property="code" column="code"/>
+        <result property="beginDate" column="begin_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="lng" column="lng"/>
+        <result property="baseHeight" column="base_height"/>
+        <result property="operateTime" column="operate_time"/>
+        <result property="operateUser" column="operate_user"/>
+        <result property="operateFlag" column="operate_flag"/>
+        <result property="operateDesc" column="operate_desc"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="stationMap">
+        SELECT * FROM station;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM station;
+    </select>
+
+    <select id="findById" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
+        SELECT * FROM station WHERE uid = #{id};
+    </select>
+
+    <select id="findByIdList" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
+        SELECT * FROM station WHERE uid IN #{ids};
+    </select>
+
+    <select id="findByCode" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
+        SELECT * FROM station WHERE code = #{stationCode};
+    </select>
+
+    <select id="findByCodeList" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
+        SELECT * FROM station WHERE code IN #{stationCodeList};
+    </select>
+
+    <select id="findNewestData" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
+        SELECT * FROM station ORDER BY begin_date DESC LIMIT 1;
+    </select>
+</mapper>
