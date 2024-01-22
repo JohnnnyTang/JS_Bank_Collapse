@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IGnssDataRepo">
+    <select id="findAll" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM gnssdata;
+    </select>
+
+    <select id="getTotalCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM gnssdata WHERE device_code = #{deviceCode};
+    </select>
+
+    <select id="getTotalCountInStation" resultType="integer">
+        SELECT COUNT(*) FROM gnssdata WHERE station_code = #{stationCode};
+    </select>
+
+    <select id="findByStationCode" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata WHERE station_code = #{stationCode};
+    </select>
+
+    <select id="findByDeviceCode" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata WHERE device_code = #{deviceCode};
+    </select>
+
+<!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
+<!--        SELECT * FROM device WHERE station_code IN #{stationCodeList};-->
+<!--    </select>-->
+
+    <select id="findNewestData" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataInStation" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata WHERE station_code = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataOfDevice" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata WHERE device_code = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findDataByTime" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="findDataByTimeOfDevice" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND device_code = #{deviceCode} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="findDataByTimeInStation" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
+        SELECT * FROM gnssdata WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_code = #{stationCode} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="ifContinueUpdateOfDevice" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM gnssdata
+            WHERE measure_time >= CURRENT_TIMESTAMP - #{updateInterval}
+            AND device_code = #{deviceCode}
+        );
+    </select>
+
+    <select id="ifContinueUpdateInStation" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM gnssdata
+            WHERE measure_time >= CURRENT_TIMESTAMP - #{updateInterval}
+              AND station_code = #{stationCode}
+        );
+    </select>
+</mapper>
