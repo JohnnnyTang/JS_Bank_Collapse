@@ -56,13 +56,13 @@ public class StationInfoController extends BaseStaticInfoController<StationInfo>
 
     @Override
     @GetMapping("/code/{code}")
-    public ResponseEntity<StationInfo> findByCode(@PathVariable int code) {
+    public ResponseEntity<StationInfo> findByCode(@PathVariable String code) {
         return ResponseEntity.ok(stationInfoService.getDataByCode(dataNode, code));
     }
 
     @Override
     @GetMapping("/codes")
-    public ResponseEntity<List<StationInfo>> findByCodeList(@RequestParam List<Integer> codeList) {
+    public ResponseEntity<List<StationInfo>> findByCodeList(@RequestParam List<String> codeList) {
         return ResponseEntity.ok(stationInfoService.getDataByCodeList(dataNode, codeList));
     }
 

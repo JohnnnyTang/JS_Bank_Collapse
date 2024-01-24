@@ -21,34 +21,34 @@ public interface IMonitorDataService<T extends MonitorData> {
     List<T> getDataByHour(DataNode dataNode, int hours);
     List<T> getDataByDay(DataNode dataNode, int days);
 
-    List<T> getDataByTimeOfDevice(DataNode dataNode, Timestamp begTime, Timestamp endTime, int deviceCode);
-    List<T> getDataByMinOfDevice(DataNode dataNode, int minutes, int deviceCode);
-    List<T> getDataByHourOfDevice(DataNode dataNode, int hours, int deviceCode);
-    List<T> getDataByDayOfDevice(DataNode dataNode, int days, int deviceCode);
+    List<T> getDataByTimeOfDevice(DataNode dataNode, Timestamp begTime, Timestamp endTime, String deviceCode);
+    List<T> getDataByMinOfDevice(DataNode dataNode, int minutes, String deviceCode);
+    List<T> getDataByHourOfDevice(DataNode dataNode, int hours, String deviceCode);
+    List<T> getDataByDayOfDevice(DataNode dataNode, int days, String deviceCode);
 
-    List<T> getDataByTimeInStation(DataNode dataNode, Timestamp begTime, Timestamp endTime, int stationCode);
-    List<T> getDataByMinInStation(DataNode dataNode, int minutes, int stationCode);
-    List<T> getDataByHourInStation(DataNode dataNode, int hours, int stationCode);
-    List<T> getDataByDayInStation(DataNode dataNode, int days, int stationCode);
+    List<T> getDataByTimeInStation(DataNode dataNode, Timestamp begTime, Timestamp endTime, String stationCode);
+    List<T> getDataByMinInStation(DataNode dataNode, int minutes, String stationCode);
+    List<T> getDataByHourInStation(DataNode dataNode, int hours, String stationCode);
+    List<T> getDataByDayInStation(DataNode dataNode, int days, String stationCode);
 
     List<T> getAll(DataNode dataNode);
 
-    List<T> getByStationCode(DataNode dataNode, int stationCode);
+    List<T> getByStationCode(DataNode dataNode, String stationCode);
 
-    List<T> getByDeviceCode(DataNode dataNode, int deviceCode);
+    List<T> getByDeviceCode(DataNode dataNode, String deviceCode);
 
     T getNewestData(DataNode dataNode);
 
-    T getNewestDataInStation(DataNode dataNode, int stationCode);
+    T getNewestDataInStation(DataNode dataNode, String stationCode);
 
-    T getNewestDataOfDevice(DataNode dataNode, int deviceCode);
+    T getNewestDataOfDevice(DataNode dataNode, String deviceCode);
 
     int getTotalCount(DataNode dataNode);
-    int getTotalCountOfDevice(DataNode dataNode, int deviceCode);
-    int getTotalCountInStation(DataNode dataNode, int stationCode);
+    int getTotalCountOfDevice(DataNode dataNode, String deviceCode);
+    int getTotalCountInStation(DataNode dataNode, String stationCode);
 
     // 检查是否还在连续更新
-    boolean checkContinueUpdateOfDevice(DataNode dataNode, Timestamp updateInterval, int deviceCode);
+    boolean checkContinueUpdateOfDevice(DataNode dataNode, Timestamp updateInterval, String deviceCode);
 
-    boolean checkContinueUpdateInStation(DataNode dataNode, Timestamp updateInterval, int stationCode);
+    boolean checkContinueUpdateInStation(DataNode dataNode, Timestamp updateInterval, String stationCode);
 }

@@ -60,49 +60,49 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
 
     @Override
     @GetMapping("/time/device/{deviceCode}")
-    public ResponseEntity<List<T>> getDataByTimeOfDevice(@RequestParam Timestamp begTime,@RequestParam Timestamp endTime,@PathVariable int deviceCode) {
+    public ResponseEntity<List<T>> getDataByTimeOfDevice(@RequestParam Timestamp begTime,@RequestParam Timestamp endTime,@PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getDataByTimeOfDevice(dataNode, begTime, endTime, deviceCode));
     }
 
     @Override
     @GetMapping("/minute/{minutes}/device/{deviceCode}")
-    public ResponseEntity<List<T>> getDataByMinOfDevice(@PathVariable int minutes,@PathVariable int deviceCode) {
+    public ResponseEntity<List<T>> getDataByMinOfDevice(@PathVariable int minutes,@PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getDataByMinOfDevice(dataNode, minutes, deviceCode));
     }
 
     @Override
     @GetMapping("/hour/{hours}/device/{deviceCode}")
-    public ResponseEntity<List<T>> getDataByHourOfDevice(@PathVariable int hours, @PathVariable int deviceCode) {
+    public ResponseEntity<List<T>> getDataByHourOfDevice(@PathVariable int hours, @PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getDataByHourOfDevice(dataNode, hours, deviceCode));
     }
 
     @Override
     @GetMapping("/day/{days}/device/{deviceCode}")
-    public ResponseEntity<List<T>> getDataByDayOfDevice(@PathVariable int days, @PathVariable int deviceCode) {
+    public ResponseEntity<List<T>> getDataByDayOfDevice(@PathVariable int days, @PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getDataByDayOfDevice(dataNode, days, deviceCode));
     }
 
     @Override
     @GetMapping("/time/station/{stationCode}")
-    public ResponseEntity<List<T>> getDataByTimeInStation(@RequestParam Timestamp begTime,@RequestParam  Timestamp endTime, @PathVariable int stationCode) {
+    public ResponseEntity<List<T>> getDataByTimeInStation(@RequestParam Timestamp begTime,@RequestParam  Timestamp endTime, @PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getDataByTimeInStation(dataNode, begTime, endTime, stationCode));
     }
 
     @Override
     @GetMapping("/minute/{minutes}/station/{stationCode}")
-    public ResponseEntity<List<T>> getDataByMinInStation(@PathVariable int minutes, @PathVariable int stationCode) {
+    public ResponseEntity<List<T>> getDataByMinInStation(@PathVariable int minutes, @PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getDataByMinInStation(dataNode, minutes, stationCode));
     }
 
     @Override
     @GetMapping("/hour/{hours}/station/{stationCode}")
-    public ResponseEntity<List<T>> getDataByHourInStation(@PathVariable int hours, @PathVariable int stationCode) {
+    public ResponseEntity<List<T>> getDataByHourInStation(@PathVariable int hours, @PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getDataByHourInStation(dataNode, hours, stationCode));
     }
 
     @Override
     @GetMapping("/day/{days}/station/{stationCode}")
-    public ResponseEntity<List<T>> getDataByDayInStation(@PathVariable int days, @PathVariable int stationCode) {
+    public ResponseEntity<List<T>> getDataByDayInStation(@PathVariable int days, @PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getDataByDayInStation(dataNode, days, stationCode));
     }
 
@@ -114,13 +114,13 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
 
     @Override
     @GetMapping("/station/{stationCode}")
-    public ResponseEntity<List<T>> getByStationCode(@PathVariable int stationCode) {
+    public ResponseEntity<List<T>> getByStationCode(@PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getByStationCode(dataNode, stationCode));
     }
 
     @Override
     @GetMapping("/device/{deviceCode}")
-    public ResponseEntity<List<T>> getByDeviceCode(@PathVariable int deviceCode) {
+    public ResponseEntity<List<T>> getByDeviceCode(@PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getByDeviceCode(dataNode, deviceCode));
     }
 
@@ -132,13 +132,13 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
 
     @Override
     @GetMapping("/newest/station/{stationCode}")
-    public ResponseEntity<T> getNewestDataInStation(@PathVariable int stationCode) {
+    public ResponseEntity<T> getNewestDataInStation(@PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getNewestDataInStation(dataNode, stationCode));
     }
 
     @Override
     @GetMapping("/newest/device/{deviceCode}")
-    public ResponseEntity<T> getNewestDataOfDevice(@PathVariable int deviceCode) {
+    public ResponseEntity<T> getNewestDataOfDevice(@PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getNewestDataOfDevice(dataNode, deviceCode));
     }
 
@@ -150,24 +150,24 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
 
     @Override
     @GetMapping("/count/station/{stationCode}")
-    public ResponseEntity<Integer> getTotalCountInStation(@PathVariable int stationCode) {
+    public ResponseEntity<Integer> getTotalCountInStation(@PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getTotalCountInStation(dataNode, stationCode));
     }
 
     @Override
-    public ResponseEntity<Integer> getTotalCountOfDevice(@PathVariable int deviceCode) {
+    public ResponseEntity<Integer> getTotalCountOfDevice(@PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getTotalCountOfDevice(dataNode, deviceCode));
     }
 
     @Override
     @GetMapping("/checkDevice/{updateInterval}/{deviceCode}")
-    public ResponseEntity<Boolean> checkContinueUpdateOfDevice(@PathVariable Timestamp updateInterval, @PathVariable int deviceCode) {
+    public ResponseEntity<Boolean> checkContinueUpdateOfDevice(@PathVariable Timestamp updateInterval, @PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.checkContinueUpdateOfDevice(dataNode, updateInterval, deviceCode));
     }
 
     @Override
     @GetMapping("/checkDevice/{updateInterval}/{stationCode}")
-    public ResponseEntity<Boolean> checkContinueUpdateInStation(@PathVariable Timestamp updateInterval, @PathVariable int stationCode) {
+    public ResponseEntity<Boolean> checkContinueUpdateInStation(@PathVariable Timestamp updateInterval, @PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.checkContinueUpdateInStation(dataNode, updateInterval, stationCode));
     }
 

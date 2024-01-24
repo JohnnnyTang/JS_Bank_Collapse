@@ -14,32 +14,32 @@ import java.util.List;
 public interface IMonitorDataRepo<T> {
     List<T> findDataByTime(Timestamp begTime, Timestamp endTime);
 
-    List<T> findDataByTimeOfDevice(Timestamp begTime, Timestamp endTime, int deviceCode);
+    List<T> findDataByTimeOfDevice(Timestamp begTime, Timestamp endTime, String deviceCode);
 
-    List<T> findDataByTimeInStation(Timestamp begTime, Timestamp endTime, int stationCode);
+    List<T> findDataByTimeInStation(Timestamp begTime, Timestamp endTime, String stationCode);
 
 //    List<T> getDataByHourFromNow(int hour);
     List<T> findAll();
 
-    List<T> findByStationCode(int stationCode);
+    List<T> findByStationCode(String stationCode);
 
-    List<T> findByDeviceCode(int deviceCode);
+    List<T> findByDeviceCode(String deviceCode);
 
     T findNewestData();
 
-    T findNewestDataInStation(int stationCode);
+    T findNewestDataInStation(String stationCode);
 
-    T findNewestDataOfDevice(int deviceCode);
+    T findNewestDataOfDevice(String deviceCode);
 
     int getTotalCount();
 
-    int getTotalCountOfDevice(int deviceCode);
+    int getTotalCountOfDevice(String deviceCode);
 
-    int getTotalCountInStation(int stationCode);
+    int getTotalCountInStation(String stationCode);
 
     // 检查是否还在连续更新
-    boolean ifContinueUpdateOfDevice(Timestamp updateInterval, int deviceCode);
+    boolean ifContinueUpdateOfDevice(Timestamp updateInterval, String deviceCode);
 
-    boolean ifContinueUpdateInStation(Timestamp updateInterval, int stationCode);
+    boolean ifContinueUpdateInStation(Timestamp updateInterval, String stationCode);
 
 }

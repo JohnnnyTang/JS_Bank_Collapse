@@ -68,13 +68,13 @@ public class StationInfoService implements IStationInfoService {
 
     @Override
     @DynamicNodeData
-    public StationInfo getDataByCode(DataNode dataNode, int stationCode) {
-        return stationRepo.findByCode((stationCode));
+    public StationInfo getDataByCode(DataNode dataNode, String stationCode) {
+        return stationRepo.findByCode(stationCode);
     }
 
     @Override
     @DynamicNodeData
-    public List<StationInfo> getDataByCodeList(DataNode dataNode, List<Integer> stationCodeList) {
+    public List<StationInfo> getDataByCodeList(DataNode dataNode, List<String> stationCodeList) {
         return stationRepo.findByCodeList(stationCodeList);
     }
 

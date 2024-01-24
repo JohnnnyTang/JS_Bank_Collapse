@@ -11,9 +11,9 @@ import java.util.List;
  * @Description:
  */
 public interface IStaticInfoBaseService<T extends StaticInfoData> extends IStaticBaseService<T> {
-    T getDataByCode(DataNode dataNode, int code);
+    T getDataByCode(DataNode dataNode, String code);
 
-    List<T> getDataByCodeList(DataNode dataNode, List<Integer> codeList);
+    List<T> getDataByCodeList(DataNode dataNode, List<String> codeList);
 
     T getNewestData(DataNode dataNode);
 

@@ -10,9 +10,9 @@ import java.util.List;
  * @Description:
  */
 public interface IStaticInfoBaseRepo<T extends StaticInfoData> extends IStaticBaseRepo<T> {
-    T findByCode(int code);
+    T findByCode(String code);
 
-    List<T> findByCodeList(List<Integer> codeList);
+    List<T> findByCodeList(List<String> codeList);
 
     T findNewestData();
 }

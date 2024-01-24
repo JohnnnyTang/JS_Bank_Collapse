@@ -50,9 +50,6 @@ public class DynamicDataSourceAspect {
         Object[] args = joinPoint.getArgs();
         DataNode dataNode = (DataNode) args[0];
 
-//        if(DataSourceContextHolder.getDataSourceKey().equals(dataNode.getId())) {
-//            return joinPoint.proceed();
-//        }
         if (!DataSourceContextHolder.containDataSourceKey(dataNode.getId())) {
             DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
             dataSourceBuilder.url(dataNode.getApiPrefix());
@@ -64,6 +61,7 @@ public class DynamicDataSourceAspect {
                 dataSourceBuilder.password((String) dataNode.getUsage().get("password"));
             }
             DataSource source = dataSourceBuilder.build();
+            log.info("add datasource: "+source.toString());
             dynamicDataSource.addDataSource(dataNode.getId(), source);
         }
         // 切换数据源

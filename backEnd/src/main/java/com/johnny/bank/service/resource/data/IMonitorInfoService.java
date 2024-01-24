@@ -12,11 +12,11 @@ import java.util.List;
  * @Description:
  */
 public interface IMonitorInfoService extends IStaticInfoBaseService<MonitorInfo> {
-    List<MonitorInfo> getDataByStationCode(DataNode dataNode, int stationCode);
+    List<MonitorInfo> getDataByStationCode(DataNode dataNode, String stationCode);
 
-    List<MonitorInfo> getDataByStationCodeList(DataNode dataNode, List<Integer> stationCodeList);
+    List<MonitorInfo> getDataByStationCodeList(DataNode dataNode, List<String> stationCodeList);
 
-    MonitorInfo getNewestDeviceInStation(DataNode dataNode, int stationCode);
+    MonitorInfo getNewestDeviceInStation(DataNode dataNode, String stationCode);
 
-    List<MonitorInfo> getDeviceByType(DataNode dataNode, String deviceType);
+    List<MonitorInfo> getDeviceByType(DataNode dataNode, Character deviceType);
 }

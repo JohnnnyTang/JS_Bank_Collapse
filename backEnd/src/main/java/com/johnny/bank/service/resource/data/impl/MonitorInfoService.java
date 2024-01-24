@@ -10,7 +10,6 @@ import com.johnny.bank.utils.DataNodeSyncUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,9 +21,9 @@ import java.util.List;
 public class MonitorInfoService implements IMonitorInfoService {
     private final IDataNodeRepo dataNodeRepo;
     private final IMonitorInfoRepo deviceInfoRepo;
-    private final List<String> deviceTypeList = new ArrayList<>(){{
-       add("gnss");
-    }};
+//    private final List<String> deviceTypeList = new ArrayList<>(){{
+//       add("gnss");
+//    }};
 
     public MonitorInfoService(@Qualifier("DataNodeRepo") IDataNodeRepo DataNodeRepo, @Qualifier("DeviceInfoRepo") IMonitorInfoRepo DeviceInfoRepo) {
         this.dataNodeRepo = DataNodeRepo;
@@ -35,7 +34,7 @@ public class MonitorInfoService implements IMonitorInfoService {
     @DynamicNodeData
     public List<MonitorInfo> getAllData(DataNode dataNode) {
         List<MonitorInfo> monitorInfoList = deviceInfoRepo.findAll();
-        DataNodeSyncUtil.SyncDeviceNodeWhenDataChanged(monitorInfoList, dataNodeRepo, dataNode);
+        DataNodeSyncUtil.SyncDeviceNodeWhenBaseGroupDataChanged(monitorInfoList, dataNodeRepo, dataNode);
         return monitorInfoList;
     }
 
@@ -59,13 +58,13 @@ public class MonitorInfoService implements IMonitorInfoService {
 
     @DynamicNodeData
     @Override
-    public MonitorInfo getDataByCode(DataNode dataNode, int code) {
+    public MonitorInfo getDataByCode(DataNode dataNode, String code) {
         return deviceInfoRepo.findByCode(code);
     }
 
     @DynamicNodeData
     @Override
-    public List<MonitorInfo> getDataByCodeList(DataNode dataNode, List<Integer> codeList) {
+    public List<MonitorInfo> getDataByCodeList(DataNode dataNode, List<String> codeList) {
         return deviceInfoRepo.findByCodeList(codeList);
     }
 
@@ -83,25 +82,25 @@ public class MonitorInfoService implements IMonitorInfoService {
 
     @DynamicNodeData
     @Override
-    public List<MonitorInfo> getDataByStationCode(DataNode dataNode, int stationCode) {
+    public List<MonitorInfo> getDataByStationCode(DataNode dataNode, String stationCode) {
         return deviceInfoRepo.findByStationCode(stationCode);
     }
 
     @DynamicNodeData
     @Override
-    public List<MonitorInfo> getDataByStationCodeList(DataNode dataNode, List<Integer> stationCodeList) {
+    public List<MonitorInfo> getDataByStationCodeList(DataNode dataNode, List<String> stationCodeList) {
         return deviceInfoRepo.findByStationCodeList(stationCodeList);
     }
 
     @DynamicNodeData
     @Override
-    public MonitorInfo getNewestDeviceInStation(DataNode dataNode, int stationCode) {
+    public MonitorInfo getNewestDeviceInStation(DataNode dataNode, String stationCode) {
         return deviceInfoRepo.findNewestDeviceInStation(stationCode);
     }
 
     @Override
     @DynamicNodeData
-    public List<MonitorInfo> getDeviceByType(DataNode dataNode, String deviceType) {
-        return deviceInfoRepo.findDeviceByType(deviceTypeList.indexOf(deviceType)+1);
+    public List<MonitorInfo> getDeviceByType(DataNode dataNode, Character deviceType) {
+        return deviceInfoRepo.findDeviceByType(deviceType);
     }
 }

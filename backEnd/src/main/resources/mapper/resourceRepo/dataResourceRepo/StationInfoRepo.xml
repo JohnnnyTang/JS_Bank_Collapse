@@ -4,18 +4,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IStationInfoRepo">
     <resultMap id="stationMap" type="com.johnny.bank.model.resource.dataResource.StationInfo">
-        <result property="uid" column="uid"/>
-        <result property="code" column="code"/>
-        <result property="beginDate" column="begin_date"/>
-        <result property="endDate" column="end_date"/>
-        <result property="name" column="name"/>
-        <result property="type" column="type"/>
-        <result property="lng" column="lng"/>
-        <result property="baseHeight" column="base_height"/>
+        <result property="code" column="station_id"/>
+        <result property="beginDate" column="begin_time"/>
+        <result property="endDate" column="end_time"/>
         <result property="operateTime" column="operate_time"/>
-        <result property="operateUser" column="operate_user"/>
-        <result property="operateFlag" column="operate_flag"/>
-        <result property="operateDesc" column="operate_desc"/>
+        <result property="operateUser" column="operator"/>
+        <result property="operateFlag" column="data_v"/>
+        <result property="operateDesc" column="data_v_explain"/>
     </resultMap>
 
     <select id="findAll" resultMap="stationMap">
@@ -26,23 +21,23 @@
         SELECT COUNT(*) FROM station;
     </select>
 
-    <select id="findById" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
-        SELECT * FROM station WHERE uid = #{id};
+    <select id="findById" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id = #{id};
     </select>
 
-    <select id="findByIdList" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
-        SELECT * FROM station WHERE uid IN #{ids};
+    <select id="findByIdList" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id IN #{ids};
     </select>
 
-    <select id="findByCode" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
-        SELECT * FROM station WHERE code = #{stationCode};
+    <select id="findByCode" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id = #{stationCode};
     </select>
 
-    <select id="findByCodeList" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
-        SELECT * FROM station WHERE code IN #{stationCodeList};
+    <select id="findByCodeList" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id IN #{stationCodeList};
     </select>
 
-    <select id="findNewestData" resultType="com.johnny.bank.model.resource.dataResource.StationInfo">
-        SELECT * FROM station ORDER BY begin_date DESC LIMIT 1;
+    <select id="findNewestData" resultMap="stationMap">
+        SELECT * FROM station ORDER BY begin_time DESC LIMIT 1;
     </select>
 </mapper>

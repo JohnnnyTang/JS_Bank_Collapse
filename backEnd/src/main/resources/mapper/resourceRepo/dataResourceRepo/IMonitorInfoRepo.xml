@@ -3,47 +3,64 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IMonitorInfoRepo">
-    <select id="findAll" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device;
+    <resultMap id="monitorMap" type="com.johnny.bank.model.resource.dataResource.MonitorInfo">
+        <result property="code" column="machine_id_nnu"/>
+        <result property="machineId" column="machine_id"/>
+        <result property="stationCode" column="station_id"/>
+        <result property="name" column="machine_name"/>
+        <result property="begTime" column="begin_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="operateTime" column="operate_time"/>
+        <result property="operateUser" column="in_operator"/>
+        <result property="operateFlag" column="data_v"/>
+        <result property="operateDesc" column="notes"/>
+        <result property="name" column="machine_name"/>
+        <result property="type" column="type"/>
+        <result property="longitude" column="longitude"/>
+        <result property="latitude" column="latitude"/>
+        <result property="elevation" column="elevation"/>
+    </resultMap>
+    <select id="findAll" resultMap="monitorMap">
+        SELECT * FROM machine;
     </select>
 
     <select id="getTotalCount" resultType="integer">
-        SELECT COUNT(*) FROM device;
+        SELECT COUNT(*) FROM machine;
     </select>
 
-    <select id="findById" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE uid = #{id};
+    <select id="findById" resultMap="monitorMap">
+        SELECT * FROM machine WHERE machine_id_nnu = #{id};
     </select>
 
-    <select id="findByIdList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE uid IN #{ids};
+    <select id="findByIdList" resultMap="monitorMap">
+        SELECT * FROM machine WHERE machine_id_nnu IN #{ids};
     </select>
 
-    <select id="findByCode" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE code = #{deviceCode};
+    <select id="findByCode" resultMap="monitorMap">
+        SELECT * FROM machine WHERE machine_id_nnu = #{deviceCode};
     </select>
 
-    <select id="findByCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE code IN #{deviceCodeList};
+    <select id="findByCodeList" resultMap="monitorMap">
+        SELECT * FROM machine WHERE machine_id_nnu IN #{deviceCodeList};
     </select>
 
-    <select id="findByStationCode" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE station_code = #{stationCode};
+    <select id="findByStationCode" resultMap="monitorMap">
+        SELECT * FROM machine WHERE station_id = #{stationCode};
     </select>
 
-    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE station_code IN #{stationCodeList};
+    <select id="findByStationCodeList" resultMap="monitorMap">
+        SELECT * FROM machine WHERE station_id IN #{stationCodeList};
     </select>
 
-    <select id="findNewestData" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device ORDER BY begin_date DESC LIMIT 1;
+    <select id="findNewestData" resultMap="monitorMap">
+        SELECT * FROM machine ORDER BY begin_time DESC LIMIT 1;
     </select>
 
-    <select id="findNewestDeviceInStation" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE station_code = #{stationCode} ORDER BY begin_date DESC LIMIT 1;
+    <select id="findNewestDeviceInStation" resultMap="monitorMap">
+        SELECT * FROM machine WHERE station_id = #{stationCode} ORDER BY begin_time DESC LIMIT 1;
     </select>
 
-    <select id="findDeviceByType" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">
-        SELECT * FROM device WHERE type = #{deviceType};
+    <select id="findDeviceByType" resultMap="monitorMap">
+        SELECT * FROM machine WHERE type = #{deviceType};
     </select>
 </mapper>
