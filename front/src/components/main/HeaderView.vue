@@ -26,7 +26,7 @@
 
 <script setup>
 // import router from '../../router/index';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 // const emit = defineEmits(['navClick'])
 import router from '../../router/index';
 
@@ -37,32 +37,33 @@ const navList = ref([
     { name: '崩岸资源管理', routerLink: '/tree', isActive: false },
 ])
 
-let previousActive = navList.value[0];
+let previousActive = 0;
 
 const emitNavClick = (navItem) => {
     // emit('navClick', navItem.routerLink);
+    console.log('click', router.currentRoute.value);
     router.push(navItem.routerLink);
-    if (previousActive.name != navItem.name) {
+    if (navList.value[previousActive].name != navItem.name) {
         for (let navItem of navList.value) {
             if (navItem.isActive) {
                 navItem.isActive = false;
             }
         }
         navItem.isActive = true;
-        previousActive = navItem;
+        previousActive = navList.value.indexOf(navItem);
     }
 }
 
-onMounted(() => {
-    console.log(router.currentRoute.value);
-    for(let navItem of navList.value) {
-        if(navItem.routerLink != router.currentRoute.value.path && navItem.isActive) {
-            navItem.isActive = false;
-        }
-        else if(navItem.routerLink == router.currentRoute.value.path) {
-            navItem.isActive = true;
-        }
+watchEffect(() => {
+  router.getRoutes().map((item, index) => {
+    if(item.path === router.currentRoute.value.path){
+        // console.log(item, index);
+        navList.value[previousActive].isActive = false;
+        navList.value[index].isActive = true;
+        previousActive = index;
+    //   navActive.value = index
     }
+  })
 })
 
 

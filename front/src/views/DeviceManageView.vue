@@ -34,7 +34,7 @@
                                             <div class="device-id">{{deviceInfo.code}}</div>
                                             <div class="device-type-container detail-double-container">
                                                 <div class="device-type-title detail-title-item">设备类别</div>
-                                                <div class="device-type-content detail-content-item">{{DEVICETYPEMAP[+deviceInfo.type]}}</div>
+                                                <div class="device-type-content detail-content-item">{{DEVICETYPEMAP[(+deviceInfo.type)-1]}}</div>
                                             </div>
                                             <div class="device-user-container detail-double-container">
                                                 <div class="device-user-title detail-title-item">录入人员</div>
@@ -54,8 +54,8 @@
                                             </div>
                                         </div>
                                         <div class="device-button-container">
-                                            <div class="device-status-button"></div>
-                                            <div class="device-log-button"></div>
+                                            <div class="device-status-button">更新状态</div>
+                                            <div class="device-log-button">生成报表</div>
                                         </div>
                                     </div>
                                 </div>
@@ -77,6 +77,7 @@ const STATIONMAP = {
     'MZS': '民主沙'
 }
 const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+const DEVICEPICMAP = ['/gnssBase.png', '/inclino.png', '/waterPress.png', '/changePress.png']
 
 const deviceCardInfoList = ref([]);
 
@@ -342,6 +343,62 @@ div.deviceManage-container {
 
                                 &.device-time-content {
                                     width: 8vw;
+                                }
+                            }
+                        }
+
+                        div.device-button-container {
+                            position: absolute;
+                            width: 10vw;
+                            height: 3.8vh;
+                            right: 0.6vw;
+                            // background-color: aqua;
+
+                            display: flex;
+                            flex-flow: row nowrap;
+                            justify-content: space-between;
+                            text-align: center;
+
+                            font-size: calc(0.2vh + 0.75vw);
+                            font-weight: 600;
+                            
+
+                            div.device-status-button {
+                                height: 3.8vh!important; 
+                                width: 4.3vw;
+                                line-height: 3.5vh;
+                                // background-color: aliceblue;
+                                color: #ffffffe6;
+
+                                box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.35);
+                                background: radial-gradient(ellipse at center, #2692da 0%, #0529ac 100%);
+                                transition: all ease-in-out 0.3s;
+                                &:hover {
+                                    cursor: pointer;
+                                    height: 3.6vh!important;
+                                    width: 4.2vw;
+                                    box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
+                                    color: #ffffff;
+                                }
+                            }
+
+                            div.device-log-button {
+                                height: 3.8vh!important;
+                                width: 4.3vw;
+                                line-height: 3.5vh;
+                                // background-color: aliceblue;
+                                color: #ffffffe6;
+
+                                box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.35);
+                                background: radial-gradient(ellipse at center, #2692da 0%, #0529ac 100%);
+                                transition: all ease-in-out 0.3s;
+
+                                &:hover {
+                                    cursor: pointer;
+                                    height: 3.6vh!important;
+                                    width: 4.2vw;
+                                    box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
+                                    color: #ffffff;
                                 }
                             }
                         }
