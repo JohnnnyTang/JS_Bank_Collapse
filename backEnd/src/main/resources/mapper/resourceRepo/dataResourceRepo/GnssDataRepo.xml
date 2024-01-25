@@ -3,71 +3,81 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IGnssDataRepo">
-    <select id="findAll" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata;
+    <resultMap id="gnssDataMap" type="com.johnny.bank.model.resource.dataResource.GnssData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="xMove" column="x_move"/>
+        <result property="yMove" column="y_move"/>
+        <result property="zMove" column="z_move"/>
+    </resultMap>
+    <select id="findAll" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record;
     </select>
 
     <select id="getTotalCount" resultType="integer">
-        SELECT COUNT(*) FROM gnssdata;
+        SELECT COUNT(*) FROM gnss_record;
     </select>
 
     <select id="getTotalCountOfDevice" resultType="integer">
-        SELECT COUNT(*) FROM gnssdata WHERE device_code = #{deviceCode};
+        SELECT COUNT(*) FROM gnss_record WHERE machine_id_nnu = #{deviceCode};
     </select>
 
     <select id="getTotalCountInStation" resultType="integer">
-        SELECT COUNT(*) FROM gnssdata WHERE station_code = #{stationCode};
+        SELECT COUNT(*) FROM gnss_record WHERE station_id = #{stationCode};
     </select>
 
-    <select id="findByStationCode" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata WHERE station_code = #{stationCode};
+    <select id="findByStationCode" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record WHERE station_id = #{stationCode};
     </select>
 
-    <select id="findByDeviceCode" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata WHERE device_code = #{deviceCode};
+    <select id="findByDeviceCode" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record WHERE machine_id_nnu = #{deviceCode};
     </select>
 
 <!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
 <!--        SELECT * FROM device WHERE station_code IN #{stationCodeList};-->
 <!--    </select>-->
 
-    <select id="findNewestData" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata ORDER BY measure_time DESC LIMIT 1;
+    <select id="findNewestData" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record ORDER BY measure_time DESC LIMIT 1;
     </select>
 
-    <select id="findNewestDataInStation" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata WHERE station_code = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+    <select id="findNewestDataInStation" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
     </select>
 
-    <select id="findNewestDataOfDevice" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata WHERE device_code = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+    <select id="findNewestDataOfDevice" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
     </select>
 
-    <select id="findDataByTime" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+    <select id="findDataByTime" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
     </select>
 
-    <select id="findDataByTimeOfDevice" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND device_code = #{deviceCode} ORDER BY measure_time DESC;
+    <select id="findDataByTimeOfDevice" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC;
     </select>
 
-    <select id="findDataByTimeInStation" resultType="com.johnny.bank.model.resource.dataResource.GnssData">
-        SELECT * FROM gnssdata WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_code = #{stationCode} ORDER BY measure_time DESC;
+    <select id="findDataByTimeInStation" resultMap="gnssDataMap">
+        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time DESC;
     </select>
 
     <select id="ifContinueUpdateOfDevice" resultType="boolean">
         SELECT EXISTS(
-            SELECT 1 FROM gnssdata
-            WHERE measure_time >= CURRENT_TIMESTAMP - #{updateInterval}
-            AND device_code = #{deviceCode}
+            SELECT 1 FROM gnss_record
+            WHERE measure_time >= #{timeLimit}
+            AND machine_id_nnu = #{deviceCode}
         );
     </select>
 
     <select id="ifContinueUpdateInStation" resultType="boolean">
         SELECT EXISTS(
-            SELECT 1 FROM gnssdata
-            WHERE measure_time >= CURRENT_TIMESTAMP - #{updateInterval}
-              AND station_code = #{stationCode}
+            SELECT 1 FROM gnss_record
+            WHERE measure_time >= #{timeLimit}
+              AND station_id = #{stationCode}
         );
     </select>
 </mapper>

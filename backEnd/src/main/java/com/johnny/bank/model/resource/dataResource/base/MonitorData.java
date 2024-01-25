@@ -19,8 +19,9 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MonitorData {
-    private int stationCode;
-    private int deviceCode;
+    private String stationId;
+    private String deviceId;
+    private String deviceCode;
     private Timestamp measureTime;
-    private Timestamp updateTime;
+    private Timestamp inTime;
 }

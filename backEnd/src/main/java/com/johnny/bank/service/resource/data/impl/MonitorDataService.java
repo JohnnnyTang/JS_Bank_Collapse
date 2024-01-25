@@ -7,8 +7,6 @@ import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.base.IMonitorDataRepo;
 import com.johnny.bank.service.resource.data.base.IMonitorDataService;
 import com.johnny.bank.utils.TimeCalcUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -19,22 +17,20 @@ import java.util.List;
  * @Date: 2024/1/4
  * @Description:
  */
-@Service("MonitorDataService")
+//@Service("MonitorDataService")
 public abstract class MonitorDataService<T extends MonitorData> implements IMonitorDataService<T> {
 
     protected IMonitorDataRepo<T> monitorDataRepo;
     protected IDataNodeRepo dataNodeRepo;
 
-    @Autowired
-    public void setDataNodeRepo(IDataNodeRepo dataNodeRepo) {
-        this.dataNodeRepo = dataNodeRepo;
-    }
-    @Autowired
-    public void setMonitorDataRepo(IMonitorDataRepo<T> monitorDataRepo) {
+    public MonitorDataService(IDataNodeRepo dataNodeRepo, IMonitorDataRepo<T> monitorDataRepo) {
+        this.dataNodeRepo =dataNodeRepo;
         this.monitorDataRepo = monitorDataRepo;
     }
 
-    public abstract DataNode getDataNodeById(String nodeId);
+    public DataNode getDataNodeById(String nodeId) {
+        return dataNodeRepo.findById(nodeId).orElse(null);
+    }
     public abstract DataNode getDataNode();
     public abstract DataNode getDataNodeByBankAndName(String bank, String name);
 
@@ -181,14 +177,21 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public boolean checkContinueUpdateOfDevice(DataNode dataNode, Timestamp updateInterval, String deviceCode) {
-        return monitorDataRepo.ifContinueUpdateOfDevice(updateInterval, deviceCode);
+    public boolean checkContinueUpdateOfDevice(DataNode dataNode, int timeLimit, String deviceCode) {
+
+        return monitorDataRepo.ifContinueUpdateOfDevice(
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.SECOND, timeLimit),
+                deviceCode
+        );
     }
 
     @DynamicNodeData
     @Override
-    public boolean checkContinueUpdateInStation(DataNode dataNode, Timestamp updateInterval, String stationCode) {
-        return monitorDataRepo.ifContinueUpdateOfDevice(updateInterval, stationCode);
+    public boolean checkContinueUpdateInStation(DataNode dataNode, int timeLimit, String stationCode) {
+        return monitorDataRepo.ifContinueUpdateOfDevice(
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.SECOND, timeLimit),
+                stationCode
+        );
     }
 
 }

@@ -38,8 +38,8 @@ public interface IMonitorDataRepo<T> {
     int getTotalCountInStation(String stationCode);
 
     // 检查是否还在连续更新
-    boolean ifContinueUpdateOfDevice(Timestamp updateInterval, String deviceCode);
+    boolean ifContinueUpdateOfDevice(Timestamp timeLimit, String deviceCode);
 
-    boolean ifContinueUpdateInStation(Timestamp updateInterval, String stationCode);
+    boolean ifContinueUpdateInStation(Timestamp timeLimit, String stationCode);
 
 }

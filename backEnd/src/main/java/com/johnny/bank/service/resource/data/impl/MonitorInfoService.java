@@ -101,6 +101,8 @@ public class MonitorInfoService implements IMonitorInfoService {
     @Override
     @DynamicNodeData
     public List<MonitorInfo> getDeviceByType(DataNode dataNode, Character deviceType) {
-        return deviceInfoRepo.findDeviceByType(deviceType);
+        List<MonitorInfo> monitorInfoList = deviceInfoRepo.findDeviceByType(deviceType);
+        DataNodeSyncUtil.SyncDeviceNodeWhenBaseGroupDataChanged(monitorInfoList, dataNodeRepo, dataNode);
+        return monitorInfoList;
     }
 }

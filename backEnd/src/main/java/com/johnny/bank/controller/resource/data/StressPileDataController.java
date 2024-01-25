@@ -1,7 +1,7 @@
 package com.johnny.bank.controller.resource.data;
 
 import com.johnny.bank.controller.resource.data.base.BaseMonitorDataController;
-import com.johnny.bank.model.resource.dataResource.GnssData;
+import com.johnny.bank.model.resource.dataResource.StressPileData;
 import com.johnny.bank.service.resource.data.impl.MonitorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @Description:
  */
 @RestController
-@RequestMapping("api/v1/data/gnssData")
-public class GnssDataController extends BaseMonitorDataController<GnssData> {
-
+@RequestMapping("api/v1/data/stressData")
+public class StressPileDataController extends BaseMonitorDataController<StressPileData> {
     @Autowired
-    public GnssDataController(@Qualifier("GnssDataService") MonitorDataService<GnssData> MonitorDataService) {
+    public StressPileDataController(@Qualifier("StressPileDataService") MonitorDataService<StressPileData> MonitorDataService) {
         super(MonitorDataService);
     }
 }

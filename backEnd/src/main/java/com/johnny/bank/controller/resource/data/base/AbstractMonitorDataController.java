@@ -44,8 +44,8 @@ public abstract class AbstractMonitorDataController<T extends MonitorData> {
     public abstract ResponseEntity<Integer> getTotalCountOfDevice(String deviceCode);
 
     // 检查是否还在连续更新
-    public abstract ResponseEntity<Boolean> checkContinueUpdateOfDevice(Timestamp updateInterval, String deviceCode);
+    public abstract ResponseEntity<Boolean> checkContinueUpdateOfDevice(int timeLimit, String deviceCode);
 
-    public abstract ResponseEntity<Boolean> checkContinueUpdateInStation(Timestamp updateInterval, String stationCode);
+    public abstract ResponseEntity<Boolean> checkContinueUpdateInStation(int timeLimit, String stationCode);
 
 }

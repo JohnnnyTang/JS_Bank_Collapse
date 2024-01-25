@@ -48,7 +48,7 @@ public interface IMonitorDataService<T extends MonitorData> {
     int getTotalCountInStation(DataNode dataNode, String stationCode);
 
     // 检查是否还在连续更新
-    boolean checkContinueUpdateOfDevice(DataNode dataNode, Timestamp updateInterval, String deviceCode);
+    boolean checkContinueUpdateOfDevice(DataNode dataNode, int timeLimit, String deviceCode);
 
-    boolean checkContinueUpdateInStation(DataNode dataNode, Timestamp updateInterval, String stationCode);
+    boolean checkContinueUpdateInStation(DataNode dataNode, int timeLimit, String stationCode);
 }

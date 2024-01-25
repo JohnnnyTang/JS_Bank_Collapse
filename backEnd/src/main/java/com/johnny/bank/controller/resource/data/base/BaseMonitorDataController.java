@@ -1,16 +1,12 @@
 package com.johnny.bank.controller.resource.data.base;
 
 import com.johnny.bank.model.node.DataNode;
-import com.johnny.bank.model.resource.dataResource.MonitorInfo;
 import com.johnny.bank.model.resource.dataResource.base.MonitorData;
 import com.johnny.bank.service.resource.data.impl.MonitorDataService;
-import com.johnny.bank.service.resource.data.impl.MonitorInfoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -20,17 +16,17 @@ import java.util.List;
  * @Date: 2024/1/4
  * @Description:
  */
-@RestController
+//@RestController
 public class BaseMonitorDataController<T extends MonitorData> extends AbstractMonitorDataController<T> {
 
     private final MonitorDataService<T> monitorDataService;
-    private final MonitorInfoService monitorInfoService;
+//    private final MonitorInfoService monitorInfoService;
     private final DataNode dataNode;
 
-    @Autowired
-    public BaseMonitorDataController(MonitorDataService<T> MonitorDataService, MonitorInfoService monitorInfoService) {
+
+    public BaseMonitorDataController(MonitorDataService<T> MonitorDataService) {
         this.monitorDataService = MonitorDataService;
-        this.monitorInfoService = monitorInfoService;
+//        this.monitorInfoService = monitorInfoService;
         this.dataNode = monitorDataService.getDataNode();
     }
 
@@ -160,22 +156,22 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
     }
 
     @Override
-    @GetMapping("/checkDevice/{updateInterval}/{deviceCode}")
-    public ResponseEntity<Boolean> checkContinueUpdateOfDevice(@PathVariable Timestamp updateInterval, @PathVariable String deviceCode) {
-        return ResponseEntity.ok(monitorDataService.checkContinueUpdateOfDevice(dataNode, updateInterval, deviceCode));
+    @GetMapping("/checkDevice/{timeLimit}/{deviceCode}")
+    public ResponseEntity<Boolean> checkContinueUpdateOfDevice(@PathVariable int timeLimit, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.checkContinueUpdateOfDevice(dataNode, timeLimit, deviceCode));
     }
 
     @Override
-    @GetMapping("/checkDevice/{updateInterval}/{stationCode}")
-    public ResponseEntity<Boolean> checkContinueUpdateInStation(@PathVariable Timestamp updateInterval, @PathVariable String stationCode) {
-        return ResponseEntity.ok(monitorDataService.checkContinueUpdateInStation(dataNode, updateInterval, stationCode));
+    @GetMapping("/checkStation/{timeLimit}/{stationCode}")
+    public ResponseEntity<Boolean> checkContinueUpdateInStation(@PathVariable int timeLimit, @PathVariable String stationCode) {
+        return ResponseEntity.ok(monitorDataService.checkContinueUpdateInStation(dataNode, timeLimit, stationCode));
     }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<List<T>> getDataByMonitorId(@PathVariable String id) {
-        MonitorInfo monitorInfo = monitorInfoService.getDataById(monitorInfoService.getDataNode(), id);
-        if(monitorInfo == null) return null;
-        return ResponseEntity.ok(monitorDataService.getByDeviceCode(dataNode, monitorInfo.getCode()));
+//        MonitorInfo monitorInfo = monitorInfoService.getDataById(monitorInfoService.getDataNode(), id);
+//        if(monitorInfo == null) return null;
+        return ResponseEntity.ok(monitorDataService.getByDeviceCode(dataNode, id));
     }
 
 }

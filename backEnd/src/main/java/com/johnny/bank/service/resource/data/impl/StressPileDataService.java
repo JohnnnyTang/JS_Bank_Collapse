@@ -1,7 +1,7 @@
 package com.johnny.bank.service.resource.data.impl;
 
 import com.johnny.bank.model.node.DataNode;
-import com.johnny.bank.model.resource.dataResource.GnssData;
+import com.johnny.bank.model.resource.dataResource.StressPileData;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.base.IMonitorDataRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,22 +13,21 @@ import org.springframework.stereotype.Service;
  * @Date: 2024/1/3
  * @Description:
  */
-@Service("GnssDataService")
-public class GnssDataService extends MonitorDataService<GnssData> {
-
+@Service("StressPileDataService")
+public class StressPileDataService extends MonitorDataService<StressPileData> {
     @Autowired
-    public GnssDataService(IDataNodeRepo dataNodeRepo, @Qualifier("GnssDataRepo") IMonitorDataRepo<GnssData> monitorDataRepo) {
+    public StressPileDataService(IDataNodeRepo dataNodeRepo, @Qualifier("StressPileDataRepo") IMonitorDataRepo<StressPileData> monitorDataRepo) {
         super(dataNodeRepo, monitorDataRepo);
     }
 
     @Override
     public DataNode getDataNode() {
-        return dataNodeRepo.getNodeByCategoryAndName("GnssDataGroup", "gnssDataGroupOfTestBank");
+        return dataNodeRepo.getNodeByCategoryAndName("StressDataGroup", "stressDataGroupOfTestBank");
     }
 
     @Override
     public DataNode getDataNodeByBankAndName(String bank, String name) {
-        return dataNodeRepo.getNodeByCategoryAndNameAndBank("GnssDataItem", name, bank);
+        return dataNodeRepo.getNodeByCategoryAndNameAndBank("StressDataItem", name, bank);
     }
 
 }

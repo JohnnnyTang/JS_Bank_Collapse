@@ -6,6 +6,7 @@ import com.johnny.bank.model.resource.dataResource.base.DetailMonitorInfo;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.base.IDetailMonitorInfoRepo;
 import com.johnny.bank.service.resource.data.base.IDetailMonitorInfoService;
+import com.johnny.bank.utils.DataNodeSyncUtil;
 
 import java.util.List;
 
@@ -48,7 +49,9 @@ public class DetailMonitorInfoService<T extends IDetailMonitorInfoRepo> implemen
     @Override
     @DynamicNodeData
     public List<DetailMonitorInfo> getAllData(DataNode dataNode) {
-        return detailMonitorRepo.findAll();
+        List<DetailMonitorInfo> detailMonitorInfos = detailMonitorRepo.findAll();
+        DataNodeSyncUtil.SyncDeviceNodeWhenSpecificGroupDataChanged(detailMonitorInfos, dataNodeRepo, dataNode);
+        return detailMonitorInfos;
     }
 
     @Override

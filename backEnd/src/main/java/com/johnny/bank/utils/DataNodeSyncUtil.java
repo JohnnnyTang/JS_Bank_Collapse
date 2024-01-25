@@ -2,6 +2,7 @@ package com.johnny.bank.utils;
 
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.MonitorInfo;
+import com.johnny.bank.model.resource.dataResource.base.DetailMonitorInfo;
 import com.johnny.bank.model.resource.dataResource.base.StaticInfoData;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 
@@ -122,28 +123,28 @@ public class DataNodeSyncUtil {
     }
 
     public static void SyncDeviceNodeWhenSpecificGroupDataChanged(
-            List<MonitorInfo> monitorInfoList, IDataNodeRepo dataNodeRepo,
+            List<DetailMonitorInfo> monitorInfoList, IDataNodeRepo dataNodeRepo,
             DataNode parentNode) {
         List<String> linkCodeList = new ArrayList<>();
 //        DataNode parentNode = dataNodeRepo.getNodeByCategoryAndName("DeviceInfoGroup", "deviceInfo");
         List<DataNode> linkedParentNodeList = dataNodeRepo.getNodeByLinkCode(parentNode.getLinkCode());
 
         // instance missing data node as to data item
-        for(MonitorInfo aData: monitorInfoList) {
+        for(DetailMonitorInfo aData: monitorInfoList) {
             String linkCodeOfDevice = aData.getCode();
             linkCodeList.add(linkCodeOfDevice);
             List<DataNode> linkedNodeList = dataNodeRepo.getNodeByLinkCode(linkCodeOfDevice);
             // add node process
             if(linkedNodeList.isEmpty()) {
-                String deviceType = deviceTypeList.get((Character.getNumericValue(aData.getType())-1));
+//                String deviceType = deviceTypeList.get((Character.getNumericValue(aData.getType())-1));
                 for(DataNode aParentNode: linkedParentNodeList) {
                     String newNodeCategory = aParentNode.getCategory()
-                            .replace("Group", "Item")
-                            .replace("Monitor", deviceType);
-                    String newNodeParentName = aParentNode.getName().replace("monitor", deviceType.toLowerCase());
-                    String newNodePath = aParentNode.getPath()+aParentNode.getName()+','+newNodeParentName+',';
+                            .replace("Group", "Item");
+//                            .replace("Monitor", deviceType);
+//                    String newNodeParentName = aParentNode.getName().replace("monitor", deviceType.toLowerCase());
+                    String newNodePath = aParentNode.getPath()+','+aParentNode.getName()+',';
                     DataNode newNode = dataNodeRepo.save(
-                            DataNode.dataNodeBuilder().name(aData.getName()).linkCode(linkCodeOfDevice)
+                            DataNode.dataNodeBuilder().name(aData.getMachineId()).linkCode(linkCodeOfDevice)
                                     .usage(aParentNode.getUsage()).auth("all").apiPrefix(aParentNode.getApiPrefix())
                                     .category(newNodeCategory).bank(aParentNode.getBank())
                                     .path(newNodePath)
@@ -153,10 +154,10 @@ public class DataNodeSyncUtil {
                 }
             }
         }
-        List<DataNode> groupNode = dataNodeRepo.getNodeChildByPath("," + parentNode.getName() + ",$");
+//        List<DataNode> groupNode = dataNodeRepo.getNodeChildByPath("," + parentNode.getName() + ",$");
         List<DataNode> childList = new ArrayList<>();
-        for(DataNode aGroupNode: groupNode) {
-            childList.addAll(dataNodeRepo.getNodeChildByPath("," + aGroupNode.getName() + ",$"));
+        for(DataNode aLinkedParentNode: linkedParentNodeList) {
+            childList.addAll(dataNodeRepo.getNodeChildByPath("," + aLinkedParentNode.getName() + ",$"));
         }
         // delete redundant data nodes connected by linkCode
         for(DataNode childNode: childList) {

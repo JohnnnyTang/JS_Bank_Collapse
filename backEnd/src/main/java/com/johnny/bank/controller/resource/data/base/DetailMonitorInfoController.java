@@ -27,7 +27,7 @@ public class DetailMonitorInfoController<T extends DetailMonitorInfoService<?>> 
     public DetailMonitorInfoController(T detailMonitorInfoService) {
         this.detailMonitorInfoService = detailMonitorInfoService;
         this.dataNode = detailMonitorInfoService.getDataNode();
-        log.info(this.dataNode.toString());
+//        log.info(this.dataNode.toString());
     }
 
     @GetMapping

@@ -160,7 +160,7 @@ const nodeDataList = ref([{}])
 let treeChartCore = null;
 
 let sampleData = ref({
-    name: 'Data Node',
+    name: 'Data Resource',
     "node": {
         "apiPrefix": "",
         "auth": "all",
@@ -491,16 +491,19 @@ div.container {
                 }
             }
 
+
+
             &.node-group {
                 background-color: rgb(180, 218, 252);
             }
 
             &.node-item {
                 background-color: rgb(227, 238, 255);
-
+                width: 100px;
                 div.node-title-text {
                     font-weight: 600;
                     font-size: 14px;
+                    height: fit-content;
                     color: rgb(38, 96, 172);
                 }
             }
