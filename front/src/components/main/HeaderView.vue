@@ -26,9 +26,9 @@
 
 <script setup>
 // import router from '../../router/index';
-import { ref } from 'vue'
-const emit = defineEmits(['navClick'])
-
+import { ref, onMounted } from 'vue'
+// const emit = defineEmits(['navClick'])
+import router from '../../router/index';
 
 const navList = ref([
     { name: '崩岸预警监测', routerLink: '/', isActive: true },
@@ -40,7 +40,8 @@ const navList = ref([
 let previousActive = navList.value[0];
 
 const emitNavClick = (navItem) => {
-    emit('navClick', navItem.routerLink);
+    // emit('navClick', navItem.routerLink);
+    router.push(navItem.routerLink);
     if (previousActive.name != navItem.name) {
         for (let navItem of navList.value) {
             if (navItem.isActive) {
@@ -50,8 +51,19 @@ const emitNavClick = (navItem) => {
         navItem.isActive = true;
         previousActive = navItem;
     }
-
 }
+
+onMounted(() => {
+    console.log(router.currentRoute.value);
+    for(let navItem of navList.value) {
+        if(navItem.routerLink != router.currentRoute.value.path && navItem.isActive) {
+            navItem.isActive = false;
+        }
+        else if(navItem.routerLink == router.currentRoute.value.path) {
+            navItem.isActive = true;
+        }
+    }
+})
 
 
 

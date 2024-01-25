@@ -1,6 +1,6 @@
 <template>
   <!-- <WsTest /> -->
-  <HeaderView @nav-click="changeNav"/>
+  <HeaderView/>
   <RouterView />
   <!-- <TreeTypesView /> -->
 </template>
@@ -8,11 +8,8 @@
 <script setup>
 import HeaderView from './components/main/HeaderView.vue';
 // import WsTest from './views/WsTest.vue';
-import router from './router/index';
+// import router from './router/index';
 
-const changeNav = (navLink) => {
-  router.push(navLink);
-}
 
 </script>
 
