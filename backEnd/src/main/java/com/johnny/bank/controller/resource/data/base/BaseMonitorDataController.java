@@ -151,6 +151,7 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
     }
 
     @Override
+    @GetMapping("/count/device/{deviceCode}")
     public ResponseEntity<Integer> getTotalCountOfDevice(@PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getTotalCountOfDevice(dataNode, deviceCode));
     }
@@ -159,6 +160,12 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
     @GetMapping("/checkDevice/{timeLimit}/{deviceCode}")
     public ResponseEntity<Boolean> checkContinueUpdateOfDevice(@PathVariable int timeLimit, @PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.checkContinueUpdateOfDevice(dataNode, timeLimit, deviceCode));
+    }
+
+    @Override
+    @GetMapping("/checkDevice/minute/{timeInMinute}/{deviceCode}")
+    public ResponseEntity<Boolean> checkContinueUpdateOfDeviceWithMinute(@PathVariable int timeInMinute, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.checkContinueUpdateOfDeviceWithMinute(dataNode, timeInMinute, deviceCode));
     }
 
     @Override

@@ -169,9 +169,9 @@ div.main-header-container {
                     color: #ace3eb;
 
                     text-shadow:
-                        1px -1px 0 #707a81,
-                        -1px 2px 1px rgb(92, 100, 105),
-                        -2px 4px 1px rgb(65, 75, 85);
+                        1px -1px 0 #707a81c9,
+                        -1px 2px 1px rgba(92, 100, 105, 0.732),
+                        -2px 4px 1px rgba(65, 75, 85, 0.489);
                         // -3px 6px 1px #787777,
                         // -4px 8px 1px #7b7a7a,
                     font-weight: 600;
@@ -184,9 +184,9 @@ div.main-header-container {
                     color: #b1f6ff;
 
                     text-shadow:
-                        1px -1px 0 #707a81,
-                        -1px 2px 1px rgb(92, 100, 105),
-                        -2px 4px 1px rgb(39, 45, 51);
+                        1px -1px 0 rgba(87, 96, 102, 0.8),
+                        -1px 2px 1px rgb(92, 100, 105,0.6),
+                        -2px 4px 1px rgb(39, 45, 51,0.3);
                         // -3px 6px 1px #787777,
                         // -4px 8px 1px #7b7a7a,
                     font-weight: 600;
