@@ -6,10 +6,14 @@
 </template>
 
 <script setup>
+import {onMounted} from 'vue';
 import HeaderView from './components/main/HeaderView.vue';
 // import WsTest from './views/WsTest.vue';
-// import router from './router/index';
+import router from './router/index';
 
+onMounted(() => {
+  console.log('app', router.currentRoute.value)
+})
 
 </script>
 

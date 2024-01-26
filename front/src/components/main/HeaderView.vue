@@ -26,7 +26,7 @@
 
 <script setup>
 // import router from '../../router/index';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 // const emit = defineEmits(['navClick'])
 import router from '../../router/index';
 
@@ -37,32 +37,33 @@ const navList = ref([
     { name: '崩岸资源管理', routerLink: '/tree', isActive: false },
 ])
 
-let previousActive = navList.value[0];
+let previousActive = 0;
 
 const emitNavClick = (navItem) => {
     // emit('navClick', navItem.routerLink);
+    console.log('click', router.currentRoute.value);
     router.push(navItem.routerLink);
-    if (previousActive.name != navItem.name) {
+    if (navList.value[previousActive].name != navItem.name) {
         for (let navItem of navList.value) {
             if (navItem.isActive) {
                 navItem.isActive = false;
             }
         }
         navItem.isActive = true;
-        previousActive = navItem;
+        previousActive = navList.value.indexOf(navItem);
     }
 }
 
-onMounted(() => {
-    console.log(router.currentRoute.value);
-    for(let navItem of navList.value) {
-        if(navItem.routerLink != router.currentRoute.value.path && navItem.isActive) {
-            navItem.isActive = false;
-        }
-        else if(navItem.routerLink == router.currentRoute.value.path) {
-            navItem.isActive = true;
-        }
+watchEffect(() => {
+  router.getRoutes().map((item, index) => {
+    if(item.path === router.currentRoute.value.path){
+        // console.log(item, index);
+        navList.value[previousActive].isActive = false;
+        navList.value[index].isActive = true;
+        previousActive = index;
+    //   navActive.value = index
     }
+  })
 })
 
 
@@ -168,9 +169,9 @@ div.main-header-container {
                     color: #ace3eb;
 
                     text-shadow:
-                        1px -1px 0 #707a81,
-                        -1px 2px 1px rgb(92, 100, 105),
-                        -2px 4px 1px rgb(65, 75, 85);
+                        1px -1px 0 #707a81c9,
+                        -1px 2px 1px rgba(92, 100, 105, 0.732),
+                        -2px 4px 1px rgba(65, 75, 85, 0.489);
                         // -3px 6px 1px #787777,
                         // -4px 8px 1px #7b7a7a,
                     font-weight: 600;
@@ -183,9 +184,9 @@ div.main-header-container {
                     color: #b1f6ff;
 
                     text-shadow:
-                        1px -1px 0 #707a81,
-                        -1px 2px 1px rgb(92, 100, 105),
-                        -2px 4px 1px rgb(39, 45, 51);
+                        1px -1px 0 rgba(87, 96, 102, 0.8),
+                        -1px 2px 1px rgb(92, 100, 105,0.6),
+                        -2px 4px 1px rgb(39, 45, 51,0.3);
                         // -3px 6px 1px #787777,
                         // -4px 8px 1px #7b7a7a,
                     font-weight: 600;
