@@ -1,5 +1,6 @@
 import datetime
 import json
+import uuid
 
 import pymongo
 
@@ -39,6 +40,7 @@ def createHistoryInfo(
 
     for historyInfo in historyInfoArray:
         doc = {}
+        doc["uuid"] = str(uuid.uuid4())
         for key, value in filedSet.items():
             doc[value] = historyInfo.get(key)
 

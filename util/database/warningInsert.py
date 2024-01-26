@@ -1,5 +1,6 @@
 import datetime
 import json
+import uuid
 
 import pymongo
 import xlrd
@@ -7,7 +8,9 @@ from bson import ObjectId
 
 
 def resolveTXT(path: str):
-    client = pymongo.MongoClient("mongodb://bankAdmin:20000601@192.168.1.6:27017/bank")
+    client = pymongo.MongoClient(
+        "mongodb://bankAdmin:20000601@192.168.1.6:27017/bank"
+    )
     db = client["bank"]
     collection = db["yujing"]
     idSet = set()
@@ -114,7 +117,9 @@ def createYuJing(
     dataArray: list[dict],
     coordDict: dict[str, list[tuple[float, float]]],
 ):
-    client = pymongo.MongoClient("mongodb://bankAdmin:20000601@192.168.1.6:27017/bank")
+    client = pymongo.MongoClient(
+        "mongodb://bankAdmin:20000601@192.168.1.6:27017/bank"
+    )
     db = client["bank"]
     collection = db[name]
     collection.delete_many({})
@@ -123,6 +128,7 @@ def createYuJing(
         localized_time = datetime.datetime.now()
 
         doc = {
+            "uuid": str(uuid.uuid4()),
             "cityName": data["cityName"],
             "riverName": data["riverName"],
             "number": data["number"],
