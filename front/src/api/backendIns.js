@@ -16,10 +16,10 @@ export default class BackEndRequest {
         let url = '/data/';
         let apiInfo = CommonUtils.getApiInfoFromCategory(dataNode.category);
         // console.log(apiInfo);
-        url += (apiInfo[1].toLowerCase()+apiInfo[2]);
+        url += (apiInfo[1].toLowerCase() + apiInfo[2]);
         console.log(url)
 
-        if(apiInfo[apiInfo.length-1] != 'Item') {
+        if (apiInfo[apiInfo.length - 1] != 'Item') {
             return backendInstance.get(url);
         }
         else {
@@ -27,10 +27,76 @@ export default class BackEndRequest {
         }
     }
 
-    static updateNodeInfo(nodeInfo) {
-        
+    static getChannelData() {
+        return backendInstance.get("/data/channel")
     }
+
+    static getbankLineData() {
+        return backendInstance.get("/data/bankLine")
+    }
+
+    static getMonitorInfo() {
+        return backendInstance.get("/data/monitorInfo")
+    }
+
+    static getHistoryInfo() {
+        return backendInstance.get("/data/historyInfo")
+    }
+
+    static getMonitorDetailByType_Code(code, type) {
+        //data
+        switch (type) {
+            case '1': {
+                return backendInstance.get(`/data/gnssData/id/${code}`)
+            }
+            case '2': {
+                return backendInstance.get(`/data/inclinometerData/id/${code}`)
+
+            }
+            case '3': {
+                return backendInstance.get(`/data/manometerData/id/${code}`)
+
+            }
+            case '4': {
+                return backendInstance.get(`/data/stressData/id/${code}`)
+            }
+        }
+    }
+
+    // /data/inclinometerInfo/id/{id}
+    // /data/manometerInfo/id/{id}
+    // /data/stressInfo/id/{id}
+
+    static getInclinometerInfoByDeviceID(deviceID){
+        return backendInstance.get(`/data/inclinometerInfo/id/${deviceID}`)
+    }
+    static getManometerInfoByDeviceID(deviceID){
+        return backendInstance.get(`/data/manometerInfo/id/${deviceID}`)
+    }
+    static getStressInfoByDeviceID(deviceID){
+        return backendInstance.get(`/data/stressInfo/id/${deviceID}`)
+    }
+    
+    static getMonitorInfoByType_Code(code,type){
+        //desc
+        switch (type) {
+            case '1': {
+                return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+            }
+            case '2': {
+                return backendInstance.get(`/data/inclinometerInfo/id/${code}`)
+            }
+            case '3': {
+                return backendInstance.get(`/data/manometerInfo/id/${code}`)
+            }
+            case '4': {
+                return backendInstance.get(`/data/stressInfo/id/${code}`)
+            }
+        }
+    }
+
 }
+
 
 // export default {
 //     getDataNodeTree() {
