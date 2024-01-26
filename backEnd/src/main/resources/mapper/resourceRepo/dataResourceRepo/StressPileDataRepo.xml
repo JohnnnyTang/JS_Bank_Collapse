@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IStressPileDataRepo">
+    <resultMap id="stressPileDataMap" type="com.johnny.bank.model.resource.dataResource.StressPileData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="horizontal1" column="horizontal1"/>
+        <result property="horizontal2" column="horizontal2"/>
+        <result property="horizontal3" column="horizontal3"/>
+        <result property="horizontal4" column="horizontal4"/>
+        <result property="horizontal5" column="horizontal5"/>
+        <result property="horizontal6" column="horizontal6"/>
+        <result property="horizontal_stress1" column="horizontal_stress1"/>
+        <result property="horizontal_stress2" column="horizontal_stress2"/>
+        <result property="horizontal_stress3" column="horizontal_stress3"/>
+        <result property="horizontal_stress4" column="horizontal_stress4"/>
+        <result property="horizontal_stress5" column="horizontal_stress5"/>
+        <result property="horizontal_stress6" column="horizontal_stress6"/>
+        <result property="vertical_stress1" column="vertical_stress1"/>
+        <result property="vertical_stress2" column="vertical_stress2"/>
+        <result property="vertical_stress3" column="vertical_stress3"/>
+        <result property="vertical_stress4" column="vertical_stress4"/>
+        <result property="vertical_stress5" column="vertical_stress5"/>
+        <result property="vertical_stress6" column="vertical_stress6"/>
+    </resultMap>
+    <select id="findAll" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM stresspile_record;
+    </select>
+
+    <select id="getTotalCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM stresspile_record WHERE machine_id_nnu = #{deviceCode};
+    </select>
+
+    <select id="getTotalCountInStation" resultType="integer">
+        SELECT COUNT(*) FROM stresspile_record WHERE station_id = #{stationCode};
+    </select>
+
+    <select id="findByStationCode" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record WHERE station_id = #{stationCode};
+    </select>
+
+    <select id="findByDeviceCode" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode};
+    </select>
+
+<!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
+<!--        SELECT * FROM device WHERE station_code IN #{stationCodeList};-->
+<!--    </select>-->
+
+    <select id="findNewestData" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataInStation" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataOfDevice" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findDataByTime" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="findDataByTimeOfDevice" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="findDataByTimeInStation" resultMap="stressPileDataMap">
+        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="ifContinueUpdateOfDevice" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM stresspile_record
+            WHERE measure_time >= #{timeLimit}
+            AND machine_id_nnu = #{deviceCode}
+        );
+    </select>
+
+    <select id="ifContinueUpdateInStation" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM stresspile_record
+            WHERE measure_time >= #{timeLimit}
+              AND station_id = #{stationCode}
+        );
+    </select>
+</mapper>

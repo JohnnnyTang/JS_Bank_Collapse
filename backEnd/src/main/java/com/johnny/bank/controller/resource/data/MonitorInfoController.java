@@ -53,13 +53,13 @@ public class MonitorInfoController extends BaseStaticInfoController<MonitorInfo>
 
     @Override
     @GetMapping("/code/{code}")
-    public ResponseEntity<MonitorInfo> findByCode(@PathVariable int code) {
+    public ResponseEntity<MonitorInfo> findByCode(@PathVariable String code) {
         return ResponseEntity.ok(deviceInfoService.getDataByCode(dataNode, code));
     }
 
     @Override
     @GetMapping("/codes")
-    public ResponseEntity<List<MonitorInfo>> findByCodeList(@RequestParam List<Integer> codeList) {
+    public ResponseEntity<List<MonitorInfo>> findByCodeList(@RequestParam List<String> codeList) {
         return null;
     }
 
@@ -70,17 +70,17 @@ public class MonitorInfoController extends BaseStaticInfoController<MonitorInfo>
     }
 
     @GetMapping("/station/{stationCode}")
-    public ResponseEntity<List<MonitorInfo>> findDataByStationCode(@PathVariable int stationCode) {
+    public ResponseEntity<List<MonitorInfo>> findDataByStationCode(@PathVariable String stationCode) {
         return ResponseEntity.ok(deviceInfoService.getDataByStationCode(dataNode, stationCode));
     }
 
     @GetMapping("/stations")
-    public ResponseEntity<List<MonitorInfo>> findDataByStationCodeList(@RequestParam List<Integer> stationCodeList) {
+    public ResponseEntity<List<MonitorInfo>> findDataByStationCodeList(@RequestParam List<String> stationCodeList) {
         return ResponseEntity.ok(deviceInfoService.getDataByStationCodeList(dataNode, stationCodeList));
     }
 
     @GetMapping("/newest/station/{stationCode}")
-    public ResponseEntity<MonitorInfo> findNewestInStation(@PathVariable int stationCode) {
+    public ResponseEntity<MonitorInfo> findNewestInStation(@PathVariable String stationCode) {
         return ResponseEntity.ok(deviceInfoService.getNewestDeviceInStation(dataNode, stationCode));
     }
 }

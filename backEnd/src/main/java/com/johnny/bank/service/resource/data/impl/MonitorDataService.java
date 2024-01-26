@@ -7,8 +7,6 @@ import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.base.IMonitorDataRepo;
 import com.johnny.bank.service.resource.data.base.IMonitorDataService;
 import com.johnny.bank.utils.TimeCalcUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -19,22 +17,20 @@ import java.util.List;
  * @Date: 2024/1/4
  * @Description:
  */
-@Service("MonitorDataService")
+//@Service("MonitorDataService")
 public abstract class MonitorDataService<T extends MonitorData> implements IMonitorDataService<T> {
 
     protected IMonitorDataRepo<T> monitorDataRepo;
     protected IDataNodeRepo dataNodeRepo;
 
-    @Autowired
-    public void setDataNodeRepo(IDataNodeRepo dataNodeRepo) {
-        this.dataNodeRepo = dataNodeRepo;
-    }
-    @Autowired
-    public void setMonitorDataRepo(IMonitorDataRepo<T> monitorDataRepo) {
+    public MonitorDataService(IDataNodeRepo dataNodeRepo, IMonitorDataRepo<T> monitorDataRepo) {
+        this.dataNodeRepo =dataNodeRepo;
         this.monitorDataRepo = monitorDataRepo;
     }
 
-    public abstract DataNode getDataNodeById(String nodeId);
+    public DataNode getDataNodeById(String nodeId) {
+        return dataNodeRepo.findById(nodeId).orElse(null);
+    }
     public abstract DataNode getDataNode();
     public abstract DataNode getDataNodeByBankAndName(String bank, String name);
 
@@ -67,13 +63,13 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByTimeOfDevice(DataNode dataNode, Timestamp begTime, Timestamp endTime, int deviceCode) {
+    public List<T> getDataByTimeOfDevice(DataNode dataNode, Timestamp begTime, Timestamp endTime, String deviceCode) {
         return monitorDataRepo.findDataByTimeOfDevice(begTime, endTime, deviceCode);
     }
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByMinOfDevice(DataNode dataNode, int minutes, int deviceCode) {
+    public List<T> getDataByMinOfDevice(DataNode dataNode, int minutes, String deviceCode) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return monitorDataRepo.findDataByTimeOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutes), current, deviceCode);
@@ -81,7 +77,7 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByHourOfDevice(DataNode dataNode, int hours, int deviceCode) {
+    public List<T> getDataByHourOfDevice(DataNode dataNode, int hours, String deviceCode) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return monitorDataRepo.findDataByTimeOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.HOUR, hours), current, deviceCode);
@@ -89,7 +85,7 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByDayOfDevice(DataNode dataNode, int days, int deviceCode) {
+    public List<T> getDataByDayOfDevice(DataNode dataNode, int days, String deviceCode) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return monitorDataRepo.findDataByTimeOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.DATE, days), current, deviceCode);
@@ -97,13 +93,13 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByTimeInStation(DataNode dataNode, Timestamp begTime, Timestamp endTime, int stationCode) {
+    public List<T> getDataByTimeInStation(DataNode dataNode, Timestamp begTime, Timestamp endTime, String stationCode) {
         return monitorDataRepo.findDataByTimeInStation(begTime, endTime, stationCode);
     }
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByMinInStation(DataNode dataNode, int minutes, int stationCode) {
+    public List<T> getDataByMinInStation(DataNode dataNode, int minutes, String stationCode) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return monitorDataRepo.findDataByTimeOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutes), current, stationCode);
@@ -111,7 +107,7 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByHourInStation(DataNode dataNode, int hours, int stationCode) {
+    public List<T> getDataByHourInStation(DataNode dataNode, int hours, String stationCode) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return monitorDataRepo.findDataByTimeOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.HOUR, hours), current, stationCode);
@@ -119,7 +115,7 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public List<T> getDataByDayInStation(DataNode dataNode, int days, int stationCode) {
+    public List<T> getDataByDayInStation(DataNode dataNode, int days, String stationCode) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return monitorDataRepo.findDataByTimeOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.DATE, days), current, stationCode);
@@ -133,13 +129,13 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public List<T> getByStationCode(DataNode dataNode, int stationCode) {
+    public List<T> getByStationCode(DataNode dataNode, String stationCode) {
         return monitorDataRepo.findByStationCode(stationCode);
     }
 
     @DynamicNodeData
     @Override
-    public List<T> getByDeviceCode(DataNode dataNode, int deviceCode) {
+    public List<T> getByDeviceCode(DataNode dataNode, String deviceCode) {
         return monitorDataRepo.findByDeviceCode(deviceCode);
     }
 
@@ -151,13 +147,13 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
-    public T getNewestDataInStation(DataNode dataNode, int stationCode) {
+    public T getNewestDataInStation(DataNode dataNode, String stationCode) {
         return monitorDataRepo.findNewestDataInStation(stationCode);
     }
 
     @DynamicNodeData
     @Override
-    public T getNewestDataOfDevice(DataNode dataNode, int deviceCode) {
+    public T getNewestDataOfDevice(DataNode dataNode, String deviceCode) {
         return monitorDataRepo.findNewestDataOfDevice(deviceCode);
     }
 
@@ -169,26 +165,33 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @Override
     @DynamicNodeData
-    public int getTotalCountOfDevice(DataNode dataNode, int deviceCode) {
+    public int getTotalCountOfDevice(DataNode dataNode, String deviceCode) {
         return monitorDataRepo.getTotalCountOfDevice(deviceCode);
     }
 
     @Override
     @DynamicNodeData
-    public int getTotalCountInStation(DataNode dataNode, int stationCode) {
+    public int getTotalCountInStation(DataNode dataNode, String stationCode) {
         return monitorDataRepo.getTotalCountInStation(stationCode);
     }
 
     @DynamicNodeData
     @Override
-    public boolean checkContinueUpdateOfDevice(DataNode dataNode, Timestamp updateInterval, int deviceCode) {
-        return monitorDataRepo.ifContinueUpdateOfDevice(updateInterval, deviceCode);
+    public boolean checkContinueUpdateOfDevice(DataNode dataNode, int timeLimit, String deviceCode) {
+
+        return monitorDataRepo.ifContinueUpdateOfDevice(
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.SECOND, timeLimit),
+                deviceCode
+        );
     }
 
     @DynamicNodeData
     @Override
-    public boolean checkContinueUpdateInStation(DataNode dataNode, Timestamp updateInterval, int stationCode) {
-        return monitorDataRepo.ifContinueUpdateOfDevice(updateInterval, stationCode);
+    public boolean checkContinueUpdateInStation(DataNode dataNode, int timeLimit, String stationCode) {
+        return monitorDataRepo.ifContinueUpdateOfDevice(
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.SECOND, timeLimit),
+                stationCode
+        );
     }
 
 }

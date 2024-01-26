@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IManometerDataRepo">
+    <resultMap id="manometerDataMap" type="com.johnny.bank.model.resource.dataResource.ManometerData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="pressure1" column="pressure1"/>
+        <result property="pressure2" column="pressure1"/>
+        <result property="pressure3" column="pressure2"/>
+        <result property="pressure4" column="pressure2"/>
+        <result property="pressure5" column="pressure3"/>
+        <result property="pressure6" column="pressure3"/>
+    </resultMap>
+    <select id="findAll" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM manometer_record;
+    </select>
+
+    <select id="getTotalCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM manometer_record WHERE machine_id_nnu = #{deviceCode};
+    </select>
+
+    <select id="getTotalCountInStation" resultType="integer">
+        SELECT COUNT(*) FROM manometer_record WHERE station_id = #{stationCode};
+    </select>
+
+    <select id="findByStationCode" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record WHERE station_id = #{stationCode};
+    </select>
+
+    <select id="findByDeviceCode" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record WHERE machine_id_nnu = #{deviceCode};
+    </select>
+
+<!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
+<!--        SELECT * FROM device WHERE station_code IN #{stationCodeList};-->
+<!--    </select>-->
+
+    <select id="findNewestData" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataInStation" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataOfDevice" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findDataByTime" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="findDataByTimeOfDevice" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="findDataByTimeInStation" resultMap="manometerDataMap">
+        SELECT * FROM manometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time DESC;
+    </select>
+
+    <select id="ifContinueUpdateOfDevice" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM manometer_record
+            WHERE measure_time >= #{timeLimit}
+            AND machine_id_nnu = #{deviceCode}
+        );
+    </select>
+
+    <select id="ifContinueUpdateInStation" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM manometer_record
+            WHERE measure_time >= #{timeLimit}
+              AND station_id = #{stationCode}
+        );
+    </select>
+</mapper>

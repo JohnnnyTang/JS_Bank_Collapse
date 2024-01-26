@@ -20,9 +20,9 @@ public abstract class AbstractStaticDataController<T> {
 
     public abstract ResponseEntity<Integer> getRowNumber();
 
-    public abstract ResponseEntity<T> findByCode(@PathVariable("code") int code);
+    public abstract ResponseEntity<T> findByCode(@PathVariable("code") String code);
 
-    public abstract ResponseEntity<List<T>> findByCodeList(@RequestParam("codeList") List<Integer> codeList);
+    public abstract ResponseEntity<List<T>> findByCodeList(@RequestParam("codeList") List<String> codeList);
 
     public abstract ResponseEntity<T> findNewestData();
 }

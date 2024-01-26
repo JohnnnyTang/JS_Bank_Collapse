@@ -1,5 +1,6 @@
 package com.johnny.bank.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -8,12 +9,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @Date: 2024/1/9
  * @Description:
  */
-//@Configuration
+@Configuration
 public class WebCorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")
+                .allowedOriginPatterns("192.168.1.*")
                 .allowedMethods("PUT", "DELETE", "GET", "POST", "OPTIONS")
                 .allowedHeaders("*")
                 .exposedHeaders("access-control-allow-headers",

@@ -2,6 +2,10 @@ package com.johnny.bank.service.resource.data.impl;
 
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.GnssData;
+import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
+import com.johnny.bank.repository.resourceRepo.dataResourceRepo.base.IMonitorDataRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,8 +15,10 @@ import org.springframework.stereotype.Service;
  */
 @Service("GnssDataService")
 public class GnssDataService extends MonitorDataService<GnssData> {
-    public DataNode getDataNodeById(String nodeId) {
-        return dataNodeRepo.findById(nodeId).orElse(null);
+
+    @Autowired
+    public GnssDataService(IDataNodeRepo dataNodeRepo, @Qualifier("GnssDataRepo") IMonitorDataRepo<GnssData> monitorDataRepo) {
+        super(dataNodeRepo, monitorDataRepo);
     }
 
     @Override

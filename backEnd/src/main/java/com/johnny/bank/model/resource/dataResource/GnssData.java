@@ -18,17 +18,18 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GnssData extends MonitorData {
-    private double x;
-    private double y;
-    private double z;
+    private double xMove;
+    private double yMove;
+    private double zMove;
 
     @Builder(builderMethodName = "gnssDataBuilder")
     public GnssData(
-            int stationCode, int deviceCode, Timestamp measureTime, Timestamp updateTime,
+            String stationId, String deviceId, String deviceCode,
+            Timestamp measureTime, Timestamp updateTime,
             double x, double y, double z) {
-        super(stationCode, deviceCode, measureTime, updateTime);
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        super(stationId, deviceId, deviceCode, measureTime, updateTime);
+        this.xMove = x;
+        this.yMove = y;
+        this.zMove = z;
     }
 }

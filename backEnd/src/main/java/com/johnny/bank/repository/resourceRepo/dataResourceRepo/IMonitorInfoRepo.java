@@ -13,11 +13,11 @@ import java.util.List;
  */
 @Repository("DeviceInfoRepo")
 public interface IMonitorInfoRepo extends IStaticInfoBaseRepo<MonitorInfo> {
-    List<MonitorInfo> findByStationCode(int stationCode);
+    List<MonitorInfo> findByStationCode(String stationCode);
 
-    List<MonitorInfo> findByStationCodeList(List<Integer> stationCodeList);
+    List<MonitorInfo> findByStationCodeList(List<String> stationCodeList);
 
-    MonitorInfo findNewestDeviceInStation(int stationCode);
+    MonitorInfo findNewestDeviceInStation(String stationCode);
 
-    List<MonitorInfo> findDeviceByType(int deviceType);
+    List<MonitorInfo> findDeviceByType(Character deviceType);
 }

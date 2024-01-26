@@ -33,7 +33,7 @@ public class GnssInfoController {
 
     @GetMapping()
     public ResponseEntity<List<MonitorInfo>> findAllGnssDevice() {
-        return ResponseEntity.ok(deviceInfoService.getDeviceByType(dataNode, "gnss"));
+        return ResponseEntity.ok(deviceInfoService.getDeviceByType(dataNode, '1'));
     }
 
     @GetMapping("id/{id}")

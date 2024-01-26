@@ -19,14 +19,19 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
 public class StationInfo extends StaticInfoData {
+//    private String operateUser;
+//    private Timestamp operateTime;
+    private LocalDate beginDate;
+    private LocalDate endDate;
+//    private int operateFlag;
+//    private String operateDesc;
 
-    @Builder(builderMethodName = "stationInfoBuilder")
-    public StationInfo(String uid, int code, String name, int type,
-                       double lng, double lat, double baseHeight,
-                       String operateUser, Timestamp operateTime,
-                       LocalDate beginDate, LocalDate endDate, int operateFlag, String operateDesc) {
-        super(uid, code, name, type, lng, lat,
-                baseHeight, operateUser, operateTime,
-                beginDate, endDate, operateFlag, operateDesc);
+
+    public StationInfo(String code, String operateUser, Timestamp operateTime,
+                       int operateFlag, String operateDesc,
+                       LocalDate beginDate, LocalDate endDate) {
+        super(code, operateUser, operateTime, operateFlag, operateDesc);
+        this.beginDate = beginDate;
+        this.endDate = endDate;
     }
 }
