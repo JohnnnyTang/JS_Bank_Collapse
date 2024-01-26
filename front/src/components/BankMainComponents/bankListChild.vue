@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onBeforeMount, watch, defineEmits, defineProps } from 'vue';
+import { onMounted, ref, onBeforeMount, watch, } from 'vue';
 import BackEndRequest from "../../api/backendIns"
 
 let tableData = ref([])

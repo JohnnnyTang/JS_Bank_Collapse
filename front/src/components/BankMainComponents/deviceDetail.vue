@@ -14,14 +14,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onBeforeMount, watch, defineProps } from 'vue';
+import { onMounted, ref, onBeforeMount, watch } from 'vue';
 import BackEndRequest from "../../api/backendIns"
 import * as echarts from 'echarts'
 
 const showChart1 = ref(false)
 const showChart2 = ref(false)
-const showbutton1 = ref(true)
-const showbutton2 = ref(true)
+const showbutton1 = ref(false)
+const showbutton2 = ref(false)
 
 const chart1DOM = ref()
 const chart2DOM = ref()
@@ -38,35 +38,31 @@ const props = defineProps({
   },
 })
 
-let pointNum = 0
-let pointDepthArr = []
 let myChart;
 let myChart2;
 
 watch(chart1DOM, async (val) => {
-  console.log('dom1', val);
+  // let dom = document.querySelector('#chart')
   if (val) {
     myChart = echarts.init(val)
     myChart.showLoading()
-    await chartDataProcess()
+    await chartDataProcess(deviceID.value, deviceType.value)
   } else {
     myChart && myChart.clear()
     myChart2 && myChart2.clear()
   }
 })
 watch(chart2DOM, async (val) => {
-  console.log('dom2', val);
-  if (val) {
-    myChart2 = echarts.init(val)
+  let dom = document.querySelector('#chart2')
+  if (val || dom) {
+    myChart2 = echarts.init(val ? val : dom)
     myChart2.showLoading()
-    await chartDataProcess()
+    await chartDataProcess(deviceID.value, deviceType.value)
   } else {
     myChart && myChart.clear()
     myChart2 && myChart2.clear()
   }
 
-  // var chartDom = document.getElementById('chart2');
-  // myChart = echarts.init(chartDom)
 })
 
 
@@ -85,34 +81,42 @@ watch(props, async (val) => {
   deviceType.value = deviceInfoo.type
   if (deviceType.value == '1') {
     //gnss 无表
+    myChart && myChart.clear()
+    myChart2 && myChart2.clear()
     showbutton1.value = false
     showbutton2.value = false
   }
   else if (deviceType.value == '2') {
     //斜侧仪 双表
-    showbutton1.value = true
-    showbutton2.value = true
+    console.log('斜侧仪 双表');
+    myChart && myChart.clear()
+    myChart2 && myChart2.clear()
     chart1Name.value = '水平偏移图表'
     chart2Name.value = '垂向偏移图表'
+    showbutton1.value = true
+    showbutton2.value = true
 
   }
   else if (deviceType.value == '3') {
     //水压力 单表
+    myChart && myChart.clear()
+    myChart2 && myChart2.clear()
+    chart1Name.value = '水压力图表'
     showbutton1.value = true
     showbutton2.value = false
-    chart1Name.value = '水压力图表'
   }
   else if (deviceType.value == '4') {
     //应力桩 双表
-    showbutton1.value = true
-    showbutton2.value = true
+    myChart && myChart.clear()
+    myChart2 && myChart2.clear()
     chart1Name.value = '水平受力图表'
     chart2Name.value = '垂向受力图表'
+    showbutton1.value = true
+    showbutton2.value = true
   }
 
-  // myChart.showLoading()
-  // myChart2.showLoading()
-  await chartDataProcess(deviceID.value, deviceType.value)
+
+  // await chartDataProcess(deviceID.value, deviceType.value)
 
 })
 

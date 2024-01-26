@@ -11,7 +11,9 @@
 
         <bankHistory v-show="showHistory"></bankHistory>
         <mzsDetail v-show="showmzsDetail"></mzsDetail>
-        <deviceDetail v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail>
+        <!-- <deviceDetail v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail> -->
+        <deviceDetail2 v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail2>
+
     </div>
 </template>
 
@@ -28,6 +30,8 @@ import bankListChild from '../components/BankMainComponents/bankListChild.vue';
 import bankHistory from "../components/BankMainComponents/bankHistory.vue"
 import mzsDetail from "../components/BankMainComponents/mzsDetail.vue"
 import deviceDetail from '../components/BankMainComponents/deviceDetail.vue';
+import deviceDetail2 from '../components/BankMainComponents/deviceDetail2.vue';
+
 
 const showLegend = ref(true)
 const showLegend2 = ref(false)
