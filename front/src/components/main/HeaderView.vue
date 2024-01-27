@@ -34,6 +34,7 @@ const navList = ref([
     { name: '崩岸预警监测', routerLink: '/', isActive: true },
     { name: '监测设备管理', routerLink: '/device', isActive: false },
     { name: '崩岸知识库', routerLink: '/knowledge', isActive: false },
+    { name: '模型案例', routerLink: '/model', isActive: false },
     { name: '崩岸资源管理', routerLink: '/tree', isActive: false },
 ])
 

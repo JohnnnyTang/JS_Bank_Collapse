@@ -519,4 +519,5 @@ div.deviceManage-container {
 // :deep(.el-skeleton__item) {
 //     background: rgb(88, 105, 121) !important;
 //     background-size: 400% 100%;
-// }</style>
+// }
+</style>

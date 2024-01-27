@@ -18,6 +18,10 @@ const routes = [
         component: () => import("../views/BankKnowledgeView.vue")
     },
     {
+        path: '/model',
+        component: () => import("../views/ModelExampleView.vue")
+    },
+    {
         path: '/tree',
         component: () => import("../views/ResourceTreeView.vue")
     },

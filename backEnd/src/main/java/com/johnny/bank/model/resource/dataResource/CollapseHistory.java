@@ -28,13 +28,20 @@ import java.util.Date;
 public class CollapseHistory {
     @Id
     private String id;
-    private String length;
     private String district;
     private String time;
     private String river;
-    private String ratio;
     private String side;
-    private String width;
+    private Double width;
+    private Double length;
+    private Double height;
+    private Double ratio;
+    private Double volume;
+    private String angle;
+    private Double curvature1;
+    private Double curvature2;
+    private Double curvature3;
+    private String steep;
     private String place;
     private String type;
     private String description;
