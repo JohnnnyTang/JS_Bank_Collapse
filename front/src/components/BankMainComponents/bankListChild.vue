@@ -54,10 +54,12 @@ onMounted(async () => {
         text-align: center;
         margin-top: 1vh;
         margin-bottom: 1vh;
+        color: aliceblue;
     }
 
     .text{
         padding: 1vh;
+        color: aliceblue;
     }
 
 }

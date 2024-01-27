@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import BackEndRequest from "../api/backendIns"
-import { mzsBoundary_gj, mzsMonitor_gj, mzsMonitorSection_gj, mzsMonitorBankLine_gj } from "./geojson/monitordata"
+import { mzsBoundary_gj, mzsMonitor_gj, mzsMonitorSection_gj, mzsMonitorBankLine_gj, changjiangBoudary } from "./geojson/monitordata"
 mapboxgl.accessToken = 'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg';
 
 let geoJson = new Map();
@@ -53,7 +53,8 @@ const initAllLayer = async (map) => {
         'mzsBoundary',
         'mzsMonitorDevice',
         'mzsMonitorSectionLayer',
-        'mzsMonitorBankLineLayer'
+        'mzsMonitorBankLineLayer',
+        'changjiangboudary'
     ]
     console.log(map.loaded());
     if (map.loaded()) {
@@ -82,6 +83,10 @@ const initAllLayer = async (map) => {
         map.addSource('mzsMonitorBankLineSource', {
             'type': 'geojson',
             'data': mzsMonitorBankLine_gj
+        })
+        map.addSource('changjiangboudarySource', {
+            'type': 'geojson',
+            'data': changjiangBoudary
         })
 
         //add invisible layer
@@ -151,7 +156,7 @@ const initAllLayer = async (map) => {
             },
             'paint': {
                 'fill-color': '#02b9ff',
-                'fill-opacity': 0.5
+                'fill-opacity': 0.1
             }
         });
         let size = 100
@@ -279,6 +284,16 @@ const initAllLayer = async (map) => {
             }
         })
 
+        map.addLayer({
+            'id': 'changjiangboudary',
+            'type': 'fill',
+            'source': 'changjiangboudarySource', // reference the data source
+            'layout': {},
+            'paint': {
+                'fill-color': '#0080ff', // blue color fill
+                'fill-opacity': 0.2
+            }
+        });
 
     }
     else {
@@ -309,6 +324,11 @@ const initAllLayer = async (map) => {
                 'type': 'geojson',
                 'data': mzsMonitorBankLine_gj
             })
+            map.addSource('changjiangboudarySource', {
+                'type': 'geojson',
+                'data': changjiangBoudary
+            })
+    
 
             //add invisible layer
             map.addLayer({
@@ -502,7 +522,16 @@ const initAllLayer = async (map) => {
                     ],
                 }
             })
-
+            map.addLayer({
+                'id': 'changjiangboudary',
+                'type': 'fill',
+                'source': 'changjiangboudarySource', // reference the data source
+                'layout': {},
+                'paint': {
+                    'fill-color': '#0080ff', // blue color fill
+                    'fill-opacity': 0.2
+                }
+            });
             console.log('layer inited');
         })
     }
@@ -517,11 +546,13 @@ const showLayers = (map, allLayer, layerShowArr) => {
 
     // map.on('load',()=>{
     allLayer.forEach((item) => {
-        map.setLayoutProperty(item, 'visibility', 'none');
+        if (map.getLayer(item))
+            map.setLayoutProperty(item, 'visibility', 'none');
     })
 
     layerShowArr.forEach((item) => {
-        map.setLayoutProperty(item, 'visibility', 'visible');
+        if (map.getLayer(item))
+            map.setLayoutProperty(item, 'visibility', 'visible');
     })
     // })
 

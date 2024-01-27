@@ -17,6 +17,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { ElMessage } from 'element-plus'
 // import { initMap, channelVisual, bankLineVisual, mzsMonitorVisual, monitorDeviceVisual } from '../utils/code4MainView'
@@ -44,23 +45,24 @@ const showInfo = ref({})
 const deviceInfo = ref({})
 
 let map
+let marker
 let layerIDs = [
     'channelLayer',
     'banklineLayer',
     'mzsBoundary',
     'mzsMonitorDevice',
     'mzsMonitorSectionLayer',
-    'mzsMonitorBankLineLayer'
+    'mzsMonitorBankLineLayer',
+    'changjiangboudary'
 ]
 let layerInited = false
 
-const largeScale = ['channelLayer', 'banklineLayer']
-const smallScale = ['mzsBoundary', 'mzsMonitorDevice', 'mzsMonitorSectionLayer', 'mzsMonitorBankLineLayer']
+const largeScale = ['channelLayer', 'banklineLayer','changjiangboudary']
+const smallScale = ['mzsBoundary', 'mzsMonitorDevice', 'mzsMonitorSectionLayer', 'mzsMonitorBankLineLayer','changjiangboudary']
 
 const handlerListDBclick = (info) => {
     handlerShowchange(info)
     childData.value = info.childInfo
-    console.log(info.childInfo);
     map.flyTo({
         center: info.childInfo.coord[0],
         zoom: 12.946462040328413,
@@ -119,8 +121,7 @@ const mapFlyToMZS = async () => {
 }
 
 const largeScaleShow = () => {
-    // console.log('largeScaleShow', map.loaded());
-    if (map.getStyle().layers.length != 58) {
+    if (map.getStyle().layers.length != 59) {
         ElMessage('图层正在加载中')
         return;
     }
@@ -140,11 +141,12 @@ const largeScaleShow = () => {
 }
 
 const smallScaleShow = () => {
-    if (map.getStyle().layers.length != 58) {
+
+    if (map.getStyle().layers.length != 59) {
         ElMessage('图层正在加载中')
         return;
     }
-
+    console.log(smallScale.push(largeScale));
     mapFlyToMZS()
     showLayers(map, layerIDs, smallScale)
     showLegend.value = false
@@ -161,8 +163,8 @@ const layerEventLogic = (map) => {
 
     map.on('click', (e) => {
         const box = [
-            [e.point.x - 5, e.point.y - 5],
-            [e.point.x + 5, e.point.y + 5]
+            [e.point.x - 3, e.point.y - 3],
+            [e.point.x + 3, e.point.y + 3]
         ]
         //点击device弹出deviceDetail
         const mzsMonitorDevices = map.queryRenderedFeatures(box, { layers: ['mzsMonitorDevice'] });
@@ -175,22 +177,49 @@ const layerEventLogic = (map) => {
         const bankLines = map.queryRenderedFeatures(box, { layers: ['banklineLayer'] });
         if (bankLines && bankLines[0]) {
             childData.value = bankLines[0].properties
-            // showChild.value = true
-            // showChild.value = false
-
+            showChild.value = true
+            showList.value = false
+            let lonlat = bankLines[0].properties.coord.slice(2, 28).split(',')
+            marker&&marker.remove()  
+            marker = new mapboxgl.Marker()
+                .setLngLat(e.lngLat)
+                .addTo(map);
             map.flyTo({
-                center: bankLines[0].properties.coord[0],
-                zoom: 12.946462040328413,
+                center: [Number(lonlat[0]), Number(lonlat[1])],
+                zoom: 11,
                 pitch: 56.686721021958206
             })
         }
     })
 
-    // map.on('zoom',(e)=>{
-    //     console.log('zooming',e);
-    //     // if small enough 
-    //     // show small scale
-    // })
+
+
+    map.on('mousemove', (e) => {
+        const box = [
+            [e.point.x - 5, e.point.y - 5],
+            [e.point.x + 5, e.point.y + 5]
+        ]
+        if (map.getLayer('banklineLayer')) {
+            const bankLines = map.queryRenderedFeatures(box, { layers: ['banklineLayer'] });
+            if (bankLines && bankLines[0]) {
+                map.getCanvas().style.cursor = 'pointer'
+            }
+            else {
+                map.getCanvas().style.cursor = ''
+            }
+        }
+
+
+    })
+
+    map.on('zoom',(e)=>{
+
+        console.log('zoom ',map.getZoom());
+        console.log('Center ',map.getCenter());
+        console.log('Bounds ',map.getBounds());
+        // if small enough 
+        // show small scale
+    })
 
 
 }

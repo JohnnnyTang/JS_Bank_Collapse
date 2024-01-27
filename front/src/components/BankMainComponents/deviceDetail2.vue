@@ -6,7 +6,8 @@
         <div class="text">海拔：{{ deviceInfo.elevation }}</div>
         <div class="text">站点编号：{{ deviceInfo.stationCode }}</div>
         <el-button type="primary" @click="showC1">{{ nameMap[deviceInfo.type][0] }}</el-button>
-        <el-button type="primary" @click="showC2" v-if="deviceInfo.type === '2' || deviceInfo.type === '4'">{{nameMap[deviceInfo.type][1] }}</el-button>
+        <el-button type="primary" @click="showC2" v-if="deviceInfo.type === '2' || deviceInfo.type === '4'">{{
+            nameMap[deviceInfo.type][1] }}</el-button>
 
         <div class="chart" id="chart" v-if="showChart1" ref="chart1DOM"></div>
     </div>
@@ -21,7 +22,7 @@ const showChart1 = ref(false)
 const chart1DOM = ref()
 
 const nameMap = ref({
-    '1': ['GNSS', ''],
+    '1': ['GNSS偏移图表', ''],
     '2': ['水平偏移图表', '垂向偏移图表'],
     '3': ['水压力图表', ''],
     '4': ['水平受力图表', '垂向受力图表']
@@ -67,20 +68,20 @@ const showC2 = async () => {
     }
 }
 
-watch(props,(val)=>{
-    myChart&&myChart.clear()
+watch(props, (val) => {
+    myChart && myChart.clear()
 })
 
 
 const chartDataProcess = async (deviceID, deviceType, chartID) => {
     switch (deviceType) {
-        case '1':
-            {
-                myOptions = await type1process(deviceID, deviceType)
-                myChart && myChart.hideLoading()
-                myChart && myChart.clear()
-                break;
-            }
+        case '1': {
+            var Option = await type1process(deviceID, deviceType)
+            myChart && myChart.hideLoading()
+            myChart && myChart.clear()
+            myChart && myChart.setOption(Option);
+            break;
+        }
         case '2': {
 
             myOptions = await type2process(deviceID, deviceType)
@@ -115,211 +116,142 @@ const type1process = async (id, type) => {
 
     console.log('GNSS deviceDetail', deviceDetail);
     console.log('GNSS monitorInfo', monitorInfo);
-    // var optionX
-    // var optionY
-    // let pointNum = monitorInfo.pointNum
-    // let pointDepthArr = [];
-    // let i = 1
-    // while (i <= pointNum) {
-    //     pointDepthArr.push(monitorInfo[`point${i}Depth`])
-    //     i++;
-    // }
-    // let defaultColor = ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00', '#FF0000']
-    // let color = []
-    // let legendData = []
-    // for (let i = 0; i < pointNum; i++) {
-    //     legendData.push(pointDepthArr[i] + 'm')
-    //     color.push(defaultColor[i])
-    // }
+    var option
 
+    let color = ['#80FFA5', '#00DDFF', '#37A2FF']
+    let legendData = ['XMove', 'YMove', 'ZMove'];
 
-    // let fieldmap = new Map()
-    // fieldmap.set(0, ['XMove1', 'YMove1'])
-    // fieldmap.set(1, ['XMove2', 'YMove2'])
-    // fieldmap.set(2, ['XMove3', 'YMove3'])
-    // fieldmap.set(3, ['XMove4', 'YMove4'])
-    // fieldmap.set(4, ['XMove5', 'YMove5'])
-    // fieldmap.set(5, ['XMove6', 'YMove6'])
+    let seriesArr = []
 
+    let seriesData4XMVOE = []
+    let seriesData4YMVOE = []
+    let seriesData4ZMVOE = []
 
+    deviceDetail.forEach((item) => {
+        seriesData4XMVOE.push(item['XMove'])
+        seriesData4YMVOE.push(item['YMove'])
+        seriesData4ZMVOE.push(item['ZMove'])
+    })
 
-    // let seriesArr4XMOVE = []
-    // let seriesArr4YMOVE = []
+    let seriestItem4X = {
+        name: legendData[0],
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        lineStyle: {
+            width: 2,
+            color: color[0]
+        },
+        showSymbol: false,
+        emphasis: {
+            focus: 'series'
+        },
+        data: seriesData4XMVOE
+    }
+    seriesArr.push(seriestItem4X)
 
-    // for (let i = 0; i < pointNum; i++) {
+    let seriestItem4Y = {
+        name: legendData[1],
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        lineStyle: {
+            width: 2,
+            color: color[1]
+        },
+        showSymbol: false,
+        emphasis: {
+            focus: 'series'
+        },
+        data: seriesData4YMVOE
+    }
+    seriesArr.push(seriestItem4Y)
 
-    //     let seriesData4XMVOE = []
-    //     let seriesData4YMVOE = []
-    //     deviceDetail.forEach((item) => {
-    //         seriesData4XMVOE.push(item[(fieldmap.get(i)[0])])
-    //         seriesData4YMVOE.push(item[(fieldmap.get(i)[1])])
-    //     })
+    let seriestItem4Z = {
+        name: legendData[2],
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        lineStyle: {
+            width: 2,
+            color: color[2]
+        },
+        showSymbol: false,
+        emphasis: {
+            focus: 'series'
+        },
+        data: seriesData4ZMVOE
+    }
+    seriesArr.push(seriestItem4Z)
 
-    //     let seriestItem4X = {
-    //         name: legendData[i],
-    //         type: 'line',
-    //         stack: 'Total',
-    //         smooth: true,
-    //         lineStyle: {
-    //             width: 2,
-    //             color: color[i]
-    //         },
-    //         showSymbol: false,
-    //         emphasis: {
-    //             focus: 'series'
-    //         },
-    //         data: seriesData4XMVOE
-    //     }
-    //     seriesArr4XMOVE.push(seriestItem4X)
+    let xAxisData4XY = []
+    deviceDetail.forEach((item) => {
+        xAxisData4XY.push(item["measureTime"])
+    })
+    option = {
+        color: color,
+        title: {
+            text: 'GNSS偏移图表',
+            textStyle: {
+                color: '#FFFFFF',
+                fontSize: 15
+            }
+        },
 
-    //     let seriestItem4Y = {
-    //         name: legendData[i],
-    //         type: 'line',
-    //         stack: 'Total',
-    //         smooth: true,
-    //         lineStyle: {
-    //             width: 2,
-    //             color: color[i]
-    //         },
-    //         showSymbol: false,
-    //         emphasis: {
-    //             focus: 'series'
-    //         },
-    //         data: seriesData4YMVOE
-    //     }
-    //     seriesArr4YMOVE.push(seriestItem4Y)
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        legend: {
+            data: legendData,
+            textStyle: {
+                color: '#FFFFFF',
+                fontSize: 8
+            },
+            right:10
+        },
+        grid: {
+            // left: '0%',
+            // right: '4%',
+            // bottom: '3%',
+            containLabel: true
+        },
+        xAxis: [
+            {
+                type: 'category',
+                boundaryGap: false,
+                axisLabel: {
+                    color: '#FFFFFF',
+                    interval: xAxisData4XY.length - 2,
+                    fontSize: 10
+                    // padding: [0, 50, 0, 0]
+                },
+                data: xAxisData4XY,
 
-    // }
-
-    // let xAxisData4XY = []
-    // deviceDetail.forEach((item) => {
-    //     xAxisData4XY.push(item["measureTime"])
-    // })
-    // optionX = {
-    //     color: color,
-    //     title: {
-    //         text: '测斜仪XMove',
-    //         textStyle: {
-    //             color: '#FFFFFF',
-    //             fontSize: 15
-    //         }
-    //     },
-
-    //     tooltip: {
-    //         trigger: 'axis',
-    //         axisPointer: {
-    //             type: 'cross',
-    //             label: {
-    //                 backgroundColor: '#6a7985'
-    //             }
-    //         }
-    //     },
-    //     legend: {
-    //         data: legendData,
-    //         textStyle: {
-    //             color: '#FFFFFF',
-    //             fontSize: 8
-    //         }
-    //     },
-    //     grid: {
-    //         // left: '0%',
-    //         // right: '4%',
-    //         // bottom: '3%',
-    //         containLabel: true
-    //     },
-    //     xAxis: [
-    //         {
-    //             type: 'category',
-    //             boundaryGap: false,
-    //             axisLabel: {
-    //                 color: '#FFFFFF',
-    //                 interval: xAxisData4XY.length - 2,
-    //                 fontSize: 10
-    //                 // padding: [0, 50, 0, 0]
-    //             },
-    //             data: xAxisData4XY,
-
-    //         }
-    //     ],
-    //     dataZoom: [
-    //         {
-    //             start: 0,
-    //             end: 20
-    //         }
-    //     ],
-    //     yAxis: [
-    //         {
-    //             type: 'value',
-    //             axisLabel: {
-    //                 color: '#FFFFFF',
-    //             }
-    //         }
-    //     ],
-    //     series: seriesArr4XMOVE
-    // };
-    // optionY = {
-    //     color: color,
-    //     title: {
-    //         text: '测斜仪YMove',
-    //         textStyle: {
-    //             color: '#FFFFFF',
-    //             fontSize: 15
-    //         }
-    //     },
-
-    //     tooltip: {
-    //         trigger: 'axis',
-    //         axisPointer: {
-    //             type: 'cross',
-    //             label: {
-    //                 backgroundColor: '#6a7985'
-    //             }
-    //         }
-    //     },
-    //     legend: {
-    //         data: legendData,
-    //         textStyle: {
-    //             color: '#FFFFFF',
-    //             fontSize: 8
-    //         }
-    //     },
-    //     grid: {
-    //         // left: '0%',
-    //         // right: '4%',
-    //         // bottom: '3%',
-    //         containLabel: true
-    //     },
-    //     xAxis: [
-    //         {
-    //             type: 'category',
-    //             boundaryGap: false,
-    //             axisLabel: {
-    //                 color: '#FFFFFF',
-    //                 interval: xAxisData4XY.length - 2,
-    //                 fontSize: 10
-    //                 // padding: [0, 50, 0, 0]
-    //             },
-    //             data: xAxisData4XY,
-
-    //         }
-    //     ],
-    //     dataZoom: [
-    //         {
-    //             start: 0,
-    //             end: 20
-    //         }
-    //     ],
-    //     yAxis: [
-    //         {
-    //             type: 'value',
-    //             axisLabel: {
-    //                 color: '#FFFFFF',
-    //             }
-    //         }
-    //     ],
-    //     series: seriesArr4YMOVE
-    // };
-    // return [optionX, optionY]
+            }
+        ],
+        dataZoom: [
+            {
+                start: 0,
+                end: 20
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                axisLabel: {
+                    color: '#FFFFFF',
+                }
+            }
+        ],
+        series: seriesArr
+    };
+    return option
 }
 
 
