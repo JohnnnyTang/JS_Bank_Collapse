@@ -21,7 +21,7 @@ onMounted(async () => {
     width: 20vw;
     height: 56vh;
     background-color: hsla(210, 70%, 24%, 0.5);
-    border-radius: 2vh;
+    border-radius: 1vh;
     box-shadow: 0px 0px 8px 4px hsla(210, 70%, 12%, 0.5);
 
     h3 {

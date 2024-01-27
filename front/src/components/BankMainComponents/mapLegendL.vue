@@ -89,7 +89,7 @@ onMounted(async () => {});
         width: 12vw;
         height: 26vh;
         color: hsl(210, 70%, 90%);
-        background-color: hsla(210, 70%, 20%, 0.8);
+        background-color: hsla(210, 70%, 16%, 0.8);
         border-radius: 1vh;
         // transform: scale(0.95);
         box-shadow: 0px 0px 8px 4px hsla(210, 70%, 12%, 0.5);

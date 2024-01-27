@@ -20,8 +20,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onBeforeMount, watch } from 'vue';
-import BackEndRequest from "../../api/backendIns"
+import { onBeforeMount, onMounted, ref, watch } from 'vue';
+import BackEndRequest from '../../api/backendIns';
 
 let tableData = ref([]);
 const loading = ref(true);
@@ -52,8 +52,8 @@ onMounted(async () => {
 .bankListDIV {
     width: 20vw;
     height: 50vh;
-    background-color: hsl(210, 70%, 20%);
-    border-radius: 2vh;
+    background-color: hsl(210, 30%, 14%);
+    border-radius: 1vh;
     box-shadow: 0px 0px 8px 4px hsla(210, 70%, 12%, 0.7);
 
     h3 {
@@ -63,30 +63,35 @@ onMounted(async () => {
         color: hsl(210, 70%, 90%);
     }
 
-    :deep(.el-table th.el-table__cell.is-leaf) {
+    :deep(.el-table__inner-wrapper::before) {
+        background: hsl(210, 70%, 30%);
+    }
+
+    :deep(.el-table .el-table__cell) {
         border: 0px solid black;
     }
 
     :deep(.el-table thead th.el-table__cell) {
-        background: hsl(210, 70%, 90%);
+        color: hsl(210, 70%, 90%);
+        background: hsl(210, 70%, 20%);
     }
 
     :deep(.el-table tbody tr:nth-child(2n)) {
-        color: hsl(210, 70%, 30%);
-        background: hsl(210, 70%, 90%);
+        color: hsl(210, 70%, 90%);
+        background: hsl(210, 70%, 24%);
     }
 
     :deep(.el-table__body tr:nth-child(2n):hover > td) {
-        background: hsl(210, 70%, 80%);
+        background: hsl(210, 70%, 32%);
     }
 
     :deep(.el-table tbody tr:nth-child(2n + 1)) {
         color: hsl(210, 70%, 90%);
-        background: hsl(210, 70%, 30%);
+        background: hsl(210, 70%, 16%);
     }
 
     :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
-        background: hsl(210, 70%, 40%);
+        background: hsl(210, 70%, 32%);
     }
 }
 </style>
