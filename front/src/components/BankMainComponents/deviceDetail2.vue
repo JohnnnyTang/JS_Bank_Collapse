@@ -5,11 +5,10 @@
         <div class="text">测量周期：{{ deviceInfo.begTime }} -- {{ deviceInfo.endTime }}</div>
         <div class="text">海拔：{{ deviceInfo.elevation }}</div>
         <div class="text">站点编号：{{ deviceInfo.stationCode }}</div>
-        <el-button type="primary" @click="showC1" v-if="showbutton1">{{ chart1Name }}</el-button>
-        <el-button type="primary" @click="showC2" v-if="showbutton2">{{ chart2Name }}</el-button>
+        <el-button type="primary" @click="showC1">{{ nameMap[deviceInfo.type][0] }}</el-button>
+        <el-button type="primary" @click="showC2" v-if="deviceInfo.type === '2' || deviceInfo.type === '4'">{{nameMap[deviceInfo.type][1] }}</el-button>
 
         <div class="chart" id="chart" v-if="showChart1" ref="chart1DOM"></div>
-        <!-- <div class="chart" id="chart2" v-if="showChart2" ref="chart2DOM"></div> -->
     </div>
 </template>
   
@@ -19,18 +18,15 @@ import BackEndRequest from "../../api/backendIns"
 import * as echarts from 'echarts'
 
 const showChart1 = ref(false)
-//   const showChart2 = ref(false)
-const showbutton1 = ref(false)
-const showbutton2 = ref(false)
-
 const chart1DOM = ref()
-//   const chart2DOM = ref()
-const chart1Name = ref("")
-const chart2Name = ref("")
 
+const nameMap = ref({
+    '1': ['GNSS', ''],
+    '2': ['水平偏移图表', '垂向偏移图表'],
+    '3': ['水压力图表', ''],
+    '4': ['水平受力图表', '垂向受力图表']
+})
 
-const deviceID = ref("")
-const deviceType = ref("")
 const props = defineProps({
     deviceInfo: {
         type: Object,
@@ -41,93 +37,51 @@ const props = defineProps({
 let myChart;
 let myDom
 let myOptions = new Array(2);
-let chartBeshowed 
+let chartBeshowed
 
 watch(chart1DOM, async (val) => {
-    // let dom = document.querySelector('#chart')
     if (val) {
-        myDom=val
+        myDom = val
         myChart = echarts.init(val)
         myChart.showLoading()
-        await chartDataProcess(deviceID.value, deviceType.value,chartBeshowed)
+        await chartDataProcess(props.deviceInfo.code, props.deviceInfo.type, chartBeshowed)
     } else {
-        //?
         myChart && myChart.clear()
     }
 })
 
-
-
-const showC1 = async() => {
+const showC1 = async () => {
     showChart1.value = true;
     chartBeshowed = 0;
-    if(myChart){
+    if (myChart) {
         myChart.showLoading()
-        await chartDataProcess(deviceID.value, deviceType.value,chartBeshowed)
+        await chartDataProcess(props.deviceInfo.code, props.deviceInfo.type, chartBeshowed)
     }
 }
-const showC2 = async() => {
+const showC2 = async () => {
     showChart1.value = true;
     chartBeshowed = 1;
-    if(myChart){
+    if (myChart) {
         myChart.showLoading()
-        await chartDataProcess(deviceID.value, deviceType.value,chartBeshowed)
+        await chartDataProcess(props.deviceInfo.code, props.deviceInfo.type, chartBeshowed)
     }
 }
 
-watch(props, async (val) => {
-    let deviceInfoo = val.deviceInfo
-    deviceID.value = deviceInfoo.code
-    deviceType.value = deviceInfoo.type
-    if (deviceType.value == '1') {
-        //gnss 无表
-        myChart && myChart.clear()
-        showbutton1.value = false
-        showbutton2.value = false
-    }
-    else if (deviceType.value == '2') {
-        //斜侧仪 双表
-        console.log('斜侧仪 双表');
-        myChart && myChart.clear()
-        chart1Name.value = '水平偏移图表'
-        chart2Name.value = '垂向偏移图表'
-        showbutton1.value = true
-        showbutton2.value = true
-
-    }
-    else if (deviceType.value == '3') {
-        //水压力 单表
-        console.log('水压力 单表');
-        myChart && myChart.clear()
-        chart1Name.value = '水压力图表'
-        showbutton1.value = true
-        showbutton2.value = false
-    }
-    else if (deviceType.value == '4') {
-        //应力桩 双表
-        console.log('应力桩 双表');
-        myChart && myChart.clear()
-        chart1Name.value = '水平受力图表'
-        chart2Name.value = '垂向受力图表'
-        showbutton1.value = true
-        showbutton2.value = true
-    }
+watch(props,(val)=>{
+    myChart&&myChart.clear()
 })
 
 
-const chartDataProcess = async (deviceID, deviceType,chartID) => {
-
+const chartDataProcess = async (deviceID, deviceType, chartID) => {
     switch (deviceType) {
         case '1':
             {
-                chart1Name.value = ''
-                chart2Name.value = ''
+                myOptions = await type1process(deviceID, deviceType)
+                myChart && myChart.hideLoading()
+                myChart && myChart.clear()
                 break;
             }
         case '2': {
-
-            chart1Name.value = '水平偏移图表'
-            chart2Name.value = '垂向偏移图表'
 
             myOptions = await type2process(deviceID, deviceType)
             myChart && myChart.hideLoading()
@@ -137,8 +91,6 @@ const chartDataProcess = async (deviceID, deviceType,chartID) => {
         }
         case '3': {
 
-            chart1Name.value = '水压力图表'
-            chart2Name.value = ''
             myChart && myChart.clear()
             var option = await type3process(deviceID, deviceType);
             myChart && myChart.hideLoading()
@@ -146,8 +98,7 @@ const chartDataProcess = async (deviceID, deviceType,chartID) => {
             break;
         }
         case '4': {
-            chart1Name.value = '水平受力图表'
-            chart2Name.value = '垂向受力图表'
+
             myChart && myChart.clear()
             myOptions = await type4process(deviceID, deviceType)
             myChart && myChart.hideLoading()
@@ -157,6 +108,221 @@ const chartDataProcess = async (deviceID, deviceType,chartID) => {
     }
 
 }
+
+const type1process = async (id, type) => {
+    let deviceDetail = (await BackEndRequest.getMonitorDetailByType_Code(id, type)).data
+    let monitorInfo = (await BackEndRequest.getMonitorInfoByType_Code(id, type)).data
+
+    console.log('GNSS deviceDetail', deviceDetail);
+    console.log('GNSS monitorInfo', monitorInfo);
+    // var optionX
+    // var optionY
+    // let pointNum = monitorInfo.pointNum
+    // let pointDepthArr = [];
+    // let i = 1
+    // while (i <= pointNum) {
+    //     pointDepthArr.push(monitorInfo[`point${i}Depth`])
+    //     i++;
+    // }
+    // let defaultColor = ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00', '#FF0000']
+    // let color = []
+    // let legendData = []
+    // for (let i = 0; i < pointNum; i++) {
+    //     legendData.push(pointDepthArr[i] + 'm')
+    //     color.push(defaultColor[i])
+    // }
+
+
+    // let fieldmap = new Map()
+    // fieldmap.set(0, ['XMove1', 'YMove1'])
+    // fieldmap.set(1, ['XMove2', 'YMove2'])
+    // fieldmap.set(2, ['XMove3', 'YMove3'])
+    // fieldmap.set(3, ['XMove4', 'YMove4'])
+    // fieldmap.set(4, ['XMove5', 'YMove5'])
+    // fieldmap.set(5, ['XMove6', 'YMove6'])
+
+
+
+    // let seriesArr4XMOVE = []
+    // let seriesArr4YMOVE = []
+
+    // for (let i = 0; i < pointNum; i++) {
+
+    //     let seriesData4XMVOE = []
+    //     let seriesData4YMVOE = []
+    //     deviceDetail.forEach((item) => {
+    //         seriesData4XMVOE.push(item[(fieldmap.get(i)[0])])
+    //         seriesData4YMVOE.push(item[(fieldmap.get(i)[1])])
+    //     })
+
+    //     let seriestItem4X = {
+    //         name: legendData[i],
+    //         type: 'line',
+    //         stack: 'Total',
+    //         smooth: true,
+    //         lineStyle: {
+    //             width: 2,
+    //             color: color[i]
+    //         },
+    //         showSymbol: false,
+    //         emphasis: {
+    //             focus: 'series'
+    //         },
+    //         data: seriesData4XMVOE
+    //     }
+    //     seriesArr4XMOVE.push(seriestItem4X)
+
+    //     let seriestItem4Y = {
+    //         name: legendData[i],
+    //         type: 'line',
+    //         stack: 'Total',
+    //         smooth: true,
+    //         lineStyle: {
+    //             width: 2,
+    //             color: color[i]
+    //         },
+    //         showSymbol: false,
+    //         emphasis: {
+    //             focus: 'series'
+    //         },
+    //         data: seriesData4YMVOE
+    //     }
+    //     seriesArr4YMOVE.push(seriestItem4Y)
+
+    // }
+
+    // let xAxisData4XY = []
+    // deviceDetail.forEach((item) => {
+    //     xAxisData4XY.push(item["measureTime"])
+    // })
+    // optionX = {
+    //     color: color,
+    //     title: {
+    //         text: '测斜仪XMove',
+    //         textStyle: {
+    //             color: '#FFFFFF',
+    //             fontSize: 15
+    //         }
+    //     },
+
+    //     tooltip: {
+    //         trigger: 'axis',
+    //         axisPointer: {
+    //             type: 'cross',
+    //             label: {
+    //                 backgroundColor: '#6a7985'
+    //             }
+    //         }
+    //     },
+    //     legend: {
+    //         data: legendData,
+    //         textStyle: {
+    //             color: '#FFFFFF',
+    //             fontSize: 8
+    //         }
+    //     },
+    //     grid: {
+    //         // left: '0%',
+    //         // right: '4%',
+    //         // bottom: '3%',
+    //         containLabel: true
+    //     },
+    //     xAxis: [
+    //         {
+    //             type: 'category',
+    //             boundaryGap: false,
+    //             axisLabel: {
+    //                 color: '#FFFFFF',
+    //                 interval: xAxisData4XY.length - 2,
+    //                 fontSize: 10
+    //                 // padding: [0, 50, 0, 0]
+    //             },
+    //             data: xAxisData4XY,
+
+    //         }
+    //     ],
+    //     dataZoom: [
+    //         {
+    //             start: 0,
+    //             end: 20
+    //         }
+    //     ],
+    //     yAxis: [
+    //         {
+    //             type: 'value',
+    //             axisLabel: {
+    //                 color: '#FFFFFF',
+    //             }
+    //         }
+    //     ],
+    //     series: seriesArr4XMOVE
+    // };
+    // optionY = {
+    //     color: color,
+    //     title: {
+    //         text: '测斜仪YMove',
+    //         textStyle: {
+    //             color: '#FFFFFF',
+    //             fontSize: 15
+    //         }
+    //     },
+
+    //     tooltip: {
+    //         trigger: 'axis',
+    //         axisPointer: {
+    //             type: 'cross',
+    //             label: {
+    //                 backgroundColor: '#6a7985'
+    //             }
+    //         }
+    //     },
+    //     legend: {
+    //         data: legendData,
+    //         textStyle: {
+    //             color: '#FFFFFF',
+    //             fontSize: 8
+    //         }
+    //     },
+    //     grid: {
+    //         // left: '0%',
+    //         // right: '4%',
+    //         // bottom: '3%',
+    //         containLabel: true
+    //     },
+    //     xAxis: [
+    //         {
+    //             type: 'category',
+    //             boundaryGap: false,
+    //             axisLabel: {
+    //                 color: '#FFFFFF',
+    //                 interval: xAxisData4XY.length - 2,
+    //                 fontSize: 10
+    //                 // padding: [0, 50, 0, 0]
+    //             },
+    //             data: xAxisData4XY,
+
+    //         }
+    //     ],
+    //     dataZoom: [
+    //         {
+    //             start: 0,
+    //             end: 20
+    //         }
+    //     ],
+    //     yAxis: [
+    //         {
+    //             type: 'value',
+    //             axisLabel: {
+    //                 color: '#FFFFFF',
+    //             }
+    //         }
+    //     ],
+    //     series: seriesArr4YMOVE
+    // };
+    // return [optionX, optionY]
+}
+
+
 const type2process = async (id, type) => {
     let deviceDetail = (await BackEndRequest.getMonitorDetailByType_Code(id, type)).data
     let monitorInfo = (await BackEndRequest.getMonitorInfoByType_Code(id, type)).data
@@ -717,8 +883,6 @@ onBeforeMount(async () => {
 
 
 onMounted(async () => {
-    // var chartDom = document.getElementById('chart');
-    // myChart = echarts.init(chartDom);
 
 
 })

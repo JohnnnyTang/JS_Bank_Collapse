@@ -75,12 +75,14 @@ const showC2 = () => {
   showChart2.value = true;
 }
 
-watch(props, async (val) => {
-  let deviceInfoo = val.deviceInfo
+watch(props.deviceInfo, (val) => {
+  console.log(val);
+  let deviceInfoo = val
   deviceID.value = deviceInfoo.code
   deviceType.value = deviceInfoo.type
   if (deviceType.value == '1') {
     //gnss 无表
+    console.log('gnss');
     myChart && myChart.clear()
     myChart2 && myChart2.clear()
     showbutton1.value = false
@@ -91,28 +93,28 @@ watch(props, async (val) => {
     console.log('斜侧仪 双表');
     myChart && myChart.clear()
     myChart2 && myChart2.clear()
-    chart1Name.value = '水平偏移图表'
-    chart2Name.value = '垂向偏移图表'
     showbutton1.value = true
     showbutton2.value = true
+    chart1Name.value = '水平偏移图表'
+    chart2Name.value = '垂向偏移图表'
 
   }
   else if (deviceType.value == '3') {
     //水压力 单表
     myChart && myChart.clear()
     myChart2 && myChart2.clear()
-    chart1Name.value = '水压力图表'
     showbutton1.value = true
     showbutton2.value = false
+    chart1Name.value = '水压力图表'
   }
   else if (deviceType.value == '4') {
     //应力桩 双表
     myChart && myChart.clear()
     myChart2 && myChart2.clear()
-    chart1Name.value = '水平受力图表'
-    chart2Name.value = '垂向受力图表'
     showbutton1.value = true
     showbutton2.value = true
+    chart1Name.value = '水平受力图表'
+    chart2Name.value = '垂向受力图表'
   }
 
 

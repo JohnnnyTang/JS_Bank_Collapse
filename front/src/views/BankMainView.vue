@@ -6,12 +6,10 @@
         <button style="left: 2vh;" @click="largeScaleShow">长江江苏段</button>
         <button style="left: 25vh;" @click="smallScaleShow">民主沙示范段</button>
         <bankList v-show="showList" @showChange="handlerListDBclick"></bankList>
-        <!-- <bankListChild v-show="showChild" :info="childData" :showFather="showFather" :showChild="showChild" ref ="showInfo"></bankListChild> -->
         <bankListChild v-show="showChild" @showChange="handlerShowchange" :info="childData"></bankListChild>
 
         <bankHistory v-show="showHistory"></bankHistory>
         <mzsDetail v-show="showmzsDetail"></mzsDetail>
-        <!-- <deviceDetail v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail> -->
         <deviceDetail2 v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail2>
 
     </div>
@@ -22,14 +20,14 @@ import { onMounted, ref } from 'vue';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { ElMessage } from 'element-plus'
 // import { initMap, channelVisual, bankLineVisual, mzsMonitorVisual, monitorDeviceVisual } from '../utils/code4MainView'
-import { initMap, initAllLayer, showLayers, test } from "../utils/MainView"
+import { initMap, initAllLayer, showLayers } from "../utils/MainView"
 import mapLegend from "../components/BankMainComponents/mapLegend.vue"
 import mapLegendL from "../components/BankMainComponents/mapLegendL.vue"
 import bankList from "../components/BankMainComponents/bankList.vue"
 import bankListChild from '../components/BankMainComponents/bankListChild.vue';
 import bankHistory from "../components/BankMainComponents/bankHistory.vue"
 import mzsDetail from "../components/BankMainComponents/mzsDetail.vue"
-import deviceDetail from '../components/BankMainComponents/deviceDetail.vue';
+// import deviceDetail from '../components/BankMainComponents/deviceDetail.vue';
 import deviceDetail2 from '../components/BankMainComponents/deviceDetail2.vue';
 
 
@@ -85,6 +83,7 @@ onMounted(async () => {
         message: '图层加载完毕',
         type: 'success'
     })
+    largeScaleShow();
     layerEventLogic(map);
 })
 
@@ -168,14 +167,17 @@ const layerEventLogic = (map) => {
         //点击device弹出deviceDetail
         const mzsMonitorDevices = map.queryRenderedFeatures(box, { layers: ['mzsMonitorDevice'] });
         if (mzsMonitorDevices && mzsMonitorDevices[0]) {
-            deviceInfo.value = mzsMonitorDevices[0].properties;
             showDeviceDetail.value = true
+            deviceInfo.value = mzsMonitorDevices[0].properties;
         }
 
         //点击bankLine 图查文, 和双击表格一样的效果
         const bankLines = map.queryRenderedFeatures(box, { layers: ['banklineLayer'] });
         if (bankLines && bankLines[0]) {
             childData.value = bankLines[0].properties
+            // showChild.value = true
+            // showChild.value = false
+
             map.flyTo({
                 center: bankLines[0].properties.coord[0],
                 zoom: 12.946462040328413,
@@ -184,6 +186,11 @@ const layerEventLogic = (map) => {
         }
     })
 
+    // map.on('zoom',(e)=>{
+    //     console.log('zooming',e);
+    //     // if small enough 
+    //     // show small scale
+    // })
 
 
 }

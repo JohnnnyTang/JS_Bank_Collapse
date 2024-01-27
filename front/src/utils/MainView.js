@@ -32,7 +32,8 @@ const initAllLayer = async (map) => {
     let channelData = (await BackEndRequest.getChannelData()).data
     let bankData = (await BackEndRequest.getbankLineData()).data
     let mzs_monitorDevice = (await BackEndRequest.getMonitorInfo()).data
-    console.log(mzs_monitorDevice);
+
+
     //load Json
     let channel_gs = generateGeoJson(channelData, (element) => {
         return element['llCoords']
@@ -153,7 +154,7 @@ const initAllLayer = async (map) => {
                 'fill-opacity': 0.5
             }
         });
-        let size = 50
+        let size = 100
         const pulsingDot = {
             width: size,
             height: size,
@@ -379,7 +380,7 @@ const initAllLayer = async (map) => {
                     'fill-opacity': 0.1
                 }
             });
-            let size = 50
+            let size = 100
             const pulsingDot = {
                 width: size,
                 height: size,
@@ -512,36 +513,6 @@ const initAllLayer = async (map) => {
 }
 
 
-
-const test = async()=>{
-
-    // let gnss = (await (BackEndRequest.getMonitorDetailByType_Code('MZS120.529408_32.033683_1',"1"))).data
-    // console.log('gnss',gnss);
-
-    // let cexieyi = (await (BackEndRequest.getMonitorDetailByType_Code('MZS120.528701_32.034685_2',"2"))).data
-    // console.log('测斜仪',cexieyi);
-
-    // let cexieyInfo = (await (BackEndRequest.getInclinometerInfoByDeviceID('MZS120.528701_32.034685_2'))).data
-    // console.log('测斜仪detail',cexieyInfo);
-
-    // let yaliji = (await (BackEndRequest.getMonitorDetailByType_Code('MZS120.531984_32.032682_3',"3"))).data
-    // console.log('压力计',yaliji);
-
-    // let yalijiInfo = (await (BackEndRequest.getInclinometerInfoByDeviceID('MZS120.528701_32.034685_2'))).data
-    // console.log('压力计detail',yalijiInfo);
-
-
-    // let yinglizhuang = (await (BackEndRequest.getMonitorDetailByType_Code('MZS120.530415_32.033657_4',"4"))).data
-    // console.log('应力桩',yinglizhuang);
-
-    // let yinglizhuangInfo = (await (BackEndRequest.getInclinometerInfoByDeviceID('MZS120.528701_32.034685_2'))).data
-    // console.log('应力桩detail',yinglizhuangInfo);
-
-
-
-}
-
-
 const showLayers = (map, allLayer, layerShowArr) => {
 
     // map.on('load',()=>{
@@ -598,5 +569,4 @@ export {
     showLayers,
     initMap,
     initAllLayer,
-    test,
 }
