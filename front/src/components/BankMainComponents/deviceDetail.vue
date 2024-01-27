@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onBeforeMount, watch, defineProps } from 'vue';
+import { onMounted, ref, onBeforeMount, watch } from 'vue';
 import BackEndRequest from "../../api/backendIns"
 import * as echarts from 'echarts'
 

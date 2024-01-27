@@ -5,32 +5,49 @@
             <el-button type="primary" @click="treeZoomOut">Zoom Out</el-button>
             <el-button type="primary" @click="treeZoomInit">Init</el-button>
         </div>
-        <vue-tree style="width: 98vw; height: 98vh; border: 1px solid gray;" :dataset="sampleData" :config="treeConfig"
-            @mousewheel="treeMouseWheel" ref="nodeTree">
+        <vue-tree
+            style="width: 98vw; height: 98vh; border: 1px solid gray"
+            :dataset="sampleData"
+            :config="treeConfig"
+            @mousewheel="treeMouseWheel"
+            ref="nodeTree"
+        >
             <template v-slot:node="{ node, collapsed }">
                 <!-- <span class="tree-node" :style="{ border: collapsed ? '2px solid grey' : '' }">{{ node.value }}</span> -->
                 <div class="tree-node-container">
                     <div :class="mapNodeStyle(node)">
-                        <div class="node-title-text">{{ CommonUtils.humpToHyphen(node.node.name, ' ') }}</div>
+                        <div class="node-title-text">
+                            {{ CommonUtils.humpToHyphen(node.node.name, ' ') }}
+                        </div>
                     </div>
-                    <el-dropdown :trigger="['contextmenu']" ref="dropdownRef" class="node-drop-down">
+                    <el-dropdown
+                        :trigger="['contextmenu']"
+                        ref="dropdownRef"
+                        class="node-drop-down"
+                    >
                         {{ CommonUtils.humpToHyphen(node.node.name, ' ') }}
                         <template #dropdown>
                             <el-dropdown-menu>
-                                <el-dropdown-item @click="getNodeInfo(node.node)">
+                                <el-dropdown-item
+                                    @click="getNodeInfo(node.node)"
+                                >
                                     <el-icon>
-                                        <InfoFilled />
-                                    </el-icon>Info
+                                        <InfoFilled /> </el-icon
+                                    >Info
                                 </el-dropdown-item>
-                                <el-dropdown-item @click="getNodeData(node.node)">
+                                <el-dropdown-item
+                                    @click="getNodeData(node.node)"
+                                >
                                     <el-icon>
-                                        <Coin />
-                                    </el-icon>Data
+                                        <Coin /> </el-icon
+                                    >Data
                                 </el-dropdown-item>
-                                <el-dropdown-item v-if="checkIfCanAddNode(node)">
+                                <el-dropdown-item
+                                    v-if="checkIfCanAddNode(node)"
+                                >
                                     <el-icon>
-                                        <Coin />
-                                    </el-icon>Add Child
+                                        <Coin /> </el-icon
+                                    >Add Child
                                 </el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
@@ -42,18 +59,32 @@
                 </div>
             </template>
         </vue-tree>
-        <el-drawer v-model="nodeDrawerShow" direction="rtl" size="24%" @closed="drawerClosed" ref="drawerRef">
-            <template #header style="margin-bottom: 0;">
-                <h4 style="font-size: larger;">{{ drawerName }}</h4>
+        <el-drawer
+            v-model="nodeDrawerShow"
+            direction="rtl"
+            size="24%"
+            @closed="drawerClosed"
+            ref="drawerRef"
+        >
+            <template #header style="margin-bottom: 0">
+                <h4 style="font-size: larger">{{ drawerName }}</h4>
             </template>
             <template #default>
-                <el-radio-group v-if="typeRadioShow" @change="typeRadioChange" v-model="dataTypeRadio">
+                <el-radio-group
+                    v-if="typeRadioShow"
+                    @change="typeRadioChange"
+                    v-model="dataTypeRadio"
+                >
                     <el-radio label="Raw" size="large">Raw</el-radio>
                     <el-radio label="GeoJSON" size="large">GeoJSON</el-radio>
                 </el-radio-group>
                 <div class="data-container">
-                    <el-form label-position="top" :model="infoFormInput" style="max-width: 460px"
-                        v-if="drawerInfoTypeEnum == 1">
+                    <el-form
+                        label-position="top"
+                        :model="infoFormInput"
+                        style="max-width: 460px"
+                        v-if="drawerInfoTypeEnum == 1"
+                    >
                         <el-form-item label="Name">
                             <el-input v-model="infoFormInput.name" />
                         </el-form-item>
@@ -70,7 +101,10 @@
                             <el-input v-model="infoFormInput.authority" />
                         </el-form-item>
                     </el-form>
-                    <div class="single-data-container node-data-container" v-else-if="drawerInfoTypeEnum == 2">
+                    <div
+                        class="single-data-container node-data-container"
+                        v-else-if="drawerInfoTypeEnum == 2"
+                    >
                         <el-scrollbar height="80vh">
                             <!-- <div v-for="nodeData of nodeDataList" class="single-data-kv">
                                 <div v-for="(value, key, index) in nodeData" class="a-data-column">
@@ -79,16 +113,37 @@
                                 </div>
                                 <el-divider border-style="double" />
                             </div> -->
-                            <el-descriptions :column="2" border v-for="nodeData of nodeDataList"
-                                style="margin-bottom: 20px;" v-if="dataTypeRadio == 'Raw'">
-                                <el-descriptions-item v-for="(value, key, index) in nodeData" :label="key"
-                                    label-align="right" align="center" label-class-name="data-desc-key"
-                                    class-name="data-desc-value">{{ value }}</el-descriptions-item>
+                            <el-descriptions
+                                :column="2"
+                                border
+                                v-for="nodeData of nodeDataList"
+                                style="margin-bottom: 20px"
+                                v-if="dataTypeRadio == 'Raw'"
+                            >
+                                <el-descriptions-item
+                                    v-for="(value, key, index) in nodeData"
+                                    :label="key"
+                                    label-align="right"
+                                    align="center"
+                                    label-class-name="data-desc-key"
+                                    class-name="data-desc-value"
+                                    >{{ value }}</el-descriptions-item
+                                >
                             </el-descriptions>
-                            <JsonViewer v-else :value="geojsonData" copyable boxed :expanded="jsonExpanded" :expand-depth=5 />
+                            <JsonViewer
+                                v-else
+                                :value="geojsonData"
+                                copyable
+                                boxed
+                                :expanded="jsonExpanded"
+                                :expand-depth="5"
+                            />
                         </el-scrollbar>
                     </div>
-                    <div class="multiple-data-container node-data-container" v-else>
+                    <div
+                        class="multiple-data-container node-data-container"
+                        v-else
+                    >
                         <el-scrollbar height="80vh">
                             <!-- <div v-for="nodeData of nodeDataList" class="single-data-kv">
                                 <div v-for="(value, key, index) in nodeData">
@@ -96,8 +151,22 @@
                                     <div>{{ value }}</div>
                                 </div>
                             </div> -->
-                            <el-table :data="nodeDataList" height="80vh" style="width: 100%" stripe="true" border="true" highlight-current-row="true">
-                                <el-table-column v-for="(value, key, index) in nodeDataList[0]"  :prop="key" :label="key" width="160"/>
+                            <el-table
+                                :data="nodeDataList"
+                                height="80vh"
+                                style="width: 100%"
+                                stripe="true"
+                                border="true"
+                                highlight-current-row="true"
+                            >
+                                <el-table-column
+                                    v-for="(
+                                        value, key, index
+                                    ) in nodeDataList[0]"
+                                    :prop="key"
+                                    :label="key"
+                                    width="160"
+                                />
                                 <!-- <el-table-column prop="date" label="Date" width="180" />
                                 <el-table-column prop="name" label="Name" width="180" />
                                 <el-table-column prop="address" label="Address" /> -->
@@ -109,7 +178,9 @@
             <template #footer>
                 <div style="flex: auto" v-show="footerShow">
                     <el-button @click="cancelClick">cancel</el-button>
-                    <el-button type="primary" @click="confirmClick">confirm</el-button>
+                    <el-button type="primary" @click="confirmClick"
+                        >confirm</el-button
+                    >
                 </div>
             </template>
         </el-drawer>
@@ -117,8 +188,8 @@
 </template>
 
 <script setup>
-import { JsonViewer } from "vue3-json-viewer";
-import "vue3-json-viewer/dist/index.css";
+import { JsonViewer } from 'vue3-json-viewer';
+import 'vue3-json-viewer/dist/index.css';
 import VueTree from '@ssthouse/vue3-tree-chart';
 import TreeChartCore, {
     // DEFAULT_NODE_WIDTH,
@@ -126,8 +197,8 @@ import TreeChartCore, {
     // DEFAULT_LEVEL_HEIGHT,
     TreeLinkStyle,
     Direction,
-} from "@ssthouse/tree-chart-core";
-import "@ssthouse/vue3-tree-chart/dist/vue3-tree-chart.css";
+} from '@ssthouse/tree-chart-core';
+import '@ssthouse/vue3-tree-chart/dist/vue3-tree-chart.css';
 import { onMounted, ref, reactive } from 'vue';
 import BackEndRequest from '../api/backendIns.js';
 import CommonUtils from '../utils/CommonUtils.js';
@@ -137,15 +208,14 @@ const MATCH_SCALE_REGEX = /scale\((\S*)\)/i;
 const MATCH_TRANSLATE_REGEX = /translate\((-?\d+)px, ?(-?\d+)px\)/i;
 const MATCH_TRANSFORMORIGIN_REGEX = /(-?\d+)px ?(-?\d+)px/i;
 
-
 const nodeTree = ref(null);
 
 let curNodeInfo = null;
 
 const drawerRef = ref();
 const nodeDrawerShow = ref(false);
-const drawerName = ref("Node Name Here")
-const dataTypeRadio = ref("Raw")
+const drawerName = ref('Node Name Here');
+const dataTypeRadio = ref('Raw');
 const typeRadioShow = ref(true);
 const footerShow = ref(true);
 const geojsonData = ref({});
@@ -155,25 +225,25 @@ const jsonExpanded = ref(true);
 
 // 1: info 2: item data 3: rows of data
 const drawerInfoTypeEnum = ref(1);
-const nodeDataList = ref([{}])
+const nodeDataList = ref([{}]);
 
 let treeChartCore = null;
 
 let sampleData = ref({
     name: 'Data Resource',
-    "node": {
-        "apiPrefix": "",
-        "auth": "all",
-        "bank": "all",
-        "category": "DataNode",
-        "id": "659bee3062838e7ac7ee21a1",
-        "linkCode": "",
-        "name": "dataNode",
-        "path": "",
-        "usage": {}
+    node: {
+        apiPrefix: '',
+        auth: 'all',
+        bank: 'all',
+        category: 'DataNode',
+        id: '659bee3062838e7ac7ee21a1',
+        linkCode: '',
+        name: 'dataNode',
+        path: '',
+        usage: {},
     },
-    children: []
-})
+    children: [],
+});
 
 const infoFormInput = reactive({
     name: '',
@@ -181,15 +251,16 @@ const infoFormInput = reactive({
     bank: '',
     category: '',
     authority: '',
-})
+});
 
 function typeRadioChange(curLabel) {
     console.log(curLabel);
-    if(curLabel == "GeoJSON") {
-        geojsonData.value = CommonUtils.staticInfoData2GeoJson(nodeDataList.value);
+    if (curLabel == 'GeoJSON') {
+        geojsonData.value = CommonUtils.staticInfoData2GeoJson(
+            nodeDataList.value,
+        );
     }
 }
-
 
 let getTranslate = () => {
     let string = treeChartCore.svgElement.style.transform;
@@ -200,16 +271,18 @@ let getTranslate = () => {
     let x = parseInt(match[1]);
     let y = parseInt(match[2]);
     return [x, y];
-}
+};
 
 let setScale = (scaleNum) => {
-    if (typeof scaleNum !== "number") return;
+    if (typeof scaleNum !== 'number') return;
     let pos = getTranslate();
     let translateString = `translate(${pos[0]}px, ${pos[1]}px)`;
-    treeChartCore.svgElement.style.transform = `scale(${scaleNum}) ` + translateString;
-    treeChartCore.domElement.style.transform = `scale(${scaleNum}) ` + translateString;
+    treeChartCore.svgElement.style.transform =
+        `scale(${scaleNum}) ` + translateString;
+    treeChartCore.domElement.style.transform =
+        `scale(${scaleNum}) ` + translateString;
     treeChartCore.currentScale = scaleNum;
-}
+};
 
 let treeMouseWheel = (e) => {
     // console.log("wheel", e);
@@ -226,13 +299,12 @@ let treeMouseWheel = (e) => {
         originScale = parseFloat(scaleMatchResult[1]);
         if (e.wheelDelta > 0) targetScale *= originScale;
         else targetScale = originScale / 1.2;
-    }
-    else {
-        console.log("Scale match error!");
+    } else {
+        console.log('Scale match error!');
         return;
     }
     // console.log("target scale:", targetScale)
-    if (typeof targetScale !== "number") return;
+    if (typeof targetScale !== 'number') return;
     let translatePos = getTranslate();
     // console.log("translatePos:", translatePos);
     // console.log("ratio", targetScale, originScale)
@@ -249,24 +321,25 @@ let treeMouseWheel = (e) => {
     let translateString = `translate(${translatePos[0]}px, ${translatePos[1]}px)`;
     // let translateString = `translate(${translatePos[0]}px, ${translatePos[1]}px)`;
     if (originMatch != null) {
-
     }
     console.log(translateString);
-    console.log(`${translatePos[0]}px ${translatePos[1]}px`)
+    console.log(`${translatePos[0]}px ${translatePos[1]}px`);
     treeChartCore.svgElement.style.transformOrigin = `${e.clientX}px ${e.clientY}px`;
     treeChartCore.domElement.style.transformOrigin = `${e.clientX}px ${e.clientY}px`;
-    treeChartCore.svgElement.style.transform = `scale(${targetScale}) ` + translateString;
-    treeChartCore.domElement.style.transform = `scale(${targetScale}) ` + translateString;
+    treeChartCore.svgElement.style.transform =
+        `scale(${targetScale}) ` + translateString;
+    treeChartCore.domElement.style.transform =
+        `scale(${targetScale}) ` + translateString;
     treeChartCore.currentScale = targetScale;
-}
+};
 
 let treeZoomIn = () => {
     treeChartCore.zoomIn();
-}
+};
 
 let treeZoomOut = () => {
     treeChartCore.zoomOut();
-}
+};
 
 let treeZoomInit = () => {
     const origin = treeChartCore.getInitialTransformStyle();
@@ -274,35 +347,35 @@ let treeZoomInit = () => {
     treeChartCore.domElement.style.transform = origin.transform;
     treeChartCore.svgElement.style.transformOrigin = `center center`;
     treeChartCore.domElement.style.transformOrigin = `center center`;
-}
+};
 
 const cancelClick = () => {
     drawerRef.value.close();
-}
+};
 
 const confirmClick = () => {
     let ifUpdated = false;
-    console.log(curNodeInfo)
-    if(curNodeInfo.name != infoFormInput.name) {
-        curNodeInfo.name = infoFormInput.name
+    console.log(curNodeInfo);
+    if (curNodeInfo.name != infoFormInput.name) {
+        curNodeInfo.name = infoFormInput.name;
     }
-    if(curNodeInfo.auth != infoFormInput.authority) {
-        curNodeInfo.auth = infoFormInput.authority
+    if (curNodeInfo.auth != infoFormInput.authority) {
+        curNodeInfo.auth = infoFormInput.authority;
     }
-    if(curNodeInfo.bank != infoFormInput.bank) {
-        curNodeInfo.bank = infoFormInput.bank
+    if (curNodeInfo.bank != infoFormInput.bank) {
+        curNodeInfo.bank = infoFormInput.bank;
     }
-    if(curNodeInfo.category != infoFormInput.category) {
-        curNodeInfo.category = infoFormInput.category
+    if (curNodeInfo.category != infoFormInput.category) {
+        curNodeInfo.category = infoFormInput.category;
     }
-    if(curNodeInfo.apiPrefix != infoFormInput.database) {
-        curNodeInfo.apiPrefix = infoFormInput.database
+    if (curNodeInfo.apiPrefix != infoFormInput.database) {
+        curNodeInfo.apiPrefix = infoFormInput.database;
     }
-    if(ifUpdated) {
+    if (ifUpdated) {
         BackEndRequest.updateNodeInfo(curNodeInfo);
     }
     drawerRef.value.close();
-}
+};
 
 const getNodeInfo = (node) => {
     // console.log(node.node);
@@ -317,7 +390,7 @@ const getNodeInfo = (node) => {
     infoFormInput.category = node.category;
     infoFormInput.database = node.apiPrefix;
     nodeDrawerShow.value = true;
-}
+};
 
 const getNodeData = async (node) => {
     let nodeReqData = await BackEndRequest.getDataNodeData(node);
@@ -325,66 +398,65 @@ const getNodeData = async (node) => {
     footerShow.value = false;
     console.log(nodeReqData);
     if (Array.isArray(nodeReqData.data)) {
-        nodeDataList.value = nodeReqData.data
+        nodeDataList.value = nodeReqData.data;
         if (nodeDataList.value.length > 2) {
             drawerInfoTypeEnum.value = 3;
             typeRadioShow.value = false;
-        }
-        else {
+        } else {
             drawerInfoTypeEnum.value = 2;
             typeRadioShow.value = true;
         }
-    }
-    else {
+    } else {
         nodeDataList.value[0] = nodeReqData.data;
         drawerInfoTypeEnum.value = 2;
         typeRadioShow.value = true;
     }
-    if(typeRadioShow.value && dataTypeRadio.value == "GeoJSON") {
-        geojsonData.value = CommonUtils.staticInfoData2GeoJson(nodeDataList.value);
+    if (typeRadioShow.value && dataTypeRadio.value == 'GeoJSON') {
+        geojsonData.value = CommonUtils.staticInfoData2GeoJson(
+            nodeDataList.value,
+        );
     }
     nodeDrawerShow.value = true;
-}
+};
 
 const drawerClosed = () => {
     // console.log("closed");
     nodeDataList.value = [{}];
-}
+};
 
 const treeConfig = { nodeWidth: 200, nodeHeight: 120, levelHeight: 240 };
 
 let mapNodeStyle = (node) => {
     // console.log("node", node);
     // TODO: add data node style mapper
-    let classProp = ["tree-node-title"];
+    let classProp = ['tree-node-title'];
 
     if (node.children == null || node.children.length == 0) {
-        classProp.push("leaf");
+        classProp.push('leaf');
     }
-    let parentNodeList = ["dataNode", "modelNode", "paramNode", "taskNode"];
+    let parentNodeList = ['dataNode', 'modelNode', 'paramNode', 'taskNode'];
     if (parentNodeList.indexOf(node.parentName) != -1) {
-        classProp.push("sec-root");
+        classProp.push('sec-root');
     }
-    if (node.parentName == "") {
-        classProp.push("root");
+    if (node.parentName == '') {
+        classProp.push('root');
     }
     // console.log("name", node["node"]["name"])
     // console.log("category", node["node"]["category"])
-    if (node["node"].category.endsWith("Item")) {
-        classProp.push("node-item");
-    } else if (node.node.category.endsWith("Group")) {
-        classProp.push("node-group");
+    if (node['node'].category.endsWith('Item')) {
+        classProp.push('node-item');
+    } else if (node.node.category.endsWith('Group')) {
+        classProp.push('node-group');
     }
 
-    return classProp.join(" ");
-}
+    return classProp.join(' ');
+};
 
 let checkIfCanAddNode = (node) => {
-    if (node.parentName == "" || node["node"].category.endsWith("Item")) {
+    if (node.parentName == '' || node['node'].category.endsWith('Item')) {
         return false;
-    }
-    else return true;
-}
+    } else return true;
+};
 
 onMounted(async () => {
     const tree = await BackEndRequest.getDataNodeTree();
@@ -400,11 +472,10 @@ onMounted(async () => {
         direction: Direction.VERTICAL,
         treeConfig: treeConfig,
         collapseEnabled: true,
-        linkStyle: TreeLinkStyle.CURVE
-    })
+        linkStyle: TreeLinkStyle.CURVE,
+    });
     treeChartCore.init();
-})
-
+});
 </script>
 
 <style lang="scss" scoped>
@@ -415,6 +486,7 @@ div.container {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background-color: rgb(245, 249, 255);
 
     div.el-drawer__header {
         margin-bottom: 0px;
@@ -483,15 +555,14 @@ div.container {
             }
 
             &.sec-root {
-                border-width: 2px;
+                border-width: 4px;
                 border-style: solid;
+                border-color: rgb(255, 205, 134);
 
                 div.node-title-text {
                     font-weight: 600;
                 }
             }
-
-
 
             &.node-group {
                 background-color: rgb(180, 218, 252);
@@ -507,7 +578,6 @@ div.container {
                     color: rgb(38, 96, 172);
                 }
             }
-
         }
 
         div.node-drop-down {
@@ -531,7 +601,6 @@ div.container {
             display: flex;
             flex-flow: row nowrap;
             text-align: center;
-
 
             div.node-info {
                 width: 50%;
@@ -557,7 +626,6 @@ div.container {
         //     }
         // }
 
-
         div.tree-node-content {
             height: 30px;
             width: 160px;
@@ -577,6 +645,12 @@ div.container {
             }
         }
     }
+}
+
+:deep(div.tree-container) {
+    width: 100vw!important;
+    height: 93vh!important;
+    border-style: none!important;
 }
 
 div.el-scrollbar {
