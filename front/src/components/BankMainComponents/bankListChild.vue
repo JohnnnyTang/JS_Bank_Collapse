@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onBeforeMount, watch, defineEmits, defineProps } from 'vue';
+import { onMounted, ref, onBeforeMount, watch, } from 'vue';
 import BackEndRequest from "../../api/backendIns"
 
 let tableData = ref([])
@@ -54,10 +54,12 @@ onMounted(async () => {
         text-align: center;
         margin-top: 1vh;
         margin-bottom: 1vh;
+        color: aliceblue;
     }
 
     .text{
         padding: 1vh;
+        color: aliceblue;
     }
 
 }

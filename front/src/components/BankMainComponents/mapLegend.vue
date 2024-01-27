@@ -18,8 +18,8 @@
                 <div
                     class="column1"
                     style="
-                        background-image: url('/legend/monitorPoint.png');
-                        background-size: 2vh;
+                        background-image: url('/monitorPoint.png');
+                        background-size: 3vh;
                     "
                 ></div>
                 <div class="column2">监测站点</div>

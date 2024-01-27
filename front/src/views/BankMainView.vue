@@ -3,52 +3,49 @@
         <div class="map-container" id="map"></div>
         <mapLegendL v-show="showLegend"></mapLegendL>
         <mapLegend v-show="showLegend2"></mapLegend>
-        <button style="left: 4vh" @click="largeScaleShow">长江江苏段</button>
-        <button style="left: 24vh" @click="smallScaleShow">民主沙示范段</button>
+        <button style="left: 2vh;" class="button" @click="largeScaleShow">长江江苏段</button>
+        <button style="left: 25vh;" class="button" @click="smallScaleShow">民主沙示范段</button>
+
         <bankList v-show="showList" @showChange="handlerListDBclick"></bankList>
-        <!-- <bankListChild v-show="showChild" :info="childData" :showFather="showFather" :showChild="showChild" ref ="showInfo"></bankListChild> -->
-        <bankListChild
-            v-show="showChild"
-            @showChange="handlerShowchange"
-            :info="childData"
-        ></bankListChild>
+        <bankListChild v-show="showChild" @showChange="handlerShowchange" :info="childData"></bankListChild>
 
         <bankHistory v-show="showHistory"></bankHistory>
         <mzsDetail v-show="showmzsDetail"></mzsDetail>
-        <deviceDetail
-            v-if="showDeviceDetail"
-            :deviceInfo="deviceInfo"
-        ></deviceDetail>
+        <deviceDetail v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail>
+
     </div>
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus';
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { onMounted, ref } from 'vue';
-// import { initMap, channelVisual, bankLineVisual, mzsMonitorVisual, monitorDeviceVisual } from '../utils/code4MainView'
+import { ElMessage } from 'element-plus';
+import { initMap, initAllLayer, showLayers } from "../utils/MainView"
+import mapLegend from "../components/BankMainComponents/mapLegend.vue"
+import mapLegendL from "../components/BankMainComponents/mapLegendL.vue"
 import bankHistory from '../components/BankMainComponents/bankHistory.vue';
-import bankList from '../components/BankMainComponents/banklist.vue';
+import bankList from "../components/BankMainComponents/bankList.vue"
 import bankListChild from '../components/BankMainComponents/bankListChild.vue';
 import deviceDetail from '../components/BankMainComponents/deviceDetail.vue';
-import mapLegend from '../components/BankMainComponents/mapLegend.vue';
-import mapLegendL from '../components/BankMainComponents/mapLegendL.vue';
 import mzsDetail from '../components/BankMainComponents/mzsDetail.vue';
-import { initAllLayer, initMap, showLayers } from '../utils/MainView';
 
-const showLegend = ref(true);
-const showLegend2 = ref(false);
-const showList = ref(true);
-const showChild = ref(false);
-const showHistory = ref(true);
-const showmzsDetail = ref(false);
-const showDeviceDetail = ref(false);
-const childData = ref({});
+const showLegend = ref(true)
+const showLegend2 = ref(false)
+const showList = ref(true)
+const showChild = ref(false)
+const showHistory = ref(true)
+const showmzsDetail = ref(false)
+const showDeviceDetail = ref(false)
+const childData = ref({})
 
-const showInfo = ref({});
-const deviceInfo = ref({});
+const deviceInfo = ref({})
 
-let map;
+const viewMode = ref('1')
+
+let map
+let marker
+
 let layerIDs = [
     'channelLayer',
     'banklineLayer',
@@ -56,20 +53,16 @@ let layerIDs = [
     'mzsMonitorDevice',
     'mzsMonitorSectionLayer',
     'mzsMonitorBankLineLayer',
-];
-let layerInited = false;
+    'changjiangboudary'
+]
+let layerInited = false
 
-const largeScale = ['channelLayer', 'banklineLayer'];
-const smallScale = [
-    'mzsBoundary',
-    'mzsMonitorDevice',
-    'mzsMonitorSectionLayer',
-    'mzsMonitorBankLineLayer',
-];
+const largeScale = ['channelLayer', 'banklineLayer', 'changjiangboudary']
+const smallScale = ['mzsBoundary', 'mzsMonitorDevice', 'mzsMonitorSectionLayer', 'mzsMonitorBankLineLayer', 'changjiangboudary']
 
 const handlerListDBclick = (info) => {
-    handlerShowchange(info);
-    childData.value = info.childInfo;
+    handlerShowchange(info)
+    childData.value = info.childInfo
     map.flyTo({
         center: info.childInfo.coord[0],
         zoom: 12.946462040328413,
@@ -87,9 +80,11 @@ onMounted(async () => {
     map = initMap();
     layerInited = await initAllLayer(map);
     ElMessage({
+        offset: 80,
         message: '图层加载完毕',
-        type: 'success',
-    });
+        type: 'success'
+    })
+    largeScaleShow();
     layerEventLogic(map);
 });
 
@@ -127,8 +122,11 @@ const mapFlyToMZS = async () => {
 };
 
 const largeScaleShow = () => {
-    if (map.getStyle().layers.length != 58) {
-        ElMessage('图层正在加载中');
+    if (map.getStyle().layers.length != 59) {
+        ElMessage({
+            offset: 80,
+            message: '图层加载中',
+        })
         return;
     }
 
@@ -145,50 +143,96 @@ const largeScaleShow = () => {
 };
 
 const smallScaleShow = () => {
-    if (map.getStyle().layers.length != 58) {
-        ElMessage('图层正在加载中');
+
+    if (map.getStyle().layers.length != 59) {
+        ElMessage({
+            offset: 80,
+            message: '图层加载中',
+        })
         return;
     }
+    mapFlyToMZS()
+    showLayers(map, layerIDs, smallScale)
+    showLegend.value = false
+    showLegend2.value = true
+    showList.value = false
+    showChild.value = false
+    showHistory.value = false
+    showmzsDetail.value = true
 
-    mapFlyToMZS();
-    showLayers(map, layerIDs, smallScale);
-    showLegend.value = false;
-    showLegend2.value = true;
-    showList.value = false;
-    showChild.value = false;
-    showHistory.value = false;
-    showmzsDetail.value = true;
-};
+}
 
 const layerEventLogic = (map) => {
     map.on('click', (e) => {
         const box = [
-            [e.point.x - 5, e.point.y - 5],
-            [e.point.x + 5, e.point.y + 5],
-        ];
+            [e.point.x - 3, e.point.y - 3],
+            [e.point.x + 3, e.point.y + 3]
+        ]
         //点击device弹出deviceDetail
-        const mzsMonitorDevices = map.queryRenderedFeatures(box, {
-            layers: ['mzsMonitorDevice'],
-        });
-        if (mzsMonitorDevices && mzsMonitorDevices[0]) {
-            deviceInfo.value = mzsMonitorDevices[0].properties;
-            showDeviceDetail.value = true;
+        if (map.getLayer('mzsMonitorDevice')) {
+            const mzsMonitorDevices = map.queryRenderedFeatures(box, { layers: ['mzsMonitorDevice'] });
+            if (mzsMonitorDevices && mzsMonitorDevices[0]) {
+                showDeviceDetail.value = true
+                deviceInfo.value = mzsMonitorDevices[0].properties;
+            }
         }
 
-        // //点击bankLine 图查文, 和双击表格一样的效果
-        // const bankLines = map.queryRenderedFeatures(box, {
-        //     layers: ['banklineLayer'],
-        // });
-        // if (bankLines && bankLines[0]) {
-        //     childData.value = bankLines[0].properties;
-        //     map.flyTo({
-        //         center: bankLines[0].properties.coord[0],
-        //         zoom: 12.946462040328413,
-        //         pitch: 56.686721021958206,
-        //     });
-        // }
-    });
-};
+        //点击bankLine 图查文, 和双击表格一样的效果
+        if (map.getLayer('banklineLayer')) {
+            const bankLines = map.queryRenderedFeatures(box, { layers: ['banklineLayer'] });
+            if (bankLines && bankLines[0]) {
+                childData.value = bankLines[0].properties
+                showChild.value = true
+                showList.value = false
+                let lonlat = bankLines[0].properties.coord.slice(2, 28).split(',')
+                marker && marker.remove()
+                marker = new mapboxgl.Marker()
+                    .setLngLat(e.lngLat)
+                    .addTo(map);
+                map.flyTo({
+                    center: [Number(lonlat[0]), Number(lonlat[1])],
+                    zoom: 11,
+                    pitch: 56.686721021958206
+                })
+            }
+        }
+
+    })
+
+
+
+    map.on('mousemove', (e) => {
+        const box = [
+            [e.point.x - 5, e.point.y - 5],
+            [e.point.x + 5, e.point.y + 5]
+        ]
+        if (map.getLayer('banklineLayer')) {
+            const bankLines = map.queryRenderedFeatures(box, { layers: ['banklineLayer'] });
+            if (bankLines && bankLines[0]) {
+                map.getCanvas().style.cursor = 'pointer'
+            }
+            else {
+                map.getCanvas().style.cursor = ''
+            }
+        }
+
+
+    })
+
+    map.on('zoom', (e) => {
+
+        // console.log('zoom ',map.getZoom());
+        // console.log('Center ',map.getCenter());
+        // console.log('Bounds ',map.getBounds());
+        // if small enough 
+        // show small scale
+    })
+
+
+}
+
+
+
 </script>
 
 <style lang="scss" scoped>

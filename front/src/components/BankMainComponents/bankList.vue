@@ -20,8 +20,8 @@
 </template>
 
 <script setup>
-import { defineEmits, onBeforeMount, onMounted, ref, watch } from 'vue';
-import BackEndRequest from '../../api/backendIns';
+import { onMounted, ref, onBeforeMount, watch } from 'vue';
+import BackEndRequest from "../../api/backendIns"
 
 let tableData = ref([]);
 const loading = ref(true);

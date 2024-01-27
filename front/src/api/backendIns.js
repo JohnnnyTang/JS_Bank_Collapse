@@ -63,20 +63,7 @@ export default class BackEndRequest {
         }
     }
 
-    // /data/inclinometerInfo/id/{id}
-    // /data/manometerInfo/id/{id}
-    // /data/stressInfo/id/{id}
 
-    static getInclinometerInfoByDeviceID(deviceID){
-        return backendInstance.get(`/data/inclinometerInfo/id/${deviceID}`)
-    }
-    static getManometerInfoByDeviceID(deviceID){
-        return backendInstance.get(`/data/manometerInfo/id/${deviceID}`)
-    }
-    static getStressInfoByDeviceID(deviceID){
-        return backendInstance.get(`/data/stressInfo/id/${deviceID}`)
-    }
-    
     static getMonitorInfoByType_Code(code,type){
         //desc
         switch (type) {
