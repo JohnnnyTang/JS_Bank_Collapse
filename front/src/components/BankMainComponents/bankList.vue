@@ -71,18 +71,22 @@ onMounted(async () => {
         background: hsl(210, 70%, 90%);
     }
 
-    :deep(.el-table tbody tr:hover) {
-        background: hsl(210, 70%, 60%);
-    }
-
     :deep(.el-table tbody tr:nth-child(2n)) {
         color: hsl(210, 70%, 30%);
         background: hsl(210, 70%, 90%);
     }
 
+    :deep(.el-table__body tr:nth-child(2n):hover > td) {
+        background: hsl(210, 70%, 80%);
+    }
+
     :deep(.el-table tbody tr:nth-child(2n + 1)) {
         color: hsl(210, 70%, 90%);
         background: hsl(210, 70%, 30%);
+    }
+
+    :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
+        background: hsl(210, 70%, 40%);
     }
 }
 </style>
