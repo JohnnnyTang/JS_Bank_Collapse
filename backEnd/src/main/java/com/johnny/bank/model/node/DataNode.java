@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Document(collection = "dataNode")
+@Document(collection = "test")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataNode extends BaseNode {
     String apiPrefix;
