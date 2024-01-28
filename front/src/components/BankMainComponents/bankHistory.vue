@@ -9,33 +9,28 @@
             :cell-style="{ padding: '0px' }"
             v-loading="loading"
         >
-            <el-table-column prop="时间" label="时间" align="center" />
-            <el-table-column prop="崩岸地点" label="崩岸地点" align="center" />
-            <el-table-column prop="崩岸类型" label="崩岸类型" align="center" />
-            <el-table-column prop="岸别" label="岸别" align="center" />
-            <el-table-column prop="所在河段" label="所在河段" align="center" />
-            <!-- <el-table-column prop="time" label="时间" align="center" />
+
+            <el-table-column prop="time" label="时间" align="center" />
             <el-table-column prop="place" label="崩岸地点" align="center" />
             <el-table-column prop="type" label="崩岸类型" align="center" />
             <el-table-column prop="side" label="岸别" align="center" />
-            <el-table-column prop="river" label="所在河段" align="center" /> -->
+            <el-table-column prop="river" label="所在河段" align="center" />
         </el-table>
     </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { historyInfo } from '../../utils/geojson/monitordata';
 import BackEndRequest from '../../api/backendIns';
 
 const tableData = ref([]);
 const loading = ref(true)
 onMounted(async () => {
-    tableData.value = historyInfo;
-    // const historydata = (await BackEndRequest.getHistoryInfo()).data
-    // console.log(historydata);
+
+    const historydata = (await BackEndRequest.getHistoryInfo()).data
+
+    tableData.value = historydata;
     loading.value = false
-    // tableData.value = historydata;
 });
 </script>
 

@@ -95,6 +95,7 @@ const showC2 = async () => {
 };
 
 watch(props, (val) => {
+
     chart1DOM.value.style.display = 'none';
     myChart && myChart.clear();
 });

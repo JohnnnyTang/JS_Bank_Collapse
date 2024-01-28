@@ -3,26 +3,26 @@
         <div class="map-container" id="map"></div>
         <mapLegendL v-show="showLegend"></mapLegendL>
         <mapLegend v-show="showLegend2"></mapLegend>
-        <button style="left: 4vh" class="button" @click="largeScaleShow">
+        <button style="left: 4vh" class="button" @click="largeScaleShow" ref="btn1">
             长江江苏段
         </button>
-        <button style="left: 24vh" class="button" @click="smallScaleShow">
+        <button style="left: 24vh" class="button" @click="smallScaleShow" ref="btn2">
             民主沙示范段
         </button>
+        <div class="checkbox" v-show="showmzsDetail">
+            <el-checkbox v-model="view['2D']" :disabled="disable2D">2D视图</el-checkbox>
+            <el-checkbox v-model="view['3D']" :disabled="disable3D">3D视图</el-checkbox>
+            <!-- <el-checkbox v-model="view['Flow']" :disabled="false">流场</el-checkbox> -->
+        </div>
+
 
         <bankList v-show="showList" @showChange="handlerListDBclick"></bankList>
-        <bankListChild
-            v-show="showChild"
-            @showChange="handlerShowchange"
-            :info="childData"
-        ></bankListChild>
+        <bankListChild v-show="showChild" @showChange="handlerShowchange" :info="childData" @showDetail="handleShowDetail">
+        </bankListChild>
 
         <bankHistory v-show="showHistory"></bankHistory>
         <mzsDetail v-show="showmzsDetail"></mzsDetail>
-        <deviceDetail
-            v-if="showDeviceDetail"
-            :deviceInfo="deviceInfo"
-        ></deviceDetail>
+        <deviceDetail v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail>
     </div>
 </template>
 
@@ -30,7 +30,7 @@
 import { ElMessage } from 'element-plus';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref,watch } from 'vue';
 import bankHistory from '../components/BankMainComponents/bankHistory.vue';
 import bankList from '../components/BankMainComponents/bankList.vue';
 import bankListChild from '../components/BankMainComponents/bankListChild.vue';
@@ -38,7 +38,7 @@ import deviceDetail from '../components/BankMainComponents/deviceDetail.vue';
 import mapLegend from '../components/BankMainComponents/mapLegend.vue';
 import mapLegendL from '../components/BankMainComponents/mapLegendL.vue';
 import mzsDetail from '../components/BankMainComponents/mzsDetail.vue';
-import { initAllLayer, initMap, showLayers } from '../utils/MainView';
+import { initAllLayer, initMap, showLayers,hideLayers } from '../utils/MainView';
 
 const showLegend = ref(true);
 const showLegend2 = ref(false);
@@ -51,7 +51,16 @@ const childData = ref({});
 
 const deviceInfo = ref({});
 
-const viewMode = ref('1');
+const view = reactive({
+    '2D': true,
+    '3D': false,
+    // 'Flow':false,
+});
+const disable2D = ref(false)
+const disable3D = ref(true)
+
+const btn1 = ref({})
+const btn2 = ref({})
 
 let map;
 let marker;
@@ -65,6 +74,7 @@ let layerIDs = [
     'mzsMonitorBankLineLayer',
     'changjiangboudary',
 ];
+let layerCount = 52+layerIDs.length
 let layerInited = false;
 
 const largeScale = ['channelLayer', 'banklineLayer', 'changjiangboudary'];
@@ -81,8 +91,8 @@ const handlerListDBclick = (info) => {
     childData.value = info.childInfo;
     map.flyTo({
         center: info.childInfo.coord[0],
-        zoom: 12.946462040328413,
-        pitch: 56.686721021958206,
+        zoom: 12,
+        pitch: 0,
     });
     // map.setPaintProperty('banklineLayer', 'line-color', []);
 };
@@ -91,6 +101,35 @@ const handlerShowchange = (info) => {
     showChild.value = info.showChild;
     showList.value = info.showFather;
 };
+const handleShowDetail = (info) => {
+    showChild.value = info.showChild;
+    showList.value = info.showFather;
+    showmzsDetail.value = info.showDetail;
+    smallScaleShow()
+};
+
+watch(view,(val)=>{
+
+    disable3D.value = view['2D'];
+    disable2D.value = view['3D'];
+   
+    if(view['2D']){
+        smallScaleShow();
+    }
+    if(!view['2D']){
+        hideLayers(map,layerIDs);
+    }
+    if(view['3D']){
+        // new custome layer
+        // map.add layer
+    }
+    if(!view['3D']){
+        // new map.
+    }
+
+
+
+})
 
 onMounted(async () => {
     map = initMap();
@@ -99,9 +138,10 @@ onMounted(async () => {
     ElMessage({
         offset: 80,
         message: '图层加载完毕',
-        type: 'success',
-    });
-    // largeScaleShow();
+        type: 'success'
+    })
+    btn1.value.classList.add('active')
+
     layerEventLogic(map);
 });
 
@@ -139,7 +179,7 @@ const mapFlyToMZS = async () => {
 };
 
 const largeScaleShow = () => {
-    if (map.getStyle().layers.length != 59) {
+    if (map.getStyle().layers.length != layerCount) {
         ElMessage({
             offset: 80,
             message: '图层加载中',
@@ -162,13 +202,14 @@ const largeScaleShow = () => {
 };
 
 const smallScaleShow = () => {
-    if (map.getStyle().layers.length != 59) {
+    if (map.getStyle().layers.length != layerCount) {
         ElMessage({
             offset: 80,
             message: '图层加载中',
         });
         return;
     }
+    view['2D'] = true;
     marker && marker.remove();
     mapFlyToMZS();
     showLayers(map, layerIDs, smallScale);
@@ -215,7 +256,8 @@ const layerEventLogic = () => {
                     center: [Number(lonlat[0]), Number(lonlat[1])],
                     zoom: 11,
                     pitch: 0,
-                });
+                    speed: 0.5,
+                })
             }
         }
     });
@@ -231,19 +273,21 @@ const layerEventLogic = () => {
             });
             if (bankLines && bankLines[0]) {
                 map.getCanvas().style.cursor = 'pointer';
-            } else {
-                map.getCanvas().style.cursor = '';
             }
         }
-    });
+        if (map.getLayer('mzsMonitorDevice')) {
+            const devices = map.queryRenderedFeatures(box, {
+                layers: ['mzsMonitorDevice'],
+            });
+            if (devices && devices[0]) {
+                map.getCanvas().style.cursor = 'pointer';
+            }
+        }
 
-    map.on('zoom', (e) => {
-        // console.log('zoom ',map.getZoom());
-        // console.log('Center ',map.getCenter());
-        // console.log('Bounds ',map.getBounds());
-        // if small enough
-        // show small scale
-    });
+    })
+    
+
+
 };
 </script>
 
@@ -259,6 +303,17 @@ div.bankMain-container {
         width: 100vw;
         background-color: rgb(34, 34, 34);
     }
+
+    div.checkbox {
+        position: absolute;
+        top: 20vh;
+        right: 30vw;
+
+        .el-checkbox {
+            padding: 10;
+        }
+    }
+
 }
 
 .legendCard {
@@ -290,6 +345,13 @@ button:hover {
     background: hsla(210, 70%, 30%);
     transition: 500ms;
 }
+
+// .active{
+//     background-color:rgb(247, 241, 241);
+//     color:black;
+//     font-size: larger;
+//     box-shadow: 10px 5px 5px 5px hsl(210, 70%, 90%);
+// }
 
 .bankListDIV {
     position: absolute;
