@@ -3,25 +3,18 @@
         <div class="card2">
             <div id="title">图例</div>
             <hr />
-            <div
-                v-for="(item, index) in lengendData"
-                :key="index"
-                class="legendItem"
-            >
-                <div
-                    class="colorcolumn"
-                    :style="{ 'border-top-color': item.color }"
-                ></div>
+            <div v-for="(item, index) in lengendData" :key="index" class="legendItem">
+                <div class="colorcolumn" :style="{
+                    'border-top-color': item.color,
+                    'border-top-width': item.legendWidth
+                }"></div>
                 <div class="column2">{{ item.desc }}</div>
             </div>
             <div class="legendItem">
-                <div
-                    class="column1"
-                    style="
+                <div class="column1" style="
                         background-image: url('/monitorPoint.png');
                         background-size: 3vh;
-                    "
-                ></div>
+                    "></div>
                 <div class="column2">监测站点</div>
             </div>
         </div>
@@ -34,23 +27,27 @@ import { onMounted } from 'vue';
 const lengendData = [
     {
         color: '#ff001e',
+        legendWidth: '2px',
         desc: '一级预警崩岸段',
     },
     {
         color: '#f65c6d',
+        legendWidth: '2px',
         desc: '二级预警崩岸段',
     },
     {
         color: '#f4d4d4',
+        legendWidth: '2px',
         desc: '三级预警崩岸段',
     },
     {
         color: '#9b9b9b',
+        legendWidth: '5px',
         desc: '断面',
     },
 ];
 
-onMounted(async () => {});
+onMounted(async () => { });
 </script>
 
 <style lang="scss" scoped>
@@ -100,7 +97,6 @@ onMounted(async () => {});
             height: 1vh;
             margin-left: 1vw;
             border-top-color: rgb(84, 84, 206);
-            border-top-width: 2px;
             border-top-style: solid;
             transform: translateY(50%);
         }

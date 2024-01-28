@@ -4,8 +4,6 @@ import BackEndRequest from "../api/backendIns"
 import { mzsBoundary_gj, mzsMonitor_gj, mzsMonitorSection_gj, mzsMonitorBankLine_gj, changjiangBoudary } from "./geojson/monitordata"
 mapboxgl.accessToken = 'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg';
 
-let geoJson = new Map();
-
 
 const initMap = () => {
     let map = new mapboxgl.Map({
@@ -17,6 +15,7 @@ const initMap = () => {
     });
 
     map.on('load', () => {
+
         mapFlyToRiver(map);
         // window.onresize = () => {
         //     mapFlyToRiver(map);
@@ -56,6 +55,7 @@ const initAllLayer = async (map) => {
         'mzsMonitorBankLineLayer',
         'changjiangboudary'
     ]
+    //map load 在 请求之前
     if (map.loaded()) {
         //map add source
         map.addSource('channelSource', {
@@ -96,7 +96,7 @@ const initAllLayer = async (map) => {
             'layout': {
                 'line-join': 'round',
                 'line-cap': 'round',
-                'visibility': 'none',// 'visible'
+                // 'visibility': 'none',// 'visible'
             },
             'paint': {
                 'line-color': [
@@ -121,7 +121,7 @@ const initAllLayer = async (map) => {
             type: 'line',
             source: 'banklineSource',
             'layout': {
-                'visibility': 'none'
+                // 'visibility': 'none'
             },
             paint: {
                 'line-color': [
@@ -156,9 +156,9 @@ const initAllLayer = async (map) => {
             'paint': {
                 'fill-color': '#02b9ff',
                 'fill-opacity': 0.1
-            } 
+            }
         });
-        let size = 100
+        let size = 60
         const pulsingDot = {
             width: size,
             height: size,
@@ -171,6 +171,7 @@ const initAllLayer = async (map) => {
                 canvas.width = this.width;
                 canvas.height = this.height;
                 this.context = canvas.getContext('2d');
+                this.context.canvas.willReadFrequently = true;
             },
 
             // Call once before every frame where the icon will be used.
@@ -211,12 +212,14 @@ const initAllLayer = async (map) => {
                 context.stroke();
 
                 // Update this image's data with data from the canvas.
+                context.canvas.willReadFrequently = true;
                 this.data = context.getImageData(
                     0,
                     0,
                     this.width,
                     this.height
                 ).data;
+                context.canvas.willReadFrequently = true;
 
                 // Continuously repaint the map, resulting
                 // in the smooth animation of the dot.
@@ -233,7 +236,9 @@ const initAllLayer = async (map) => {
             'source': 'mzsDeviceSource',
             'layout': {
                 'visibility': 'none',
-                'icon-image': 'pulsing-dot'
+                'icon-image': 'pulsing-dot',
+                'icon-allow-overlap': true
+
             },
         })
 
@@ -247,7 +252,7 @@ const initAllLayer = async (map) => {
             },
             'paint': {
                 'line-color': '#9b9b9b',
-                'line-width': 3
+                'line-width': 8
             }
         })
         map.addLayer({
@@ -278,7 +283,7 @@ const initAllLayer = async (map) => {
                     3,
                     '3',
                     2,
-                    1
+                    2
                 ],
             }
         })
@@ -293,8 +298,255 @@ const initAllLayer = async (map) => {
                 'fill-opacity': 0.1
             }
         });
+    }
 
-        }
+    //map load 在 请求之后
+    else {
+        map.on('load', () => {
+            map.addSource('channelSource', {
+                'type': 'geojson',
+                'data': channel_gs
+            });
+            map.addSource('banklineSource', {
+                'type': 'geojson',
+                'data': bankline_gs
+            })
+            map.addSource('mzsBoundarySource', {
+                'type': 'geojson',
+                'data': mzsBoundary_gj
+            })
+            map.addSource('mzsDeviceSource', {
+                'type': 'geojson',
+                'data': mzs_mDevice_gs
+            })
+
+            map.addSource('mzsMonitorSectionSource', {
+                'type': 'geojson',
+                'data': mzsMonitorSection_gj
+            })
+            map.addSource('mzsMonitorBankLineSource', {
+                'type': 'geojson',
+                'data': mzsMonitorBankLine_gj
+            })
+            map.addSource('changjiangboudarySource', {
+                'type': 'geojson',
+                'data': changjiangBoudary
+            })
+
+            //add invisible layer
+            map.addLayer({
+                'id': 'channelLayer',
+                'type': 'line',
+                'source': 'channelSource',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round',
+                    // 'visibility': 'none',// 'visible'
+                },
+                'paint': {
+                    'line-color': [
+                        'match',
+                        ['get', 'type'],
+                        '在建通道',
+                        '#98E19B',
+                        '已建通道',
+                        '#12E0A5',
+                        '规划通道',
+                        '#12E05F',
+                        '#C9E0BA'
+                    ],
+                    'line-width': 2,
+                    // 'line-dasharray': [2, 4],
+                    'line-opacity': 0.6
+                }
+            });
+
+            map.addLayer({
+                id: 'banklineLayer',
+                type: 'line',
+                source: 'banklineSource',
+                'layout': {
+                    // 'visibility': 'none'
+                },
+                paint: {
+                    'line-color': [
+                        'match',
+                        ['get', 'warningLevel'],
+                        1,
+                        '#F12F05',
+                        2,
+                        '#F05C04',
+                        3,
+                        '#F5E309',
+                        '#ccc'
+                    ],
+                    'line-width': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 4,   // 缩放级别为 0 时的线宽
+                        10, 1  // 缩放级别为 10 时的线宽
+                    ],
+                    'line-opacity': 0.6
+                }
+            })
+
+            map.addLayer({
+                'id': 'mzsBoundary',
+                'type': 'fill',
+                'source': 'mzsBoundarySource', // reference the data source
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': '#02b9ff',
+                    'fill-opacity': 0.1
+                }
+            });
+            let size = 60
+            const pulsingDot = {
+                width: size,
+                height: size,
+                data: new Uint8Array(size * size * 4),
+
+                // When the layer is added to the map,
+                // get the rendering context for the map canvas.
+                onAdd: function () {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    this.context = canvas.getContext('2d');
+                    this.context.canvas.willReadFrequently = true;
+                },
+
+                // Call once before every frame where the icon will be used.
+                render: function () {
+                    const duration = 1000;
+                    const t = (performance.now() % duration) / duration;
+
+                    const radius = (size / 2) * 0.3;
+                    const outerRadius = (size / 2) * 0.7 * t + radius;
+                    const context = this.context;
+
+                    // Draw the outer circle.
+                    context.clearRect(0, 0, this.width, this.height);
+                    context.beginPath();
+                    context.arc(
+                        this.width / 2,
+                        this.height / 2,
+                        outerRadius,
+                        0,
+                        Math.PI * 2
+                    );
+                    context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+                    context.fill();
+
+                    // Draw the inner circle.
+                    context.beginPath();
+                    context.arc(
+                        this.width / 2,
+                        this.height / 2,
+                        radius,
+                        0,
+                        Math.PI * 2
+                    );
+                    context.fillStyle = 'rgba(255, 100, 100, 1)';
+                    context.strokeStyle = 'white';
+                    context.lineWidth = 2 + 4 * (1 - t);
+                    context.fill();
+                    context.stroke();
+
+                    // Update this image's data with data from the canvas.
+                    context.canvas.willReadFrequently = true;
+                    this.data = context.getImageData(
+                        0,
+                        0,
+                        this.width,
+                        this.height
+                    ).data;
+                    context.canvas.willReadFrequently = true;
+
+                    // Continuously repaint the map, resulting
+                    // in the smooth animation of the dot.
+                    map.triggerRepaint();
+
+                    // Return `true` to let the map know that the image was updated.
+                    return true;
+                }
+            };
+            map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 1 });
+            map.addLayer({
+                'id': 'mzsMonitorDevice',
+                'type': 'symbol',
+                'source': 'mzsDeviceSource',
+                'layout': {
+                    'visibility': 'none',
+                    'icon-image': 'pulsing-dot',
+                    'icon-allow-overlap': true
+
+                },
+            })
+
+
+            map.addLayer({
+                'id': 'mzsMonitorSectionLayer',
+                'type': 'line',
+                'source': 'mzsMonitorSectionSource',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'line-color': '#9b9b9b',
+                    'line-width': 8
+                }
+            })
+            map.addLayer({
+                'id': 'mzsMonitorBankLineLayer',
+                'type': 'line',
+                'source': 'mzsMonitorBankLineSource',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'line-color': [
+                        'match',
+                        ['get', 'warning'],
+                        '1',
+                        '#ff001e',
+                        '2',
+                        '#f65c6d',
+                        '3',
+                        '#f4d4d4',
+                        '#f4d4d4'
+                    ],
+                    'line-width': [
+                        'match',
+                        ['get', 'warning'],
+                        '1',
+                        5,
+                        '2',
+                        3,
+                        '3',
+                        2,
+                        2
+                    ],
+                }
+            })
+
+            map.addLayer({
+                'id': 'changjiangboudary',
+                'type': 'fill',
+                'source': 'changjiangboudarySource', // reference the data source
+                'layout': {},
+                'paint': {
+                    'fill-color': '#0080ff', // blue color fill
+                    'fill-opacity': 0.1
+                }
+            });
+        })
+    }
+
+
     return LayerID
 
 }

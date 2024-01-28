@@ -35,13 +35,15 @@ export default class BackEndRequest {
         return backendInstance.get("/data/bankLine")
     }
 
+    static getHistoryInfo() {
+        return backendInstance.get("/data/historyInfo")
+    }
+
     static getMonitorInfo() {
         return backendInstance.get("/data/monitorInfo")
     }
 
-    static getHistoryInfo() {
-        return backendInstance.get("/data/historyInfo")
-    }
+
 
     static getMonitorDetailByType_Code(code, type) {
         //data
