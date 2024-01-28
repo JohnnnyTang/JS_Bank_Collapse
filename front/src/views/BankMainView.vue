@@ -10,19 +10,19 @@
             民主沙示范段
         </button>
         <div class="checkbox" v-show="showmzsDetail">
-            <el-checkbox v-model="view['2D']" :disabled="disable2D">2D视图</el-checkbox>
-            <el-checkbox v-model="view['3D']" :disabled="disable3D">3D视图</el-checkbox>
-            <!-- <el-checkbox v-model="view['Flow']" :disabled="false">流场</el-checkbox> -->
+            <el-radio-group v-model="viewMode" size="large">
+                <el-radio-button label="2D视图" />
+                <el-radio-button label="3D视图" />
+            </el-radio-group>
         </div>
-
 
         <bankList v-show="showList" @showChange="handlerListDBclick"></bankList>
         <bankListChild v-show="showChild" @showChange="handlerShowchange" :info="childData" @showDetail="handleShowDetail">
         </bankListChild>
 
         <bankHistory v-show="showHistory"></bankHistory>
-        <mzsDetail v-show="showmzsDetail"></mzsDetail>
-        <deviceDetail v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail>
+        <mzsDetail @closeMzsDetail="handleMzsDetail" v-show="showmzsDetail"></mzsDetail>
+        <deviceDetail @closeDeviceDetail="handleDDClose" v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail>
     </div>
 </template>
 
@@ -30,7 +30,7 @@
 import { ElMessage } from 'element-plus';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { onMounted, reactive, ref,watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import bankHistory from '../components/BankMainComponents/bankHistory.vue';
 import bankList from '../components/BankMainComponents/bankList.vue';
 import bankListChild from '../components/BankMainComponents/bankListChild.vue';
@@ -38,7 +38,7 @@ import deviceDetail from '../components/BankMainComponents/deviceDetail.vue';
 import mapLegend from '../components/BankMainComponents/mapLegend.vue';
 import mapLegendL from '../components/BankMainComponents/mapLegendL.vue';
 import mzsDetail from '../components/BankMainComponents/mzsDetail.vue';
-import { initAllLayer, initMap, showLayers,hideLayers } from '../utils/MainView';
+import { initAllLayer, initMap, showLayers, hideLayers } from '../utils/MainView';
 
 const showLegend = ref(true);
 const showLegend2 = ref(false);
@@ -50,12 +50,7 @@ const showDeviceDetail = ref(false);
 const childData = ref({});
 
 const deviceInfo = ref({});
-
-const view = reactive({
-    '2D': true,
-    '3D': false,
-    // 'Flow':false,
-});
+const viewMode = ref("2D视图")
 const disable2D = ref(false)
 const disable3D = ref(true)
 
@@ -74,7 +69,7 @@ let layerIDs = [
     'mzsMonitorBankLineLayer',
     'changjiangboudary',
 ];
-let layerCount = 52+layerIDs.length
+let layerCount = 52 + layerIDs.length
 let layerInited = false;
 
 const largeScale = ['channelLayer', 'banklineLayer', 'changjiangboudary'];
@@ -108,27 +103,22 @@ const handleShowDetail = (info) => {
     smallScaleShow()
 };
 
-watch(view,(val)=>{
+const handleMzsDetail = (info) => {
+    showmzsDetail.value = info.showmzsDetail
+}
+const handleDDClose = (info) => {
+    showDeviceDetail.value = info.showDeviceDetail;
+}
 
-    disable3D.value = view['2D'];
-    disable2D.value = view['3D'];
-   
-    if(view['2D']){
+watch(viewMode,(val)=>{
+    console.log(val);
+    if(val === "2D视图")
+    {
         smallScaleShow();
+    }else{
+        hideLayers(map, layerIDs);
+        console.log('new custome layer,  map.add layer');
     }
-    if(!view['2D']){
-        hideLayers(map,layerIDs);
-    }
-    if(view['3D']){
-        // new custome layer
-        // map.add layer
-    }
-    if(!view['3D']){
-        // new map.
-    }
-
-
-
 })
 
 onMounted(async () => {
@@ -209,7 +199,6 @@ const smallScaleShow = () => {
         });
         return;
     }
-    view['2D'] = true;
     marker && marker.remove();
     mapFlyToMZS();
     showLayers(map, layerIDs, smallScale);
@@ -285,7 +274,7 @@ const layerEventLogic = () => {
         }
 
     })
-    
+
 
 
 };
@@ -306,8 +295,8 @@ div.bankMain-container {
 
     div.checkbox {
         position: absolute;
-        top: 20vh;
-        right: 30vw;
+        bottom: 20vh;
+        left: 7vw;
 
         .el-checkbox {
             padding: 10;
