@@ -94,13 +94,14 @@ const handlerShowchange = (info) => {
 
 onMounted(async () => {
     map = initMap();
+    console.log('init layer')
     layerInited = await initAllLayer(map);
     ElMessage({
         offset: 80,
         message: '图层加载完毕',
-        type: 'success',
-    });
-    largeScaleShow();
+        type: 'success'
+    })
+    // largeScaleShow();
     layerEventLogic(map);
 });
 
@@ -145,17 +146,20 @@ const largeScaleShow = () => {
         });
         return;
     }
+    if (map.loaded()) {
+        console.log('map loaded , 显示数据')
+        marker && marker.remove()
+        mapFlyToRiver();
+        showLayers(map, layerIDs, largeScale);
+        showLegend.value = true;
+        showLegend2.value = false;
+        showList.value = true;
+        showChild.value = false;
+        showHistory.value = true;
+        showmzsDetail.value = false;
+        showDeviceDetail.value = false;
+    }
 
-    mapFlyToRiver();
-
-    showLayers(map, layerIDs, largeScale);
-    showLegend.value = true;
-    showLegend2.value = false;
-    showList.value = true;
-    showChild.value = false;
-    showHistory.value = true;
-    showmzsDetail.value = false;
-    showDeviceDetail.value = false;
 };
 
 const smallScaleShow = () => {
@@ -166,22 +170,25 @@ const smallScaleShow = () => {
         });
         return;
     }
-    mapFlyToMZS();
-    showLayers(map, layerIDs, smallScale);
-    showLegend.value = false;
-    showLegend2.value = true;
-    showList.value = false;
-    showChild.value = false;
-    showHistory.value = false;
-    showmzsDetail.value = true;
-};
+    marker && marker.remove()
+    mapFlyToMZS()
+    showLayers(map, layerIDs, smallScale)
+    showLegend.value = false
+    showLegend2.value = true
+    showList.value = false
+    showChild.value = false
+    showHistory.value = false
+    showmzsDetail.value = true
 
-const layerEventLogic = (map) => {
+}
+
+const layerEventLogic = () => {
     map.on('click', (e) => {
         const box = [
             [e.point.x - 3, e.point.y - 3],
-            [e.point.x + 3, e.point.y + 3],
-        ];
+            [e.point.x + 3, e.point.y + 3]
+        ]
+        marker && marker.remove()
         //点击device弹出deviceDetail
         if (map.getLayer('mzsMonitorDevice')) {
             const mzsMonitorDevices = map.queryRenderedFeatures(box, {
@@ -199,19 +206,18 @@ const layerEventLogic = (map) => {
                 layers: ['banklineLayer'],
             });
             if (bankLines && bankLines[0]) {
-                childData.value = bankLines[0].properties;
-                showChild.value = true;
-                showList.value = false;
-                let lonlat = bankLines[0].properties.coord
-                    .slice(2, 28)
-                    .split(',');
-                marker && marker.remove();
-                marker = new mapboxgl.Marker().setLngLat(e.lngLat).addTo(map);
+                childData.value = bankLines[0].properties
+                showChild.value = true
+                showList.value = false
+                let lonlat = bankLines[0].properties.coord.slice(2, 28).split(',')
+                marker = new mapboxgl.Marker()
+                    .setLngLat(e.lngLat)
+                    .addTo(map);
                 map.flyTo({
                     center: [Number(lonlat[0]), Number(lonlat[1])],
                     zoom: 11,
-                    pitch: 56.686721021958206,
-                });
+                    pitch: 0
+                })
             }
         }
     });

@@ -20,11 +20,11 @@
         <div class="chart" id="chart" v-if="showChart1" ref="chart1DOM"></div>
     </div>
 </template>
-
+  
 <script setup>
-import * as echarts from 'echarts';
-import { onBeforeMount, onMounted, ref, watch } from 'vue';
-import BackEndRequest from '../../api/backendIns';
+import { onMounted, ref, onBeforeMount, watch } from 'vue';
+import BackEndRequest from "../../api/backendIns"
+import * as echarts from 'echarts' 
 
 const showChart1 = ref(false);
 const chart1DOM = ref();
@@ -95,12 +95,9 @@ const showC2 = async () => {
 };
 
 watch(props, (val) => {
-    chart1DOM.value.style.display = 'none';
-    myChart && myChart.clear();
-});
+    myChart && myChart.clear()
+})
 
-// var chartDom = document.getElementById('chart2');
-// myChart = echarts.init(chartDom)
 
 const chartDataProcess = async (deviceID, deviceType, chartID) => {
     switch (deviceType) {
@@ -136,12 +133,9 @@ const chartDataProcess = async (deviceID, deviceType, chartID) => {
 };
 
 const type1process = async (id, type) => {
-    let deviceDetail = (
-        await BackEndRequest.getMonitorDetailByType_Code(id, type)
-    ).data;
-    let monitorInfo = (await BackEndRequest.getMonitorInfoByType_Code(id, type))
-        .data;
-    var option;
+    let deviceDetail = (await BackEndRequest.getMonitorDetailByType_Code(id, type)).data
+    // let monitorInfo = (await BackEndRequest.getMonitorInfoByType_Code(id, type)).data
+    var option
 
     let color = ['#80FFA5', '#00DDFF', '#37A2FF'];
     let legendData = ['XMove', 'YMove', 'ZMove'];
@@ -238,13 +232,13 @@ const type1process = async (id, type) => {
                 color: '#FFFFFF',
                 fontSize: 8,
             },
-            right: 10,
+            right: 10
         },
         grid: {
-            // left: '0%',
-            // right: '4%',
-            // bottom: '3%',
-            containLabel: true,
+            top:'18%',
+            bottom: '8%',
+            right: '15%',
+            containLabel: true
         },
         xAxis: [
             {
@@ -261,8 +255,9 @@ const type1process = async (id, type) => {
         ],
         dataZoom: [
             {
+                type: 'inside',
                 start: 0,
-                end: 20,
+                end: 20
             },
         ],
         yAxis: [
@@ -394,10 +389,10 @@ const type2process = async (id, type) => {
             },
         },
         grid: {
-            // left: '0%',
-            // right: '4%',
-            // bottom: '3%',
-            containLabel: true,
+            top:'18%',
+            bottom: '8%',
+            right: '15%',
+            containLabel: true
         },
         xAxis: [
             {
@@ -414,8 +409,9 @@ const type2process = async (id, type) => {
         ],
         dataZoom: [
             {
+                type: 'inside',
                 start: 0,
-                end: 20,
+                end: 20
             },
         ],
         yAxis: [
@@ -455,10 +451,10 @@ const type2process = async (id, type) => {
             },
         },
         grid: {
-            // left: '0%',
-            // right: '4%',
-            // bottom: '3%',
-            containLabel: true,
+            top:'18%',
+            bottom: '8%',
+            right: '15%',
+            containLabel: true
         },
         xAxis: [
             {
@@ -475,8 +471,9 @@ const type2process = async (id, type) => {
         ],
         dataZoom: [
             {
+                type: 'inside',
                 start: 0,
-                end: 20,
+                end: 20
             },
         ],
         yAxis: [
@@ -588,13 +585,20 @@ const type3process = async (id, type) => {
             },
             left: '40%',
         },
+
         grid: {
-            top: '13%',
-            // left: '0%',
+            top:'18%',
+            bottom: '8%',
             right: '15%',
-            // bottom: '3%',
-            containLabel: true,
+            containLabel: true
         },
+        dataZoom: [
+            {
+                type: 'inside',
+                start: 0,
+                end: 20
+            },
+        ],
         xAxis: [
             {
                 type: 'category',
@@ -744,10 +748,10 @@ const type4process = async (id, type) => {
             left: 200,
         },
         grid: {
-            // left: '0%',
-            // right: '4%',
-            bottom: '3%',
-            containLabel: true,
+            top:'23%',
+            bottom: '8%',
+            right: '15%',
+            containLabel: true
         },
         xAxis: [
             {
@@ -764,8 +768,9 @@ const type4process = async (id, type) => {
         ],
         dataZoom: [
             {
+                type: 'inside',
                 start: 0,
-                end: 20,
+                end: 20
             },
         ],
         yAxis: [
@@ -807,7 +812,10 @@ const type4process = async (id, type) => {
             left: 200,
         },
         grid: {
-            containLabel: true,
+            top:'18%',
+            bottom: '8%',
+            right: '15%',
+            containLabel: true
         },
         xAxis: [
             {
@@ -824,8 +832,9 @@ const type4process = async (id, type) => {
         ],
         dataZoom: [
             {
+                type: 'inside',
                 start: 0,
-                end: 20,
+                end: 20
             },
         ],
         yAxis: [
@@ -841,7 +850,7 @@ const type4process = async (id, type) => {
     return [optionX, optionY];
 };
 
-onBeforeMount(async () => {});
+onBeforeMount(async () => { });
 
 onMounted(async () => {});
 </script>

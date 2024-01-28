@@ -48,29 +48,6 @@ const lengendData = [
     },
 ];
 
-const lengendData2 = [
-    {
-        color: '#ff001e',
-        desc: '一级预警崩岸段',
-    },
-    {
-        color: '#f65c6d',
-        desc: '二级预警崩岸段',
-    },
-    {
-        color: '#f4d4d4',
-        desc: '三级预警崩岸段',
-    },
-    {
-        color: '#9b9b9b',
-        desc: '断面',
-    },
-    // {
-    //     color: 'red',
-    //     desc: "监测点"
-    // },
-];
-
 onMounted(async () => {});
 </script>
 
