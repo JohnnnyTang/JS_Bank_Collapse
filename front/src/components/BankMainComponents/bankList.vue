@@ -1,20 +1,11 @@
 <template>
     <div class="bankListDIV">
         <h3>崩岸预警信息</h3>
-        <el-table
-            :data="tableData"
-            size="small"
-            style="width: 18vw; height: 42vh; margin: 0vw 1vw"
-            @row-dblclick="rowDoubleClick"
-            v-loading="loading"
-        >
+        <el-table :data="tableData" size="small" style="width: 18vw; height: 42vh; margin: 0vw 1vw"
+            @row-dblclick="rowDoubleClick" v-loading="loading" :row-class-name="tableRowClassName">
             <el-table-column prop="bankName" label="名称" align="center" />
             <el-table-column prop="riverName" label="所处河段" align="center" />
-            <el-table-column
-                prop="warningLevel"
-                label="预警等级"
-                align="center"
-            />
+            <el-table-column prop="warningLevel" label="预警等级" align="center" />
         </el-table>
     </div>
 </template>
@@ -39,12 +30,21 @@ watch(tableData, (val) => {
     if (tableData.value != []) loading.value = false;
 });
 
-onBeforeMount(async () => {
-    tableData.value = (await BackEndRequest.getbankLineData()).data;
-});
+
+const tableRowClassName = (row) => {
+    if (row.row.bankName === '民主沙') {
+        return 'highLight-row'
+    }
+}
 
 onMounted(async () => {
-    // tableData.value = (await BackEndRequest.getbankLineData()).data
+    let data = (await BackEndRequest.getbankLineData()).data
+    let mzsIndex = data.findIndex((element) => element.bankName === '民主沙')
+    let mzsItem = data.find((element) => element.bankName === '民主沙')
+    data.splice(mzsIndex, 1)
+    data.unshift(mzsItem)
+    tableData.value = data;
+
 });
 </script>
 
@@ -93,5 +93,29 @@ onMounted(async () => {
     :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
         background: hsl(210, 70%, 32%);
     }
-}
-</style>
+
+    :deep(.el-table tbody tr.highLight-row) {
+        background: hsl(210, 70%, 16%);
+        animation: shine 2.4s infinite;
+    }
+
+    :deep(.el-table tbody tr.highLight-row:hover > td) {
+        cursor: pointer;
+    }
+
+    @keyframes shine {
+
+        0%,
+        100% {
+            color: #ffd900;
+            text-shadow: 0 0 10px #fffb06, 0 0 10px #fffb06;
+            font-size: large;
+        }
+
+        50% {
+            text-shadow: 0 0 10px #eeebdd, 0 0 10px #eeebdd;
+            font-size: medium;
+        }
+    }
+
+}</style>
