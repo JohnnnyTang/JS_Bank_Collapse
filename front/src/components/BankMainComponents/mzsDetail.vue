@@ -12,11 +12,11 @@
 </template>
 
 <script setup>
-import { onMounted} from 'vue';
+import { onMounted } from 'vue';
 
 const emit = defineEmits(['closeMzsDetail'])
-const closeClick = ()=>{
-    emit('closeMzsDetail',{
+const closeClick = () => {
+    emit('closeMzsDetail', {
         showmzsDetail: false
     })
 }
@@ -46,6 +46,7 @@ onMounted(async () => {
         font-size: 2vh;
         color: hsl(210, 70%, 90%);
     }
+
     .img {
         margin-left: 4vw;
         width: 135px;
@@ -54,6 +55,7 @@ onMounted(async () => {
         background-size: contain;
         background-repeat: no-repeat;
     }
+
     .icon {
         position: absolute;
         right: 1vw;
@@ -63,9 +65,8 @@ onMounted(async () => {
         height: calc(1vh + 1vw);
         background-size: contain;
         background-repeat: no-repeat;
-        :hover{
-            cursor: pointer;
-        }
+        cursor: pointer;
+
     }
 }
 </style>

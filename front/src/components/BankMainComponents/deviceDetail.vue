@@ -935,5 +935,6 @@ onMounted(async () => { });
         height: calc(1vh + 1vw);
         background-size: contain;
         background-repeat: no-repeat;
+        cursor: pointer;
     }
 }</style>

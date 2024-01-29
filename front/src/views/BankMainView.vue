@@ -1,6 +1,6 @@
 <template>
     <div class="bankMain-container">
-        <div class="map-container" id="map"></div>
+        <div class="map-container" id="map" ref="mapContainer"></div>
         <mapLegendL v-show="showLegend"></mapLegendL>
         <mapLegend v-show="showLegend2"></mapLegend>
         <button style="left: 4vh" class="button" @click="largeScaleShow" ref="btn1">
@@ -23,7 +23,7 @@
         <bankHistory v-show="showHistory"></bankHistory>
         <mzsDetail @closeMzsDetail="handleMzsDetail" v-show="showmzsDetail"></mzsDetail>
         <deviceDetail @closeDeviceDetail="handleDDClose" v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail>
-        <!-- <canvas id="WebGPUFrame" class='map-container'></canvas> -->
+        <canvas id="WebGPUFrame" v-show="showWEBGPU"></canvas>
     </div>
 </template>
 
@@ -40,10 +40,9 @@ import mapLegend from '../components/BankMainComponents/mapLegend.vue';
 import mapLegendL from '../components/BankMainComponents/mapLegendL.vue';
 import mzsDetail from '../components/BankMainComponents/mzsDetail.vue';
 import { initAllLayer, initMap, showLayers, hideLayers } from '../utils/MainView';
-// import { FlowLayer_trajectory } from "../utils/WebGPU/function/effects/mapbox-layers/layers/flowLayer_trajectory";
 
 
-
+const mapContainer = ref();
 const showLegend = ref(true);
 const showLegend2 = ref(false);
 const showList = ref(true);
@@ -56,8 +55,6 @@ const childData = ref({});
 
 const deviceInfo = ref({});
 const viewMode = ref("2D视图")
-const disable2D = ref(false)
-const disable3D = ref(true)
 
 const btn1 = ref({})
 const btn2 = ref({})
@@ -119,8 +116,8 @@ const handleDDClose = (info) => {
 
 watch(viewMode, (val) => {
     if (val === "2D视图") {
-        smallScaleShow();
         layerCount = 52 + layerIDs.length;
+        smallScaleShow();
     } else {
         hideLayers(map, layerIDs);
         console.log('new custome layer,  map.add layer');
@@ -134,7 +131,7 @@ watch(viewMode, (val) => {
 })
 
 onMounted(async () => {
-    map = initMap();
+    map = await initMap(mapContainer);
     layerInited = await initAllLayer(map);
     // console.log(map.getStyle().layers.length);
     // if (map.getStyle().layers.length === layerCount)
@@ -204,6 +201,7 @@ const largeScaleShow = () => {
         showHistory.value = true;
         showmzsDetail.value = false;
         showDeviceDetail.value = false;
+        showRadio.value = false;
     }
 };
 
@@ -217,13 +215,14 @@ const smallScaleShow = () => {
     }
     marker && marker.remove();
     mapFlyToMZS();
-    showLayers(map, layerIDs, smallScale);
+    showLayers(map, layerIDs, smallScale.concat(largeScale));
     showLegend.value = false;
     showLegend2.value = true;
     showList.value = false;
     showChild.value = false;
     showHistory.value = false;
     showmzsDetail.value = true;
+    showRadio.value = true
 };
 
 const layerEventLogic = () => {
@@ -311,6 +310,9 @@ div.bankMain-container {
     }
 
     canvas#WebGPUFrame {
+        position: absolute;
+        // background-color: aqua;
+        top: 7vh;
         height: 93vh;
         width: 100vw;
         pointer-events: none;
@@ -322,6 +324,7 @@ div.checkbox {
     position: absolute;
     bottom: 20vh;
     left: 7vw;
+    color: aquamarine;
 
     .el-checkbox {
         padding: 10;
