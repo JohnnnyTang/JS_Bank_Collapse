@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.johnny.bank.model.node.base.BaseNode;
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -21,8 +20,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "paramNode")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ParamNode extends BaseNode {
-    @DBRef
-    ModelNode modelNode;
+//    @DBRef
+    String modelId;
     JSONObject params;
 
     @Builder(builderMethodName = "paramNodeBuilder")
@@ -32,7 +31,7 @@ public class ParamNode extends BaseNode {
             String modelId, JSONObject params
     ) {
         super(id, name, auth, category, path);
-        this.modelNode = ModelNode.modelNodeBuilder().id(modelId).build();
+        this.modelId = modelId;
         this.params = params;
     }
 

@@ -1,0 +1,21 @@
+文件1
+1
+x y z
+...
+2
+x1 y1 x2 y2 x3 y3 x4 y4 x5 y5 x6 y6
+...
+3
+pressure1 pressure2 pressure3 pressure4 pressure5 pressure6
+...
+4
+horizontal_stress1 vertical_stress1 horizontal_stress2 vertical_stress2 horizontal_stress3 vertical_stress3 horizontal_stress4 vertical_stress4 horizontal_stress5 vertical_stress5 horizontal_stress6 vertical_stress6
+...
+
+文件2
+4
+4
+4
+4
+3
+矩阵

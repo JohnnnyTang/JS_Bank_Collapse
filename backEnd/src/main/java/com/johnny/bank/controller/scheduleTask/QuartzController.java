@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @package: com.johnny.bank.controller.scheduleTask
  * @className: QuartzController
  * @author: Johnny Tang
- * @description: TODO
+ * @description: Quartz 控制器
  * @date: 2024/1/27 23:32
  * @version: 1.0
  */

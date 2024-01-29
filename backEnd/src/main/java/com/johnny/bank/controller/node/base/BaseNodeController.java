@@ -18,7 +18,7 @@ import java.util.List;
 //@RequestMapping("api/v1/baseNode")
 public abstract class BaseNodeController<T extends BaseNode> extends AbstractNodeController<T> {
 
-    private NodeService<T> nodeServiceImpl;
+    protected NodeService<T> nodeServiceImpl;
 
     @Autowired
     public void setNodeServiceImpl(NodeService<T> nodeServiceImpl) {

@@ -23,24 +23,27 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class TaskNode extends BaseNode {
     @DBRef
     ModelNode modelNode;
-//    String modelId;
     @DBRef
     ParamNode paramNode;
-    String dataId;
+    @DBRef
+    DataNode dataNode;
     String status;
+    Boolean ifAuto; // 是否为自动任务
     JSONObject result;
 
     @Builder(builderMethodName = "taskNodeBuilder")
     public TaskNode(
             String id, String name, String auth,
             String category, String path,
-            String modelId, String paramId, String dataId, String status, JSONObject result
+            ModelNode modelNode, ParamNode paramNode, DataNode dataNode,
+            String status, JSONObject result, Boolean ifAuto
     ) {
         super(id, name, auth, category, path);
-        this.modelNode = ModelNode.modelNodeBuilder().id(modelId).build();
-        this.paramNode = ParamNode.paramNodeBuilder().id(paramId).build();
-        this.dataId = dataId;
+        this.modelNode = modelNode;
+        this.paramNode = paramNode;
+        this.dataNode = dataNode;
         this.status = status;
         this.result = result;
+        this.ifAuto = ifAuto;
     }
 }

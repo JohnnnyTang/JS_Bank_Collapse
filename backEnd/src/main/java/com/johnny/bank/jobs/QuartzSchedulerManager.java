@@ -12,7 +12,7 @@ import java.util.Date;
  * @package: com.johnny.bank.jobs
  * @className: QuartzSchedulerManager
  * @author: Johnny Tang
- * @description: TODO
+ * @description: Quartz Job的控制逻辑
  * @date: 2024/1/27 23:25
  * @version: 1.0
  */

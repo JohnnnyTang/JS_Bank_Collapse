@@ -31,7 +31,7 @@ public class ChannelDataController {
         this.ChannelDataService = ChannelDataService;
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<ChannelData>> findAll() {
         return ResponseEntity.ok(ChannelDataService.findAll());
     }

@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @Slf4j
 public abstract class NodeService<T extends BaseNode> implements INodeService<T> {
-    private IBaseNodeRepo<T> IBaseNodeRepo;
+    protected IBaseNodeRepo<T> IBaseNodeRepo;
 
     @Autowired
 //    @Qualifier("BaseNodeRepo")

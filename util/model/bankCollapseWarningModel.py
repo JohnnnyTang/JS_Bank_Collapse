@@ -1,102 +1,196 @@
 import numpy as np
 
 
-def __hydrodynamicMatrix(
-    data: dict[str, dict], weight: tuple[float, float, float, float]
-) -> tuple[float, float, float, float]:
-    zeroMatrix = np.zeros((4, 4))
-    for row in zeroMatrix:
-        row[np.random.randint(0, 4)] = 1
+def __matrixDot(matrix: list[list[float]], weight: list[float]) -> list[float]:
+    dataMatrix = np.array(matrix)
     weightMatrix = np.array(weight)
-    result = np.dot(weightMatrix, zeroMatrix)
+    result = np.dot(weightMatrix, dataMatrix)
     return result
 
 
-def __riverBedMatrix(
-    data: dict[str, dict], weight: tuple[float, float, float, float]
-) -> tuple[float, float, float, float]:
+def __hydrodynamicMatrix(data: list[list[float]]) -> list[list[float]]:
     zeroMatrix = np.zeros((4, 4))
+    xMove = [x[0] for x in data]
+    yMove = [x[1] for x in data]
+    zMove = [x[2] for x in data]
+    mean = sum(xMove + yMove + zMove) / 3 * len(xMove)
+    start = 2 if mean > data[0][0] else 0
     for row in zeroMatrix:
-        row[np.random.randint(0, 4)] = 1
-    weightMatrix = np.array(weight)
-    result = np.dot(weightMatrix, zeroMatrix)
-    return result
+        row[np.random.randint(start, 4)] = 1
+    return zeroMatrix.tolist()
 
 
-def __bankSlopeMatrix(
-    data: dict[str, dict], weight: tuple[float, float, float, float]
-) -> tuple[float, float, float, float]:
+def __riverBedMatrix(data: list[list[float]]):
     zeroMatrix = np.zeros((4, 4))
+    x1 = [x[0] for x in data]
+    y1 = [x[1] for x in data]
+    x2 = [x[2] for x in data]
+    y2 = [x[3] for x in data]
+    mean = sum(x1 + x2 + y1 + y2) / 4 * len(x1)
+    start = 2 if mean > data[0][0] else 0
     for row in zeroMatrix:
-        row[np.random.randint(0, 4)] = 1
-    weightMatrix = np.array(weight)
-    result = np.dot(weightMatrix, zeroMatrix)
-    return result
+        row[np.random.randint(start, 4)] = 1
+    return zeroMatrix.tolist()
 
 
-def __humanActivityMatrix(
-    data: dict[str, dict], weight: tuple[float, float, float]
-) -> tuple[float, float, float, float]:
+def __bankSlopeMatrix(data: list[list[float]]):
+    zeroMatrix = np.zeros((4, 4))
+    pressure1 = [x[0] for x in data]
+    pressure2 = [x[1] for x in data]
+    pressure3 = [x[2] for x in data]
+    pressure4 = [x[3] for x in data]
+    pressure5 = [x[4] for x in data]
+    pressure6 = [x[5] for x in data]
+    mean = (
+        sum(
+            pressure1
+            + pressure2
+            + pressure3
+            + pressure4
+            + pressure5
+            + pressure6
+        )
+        / 6
+        * len(pressure1)
+    )
+    start = 2 if mean > data[0][0] else 0
+    for row in zeroMatrix:
+        row[np.random.randint(start, 4)] = 1
+    return zeroMatrix.tolist()
+
+
+def __humanActivityMatrix(data: list[list[float]]):
     zeroMatrix = np.zeros((3, 4))
+    pressure1 = [x[0] for x in data]
+    pressure2 = [x[1] for x in data]
+    pressure3 = [x[2] for x in data]
+    pressure4 = [x[3] for x in data]
+    pressure5 = [x[4] for x in data]
+    pressure6 = [x[5] for x in data]
+    mean = (
+        sum(
+            pressure1
+            + pressure2
+            + pressure3
+            + pressure4
+            + pressure5
+            + pressure6
+        )
+        / 6
+        * len(pressure1)
+    )
+    start = 2 if mean > data[0][0] else 0
     for row in zeroMatrix:
-        row[np.random.randint(0, 4)] = 1
-    weightMatrix = np.array(weight)
-    result = np.dot(weightMatrix, zeroMatrix)
-    return result
+        row[np.random.randint(start, 4)] = 1
+    return zeroMatrix.tolist()
 
 
-def __mainFactorMatrix(
-    matrix: tuple[
-        tuple[float, float, float, float],
-        tuple[float, float, float, float],
-        tuple[float, float, float, float],
-        tuple[float, float, float, float],
-    ],
-    weight: tuple[float, float, float, float],
-) -> tuple[float, float, float, float]:
-    zeroMatrix = np.zeros((4, 4))
-    for row in zeroMatrix:
-        row[np.random.randint(0, 4)] = 1
-    weightMatrix = np.array(weight)
-    result = np.dot(weightMatrix, zeroMatrix)
-    return result
+def getData(dataPath: str, weightPath: str) -> dict[str, dict[str, list]]:
+    result = {}
 
+    # read data file
+    with open(dataPath, "r", encoding="utf8") as f:
+        dataResult = {}
+        # GNSS
+        temp = []
+        for row in f:
+            if "x,y,z" in row:
+                continue
+            if "x1,y1" in row:
+                break
+            strList = row.removesuffix("\n").split(",")
+            floatList = [float(x) for x in strList]
+            temp.append(floatList)
+        dataResult["gnss"] = temp
 
-def getData() -> list[list[float]]:
-    return [
-        [0.34, 0.34, 0.20, 0.12],
-        [0.37, 0.13, 0.28, 0.22],
-        [0.30, 0.30, 0.21, 0.19],
-        [0.48, 0.16, 0.36],
-        [0.37, 0.29, 0.22, 0.12],
-    ]
+        # Inclinometer
+        temp = []
+        for row in f:
+            if "pressure" in row:
+                break
+            strList = row.removesuffix("\n").split(",")
+            floatList = [float(x) for x in strList]
+            temp.append(floatList)
+        dataResult["inclinometer"] = temp
 
+        # manometer
+        temp = []
+        for row in f:
+            if "horizontal_stress1" in row:
+                break
+            strList = row.removesuffix("\n").split(",")
+            floatList = [float(x) for x in strList]
+            temp.append(floatList)
+        dataResult["manometer"] = temp
 
-def dataPreprocessing() -> None:
-    print("preprocessing")
+        # manometer
+        temp = []
+        for row in f:
+            strList = row.removesuffix("\n").split(",")
+            floatList = [float(x) for x in strList]
+            temp.append(floatList)
+        dataResult["stresspile"] = temp
 
+        result["data"] = dataResult
 
-def runModel(weightList: list[list[float]]) -> tuple[float, float, float, float]:
-    row0 = __hydrodynamicMatrix(
-        {}, (weightList[0][0], weightList[0][1], weightList[0][2], weightList[0][3])
-    )
-    row1 = __riverBedMatrix(
-        {}, (weightList[1][0], weightList[1][1], weightList[1][2], weightList[1][3])
-    )
-    row2 = __bankSlopeMatrix(
-        {}, (weightList[2][0], weightList[2][1], weightList[2][2], weightList[2][3])
-    )
-    row3 = __humanActivityMatrix(
-        {}, (weightList[3][0], weightList[3][1], weightList[3][2])
-    )
-    result = __mainFactorMatrix(
-        (row0, row1, row2, row3),
-        (weightList[4][0], weightList[4][1], weightList[4][2], weightList[4][3]),
-    )
+    # read weight file
+    with open(weightPath, "r", encoding="utf8") as f:
+        weightResult = {}
+        # main
+        strList = f.readline().removesuffix("\n").split(",")
+        floatList = [float(x) for x in strList]
+        weightResult["main"] = floatList
+        # hydrodynamic
+        strList = f.readline().removesuffix("\n").split(",")
+        floatList = [float(x) for x in strList]
+        weightResult["hydrodynamic"] = floatList
+        # riverBed
+        strList = f.readline().removesuffix("\n").split(",")
+        floatList = [float(x) for x in strList]
+        weightResult["riverBed"] = floatList
+        # bankSlope
+        strList = f.readline().removesuffix("\n").split(",")
+        floatList = [float(x) for x in strList]
+        weightResult["bankSlope"] = floatList
+        # humanActivity
+        strList = f.readline().removesuffix("\n").split(",")
+        floatList = [float(x) for x in strList]
+        weightResult["humanActivity"] = floatList
+
+        result["weight"] = weightResult
+
     return result
 
 
 if __name__ == "__main__":
-    modelData = getData()
-    result = runModel(modelData)
-    print(result)
+    # if sys.argv[1]:
+    #     argv = sys.argv
+    #     dataPath = argv[1]
+    #     weightPath = argv[2]
+    #     outputPath = argv[3]
+
+    dataPath = r"D:\project\JS_Bank_Collapse\util\model\data.csv"
+    weightPath = r"D:\project\JS_Bank_Collapse\util\model\weight.csv"
+    outputPath = r"D:\project\JS_Bank_Collapse\util\model\output.csv"
+
+    modelData = getData(dataPath, weightPath)
+
+    hydrodynamicMatrix = __hydrodynamicMatrix(modelData["data"]["gnss"])
+    riverBedMatrix = __riverBedMatrix(modelData["data"]["inclinometer"])
+    bankSlopeMatrix = __bankSlopeMatrix(modelData["data"]["manometer"])
+    humanActivityMatrix = __humanActivityMatrix(modelData["data"]["stresspile"])
+
+    row0 = __matrixDot(hydrodynamicMatrix, modelData["weight"]["hydrodynamic"])
+    row1 = __matrixDot(riverBedMatrix, modelData["weight"]["riverBed"])
+    row2 = __matrixDot(bankSlopeMatrix, modelData["weight"]["bankSlope"])
+    row3 = __matrixDot(
+        humanActivityMatrix, modelData["weight"]["humanActivity"]
+    )
+    result = __matrixDot([row0, row1, row2, row3], modelData["weight"]["main"])
+
+    print(",".join([str(i) for i in result]))
+
+    # with open(outputPath, "w", encoding="utf8") as f:
+    #     f.writelines(",".join([str(i) for i in result]))
+
+    # python D:\project\JS_Bank_Collapse\util\model\bankCollapseWarningModel.py D:\project\JS_Bank_Collapse\util\model\data.csv D:\project\JS_Bank_Collapse\util\model\weight.csv D:\project\JS_Bank_Collapse\util\model\output.csv
