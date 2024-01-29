@@ -1,6 +1,8 @@
 <template>
     <div class="monitorDeviceDetail">
+        <div class="icon" @click="closeClick"></div>
         <div class="text large title">{{ deviceInfo.name }}</div>
+
         <div class="text">仪器编号：{{ deviceInfo.code }}</div>
         <div class="text">
             测量周期：{{ deviceInfo.begTime }} -- {{ deviceInfo.endTime }}
@@ -10,12 +12,8 @@
         <el-button type="primary" @click="showC1">{{
             nameMap[deviceInfo.type][0]
         }}</el-button>
-        <el-button
-            type="primary"
-            @click="showC2"
-            v-if="deviceInfo.type === '2' || deviceInfo.type === '4'"
-            >{{ nameMap[deviceInfo.type][1] }}</el-button
-        >
+        <el-button type="primary" @click="showC2" v-if="deviceInfo.type === '2' || deviceInfo.type === '4'">{{
+            nameMap[deviceInfo.type][1] }}</el-button>
 
         <div class="chart" id="chart" v-if="showChart1" ref="chart1DOM"></div>
     </div>
@@ -23,7 +21,7 @@
 
 <script setup>
 import * as echarts from 'echarts';
-import { onBeforeMount, onMounted, ref, watch } from 'vue';
+import { onBeforeMount, onMounted, ref, watch,defineEmits } from 'vue';
 import BackEndRequest from '../../api/backendIns';
 
 const showChart1 = ref(false);
@@ -42,6 +40,13 @@ const props = defineProps({
         default: {},
     },
 });
+
+const emit = defineEmits(['closeDeviceDetail'])
+const closeClick = ()=>{
+    emit('closeDeviceDetail',{
+        showDeviceDetail:false
+    })
+}
 
 let myChart;
 let myDom;
@@ -852,9 +857,9 @@ const type4process = async (id, type) => {
     return [optionX, optionY];
 };
 
-onBeforeMount(async () => {});
+onBeforeMount(async () => { });
 
-onMounted(async () => {});
+onMounted(async () => { });
 </script>
 
 <style lang="scss" scoped>
@@ -920,5 +925,15 @@ onMounted(async () => {});
         background: hsla(210, 70%, 30%);
         transition: 500ms;
     }
-}
-</style>
+
+    .icon {
+        position: absolute;
+        right: 1vw;
+        top: 1vh;
+        background-image: url('/close.svg');
+        width: calc(1vh + 1vw);
+        height: calc(1vh + 1vw);
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+}</style>

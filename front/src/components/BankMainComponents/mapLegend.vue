@@ -1,7 +1,7 @@
 <template>
     <div class="legendCard">
         <div class="card2">
-            <div id="title">图例</div>
+            <div id="title">图 例</div>
             <hr />
             <div v-for="(item, index) in lengendData" :key="index" class="legendItem">
                 <div class="colorcolumn" :style="{

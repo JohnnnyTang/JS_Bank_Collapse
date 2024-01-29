@@ -4,10 +4,6 @@ server:
 spring:
   data:
     mongodb:
-      username: bankAdmin
-      password: 20000601
-      host: 127.0.0.1
-      port: 27017
       database: bank
       authentication-database: admin
       uri: mongodb://bankAdmin:20000601@192.168.31.12:27017/bank

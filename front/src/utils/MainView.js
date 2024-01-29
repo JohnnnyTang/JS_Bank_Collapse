@@ -146,16 +146,30 @@ const initAllLayer = async (map) => {
             }
         })
 
+        // map.addLayer({
+        //     'id': 'mzsBoundary',
+        //     'type': 'fill',
+        //     'source': 'mzsBoundarySource', // reference the data source
+        //     'layout': {
+        //         'visibility': 'none'
+        //     },
+        //     'paint': {
+        //         'fill-color': '#02b9ff',
+        //         'fill-opacity': 0.1
+        //     }
+        // });
         map.addLayer({
             'id': 'mzsBoundary',
-            'type': 'fill',
+            'type': 'line',
             'source': 'mzsBoundarySource', // reference the data source
             'layout': {
                 'visibility': 'none'
             },
             'paint': {
-                'fill-color': '#02b9ff',
-                'fill-opacity': 0.1
+                'line-color': '#1cf85c',
+                'line-opacity': 0.9,
+                'line-width':3,
+                'line-dasharray':[2,2]
             }
         });
         let size = 60
@@ -391,16 +405,30 @@ const initAllLayer = async (map) => {
                 }
             })
 
+            // map.addLayer({
+            //     'id': 'mzsBoundary',
+            //     'type': 'fill',
+            //     'source': 'mzsBoundarySource', // reference the data source
+            //     'layout': {
+            //         'visibility': 'none'
+            //     },
+            //     'paint': {
+            //         'fill-color': '#02b9ff',
+            //         'fill-opacity': 0.1
+            //     }
+            // });
             map.addLayer({
                 'id': 'mzsBoundary',
-                'type': 'fill',
+                'type': 'line',
                 'source': 'mzsBoundarySource', // reference the data source
                 'layout': {
                     'visibility': 'none'
                 },
                 'paint': {
-                    'fill-color': '#02b9ff',
-                    'fill-opacity': 0.1
+                    'line-color': '#1cf85c',
+                    'line-opacity': 0.5,
+                    'line-width':3,
+                    'line-dasharray':[2,2]
                 }
             });
             let size = 60
@@ -569,6 +597,13 @@ const showLayers = (map, allLayer, layerShowArr) => {
     //visible
 }
 
+const hideLayers = (map, layerArr) =>{
+    layerArr.forEach((item) => {
+        if (map.getLayer(item))
+            map.setLayoutProperty(item, 'visibility', 'none');
+    })
+}
+
 
 
 const generateGeoJson = (itemArr, getCoords, type) => {
@@ -608,6 +643,7 @@ const mapFlyToRiver = (map) => {
 
 export {
     showLayers,
+    hideLayers,
     initMap,
     initAllLayer,
 }
