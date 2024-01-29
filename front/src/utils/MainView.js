@@ -57,7 +57,6 @@ const initAllLayer = async (map) => {
         'mzsMonitorBankLineLayer',
         'changjiangboudary'
     ]
-    //map load 在 请求之前
 
     //map add source
     map.addSource('channelSource', {
