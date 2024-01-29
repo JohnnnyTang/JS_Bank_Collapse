@@ -9,7 +9,7 @@
         <button style="left: 24vh" class="button" @click="smallScaleShow" ref="btn2">
             民主沙示范段
         </button>
-        <div class="checkbox" v-show="showmzsDetail">
+        <div class="checkbox" v-show="showRadio">
             <el-radio-group v-model="viewMode" size="large">
                 <el-radio-button label="2D视图" />
                 <el-radio-button label="3D视图" />
@@ -23,6 +23,7 @@
         <bankHistory v-show="showHistory"></bankHistory>
         <mzsDetail @closeMzsDetail="handleMzsDetail" v-show="showmzsDetail"></mzsDetail>
         <deviceDetail @closeDeviceDetail="handleDDClose" v-if="showDeviceDetail" :deviceInfo="deviceInfo"></deviceDetail>
+        <!-- <canvas id="WebGPUFrame" class='map-container'></canvas> -->
     </div>
 </template>
 
@@ -39,6 +40,9 @@ import mapLegend from '../components/BankMainComponents/mapLegend.vue';
 import mapLegendL from '../components/BankMainComponents/mapLegendL.vue';
 import mzsDetail from '../components/BankMainComponents/mzsDetail.vue';
 import { initAllLayer, initMap, showLayers, hideLayers } from '../utils/MainView';
+// import { FlowLayer_trajectory } from "../utils/WebGPU/function/effects/mapbox-layers/layers/flowLayer_trajectory";
+
+
 
 const showLegend = ref(true);
 const showLegend2 = ref(false);
@@ -47,6 +51,7 @@ const showChild = ref(false);
 const showHistory = ref(true);
 const showmzsDetail = ref(false);
 const showDeviceDetail = ref(false);
+const showRadio = ref(false)
 const childData = ref({});
 
 const deviceInfo = ref({});
@@ -82,6 +87,7 @@ const smallScale = [
 ];
 
 const handlerListDBclick = (info) => {
+    marker && marker.remove()
     handlerShowchange(info);
     childData.value = info.childInfo;
     map.flyTo({
@@ -100,6 +106,7 @@ const handleShowDetail = (info) => {
     showChild.value = info.showChild;
     showList.value = info.showFather;
     showmzsDetail.value = info.showDetail;
+    showRadio.value = true;
     smallScaleShow()
 };
 
@@ -110,38 +117,48 @@ const handleDDClose = (info) => {
     showDeviceDetail.value = info.showDeviceDetail;
 }
 
-watch(viewMode,(val)=>{
-    console.log(val);
-    if(val === "2D视图")
-    {
+watch(viewMode, (val) => {
+    if (val === "2D视图") {
         smallScaleShow();
-    }else{
+        layerCount = 52 + layerIDs.length;
+    } else {
         hideLayers(map, layerIDs);
         console.log('new custome layer,  map.add layer');
+        // webgpuCVS
+
+        const webgpuCVS = document.querySelector(`#WebGPUFrame`);
+        console.log(webgpuCVS);
+        // map.addLayer(new FlowLayer_trajectory("FlowLayer_trajectory", "2d", webgpuCVS))
+        layerCount = 52 + layerIDs.length + 1;
     }
 })
 
 onMounted(async () => {
     map = initMap();
-    console.log('init layer');
     layerInited = await initAllLayer(map);
+    // console.log(map.getStyle().layers.length);
+    // if (map.getStyle().layers.length === layerCount)
     ElMessage({
         offset: 80,
         message: '图层加载完毕',
         type: 'success'
     })
-    btn1.value.classList.add('active')
+    // btn1.value.classList.add('active')
 
     layerEventLogic(map);
 });
 
 window.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') console.log(map.getStyle().layers);
+    if (e.key === 'Enter') {
+        console.log(map.getStyle().layers);
+    }
     if (e.key === ' ') {
         console.log('pitch', map.getPitch());
         console.log('zoom', map.getZoom());
         console.log('center', map.getCenter());
     }
+},{
+    once:true
 });
 
 const mapFlyToRiver = () => {
@@ -177,7 +194,6 @@ const largeScaleShow = () => {
         return;
     }
     if (map.loaded()) {
-        console.log('map loaded , 显示数据');
         marker && marker.remove();
         mapFlyToRiver();
         showLayers(map, layerIDs, largeScale);
@@ -233,6 +249,7 @@ const layerEventLogic = () => {
             const bankLines = map.queryRenderedFeatures(box, {
                 layers: ['banklineLayer'],
             });
+            marker && marker.remove();
             if (bankLines && bankLines[0]) {
                 childData.value = bankLines[0].properties;
                 showChild.value = true;
@@ -293,21 +310,27 @@ div.bankMain-container {
         background-color: rgb(34, 34, 34);
     }
 
-    div.checkbox {
-        position: absolute;
-        bottom: 20vh;
-        left: 7vw;
-
-        .el-checkbox {
-            padding: 10;
-        }
+    canvas#WebGPUFrame {
+        height: 93vh;
+        width: 100vw;
+        pointer-events: none;
+        z-index: 1;
     }
+}
 
+div.checkbox {
+    position: absolute;
+    bottom: 20vh;
+    left: 7vw;
+
+    .el-checkbox {
+        padding: 10;
+    }
 }
 
 .legendCard {
     position: absolute;
-    bottom: 4vh;
+    bottom: 5vh;
     right: 2vw;
     z-index: 1;
 }

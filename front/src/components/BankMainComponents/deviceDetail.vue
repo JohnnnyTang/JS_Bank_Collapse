@@ -733,7 +733,7 @@ const type4process = async (id, type) => {
                 fontSize: 15,
             },
             left: 50,
-            top: 20,
+            top: 10
         },
 
         tooltip: {
@@ -751,7 +751,6 @@ const type4process = async (id, type) => {
                 color: '#FFFFFF',
                 fontSize: 8,
             },
-            itemWidth: 5,
             left: 200,
         },
         grid: {
@@ -799,6 +798,7 @@ const type4process = async (id, type) => {
                 fontSize: 15,
             },
             left: 50,
+            top: 10
         },
 
         tooltip: {

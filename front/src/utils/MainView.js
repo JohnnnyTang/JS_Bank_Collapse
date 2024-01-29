@@ -15,7 +15,7 @@ const initMap = () => {
     });
 
     map.on('load', () => {
-
+        console.log('map loaded!!!');
         mapFlyToRiver(map);
         // window.onresize = () => {
         //     mapFlyToRiver(map);
@@ -31,6 +31,7 @@ const initAllLayer = async (map) => {
     let channelData = (await BackEndRequest.getChannelData()).data
     let bankData = (await BackEndRequest.getbankLineData()).data
     let mzs_monitorDevice = (await BackEndRequest.getMonitorInfo()).data
+    console.log('data loaded!!!');
 
 
     //load Json
