@@ -25,7 +25,6 @@ import java.util.Optional;
 @Service("TaskNodeService")
 @Slf4j
 public class TaskNodeService extends NodeService<TaskNode> {
-
     private IDataNodeRepo dataNodeRepo;
     private IModelNodeRepo modelNodeRepo;
     private IParamNodeRepo paramNodeRepo;
