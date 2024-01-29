@@ -187,6 +187,15 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
 
     @DynamicNodeData
     @Override
+    public boolean checkContinueUpdateOfDeviceWithMinute(DataNode dataNode, int timeLimitMinute, String deviceCode) {
+        return monitorDataRepo.ifContinueUpdateOfDevice(
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, timeLimitMinute),
+                deviceCode
+        );
+    }
+
+    @DynamicNodeData
+    @Override
     public boolean checkContinueUpdateInStation(DataNode dataNode, int timeLimit, String stationCode) {
         return monitorDataRepo.ifContinueUpdateOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.SECOND, timeLimit),

@@ -10,10 +10,6 @@ const routes = [
         component: () => import("../views/BankMainView.vue")
     },
     {
-        path: '/tree',
-        component: () => import("../views/ResourceTreeView.vue")
-    },
-    {
         path: '/device',
         component: () => import("../views/DeviceManageView.vue")
     },
@@ -21,6 +17,15 @@ const routes = [
         path: '/knowledge',
         component: () => import("../views/BankKnowledgeView.vue")
     },
+    {
+        path: '/model',
+        component: () => import("../views/ModelExampleView.vue")
+    },
+    {
+        path: '/tree',
+        component: () => import("../views/ResourceTreeView.vue")
+    },
+    
 ]
 // 3、创建一个路由的对象
 const router = createRouter({
@@ -29,7 +34,7 @@ const router = createRouter({
      * createWebHashHistory 带 # 号
      * createWebHistory 不带 # 号
      */
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     // 下面这个 可以写成ES6的简写 routers
     routes:routes
 })
