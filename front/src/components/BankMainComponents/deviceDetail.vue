@@ -21,7 +21,7 @@
 
 <script setup>
 import * as echarts from 'echarts';
-import { onBeforeMount, onMounted, ref, watch,defineEmits } from 'vue';
+import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import BackEndRequest from '../../api/backendIns';
 
 const showChart1 = ref(false);

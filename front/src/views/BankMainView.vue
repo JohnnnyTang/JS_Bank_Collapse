@@ -39,8 +39,11 @@ import deviceDetail from '../components/BankMainComponents/deviceDetail.vue';
 import mapLegend from '../components/BankMainComponents/mapLegend.vue';
 import mapLegendL from '../components/BankMainComponents/mapLegendL.vue';
 import mzsDetail from '../components/BankMainComponents/mzsDetail.vue';
-import { initAllLayer, initMap, showLayers, hideLayers } from '../utils/MainView';
 
+import { initAllLayer, initMap, showLayers, hideLayers } from '../utils/MainView';
+import { DEMLayer } from '../utils/webgpu/layers/demLayers'
+
+const threeDLayer = new DEMLayer('3DLayer')
 
 const mapContainer = ref();
 const showLegend = ref(true);
@@ -52,6 +55,7 @@ const showmzsDetail = ref(false);
 const showDeviceDetail = ref(false);
 const showRadio = ref(false)
 const childData = ref({});
+const showWEBGPU = ref(true)
 
 const deviceInfo = ref({});
 const viewMode = ref("2D视图")
@@ -116,16 +120,34 @@ const handleDDClose = (info) => {
 
 watch(viewMode, (val) => {
     if (val === "2D视图") {
+        // console.log(document.getElementsByClassName("dg ac"));
+        const guidiv = document.getElementsByClassName("dg ac")[0]
+        if (guidiv) guidiv.style.display = 'none'
+        showWEBGPU.value = false;
+        if (map.getLayer('3DLayer'))
+            map.removeLayer('3DLayer')
+
+        ElMessage({
+            offset: 80,
+            message: '2D视图',
+            type: 'success'
+        })
+
         layerCount = 52 + layerIDs.length;
         smallScaleShow();
     } else {
+        const guidiv = document.getElementsByClassName("dg ac")[0]
+        if (guidiv) guidiv.style.display = 'block'
+        showWEBGPU.value = true;
         hideLayers(map, layerIDs);
-        console.log('new custome layer,  map.add layer');
-        // webgpuCVS
 
-        const webgpuCVS = document.querySelector(`#WebGPUFrame`);
-        console.log(webgpuCVS);
-        // map.addLayer(new FlowLayer_trajectory("FlowLayer_trajectory", "2d", webgpuCVS))
+        ElMessage({
+            offset: 80,
+            message: '3D视图',
+            type: 'success'
+        })
+
+        map.addLayer(threeDLayer)
         layerCount = 52 + layerIDs.length + 1;
     }
 })
@@ -154,8 +176,8 @@ window.addEventListener('keydown', (e) => {
         console.log('zoom', map.getZoom());
         console.log('center', map.getCenter());
     }
-},{
-    once:true
+}, {
+    once: true
 });
 
 const mapFlyToRiver = () => {
@@ -183,13 +205,13 @@ const mapFlyToMZS = async () => {
 };
 
 const largeScaleShow = () => {
-    if (map.getStyle().layers.length != layerCount) {
-        ElMessage({
-            offset: 80,
-            message: '图层加载中',
-        });
-        return;
-    }
+    // if (map.getStyle().layers.length != layerCount) {
+    //     ElMessage({
+    //         offset: 80,
+    //         message: '图层加载中',
+    //     });
+    //     return;
+    // }
     if (map.loaded()) {
         marker && marker.remove();
         mapFlyToRiver();
@@ -206,16 +228,16 @@ const largeScaleShow = () => {
 };
 
 const smallScaleShow = () => {
-    if (map.getStyle().layers.length != layerCount) {
-        ElMessage({
-            offset: 80,
-            message: '图层加载中',
-        });
-        return;
-    }
+    // if (map.getStyle().layers.length != layerCount) {
+    //     ElMessage({
+    //         offset: 80,
+    //         message: '图层加载中',
+    //     });
+    //     return;
+    // }
     marker && marker.remove();
     mapFlyToMZS();
-    showLayers(map, layerIDs, smallScale.concat(largeScale));
+    showLayers(map, layerIDs, smallScale);
     showLegend.value = false;
     showLegend2.value = true;
     showList.value = false;
@@ -335,13 +357,13 @@ div.checkbox {
     position: absolute;
     bottom: 5vh;
     right: 2vw;
-    z-index: 1;
+    z-index: 2;
 }
 
 button {
     position: absolute;
     top: 8vh;
-    z-index: 1;
+    z-index: 2;
     margin: 5px;
     height: 40px;
     width: 8vw;
@@ -372,34 +394,35 @@ button:hover {
     position: absolute;
     top: 16vh;
     left: 3vh;
-    z-index: 1;
+    z-index: 2;
 }
 
 .bankListChildDIV {
     position: absolute;
     top: 16vh;
     left: 3vh;
-    z-index: 1;
+    z-index: 2;
 }
 
 .historyDIV {
     position: absolute;
     top: 10vh;
     right: 3vh;
-    z-index: 1;
+    z-index: 2;
 }
 
 .mzsDetailDIV {
     position: absolute;
     top: 16vh;
     left: 3vh;
-    z-index: 1;
+    z-index: 2;
 }
 
 .monitorDeviceDetail {
     position: absolute;
     top: 10vh;
     right: 4vh;
-    z-index: 1;
+    z-index: 2;
 }
+
 </style>
