@@ -10,7 +10,7 @@ import org.quartz.JobExecutionException;
  * @package: com.johnny.bank.jobs
  * @className: TestJob
  * @author: Johnny Tang
- * @description: TODO
+ * @description: Quartz 测试任务
  * @date: 2024/1/27 23:19
  * @version: 1.0
  */

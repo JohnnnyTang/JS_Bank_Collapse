@@ -18,7 +18,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @package: com.johnny.bank.config
  * @className: QuartzListener
  * @author: Johnny Tang
- * @description: TODO
+ * @description: Quartz 设置自动启动
  * @date: 2024/1/27 23:28
  * @version: 1.0
  */
@@ -32,12 +32,12 @@ public class QuartzListener implements ApplicationListener<ContextRefreshedEvent
     // 初始启动quartz
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
-        try {
-            quartzSchedulerManager.startJob();
-            log.info("任务已经启动...");
-        } catch (SchedulerException e) {
-            log.info(e.getMessage(), e.toString());
-        }
+//        try {
+////            quartzSchedulerManager.startJob();
+//            log.info("任务已经启动...");
+//        } catch (SchedulerException e) {
+//            log.info(e.getMessage(), e.toString());
+//        }
     }
     // 初始注入scheduler
     @Bean
