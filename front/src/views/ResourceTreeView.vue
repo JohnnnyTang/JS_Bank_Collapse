@@ -155,9 +155,9 @@
                                 :data="nodeDataList"
                                 height="80vh"
                                 style="width: 100%"
-                                stripe="true"
-                                border="true"
-                                highlight-current-row="true"
+                                :stripe=true
+                                :border=true
+                                :highlight-current-row=true
                             >
                                 <el-table-column
                                     v-for="(
@@ -254,7 +254,7 @@ const infoFormInput = reactive({
 });
 
 function typeRadioChange(curLabel) {
-    console.log(curLabel);
+    // console.log(curLabel);
     if (curLabel == 'GeoJSON') {
         geojsonData.value = CommonUtils.staticInfoData2GeoJson(
             nodeDataList.value,
@@ -317,13 +317,13 @@ let treeMouseWheel = (e) => {
     // ]
     let originString = treeChartCore.svgElement.style.transformOrigin;
     let originMatch = originString.match(MATCH_TRANSFORMORIGIN_REGEX);
-    console.log(originMatch);
+    // console.log(originMatch);
     let translateString = `translate(${translatePos[0]}px, ${translatePos[1]}px)`;
     // let translateString = `translate(${translatePos[0]}px, ${translatePos[1]}px)`;
     if (originMatch != null) {
     }
-    console.log(translateString);
-    console.log(`${translatePos[0]}px ${translatePos[1]}px`);
+    // console.log(translateString);
+    // console.log(`${translatePos[0]}px ${translatePos[1]}px`);
     treeChartCore.svgElement.style.transformOrigin = `${e.clientX}px ${e.clientY}px`;
     treeChartCore.domElement.style.transformOrigin = `${e.clientX}px ${e.clientY}px`;
     treeChartCore.svgElement.style.transform =
@@ -355,7 +355,7 @@ const cancelClick = () => {
 
 const confirmClick = () => {
     let ifUpdated = false;
-    console.log(curNodeInfo);
+    // console.log(curNodeInfo);
     if (curNodeInfo.name != infoFormInput.name) {
         curNodeInfo.name = infoFormInput.name;
     }
@@ -396,7 +396,7 @@ const getNodeData = async (node) => {
     let nodeReqData = await BackEndRequest.getDataNodeData(node);
     drawerName.value = CommonUtils.humpToHyphen(node.name, ' ');
     footerShow.value = false;
-    console.log(nodeReqData);
+    // console.log(nodeReqData);
     if (Array.isArray(nodeReqData.data)) {
         nodeDataList.value = nodeReqData.data;
         if (nodeDataList.value.length > 2) {
@@ -462,7 +462,7 @@ onMounted(async () => {
     const tree = await BackEndRequest.getDataNodeTree();
     console.log(tree.data);
     sampleData.value = tree.data;
-    console.log(nodeTree.value.$refs);
+    // console.log(nodeTree.value.$refs);
 
     treeChartCore = new TreeChartCore({
         svgElement: nodeTree.value.$refs.svg,

@@ -462,7 +462,7 @@ onMounted(async () => {
     // knowledgeInfoList.value = (
     //     await backendInstance.get('/data/historyInfo/desc')
     // ).data;
-    console.log(knowledgeInfoList.value);
+    // console.log(knowledgeInfoList.value);
     knowledgeInfoList.value.forEach((item) => {
         item.firstPage = true;
     });
