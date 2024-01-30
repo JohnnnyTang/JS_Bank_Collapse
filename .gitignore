@@ -2,10 +2,8 @@
 
 .vscode/
 mask/
-bank/
-bank2/
-config/
-JiangSu_2021.dwg
+/data/
+
 
 # dependencies
 node_modules/
