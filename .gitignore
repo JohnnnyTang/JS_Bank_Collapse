@@ -2,7 +2,8 @@
 
 .vscode/
 mask/
-data/
+/data/
+
 
 # dependencies
 node_modules/

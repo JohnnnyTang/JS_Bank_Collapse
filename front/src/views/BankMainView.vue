@@ -9,7 +9,7 @@
         <button style="left: 24vh" class="button" @click="smallScaleShow" ref="btn2">
             民主沙示范段
         </button>
-        <div class="checkbox" v-show="showRadio">
+        <div class="radioBox" v-show="showRadio">
             <el-radio-group v-model="viewMode" size="large">
                 <el-radio-button label="2D视图" />
                 <el-radio-button label="3D视图" />
@@ -342,15 +342,13 @@ div.bankMain-container {
     }
 }
 
-div.checkbox {
+div.radioBox {
     position: absolute;
     bottom: 20vh;
     left: 7vw;
     color: aquamarine;
+    z-index: 2;
 
-    .el-checkbox {
-        padding: 10;
-    }
 }
 
 .legendCard {
