@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 
 def __matrixDot(matrix: list[list[float]], weight: list[float]) -> list[float]:
@@ -163,15 +164,15 @@ def getData(dataPath: str, weightPath: str) -> dict[str, dict[str, list]]:
 
 
 if __name__ == "__main__":
-    # if sys.argv[1]:
-    #     argv = sys.argv
-    #     dataPath = argv[1]
-    #     weightPath = argv[2]
+    if sys.argv[1]:
+        argv = sys.argv
+        dataPath = argv[1]
+        weightPath = argv[2]
     #     outputPath = argv[3]
 
-    dataPath = r"D:\project\JS_Bank_Collapse\util\model\data.csv"
-    weightPath = r"D:\project\JS_Bank_Collapse\util\model\weight.csv"
-    outputPath = r"D:\project\JS_Bank_Collapse\util\model\output.csv"
+    # dataPath = r"D:\project\JS_Bank_Collapse\util\model\data.csv"
+    # weightPath = r"D:\project\JS_Bank_Collapse\util\model\weight.csv"
+    # outputPath = r"D:\project\JS_Bank_Collapse\util\model\output.csv"
 
     modelData = getData(dataPath, weightPath)
 

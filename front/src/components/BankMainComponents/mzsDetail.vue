@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { onMounted,defineEmits} from 'vue';
+import { onMounted } from 'vue';
 
 const emit = defineEmits(['closeMzsDetail'])
 const closeClick = ()=>{

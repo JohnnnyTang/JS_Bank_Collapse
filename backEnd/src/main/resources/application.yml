@@ -10,12 +10,12 @@ spring:
   datasource:
     hikari:
       maxLifeTime: 120000
+      idle-timeout: 0
       #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
     url: jdbc:postgresql://192.168.31.203:5432/shore?stringtype=unspecified
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: 123456
-
 mybatis:
   mapper-locations: classpath:mapper/resourceRepo/*/*.xml
   configuration:

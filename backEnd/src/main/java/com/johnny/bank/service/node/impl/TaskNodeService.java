@@ -1,5 +1,6 @@
 package com.johnny.bank.service.node.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.node.ModelNode;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -37,7 +39,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
 
     @Override
     public String save(TaskNode taskNode) {
-        if(taskNode.getDataNode().getId() != null) {
+        if(taskNode.getDataNode() != null && taskNode.getDataNode().getId() != null) {
             Optional<DataNode> dataNode = dataNodeRepo.findById(taskNode.getDataNode().getId());
             taskNode.setDataNode(dataNode.orElse(null));
         } else taskNode.setDataNode(null);
@@ -54,6 +56,28 @@ public class TaskNodeService extends NodeService<TaskNode> {
 
         return IBaseNodeRepo.save(taskNode).getId();
     }
+
+    public Boolean updateNodeStatusById(String id, String status) {
+        ((ITaskNodeRepo)IBaseNodeRepo).updateTaskNodeStatusById(id, status);
+        return true;
+    }
+
+    public void updateNodeStatusResultById(String id, String status, JSONObject result) {
+        ((ITaskNodeRepo)IBaseNodeRepo).updateTaskNodeStatusResultById(id, status, result);
+    }
+
+    public List<TaskNode> getAutoTaskNode() {
+        return ((ITaskNodeRepo)IBaseNodeRepo).getAutoTaskNodeItem();
+    }
+
+    public List<TaskNode> getManualTaskNode() {
+        return ((ITaskNodeRepo)IBaseNodeRepo).getNoAutoTaskNodeItem();
+    }
+
+//    public TaskNode queryById(String id) {
+//        return ((ITaskNodeRepo)IBaseNodeRepo).queryById(id);
+//    }
+
 
     // TODO: 新增任务的业务逻辑、任务案例页面
 
@@ -81,7 +105,6 @@ public class TaskNodeService extends NodeService<TaskNode> {
         this.paramNodeRepo = paramNodeRepo;
     }
 
-
     public class TaskThread extends Thread {
         TaskNode taskNode;
 
@@ -92,19 +115,25 @@ public class TaskNodeService extends NodeService<TaskNode> {
         @Override
         public void run() {
             try {
+                updateNodeStatusById(taskNode.getId(), "1");
                 Process process = ProcessUtil.buildTaskNodeProcess(taskNode);
                 ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
+                log.info(cmdOutput.toString());
                 if(cmdOutput.getStatusCode() == 0) {
-                    taskNode.setStatus("-1");
+//                    taskNode.setStatus("-1");
+                    updateNodeStatusById(taskNode.getId(), "-1");
                 }
                 int code = process.waitFor();
                 process.destroy();
                 if(code == 0) {
-                    taskNode.setStatus("1");
-                    taskNode.getResult().put("resultString", cmdOutput.getOutputString());
+//                    taskNode.setStatus("1");
+                    JSONObject result = new JSONObject();
+                    result.put("resultString", cmdOutput.getOutputString());
+                    updateNodeStatusResultById(taskNode.getId(), "2", result);
+//                    taskNode.getResult().put("resultString", cmdOutput.getOutputString());
                 }
                 else {
-                    taskNode.setStatus("-1");
+                    updateNodeStatusById(taskNode.getId(), "-1");
                 }
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);

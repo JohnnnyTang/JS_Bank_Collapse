@@ -1,13 +1,18 @@
 package com.johnny.bank.utils;
 
-import org.apache.commons.lang3.mutable.Mutable;
+import com.johnny.bank.model.resource.dataResource.GnssData;
+import com.johnny.bank.model.resource.dataResource.InclinometerData;
+import com.johnny.bank.model.resource.dataResource.ManometerData;
+import com.johnny.bank.model.resource.dataResource.StressPileData;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 /**
  * @projectName: backEnd
@@ -36,5 +41,76 @@ public class FileUtil {
         Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
         return targetPath.toString();
+    }
+
+    public static Boolean storeFileLocal(String strBuffer, String filePath) {
+        try
+        {
+            // 创建文件对象
+            File fileText = new File(filePath);
+            // 向文件写入对象写入信息
+            FileWriter fileWriter = new FileWriter(fileText);
+            // 写文件
+            fileWriter.write(strBuffer);
+            // 关闭
+            fileWriter.close();
+            return true;
+        }
+        catch (IOException e)
+        {
+            //
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static String buildGnssDataString(List<GnssData> gnssDataList) {
+        StringBuilder out = new StringBuilder("x,y,z\n");
+        for(GnssData gnssData:gnssDataList) {
+            out.append(gnssData.getXMove()).append(",")
+                    .append(gnssData.getYMove()).append(",")
+                    .append(gnssData.getZMove()).append("\n");
+        }
+        return out.toString();
+    }
+
+    public static String buildInclinoDataString(List<InclinometerData> inclinometerDataList) {
+        StringBuilder out = new StringBuilder("x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6\n");
+        for(InclinometerData inclinometerData:inclinometerDataList) {
+            out.append(inclinometerData.getXMove1()).append(",").append(inclinometerData.getYMove1()).append(",")
+                    .append(inclinometerData.getXMove2()).append(",").append(inclinometerData.getYMove2()).append(",")
+                    .append(inclinometerData.getXMove3()).append(",").append(inclinometerData.getYMove3()).append(",")
+                    .append(inclinometerData.getXMove4()).append(",").append(inclinometerData.getYMove4()).append(",")
+                    .append(inclinometerData.getXMove5()).append(",").append(inclinometerData.getYMove5()).append(",")
+                    .append(inclinometerData.getXMove6()).append(",").append(inclinometerData.getYMove6()).append("\n");
+        }
+        return out.toString();
+    }
+
+    public static String buildManoDataString(List<ManometerData> manometerDataList) {
+        StringBuilder out = new StringBuilder("pressure1,pressure2,pressure3,pressure4,pressure5,pressure6\n");
+        for(ManometerData manometerData:manometerDataList) {
+            out.append(manometerData.getPressure1()).append(",").append(manometerData.getPressure2()).append(",")
+                    .append(manometerData.getPressure3()).append(",").append(manometerData.getPressure4()).append(",")
+                    .append(manometerData.getPressure5()).append(",").append(manometerData.getPressure6()).append("\n");
+        }
+        return out.toString();
+    }
+
+    public static String buildStressDataString(List<StressPileData> stressPileDataList) {
+        StringBuilder out = new StringBuilder(
+                        "horizontal_stress1,vertical_stress1,horizontal_stress2,vertical_stress2," +
+                        "horizontal_stress3,vertical_stress3,horizontal_stress4,vertical_stress4," +
+                        "horizontal_stress5,vertical_stress5,horizontal_stress6,vertical_stress6\n");
+        for(StressPileData stressPileData:stressPileDataList) {
+            out.append(stressPileData.getHorizontal_stress1()).append(",").append(stressPileData.getVertical_stress1()).append(",")
+                    .append(stressPileData.getHorizontal_stress2()).append(",").append(stressPileData.getVertical_stress2()).append(",")
+                    .append(stressPileData.getHorizontal_stress3()).append(",").append(stressPileData.getVertical_stress3()).append(",")
+                    .append(stressPileData.getHorizontal_stress4()).append(",").append(stressPileData.getVertical_stress4()).append(",")
+                    .append(stressPileData.getHorizontal_stress5()).append(",").append(stressPileData.getVertical_stress5()).append(",")
+                    .append(stressPileData.getHorizontal_stress6()).append(",").append(stressPileData.getVertical_stress6()).append("\n");
+        }
+        String outStr = out.toString();
+        return outStr.substring(0, outStr.length()-1);
     }
 }
