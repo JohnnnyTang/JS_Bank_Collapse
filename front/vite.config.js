@@ -6,14 +6,14 @@ import basicSsl from '@vitejs/plugin-basic-ssl'
 export default defineConfig({
     plugins: [
         vue(),
-        basicSsl({
-            /** name of certification */
-            name: 'test',
-            /** custom trust domains */
-            domains: ['*.custom.com'],
-            /** custom certification directory */
-            certDir: '/Users/.../.devServer/cert'
-          })
+        // basicSsl({
+        //     /** name of certification */
+        //     name: 'test',
+        //     /** custom trust domains */
+        //     domains: ['*.custom.com'],
+        //     /** custom certification directory */
+        //     certDir: '/Users/.../.devServer/cert'
+        //   })
     ],
     server: {
         host: '0.0.0.0',
