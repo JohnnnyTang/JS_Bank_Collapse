@@ -34,13 +34,16 @@ export { monitor, Monitor }
 
 export {
 	NoBlending,
-    NormalBlending,
-    AdditiveBlending,
-    PremultipliedBlending,
+	NormalBlending,
+	AdditiveBlending,
+	PremultipliedBlending,
 } from './platform/blending/blending.js'
 
 import imageLoader from './resource/image/imageLoader.js'
 export { imageLoader }
+import { imageBufferLoader } from './resource/image/imageBufferLoader.js'
+export { imageBufferLoader }
+
 import shaderLoader from './resource/shader/shaderLoader.js'
 export { shaderLoader }
 
@@ -73,7 +76,8 @@ export {
 	floorPowerOfTwo,
 	setQuaternionFromProperEuler,
 	normalize,
-	denormalize,} from './core/math/MathUtils.js'
+	denormalize,
+} from './core/math/MathUtils.js'
 export { Vector2 } from './core/math/Vector2.js'
 export { Vector3 } from './core/math/Vector3.js'
 export { Vector4 } from './core/math/Vector4.js'

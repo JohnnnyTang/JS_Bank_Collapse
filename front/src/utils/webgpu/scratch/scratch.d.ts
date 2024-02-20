@@ -45,6 +45,8 @@ export {
 
 import imageLoader from './resource/image/imageLoader'
 export { imageLoader }
+import { imageBufferLoader } from './resource/image/imageBufferLoader.js'
+export { imageBufferLoader }
 import shaderLoader from './resource/shader/shaderLoader'
 export { shaderLoader }
 

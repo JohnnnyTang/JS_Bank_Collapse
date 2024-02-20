@@ -8,6 +8,8 @@ export type BufferDescription = {
 export class Buffer {
     constructor(description: BufferDescription);
 
+    static create(description: BufferDescription):Buffer;
+
     name: string;
 
     buffer: GPUBuffer;
@@ -29,4 +31,6 @@ export class Buffer {
     release(): null;
 
     destroy(): void;
+
+    reset(): void;
 }

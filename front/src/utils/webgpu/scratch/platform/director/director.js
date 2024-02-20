@@ -5,7 +5,7 @@ export class Director {
     constructor() {
 
         /**
-         * @type {{[name: string]: Array<any>}}
+         * @type {{[name: string]: {items: Array<any>, visibility: boolean}}}
          */
         this.stages = {}
         this.stageNum = 0
@@ -17,7 +17,10 @@ export class Director {
     makeNewStage(name) {
 
         if (!this.stages[name]) this.stageNum++
-        this.stages[name] = []
+        this.stages[name] = {
+            items: [],
+            visibility: true,
+        }
 
         return this
     }
@@ -51,12 +54,30 @@ export class Director {
     }
 
     /** 
-     * @param {{name: string, items: Array<any>}} stage 
+     * @param {{name: string, items: Array<any>, visibility?: boolean}} stage 
      */
     addStage(stage) {
 
         if (!this.stages[stage.name]) this.stageNum++
-        this.stages[stage.name] = stage.items
+        this.stages[stage.name] = {
+            items: stage.items,
+            visibility: stage.visibility !== undefined ? stage.visibility : true,
+        }
+    }
+
+    /**
+     * @param {string} name 
+     */
+    hideStage(name) {
+
+        if (!this.stages[name]) return
+        this.stages[name].visibility = false
+    }
+
+    showStage(name) {
+
+        if (!this.stages[name]) return
+        this.stages[name].visibility = true
     }
 
     /**
@@ -79,20 +100,21 @@ export class Director {
         for (const key in this.textures) {
             this.textures[key].update()
         }
-        // this.bindings.forEach(binding => binding.complete && binding.update())
     }
 
     tickRender() {
 
         const device = getDevice()
-        const encoders = new Array(this.stageNum)
+        const encoders = []
         let index = 0
         for (const name in this.stages) {
+            if (!this.stages[name].visibility) continue
+
             const encoder = device.createCommandEncoder({label: `${name}`})
-            this.stages[name].forEach(item => {
-                item.execute(encoder)
+            this.stages[name].items.forEach(stage => {
+                stage.execute(encoder)
             })
-            encoders[index++] = encoder.finish()
+            encoders.push(encoder.finish())
         }
         device.queue.submit(encoders)
     }

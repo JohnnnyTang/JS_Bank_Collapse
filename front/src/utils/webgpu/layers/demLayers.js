@@ -1,10 +1,9 @@
 import mapboxgl from 'mapbox-gl'
-// import * as Scratch from './scratch/scratch.js'
 import * as Scratch from '../scratch/scratch.js'
 import { mat4 } from 'gl-matrix'
 import axios from 'axios'
 import earcut from 'earcut'
-import { tickLogic, init } from './flowLayer.js'
+import { tickLogic, init, showFlowField } from './flowLayer.js'
 
 /**
  * @typedef {object} MapOptions
@@ -14,7 +13,7 @@ import { tickLogic, init } from './flowLayer.js'
  */
 
 class BoundingBox2D {
-    
+
     constructor(boundary) {
 
         if (boundary) this.boundary = boundary
@@ -33,7 +32,7 @@ class BoundingBox2D {
     }
 
     update(x, y) {
-        
+
         this.boundary[0] = x < this.boundary[0] ? x : this.boundary[0]
         this.boundary[1] = y < this.boundary[1] ? y : this.boundary[1]
         this.boundary[2] = x > this.boundary[2] ? x : this.boundary[2]
@@ -41,7 +40,7 @@ class BoundingBox2D {
     }
 
     updateByBox(box) {
-        
+
         this.update(box.boundary[0], box.boundary[1])
         this.update(box.boundary[2], box.boundary[3])
     }
@@ -67,7 +66,7 @@ class BoundingBox2D {
     }
 
     size() {
-        
+
         return [
             this.boundary[2] - this.boundary[0],
             this.boundary[3] - this.boundary[1],
@@ -124,7 +123,7 @@ class TerrainNode2D {
     }
 
     release() {
-        
+
         this.bBox = this.bBox.release()
         this.children = null
         this.parent = null
@@ -235,7 +234,7 @@ class TerrainTile {
                 { buffer: gStaticBuffer },
                 { buffer: gDynamicBuffer }
             ],
-            samplers: [ lSamplerDesc ],
+            samplers: [lSamplerDesc],
             textures: [
                 { texture: demTexture },
                 { texture: borderTexture },
@@ -259,7 +258,7 @@ class TerrainTile {
         this.meshRenderPipeline = Scratch.RenderPipeline.create({
             name: 'Render Pipeline (Terrain Mesh)',
             shader: { module: Scratch.shaderLoader.load('Shader (Terrain Mesh)', '/shaders/terrainMesh.wgsl') },
-            colorTargetStates: [ { blend: Scratch.NoBlending } ],
+            colorTargetStates: [{ blend: Scratch.NoBlending }],
             depthTest: true,
         })
         this.meshLineRenderPipeline = Scratch.RenderPipeline.create({
@@ -277,7 +276,7 @@ class TerrainTile {
      * @param {MapOptions} options 
      */
     registerRenderableNode(options) {
-        
+
         this.tileBox.reset()
         this.sectorSize = []
         this.bindingUsed = 0
@@ -286,13 +285,13 @@ class TerrainTile {
 
         this.stack.push(new TerrainNode2D(0, 0))
         const visibleNode = []
-        while(this.stack.length > 0) {
-            
+        while (this.stack.length > 0) {
+
             let node = this.stack.pop()
             if (!node.bBox.overlap(boundaryCondition)) continue
 
             if (!node.isSubdividable(options) || node.level >= this.maxLevel || node.level >= options.zoomLevel) {
-                
+
                 visibleNode.push(node)
                 if (node.level > this.maxVisibleNodeLevel) {
 
@@ -384,9 +383,9 @@ function quadGrid(time = 5) {
     const positions = []
     const vertexMap = new Map()
     function add2Map(v) {
-        
+
         const key = v.join('-')
-        if(!vertexMap.has(key))vertexMap.set(key, positions.length / 2)
+        if (!vertexMap.has(key)) vertexMap.set(key, positions.length / 2)
         positions.push(v[0])
         positions.push(v[1])
         return v
@@ -413,7 +412,7 @@ function quadGrid(time = 5) {
     stack.push(secondTriangle)
 
     const triangles = []
-    while(stack.length) {
+    while (stack.length) {
 
         const triangle = stack.pop(stack)
 
@@ -450,7 +449,7 @@ function quadGrid(time = 5) {
 function encodeFloatToDouble(value) {
     const result = new Float32Array(2);
     result[0] = value;
-    
+
     const delta = value - result[0];
     result[1] = delta;
     return result;
@@ -567,7 +566,7 @@ async function makeBridgeSurf() {
 
         // Vertices filling
         for (let i = 0; i < tempCoords.length; i += 2) {
-            
+
             const lon = tempCoords[i + 0]
             const lat = tempCoords[i + 1]
             const hlLon = encodeFloatToDouble(lon)
@@ -615,7 +614,7 @@ async function makeBridgeSurf() {
 
     const exVertexBuffer = Scratch.VertexBuffer.create({
         name: 'Vertex Buffer (Bridge Surface)',
-        resource: { arrayRef: Scratch.aRef(new Float32Array(exVertices)), structure: [ { components: 4 } ] },
+        resource: { arrayRef: Scratch.aRef(new Float32Array(exVertices)), structure: [{ components: 4 }] },
     })
 
     const uniformBuffer_object = Scratch.UniformBuffer.create({
@@ -651,46 +650,46 @@ async function makeBridgeSurf() {
 
     const binding_bf = Scratch.Binding.create({
         name: 'Binding (Bridge Surface)',
-        range: () => [ indices.length ],
+        range: () => [indices.length],
         sharedUniforms: [
             { buffer: uniformBuffer_object },
             { buffer: gStaticBuffer },
             { buffer: gDynamicBuffer },
         ],
         index: { buffer: indexBuffer },
-        vertices: [ { buffer: exVertexBuffer } ],
-        textures: [ { texture: demTexture } ],
+        vertices: [{ buffer: exVertexBuffer }],
+        textures: [{ texture: demTexture }],
     })
     const binding_bf_ex = Scratch.Binding.create({
         name: 'Binding (Bridge Surface Extrusion)',
-        range: () => [ exIndices.length ],
+        range: () => [exIndices.length],
         sharedUniforms: [
             { buffer: uniformBuffer_object },
             { buffer: gStaticBuffer },
             { buffer: gDynamicBuffer },
         ],
         index: { buffer: exIndexBuffer },
-        vertices: [ { buffer: exVertexBuffer } ],
-        textures: [ { texture: demTexture } ],
+        vertices: [{ buffer: exVertexBuffer }],
+        textures: [{ texture: demTexture }],
     })
 
     const bfRenderPipeline = Scratch.RenderPipeline.create({
         name: 'Render Pipeline (Bridge Surface)',
         shader: { module: Scratch.shaderLoader.load('Shader (Bridge)', '/shaders/bridgeSurf.wgsl') },
-        colorTargetStates: [ { blend: Scratch.NormalBlending } ],
+        colorTargetStates: [{ blend: Scratch.NormalBlending }],
         depthTest: true,
     })
 
     const bfExRenderPipeline = Scratch.RenderPipeline.create({
         name: 'Render Pipeline (Bridge Surface Extrusion)',
         shader: { module: Scratch.shaderLoader.load('Shader (Bridge)', '/shaders/bridgeSurfEx.wgsl') },
-        colorTargetStates: [ { blend: Scratch.NormalBlending } ],
+        colorTargetStates: [{ blend: Scratch.NormalBlending }],
         depthTest: true,
     })
 
     jsonRenderPass
-    .add(bfRenderPipeline, binding_bf)
-    .add(bfExRenderPipeline, binding_bf_ex)
+        .add(bfRenderPipeline, binding_bf)
+        .add(bfExRenderPipeline, binding_bf_ex)
 }
 
 async function makeBridgeColumn() {
@@ -733,7 +732,7 @@ async function makeBridgeColumn() {
 
         // Vertices filling
         for (let i = 0; i < tempCoords.length; i += 2) {
-            
+
             const lon = tempCoords[i + 0]
             const lat = tempCoords[i + 1]
             const hlLon = encodeFloatToDouble(lon)
@@ -781,7 +780,7 @@ async function makeBridgeColumn() {
 
     const vertexBuffer_bcEx = Scratch.VertexBuffer.create({
         name: 'Vertex Buffer (Bridge Column Extrusion)',
-        resource: { arrayRef: Scratch.aRef(new Float32Array(bcEx_vertices)), structure: [ { components: 4 } ] },
+        resource: { arrayRef: Scratch.aRef(new Float32Array(bcEx_vertices)), structure: [{ components: 4 }] },
     })
 
     const uniformBuffer_object = Scratch.UniformBuffer.create({
@@ -817,54 +816,54 @@ async function makeBridgeColumn() {
 
     const binding_bc = Scratch.Binding.create({
         name: 'Binding (Bridge Column)',
-        range: () => [ bc_indices.length ],
+        range: () => [bc_indices.length],
         sharedUniforms: [
             { buffer: uniformBuffer_object },
             { buffer: gStaticBuffer },
             { buffer: gDynamicBuffer },
         ],
         index: { buffer: indexBuffer_bc },
-        vertices: [ { buffer: vertexBuffer_bcEx } ],
-        textures: [ { texture: demTexture } ],
+        vertices: [{ buffer: vertexBuffer_bcEx }],
+        textures: [{ texture: demTexture }],
     })
 
     const binding_bc_ex = Scratch.Binding.create({
         name: 'Binding (Bridge Column Extrusion)',
-        range: () => [ bcEx_indices.length ],
+        range: () => [bcEx_indices.length],
         sharedUniforms: [
             { buffer: uniformBuffer_object },
             { buffer: gStaticBuffer },
             { buffer: gDynamicBuffer },
         ],
         index: { buffer: indexBuffer_bcEx },
-        vertices: [ { buffer: vertexBuffer_bcEx } ],
-        textures: [ { texture: demTexture } ],
+        vertices: [{ buffer: vertexBuffer_bcEx }],
+        textures: [{ texture: demTexture }],
     })
 
     const bcRenderPipeline = Scratch.RenderPipeline.create({
         name: 'Render Pipeline (Bridge Column)',
         shader: { module: Scratch.shaderLoader.load('Shader (Bridge)', '/shaders/bridge.wgsl') },
-        colorTargetStates: [ { blend: Scratch.NormalBlending } ],
+        colorTargetStates: [{ blend: Scratch.NormalBlending }],
         depthTest: true,
     })
 
     const bcExRenderPipeline = Scratch.RenderPipeline.create({
         name: 'Render Pipeline (Bridge Column Extrusion)',
         shader: { module: Scratch.shaderLoader.load('Shader (Bridge)', '/shaders/bridgeEx.wgsl') },
-        colorTargetStates: [ { blend: Scratch.NormalBlending } ],
+        colorTargetStates: [{ blend: Scratch.NormalBlending }],
         depthTest: true,
     })
 
     jsonRenderPass
-    .add(bcRenderPipeline, binding_bc)
-    .add(bcExRenderPipeline, binding_bc_ex)
+        .add(bcRenderPipeline, binding_bc)
+        .add(bcExRenderPipeline, binding_bc_ex)
 }
 
 export class DEMLayer {
-    
-    constructor(id) {
 
-        this.id = id
+    constructor() {
+
+        this.id = 'DemLayer'
         this.type = 'custom'
         this.renderingMode = '3d'
         this.map = undefined
@@ -873,7 +872,7 @@ export class DEMLayer {
     }
 
     async onAdd(map, gl) {
-        if(this.isInitialized) return;
+
         /**
          * @type {mapboxgl.Map}
          */
@@ -885,8 +884,8 @@ export class DEMLayer {
         const gpuCanvas = document.getElementById('WebGPUFrame')
 
         screen = Scratch.Screen.create({ canvas: gpuCanvas })
-        const sceneTexture = screen.createScreenDependentTexture('Texture (DEM Scene)', undefined)
-        const depthTexture = screen.createScreenDependentTexture('Texture (Depth)', 'depth32float')
+        const sceneTexture = screen.createScreenDependentTexture('Texture (DEM Scene)', undefined, [2, 2])
+        const depthTexture = screen.createScreenDependentTexture('Texture (Depth)', 'depth32float', [2, 2])
         // const fxaaPass = Scratch.FXAAPass.create({
         //     threshold: 0.0312,
         //     searchStep: 10,
@@ -896,7 +895,7 @@ export class DEMLayer {
 
         demTexture = Scratch.imageLoader.load('Texture (Water DEM)', '/images/dem.png')
         borderTexture = Scratch.imageLoader.load('Texture (Water DEM)', '/images/border.png')
-        paletteTexture = Scratch.imageLoader.load('Texture (DEM Palette)', '/images/demPalette_1d.png')
+        paletteTexture = Scratch.imageLoader.load('Texture (DEM Palette)', '/images/demPalette10.png')
         lodMapTexture = Scratch.Texture.create({
             name: 'Texture (LOD Map)',
             format: 'rgba8unorm',
@@ -908,7 +907,7 @@ export class DEMLayer {
         positionBuffer = Scratch.VertexBuffer.create({
             name: 'Vertex Buffer (Terrain Position)',
             randomAccessible: true,
-            resource: { arrayRef: Scratch.aRef(new Float32Array(positions)), structure: [{components: 2}] }
+            resource: { arrayRef: Scratch.aRef(new Float32Array(positions)), structure: [{ components: 2 }] }
         }).use()
         indexBuffer = Scratch.IndexBuffer.create({
             name: 'Index Buffer (Terrain Index)',
@@ -946,7 +945,6 @@ export class DEMLayer {
                 }),
             ]
         }).use()
-        gStaticBuffer.update()
 
         gDynamicBuffer = Scratch.UniformBuffer.create({
             name: 'Uniform Buffer (Terrain global dynamic)',
@@ -973,15 +971,15 @@ export class DEMLayer {
                         },
                         centerLow: {
                             type: 'vec2f',
-                            value: () => new Float32Array([ lowX, lowY ]),
+                            value: () => new Float32Array([lowX, lowY]),
                         },
                         centerHigh: {
                             type: 'vec2f',
-                            value: () => new Float32Array([ highX, highY ]),
+                            value: () => new Float32Array([highX, highY]),
                         },
                         z: {
                             type: 'vec2f',
-                            value: () => [ highZ, lowZ ],
+                            value: () => [highZ, lowZ],
                         },
                     }
                 }),
@@ -990,7 +988,7 @@ export class DEMLayer {
 
         const outputBinding = Scratch.Binding.create({
             range: () => [4],
-            samplers: [ lSamplerDesc ],
+            samplers: [lSamplerDesc],
             uniforms: [
                 {
                     name: 'staticUniform',
@@ -1003,7 +1001,7 @@ export class DEMLayer {
                 }
             ],
             // textures: [ { texture: fxaaPass.getOutputAttachment()} ]
-            textures: [ { texture: sceneTexture} ]
+            textures: [{ texture: sceneTexture }]
         })
 
         const outputPipeline = Scratch.RenderPipeline.create({
@@ -1013,41 +1011,60 @@ export class DEMLayer {
 
         lodMapPass = Scratch.RenderPass.create({
             name: 'Render Pass (LOD Map)',
-            colorAttachments: [ { colorResource: lodMapTexture } ]
+            colorAttachments: [{ colorResource: lodMapTexture }]
         })
 
         meshRenderPass = Scratch.RenderPass.create({
             name: 'Render Pass (Water DEM)',
-            colorAttachments: [ { colorResource: sceneTexture } ],
+            colorAttachments: [{ colorResource: sceneTexture }],
             depthStencilAttachment: { depthStencilResource: depthTexture }
         })
 
         jsonRenderPass = Scratch.RenderPass.create({
             name: 'Render Pass (Water DEM)',
-            colorAttachments: [ { colorResource: sceneTexture, loadOp: 'load' } ],
-            depthStencilAttachment: { depthStencilResource: depthTexture }
+            colorAttachments: [{ colorResource: sceneTexture, loadOp: 'load' }],
+            depthStencilAttachment: { depthStencilResource: depthTexture, depthLoadOp: 'load' }
         })
 
         const outputRenderPass = Scratch.RenderPass.create({
             name: 'DEM Layer Output',
-            colorAttachments: [ { colorResource: screen.getCurrentCanvasTexture() } ]
+            colorAttachments: [{ colorResource: screen.getCurrentCanvasTexture() }]
         }).add(outputPipeline, outputBinding)
 
-        const {simulationPass, renderPass} = await init(sceneTexture)
 
         Scratch.director.addStage({
             name: 'Water DEM Shower',
             items: [
-
                 lodMapPass,
-
-                simulationPass,
                 meshRenderPass,
+            ],
+            visibility: true,
+        })
+
+        const { simulationPass, renderPass } = await init(sceneTexture)
+        Scratch.director.addStage({
+            name: 'Flow Field Shower',
+            items: [
+                simulationPass,
                 renderPass,
-                jsonRenderPass,
-                // fxaaPass,
+            ],
+            visibility: true,
+        })
+
+        Scratch.director.addStage({
+            name: 'Bridge Shower',
+            items: [
+                jsonRenderPass
+            ],
+            visibility: true,
+        })
+
+        Scratch.director.addStage({
+            name: 'OutPut',
+            items: [
                 outputRenderPass,
-            ]
+            ],
+            visibility: true,
         })
 
         terrain2d = new TerrainTile(MAX_LEVEL)
@@ -1059,6 +1076,27 @@ export class DEMLayer {
         // await init(document.getElementById('WebGPUFrame-flow'))
 
         this.isInitialized = true
+        showFlowField(true)
+        showBridge(true)
+        window.addEventListener("keydown", (e) => {
+            // console.log(e.key);
+            if (e.key === '1')
+                showFlowField(true)
+            if (e.key === '2')
+                showFlowField(false)
+            if (e.key === '3')
+                showBridge(true)
+            if (e.key === '4')
+                showBridge(false)
+            if (e.key === '5')
+                showDEM(true)
+            if (e.key === '6')
+                showDEM(false)
+            // if (e.key === '7')
+            //     Scratch.director.showStage('Water DEM Shower')
+            // if (e.key === '8')
+            //     Scratch.director.hideStage('Water DEM Shower')
+        })
     }
 
     render(gl, matrix) {
@@ -1113,8 +1151,20 @@ export class DEMLayer {
         Scratch.director.tick()
 
         // console.log(Scratch.monitor.getMemoryInMB())
-        
+
     }
+}
+
+function showBridge(visibility) {
+
+    if (visibility) Scratch.director.showStage('Bridge Shower')
+    else Scratch.director.hideStage('Bridge Shower')
+}
+
+function showDEM(visibility) {
+
+    if (visibility) Scratch.director.showStage('OutPut')
+    else Scratch.director.hideStage('OutPut')
 }
 
 function smoothstep(e0, e1, x) {
@@ -1138,7 +1188,7 @@ function getProjectionInterpolationT(projection, zoom, width, height, maxSize = 
 }
 
 function getMercatorMatrix(t) {
-    
+
     if (!t.height) return;
 
     const offset = t.centerOffset;
@@ -1187,7 +1237,7 @@ function getMercatorMatrix(t) {
     cameraToClipPerspective[9] = offset.y * 2 / t.height;
 
     if (t.isOrthographic) {
-        const cameraToCenterDistance =  0.5 * t.height / Math.tan(t._fov / 2.0) * 1.0;
+        const cameraToCenterDistance = 0.5 * t.height / Math.tan(t._fov / 2.0) * 1.0;
 
         // Calculate bounds for orthographic view
         let top = cameraToCenterDistance * Math.tan(t._fov * 0.5);
@@ -1203,7 +1253,7 @@ function getMercatorMatrix(t) {
         cameraToClip = t._camera.getCameraToClipOrthographic(left, right, bottom, top, t._nearZ, t._farZ);
 
         const mixValue =
-        t.pitch >= OrthographicPitchTranstionValue ? 1.0 : t.pitch / OrthographicPitchTranstionValue;
+            t.pitch >= OrthographicPitchTranstionValue ? 1.0 : t.pitch / OrthographicPitchTranstionValue;
         // lerpMatrix(cameraToClip, cameraToClip, cameraToClipPerspective, easeIn(mixValue));
     } else {
         cameraToClip = cameraToClipPerspective;
@@ -1328,7 +1378,7 @@ function mercatorZfromAltitude(altitude, lat) {
 }
 
 function getMercatorMatrix2(t) {
-    
+
     if (!t.height) return;
 
     const offset = t.centerOffset;
@@ -1376,7 +1426,7 @@ function getMercatorMatrix2(t) {
     cameraToClipPerspective[9] = offset.y * 2 / t.height;
 
     if (t.isOrthographic) {
-        const cameraToCenterDistance =  0.5 * t.height / Math.tan(t._fov / 2.0) * 1.0;
+        const cameraToCenterDistance = 0.5 * t.height / Math.tan(t._fov / 2.0) * 1.0;
 
         // Calculate bounds for orthographic view
         let top = cameraToCenterDistance * Math.tan(t._fov * 0.5);
@@ -1392,7 +1442,7 @@ function getMercatorMatrix2(t) {
         cameraToClip = t._camera.getCameraToClipOrthographic(left, right, bottom, top, t._nearZ, t._farZ);
 
         const mixValue =
-        t.pitch >= OrthographicPitchTranstionValue ? 1.0 : t.pitch / OrthographicPitchTranstionValue;
+            t.pitch >= OrthographicPitchTranstionValue ? 1.0 : t.pitch / OrthographicPitchTranstionValue;
         // lerpMatrix(cameraToClip, cameraToClip, cameraToClipPerspective, easeIn(mixValue));
     } else {
         cameraToClip = cameraToClipPerspective;

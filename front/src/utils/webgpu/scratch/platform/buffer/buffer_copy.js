@@ -30,28 +30,18 @@ class Buffer {
         this.device = getDevice()
         this.onChangeHandlers = []
 
-        this.resource = {
-            data: undefined,
-            dataType: 'clean'
-        }
-        if (description) {
+        if (description && description.size) {
 
-            this.usage = description.usage ? description.usage : GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC
-            this.name = description.name ? description.name : 'Buffer'
-            this.resource = description.resource ? description.resource : {
-                data: undefined,
-                dataType: 'clean'
-            }
-            if (description.size) {
-                this.size = description.size
-                this.buffer = this.device.createBuffer({
-                    label: this.name,
-                    size: this.size,
-                    usage: this.usage
-                })
-                monitor.memorySizeInBytes += this.size
-            }
+            this.size = description.size,
+                this.usage = description.usage
+            this.name = description.name
 
+            this.buffer = this.device.createBuffer({
+                label: this.name,
+                size: this.size,
+                usage: this.usage
+            })
+            monitor.memorySizeInBytes += this.size
         }
 
         /**
@@ -139,52 +129,14 @@ class Buffer {
     }
 
     update() {
-        let encoder = this.device.createCommandEncoder()
-        switch (this.resource.dataType) {
-            case 'clean':
 
-                if (!this.dirtyList.size) return
-                this.dirtyList.forEach((name) => {
-                    this.updateSubArea(name)
-                })
-                this.dirtyList = new Set()
-                break;
+        if (!this.dirtyList.size) return
 
-            case 'size':
+        this.dirtyList.forEach((name) => {
+            this.updateSubArea(name)
+        })
 
-                if (this.buffer) return;
-                this.buffer = this.device.createBuffer({
-                    label: this.name,
-                    size: this.size,
-                    usage: this.usage
-                })
-                monitor.memorySizeInBytes += this.size
-                break;
-
-            case 'texture'://GPUTexture
-                let texture = this.resource.data()
-                if (!texture) return;
-                encoder.copyTextureToBuffer(
-                    { texture: texture, mipLevel: 0, origin: [0, 0, 0], aspect: 'all' },
-                    { buffer: this.buffer, offset: 0, bytesPerRow: texture.width * 4, rowsPerImage: texture.height },
-                    [texture.width, texture.height]
-                )
-                break;
-
-            case 'buffer'://GPUBuffer
-                let srcBuffer = this.resource.data()
-                if(!srcBuffer) return
-                //default copy all
-                encoder.copyBuffertoBuffer(
-                    srcBuffer, 0,
-                    this.buffer, 0,
-                    this.buffer.size
-                )
-                break;
-        }
-        this.device.queue.submit([encoder.finish()])
-
-        this.resource.dataType = 'clean'
+        this.dirtyList = new Set()
     }
 
     destroy() {
@@ -221,35 +173,25 @@ class Buffer {
     }
 
     reset(description) {
+        if (description && description.size) {
 
-        if (description) {
+            this.size = description.size,
+                this.usage = description.usage
+            this.name = description.name
 
-            this.usage = description.usage ? description.usage : GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC
-            this.name = description.name ? description.name : 'Buffer'
-            this.resource = description.resource ? description.resource : {
-                data: undefined,
-                dataType: 'clean'
-            }
-            if (description.size) {
-                this.size = description.size
-                if (!this.buffer) {
-                    this.buffer = this.device.createBuffer({
-                        label: this.name,
-                        size: this.size,
-                        usage: this.usage
-                    })
-                    monitor.memorySizeInBytes += this.size
-                }
-
-            }
-
+            this.buffer = this.device.createBuffer({
+                label: this.name,
+                size: this.size,
+                usage: this.usage
+            })
+            monitor.memorySizeInBytes += this.size
         }
-        this.update()
         this.onChangeHandlers.forEach(handler => handler && handler())
 
     }
 
     registerCallback(callback) {
+        console.log('registerCallback',callback);
         this.onChangeHandlers.push(callback)
         return this.onChangeHandlers.length - 1
 

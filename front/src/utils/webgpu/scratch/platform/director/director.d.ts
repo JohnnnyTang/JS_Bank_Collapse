@@ -4,7 +4,9 @@ import { Texture } from '../texture/texture';
 
 export class Director {
 
-    addStage(stage: {name: string, items: Array<any>}): void;
+    addStage(stage: {name: string, items: Array<any>, visibility?: boolean}): void;
+    showStage(name: string): void;
+    hideStage(name: string): void;
     addBinding(binding: Binding): void;
     addBuffer(buffer: Buffer): void;
     addTexture(texture: Texture): void;

@@ -1,6 +1,5 @@
-import axios from "axios";
-import { GUI } from "dat.gui";
-// import * as Scratch from './scratch/scratch.js'
+import axios from "axios"
+import { GUI } from "dat.gui"
 import * as Scratch from '../scratch/scratch.js'
 
 class DescriptionParser {
@@ -30,46 +29,46 @@ class DescriptionParser {
     async Parsing() {
 
         await axios.get(this.url)
-        .then(async (response) => {
-            this.flowBoundary[0] = response.data["flow_boundary"]["u_min"]
-            this.flowBoundary[1] = response.data["flow_boundary"]["v_min"]
-            this.flowBoundary[2] = response.data["flow_boundary"]["u_max"]
-            this.flowBoundary[3] = response.data["flow_boundary"]["v_max"]
+            .then(async (response) => {
+                this.flowBoundary[0] = response.data["flow_boundary"]["u_min"]
+                this.flowBoundary[1] = response.data["flow_boundary"]["v_min"]
+                this.flowBoundary[2] = response.data["flow_boundary"]["u_max"]
+                this.flowBoundary[3] = response.data["flow_boundary"]["v_max"]
 
-            this.maxTextureSize = response.data["constraints"]["max_texture_size"]
-            this.maxTrajectoryNum = response.data["constraints"]["max_streamline_num"]
-            this.maxSegmentNum = response.data["constraints"]["max_segment_num"] - 1
-            this.maxDropRate = response.data["constraints"]["max_drop_rate"]
-            this.maxDropRateBump = response.data["constraints"]["max_drop_rate_bump"]
+                this.maxTextureSize = response.data["constraints"]["max_texture_size"]
+                this.maxTrajectoryNum = response.data["constraints"]["max_streamline_num"]
+                this.maxSegmentNum = response.data["constraints"]["max_segment_num"] - 1
+                this.maxDropRate = response.data["constraints"]["max_drop_rate"]
+                this.maxDropRateBump = response.data["constraints"]["max_drop_rate_bump"]
 
-            this.extent[0] = response.data["extent"][0]
-            this.extent[1] = response.data["extent"][1]
-            this.extent[2] = response.data["extent"][2]
-            this.extent[3] = response.data["extent"][3]
+                this.extent[0] = response.data["extent"][0]
+                this.extent[1] = response.data["extent"][1]
+                this.extent[2] = response.data["extent"][2]
+                this.extent[3] = response.data["extent"][3]
 
-            for (const url of response.data["flow_fields"]) {
-                this.flowFieldResourceArray.push(url)
-            }
-            this.flowFieldTextureSize[0] = response.data["texture_size"]["flow_field"][0]
-            this.flowFieldTextureSize[1] = response.data["texture_size"]["flow_field"][1]
+                for (const url of response.data["flow_fields"]) {
+                    this.flowFieldResourceArray.push(url)
+                }
+                this.flowFieldTextureSize[0] = response.data["texture_size"]["flow_field"][0]
+                this.flowFieldTextureSize[1] = response.data["texture_size"]["flow_field"][1]
 
-            for (const url of response.data["area_masks"]) {
-                this.seedingResourceArray.push(url)
-            }
-            this.seedingTextureSize[0] = response.data["texture_size"]["area_mask"][0]
-            this.seedingTextureSize[1] = response.data["texture_size"]["area_mask"][1]
+                for (const url of response.data["area_masks"]) {
+                    this.seedingResourceArray.push(url)
+                }
+                this.seedingTextureSize[0] = response.data["texture_size"]["area_mask"][0]
+                this.seedingTextureSize[1] = response.data["texture_size"]["area_mask"][1]
 
-            this.transform2DHighResource = response.data["projection"]["2D"]["high"]
-            this.transform2DLowResource = response.data["projection"]["2D"]["low"]
-            this.transform2DResource = response.data["projection"]["2D"]["normal"]
-            this.transform3DResource = response.data["projection"]["3D"]
-            this.transformTextureSize[0] = response.data["texture_size"]["projection"][0]
-            this.transformTextureSize[1] = response.data["texture_size"]["projection"][1]
+                this.transform2DHighResource = response.data["projection"]["2D"]["high"]
+                this.transform2DLowResource = response.data["projection"]["2D"]["low"]
+                this.transform2DResource = response.data["projection"]["2D"]["normal"]
+                this.transform3DResource = response.data["projection"]["3D"]
+                this.transformTextureSize[0] = response.data["texture_size"]["projection"][0]
+                this.transformTextureSize[1] = response.data["texture_size"]["projection"][1]
 
-        })
-        .catch((error) => {
-            console.log("ERROR::RESOURCE_NOT_LOAD_BY_URL", error)
-        });
+            })
+            .catch((error) => {
+                console.log("ERROR::RESOURCE_NOT_LOAD_BY_URL", error)
+            });
     }
 
 }
@@ -79,7 +78,7 @@ class DynamicController {
     constructor(constraints) {
         this.particleNum = 65536
         this.segmentNum = 16
-        this.speedFactor = 1.0
+        this.speedFactor = 3.0
         this.dropRate = 0.003
         this.dropRateBump = 0.001
         this.fillWidth = 1.0
@@ -116,7 +115,7 @@ class FrameTimer {
         this.timeCount = 0.0
         this.timeLast = 0.0
         this.tickPerPhase = 0.0
-     }
+    }
 
     tickTimer() {
         let lastPhase = Math.floor(this.timeCount / this.tickPerPhase)
@@ -125,7 +124,7 @@ class FrameTimer {
         this.timeCount = (this.timeCount + 1) % this.timeLast
         this.progress = this.timeCount % this.tickPerPhase / this.tickPerPhase
 
-        if (nowPhase - 1 == lastPhase) return true
+        if (Math.abs(nowPhase - lastPhase) === 1) return true
         return false
     }
 }
@@ -158,6 +157,7 @@ let simulation_pass
 let render_pass
 let stageName
 let stage
+let gui
 
 let flowTextureArr
 let flowTextureArrSize = 3
@@ -167,7 +167,7 @@ let startStorageIndex = 1
 
 const setGUI = (controller) => {
 
-    const gui = new GUI()
+    gui = new GUI()
 
     gui.domElement.style.position = "absolute"
     gui.domElement.style.right = "100px"
@@ -185,7 +185,6 @@ const setGUI = (controller) => {
     folder.add(controller, "fillWidth", 0.0, 5.0)
     folder.add(controller, "aaWidth", 0.0, 5.0)
     folder.open()
-
 }
 
 
@@ -210,7 +209,7 @@ const init = async (sceneTexture) => {
     frameTimer.phaseCount = parser.flowFieldResourceArray.length
     frameTimer.progress = 0.0
     frameTimer.timeCount = 0
-    frameTimer.tickPerPhase = 200
+    frameTimer.tickPerPhase = 60
     frameTimer.timeLast = frameTimer.phaseCount * frameTimer.tickPerPhase // 200 tick per phase
     frameTimer.totalPrograseRate = 0.0
 
@@ -248,6 +247,8 @@ const init = async (sceneTexture) => {
     })
 
     let defaultAliveNumIndirect = new Uint32Array([(parser.maxSegmentNum - 1) * 2, controller.particleNum, 0, 0])
+    // let defaultAliveNumIndirect = new Uint32Array([4, controller.particleNum, 0, 0])
+
     aliveNumIndirectRef = Scratch.aRef(defaultAliveNumIndirect, 'aliveNumIndirectRef')
     aliveNum_indirect = Scratch.IndirectBuffer.create({
         name: 'aliveNum_indirect',
@@ -400,8 +401,8 @@ const init = async (sceneTexture) => {
             { buffer: gDynamicBuffer }
         ],
         textures: [
-            { texture: flowTextureArr[0], sampleType: 'unfilterable-float' },
             { texture: flowTextureArr[1], sampleType: 'unfilterable-float' },
+            { texture: flowTextureArr[2], sampleType: 'unfilterable-float' },
             { texture: seedTexture, sampleType: 'float' },
             { texture: transHighTex, sampleType: 'unfilterable-float' },
             { texture: transLowTex, sampleType: 'unfilterable-float' },
@@ -422,8 +423,8 @@ const init = async (sceneTexture) => {
             { buffer: gDynamicBuffer }
         ],
         textures: [
+            { texture: flowTextureArr[2], sampleType: 'unfilterable-float' },
             { texture: flowTextureArr[0], sampleType: 'unfilterable-float' },
-            { texture: flowTextureArr[1], sampleType: 'unfilterable-float' },
             { texture: seedTexture, sampleType: 'float' },
             { texture: transHighTex, sampleType: 'unfilterable-float' },
             { texture: transLowTex, sampleType: 'unfilterable-float' },
@@ -471,7 +472,7 @@ const init = async (sceneTexture) => {
     let render_pipeline = Scratch.RenderPipeline.create({
         name: 'render_pipeline',
         shader: { module: Scratch.shaderLoader.load('FFrend', '/shaders/FFrend.wgsl') },
-        colorTargetStates: [ { blend: Scratch.PremultipliedBlending} ],
+        colorTargetStates: [{ blend: Scratch.PremultipliedBlending }],
         primitive: { topology: 'triangle-strip' },
     })
 
@@ -489,6 +490,15 @@ const init = async (sceneTexture) => {
             }
         ],
     }).add(render_pipeline, render_binding);
+
+
+    Scratch.director.addStage({
+        name: 'Flow Field Shower',
+        items: [
+            simulation_pass,
+            render_pass,
+        ]
+    })
 
     return {
         simulationPass: simulation_pass,
@@ -528,20 +538,20 @@ const tickLogic = (mapbox_matrix, mercatorCenter) => {
     if (!controller.stop) {
         // aliveNumIndirectRef.value = new Uint32Array([(parser.maxSegmentNum - 1) * 2, 0, 0, 0]);
         aliveNumIndirectRef.elements(1, 0)
-        
+
         startReadIndex = (startReadIndex + 1) % parser.maxSegmentNum
         startStorageIndex = (startStorageIndex + 1) % parser.maxSegmentNum
-   
+
         if (frameTimer.tickTimer()) {
 
             let nowPhase = Math.floor(frameTimer.timeCount / frameTimer.tickPerPhase)
-            let updatePhase = ( nowPhase + 2 ) % frameTimer.phaseCount
+            let updatePhase = (nowPhase + 1) % frameTimer.phaseCount
 
             // using mutiple binding
             bindingIndex = nowPhase % flowTextureArrSize
             simulation_pass.empty()
-            simulation_pass.add(simulation_pipeline,simuBindArr[bindingIndex])
-            // updateReparse(flowTextureArr[updatePhase % flowTextureArrSize],parser.flowFieldResourceArray[updatePhase]);
+            simulation_pass.add(simulation_pipeline, simuBindArr[bindingIndex])
+            updateReparse(flowTextureArr[updatePhase % flowTextureArrSize], parser.flowFieldResourceArray[updatePhase]);
 
         }
 
@@ -568,8 +578,18 @@ const tickLogic = (mapbox_matrix, mercatorCenter) => {
 
 }
 
-const tickRender = () => {
-    Scratch.director.show()
+export function showFlowField(visibility) {
+
+    if (visibility) {
+        controller.stop = false
+        Scratch.director.showStage('Flow Field Shower')
+        gui.show()
+    }
+    else {
+        controller.stop = true
+        Scratch.director.hideStage('Flow Field Shower')
+        gui.hide()
+    }
 }
 
 const rendering = (mapbox_matrix, mercatorCenter) => {
@@ -578,27 +598,30 @@ const rendering = (mapbox_matrix, mercatorCenter) => {
 }
 
 
-// const updateReparse = (oldTexture, url) => {
+const updateReparse = (oldTexture, url) => {
 
-//     console.log('loading --',oldTexture.name, "  ", url);
-    
-//     const { scratchBuffer } = Scratch.bufferLoader.load("newflowBuffer", url);
-//     const updateDesc = {
-//         format: "rg32float",
-//         resource: {
-//             dataType: 'buffer2',
-//             buffer: () => scratchBuffer
-//         }
-//     }
-//     scratchBuffer.registerCallback(() => {
-//         oldTexture.reset(updateDesc)
+    // console.log('updating --', oldTexture.name, " by ", url)
+    // get rgba8 image buffer
+    const imgBuffer = Scratch.imageBufferLoader.load('imgBuffer', url, false)
 
-//     })
+    const updateDesc = {
+        format: "rg32float",
+        resource: {
+            dataType: 'buffer',
+            buffer: () => imgBuffer.buffer
+        }
+    }
+    // when buffer load  call back to reparse
+    imgBuffer.registerCallback(() => {
+        if (imgBuffer.resource.dataType === 'clean') {
+            oldTexture.reset(updateDesc)
+        }
+    })
+}
 
-// }
 
 export {
     init,
     tickLogic,
-    rendering
+    rendering,
 }

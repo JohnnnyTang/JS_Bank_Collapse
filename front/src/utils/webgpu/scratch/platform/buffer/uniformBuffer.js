@@ -36,13 +36,14 @@ class UniformBuffer extends Buffer {
             size: byteLength
         }
         super(bufferDesc)
-
+        
         this.alignSize = alignSize
         this.dynamicBlocks = []
         description.blocks.forEach((block) => {
             this.addBlock(block)
         })
         this.isInitialized = false
+    
     }
 
     /**
@@ -64,8 +65,7 @@ class UniformBuffer extends Buffer {
     }
 
     update() {
-
-        if (this.dynamicBlocks.length || !this.isInitialized ) {
+        if (this.dynamicBlocks && (this.dynamicBlocks.length || !this.isInitialized) ) {
 
             this.dynamicBlocks.forEach(block => block.update()) 
             this.isInitialized = true

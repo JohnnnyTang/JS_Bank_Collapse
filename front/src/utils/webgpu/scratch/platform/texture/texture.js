@@ -12,14 +12,14 @@ const generateMips = (() => {
     let sampler
     let module
     const pipelineByFormat = {}
- 
+
     return function generateMips(texture) {
 
         const device = getDevice()
         if (!module) {
-        module = device.createShaderModule({
-            label: 'textured quad shaders for mip level generation',
-            code: `
+            module = device.createShaderModule({
+                label: 'textured quad shaders for mip level generation',
+                code: `
             struct VSOutput {
                 @builtin(position) position: vec4f,
                 @location(0) texcoord: vec2f,
@@ -54,13 +54,13 @@ const generateMips = (() => {
                 return textureSample(ourTexture, ourSampler, fsInput.texcoord);
             }
             `,
-        });
+            });
 
-        sampler = device.createSampler({
-            minFilter: 'linear',
-            addressModeU: 'clamp-to-edge',
-            addressModeV: 'clamp-to-edge',
-        });
+            sampler = device.createSampler({
+                minFilter: 'linear',
+                addressModeU: 'clamp-to-edge',
+                addressModeV: 'clamp-to-edge',
+            });
         }
 
         if (!pipelineByFormat[texture.format]) {
@@ -93,7 +93,7 @@ const generateMips = (() => {
                 layout: pipeline.getBindGroupLayout(0),
                 entries: [
                     { binding: 0, resource: sampler },
-                    { binding: 1, resource: texture.createView({baseMipLevel, mipLevelCount: 1}) },
+                    { binding: 1, resource: texture.createView({ baseMipLevel, mipLevelCount: 1 }) },
                 ],
             })
 
@@ -102,11 +102,11 @@ const generateMips = (() => {
             const renderPassDescriptor = {
                 label: 'our basic canvas renderPass',
                 colorAttachments: [
-                {
-                    view: texture.createView({baseMipLevel, mipLevelCount: 1}),
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                },
+                    {
+                        view: texture.createView({ baseMipLevel, mipLevelCount: 1 }),
+                        loadOp: 'clear',
+                        storeOp: 'store',
+                    },
                 ],
             }
 
@@ -150,7 +150,7 @@ class Texture {
     constructor(description) {
 
         this.uuid = UUID()
-        
+
         this.refCount = 0
         this.name = description.name ? description.name : 'Texture'
         this.resource = description.resource
@@ -174,6 +174,7 @@ class Texture {
             'imageBitmap': () => this.updateByImageBitmap(),
             'size': () => this.updateBySize(),
             'canvasTexture': () => this.updateByCanvasTexture(),
+            'buffer': () => this.updateByBuffer(),
         }
 
         /**
@@ -215,13 +216,13 @@ class Texture {
     view() {
         return this.texture.createView({
             ...(this.mipMapped && {
-                baseMipLevel: 0, 
+                baseMipLevel: 0,
                 mipLevelCount: Math.max(this.texture.mipLevelCount, 1)
             })
         })
     }
 
-    updateWhenClean() {}
+    updateWhenClean() { }
 
     updateByImageBitmap() {
 
@@ -232,7 +233,7 @@ class Texture {
             this.texture.destroy()
         }
 
-        const {imageBitmap, id} = this.resource.imageBitmap()
+        const { imageBitmap, id } = this.resource.imageBitmap()
         if (!imageBitmap) return
 
         let rgba8Texture = device.createTexture({
@@ -246,9 +247,9 @@ class Texture {
         })
 
         device.queue.copyExternalImageToTexture(
-            {source: imageBitmap, flipY: this.flipY},
-            {texture: rgba8Texture},
-            {width: imageBitmap.width, height: imageBitmap.height}
+            { source: imageBitmap, flipY: this.flipY },
+            { texture: rgba8Texture },
+            { width: imageBitmap.width, height: imageBitmap.height }
         )
 
         if (this.format === 'rgba8unorm') this.texture = rgba8Texture
@@ -257,7 +258,7 @@ class Texture {
             const componentNum = {
                 'rg32float': 2,
             }
-        
+
             if (!(this.format in componentNum)) {
                 throw new Error(`Unsupported reparsed format: ${this.format}`)
             }
@@ -266,32 +267,32 @@ class Texture {
             // Reparsing
             const tempEncoder = device.createCommandEncoder()
             const tempBuffer = device.createBuffer({
-              label: 'tempBuffer',
-              size: rgba8Texture.width * rgba8Texture.height * 4,
-              usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC
+                label: 'tempBuffer',
+                size: rgba8Texture.width * rgba8Texture.height * 4,
+                usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC
             })
             tempEncoder.copyTextureToBuffer(
-              { texture: rgba8Texture, mipLevel: 0, origin: [0, 0, 0], aspect: 'all' },
-              { buffer: tempBuffer, offset: 0, bytesPerRow: rgba8Texture.width * 4, rowsPerImage: rgba8Texture.height },
-              [rgba8Texture.width, rgba8Texture.height]
+                { texture: rgba8Texture, mipLevel: 0, origin: [0, 0, 0], aspect: 'all' },
+                { buffer: tempBuffer, offset: 0, bytesPerRow: rgba8Texture.width * 4, rowsPerImage: rgba8Texture.height },
+                [rgba8Texture.width, rgba8Texture.height]
             )
-      
+
             const parsedTexture = device.createTexture({
-              label: this.name,
-              format: this.format,
-              size: [rgba8Texture.width / targetComponents, imageBitmap.height],
-              usage: this.usage,
-              ...(this.mipMapped && {
-                  mipLevelCount: numMipLevels(rgba8Texture.width / targetComponents, imageBitmap.height)
-              })
+                label: this.name,
+                format: this.format,
+                size: [rgba8Texture.width / targetComponents, imageBitmap.height],
+                usage: this.usage,
+                ...(this.mipMapped && {
+                    mipLevelCount: numMipLevels(rgba8Texture.width / targetComponents, imageBitmap.height)
+                })
             })
             tempEncoder.copyBufferToTexture(
-              { buffer: tempBuffer, offset: 0, bytesPerRow: rgba8Texture.width * 4, rowsPerImage: parsedTexture.height },
-              { texture: parsedTexture, mipLevel: 0, origin: [0, 0, 0], aspect: 'all' },
-              [parsedTexture.width, parsedTexture.height]
+                { buffer: tempBuffer, offset: 0, bytesPerRow: rgba8Texture.width * 4, rowsPerImage: parsedTexture.height },
+                { texture: parsedTexture, mipLevel: 0, origin: [0, 0, 0], aspect: 'all' },
+                [parsedTexture.width, parsedTexture.height]
             )
             device.queue.submit([tempEncoder.finish()])
-            
+
             rgba8Texture.destroy()
             tempBuffer.destroy()
             this.texture = parsedTexture
@@ -302,9 +303,28 @@ class Texture {
         }
 
         this.dirtyType = 'clean'
-        
+
         this.getByteLength()
         monitor.memorySizeInBytes += this.byteLength
+    }
+
+    updateByBuffer() {
+        const device = getDevice()
+        
+        const buffer = this.resource.buffer()
+        if (!buffer) return
+
+        //copy rgba8buffer to rg32texture(this.texture)
+        const tempEncoder = device.createCommandEncoder()
+        tempEncoder.copyBufferToTexture(
+            { buffer: buffer, offset: 0, bytesPerRow: this.texture.width * 4 * 2, rowsPerImage: this.texture.height },
+            { texture: this.texture, mipLevel: 0, origin: [0, 0, 0], aspect: 'all' },
+            [this.texture.width, this.texture.height]
+        )
+        device.queue.submit([tempEncoder.finish()])
+
+        this.dirtyType = 'clean'
+
     }
 
     updateByCanvasTexture() {
@@ -317,7 +337,7 @@ class Texture {
 
         this.texture = gpuTexture
         this.dirtyType = 'clean'
-        
+
         this.getByteLength()
         monitor.memorySizeInBytes += this.byteLength
     }
@@ -351,7 +371,7 @@ class Texture {
         monitor.memorySizeInBytes += this.byteLength
     }
 
-    getByteLength()  {
+    getByteLength() {
 
         const formatSize = {
             'r8unorm': 1,
@@ -367,13 +387,13 @@ class Texture {
             'depth24plus': 3,
             'depth32float': 4,
         }
-    
+
         if (!(this.format in formatSize)) {
             throw new Error(`Unsupported format: ${this.format}`)
         }
-    
+
         let singleLayerSize = this.texture.width * this.texture.height * formatSize[this.format]
-    
+
         this.byteLength = 0
         let currentWidth = this.texture.width
         let currentHeight = this.texture.height
@@ -385,7 +405,7 @@ class Texture {
                 singleLayerSize = currentWidth * currentHeight * formatSize[this.format]
             }
         }
-    
+
         this.byteLength += singleLayerSize;
     }
 
@@ -398,7 +418,7 @@ class Texture {
      * @param {TextureDescription} [description] 
      */
     reset(description) {
-        
+
         if (description) {
 
             this.name = description.name ? description.name : this.name
@@ -406,7 +426,7 @@ class Texture {
             this.usage = description.usage ? description.usage : this.usage
             this.format = description.format ? description.format : this.format
             this.mipMapped = description.mipMapped ? description.mipMapped : this.mipMapped
-            this.resource = description.resource 
+            this.resource = description.resource
             this.dirtyType = description.resource.dataType ? description.resource.dataType : 'size'
         } else {
 

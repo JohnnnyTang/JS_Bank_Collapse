@@ -31,7 +31,7 @@
 import { ElMessage } from 'element-plus';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch, onUnmounted } from 'vue';
 import bankHistory from '../components/BankMainComponents/bankHistory.vue';
 import bankList from '../components/BankMainComponents/bankList.vue';
 import bankListChild from '../components/BankMainComponents/bankListChild.vue';
@@ -166,6 +166,16 @@ onMounted(async () => {
 
     layerEventLogic(map);
 });
+
+onUnmounted(() => {
+    if (map.getLayer('3DLayer'))
+        map.removeLayer('3DLayer')
+    map.remove()
+    
+    const guidiv = document.getElementsByClassName("dg ac")[0]
+    if (guidiv) 
+        guidiv.style.display = 'none'
+})
 
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
@@ -422,5 +432,4 @@ button:hover {
     right: 4vh;
     z-index: 2;
 }
-
 </style>
