@@ -13,6 +13,7 @@ public class BankApplication {
 
     public static void main(String[] args) {
 //        System.out.println(Arrays.toString(",asd,".split(",")));
+//        System.out.println(System.getProperty("user.dir"));
         SpringApplication.run(BankApplication.class, args);
     }
 

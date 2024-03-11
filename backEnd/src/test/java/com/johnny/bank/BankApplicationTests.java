@@ -23,7 +23,7 @@ class BankApplicationTests {
             put("password", "20000601");
         }};
         DataNode dataNode = DataNode.dataNodeBuilder()
-                .id("1").name("test").nodeType("stationInfo")
+                .id("1").name("test")
                 .usage(usage).category("staticGroup")
                 .apiPrefix("jdbc:postgresql://192.168.1.125:5432/bankdemo?stringtype=unspecified")
                 .build();
