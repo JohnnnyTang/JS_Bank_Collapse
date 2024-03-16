@@ -1,21 +1,48 @@
 <template>
     <div class="data-visual-container">
-
+        <div id="map"></div>
     </div>
 </template>
 
 <script setup>
+import mapboxgl from 'mapbox-gl'
+import "mapbox-gl/dist/mapbox-gl.css"
+import { onMounted } from 'vue';
+import { initMap } from '../utils/mapUtils';
+
+// mapbox://styles/nujabesloo/cltoh2lrx001g01qv4ptsdh8g
+
+onMounted(async() => {
+    const map = await initMap();
+    const isLoaded = map.loaded();
+    console.log(isLoaded);
+})
+
+
+
 
 </script>
 
 <style lang="scss" scoped>
-div.data-visual-container  {
+div.data-visual-container {
     position: absolute;
     width: 100vw;
     height: 92vh;
     top: 8vh;
     left: 0;
+    background-color: rgb(126, 253, 8);
 
-    background-color: rgb(215, 250, 238);
+    #map {
+        position: absolute;
+        width: 100vw;
+        height: 92vh;
+        background-color: rgb(124, 179, 203);
+    }
+
+    .mapbox-improve-map {
+        display: none;
+    }
+    
+    
 }
 </style>
