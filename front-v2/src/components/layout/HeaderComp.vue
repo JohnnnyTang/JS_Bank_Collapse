@@ -5,6 +5,7 @@
             <div
                 class="header-nav-item"
                 v-for="(navItem, index) in navList"
+                :key="index"
                 @click="emitNavClick(index)"
                 :class="{
                     active: navItem.isActive,
