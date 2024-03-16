@@ -30,6 +30,7 @@
                         <div
                             class="knowledge-card-container"
                             v-for="(infoItem, index) in knowledgeInfoList"
+                            :key="index"
                         >
                             <div class="knowledge-card-wrapper">
                                 <div

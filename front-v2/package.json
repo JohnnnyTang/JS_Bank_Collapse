@@ -11,8 +11,10 @@
   "dependencies": {
     "animejs": "^3.2.2",
     "axios": "^1.6.7",
+    "echarts": "^5.5.0",
     "element-plus": "^2.6.1",
     "eslint-plugin-vue": "^9.22.0",
+    "mapbox-gl": "^3.2.0",
     "prettier": "^3.2.5",
     "sass": "^1.71.1",
     "uuid": "^9.0.1",

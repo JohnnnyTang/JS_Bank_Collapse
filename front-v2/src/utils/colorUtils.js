@@ -49,6 +49,7 @@ function getOpacity(color) {
 }
 
 function getRgbValue(color) {
+    // console.log('color', color)
     const lowerColor = color.toLowerCase()
 
     return isHex(lowerColor)
