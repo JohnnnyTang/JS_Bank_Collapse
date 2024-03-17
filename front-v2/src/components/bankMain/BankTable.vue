@@ -45,7 +45,7 @@ onMounted(() => {
     let scrollBar = bankTableDomRef.value.$el.querySelectorAll(
         '.el-scrollbar__wrap',
     )[0]
-    console.log(scrollBar)
+    // console.log(scrollBar)
 
     setInterval(() => {
         if (tableRows[curRowIndex].offsetHeight != 0) {

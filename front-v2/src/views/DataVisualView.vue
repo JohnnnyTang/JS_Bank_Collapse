@@ -1,21 +1,28 @@
 <template>
     <div class="data-visual-container">
-        <div id="map"></div>
+        <div id="map" ref="mapContainerRef"></div>
     </div>
 </template>
 
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { onMounted } from 'vue';
+import { onMounted,ref } from 'vue';
 import { initMap } from '../utils/mapUtils';
+
+const mapContainerRef = ref();
 
 // mapbox://styles/nujabesloo/cltoh2lrx001g01qv4ptsdh8g
 
+let map = null;
+
+
 onMounted(async() => {
-    const map = await initMap();
-    const isLoaded = map.loaded();
-    console.log(isLoaded);
+
+    //q:
+    map = initMap(mapContainerRef)
+    // console.log(map);
+
 })
 
 
