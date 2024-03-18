@@ -1,18 +1,29 @@
 <template>
   <div class="card">
     <div class="top-section">
-      <div class="border"></div>
-    </div>
-    <div class="bottom-section">
-      <span class="title">典型数据场景</span>
-
+      <div class="border">
+        <div class="title-text">
+          {{ props.title }}
+        </div>
+      </div>
+      <div class='icon' :style="{backgroundImage:`url(${props.iconSrc})`}"></div>
+      <div class="text">
+        {{ props.desc }}
+        </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
-import router from './router/index';
+
+
+//涵盖了水库、堤坝、灌溉系统等重要水利工程.
+const props = defineProps({
+  title:String,
+  desc:String,
+  iconSrc:String,
+})
 
 onMounted(async () => {
 
@@ -22,30 +33,95 @@ onMounted(async () => {
 
 <style lang="scss">
 .card {
-  width: 230px;
-  border-radius: 20px;
+ // position: absolute;
+ // top: 3vh;
+ // left: 1vw;
+  margin: 10px;
+  width: 15vw;
+  border-radius: 10px;
   background: #1b233d;
   padding: 5px;
   overflow: hidden;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 20px 0px;
+  box-shadow: rgba(100, 100, 111, 0.2) 10px 7px 20px 0px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.5s;
+  &:hover{
+    transform: scale(1.02);
+    cursor: pointer;
+  }
+  
 
   .top-section {
-    height: 150px;
+    height: 10vh;
     border-radius: 15px;
     display: flex;
     flex-direction: column;
     background: linear-gradient(45deg, rgb(4, 159, 187) 0%, rgb(80, 246, 255) 100%);
     position: relative;
 
+    &::before {
+      content: "";
+      position: absolute;
+      top: 4vh;
+      left: 0;
+      background: rgba(255, 255, 255, 0);
+      height: 15px;
+      width: 15px;
+      border-top-left-radius: 15px;
+      box-shadow: -5px -5px 0 2px #1b233d;
+    }
+
+
+
     .border {
       border-bottom-right-radius: 10px;
-      height: 30px;
-      width: 130px;
-      background: white;
+      height: 4vh;
+      width: 70%;
       background: #1b233d;
       position: relative;
-      transform: skew(-40deg);
+      transform: skew(-20deg);
       box-shadow: -10px -10px 0 0 #1b233d;
+
+      &::before {
+        content: "";
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        top: 0;
+        right: -15px;
+        border-top-left-radius: 10px;
+        box-shadow: -5px -5px 0 2px #1b233d;
+      }
+
+      .title-text {
+        color: white;
+        font-size: calc(0.8vw + 0.8vh);
+        font-style: normal;
+        text-align: center;
+        line-height: 4vh;;
+      }
+
+    }
+
+    .icon {
+      top: 0;
+      right: 15%;
+      transform: translateX(50%);
+      width: 4vh;
+      position: absolute;
+      height: 4vh;
+      //background-image: url('./icons/beach.png');
+      background-size: contain;
+    }
+
+
+
+    .text {
+      color: black;
+      font-style: normal;
+      font-weight: bolder;
+      padding: 5px;
     }
   }
 
@@ -59,29 +135,8 @@ onMounted(async () => {
       letter-spacing: 2px;
     }
   }
-}
 
-.card .top-section .border::before {
-  content: "";
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  top: 0;
-  right: -15px;
-  background: rgba(255, 255, 255, 0);
-  border-top-left-radius: 10px;
-  box-shadow: -5px -5px 0 2px #1b233d;
-}
 
-.card .top-section::before {
-  content: "";
-  position: absolute;
-  top: 30px;
-  left: 0;
-  background: rgba(255, 255, 255, 0);
-  height: 15px;
-  width: 15px;
-  border-top-left-radius: 15px;
-  box-shadow: -5px -5px 0 2px #1b233d;
+
 }
 </style>

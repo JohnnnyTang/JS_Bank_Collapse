@@ -1,6 +1,7 @@
 <template>
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
+        <sceneContainer/>
     </div>
 </template>
 
@@ -9,6 +10,7 @@ import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted,ref } from 'vue';
 import { initMap } from '../utils/mapUtils';
+import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 
 const mapContainerRef = ref();
 
