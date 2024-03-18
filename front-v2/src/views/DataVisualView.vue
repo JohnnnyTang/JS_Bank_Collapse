@@ -1,25 +1,51 @@
 <template>
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
-        <sceneContainer/>
+        <sceneContainer />
+        <layerControl :allLayers="dataScene[index].allLayers" :layerScene="dataScene[index].layerScene" />
+        <searchContainer />
+
     </div>
 </template>
 
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { onMounted,ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { initMap } from '../utils/mapUtils';
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
-
+import layerControl from '../components/dataVisual/layerControl.vue';
+import searchContainer from '../components/dataVisual/searchContainer.vue';
 const mapContainerRef = ref();
 
 // mapbox://styles/nujabesloo/cltoh2lrx001g01qv4ptsdh8g
 
 let map = null;
+const index = ref(2)
+const dataScene = [
+    {
+        layerScene: '水利一张图',
+        allLayers: ['船舶', '码头', '水域']
+    },
+    {
+        layerScene: '河湖码头',
+        allLayers: ['码头']
+    },
+    {
+        layerScene: '典型崩岸',
+        allLayers: ['一级预警崩岸', '二级预警崩岸', '三级预警崩岸']
+    },
+    {
+        layerScene: '过江通道',
+        allLayers: ['已建通道', '在建通道', '规划通道']
+    }
+]
 
 
-onMounted(async() => {
+
+
+
+onMounted(async () => {
 
     //q:
     map = initMap(mapContainerRef)
@@ -34,6 +60,7 @@ onMounted(async() => {
 
 <style lang="scss" scoped>
 div.data-visual-container {
+    user-select: none;
     position: absolute;
     width: 100vw;
     height: 92vh;
@@ -51,7 +78,7 @@ div.data-visual-container {
     .mapbox-improve-map {
         display: none;
     }
-    
-    
+
+
 }
 </style>

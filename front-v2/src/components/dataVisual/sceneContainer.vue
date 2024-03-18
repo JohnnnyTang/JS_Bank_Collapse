@@ -1,9 +1,10 @@
 <template>
     <div class="scene-container">
 
-        <div class="scene-title"> 典型数据场景 </div>
-        <div class="card-container" v-for="info in sceneCardInfo">
-            <sceneCard :title="info.title" :desc="info.desc" :iconSrc="info.iconSrc"></sceneCard>
+        <div class="scene-title"> 长江江苏段 </div>
+        <div class="card-container">
+            <sceneCard v-for="(info, index) in sceneCardInfo" :key="index" :title="info.title" :desc="info.desc"
+                :iconSrc="info.iconSrc"></sceneCard>
             <hr>
         </div>
 
@@ -17,43 +18,43 @@ import sceneCard from './sceneCard.vue'
 const sceneCardInfo = ref([
     {
         title: '水利一张图',
-        desc: '涵盖了水库、堤坝、灌溉系统等重要水利工程.',
+        desc: '展示关键水利工程信息。',
         iconSrc: './icons/beach.png'
     },
     {
         title: '河湖码头',
-        desc: '反映当前水域的水位、流速等信息，用于水资源管理和调度.',
-        iconSrc: './icons/beach.png'
+        desc: '展示河湖码头信息，助力水资源管理和调度。',
+        iconSrc: './icons/pier.png'
     },
     {
         title: '过江通道',
-        desc: '反映当前水域的水位、流速等信息，用于水资源管理和调度.',
-        iconSrc: './icons/beach.png'
+        desc: '展示三类过江通道,助力有关规划决策.',
+        iconSrc: './icons/gate.png'
     },
     {
         title: '实时水情',
         desc: '反映当前水域的水位、流速等信息，用于水资源管理和调度.',
-        iconSrc: './icons/beach.png'
+        iconSrc: './icons/water-drop.png'
     },
     {
         title: '典型崩岸',
         desc: '描绘典型崩岸地貌，用于分析地质特征和防范措施.',
-        iconSrc: './icons/beach.png'
+        iconSrc: './icons/collapse.png'
     },
     {
         title: '预警分区',
         desc: '标示潜在灾害风险区域，帮助提前预警和应对应急情况.',
-        iconSrc: './icons/beach.png'
+        iconSrc: './icons/warning.png'
     },
     {
         title: '全江地形',
         desc: '呈现整个江河的地形高低变化，为水文分析提供基础数据.',
-        iconSrc: './icons/beach.png'
+        iconSrc: './icons/terrain.png'
     },
     {
         title: '平面冲淤',
-        desc: '呈现整个江河的地形高低变化，为水文分析提供基础数据.',
-        iconSrc: './icons/beach.png'
+        desc: '呈现整个江河岸段的冲淤情况',
+        iconSrc: './icons/shore.png'
     },
 
 ])
@@ -67,42 +68,16 @@ onMounted(async () => {
 <style lang="scss">
 .scene-container {
     position: absolute;
-
-    overflow-y: scroll;
-    overflow-x:hidden;
     background: rgb(209, 254, 255);
     background: linear-gradient(0deg, rgba(209, 254, 255, 0.6082808123249299) 0%, rgba(4, 203, 255, 0.49343487394957986) 100%);
     height: 92vh;
+    overflow: hidden;
 
-    /* 定义滚动条 */
-    &::-webkit-scrollbar {
-        width: 5px;
-        /* 滚动条宽度 */
-    }
-
-    /* 定义滚动条轨道 */
-    &::-webkit-scrollbar-track {
-        background-color: rgba(98, 141, 145, 0.219);
-        /* 轨道背景颜色 */
-    }
-
-    /* 定义滚动条滑块 */
-    &::-webkit-scrollbar-thumb {
-        background-color: #15a1e294;
-        /* 滑块背景颜色 */
-        border-radius: 5px;
-        /* 滑块圆角 */
-    }
-
-    /* 滑块悬停样式 */
-    &::-webkit-scrollbar-thumb:hover {
-        background-color: #555;
-        /* 悬停时的滑块背景颜色 */
-    }
 
 
     .scene-title {
-        padding: 5px;
+        height: 4.5vh;
+        margin-top: 0.5vh;
         font-size: calc(1vw + 1vh);
         font-weight: 800;
         text-align: center;
@@ -112,7 +87,28 @@ onMounted(async () => {
 
     }
 
-    .card-container {}
+    .card-container {
+        height: 85vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-color: rgba(6, 181, 197, 0.219);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #15a1e294;
+            border-radius: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background-color: #3af0f781;
+        }
+    }
 
 
 

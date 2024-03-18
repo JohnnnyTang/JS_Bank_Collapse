@@ -46,6 +46,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   transition: transform 0.5s;
+  user-select: none;
   &:hover{
     transform: scale(1.02);
     cursor: pointer;
@@ -108,6 +109,7 @@ onMounted(async () => {
       top: 0;
       right: 15%;
       transform: translateX(50%);
+      
       width: 4vh;
       position: absolute;
       height: 4vh;
