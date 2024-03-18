@@ -1,17 +1,16 @@
 <template>
     <div class="layer-controller">
-        <!-- <h1>geeko</h1> -->
-
+    
         <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
-            <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false">
-                <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
-            </el-tooltip>
+            <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
+            <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
+            <!-- </el-tooltip> -->
         </div>
 
 
         <div class="layer-controller-main" v-show="showLayersCard">
             <div class="layer-controller-main-title">图层管理</div>
-            <div class="layer-controller-scene-title">{{props.layerScene}}</div>
+            <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
 
             <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
                 <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city }}</el-checkbox>
@@ -29,15 +28,15 @@ const showLayersCard = ref(false)
 
 const checkedLayer = ref([])
 // const alllayers = ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'asd', '1', '2', '3', '4', '5']
-const alllayers = ['一级预警崩岸','二级预警崩岸','三级预警崩岸']
+const alllayers = ['一级预警崩岸', '二级预警崩岸', '三级预警崩岸']
 
 
 const props = defineProps({
-    allLayers:Array,
-    layerScene:String,
+    allLayers: Array,
+    layerScene: String,
 })
 
-const handleCheckedLayerChange=()=>{
+const handleCheckedLayerChange = () => {
     console.log(checkedLayer.value);
 }
 
@@ -107,11 +106,11 @@ onMounted(async () => {
         right: 2vw;
         bottom: 3vh;
         height: 25vh;
-        width: 10vw;
+        width: 12vw;
         padding: 10px;
-        background-image: linear-gradient(-225deg, #fffeffd7 0%, #92f8f683 100%);
+        background: linear-gradient(90deg, rgba(105, 188, 235, 0.8407738095238095) 33%, rgba(25, 237, 246, 1) 100%);
         transition: 300ms;
-        border-radius: 1vh;
+        border-radius: 5px;
         box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
 
         .layer-controller-main-title {
@@ -121,18 +120,20 @@ onMounted(async () => {
             line-height: 3vh;
             font-size: 20px;
             font-weight: 900;
-            color: #000000;
+            color: rgb(27, 35, 61);
             //background: #FFFFFF;
+
             text-shadow: 1px 1px 0 #bcbcbc, 2px 2px 0 #9c9c9c;
             padding-bottom: 5px;
         }
 
-        .layer-controller-scene-title{
+        .layer-controller-scene-title {
             display: flex;
             justify-content: center;
             height: 1.5vh;
             line-height: 1.5vh;
             font-size: 15px;
+            color: #353480;
             font-weight: 700;
             margin-bottom: 10px;
         }
@@ -160,10 +161,20 @@ onMounted(async () => {
             }
 
             .el-checkbox {
-                padding: 0px;
+                padding-left: 1vw;
                 margin: 0px;
                 display: block;
                 color: #000000;
+
+                :deep() .el-checkbox__input{
+                    transform: translateY(2px);
+                }
+
+                :deep().el-checkbox__label {
+                    text-shadow: 1px 1px 0 #4074b5;
+                    color: #FFFFFF;
+                
+                }
             }
         }
 

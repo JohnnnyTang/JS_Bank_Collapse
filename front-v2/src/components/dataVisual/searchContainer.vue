@@ -1,9 +1,9 @@
 <template>
     <div class="search-container">
         <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
-            <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false">
+            <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
                 <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
-            </el-tooltip>
+            <!-- </el-tooltip> -->
         </div>
 
 
@@ -29,7 +29,7 @@
             </div>
 
             <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" accordion :data="data"
-                :props="defaultProps" :default-expand-all="true" :filter-node-method="filterNode"
+                :props="defaultProps" :default-expand-all="false" :filter-node-method="filterNode"
                 @node-click="selectedNodeHandler" />
 
         </div>
@@ -39,7 +39,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue';
 
-const showSearchMain = ref(false)
+const showSearchMain = ref(true)
 const iconSrc = computed(() => {
     return showSearchMain.value ? './icons/resize.png' : './icons/searching.png'
 })
@@ -244,7 +244,16 @@ onMounted(async () => {
             //background-color: rgb(215, 200, 231);
             //color: rgb(247, 1, 1);
             overflow-y: scroll;
-            height: 42vh;
+            height: 40vh;
+            background-color: rgba(240, 248, 255, 0.11);
+
+            :deep().el-tree-node__label{
+                color: red;
+            }
+
+            :deep().el-tree-node__content{
+                color: red($color: #000000);
+            }
 
             &::-webkit-scrollbar {
                 width: 5px;
@@ -263,6 +272,19 @@ onMounted(async () => {
                 background-color: #3af0f781;
             }
 
+        }
+
+        .el-tree{
+            color: rgb(0, 75, 145);
+            font-size: medium;
+            font-weight: 500;
+        }
+        .el-tree-node{
+            background-color: #cae1f3;
+        }
+
+        .el-tree-node .is-focusable{
+            background-color: #9ad1ff;
         }
     }
 

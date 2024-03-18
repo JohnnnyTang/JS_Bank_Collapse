@@ -2,7 +2,7 @@
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
         <sceneContainer />
-        <layerControl :allLayers="dataScene[index].allLayers" :layerScene="dataScene[index].layerScene" />
+        <layerControl :allLayers="dataScene[selectedsceneindex].allLayers" :layerScene="dataScene[selectedsceneindex].layerScene" />
         <searchContainer />
 
     </div>
@@ -13,6 +13,7 @@ import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted, ref } from 'vue';
 import { initMap } from '../utils/mapUtils';
+
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 import layerControl from '../components/dataVisual/layerControl.vue';
 import searchContainer from '../components/dataVisual/searchContainer.vue';
@@ -21,7 +22,7 @@ const mapContainerRef = ref();
 // mapbox://styles/nujabesloo/cltoh2lrx001g01qv4ptsdh8g
 
 let map = null;
-const index = ref(2)
+const selectedsceneindex = ref(2)
 const dataScene = [
     {
         layerScene: '水利一张图',

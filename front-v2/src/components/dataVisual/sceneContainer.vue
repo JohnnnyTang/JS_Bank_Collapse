@@ -4,7 +4,7 @@
         <div class="scene-title"> 长江江苏段 </div>
         <div class="card-container">
             <sceneCard v-for="(info, index) in sceneCardInfo" :key="index" :title="info.title" :desc="info.desc"
-                :iconSrc="info.iconSrc"></sceneCard>
+                :iconSrc="info.iconSrc" @click="clickSceneHandler(info)"></sceneCard>
             <hr>
         </div>
 
@@ -14,6 +14,12 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import sceneCard from './sceneCard.vue'
+
+
+const clickSceneHandler = (scene)=>{
+    console.log(scene);
+}
+
 
 const sceneCardInfo = ref([
     {
