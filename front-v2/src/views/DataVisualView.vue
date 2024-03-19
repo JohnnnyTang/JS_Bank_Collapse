@@ -13,7 +13,7 @@ import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { initMap, flytoLarge, flytoSmall } from '../utils/mapUtils';
-import { Scene, initLayer } from '../components/dataVisual/Scene';
+import { Scene } from '../components/dataVisual/Scene';
 import { useMapStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 import layerControl from '../components/dataVisual/layerControl.vue';
@@ -30,12 +30,11 @@ const selectSceneHandler = (sceneInstance) => {
 }
 
 
-
-
-watch(selectedScene, (newV, oldV) => {
+watch(selectedScene, async (newV, oldV) => {
+    // console.log(newV,oldV);
     oldV && oldV.removeLayers(map)
     if (!newV.allLayers.length) {
-        initLayer(newV)
+        await newV.initAllLayers(map)
     }
     else {
         newV.showLayers(map, [])
@@ -55,8 +54,8 @@ onMounted(async () => {
 
 })
 
-onUnmounted(()=>{
-    
+onUnmounted(() => {
+
 })
 
 

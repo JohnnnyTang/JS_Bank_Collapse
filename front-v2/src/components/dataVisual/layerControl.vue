@@ -13,8 +13,8 @@
                 <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
 
                 <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
-                    <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city
-                        }}</el-checkbox>
+                    <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city }}
+                    </el-checkbox>
                 </el-checkbox-group>
             </div>
         </Transition>
@@ -24,32 +24,38 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { useMapStore } from '../../store/mapStore';
 
 const mapStore = useMapStore()
 const showLayersCard = ref(false)
-
-const checkedLayer = ref([])
-const alllayers = ['一级预警崩岸', '二级预警崩岸', '三级预警崩岸']
-
-
 const props = defineProps({
     allLayers: Array,
     layerScene: String,
 })
+watch(props, () => {
+    checkedLayer.value = props.allLayers
+})
+const checkedLayer = ref([])
+
 
 const handleCheckedLayerChange = () => {
-    console.log(checkedLayer.value);
+    let map = mapStore.getMap()
+    // visible layer
+    checkedLayer.value.forEach(layerID => {
+        map.setLayoutProperty(layerID, 'visibility', 'visible');
+    })
+    // invisible layer
+    let invisibleLayer = props.allLayers.filter(v => !checkedLayer.value.includes(v))
+    invisibleLayer.forEach(layerID => {
+        map.setLayoutProperty(layerID, 'visibility', 'none');
+    });
 }
 
 
 const iconSrc = computed(() => {
     return showLayersCard.value ? './icons/resize.png' : './icons/layers.png'
 })
-
-// mapbox://styles/nujabesloo/cltoh2lrx001g01qv4ptsdh8g
-
 
 onMounted(async () => {
 
