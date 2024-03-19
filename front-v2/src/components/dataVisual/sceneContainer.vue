@@ -1,10 +1,11 @@
 <template>
     <div class="scene-container">
 
-        <div class="scene-title"> 长江江苏段 </div>
+        <div class="scene-title"> {{ sceneContainerInfo.sceneTitle }} </div>
+        <div class="switch-icon" @click="switchHandler"></div>
         <div class="card-container">
-            <sceneCard v-for="(info, index) in sceneCardInfo" :key="index" :title="info.title" :desc="info.desc"
-                :iconSrc="info.iconSrc" @click="clickSceneHandler(info)"></sceneCard>
+            <sceneCard v-for="(info, index) in sceneContainerInfo.sceneCardInfo" :key="index" :title="info.title"
+                :desc="info.desc" :iconSrc="info.iconSrc" @click="clickSceneHandler(info)"></sceneCard>
             <hr>
         </div>
 
@@ -14,56 +15,50 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import sceneCard from './sceneCard.vue'
+import { ElMessage } from "element-plus"
+import { Scene, getBigRangeScenes, getSmallRangeScenes } from './Scene.js'
+import { flytoLarge, flytoSmall } from '../../utils/mapUtils'
+import { useMapStore } from '../../store/mapStore';
 
+const mapStore = useMapStore()
 
-const clickSceneHandler = (scene)=>{
-    console.log(scene);
+const emit = defineEmits(['selectScene'])
+
+const clickSceneHandler = (scene) => {
+    // console.log(scene);
+    // ElMessage(scene.title)
+    emit('selectScene', scene)
 }
 
+const switchHandler = () => {
 
-const sceneCardInfo = ref([
-    {
-        title: '水利一张图',
-        desc: '展示关键水利工程信息。',
-        iconSrc: './icons/beach.png'
-    },
-    {
-        title: '河湖码头',
-        desc: '展示河湖码头信息，助力水资源管理和调度。',
-        iconSrc: './icons/pier.png'
-    },
-    {
-        title: '过江通道',
-        desc: '展示三类过江通道,助力有关规划决策.',
-        iconSrc: './icons/gate.png'
-    },
-    {
-        title: '实时水情',
-        desc: '反映当前水域的水位、流速等信息，用于水资源管理和调度.',
-        iconSrc: './icons/water-drop.png'
-    },
-    {
-        title: '典型崩岸',
-        desc: '描绘典型崩岸地貌，用于分析地质特征和防范措施.',
-        iconSrc: './icons/collapse.png'
-    },
-    {
-        title: '预警分区',
-        desc: '标示潜在灾害风险区域，帮助提前预警和应对应急情况.',
-        iconSrc: './icons/warning.png'
-    },
-    {
-        title: '全江地形',
-        desc: '呈现整个江河的地形高低变化，为水文分析提供基础数据.',
-        iconSrc: './icons/terrain.png'
-    },
-    {
-        title: '平面冲淤',
-        desc: '呈现整个江河岸段的冲淤情况',
-        iconSrc: './icons/shore.png'
-    },
+    //layer remove
 
-])
+    if (sceneContainerInfo.value.sceneTitle === '长江江苏段') {
+        flytoSmall(mapStore.getMap())
+
+        sceneContainerInfo.value = sceneContainerInfo2
+
+    }
+    else {
+        flytoLarge(mapStore.getMap())
+        sceneContainerInfo.value = sceneContainerInfo1
+
+    }
+}
+
+const sceneCardInfo1 = getBigRangeScenes()
+const sceneCardInfo2 = getSmallRangeScenes()
+const sceneContainerInfo1 = {
+    sceneTitle: '长江江苏段',
+    sceneCardInfo: sceneCardInfo1
+}
+const sceneContainerInfo2 = {
+    sceneTitle: '民主沙示范段',
+    sceneCardInfo: sceneCardInfo2
+}
+const sceneContainerInfo = ref(sceneContainerInfo1)
+
 
 onMounted(async () => {
 
@@ -87,11 +82,42 @@ onMounted(async () => {
         font-size: calc(1vw + 1vh);
         font-weight: 800;
         text-align: center;
+        margin-right: 3vw;
 
         color: rgb(0, 81, 233);
         text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 3px 2px 1px #CCCCCC, 2px 3px 1px #EEEEEE, 4px 3px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 5px 4px 1px #CCCCCC, 4px 5px 1px #EEEEEE, 6px 5px 1px #CCCCCC, 5px 6px 1px #EEEEEE, 7px 6px 1px #0f41e7;
 
     }
+
+    .switch-icon {
+        position: absolute;
+        top: 0.8vh;
+        right: 1vw;
+        height: 4vh;
+        width: 4vh;
+        background-image: url('./icons/switch.png');
+        background-size: contain;
+        animation: scaleAnim 1000ms infinite;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    @keyframes scaleAnim {
+        0% {
+            transform: scale(1.0);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1.0);
+        }
+    }
+
 
     .card-container {
         height: 85vh;

@@ -1,9 +1,9 @@
 <template>
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
-        <sceneContainer />
-        <layerControl :allLayers="dataScene[selectedsceneindex].allLayers" :layerScene="dataScene[selectedsceneindex].layerScene" />
-        <searchContainer />
+        <sceneContainer @selectScene="selectSceneHandler" />
+        <layerControl :allLayers="selectedScene.allLayers" :layerScene="selectedScene.title" />
+        <searchContainer :selectedScene="selectedScene" />
 
     </div>
 </template>
@@ -11,45 +11,47 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { onMounted, ref } from 'vue';
-import { initMap } from '../utils/mapUtils';
-
+import { onMounted, ref, watch } from 'vue';
+import { initMap, flytoLarge, flytoSmall } from '../utils/mapUtils';
+import { Scene, initLayer } from '../components/dataVisual/Scene';
+import { useMapStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 import layerControl from '../components/dataVisual/layerControl.vue';
 import searchContainer from '../components/dataVisual/searchContainer.vue';
+
+
 const mapContainerRef = ref();
-
-// mapbox://styles/nujabesloo/cltoh2lrx001g01qv4ptsdh8g
-
+const mapStore = useMapStore()
 let map = null;
-const selectedsceneindex = ref(2)
-const dataScene = [
-    {
-        layerScene: '水利一张图',
-        allLayers: ['船舶', '码头', '水域']
-    },
-    {
-        layerScene: '河湖码头',
-        allLayers: ['码头']
-    },
-    {
-        layerScene: '典型崩岸',
-        allLayers: ['一级预警崩岸', '二级预警崩岸', '三级预警崩岸']
-    },
-    {
-        layerScene: '过江通道',
-        allLayers: ['已建通道', '在建通道', '规划通道']
+const selectedScene = ref(new Scene())
+
+const selectSceneHandler = (sceneInstance) => {
+    selectedScene.value = sceneInstance
+}
+
+
+
+
+watch(selectedScene, (newV, oldV) => {
+    oldV && oldV.removeLayers(map)
+    if (!newV.allLayers.length) {
+        initLayer(newV)
     }
-]
-
-
+    else {
+        newV.showLayers(map, [])
+    }
+})
 
 
 
 onMounted(async () => {
 
     //q:
-    map = initMap(mapContainerRef)
+    let mapInstance = initMap(mapContainerRef)
+    mapStore.setMap(mapInstance)
+    map = mapStore.getMap()
+
+    flytoLarge(map)
     // console.log(map);
 
 })

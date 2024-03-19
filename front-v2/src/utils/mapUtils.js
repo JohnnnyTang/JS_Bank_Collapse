@@ -1,5 +1,15 @@
 import mapboxgl from "mapbox-gl";
 
+// window.addEventListener('keydown', (e) => {
+//     if (e.key == 'Enter') {
+//         console.log('center', map.getCenter());
+//         console.log('bearing', map.getBearing());
+//         console.log('Pitch', map.getPitch());
+//         console.log('zoom', map.getZoom());
+//     }
+// })
+
+
 const initMap = (ref) => {
     return new mapboxgl.Map({
         container: ref.value, // container ID
@@ -14,7 +24,28 @@ const initMap = (ref) => {
     })
 }
 
+const flytoLarge = (map)=>{
+    map.flyTo({
+        center:[119.9617548378,32.04382454852],
+        pitch: 48.0432167520608,
+        bearing: 0,
+        zoom: 8.28560629149188,
+        speed: 0.5
+    })
+}
+const flytoSmall = (map)=>{
+    map.flyTo({
+        center:[120.53070965313992,32.042615280683805],
+        pitch:61.99999999999988,
+        bearing:0,
+        zoom:13.245427972376211,
+        speed:0.5
+    })
+}
+
 
 export {
-    initMap
+    initMap,
+    flytoLarge,
+    flytoSmall
 }

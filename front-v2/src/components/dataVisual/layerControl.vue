@@ -1,21 +1,23 @@
 <template>
     <div class="layer-controller">
-    
+
         <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
             <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
             <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
             <!-- </el-tooltip> -->
         </div>
 
+        <Transition name="slidefade">
+            <div class="layer-controller-main" v-show="showLayersCard">
+                <div class="layer-controller-main-title">图层管理</div>
+                <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
 
-        <div class="layer-controller-main" v-show="showLayersCard">
-            <div class="layer-controller-main-title">图层管理</div>
-            <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
-
-            <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
-                <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city }}</el-checkbox>
-            </el-checkbox-group>
-        </div>
+                <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
+                    <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city
+                        }}</el-checkbox>
+                </el-checkbox-group>
+            </div>
+        </Transition>
     </div>
 </template>
 
@@ -23,7 +25,9 @@
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted, ref, computed } from 'vue';
+import { useMapStore } from '../../store/mapStore';
 
+const mapStore = useMapStore()
 const showLayersCard = ref(false)
 
 const checkedLayer = ref([])
@@ -46,6 +50,7 @@ const iconSrc = computed(() => {
 })
 
 // mapbox://styles/nujabesloo/cltoh2lrx001g01qv4ptsdh8g
+
 
 onMounted(async () => {
 
@@ -108,7 +113,7 @@ onMounted(async () => {
         height: 25vh;
         width: 12vw;
         padding: 10px;
-        background: linear-gradient(90deg, rgba(105, 188, 235, 0.8407738095238095) 33%, rgba(25, 237, 246, 1) 100%);
+        background: linear-gradient(45deg, rgb(159, 208, 236), rgba(240, 238, 235, 0.822));
         transition: 300ms;
         border-radius: 5px;
         box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
@@ -166,18 +171,28 @@ onMounted(async () => {
                 display: block;
                 color: #000000;
 
-                :deep() .el-checkbox__input{
+                :deep() .el-checkbox__input {
                     transform: translateY(2px);
                 }
 
                 :deep().el-checkbox__label {
-                    text-shadow: 1px 1px 0 #4074b5;
-                    color: #FFFFFF;
-                
+                    text-shadow: 1px 1px 0 #dfdada;
+                    color: #00183d;
+
                 }
             }
         }
 
+    }
+
+    .slidefade-enter-active,
+    .slidefade-leave-active {
+        transition: opacity 300ms linear;
+    }
+
+    .slidefade-enter-from,
+    .slidefade-leave-to {
+        opacity: 0;
     }
 }
 </style>

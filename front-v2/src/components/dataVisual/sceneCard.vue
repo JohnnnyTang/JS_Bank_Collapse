@@ -6,10 +6,10 @@
           {{ props.title }}
         </div>
       </div>
-      <div class='icon' :style="{backgroundImage:`url(${props.iconSrc})`}"></div>
+      <div class='icon' :style="{ backgroundImage: `url(${props.iconSrc})` }"></div>
       <div class="text">
         {{ props.desc }}
-        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -20,9 +20,9 @@ import { onMounted } from 'vue'
 
 //涵盖了水库、堤坝、灌溉系统等重要水利工程.
 const props = defineProps({
-  title:String,
-  desc:String,
-  iconSrc:String,
+  title: String,
+  desc: String,
+  iconSrc: String,
 })
 
 onMounted(async () => {
@@ -33,11 +33,11 @@ onMounted(async () => {
 
 <style lang="scss">
 .card {
- // position: absolute;
- // top: 3vh;
- // left: 1vw;
+  // position: absolute;
+  // top: 3vh;
+  // left: 1vw;
   margin: 10px;
-  width: 15vw;
+  width: 16vw;
   border-radius: 10px;
   background: #1b233d;
   padding: 5px;
@@ -47,11 +47,12 @@ onMounted(async () => {
   flex-direction: column;
   transition: transform 0.5s;
   user-select: none;
-  &:hover{
+
+  &:hover {
     transform: scale(1.02);
     cursor: pointer;
   }
-  
+
 
   .top-section {
     height: 10vh;
@@ -100,7 +101,8 @@ onMounted(async () => {
         font-size: calc(0.8vw + 0.8vh);
         font-style: normal;
         text-align: center;
-        line-height: 4vh;;
+        line-height: 4vh;
+        ;
       }
 
     }
@@ -109,7 +111,7 @@ onMounted(async () => {
       top: 0;
       right: 15%;
       transform: translateX(50%);
-      
+
       width: 4vh;
       position: absolute;
       height: 4vh;
