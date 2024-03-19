@@ -1,5 +1,7 @@
 import { ElMessage } from "element-plus"
 import mapboxgl from "mapbox-gl"
+import BackEndRequest from '../../api/backend.js'
+
 
 class Scene {
     constructor() {
@@ -137,7 +139,18 @@ const getSmallRangeScenes = () => {
 
 const initLayer = async (sceneInstance) => {
     console.log('init layer for ', sceneInstance.title)
+    switch (sceneInstance.title){
+        case '典型崩岸':
+
+            break;
+  
+        default:
+            ElMessage('wait developing...')
+            break;
+    }
 }
+
+
 
 
 export {

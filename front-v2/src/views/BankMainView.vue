@@ -80,7 +80,6 @@ onUnmounted(() => {
     // resizeObserver.unobserve(containerDom.value)
     console.log('onUnmounted');
     map&&map.remove()
-    console.log(map);
     console.log('map.remove');
 
 })

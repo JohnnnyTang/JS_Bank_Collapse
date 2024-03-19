@@ -259,13 +259,7 @@ onMounted(async () => {
             height: 40vh;
             background-color: rgba(240, 248, 255, 0.11);
 
-            :deep().el-tree-node__label {
-                color: red;
-            }
-
-            :deep().el-tree-node__content {
-                color: red($color: #000000);
-            }
+ 
 
             &::-webkit-scrollbar {
                 width: 5px;
@@ -286,19 +280,7 @@ onMounted(async () => {
 
         }
 
-        .el-tree {
-            color: rgb(0, 75, 145);
-            font-size: medium;
-            font-weight: 500;
-        }
 
-        .el-tree-node {
-            background-color: #cae1f3;
-        }
-
-        .el-tree-node .is-focusable {
-            background-color: #afd2ec;
-        }
     }
 
     .slidefade-enter-active,
@@ -309,6 +291,23 @@ onMounted(async () => {
     .slidefade-leave-to{
         opacity: 0;
     }
-
 }
+
+.el-tree {
+    color: rgb(0, 75, 145);
+    font-size: medium;
+    font-weight: 500;
+}
+
+.el-tree-node {
+    background-color: #cae1f3;
+    color:rgb(13, 58, 136);
+    font-weight: 600;
+    text-shadow:  1px 1px rgb(255, 255, 255);
+}
+
+.el-tree-node .is-focusable {
+    background-color: #afd2ec;
+}
+
 </style>

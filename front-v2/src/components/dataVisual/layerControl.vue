@@ -31,7 +31,6 @@ const mapStore = useMapStore()
 const showLayersCard = ref(false)
 
 const checkedLayer = ref([])
-// const alllayers = ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'asd', '1', '2', '3', '4', '5']
 const alllayers = ['一级预警崩岸', '二级预警崩岸', '三级预警崩岸']
 
 

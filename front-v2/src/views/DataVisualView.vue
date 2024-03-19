@@ -11,7 +11,7 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { initMap, flytoLarge, flytoSmall } from '../utils/mapUtils';
 import { Scene, initLayer } from '../components/dataVisual/Scene';
 import { useMapStore } from '../store/mapStore'
@@ -50,10 +50,13 @@ onMounted(async () => {
     let mapInstance = initMap(mapContainerRef)
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
-
     flytoLarge(map)
     // console.log(map);
 
+})
+
+onUnmounted(()=>{
+    
 })
 
 
