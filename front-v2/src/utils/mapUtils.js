@@ -27,6 +27,7 @@ const initMap = (ref) => {
 const flytoLarge = (map)=>{
     map.flyTo({
         center:[119.9617548378,32.04382454852],
+        // center:[-74.5447, 40.6892],
         pitch: 48.0432167520608,
         bearing: 0,
         zoom: 8.28560629149188,

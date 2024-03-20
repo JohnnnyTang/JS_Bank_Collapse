@@ -43,6 +43,10 @@
 import { onMounted, ref, computed, watch } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
+import { useMapStore } from '../../store/mapStore';
+
+
+const mapStore = useMapStore()
 
 const props = defineProps({
     selectedScene: Scene
@@ -147,6 +151,11 @@ const data = [
 
 watch(props, (newV) => {
     // request data from new V
+    let map = mapStore.getMap()
+    if(props.selectedScene.layerSrc.length!=0){
+        console.log(map.getSource(props.selectedScene.layerSrc[0]));
+    }
+
 })
 
 
@@ -199,7 +208,7 @@ onMounted(async () => {
         position: absolute;
         right: 2vw;
         top: 2vh;
-        height: 50vh;
+        height: 40vh;
         width: 15vw;
         padding: 1vh;
         background-color: rgba(240, 238, 235, 0.822);
@@ -256,10 +265,10 @@ onMounted(async () => {
             //background-color: rgb(215, 200, 231);
             //color: rgb(247, 1, 1);
             overflow-y: scroll;
-            height: 40vh;
+            height: 33vh;
             background-color: rgba(240, 248, 255, 0.11);
 
- 
+
 
             &::-webkit-scrollbar {
                 width: 5px;
@@ -284,11 +293,12 @@ onMounted(async () => {
     }
 
     .slidefade-enter-active,
-    .slidefade-leave-active{
+    .slidefade-leave-active {
         transition: opacity 300ms linear;
     }
+
     .slidefade-enter-from,
-    .slidefade-leave-to{
+    .slidefade-leave-to {
         opacity: 0;
     }
 }
@@ -301,13 +311,12 @@ onMounted(async () => {
 
 .el-tree-node {
     background-color: #cae1f3;
-    color:rgb(13, 58, 136);
+    color: rgb(13, 58, 136);
     font-weight: 600;
-    text-shadow:  1px 1px rgb(255, 255, 255);
+    text-shadow: 1px 1px rgb(255, 255, 255);
 }
 
 .el-tree-node .is-focusable {
     background-color: #afd2ec;
 }
-
 </style>

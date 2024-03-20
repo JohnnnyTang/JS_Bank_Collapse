@@ -70,7 +70,6 @@ onMounted(async () => {
 .layer-controller {
     user-select: none;
 
-
     // icon button
     .layer-controller-icon-container {
         //position
@@ -82,12 +81,14 @@ onMounted(async () => {
         //size and border
         width: 6.5vh;
         height: 6.5vh;
-        background-color: rgb(255, 255, 255);
+        background-color: rgb(255, 245, 245);
         border-radius: 6vh;
         //center
         display: flex;
         align-items: center;
         justify-content: center;
+
+        
 
         .layer-controller-icon {
             width: 5vh;
@@ -118,10 +119,10 @@ onMounted(async () => {
         height: 25vh;
         width: 12vw;
         padding: 10px;
-        background: linear-gradient(45deg, rgb(159, 208, 236), rgba(240, 238, 235, 0.822));
+        background: linear-gradient(45deg, rgb(159, 208, 236), rgb(240, 238, 235));
         transition: 300ms;
         border-radius: 5px;
-        box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+        box-shadow:  rgb(241, 238, 238) 0px 8px 24px, rgba(246, 246, 247, 0.945) 0px 5px 5px;
 
         .layer-controller-main-title {
             display: flex;
