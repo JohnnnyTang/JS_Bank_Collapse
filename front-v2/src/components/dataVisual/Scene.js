@@ -1,6 +1,7 @@
 import { ElMessage } from "element-plus"
 import mapboxgl from "mapbox-gl"
 import BackEndRequest from '../../api/backend.js'
+import { loadImage } from '../../utils/mapUtils.js'
 
 // BackEndRequest.getDataNodeData()
 
@@ -205,7 +206,6 @@ const initLayers = async (sceneInstance, map) => {
             let bankData = new DataPioneer('典型崩岸', e => e['coord'], 'LineString')
             await bankData.requestData(BackEndRequest.getbankLineData)
             const { level1, level2, level3 } = getDifBankData(bankData.origin2geojson())
-            sceneInstance.layerSrc.push('bank-level1-source', 'bank-level2-source', 'bank-level3-source')
             map.addSource('bank-level1-source', {
                 'type': 'geojson',
                 'data': level1
@@ -218,90 +218,82 @@ const initLayers = async (sceneInstance, map) => {
                 'type': 'geojson',
                 'data': level3
             });
+            sceneInstance.layerSrc.push('bank-level1-source', 'bank-level2-source', 'bank-level3-source')
+
+
+            await loadImage(map, './geoStyle/warning1.png', 'warning1')
+            map.addLayer({
+                'id': '一级预警岸段',
+                'type': 'line',
+                'source': 'bank-level1-source',
+                'layout': { 'line-join': 'round', 'line-cap': 'round', },
+                "paint": {
+                    "line-color": "rgb(121, 164, 35)",
+                    "line-opacity": 1,
+                    "line-width": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        7, 5, 22, 20
+                    ],
+                    "line-pattern": "warning1"
+                },
+                "layout": {
+                    "line-cap": "round",
+                    "line-join": "round",
+                    "line-round-limit": 2
+                }
+            })
+
+
+            await loadImage(map, './geoStyle/warning2.png', 'warning2')
+            map.addLayer({
+                'id': '二级预警岸段',
+                'type': 'line',
+                'source': 'bank-level2-source',
+                'layout': { 'line-join': 'round', 'line-cap': 'round', },
+                "paint": {
+                    "line-color": "rgb(121, 164, 35)",
+                    "line-opacity": 1,
+                    "line-width": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        7, 5, 22, 20
+                    ],
+                    "line-pattern": "warning2"
+                },
+                "layout": {
+                    "line-cap": "round",
+                    "line-join": "round",
+                    "line-round-limit": 2
+                }
+            })
+
+            await loadImage(map, './geoStyle/warning3.png', 'warning3')
+            map.addLayer({
+                'id': '三级预警岸段',
+                'type': 'line',
+                'source': 'bank-level3-source',
+                'layout': { 'line-join': 'round', 'line-cap': 'round', },
+                "paint": {
+                    "line-color": "rgb(121, 164, 35)",
+                    "line-opacity": 1,
+                    "line-width": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        7, 5, 22, 20
+                    ],
+                    "line-pattern": "warning3"
+                },
+                "layout": {
+                    "line-cap": "round",
+                    "line-join": "round",
+                    "line-round-limit": 2
+                }
+            })
             sceneInstance.allLayers.push('一级预警岸段', '二级预警岸段', '三级预警岸段')
-
-            map.loadImage('./geoStyle/test.png', (error, image) => {
-                if (error) throw error;
-                !map.hasImage('warning1')&&map.addImage('warning1', image);
-                map.addLayer({
-                    'id': '一级预警岸段',
-                    'type': 'line',
-                    'source': 'bank-level1-source',
-                    'layout': { 'line-join': 'round', 'line-cap': 'round', },
-                    "paint": {
-                        "line-color": "rgb(121, 164, 35)",
-                        "line-opacity": 1,
-                        "line-width": [
-                            "interpolate",
-                            ["linear"],
-                            ["zoom"],
-                            7, 5, 22, 20
-                        ],
-                        "line-pattern": "warning1"
-                    },
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round",
-                        "line-round-limit": 2
-                    }
-                })
-
-
-            });
-            map.loadImage('./geoStyle/warning2.png', (error, image) => {
-                if (error) throw error;
-                !map.hasImage('warning2')&&map.addImage('warning2', image);
-                map.addLayer({
-                    'id': '二级预警岸段',
-                    'type': 'line',
-                    'source': 'bank-level2-source',
-                    'layout': { 'line-join': 'round', 'line-cap': 'round', },
-                    "paint": {
-                        "line-color": "rgb(121, 164, 35)",
-                        "line-opacity": 1,
-                        "line-width": [
-                            "interpolate",
-                            ["linear"],
-                            ["zoom"],
-                            7, 5, 22, 20
-                        ],
-                        "line-pattern": "warning2"
-                    },
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round",
-                        "line-round-limit": 2
-                    }
-                })
-
-
-            });
-            map.loadImage('./geoStyle/warning3.png', (error, image) => {
-                if (error) throw error;
-                !map.hasImage('warning3')&&map.addImage('warning3', image);
-                map.addLayer({
-                    'id': '三级预警岸段',
-                    'type': 'line',
-                    'source': 'bank-level3-source',
-                    'layout': { 'line-join': 'round', 'line-cap': 'round', },
-                    "paint": {
-                        "line-color": "rgb(121, 164, 35)",
-                        "line-opacity": 1,
-                        "line-width": [
-                            "interpolate",
-                            ["linear"],
-                            ["zoom"],
-                            7, 5, 22, 20
-                        ],
-                        "line-pattern": "warning3"
-                    },
-                    "layout": {
-                        "line-cap": "round",
-                        "line-join": "round",
-                        "line-round-limit": 2
-                    }
-                })
-            });
 
 
 
@@ -346,6 +338,7 @@ class Scene {
         this.iconSrc = ''
         this.layerSrc = []
         this.allLayers = []
+        this.layer_src_map = new Map()
 
 
     }

@@ -24,9 +24,9 @@ const initMap = (ref) => {
     })
 }
 
-const flytoLarge = (map)=>{
+const flytoLarge = (map) => {
     map.flyTo({
-        center:[119.9617548378,32.04382454852],
+        center: [119.9617548378, 32.04382454852],
         // center:[-74.5447, 40.6892],
         pitch: 48.0432167520608,
         bearing: 0,
@@ -34,19 +34,32 @@ const flytoLarge = (map)=>{
         speed: 0.7
     })
 }
-const flytoSmall = (map)=>{
+const flytoSmall = (map) => {
     map.flyTo({
-        center:[120.53070965313992,32.042615280683805],
-        pitch:61.99999999999988,
-        bearing:0,
-        zoom:13.245427972376211,
-        speed:0.7
+        center: [120.53070965313992, 32.042615280683805],
+        pitch: 61.99999999999988,
+        bearing: 0,
+        zoom: 13.245427972376211,
+        speed: 0.7
     })
 }
+
+const loadImage = async (map, url, imageID) => {
+    if (map.hasImage(imageID)) return
+    return new Promise((resolve, reject) => {
+        map.loadImage(url, (err, img) => {
+            if (err) throw err;
+            map.addImage(imageID,img)
+            resolve()
+        })
+    })
+}
+
 
 
 export {
     initMap,
     flytoLarge,
-    flytoSmall
+    flytoSmall,
+    loadImage
 }

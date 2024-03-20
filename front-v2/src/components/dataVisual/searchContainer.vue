@@ -30,9 +30,20 @@
                     </span>
                 </div>
 
-                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" accordion :data="data"
+                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree"  :data="data"
                     :props="defaultProps" :default-expand-all="false" :filter-node-method="filterNode"
-                    @node-click="selectedNodeHandler" />
+                    @node-click="selectedNodeHandler">
+
+                    <template #default="{ node, data }">
+                        <span class="custom-tree-node">
+                            <span>{{ node.label }}</span>
+                            <span>
+                                <a v-show="node.isLeaf"> 查看详情 </a>
+                            </span>
+                        </span>
+                    </template>
+
+                </el-tree>
             </div>
         </Transition>
 
@@ -40,7 +51,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed, watch, reactive } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
 import { useMapStore } from '../../store/mapStore';
@@ -62,30 +73,26 @@ const defaultProps = {
     children: 'children',
     label: 'label',
 }
-const filterNode = (value, data, node) => {
-    if (!value) return true
-    return data.label.includes(value)
-}
-const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
-    console.log(nodeObj);
-}
-
-const data = [
+let data = ref([
     {
         id: 1,
         label: 'Level one 1',
+        type: 'F',
         children: [
             {
                 id: 4,
                 label: 'Level two 1-1',
+                type: 'F',
                 children: [
                     {
                         id: 9,
                         label: 'Level three 1-1-1',
+                        type: 'Leaf',
                     },
                     {
                         id: 10,
                         label: 'Level three 1-1-2',
+                        type: 'Leaf'
                     },
                 ],
             },
@@ -94,66 +101,63 @@ const data = [
     {
         id: 2,
         label: 'Level one 2',
+        type: 'F',
         children: [
             {
                 id: 5,
                 label: 'Level two 2-1',
+                type: 'Leaf'
             },
             {
                 id: 6,
                 label: 'Level two 2-2',
+                type: 'Leaf'
             },
         ],
     },
     {
         id: 3,
         label: 'Level one 3',
+        type: 'F',
         children: [
             {
                 id: 7,
                 label: 'Level two 3-1',
+                type: 'Leaf'
             },
             {
                 id: 8,
                 label: 'Level two 3-2',
+                type: 'Leaf'
             },
         ],
     },
-    {
-        id: 3,
-        label: 'Level one 3',
-        children: [
-            {
-                id: 7,
-                label: 'Level two 3-1',
-            },
-            {
-                id: 8,
-                label: 'Level two 3-2',
-            },
-        ],
-    },
-    {
-        id: 3,
-        label: 'Level one 3',
-        children: [
-            {
-                id: 7,
-                label: 'Level two 3-1',
-            },
-            {
-                id: 8,
-                label: 'Level two 3-2',
-            },
-        ],
-    },
-]
+])
+
+
+
+const filterNode = (value, data, node) => {
+    if (!value) return true
+    return data.label.includes(value)
+}
+const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
+    if (nodeProp.isLeaf) {
+        showLeafDetailHandler(nodeProp)
+    }
+}
+const showLeafDetailHandler = (node) => {
+    console.log(node.data);
+
+}
+
+
 
 watch(props, (newV) => {
-    // request data from new V
+    // get scene layer info and init data
     let map = mapStore.getMap()
-    if(props.selectedScene.layerSrc.length!=0){
-        console.log(map.getSource(props.selectedScene.layerSrc[0]));
+    if (props.selectedScene.allLayers.length != 0) {
+        // only for geojson?
+        data.value = initDataByScene(newV.selectedScene)
     }
 
 })
@@ -167,6 +171,40 @@ watch(inputText, (v1, v) => {
 onMounted(async () => {
 
 })
+
+
+const initDataByScene = (sceneInstance) => {
+    let map = mapStore.getMap()
+    let data = []
+    let idCount = 0
+    sceneInstance.allLayers.forEach(layerID => {
+        let layerChildren = []
+        let layerItem = {
+            id: idCount++,
+            label: layerID,
+            children: []
+        }
+        let layerSourceId = map.getLayer(layerID).source
+        let geojsonFeatures = map.getSource(layerSourceId)['_data']['features']
+        geojsonFeatures.forEach((feat)=>{
+            let item = {
+                id: idCount++,
+                label: feat["properties"]["bankName"]?feat["properties"]["bankName"]:feat["properties"]["name"],
+                children: [],
+                ...feat["properties"]
+            }
+            layerChildren.push(item)
+        })
+        layerItem.children = layerChildren
+        data.push(layerItem)
+    })
+
+
+    return data
+}
+
+
+
 
 </script>
 
@@ -209,7 +247,7 @@ onMounted(async () => {
         right: 2vw;
         top: 2vh;
         height: 40vh;
-        width: 15vw;
+        width: 20vw;
         padding: 1vh;
         background-color: rgba(240, 238, 235, 0.822);
         border-radius: 1vh;
@@ -308,6 +346,17 @@ onMounted(async () => {
     font-size: medium;
     font-weight: 500;
 }
+
+.custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+}
+
+
 
 .el-tree-node {
     background-color: #cae1f3;
