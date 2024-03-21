@@ -26,6 +26,7 @@ let map = null;
 const selectedScene = ref(new Scene())
 
 const selectSceneHandler = (sceneInstance) => {
+    flytoLarge(map)
     selectedScene.value = sceneInstance
 }
 

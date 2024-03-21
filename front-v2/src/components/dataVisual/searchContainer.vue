@@ -60,7 +60,7 @@ import featureDetail from './featureDetail.vue';
 import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, nextTick } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
-import { flytoFeature } from '../../utils/mapUtils';
+import { flytoFeature,flytoLarge } from '../../utils/mapUtils';
 import { useMapStore } from '../../store/mapStore';
 
 
@@ -72,7 +72,7 @@ const props = defineProps({
     selectedScene: Scene
 })
 
-const showSearchMain = ref(true)
+const showSearchMain = ref(false)
 const showfeatureDetail = ref(false)
 const selectedFeature = ref({})
 const iconSrc = computed(() => {
