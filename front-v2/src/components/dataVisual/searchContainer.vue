@@ -195,6 +195,7 @@ const getPopupCoord = (coordsArray) => {
 
 watch(props, (newV) => {
     // get scene layer info and init data
+    popUp&&popUp.remove()
     let map = mapStore.getMap()
     if (props.selectedScene.allLayers.length != 0) {
         // only for geojson?
