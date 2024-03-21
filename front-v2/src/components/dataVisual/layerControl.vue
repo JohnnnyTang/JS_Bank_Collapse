@@ -119,10 +119,11 @@ onMounted(async () => {
         height: 25vh;
         width: 12vw;
         padding: 10px;
-        background: linear-gradient(45deg, rgb(159, 208, 236), rgb(240, 238, 235));
+        background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
         transition: 300ms;
         border-radius: 5px;
-        box-shadow:  rgb(241, 238, 238) 0px 8px 24px, rgba(246, 246, 247, 0.945) 0px 5px 5px;
+        border: solid 5px #2281da;
+        box-shadow:  rgb(241, 238, 238) 0px 5px 10px, rgba(246, 246, 247, 0.945) 0px 5px 5px;
 
         .layer-controller-main-title {
             display: flex;

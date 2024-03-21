@@ -39,10 +39,10 @@ onMounted(async () => {
   margin: 10px;
   width: 16vw;
   border-radius: 10px;
-  background: #1b233d;
+  background: #175FA3;;
   padding: 5px;
   overflow: hidden;
-  box-shadow: rgba(100, 100, 111, 0.2) 10px 7px 20px 0px;
+  box-shadow: #b4c8fc 10px 7px 20px 0px;
   display: flex;
   flex-direction: column;
   transition: transform 0.5s;
@@ -59,7 +59,7 @@ onMounted(async () => {
     border-radius: 15px;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(45deg, rgb(4, 159, 187) 0%, rgb(80, 246, 255) 100%);
+    background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
     position: relative;
 
     &::before {
@@ -71,7 +71,7 @@ onMounted(async () => {
       height: 15px;
       width: 15px;
       border-top-left-radius: 15px;
-      box-shadow: -5px -5px 0 2px #1b233d;
+      box-shadow: -5px -5px 0 2px #175fa3;
     }
 
 
@@ -80,10 +80,10 @@ onMounted(async () => {
       border-bottom-right-radius: 10px;
       height: 4vh;
       width: 70%;
-      background: #1b233d;
+      background: #175FA3;
       position: relative;
       transform: skew(-20deg);
-      box-shadow: -10px -10px 0 0 #1b233d;
+      box-shadow: -10px -10px 0 0 #175fa3;
 
       &::before {
         content: "";
@@ -93,11 +93,11 @@ onMounted(async () => {
         top: 0;
         right: -15px;
         border-top-left-radius: 10px;
-        box-shadow: -5px -5px 0 2px #1b233d;
+        box-shadow: -5px -5px 0 2px #175FA3;
       }
 
       .title-text {
-        color: white;
+        color: #ECF4FD;
         font-size: calc(0.8vw + 0.8vh);
         font-style: normal;
         text-align: center;
@@ -128,19 +128,5 @@ onMounted(async () => {
       padding: 5px;
     }
   }
-
-  .bottom-section {
-    .title {
-      display: block;
-      font-size: 17px;
-      font-weight: bolder;
-      color: white;
-      text-align: center;
-      letter-spacing: 2px;
-    }
-  }
-
-
-
 }
 </style>

@@ -30,12 +30,12 @@
                     </span>
                 </div>
 
-                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree"  :data="data"
-                    :props="defaultProps" :default-expand-all="false" :filter-node-method="filterNode"
-                    @node-click="selectedNodeHandler">
+                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data" :props="defaultProps"
+                    :default-expand-all="false" :filter-node-method="filterNode" @node-click="selectedNodeHandler">
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
+                            <div class="leaf-node" v-if="node.isLeaf"></div>
                             <span>{{ node.label }}</span>
                             <span>
                                 <a v-show="node.isLeaf"> 查看详情 </a>
@@ -47,14 +47,22 @@
             </div>
         </Transition>
 
+        <!-- <Transition name="'slidefade">
+            <featureDetail v-show="showfeatureDetail" :selectedFeature></featureDetail>
+        </Transition> -->
+
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch, reactive } from 'vue';
+import mapboxgl from 'mapbox-gl';
+import featureDetail from './featureDetail.vue';
+import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, nextTick } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
 import { useMapStore } from '../../store/mapStore';
+
+
 
 
 const mapStore = useMapStore()
@@ -63,7 +71,9 @@ const props = defineProps({
     selectedScene: Scene
 })
 
-const showSearchMain = ref(false)
+const showSearchMain = ref(true)
+const showfeatureDetail = ref(false)
+const selectedFeature = ref({})
 const iconSrc = computed(() => {
     return showSearchMain.value ? './icons/resize.png' : './icons/searching.png'
 })
@@ -135,21 +145,52 @@ let data = ref([
 ])
 
 
-
 const filterNode = (value, data, node) => {
     if (!value) return true
     return data.label.includes(value)
 }
+
+const createPopUpComponent = ()=>{
+    const ap = createApp(featureDetail,{selectedFeature,})
+    const container = document.createElement("div")
+    const componentInstance = ap.mount(container)
+    return container;//返回挂载了组件的dom
+}
+const domwithComp = createPopUpComponent()
+let popUp = undefined;
+
+
+
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
     }
 }
+
 const showLeafDetailHandler = (node) => {
-    console.log(node.data);
+    // console.log(node.data);
+    selectedFeature.value = node.data;
+    showfeatureDetail.value = true;
+    let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
+    popUp&&popUp.remove()
+    popUp = new mapboxgl.Popup()
+        .setDOMContent(domwithComp)
+        .setLngLat(popupCoord)
+        .addTo(mapStore.getMap());
 
 }
 
+const getPopupCoord = (coordsArray) => {
+    if (coordsArray.length % 2) {
+        console.log(coordsArray.length, Math.floor(coordsArray.length / 2));
+        return coordsArray[Math.floor(coordsArray.length / 2)]
+    } else {
+        console.log(coordsArray.length, coordsArray.length / 2);
+        let long = (coordsArray[coordsArray.length / 2][0] + coordsArray[coordsArray.length / 2 - 1][0]) / 2
+        let lat = (coordsArray[coordsArray.length / 2][1] + coordsArray[coordsArray.length / 2 - 1][1]) / 2
+        return [long, lat]
+    }
+}
 
 
 watch(props, (newV) => {
@@ -186,10 +227,10 @@ const initDataByScene = (sceneInstance) => {
         }
         let layerSourceId = map.getLayer(layerID).source
         let geojsonFeatures = map.getSource(layerSourceId)['_data']['features']
-        geojsonFeatures.forEach((feat)=>{
+        geojsonFeatures.forEach((feat) => {
             let item = {
                 id: idCount++,
-                label: feat["properties"]["bankName"]?feat["properties"]["bankName"]:feat["properties"]["name"],
+                label: feat["properties"]["bankName"] ? feat["properties"]["bankName"] : feat["properties"]["name"],
                 children: [],
                 ...feat["properties"]
             }
@@ -208,7 +249,7 @@ const initDataByScene = (sceneInstance) => {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .search-container {
     user-select: none;
 
@@ -249,10 +290,12 @@ const initDataByScene = (sceneInstance) => {
         height: 40vh;
         width: 20vw;
         padding: 1vh;
-        background-color: rgba(240, 238, 235, 0.822);
+        //linear-gradient(45deg, #C9E1F5, #E2FFEE);
+        background-color: #D3F3F8;
         border-radius: 1vh;
         box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
         transition: 300ms;
+        border: solid 5px #2281da;
 
         .input-container {
             width: calc(100% - 6.5vh - 2vw);
@@ -264,14 +307,15 @@ const initDataByScene = (sceneInstance) => {
                 height: 3vh;
                 padding: 1vh;
                 transition: 200ms linear;
-                border: 2.5px solid rgb(7, 115, 238);
-                font-size: 14px;
+                border: 2.5px solid #54A2E9;
+                background-color: #ECF4FD;
+                font-size: 18px;
                 letter-spacing: 1px;
 
                 &:focus {
                     outline: none;
-                    border: 0.5px solid rgb(13, 145, 253);
-                    box-shadow: -2px -2px 0px rgb(1, 69, 255);
+                    border: 1px solid #54A2E9;
+                    box-shadow: -2px -2px 0px #3c58fa;
                 }
             }
 
@@ -341,11 +385,7 @@ const initDataByScene = (sceneInstance) => {
     }
 }
 
-.el-tree {
-    color: rgb(0, 75, 145);
-    font-size: medium;
-    font-weight: 500;
-}
+
 
 .custom-tree-node {
     flex: 1;
@@ -354,18 +394,34 @@ const initDataByScene = (sceneInstance) => {
     justify-content: space-between;
     font-size: 14px;
     padding-right: 8px;
+
+    .leaf-node {
+        position: absolute;
+        left: 1vw;
+        //width: 0.5vw;
+        //height: 0.5vw;
+        //border-radius: 1vw;
+        //background-color: rgb(30, 31, 30);
+        //line-height: 1vw;
+    }
 }
 
-
-
-.el-tree-node {
-    background-color: #cae1f3;
-    color: rgb(13, 58, 136);
-    font-weight: 600;
-    text-shadow: 1px 1px rgb(255, 255, 255);
+.el-tree {
+    color: #152478;
+    font-weight: 500;
 }
 
-.el-tree-node .is-focusable {
-    background-color: #afd2ec;
+:deep(.el-tree-node__content) {
+    &:hover {
+        background-color: #a9f2fd;
+    }
+}
+
+:deep(.el-tree-node .is-focusable) {
+    background-color: #c1f4fc;
+}
+
+:deep(.el-tree-node .is-focusable) {
+    background-color: #c1f4fc;
 }
 </style>

@@ -295,7 +295,9 @@ const initLayers = async (sceneInstance, map) => {
             })
             sceneInstance.allLayers.push('一级预警岸段', '二级预警岸段', '三级预警岸段')
 
+            break;
 
+        case '全江地形':
 
             break;
         default:
@@ -448,7 +450,7 @@ const getBigRangeScenes = () => {
         chongy.iconSrc = './icons/shore.png'
 
 
-    bigRangeScenes.push(typiclaCollapse, scene3, scene1, scene4, scene2, warningArea, terrain, chongy)
+    bigRangeScenes.push(typiclaCollapse, scene3, terrain, scene1, scene4, scene2, warningArea, chongy)
     return bigRangeScenes
 }
 const getSmallRangeScenes = () => {

@@ -69,8 +69,7 @@ onMounted(async () => {
 <style lang="scss">
 .scene-container {
     position: absolute;
-    background: rgb(209, 254, 255);
-    background: linear-gradient(0deg, rgba(209, 254, 255, 0.6082808123249299) 0%, rgba(4, 203, 255, 0.49343487394957986) 100%);
+    background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
     height: 92vh;
     overflow: hidden;
 
@@ -84,7 +83,7 @@ onMounted(async () => {
         text-align: center;
         margin-right: 3vw;
 
-        color: rgb(0, 81, 233);
+        color: #0663bb;
         text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 3px 2px 1px #CCCCCC, 2px 3px 1px #EEEEEE, 4px 3px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 5px 4px 1px #CCCCCC, 4px 5px 1px #EEEEEE, 6px 5px 1px #CCCCCC, 5px 6px 1px #EEEEEE, 7px 6px 1px #0f41e7;
 
     }
