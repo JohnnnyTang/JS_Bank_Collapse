@@ -44,6 +44,16 @@ const flytoSmall = (map) => {
     })
 }
 
+const flytoFeature = (map,coord) => {
+    map.flyTo({
+        center: coord,
+        pitch: 61.99999999999988,
+        bearing: 0,
+        zoom: 10,
+        speed: 1.0
+    })
+}
+
 const loadImage = async (map, url, imageID) => {
     if (map.hasImage(imageID)) return
     return new Promise((resolve, reject) => {
@@ -61,5 +71,6 @@ export {
     initMap,
     flytoLarge,
     flytoSmall,
+    flytoFeature,
     loadImage
 }

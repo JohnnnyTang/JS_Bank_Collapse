@@ -60,6 +60,7 @@ import featureDetail from './featureDetail.vue';
 import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, nextTick } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
+import { flytoFeature } from '../../utils/mapUtils';
 import { useMapStore } from '../../store/mapStore';
 
 
@@ -150,8 +151,8 @@ const filterNode = (value, data, node) => {
     return data.label.includes(value)
 }
 
-const createPopUpComponent = ()=>{
-    const ap = createApp(featureDetail,{selectedFeature,})
+const createPopUpComponent = () => {
+    const ap = createApp(featureDetail, { selectedFeature, })
     const container = document.createElement("div")
     const componentInstance = ap.mount(container)
     return container;//返回挂载了组件的dom
@@ -169,14 +170,17 @@ const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
 
 const showLeafDetailHandler = (node) => {
     // console.log(node.data);
+    let map = mapStore.getMap()
     selectedFeature.value = node.data;
     showfeatureDetail.value = true;
     let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
-    popUp&&popUp.remove()
+    flytoFeature(map, popupCoord)
+
+    popUp && popUp.remove()
     popUp = new mapboxgl.Popup()
         .setDOMContent(domwithComp)
         .setLngLat(popupCoord)
-        .addTo(mapStore.getMap());
+        .addTo(map);
 
 }
 
@@ -195,7 +199,7 @@ const getPopupCoord = (coordsArray) => {
 
 watch(props, (newV) => {
     // get scene layer info and init data
-    popUp&&popUp.remove()
+    popUp && popUp.remove()
     let map = mapStore.getMap()
     if (props.selectedScene.allLayers.length != 0) {
         // only for geojson?
