@@ -50,7 +50,7 @@ const flytoFeature = (map,coord) => {
         pitch: 61.99999999999988,
         bearing: 0,
         zoom: 10,
-        speed: 1.0
+        speed: 0.8
     })
 }
 
