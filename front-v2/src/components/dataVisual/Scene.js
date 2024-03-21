@@ -370,6 +370,7 @@ const initLayers = async (sceneInstance, map) => {
         /////Large Scene
         case '实时监测数据':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+            console.log(monitorInfo);
             let monitorDevice = generateGeoJson(monitorInfo, (element) => {
                 return [element["longitude"], element["latitude"]]
             }, "Point")

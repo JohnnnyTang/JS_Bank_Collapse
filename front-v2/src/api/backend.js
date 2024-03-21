@@ -70,7 +70,8 @@ export default class BackEndRequest {
         //desc
         switch (type) {
             case '1': {
-                return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                // return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                return backendInstance.get(`/data/gnssInfo/id/${code}`)
             }
             case '2': {
                 return backendInstance.get(`/data/inclinometerInfo/id/${code}`)
