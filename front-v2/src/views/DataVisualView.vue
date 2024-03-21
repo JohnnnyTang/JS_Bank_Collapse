@@ -26,13 +26,12 @@ let map = null;
 const selectedScene = ref(new Scene())
 
 const selectSceneHandler = (sceneInstance) => {
-    flytoLarge(map)
+    // flytoLarge(map)
     selectedScene.value = sceneInstance
 }
 
 
 watch(selectedScene, async (newV, oldV) => {
-    // console.log(newV,oldV);
     oldV && oldV.removeLayers(map)
     if (!newV.allLayers.length) {
         await newV.initAllLayers(map)
@@ -46,12 +45,10 @@ watch(selectedScene, async (newV, oldV) => {
 
 onMounted(async () => {
 
-    //q:
     let mapInstance = initMap(mapContainerRef)
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
     flytoLarge(map)
-    // console.log(map);
 
 })
 
