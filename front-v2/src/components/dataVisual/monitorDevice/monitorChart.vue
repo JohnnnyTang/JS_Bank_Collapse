@@ -1,6 +1,6 @@
 <template>
     <div class="monitor-chart-container">
-        <h2> Lorem ipsum dolor sit amet consectetur adipisicing elit. A, earum! </h2>
+        <h2> GNSS::XMove-YMove-ZMove-TIME </h2>
 
         <div class="chart" id="chart">
 
@@ -35,16 +35,20 @@ onMounted(async () => {
         "stationId": "MZS"
     }
     */
-
+    // toolset
     const time = (measturetime) => {
         return dayjs(measturetime)
     }
     const timeDif = (starttime, endtime) => {
-        return starttime.diff(endtime,'second')
+        return starttime.diff(endtime, 'second')
     }
     const timeFormat = (time) => {
         return time.format('HH-mm-ss')
     }
+    const radius = (x, y, z) => {
+        return Math.sqrt(x * x + y * y + z * z)
+    }
+
 
     //data prepare
 
@@ -52,11 +56,13 @@ onMounted(async () => {
         let data = []
         let xMoveRange = [999, -999]
         let yMoveRange = [999, -999]
+        let radiusRange = [999, -999]
         let showCount = detail.length
         showCount = 50;//100 IS ENOUGH
 
         let endTime = time(detail[0].measureTime);
         let startTime = time(detail[showCount].measureTime);
+
 
         for (let i = 0; i < showCount; i++) {
             if (detail[i].XMove < xMoveRange[0])
@@ -67,20 +73,27 @@ onMounted(async () => {
                 yMoveRange[0] = detail[i].YMove
             if (detail[i].YMove > yMoveRange[1])
                 yMoveRange[1] = detail[i].YMove
-
+            let thisradius = radius(detail[i].XMove, detail[i].YMove, detail[i].ZMove)
+            if (thisradius < radiusRange[0])
+                radiusRange[0] = thisradius
+            if (thisradius > radiusRange[1])
+                radiusRange[1] = thisradius
             let thistime = time(detail[i].measureTime)
             let deltaSeconds = timeDif(startTime, thistime)
             data.push([detail[i].XMove, detail[i].YMove, detail[i].ZMove, deltaSeconds])
         }
+
         return {
             xMoveRange,
             yMoveRange,
+            radiusRange,
             startTime,
             endTime,
             data
         }
     }
     const chartData = generateData_GNSS(gnssMonitorDetail)
+    debugger
     console.log(chartData);
 
     //chart option
@@ -89,95 +102,87 @@ onMounted(async () => {
     var chartDom = document.getElementById('chart');
     var myChart = echarts.init(chartDom);
 
-    // const option = {
-    //     gradientColor: ["#00d4ff", "#090979"],
-    //     animation: false,
-    //     grid: {
-    //         top: 40,
-    //         left: 50,
-    //         right: 40,
-    //         bottom: 50
-    //     },
-    //     xAxis: {
-    //         name: 'x',
-    //         minorTick: {
-    //             show: true
-    //         },
-    //         minorSplitLine: {
-    //             show: true
-    //         }
-    //     },
-    //     yAxis: {
-    //         name: 'y',
-    //         min: Math.floor(chartData.yMoveRange[0]),
-    //         max: Math.ceil(chartData.yMoveRange[1]),
-    //         minorTick: {
-    //             show: true
-    //         },
-    //         minorSplitLine: {
-    //             show: true
-    //         }
-    //     },
-    //     dataZoom: [
-    //         {
-    //             show: true,
-    //             type: 'inside',
-    //             filterMode: 'none',
-    //             xAxisIndex: [0],
-    //             startValue: -20,
-    //             endValue: 20
-    //         },
-    //         {
-    //             show: true,
-    //             type: 'inside',
-    //             filterMode: 'none',
-    //             yAxisIndex: [0],
-    //             startValue: -20,
-    //             endValue: 20
-    //         }
-    //     ],
-    //     series: [
-    //         {
-    //             type: 'line',
-    //             showSymbol: false,
-    //             clip: true,
-    //             data: chartData.data,
-    //             smooth: true,
-    //             lineStyle: {
-    //                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    //                     {
-    //                         offset: 0,
-    //                         color: 'rgb(255, 11, 11)'
-    //                     },
-    //                     {
-    //                         offset: 1,
-    //                         color: '#F6EDED'
-    //                     }
-    //                 ]),
-    //                 // color: 'rgb(255, 11, 11)',
-    //                 width: 3
-    //             },
-    //         }
-    //     ]
-    // };
-
-    var data = [];
-    // Parametric curve
-    for (var t = 0; t < 25; t += 0.001) {
-        var x = (1 + 0.25 * Math.cos(75 * t)) * Math.cos(t);
-        var y = (1 + 0.25 * Math.cos(75 * t)) * Math.sin(t);
-        var z = t + 2.0 * Math.sin(75 * t);
-        data.push([x, y, z]);
-    }
-    let option = {
+    // 2dline
+    const option2dline = {
+        gradientColor: ["#00d4ff", "#090979"],
+        animation: false,
+        grid: {
+            top: 40,
+            left: 50,
+            right: 40,
+            bottom: 50
+        },
+        xAxis: {
+            name: 'x',
+            minorTick: {
+                show: true
+            },
+            minorSplitLine: {
+                show: true
+            }
+        },
+        yAxis: {
+            name: 'y',
+            min: Math.floor(chartData.yMoveRange[0]),
+            max: Math.ceil(chartData.yMoveRange[1]),
+            minorTick: {
+                show: true
+            },
+            minorSplitLine: {
+                show: true
+            }
+        },
+        dataZoom: [
+            {
+                show: true,
+                type: 'inside',
+                filterMode: 'none',
+                xAxisIndex: [0],
+                startValue: -20,
+                endValue: 20
+            },
+            {
+                show: true,
+                type: 'inside',
+                filterMode: 'none',
+                yAxisIndex: [0],
+                startValue: -20,
+                endValue: 20
+            }
+        ],
+        series: [
+            {
+                type: 'line',
+                showSymbol: false,
+                clip: true,
+                data: chartData.data,
+                smooth: true,
+                lineStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgb(255, 11, 11)'
+                        },
+                        {
+                            offset: 1,
+                            color: '#F6EDED'
+                        }
+                    ]),
+                    width: 3
+                },
+            }
+        ]
+    };
+    // 3dline
+    let option3Dline = {
         tooltip: {},
         backgroundColor: '#fff',
         type: 'continuous',
         visualMap: {
-            show: true,
+            show: false,
             dimension: 3,
             min: 0,
-            max: timeDif(chartData.startTime,chartData.endTime),
+            max: timeDif(chartData.startTime, chartData.endTime),
             inRange: {
                 color: [
                     '#313695',
@@ -192,7 +197,7 @@ onMounted(async () => {
                     '#d73027',
                     '#a50026'
                 ],
-                opacity:[0.5,1.0]
+                opacity: [0.5, 1.0]
             }
         },
         xAxis3D: {
@@ -221,7 +226,86 @@ onMounted(async () => {
             }
         ]
     };
-    option && myChart.setOption(option);
+    // 3dcube
+    let option3Dcube = {
+        // tooltip: {},
+        visualMap: {
+            show: false,
+            dimension: 2,
+            min: -1,
+            max: 1,
+            inRange: {
+                opacity: [0.3]
+            }
+        },
+        xAxis3D: {},
+        yAxis3D: {},
+        zAxis3D: {},
+        grid3D: {},
+        series: [
+            {
+                type: 'surface',
+                parametric: true,
+                color: '#0E0E0E',
+                // shading: 'albedo',
+                parametricEquation: {
+                    u: {
+                        min: -Math.PI,
+                        max: Math.PI,
+                        step: Math.PI / 10
+                    },
+                    v: {
+                        min: 0,
+                        max: Math.PI,
+                        step: Math.PI / 10
+                    },
+                    x: function (u, v) {
+                        return Math.sin(v) * Math.sin(u) * chartData.radiusRange[0];
+                    },
+                    y: function (u, v) {
+                        return Math.sin(v) * Math.cos(u) * chartData.radiusRange[0];
+                    },
+                    z: function (u, v) {
+                        return Math.cos(v) * chartData.radiusRange[0];
+                    }
+                }
+            },
+            {
+                type: 'surface',
+                parametric: true,
+                color: '#D47979',
+                // shading: 'albedo',
+                parametricEquation: {
+                    u: {
+                        min: -Math.PI,
+                        max: Math.PI,
+                        step: Math.PI / 10
+                    },
+                    v: {
+                        min: 0,
+                        max: Math.PI,
+                        step: Math.PI / 10
+                    },
+                    x: function (u, v) {
+                        return Math.sin(v) * Math.sin(u) * chartData.radiusRange[1];
+                    },
+                    y: function (u, v) {
+                        return Math.sin(v) * Math.cos(u) * chartData.radiusRange[1];
+                    },
+                    z: function (u, v) {
+                        return Math.cos(v) * chartData.radiusRange[1];
+                    }
+                }
+            },
+        ]
+    };
+
+
+    myChart.setOption(option3Dcube);
+
+    window.onresize = function () {
+        myChart.resize();
+    }
 })
 
 
