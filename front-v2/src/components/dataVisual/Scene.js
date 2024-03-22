@@ -368,7 +368,7 @@ const initLayers = async (sceneInstance, map) => {
        
        
         /////Large Scene
-        case '实时监测数据':
+        case '实时监测设备':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
             console.log(monitorInfo);
             let monitorDevice = generateGeoJson(monitorInfo, (element) => {
@@ -601,7 +601,7 @@ const getSmallRangeScenes = () => {
     aggregationScene.iconSrc = './icons/collapse.png'
 
     let watching = new Scene()
-    watching.title = '实时监测数据'
+    watching.title = '实时监测设备'
     watching.desc = '监测数据可视化,监测设备管理'
     watching.iconSrc = './icons/watching.png'
 

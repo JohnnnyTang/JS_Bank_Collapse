@@ -24,31 +24,38 @@ onMounted(async () => {
     // oneGnss.getProcessedDataObject()
     // oneGnss.getChartOptions()
 
-
     /////////for inclinometer 
-    let inclinometerInfo = (await BackEndRequest.test()).data
-    let oneInclinometer = new MonitorDataAssistant(inclinometerInfo)
-    await oneInclinometer.getMonitoringdata()
+    // let inclinometerInfo = (await BackEndRequest.getSpecMonitorInfo("2")).data
+    // let oneInclinometer = new MonitorDataAssistant(inclinometerInfo[0])
+    // await oneInclinometer.getMonitoringdata()
+    // oneInclinometer.getProcessedDataObject()
+    // oneInclinometer.getChartOptions()
+
+    /////////for stress
 
 
-    debugger
+
+    /////////for manometer
+
+
     var chartDom = document.getElementById('chart');
     var myChart = echarts.init(chartDom);
 
-    // window.addEventListener("keydown", (e) => {
-    //     if (e.key == '1') {
-    //         myChart.clear()
-    //         myChart.setOption(oneGnss.chartOptions.option2dline)
-    //     }
-    //     if (e.key == '2') {
-    //         myChart.clear()
-    //         myChart.setOption(oneGnss.chartOptions.option3Dline)
-    //     }
-    //     if (e.key == '3') {
-    //         myChart.clear()
-    //         myChart.setOption(oneGnss.chartOptions.option3Dcube)
-    //     }
-    // })
+    window.addEventListener("keydown", (e) => {
+        if (e.key == '1') {
+            myChart.clear()
+            console.log(oneInclinometer);
+            myChart.setOption(oneInclinometer.chartOptions.options[0])
+        }
+        if (e.key == '2') {
+            myChart.clear()
+            myChart.setOption(oneInclinometer.chartOptions.options[1])
+        }
+        if (e.key == '3') {
+            myChart.clear()
+            myChart.setOption(oneInclinometer.chartOptions.options[2])
+        }
+    })
 
     window.onresize = function () {
         myChart.resize();

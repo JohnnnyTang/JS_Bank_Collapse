@@ -47,24 +47,19 @@ export default class BackEndRequest {
         //只查！设备概述信息！！！！
         switch(type){
             case '1':
-                return backendInstance.get("/data/gnssInfo")
+                return backendInstance.get("/data/monitorInfo/type/1")
             case '2':
-                backendInstance.get("/data/inclinometerInfo")
-                .then((response)=>{
-                    let code = response.data[0]["code"]
-                    console.log(code);
-                })
-                return backendInstance.get("/data/inclinometerInfo");
+                return backendInstance.get("/data/monitorInfo/type/2");
             case '3':
-                return backendInstance.get("/data/manometerInfo");
+                return backendInstance.get("/data/monitorInfo/type/3");
             case '4':
-                return backendInstance.get("/data/stressInfo");
+                return backendInstance.get("/data/monitorInfo/type/4");
         }   
 
     }
-    static test(){
-        return backendInstance.get("/data/monitorInfo/code/MZS120.528701_32.034685_2")
-    }
+    // static test(){
+    //     return backendInstance.get("/data/monitorInfo/code/MZS120.528701_32.034685_2")
+    // }
 
 
 
@@ -93,8 +88,8 @@ export default class BackEndRequest {
         //desc
         switch (type) {
             case '1': {
-                // return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
-                return backendInstance.get(`/data/gnssInfo/id/${code}`)
+                return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                // return backendInstance.get(`/data/gnssInfo/id/${code}`)
             }
             case '2': {
                 return backendInstance.get(`/data/inclinometerInfo/id/${code}`)

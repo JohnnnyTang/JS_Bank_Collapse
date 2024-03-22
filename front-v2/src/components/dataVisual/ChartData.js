@@ -17,7 +17,7 @@ const radius = (x, y, z) => {
     return Math.sqrt(x * x + y * y + z * z)
 }
 //////////data process func
-const generateData_GNSS = async (ogDataArray) => {
+const generateData_GNSS = (ogDataArray) => {
     let data = []
     let xMoveRange = [999, -999]
     let yMoveRange = [999, -999]
@@ -53,8 +53,39 @@ const generateData_GNSS = async (ogDataArray) => {
         data
     }
 }
-const generateData_incline = async (ogDataArray) => {
+const generateData_Incline = (ogDataArray, metaData) => {
+    let pointNum = metaData["pointNum"]
+    let depthArray = []
+    let legendData = []
+    let xMovedata = []
+    let yMovedata = []
 
+    let showCount = 20   //50enough
+
+    for (let i = 1; i <= pointNum; i++) {
+        depthArray.push(metaData[`point${i}Depth`])
+        legendData.push(String(metaData[`point${i}Depth`] + 'm'))
+    }
+    for (let i = 0; i < showCount; i++) {
+        for (let j = 0; j < pointNum; j++) {
+            let item = []
+            item.push(ogDataArray[i][`measureTime`])
+            item.push(ogDataArray[i][`XMove${j + 1}`])
+            item.push(legendData[j])
+            let item2 = []
+            item2.push(ogDataArray[i][`measureTime`])
+            item2.push(ogDataArray[i][`YMove${j + 1}`])
+            item2.push(legendData[j])
+            xMovedata.push(item)
+            yMovedata.push(item2)
+        }
+    }
+
+    return {
+        legendData,
+        xMovedata,
+        yMovedata
+    }
 }
 
 
@@ -63,6 +94,7 @@ const generateData_incline = async (ogDataArray) => {
 //////////chart options func
 const generateOptions_GNSS = (processedData) => {
 
+    console.log(processedData);
     // 2dline
     const option2dline = {
         gradientColor: ["#00d4ff", "#090979"],
@@ -268,6 +300,116 @@ const generateOptions_GNSS = (processedData) => {
     }
 }
 
+const generateOptions_Incline = (processedData) => {
+    let xMoveOption = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'line',
+                lineStyle: {
+                    color: 'rgba(0,0,0,0.2)',
+                    width: 1,
+                    type: 'solid'
+                }
+            }
+        },
+        legend: {
+            data: processedData.legendData
+        },
+        singleAxis: {
+            top: 50,
+            bottom: 50,
+            axisTick: {},
+            axisLabel: {},
+            type: 'time',
+            axisPointer: {
+                animation: true,
+                label: {
+                    show: true
+                }
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    type: 'dashed',
+                    opacity: 0.2
+                }
+            }
+        },
+        series: [
+            {
+                type: 'themeRiver',
+                itemStyle: {
+                    opacity: 0.7
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 25,
+                        shadowColor: 'rgba(0, 0, 0, 0.8)'
+                    }
+                },
+                data: processedData.xMovedata.slice(0, 25)
+            }
+        ]
+    };
+    let yMoveOption = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'line',
+                lineStyle: {
+                    color: 'rgba(0,0,0,0.2)',
+                    width: 1,
+                    type: 'solid'
+                }
+            }
+        },
+        legend: {
+            data: processedData.legendData
+        },
+        singleAxis: {
+            top: 50,
+            bottom: 50,
+            axisTick: {},
+            axisLabel: {},
+            type: 'time',
+            axisPointer: {
+                animation: true,
+                label: {
+                    show: true
+                }
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    type: 'dashed',
+                    opacity: 0.2
+                }
+            }
+        },
+        series: [
+            {
+                type: 'themeRiver',
+                itemStyle: {
+                    opacity: 0.7
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 25,
+                        shadowColor: 'rgba(0, 0, 0, 0.8)'
+                    }
+                },
+                data: processedData.yMovedata.slice(0, 25)
+            }
+        ]
+    };
+    return {
+        xMoveOption,
+        yMoveOption,
+        options: [xMoveOption, yMoveOption]
+    }
+}
+
 
 
 
@@ -297,19 +439,23 @@ class MonitorDataAssistant {
     }
 
     async getMonitoringdata() {
+        //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
+
+        //meta infomation -- pointnum
+        this.monitoringMetaData = (await BackEndRequest.getMonitorInfoByType_Code(this.info["code"], this.info["type"])).data
+
         return this.monitoringData
     }
 
-    async getProcessedDataObject() {
+    getProcessedDataObject() {
         switch (this.info["type"]) {
             case "1": //gnss
-                this.processedData = await generateData_GNSS(this.monitoringData)
+                this.processedData = generateData_GNSS(this.monitoringData)
                 return this.processedData
             case "2":
-                this.processedData = await generateData_incline(this.monitoringData)
-                return
-                break;
+                this.processedData = generateData_Incline(this.monitoringData, this.monitoringMetaData)
+                return this.processedData
             case "3":
                 break;
             case "4":
@@ -326,7 +472,8 @@ class MonitorDataAssistant {
                 this.chartOptions = generateOptions_GNSS(this.processedData)
                 return this.processedData
             case "2":
-                break;
+                this.chartOptions = generateOptions_Incline(this.processedData)
+                return this.processedData
             case "3":
                 break;
             case "4":
