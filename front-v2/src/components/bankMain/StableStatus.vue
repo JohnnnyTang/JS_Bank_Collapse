@@ -452,7 +452,7 @@ div.stable-status-conatainer {
         div.stable-status-icon {
             height: 4vh;
             width: 4vh;
-            background-image: url('./landslide.png');
+            background-image: url('/landslide.png');
             background-size: contain;
         }
 

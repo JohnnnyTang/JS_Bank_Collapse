@@ -7,5 +7,7 @@ import java.util.List;
 public interface ICollapseInfoService {
     List<CollapseHistory> getAllInfo();
 
+    List<CollapseHistory> getAllInfoSortByDesc();
+
     List<CollapseHistory> getAllInfoWithDesc();
 }

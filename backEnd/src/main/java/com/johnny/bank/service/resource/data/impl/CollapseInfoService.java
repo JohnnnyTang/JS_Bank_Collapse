@@ -34,6 +34,11 @@ public class CollapseInfoService implements ICollapseInfoService {
     }
 
     @Override
+    public List<CollapseHistory> getAllInfoSortByDesc() {
+        return ICollapseInfoRepo.findInfoSortByDescription();
+    }
+
+    @Override
     public List<CollapseHistory> getAllInfoWithDesc() {
         return ICollapseInfoRepo.findInfoWithDescription();
     }

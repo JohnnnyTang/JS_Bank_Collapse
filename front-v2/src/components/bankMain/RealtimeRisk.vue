@@ -191,7 +191,7 @@ div.realtime-risk-container {
         div.realtime-risk-icon {
             height: 4vh;
             width: 4vh;
-            background-image: url('./measurement.png');
+            background-image: url('/measurement.png');
             background-size: contain;
         }
 
@@ -247,16 +247,16 @@ div.realtime-risk-container {
                     background-repeat: no-repeat;
 
                     &[id='icon-1'] {
-                        background-image: url('./accept.png');
+                        background-image: url('/accept.png');
                     }
                     &[id='icon-2'] {
-                        background-image: url('./announcement.png');
+                        background-image: url('/announcement.png');
                     }
                     &[id='icon-3'] {
-                        background-image: url('./warning.png');
+                        background-image: url('/warning.png');
                     }
                     &[id='icon-4'] {
-                        background-image: url('./alert.png');
+                        background-image: url('/alert.png');
                     }
                 }
 

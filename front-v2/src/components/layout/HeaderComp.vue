@@ -80,11 +80,12 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, watch, onUnmounted } from 'vue'
 import TitleContainerVue from '../header/TitleContainer.vue'
 import DecorateLineVue from '../header/DecorateLine.vue'
 import TitleBracket from '../header/TitleBracket.vue'
 import router from '../../router/index'
+import { onBeforeRouteUpdate } from 'vue-router'
 
 const titleWidthInPixel = ref(300)
 const headerDom = ref(null)
@@ -111,14 +112,14 @@ const navList = ref([
         routerLink: '/dataVisual',
         isActive: false,
         oneRow: true,
-        iconUrl: './big-data.png',
+        iconUrl: '/big-data.png',
     },
     {
         name: '崩岸知识平台',
         routerLink: '/knowledgeStore',
         isActive: false,
         oneRow: true,
-        iconUrl: './knowledge.png',
+        iconUrl: '/knowledge.png',
     },
     {
         name: '长江江苏段',
@@ -132,16 +133,24 @@ const navList = ref([
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,
-        iconUrl: './predictive.png',
+        iconUrl: '/predictive.png',
     },
     {
         name: '孪生岸坡平台',
         routerLink: '/bankTwin',
         isActive: false,
         oneRow: true,
-        iconUrl: './connection.png',
+        iconUrl: '/connection.png',
     },
 ])
+
+const routerPathIndexMap = {
+    '/dataVisual': 0,
+    '/knowledgeStore': 1,
+    '/': 2,
+    '/modelStore': 3,
+    '/bankTwin': 4,
+}
 
 let previousActive = 2
 
@@ -165,8 +174,7 @@ const emitNavClick = async (navIndex) => {
 
         if (navIndex != 2) {
             focusOnNavItem(navIndex)
-        }
-        else {
+        } else {
             bracketTitleActiveShow.value = false
         }
     }
@@ -206,24 +214,60 @@ onMounted(() => {
     onResize(headerDom.value.clientWidth, headerDom.value.clientHeight)
     resizeObserver.observe(headerDom.value)
     // console.log(navItemRefs.value);
-    watchEffect(() => {
-        router.getRoutes().map((item, index) => {
-            // console.log(item.path, router.currentRoute.value.path);
+    let curRoute = router.currentRoute.value.path
+    console.log(curRoute)
+    if (routerPathIndexMap[curRoute] != previousActive) {
+        navList.value[previousActive].isActive = false
+        navList.value[routerPathIndexMap[curRoute]].isActive = true
+        previousActive = routerPathIndexMap[curRoute]
+        if (routerPathIndexMap[curRoute] != 2) {
+            focusOnNavItem(routerPathIndexMap[curRoute])
+        }
+    }
+    watch(
+        () => router.currentRoute.value.path,
+        (newPath, oldPath) => {
+            // console.log(newPath, oldPath)
+            // console.log(newPath.split('/'), oldPath)
+            let parentPath = newPath
+            let splitPath = newPath.split('/')
+            if(splitPath.length >= 3) {
+                parentPath = '/' + splitPath[1]
+            }
             if (
-                item.path === router.currentRoute.value.path &&
-                index != previousActive
+                (parentPath in routerPathIndexMap) &&
+                (routerPathIndexMap[parentPath] != previousActive)
             ) {
-                // console.log(item.path)
-                // console.log(index, previousActive);
                 navList.value[previousActive].isActive = false
-                navList.value[index].isActive = true
-                previousActive = index
-                if (index != 2) {
-                    focusOnNavItem(index)
+                navList.value[routerPathIndexMap[parentPath]].isActive = true
+                previousActive = routerPathIndexMap[parentPath]
+                if (routerPathIndexMap[parentPath] != 2) {
+                    focusOnNavItem(routerPathIndexMap[parentPath])
                 }
             }
-        })
-    })
+        },
+    )
+    // watchEffect(() => {
+    //     router.getRoutes().map((item, index) => {
+    //         console.log(item.path, index)
+    //         // if (
+    //         //     item.path === router.currentRoute.value.path &&
+    //         //     index != previousActive
+    //         // ) {
+    //         //     // console.log(item.path)
+    //         //     // console.log(index, previousActive);
+    //         //     navList.value[previousActive].isActive = false
+    //         //     navList.value[index].isActive = true
+    //         //     previousActive = index
+    //         //     if (index != 2) {
+    //         //         focusOnNavItem(index)
+    //         //     }
+    //         // }
+    //     })
+    // })
+})
+onUnmounted(() => {
+    resizeObserver.disconnect()
 })
 </script>
 
@@ -252,7 +296,7 @@ div.main-header-container {
         background-position: 50% 50%;
         background-size: contain;
         background-repeat: no-repeat;
-        background-image: url('./logo.png');
+        background-image: url('/logo.png');
     }
 
     div.header-nav-container {
@@ -352,7 +396,7 @@ div.main-header-container {
             height: 4vh;
             width: 4vh;
             // background-color: antiquewhite;
-            background-image: url('./user.png');
+            background-image: url('/user.png');
             background-repeat: no-repeat;
             background-size: contain;
             &:hover {
@@ -364,7 +408,7 @@ div.main-header-container {
             height: 1.6vh;
             width: 1.6vh;
             // background-color: #8a9a9e;
-            background-image: url('./down-arrow.png');
+            background-image: url('/down-arrow.png');
             background-repeat: no-repeat;
             background-size: contain;
             &:hover {

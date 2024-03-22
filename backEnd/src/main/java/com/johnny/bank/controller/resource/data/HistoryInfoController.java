@@ -39,4 +39,9 @@ public class HistoryInfoController {
     public ResponseEntity<List<CollapseHistory>> getInfoWithDesc() {
         return ResponseEntity.ok(collapseInfoService.getAllInfoWithDesc());
     }
+
+    @GetMapping("desc/sort")
+    public ResponseEntity<List<CollapseHistory>> getInfoSortByDesc() {
+        return ResponseEntity.ok(collapseInfoService.getAllInfoSortByDesc());
+    }
 }

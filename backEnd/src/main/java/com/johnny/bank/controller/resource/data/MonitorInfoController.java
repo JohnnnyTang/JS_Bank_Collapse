@@ -83,4 +83,9 @@ public class MonitorInfoController extends BaseStaticInfoController<MonitorInfo>
     public ResponseEntity<MonitorInfo> findNewestInStation(@PathVariable String stationCode) {
         return ResponseEntity.ok(deviceInfoService.getNewestDeviceInStation(dataNode, stationCode));
     }
+
+    @GetMapping("/type/{typeCode}")
+    public ResponseEntity<List<MonitorInfo>> findDataByTypeCode(@PathVariable Character typeCode) {
+        return ResponseEntity.ok(deviceInfoService.getDeviceByType(dataNode, typeCode));
+    }
 }

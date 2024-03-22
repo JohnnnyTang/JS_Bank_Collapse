@@ -112,7 +112,7 @@ div.warn-notice-container {
         div.warn-notice-icon {
             height: 4vh;
             width: 4vh;
-            background-image: url('./alert1.png');
+            background-image: url('/alert1.png');
             background-size: contain;
         }
 

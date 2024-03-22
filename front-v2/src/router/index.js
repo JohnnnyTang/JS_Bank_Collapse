@@ -1,4 +1,8 @@
-import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router';
+import {
+    createRouter,
+    createWebHistory,
+    createWebHashHistory,
+} from 'vue-router'
 // 1、引入组件
 // import BankMainPage from "../views/BankMainPage.vue"
 /**
@@ -7,25 +11,53 @@ import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router
 const routes = [
     {
         path: '/dataVisual',
-        component: () => import("../views/DataVisualView.vue")
+        component: () => import('../views/DataVisualView.vue'),
     },
     {
         path: '/knowledgeStore',
-        component: () => import("../views/KnowledgeStoreView.vue")
+        component: () => import('../views/KnowledgeStoreView.vue'),
+        children: [
+            {
+                path: '',
+                component: () =>
+                    import('../components/knowStore/views/ScrollHistory.vue'),
+                    props: true
+            },
+            {
+                path: 'history',
+                component: () =>
+                    import('../components/knowStore/views/ScrollHistory.vue'),
+                    props: true
+            },
+            {
+                path: 'plan',
+                component: () =>
+                    import('../components/knowStore/views/RiverPlan.vue'),
+            },
+            {
+                path: 'param',
+                component: () =>
+                    import('../components/knowStore/views/ModelParams.vue'),
+            },
+            {
+                path: 'experience',
+                component: () =>
+                    import('../components/knowStore/views/ExpertKnow.vue'),
+            },
+        ],
     },
     {
         path: '/',
-        component: () => import("../views/BankMainView.vue")
+        component: () => import('../views/BankMainView.vue'),
     },
     {
         path: '/modelStore',
-        component: () => import("../views/ModelStoreView.vue")
+        component: () => import('../views/ModelStoreView.vue'),
     },
     {
         path: '/bankTwin',
-        component: () => import("../views/BankTwinView.vue")
+        component: () => import('../views/BankTwinView.vue'),
     },
-    
 ]
 // 3、创建一个路由的对象
 const router = createRouter({
@@ -36,7 +68,7 @@ const router = createRouter({
      */
     history: createWebHistory(),
     // 下面这个 可以写成ES6的简写 routers
-    routes:routes
+    routes: routes,
 })
 
-export default router;
+export default router

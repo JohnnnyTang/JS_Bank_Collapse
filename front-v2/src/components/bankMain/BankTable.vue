@@ -103,7 +103,7 @@ div.bank-table-container {
         div.bank-table-icon {
             height: 4vh;
             width: 4vh;
-            background-image: url('./river.png');
+            background-image: url('/river.png');
             background-size: contain;
         }
 
