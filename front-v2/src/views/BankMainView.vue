@@ -68,7 +68,7 @@ onMounted(() => {
     })
 
     map.on('load', () => {
-        console.log('map loaded!!!')
+        // console.log('map loaded!!!')
         mapFlyToRiver(map)
 
         resizeObserver.observe(containerDom.value)
@@ -78,6 +78,11 @@ onMounted(() => {
 
 onUnmounted(() => {
     resizeObserver.disconnect()
+    // resizeObserver.unobserve(containerDom.value)
+    console.log('onUnmounted');
+    map&&map.remove()
+    console.log('map.remove');
+
 })
 </script>
 

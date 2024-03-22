@@ -4,9 +4,9 @@ server:
 spring:
   data:
     mongodb:
-      database: bank
+      database: bank_0301
       authentication-database: admin
-      uri: mongodb://bankAdmin:20000601@localhost:27017/bank
+      uri: mongodb://localhost:27017/bank_0301
   datasource:
     hikari:
       maxLifeTime: 120000
@@ -15,7 +15,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/shore?stringtype=unspecified
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: 123456
+    password: QWERBOOM123
 mybatis:
   mapper-locations: classpath:mapper/resourceRepo/*/*.xml
   configuration:
