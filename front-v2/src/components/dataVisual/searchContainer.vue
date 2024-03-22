@@ -60,7 +60,7 @@ import featureDetail from './featureDetail.vue';
 import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, nextTick } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
-import { flytoFeature,flytoLarge } from '../../utils/mapUtils';
+import { flytoFeature, flytoLarge } from '../../utils/mapUtils';
 import { useMapStore } from '../../store/mapStore';
 
 
@@ -186,10 +186,8 @@ const showLeafDetailHandler = (node) => {
 
 const getPopupCoord = (coordsArray) => {
     if (coordsArray.length % 2) {
-        console.log(coordsArray.length, Math.floor(coordsArray.length / 2));
         return coordsArray[Math.floor(coordsArray.length / 2)]
     } else {
-        console.log(coordsArray.length, coordsArray.length / 2);
         let long = (coordsArray[coordsArray.length / 2][0] + coordsArray[coordsArray.length / 2 - 1][0]) / 2
         let lat = (coordsArray[coordsArray.length / 2][1] + coordsArray[coordsArray.length / 2 - 1][1]) / 2
         return [long, lat]
@@ -389,8 +387,13 @@ const initDataByScene = (sceneInstance) => {
         opacity: 0;
     }
 }
-
-
+// question  ----not useful
+.mapboxgl-popup-close-button {
+    display: none;
+}
+.mapboxgl-popup-content {
+    background-color: red;
+}
 
 .custom-tree-node {
     flex: 1;

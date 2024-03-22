@@ -43,6 +43,29 @@ export default class BackEndRequest {
         return backendInstance.get("/data/monitorInfo")
     }
 
+    static getSpecMonitorInfo(type){
+        //只查！设备概述信息！！！！
+        switch(type){
+            case '1':
+                return backendInstance.get("/data/gnssInfo")
+            case '2':
+                backendInstance.get("/data/inclinometerInfo")
+                .then((response)=>{
+                    let code = response.data[0]["code"]
+                    console.log(code);
+                })
+                return backendInstance.get("/data/inclinometerInfo");
+            case '3':
+                return backendInstance.get("/data/manometerInfo");
+            case '4':
+                return backendInstance.get("/data/stressInfo");
+        }   
+
+    }
+    static test(){
+        return backendInstance.get("/data/monitorInfo/code/MZS120.528701_32.034685_2")
+    }
+
 
 
     static getMonitorDetailByType_Code(code, type) {
@@ -70,7 +93,8 @@ export default class BackEndRequest {
         //desc
         switch (type) {
             case '1': {
-                return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                // return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                return backendInstance.get(`/data/gnssInfo/id/${code}`)
             }
             case '2': {
                 return backendInstance.get(`/data/inclinometerInfo/id/${code}`)

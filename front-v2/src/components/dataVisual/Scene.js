@@ -1,7 +1,7 @@
 import { ElMessage } from "element-plus"
 import mapboxgl from "mapbox-gl"
 import BackEndRequest from '../../api/backend.js'
-import { loadImage } from '../../utils/mapUtils.js'
+import { loadImage, pulsing } from '../../utils/mapUtils.js'
 
 // BackEndRequest.getDataNodeData()
 
@@ -41,87 +41,154 @@ class DataPioneer {
         }
         return geojson
     }
+
+    static getDifChannelData(geojson) {
+        const features = geojson['features']
+        let builtFeatures = []
+        let buildingFeatures = []
+        let planningFeatures = []
+        features.forEach((feat) => {
+            switch (feat["properties"]["type"]) {
+                case "在建通道":
+                    buildingFeatures.push(feat)
+                    break
+                case "已建通道":
+                    builtFeatures.push(feat)
+                    break
+                case "规划通道":
+                    planningFeatures.push(feat)
+                    break
+                default:
+                    break
+            }
+        })
+        return {
+            built: {
+                'type': 'FeatureCollection',
+                'features': builtFeatures
+            },
+            building: {
+                'type': 'FeatureCollection',
+                'features': buildingFeatures
+            },
+            planning: {
+                'type': 'FeatureCollection',
+                'features': planningFeatures
+            }
+        }
+    }
+    static getDifBankData(geojson) {
+        const features = geojson['features']
+        let level1 = []
+        let level2 = []
+        let level3 = []
+        features.forEach((feat) => {
+            switch (feat["properties"]["warningLevel"]) {
+                case 1:
+                    level1.push(feat)
+                    break
+                case 2:
+                    level2.push(feat)
+                    break
+                case 3:
+                    level3.push(feat)
+                    break
+                default:
+                    break
+            }
+        })
+        return {
+            level1: {
+                'type': 'FeatureCollection',
+                'features': level1
+            },
+            level2: {
+                'type': 'FeatureCollection',
+                'features': level2
+            },
+            level3: {
+                'type': 'FeatureCollection',
+                'features': level3
+            }
+        }
+    }
+    static getDifMonitorData(geojson) {
+        const features = geojson['features']
+        let gnss = []
+        let incline = []
+        let manometer = [] //压力计 
+        let stress = [] // 应力桩
+        features.forEach((feat) => {
+            switch (feat["properties"]["type"]) {
+                case "1":
+                    gnss.push(feat)
+                    break
+                case "2":
+                    incline.push(feat)
+                    break
+                case "3":
+                    manometer.push(feat)
+                    break
+                case "4":
+                    stress.push(feat)
+                    break
+                default:
+                    break
+            }
+        })
+        return {
+            gnss: {
+                'type': 'FeatureCollection',
+                'features': gnss
+            },
+            incline: {
+                'type': 'FeatureCollection',
+                'features': incline
+            },
+            stress: {
+                'type': 'FeatureCollection',
+                'features': stress
+            },
+            manometer: {
+                'type': 'FeatureCollection',
+                'features': manometer
+            }
+        }
+    }
+
 }
 
-const getDifChannelData = (geojson) => {
-    const features = geojson['features']
-    let builtFeatures = []
-    let buildingFeatures = []
-    let planningFeatures = []
-    features.forEach((feat) => {
-        switch (feat["properties"]["type"]) {
-            case "在建通道":
-                buildingFeatures.push(feat)
-                break
-            case "已建通道":
-                builtFeatures.push(feat)
-                break
-            case "规划通道":
-                planningFeatures.push(feat)
-                break
-            default:
-                break
+const generateGeoJson = (itemArr, getCoords, type) => {
+    const features = []
+    itemArr.forEach(element => {
+        let coords = getCoords(element);
+        let feature = {
+            'type': 'Feature',
+            'properties': element,
+            'geometry': {
+                'coordinates': coords,
+                'type': type
+            }
         }
-    })
-    return {
-        built: {
-            'type': 'FeatureCollection',
-            'features': builtFeatures
-        },
-        building: {
-            'type': 'FeatureCollection',
-            'features': buildingFeatures
-        },
-        planning: {
-            'type': 'FeatureCollection',
-            'features': planningFeatures
-        }
+        features.push(feature)
+    });
+    const geojson = {
+        'type': 'FeatureCollection',
+        'features': features
     }
+    return geojson
 }
-const getDifBankData = (geojson) => {
-    const features = geojson['features']
-    let level1 = []
-    let level2 = []
-    let level3 = []
-    features.forEach((feat) => {
-        switch (feat["properties"]["warningLevel"]) {
-            case 1:
-                level1.push(feat)
-                break
-            case 2:
-                level2.push(feat)
-                break
-            case 3:
-                level3.push(feat)
-                break
-            default:
-                break
-        }
-    })
-    return {
-        level1: {
-            'type': 'FeatureCollection',
-            'features': level1
-        },
-        level2: {
-            'type': 'FeatureCollection',
-            'features': level2
-        },
-        level3: {
-            'type': 'FeatureCollection',
-            'features': level3
-        }
-    }
-}
+
+
 
 
 const initLayers = async (sceneInstance, map) => {
     switch (sceneInstance.title) {
+        /////Large Scene
         case '过江通道':
             let channel = new DataPioneer('过江通道', e => e['llCoords'], 'LineString')
             await channel.requestData(BackEndRequest.getChannelData)
-            const { built, building, planning } = getDifChannelData(channel.origin2geojson())
-            sceneInstance.layerSrc.push('channel-built-source', 'channel-building-source', 'channel-planning-source')
+            const { built, building, planning } = DataPioneer.getDifChannelData(channel.origin2geojson())
             map.addSource('channel-built-source', {
                 'type': 'geojson',
                 'data': built
@@ -134,7 +201,8 @@ const initLayers = async (sceneInstance, map) => {
                 'type': 'geojson',
                 'data': planning
             });
-            sceneInstance.allLayers.push('已建通道', '在建通道', '规划通道')
+            sceneInstance.layerSrc.push('channel-built-source', 'channel-building-source', 'channel-planning-source')
+
             map.addLayer({
                 'id': '已建通道',
                 'type': 'line',
@@ -198,6 +266,7 @@ const initLayers = async (sceneInstance, map) => {
                     "line-round-limit": 2
                 }
             })
+            sceneInstance.allLayers.push('已建通道', '在建通道', '规划通道')
 
 
             break;
@@ -205,7 +274,7 @@ const initLayers = async (sceneInstance, map) => {
 
             let bankData = new DataPioneer('典型崩岸', e => e['coord'], 'LineString')
             await bankData.requestData(BackEndRequest.getbankLineData)
-            const { level1, level2, level3 } = getDifBankData(bankData.origin2geojson())
+            const { level1, level2, level3 } = DataPioneer.getDifBankData(bankData.origin2geojson())
             map.addSource('bank-level1-source', {
                 'type': 'geojson',
                 'data': level1
@@ -296,10 +365,80 @@ const initLayers = async (sceneInstance, map) => {
             sceneInstance.allLayers.push('一级预警岸段', '二级预警岸段', '三级预警岸段')
 
             break;
+       
+       
+        /////Large Scene
+        case '实时监测数据':
+            let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+            console.log(monitorInfo);
+            let monitorDevice = generateGeoJson(monitorInfo, (element) => {
+                return [element["longitude"], element["latitude"]]
+            }, "Point")
+            // debugger
+            console.log(monitorDevice);
+            const { gnss, incline, stress, manometer } = DataPioneer.getDifMonitorData(monitorDevice)
 
-        case '全江地形':
-
+            map.addSource('gnss-source', {
+                'type': 'geojson',
+                'data': gnss
+            })
+            map.addSource('incline-source', {
+                'type': 'geojson',
+                'data': incline
+            })
+            map.addSource('stress-source', {
+                'type': 'geojson',
+                'data': stress
+            })
+            map.addSource('manometer-source', {
+                'type': 'geojson',
+                'data': manometer
+            })
+            sceneInstance.layerSrc.push('gnss-source', 'incline-source', 'stress-source', 'manometer-source')
+            map.addImage('pulsing-dot-gnss', pulsing.point, { pixelRatio: 1 });
+            map.addImage('pulsing-rect-incline', pulsing.rectangle, { pixelRatio: 1 });
+            map.addImage('pulsing-tri-stress', pulsing.diamond, { pixelRatio: 1 });
+            map.addImage('pulsing-dia-manometer', pulsing.triangle, { pixelRatio: 1 });
+            map.addLayer({
+                'id': 'GNSS',
+                'type': 'symbol',
+                'source': 'gnss-source',
+                'layout': {
+                    'icon-image': 'pulsing-dot-gnss',
+                    'icon-allow-overlap': true
+                },
+            })
+            map.addLayer({
+                'id': '测斜仪',
+                'type': 'symbol',
+                'source': 'incline-source',
+                'layout': {
+                    'icon-image': 'pulsing-rect-incline',
+                    'icon-allow-overlap': true
+                },
+            })
+            map.addLayer({
+                'id': '孔隙水压力计',
+                'type': 'symbol',
+                'source': 'manometer-source',
+                'layout': {
+                    'icon-image': 'pulsing-dia-manometer',
+                    'icon-allow-overlap': true
+                },
+            })
+            map.addLayer({
+                'id': '应力桩',
+                'type': 'symbol',
+                'source': 'stress-source',
+                'layout': {
+                    'icon-image': 'pulsing-tri-stress',
+                    'icon-allow-overlap': true
+                },
+            })
+            sceneInstance.allLayers.push('GNSS','测斜仪','孔隙水压力计','应力桩')
             break;
+
+
         default:
             ElMessage('wait developing...')
             break;
