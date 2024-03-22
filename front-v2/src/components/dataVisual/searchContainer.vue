@@ -173,14 +173,23 @@ const showLeafDetailHandler = (node) => {
     let map = mapStore.getMap()
     selectedFeature.value = node.data;
     showfeatureDetail.value = true;
-    let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
-    flytoFeature(map, popupCoord)
+    //for channel and bank
 
-    popUp && popUp.remove()
-    popUp = new mapboxgl.Popup()
-        .setDOMContent(domwithComp)
-        .setLngLat(popupCoord)
-        .addTo(map);
+    console.log(props.selectedScene);
+
+    if (props.selectedScene === '预警岸段' || props.selectedScene === '过江通道') {
+        //展示popUp弹窗
+        let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
+        flytoFeature(map, popupCoord)
+
+        popUp && popUp.remove()
+        popUp = new mapboxgl.Popup()
+            .setDOMContent(domwithComp)
+            .setLngLat(popupCoord)
+            .addTo(map);
+    }
+
+
 
 }
 
@@ -387,10 +396,12 @@ const initDataByScene = (sceneInstance) => {
         opacity: 0;
     }
 }
+
 // question  ----not useful
 .mapboxgl-popup-close-button {
     display: none;
 }
+
 .mapboxgl-popup-content {
     background-color: red;
 }

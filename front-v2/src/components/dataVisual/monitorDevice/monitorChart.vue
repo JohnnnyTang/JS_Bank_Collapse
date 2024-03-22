@@ -1,10 +1,12 @@
 <template>
     <div class="monitor-chart-container">
         <h2> GNSS::XMove-YMove-ZMove-TIME </h2>
+        <h2> inclinometer::XMove-YMove-PointNum-TIME </h2>
+        <h2> manometer::PointNum-Pressure-TIME </h2>
+        <h2> stress::stresshori-stressvert-pointNum-TIME </h2>
 
-        <div class="chart" id="chart">
 
-        </div>
+        <div class="chart" id="chart"></div>
 
     </div>
 </template>
@@ -31,11 +33,23 @@ onMounted(async () => {
     // oneInclinometer.getProcessedDataObject()
     // oneInclinometer.getChartOptions()
 
-    /////////for stress
-
 
 
     /////////for manometer
+    let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
+    let oneManometer = new MonitorDataAssistant(manometerInfo[0])
+    await oneManometer.getMonitoringdata()
+    oneManometer.getProcessedDataObject()
+    oneManometer.getChartOptions()
+
+
+    /////////for stress
+
+    // let stressInfo = (await BackEndRequest.getSpecMonitorInfo("4")).data
+    // let oneStress = new MonitorDataAssistant(stressInfo[0])
+    // await oneStress.getMonitoringdata()
+    // oneStress.getProcessedDataObject()
+    // oneStress.getChartOptions()
 
 
     var chartDom = document.getElementById('chart');
@@ -44,16 +58,15 @@ onMounted(async () => {
     window.addEventListener("keydown", (e) => {
         if (e.key == '1') {
             myChart.clear()
-            console.log(oneInclinometer);
-            myChart.setOption(oneInclinometer.chartOptions.options[0])
+            myChart.setOption(oneStress.chartOptions.options[0])
         }
         if (e.key == '2') {
             myChart.clear()
-            myChart.setOption(oneInclinometer.chartOptions.options[1])
+            myChart.setOption(oneStress.chartOptions.options[1])
         }
         if (e.key == '3') {
             myChart.clear()
-            myChart.setOption(oneInclinometer.chartOptions.options[2])
+            myChart.setOption(oneStress.chartOptions.options[2])
         }
     })
 
@@ -149,6 +162,13 @@ onMounted(async () => {
     height: 92vh;
     top: 8vh;
     left: 0;
+
+    h2 {
+        color: azure;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 20px;
+    }
 
     .chart {
         width: 70vw;

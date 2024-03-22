@@ -44,7 +44,7 @@ export default class BackEndRequest {
     }
 
     static getSpecMonitorInfo(type){
-        //只查！设备概述信息！！！！
+        //设备概述信息！！！！
         switch(type){
             case '1':
                 return backendInstance.get("/data/monitorInfo/type/1")
@@ -55,13 +55,7 @@ export default class BackEndRequest {
             case '4':
                 return backendInstance.get("/data/monitorInfo/type/4");
         }   
-
     }
-    // static test(){
-    //     return backendInstance.get("/data/monitorInfo/code/MZS120.528701_32.034685_2")
-    // }
-
-
 
     static getMonitorDetailByType_Code(code, type) {
         //data

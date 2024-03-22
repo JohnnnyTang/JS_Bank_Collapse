@@ -87,6 +87,34 @@ const generateData_Incline = (ogDataArray, metaData) => {
         yMovedata
     }
 }
+const generateData_Manometer = (ogDataArray, metaData) => {
+    let pointNum = metaData["pointNum"]
+    let depthArray = []
+    let legendData = []
+    let showCount = 20   //50enough
+
+    for (let i = 1; i <= pointNum; i++) {
+        depthArray.push(metaData[`point${i}Depth`])
+        legendData.push(String(metaData[`point${i}Depth`] + 'm'))
+    }
+
+    debugger
+    图
+
+}
+const generateData_Stress = (ogDataArray, metaData) => {
+    let pointNum = metaData["pointNum"]
+    let depthArray = []
+    let legendData = []
+    let showCount = 20   //50enough
+
+    for (let i = 1; i <= pointNum; i++) {
+        depthArray.push(metaData[`point${i}Depth`])
+        legendData.push(String(metaData[`point${i}Depth`] + 'm'))
+    }
+
+    debugger
+}
 
 
 
@@ -403,6 +431,7 @@ const generateOptions_Incline = (processedData) => {
             }
         ]
     };
+    // 动态柱状排序？
     return {
         xMoveOption,
         yMoveOption,
@@ -410,6 +439,17 @@ const generateOptions_Incline = (processedData) => {
     }
 }
 
+const generateOptions_Manometer = (processedData) => {
+
+    // 数据特征，全是正值，数值在10左右，比较稳定
+    // 考虑河流图，极坐标面积堆叠图，动态柱状排序
+
+}
+const generateOptions_Stress = (processedData) => {
+    // 水平应力和垂直应力的数据联动图表。
+    // https://echarts.apache.org/examples/zh/editor.html?c=dataset-link
+
+}
 
 
 
@@ -436,6 +476,7 @@ class MonitorDataAssistant {
     */
     constructor(specMonitorInfo) {
         this.info = specMonitorInfo
+        console.log(this.info);
     }
 
     async getMonitoringdata() {
@@ -444,7 +485,6 @@ class MonitorDataAssistant {
 
         //meta infomation -- pointnum
         this.monitoringMetaData = (await BackEndRequest.getMonitorInfoByType_Code(this.info["code"], this.info["type"])).data
-
         return this.monitoringData
     }
 
@@ -457,11 +497,13 @@ class MonitorDataAssistant {
                 this.processedData = generateData_Incline(this.monitoringData, this.monitoringMetaData)
                 return this.processedData
             case "3":
-                break;
+                this.processedData = generateData_Manometer(this.monitoringData, this.monitoringMetaData)
+                return this.processedData
             case "4":
-                break;
+                this.processedData = generateData_Stress(this.monitoringData, this.monitoringMetaData)
+                return this.processedData
             default:
-                console.log('e');
+                console.warn('ERROR::getProcessedDataObject');
                 break;
         }
     }
@@ -470,16 +512,18 @@ class MonitorDataAssistant {
         switch (this.info["type"]) {
             case "1": //gnss
                 this.chartOptions = generateOptions_GNSS(this.processedData)
-                return this.processedData
+                return this.chartOptions
             case "2":
                 this.chartOptions = generateOptions_Incline(this.processedData)
-                return this.processedData
+                return this.chartOptions
             case "3":
-                break;
+                this.chartOptions = generateOptions_Manometer(this.processedData)
+                return this.chartOptions
             case "4":
-                break;
+                this.chartOptions = generateOptions_Stress(this.processedData)
+                return this.chartOptions
             default:
-                console.log('e');
+                console.warn('ERROR::getChartOptions');
                 break;
         }
     }

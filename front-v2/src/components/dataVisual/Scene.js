@@ -365,8 +365,8 @@ const initLayers = async (sceneInstance, map) => {
             sceneInstance.allLayers.push('一级预警岸段', '二级预警岸段', '三级预警岸段')
 
             break;
-       
-       
+
+
         /////Large Scene
         case '实时监测设备':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
@@ -395,10 +395,10 @@ const initLayers = async (sceneInstance, map) => {
                 'data': manometer
             })
             sceneInstance.layerSrc.push('gnss-source', 'incline-source', 'stress-source', 'manometer-source')
-            map.addImage('pulsing-dot-gnss', pulsing.point, { pixelRatio: 1 });
-            map.addImage('pulsing-rect-incline', pulsing.rectangle, { pixelRatio: 1 });
-            map.addImage('pulsing-tri-stress', pulsing.diamond, { pixelRatio: 1 });
-            map.addImage('pulsing-dia-manometer', pulsing.triangle, { pixelRatio: 1 });
+            !map.hasImage('pulsing-dot-gnss') && map.addImage('pulsing-dot-gnss', pulsing.point, { pixelRatio: 1 });
+            !map.hasImage('pulsing-rect-incline') && map.addImage('pulsing-rect-incline', pulsing.rectangle, { pixelRatio: 1 });
+            !map.hasImage('pulsing-tri-stress') && map.addImage('pulsing-tri-stress', pulsing.diamond, { pixelRatio: 1 });
+            !map.hasImage('pulsing-dia-manometer') && map.addImage('pulsing-dia-manometer', pulsing.triangle, { pixelRatio: 1 });
             map.addLayer({
                 'id': 'GNSS',
                 'type': 'symbol',
@@ -435,7 +435,7 @@ const initLayers = async (sceneInstance, map) => {
                     'icon-allow-overlap': true
                 },
             })
-            sceneInstance.allLayers.push('GNSS','测斜仪','孔隙水压力计','应力桩')
+            sceneInstance.allLayers.push('GNSS', '测斜仪', '孔隙水压力计', '应力桩')
             break;
 
 
@@ -443,6 +443,40 @@ const initLayers = async (sceneInstance, map) => {
             ElMessage('wait developing...')
             break;
     }
+    /*
+  // Add a new vector tile source with ID 'mapillary'.
+        map.addSource('mapillary', {
+            'type': 'vector',
+            'tiles': [
+                'https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=MLY|4142433049200173|72206abe5035850d6743b23a49c41333'
+            ],
+            'minzoom': 6,
+            'maxzoom': 14
+        });
+        map.addLayer(
+            {
+                'id': 'mapillary', // Layer ID
+                'type': 'line',
+                'source': 'mapillary', // ID of the tile source created above
+                // Source has several layers. We visualize the one with name 'sequence'.
+                'source-layer': 'sequence',
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'paint': {
+                    'line-opacity': 0.6,
+                    'line-color': 'rgb(53, 175, 109)',
+                    'line-width': 2
+                }
+            },
+            'road-label-simple' // Arrange our new layer beneath labels and above roads
+        );
+
+
+
+
+    */
 
     // console.log('111');
     // map.addSource('wms-test-source', {

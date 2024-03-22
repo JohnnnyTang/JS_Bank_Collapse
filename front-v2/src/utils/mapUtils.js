@@ -32,7 +32,8 @@ const flytoLarge = (map) => {
         pitch: 48.0432167520608,
         bearing: 0,
         zoom: 8.28560629149188,
-        speed: 0.7
+        speed: 0.7,
+        essential: true
     })
 }
 const flytoSmall = (map) => {
@@ -41,7 +42,9 @@ const flytoSmall = (map) => {
         pitch: 61.99999999999988,
         bearing: 0,
         zoom: 13.245427972376211,
-        speed: 0.7
+        speed: 0.7,
+        essential: true
+
     })
 }
 
@@ -51,7 +54,9 @@ const flytoFeature = (map, coord) => {
         pitch: 61.99999999999988,
         bearing: 0,
         zoom: 10,
-        speed: 0.8
+        speed: 0.8,
+        essential: true
+
     })
 }
 
@@ -66,7 +71,7 @@ const loadImage = async (map, url, imageID) => {
     })
 }
 
-const size = 60
+const size = 80
 const squareThreeDivideTwo = Math.sqrt(3) / 2.0;
 const pulsing = {
     point: {
