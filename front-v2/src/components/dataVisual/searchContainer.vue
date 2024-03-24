@@ -1,51 +1,55 @@
 <template>
-    <div class="search-container">
-        <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
-            <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
-            <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
-            <!-- </el-tooltip> -->
-        </div>
-
-        <Transition name="slidefade">
-            <div class="search-container-main" v-show="showSearchMain">
-                <div class="input-container">
-                    <input type="text" name="text" class="input" placeholder="要素检索" v-model="inputText">
-                    <span class="icon">
-                        <svg width="19px" height="19px" viewBox="0 0 24 24" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier">
-                                <path opacity="1" d="M14 5H20" stroke="#000" stroke-width="1.5" stroke-linecap="round"
-                                    stroke-linejoin="round"></path>
-                                <path opacity="1" d="M14 8H17" stroke="#000" stroke-width="1.5" stroke-linecap="round"
-                                    stroke-linejoin="round"></path>
-                                <path d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2"
-                                    stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                </path>
-                                <path opacity="1" d="M22 22L20 20" stroke="#000" stroke-width="3.5"
-                                    stroke-linecap="round" stroke-linejoin="round"></path>
-                            </g>
-                        </svg>
-                    </span>
-                </div>
-
-                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data" :props="defaultProps"
-                    :default-expand-all="false" :filter-node-method="filterNode" @node-click="selectedNodeHandler">
-
-                    <template #default="{ node, data }">
-                        <span class="custom-tree-node">
-                            <div class="leaf-node" v-if="node.isLeaf"></div>
-                            <span>{{ node.label }}</span>
-                            <span>
-                                <a v-show="node.isLeaf"> 查看详情 </a>
-                            </span>
-                        </span>
-                    </template>
-
-                </el-tree>
+    <div class="search-container" id="search-container">
+        <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="false" :z="3" :w="0" :h="0" axis="y"> -->
+            <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
+                <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
+                <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
+                <!-- </el-tooltip> -->
             </div>
-        </Transition>
+
+            <Transition name="slidefade">
+                <div class="search-container-main" v-show="showSearchMain">
+                    <div class="input-container">
+                        <input type="text" name="text" class="input" placeholder="要素检索" v-model="inputText">
+                        <span class="icon">
+                            <svg width="19px" height="19px" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <path opacity="1" d="M14 5H20" stroke="#000" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path opacity="1" d="M14 8H17" stroke="#000" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path
+                                        d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2"
+                                        stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    </path>
+                                    <path opacity="1" d="M22 22L20 20" stroke="#000" stroke-width="3.5"
+                                        stroke-linecap="round" stroke-linejoin="round"></path>
+                                </g>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data"
+                        :props="defaultProps" :default-expand-all="false" :filter-node-method="filterNode"
+                        @node-click="selectedNodeHandler">
+
+                        <template #default="{ node, data }">
+                            <span class="custom-tree-node">
+                                <div class="leaf-node" v-if="node.isLeaf"></div>
+                                <span>{{ node.label }}</span>
+                                <span>
+                                    <a v-show="node.isLeaf"> 查看详情 </a>
+                                </span>
+                            </span>
+                        </template>
+
+                    </el-tree>
+                </div>
+            </Transition>
+        <!-- </VueDragResize> -->
 
         <!-- <Transition name="'slidefade">
             <featureDetail v-show="showfeatureDetail" :selectedFeature></featureDetail>
@@ -62,6 +66,8 @@ import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
 import { flytoFeature, flytoLarge } from '../../utils/mapUtils';
 import { useMapStore } from '../../store/mapStore';
+import VueDragResize from 'vue-drag-resize/src'
+
 
 
 
@@ -71,6 +77,7 @@ const mapStore = useMapStore()
 const props = defineProps({
     selectedScene: Scene
 })
+const emit = defineEmits(['selectedFeature'])
 
 const showSearchMain = ref(false)
 const showfeatureDetail = ref(false)
@@ -165,6 +172,7 @@ let popUp = undefined;
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
+        emit('selectedFeature',nodeProp.data)
     }
 }
 
@@ -175,9 +183,9 @@ const showLeafDetailHandler = (node) => {
     showfeatureDetail.value = true;
     //for channel and bank
 
-    console.log(props.selectedScene);
+    // console.log(props.selectedScene);
 
-    if (props.selectedScene === '预警岸段' || props.selectedScene === '过江通道') {
+    if (props.selectedScene.title === '预警岸段' || props.selectedScene.title === '过江通道') {
         //展示popUp弹窗
         let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
         flytoFeature(map, popupCoord)
@@ -225,6 +233,10 @@ onMounted(async () => {
 
 })
 
+const x =()=>{
+    console.log(document.getElementById(`search-container`).offsetWidth);
+    return document.getElementById(`search-container`).offsetWidth-20
+}
 
 const initDataByScene = (sceneInstance) => {
     let map = mapStore.getMap()
@@ -264,10 +276,12 @@ const initDataByScene = (sceneInstance) => {
 <style lang="scss" scoped>
 .search-container {
     user-select: none;
-
+    position: absolute;
+    right: 0vw;
+    top: 0vh;
     .search-container-icon-container {
         position: absolute;
-        right: 2vw;
+        right: 2.5vw;
         top: 2.5vh;
         z-index: 10;
         width: 6.5vh;
@@ -423,6 +437,10 @@ const initDataByScene = (sceneInstance) => {
         //background-color: rgb(30, 31, 30);
         //line-height: 1vw;
     }
+}
+
+:deep(.content-container){
+    border: none;
 }
 
 .el-tree {

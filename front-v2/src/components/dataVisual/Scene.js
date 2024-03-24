@@ -435,6 +435,7 @@ const initLayers = async (sceneInstance, map) => {
                     'icon-allow-overlap': true
                 },
             })
+
             sceneInstance.allLayers.push('GNSS', '测斜仪', '孔隙水压力计', '应力桩')
             break;
 

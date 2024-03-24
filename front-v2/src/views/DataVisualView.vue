@@ -3,8 +3,8 @@
         <div id="map" ref="mapContainerRef"></div>
         <sceneContainer @selectScene="selectSceneHandler" />
         <layerControl :allLayers="selectedScene.allLayers" :layerScene="selectedScene.title" />
-        <searchContainer :selectedScene="selectedScene" />
-
+        <searchContainer :selectedScene="selectedScene" @selected-feature="selectFeatureHandler" />
+        <monitorChart :oneSpecMonitorMetaInfo="oneSpecMonitorMetaInfo"></monitorChart>
     </div>
 </template>
 
@@ -18,16 +18,27 @@ import { useMapStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 import layerControl from '../components/dataVisual/layerControl.vue';
 import searchContainer from '../components/dataVisual/searchContainer.vue';
+import monitorChart from '../components/dataVisual/monitorDevice/monitorChart.vue';
 
 
 const mapContainerRef = ref();
 const mapStore = useMapStore()
 let map = null;
 const selectedScene = ref(new Scene())
+const selectedFeature = ref({})
+const oneSpecMonitorMetaInfo = ref({})
+
 
 const selectSceneHandler = (sceneInstance) => {
     // flytoLarge(map)
     selectedScene.value = sceneInstance
+}
+const selectFeatureHandler = (feature) => {
+    // console.log(selectedScene.value.title);
+    if(selectedScene.value.title === '实时监测设备'){
+        oneSpecMonitorMetaInfo.value = feature;
+
+    }
 }
 
 

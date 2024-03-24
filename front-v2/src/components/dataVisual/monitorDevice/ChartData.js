@@ -1,4 +1,4 @@
-import BackEndRequest from '../../api/backend'
+import BackEndRequest from '../../../api/backend'
 import * as echarts from 'echarts'
 import 'echarts-gl';
 import dayjs from 'dayjs'
@@ -11,7 +11,7 @@ const timeDif = (starttime, endtime) => {
     return starttime.diff(endtime, 'second')
 }
 const timeFormat = (time) => {
-    return time.format('HH-mm-ss')
+    return time.format('HH:mm:ss')
 }
 const radius = (x, y, z) => {
     return Math.sqrt(x * x + y * y + z * z)
@@ -91,29 +91,66 @@ const generateData_Manometer = (ogDataArray, metaData) => {
     let pointNum = metaData["pointNum"]
     let depthArray = []
     let legendData = []
-    let showCount = 20   //50enough
+    let pressureData_river = []
+    let showCount = 10   //50enough
+
+    let Depth_Data_Map = new Map()
+    let Depth_Data = []
+    let measureTime = []
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
         legendData.push(String(metaData[`point${i}Depth`] + 'm'))
+        Depth_Data.push([])
+    }
+    for (let i = 0; i < showCount; i++) {
+        for (let j = 0; j < pointNum; j++) {
+            let item = []
+            item.push(ogDataArray[i][`measureTime`])
+            item.push(ogDataArray[i][`pressure${j + 1}`])
+            item.push(legendData[j])
+            pressureData_river.push(item)
+            Depth_Data[j].push(ogDataArray[i][`pressure${j + 1}`])
+        }
+        measureTime.push(timeFormat(time(ogDataArray[i][`measureTime`])))
+
+    }
+    for (let i = 1; i <= pointNum; i++) {
+        Depth_Data_Map.set(legendData[i - 1], Depth_Data[i - 1])
     }
 
-    debugger
-    图
-
+    return {
+        legendData,
+        pressureData_river,
+        Depth_Data_Map,
+        measureTime
+    }
 }
 const generateData_Stress = (ogDataArray, metaData) => {
     let pointNum = metaData["pointNum"]
     let depthArray = []
     let legendData = []
     let showCount = 20   //50enough
+    let horizontalAngle = []
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
         legendData.push(String(metaData[`point${i}Depth`] + 'm'))
     }
 
-    debugger
+    for (let i = 0; i < showCount; i++) {
+        let horizontalAngleItem = []
+        for (let j = 0; j < pointNum; j++) {
+            horizontalAngleItem.push(ogDataArray[i][`horizontal${j + 1}`])
+
+        }
+        horizontalAngle.push(horizontalAngleItem)
+    }
+
+    return {
+        legendData,
+        horizontalAngle
+    }
 }
 
 
@@ -444,12 +481,174 @@ const generateOptions_Manometer = (processedData) => {
     // 数据特征，全是正值，数值在10左右，比较稳定
     // 考虑河流图，极坐标面积堆叠图，动态柱状排序
 
+    let optionRiver = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'line',
+                lineStyle: {
+                    color: 'rgba(0,0,0,0.2)',
+                    width: 1,
+                    type: 'solid'
+                }
+            }
+        },
+        legend: {
+            data: processedData.legendData
+        },
+        singleAxis: {
+            top: 50,
+            bottom: 50,
+            axisTick: {},
+            axisLabel: {},
+            type: 'time',
+            axisPointer: {
+                animation: true,
+                label: {
+                    show: true
+                }
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    type: 'dashed',
+                    opacity: 0.2
+                }
+            }
+        },
+        series: [
+            {
+                type: 'themeRiver',
+                itemStyle: {
+                    opacity: 0.9
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 25,
+                        shadowColor: 'rgba(0, 0, 0, 0.8)'
+                    }
+                },
+                data: processedData.pressureData_river
+            }
+        ]
+    };
+
+
+    //极坐标分series处理
+    // processedData.Depth_Data_Map.entries
+    let optionPolarStack_Seriers = []
+    processedData.Depth_Data_Map.keys().forEach((key) => {
+
+        let data = processedData.Depth_Data_Map.get(key)
+        let item = {
+            type: 'bar',
+            data,
+            coordinateSystem: 'polar',
+            name: key,
+            stack: 'a',
+            emphasis: {
+                focus: 'series'
+            }
+        }
+        optionPolarStack_Seriers.push(item)
+    })
+    let optionPolarStack = {
+        angleAxis: {
+            //pressure
+        },
+        radiusAxis: {
+            type: 'category',
+            data: processedData.measureTime,
+            z: 10
+        },
+        polar: {},
+        series: optionPolarStack_Seriers,
+        legend: {
+            show: true,
+            data: processedData.legendData
+        }
+    };
+
+    let optionBarSort = {
+
+    }
+
+    return {
+        optionRiver,
+        optionPolarStack,
+        optionBarSort,
+        options: [optionRiver, optionPolarStack, optionBarSort]
+    }
+
 }
 const generateOptions_Stress = (processedData) => {
     // 水平应力和垂直应力的数据联动图表。
     // https://echarts.apache.org/examples/zh/editor.html?c=dataset-link
 
+    //gaugeOption 
+    let gaugeData = MonitorDataAssistant.getOnegaugeData(processedData.horizontalAngle[0], processedData.legendData)
+    let gaugeOption = {
+        title: {
+            show: true,
+            text: '水平应力角度',
+            x: 'center',
+            y: 'top',
+            textAlign: 'left'
+        },
+        series: [
+            {
+                startAngle: 180,
+                endAngle: 0,
+                min: 0,
+                max: 90,
+                type: 'gauge',
+                anchor: {
+                    show: true,
+                    showAbove: true,
+                    size: 18,
+                    itemStyle: {
+                        color: '#FAC858'
+                    }
+                },
+                pointer: {
+                    icon: 'path://M2.9,0.7L2.9,0.7c1.4,0,2.6,1.2,2.6,2.6v115c0,1.4-1.2,2.6-2.6,2.6l0,0c-1.4,0-2.6-1.2-2.6-2.6V3.3C0.3,1.9,1.4,0.7,2.9,0.7z',
+                    width: 8,
+                    length: '70%',
+                    offsetCenter: [0, '8%']
+                },
+                progress: {
+                    show: true,
+                    overlap: true,
+                    roundCap: true
+                },
+                axisLine: {
+                    roundCap: true
+                },
+                data: gaugeData,
+                title: {
+                    fontSize: 10
+                },
+                detail: {
+                    width: 20,
+                    height: 12,
+                    fontSize: 12,
+                    color: '#fff',
+                    backgroundColor: 'inherit',
+                    borderRadius: 3,
+                    formatter: '{value}%'
+                }
+            }
+        ]
+    };
+
+
+    return {
+        gaugeOption,
+        options: [gaugeOption]
+    }
+
 }
+
 
 
 
@@ -476,7 +675,6 @@ class MonitorDataAssistant {
     */
     constructor(specMonitorInfo) {
         this.info = specMonitorInfo
-        console.log(this.info);
     }
 
     async getMonitoringdata() {
@@ -526,6 +724,61 @@ class MonitorDataAssistant {
                 console.warn('ERROR::getChartOptions');
                 break;
         }
+    }
+
+
+    /// static function for dynamic updateData
+    static getOnegaugeData(angleArray, legendData) {
+
+        let offsetXArray = new Array(angleArray.length).fill(0)
+        if (offsetXArray.length % 2 === 0) {
+            let mid = Math.floor(offsetXArray.length / 2)
+            let rightPointer = mid
+            let leftPointer = mid - 1
+            if (offsetXArray.length >= 2) {
+                offsetXArray[rightPointer] = 15
+                offsetXArray[leftPointer] = -15
+            }
+            rightPointer = rightPointer + 1;
+            while (rightPointer < offsetXArray.length) {
+                offsetXArray[rightPointer] = offsetXArray[rightPointer - 1] + 30
+                rightPointer++;
+            }
+            while (leftPointer >= 0) {
+                offsetXArray[leftPointer] = offsetXArray[leftPointer + 1] + (-30)
+                leftPointer--;
+            }
+        } else {
+    
+            let mid = Math.floor(offsetXArray.length / 2)
+            let rightPointer = mid + 1
+            let leftPointer = mid - 1
+            while (rightPointer < offsetXArray.length) {
+                offsetXArray[rightPointer] = (rightPointer - mid) * 30
+                rightPointer++;
+            }
+            while (leftPointer >= 0) {
+                offsetXArray[leftPointer] = (mid - leftPointer) * (-30)
+                leftPointer--;
+            }
+        }
+        let gaugeData = []
+    
+        for (let i = 0; i < angleArray.length; i++) {
+            let gaugeDataItem = {
+                value: angleArray[i],
+                name: legendData[i],
+                title: {
+                    offsetCenter: [String(offsetXArray[i]) + '%', '50%']
+                },
+                detail: {
+                    offsetCenter: [String(offsetXArray[i]) + '%', '30%']
+                }
+            }
+            gaugeData.push(gaugeDataItem)
+        }
+        return gaugeData
+    
     }
 
 }

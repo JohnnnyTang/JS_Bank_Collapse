@@ -22,6 +22,7 @@
     "sass": "^1.71.1",
     "uuid": "^9.0.1",
     "vue": "^3.4.19",
+    "vue-drag-resize": "^1.5.4",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {

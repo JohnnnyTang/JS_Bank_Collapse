@@ -39,7 +39,7 @@ const props = defineProps({
 
 watch(props, (newV, oldV) => {
     // console.log(newV.selectedFeature.value.bankName);
-    console.log(newV.selectedFeature.value);
+    // console.log(newV.selectedFeature.value);
 })
 const featureUniformInfo = computed(() => {
 

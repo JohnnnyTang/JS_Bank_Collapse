@@ -1,22 +1,74 @@
 <template>
     <div class="monitor-chart-container">
-        <h2> GNSS::XMove-YMove-ZMove-TIME </h2>
-        <h2> inclinometer::XMove-YMove-PointNum-TIME </h2>
-        <h2> manometer::PointNum-Pressure-TIME </h2>
-        <h2> stress::stresshori-stressvert-pointNum-TIME </h2>
 
-
-        <div class="chart" id="chart"></div>
+        <div class="icon-container" @click="showMainPart = !showMainPart">
+            <div class="icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
+        </div>
+        <Transition name="slidefade">
+            <div v-show="showMainPart" class="main-part">
+                <button v-for="(option, index) in options" @click="showChart(option)" class="btn">
+                    {{ index }}
+                </button>
+                <div class="chart" id="chart"></div>
+            </div>
+        </Transition>
 
     </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import VueDragResize from 'vue-drag-resize/src'
+import { onMounted, watchEffect, ref, computed, watch } from 'vue';
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
 import 'echarts-gl';
-import { MonitorDataAssistant } from '../ChartData'
+import { MonitorDataAssistant } from './ChartData'
+
+const props = defineProps({
+    oneSpecMonitorMetaInfo: Object,
+})
+const options = ref([])
+const showMainPart = ref(false)
+const iconSrc = computed(() => {
+    return showMainPart.value ? './icons/resize.png' : './icons/watching.png'
+})
+
+let myChart
+let chartDom
+let dataAssitant
+
+// watchEffect(async () => {
+//     console.log(props);
+//     if (props.oneSpecMonitorMetaInfo) {
+//         console.log(props.oneSpecMonitorMetaInfo);
+//         dataAssitant = new MonitorDataAssistant(props.oneSpecMonitorMetaInfo)
+//         await dataAssitant.getMonitoringdata()
+//         dataAssitant.getProcessedDataObject()
+//         options.value = dataAssitant.getChartOptions()
+//     }
+// })
+
+watch(props, async (newV, oldV) => {
+    if (newV.oneSpecMonitorMetaInfo) {
+        myChart && myChart.clear()
+        console.log(newV.oneSpecMonitorMetaInfo);
+        dataAssitant = new MonitorDataAssistant(newV.oneSpecMonitorMetaInfo)
+        await dataAssitant.getMonitoringdata()
+        dataAssitant.getProcessedDataObject()
+        options.value = dataAssitant.getChartOptions().options
+        console.log(options.value);
+    }
+})
+
+const showChart = (opt) => {
+    if (myChart) {
+        myChart.clear()
+        myChart.setOption(opt)
+    } else {
+        console.log('chart not prepared');
+    }
+}
+
 
 onMounted(async () => {
     //////////for gnss
@@ -36,15 +88,14 @@ onMounted(async () => {
 
 
     /////////for manometer
-    let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
-    let oneManometer = new MonitorDataAssistant(manometerInfo[0])
-    await oneManometer.getMonitoringdata()
-    oneManometer.getProcessedDataObject()
-    oneManometer.getChartOptions()
+    // let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
+    // let oneManometer = new MonitorDataAssistant(manometerInfo[0])
+    // await oneManometer.getMonitoringdata()
+    // oneManometer.getProcessedDataObject()
+    // oneManometer.getChartOptions()
 
 
     /////////for stress
-
     // let stressInfo = (await BackEndRequest.getSpecMonitorInfo("4")).data
     // let oneStress = new MonitorDataAssistant(stressInfo[0])
     // await oneStress.getMonitoringdata()
@@ -52,23 +103,36 @@ onMounted(async () => {
     // oneStress.getChartOptions()
 
 
-    var chartDom = document.getElementById('chart');
-    var myChart = echarts.init(chartDom);
+    chartDom = document.getElementById('chart');
+    myChart = echarts.init(chartDom);
 
-    window.addEventListener("keydown", (e) => {
-        if (e.key == '1') {
-            myChart.clear()
-            myChart.setOption(oneStress.chartOptions.options[0])
-        }
-        if (e.key == '2') {
-            myChart.clear()
-            myChart.setOption(oneStress.chartOptions.options[1])
-        }
-        if (e.key == '3') {
-            myChart.clear()
-            myChart.setOption(oneStress.chartOptions.options[2])
-        }
-    })
+    // window.addEventListener("keydown", (e) => {
+    //     if (e.key == '1') {
+    //         myChart.clear()
+    //         let count = 1
+    //         myChart.setOption(oneStress.chartOptions.options[0])
+
+    //         setInterval(function () {
+    //             let gaugeData = MonitorDataAssistant.getOnegaugeData(oneStress.processedData.horizontalAngle[count], oneStress.processedData.legendData)
+    //             myChart.setOption({
+    //                 series: [
+    //                     {
+    //                         data: gaugeData
+    //                     }
+    //                 ]
+    //             });
+    //             count = (count + 1) % 10
+    //         }, 2000);
+    //     }
+    //     if (e.key == '2') {
+    //         myChart.clear()
+    //         myChart.setOption(oneStress.chartOptions.options[0])
+    //     }
+    //     if (e.key == '3') {
+    //         myChart.clear()
+    //         myChart.setOption(oneStress.chartOptions.options[1])
+    //     }
+    // })
 
     window.onresize = function () {
         myChart.resize();
@@ -152,28 +216,78 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .monitor-chart-container {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(164, 236, 247);
-    width: 100vw;
-    height: 92vh;
-    top: 8vh;
-    left: 0;
 
-    h2 {
-        color: azure;
-        font-weight: 700;
-        font-size: 20px;
-        line-height: 20px;
+    user-select: none;
+    background-color: rgb(0, 217, 255);
+
+    .icon-container {
+        position: absolute;
+        right: 2vw;
+        bottom: 10vh;
+        z-index: 10;
+
+        //size and border
+        width: 6.5vh;
+        height: 6.5vh;
+        background-color: rgb(255, 245, 245);
+        border-radius: 6vh;
+        //center
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .icon {
+            width: 5vh;
+            height: 5vh;
+            background-size: contain;
+            transition: 300ms;
+
+            &:hover {
+                cursor: pointer;
+            }
+
+            &:active {
+                transform: rotate3d(0, 1, 1, 15deg);
+                cursor: pointer;
+            }
+        }
+
     }
 
-    .chart {
-        width: 70vw;
-        height: 60vh;
-        background-color: aliceblue;
+    .main-part {
+        position: absolute;
+        right: 2vw;
+        bottom: 10vh;
+        //height: 25vh;
+        // width: 25vw;
+        padding: 10px;
+        background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
+
+        .btn {
+            border-radius: 10px;
+            background-color: white;
+            color: rgb(3, 3, 100);
+            font-weight: 600;
+        }
+
+        .chart {
+            width: 25vw;
+            height: 25vh;
+            background-color: aliceblue;
+        }
+    }
+
+
+
+
+    .slidefade-enter-active,
+    .slidefade-leave-active {
+        transition: opacity 300ms linear;
+    }
+
+    .slidefade-enter-from,
+    .slidefade-leave-to {
+        opacity: 0;
     }
 
 }

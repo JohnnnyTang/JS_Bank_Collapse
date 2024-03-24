@@ -138,7 +138,7 @@ const pulsing = {
 
             // Continuously repaint the map, resulting
             // in the smooth animation of the dot.
-            useMapStore().getMap().triggerRepaint();
+            // useMapStore().getMap().triggerRepaint();
 
             // Return `true` to let the map know that the image was updated.
             return true;
@@ -206,7 +206,7 @@ const pulsing = {
 
             // Continuously repaint the map, resulting
             // in the smooth animation of the dot.
-            useMapStore().getMap().triggerRepaint();
+            // useMapStore().getMap().triggerRepaint();
 
 
             // Return `true` to let the map know that the image was updated.
@@ -288,7 +288,7 @@ const pulsing = {
 
             // Continuously repaint the map, resulting
             // in the smooth animation of the dot.
-            useMapStore().getMap().triggerRepaint();
+            // useMapStore().getMap().triggerRepaint();
 
 
             // Return `true` to let the map know that the image was updated.
