@@ -50,6 +50,7 @@ const routes = [
         path: '/',
         component: () => import("../views/BankMainView.vue")
         // component:()=> import("../components/dataVisual/monitorDevice/monitorChart.vue")
+        // component: ()=> import("../components/dataVisual/test.vue")
     },
     {
         path: '/modelStore',

@@ -1,54 +1,51 @@
 <template>
     <div class="search-container" id="search-container">
         <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="false" :z="3" :w="0" :h="0" axis="y"> -->
-            <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
-                <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
-                <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
-                <!-- </el-tooltip> -->
-            </div>
+        <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
+            <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
+            <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
+            <!-- </el-tooltip> -->
+        </div>
 
-            <Transition name="slidefade">
-                <div class="search-container-main" v-show="showSearchMain">
-                    <div class="input-container">
-                        <input type="text" name="text" class="input" placeholder="要素检索" v-model="inputText">
-                        <span class="icon">
-                            <svg width="19px" height="19px" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    <path opacity="1" d="M14 5H20" stroke="#000" stroke-width="1.5"
-                                        stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <path opacity="1" d="M14 8H17" stroke="#000" stroke-width="1.5"
-                                        stroke-linecap="round" stroke-linejoin="round"></path>
-                                    <path
-                                        d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2"
-                                        stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    </path>
-                                    <path opacity="1" d="M22 22L20 20" stroke="#000" stroke-width="3.5"
-                                        stroke-linecap="round" stroke-linejoin="round"></path>
-                                </g>
-                            </svg>
-                        </span>
-                    </div>
-
-                    <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data"
-                        :props="defaultProps" :default-expand-all="false" :filter-node-method="filterNode"
-                        @node-click="selectedNodeHandler">
-
-                        <template #default="{ node, data }">
-                            <span class="custom-tree-node">
-                                <div class="leaf-node" v-if="node.isLeaf"></div>
-                                <span>{{ node.label }}</span>
-                                <span>
-                                    <a v-show="node.isLeaf"> 查看详情 </a>
-                                </span>
-                            </span>
-                        </template>
-
-                    </el-tree>
+        <Transition name="slidefade">
+            <div class="search-container-main" v-show="showSearchMain">
+                <div class="input-container">
+                    <input type="text" name="text" class="input" placeholder="要素检索" v-model="inputText">
+                    <span class="icon">
+                        <svg width="19px" height="19px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path opacity="1" d="M14 5H20" stroke="#000" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                <path opacity="1" d="M14 8H17" stroke="#000" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                                <path d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2"
+                                    stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                </path>
+                                <path opacity="1" d="M22 22L20 20" stroke="#000" stroke-width="3.5" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </g>
+                        </svg>
+                    </span>
                 </div>
-            </Transition>
+
+                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data" :props="defaultProps"
+                    :default-expand-all="false" :filter-node-method="filterNode" @node-click="selectedNodeHandler">
+
+                    <template #default="{ node, data }">
+                        <span class="custom-tree-node">
+                            <div class="leaf-node" v-if="node.isLeaf"></div>
+                            <span>{{ node.label }}</span>
+                            <span>
+                                <a v-show="node.isLeaf"> 查看详情 </a>
+                            </span>
+                        </span>
+                    </template>
+
+                </el-tree>
+            </div>
+        </Transition>
         <!-- </VueDragResize> -->
 
         <!-- <Transition name="'slidefade">
@@ -172,7 +169,7 @@ let popUp = undefined;
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
-        emit('selectedFeature',nodeProp.data)
+        emit('selectedFeature', nodeProp.data)
     }
 }
 
@@ -233,36 +230,42 @@ onMounted(async () => {
 
 })
 
-const x =()=>{
+const x = () => {
     console.log(document.getElementById(`search-container`).offsetWidth);
-    return document.getElementById(`search-container`).offsetWidth-20
+    return document.getElementById(`search-container`).offsetWidth - 20
 }
 
 const initDataByScene = (sceneInstance) => {
     let map = mapStore.getMap()
     let data = []
     let idCount = 0
-    sceneInstance.allLayers.forEach(layerID => {
-        let layerChildren = []
-        let layerItem = {
-            id: idCount++,
-            label: layerID,
-            children: []
-        }
-        let layerSourceId = map.getLayer(layerID).source
-        let geojsonFeatures = map.getSource(layerSourceId)['_data']['features']
-        geojsonFeatures.forEach((feat) => {
-            let item = {
+    console.log(sceneInstance.title);
+    if (sceneInstance.title == '预警岸段' ||
+        sceneInstance.title == '过江通道' ||
+        sceneInstance.title == '实时监测设备' ) {
+        sceneInstance.allLayers.forEach(layerID => {
+            let layerChildren = []
+            let layerItem = {
                 id: idCount++,
-                label: feat["properties"]["bankName"] ? feat["properties"]["bankName"] : feat["properties"]["name"],
-                children: [],
-                ...feat["properties"]
+                label: layerID,
+                children: []
             }
-            layerChildren.push(item)
+            let layerSourceId = map.getLayer(layerID).source
+            let geojsonFeatures = map.getSource(layerSourceId)['_data']['features']
+            geojsonFeatures.forEach((feat) => {
+                let item = {
+                    id: idCount++,
+                    label: feat["properties"]["bankName"] ? feat["properties"]["bankName"] : feat["properties"]["name"],
+                    children: [],
+                    ...feat["properties"]
+                }
+                layerChildren.push(item)
+            })
+            layerItem.children = layerChildren
+            data.push(layerItem)
         })
-        layerItem.children = layerChildren
-        data.push(layerItem)
-    })
+    }
+
 
 
     return data
@@ -279,6 +282,7 @@ const initDataByScene = (sceneInstance) => {
     position: absolute;
     right: 0vw;
     top: 0vh;
+
     .search-container-icon-container {
         position: absolute;
         right: 2.5vw;
@@ -439,7 +443,7 @@ const initDataByScene = (sceneInstance) => {
     }
 }
 
-:deep(.content-container){
+:deep(.content-container) {
     border: none;
 }
 

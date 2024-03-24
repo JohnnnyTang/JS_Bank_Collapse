@@ -23,7 +23,12 @@
     "uuid": "^9.0.1",
     "vue": "^3.4.19",
     "vue-drag-resize": "^1.5.4",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "@webgpu/types": "^0.1.40",
+    "d3-delaunay": "^6.0.4",
+    "d3-voronoi": "^1.1.4",
+    "earcut": "^2.2.4",
+    "hammerjs": "^2.0.8"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
