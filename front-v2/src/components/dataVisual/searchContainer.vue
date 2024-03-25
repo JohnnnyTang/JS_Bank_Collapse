@@ -12,7 +12,8 @@
                 <div class="input-container">
                     <input type="text" name="text" class="input" placeholder="要素检索" v-model="inputText">
                     <span class="icon">
-                        <svg width="19px" height="19px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="19px" height="19px" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                             <g id="SVGRepo_iconCarrier">
@@ -23,25 +24,28 @@
                                 <path d="M21 11.5C21 16.75 16.75 21 11.5 21C6.25 21 2 16.75 2 11.5C2 6.25 6.25 2 11.5 2"
                                     stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 </path>
-                                <path opacity="1" d="M22 22L20 20" stroke="#000" stroke-width="3.5" stroke-linecap="round"
-                                    stroke-linejoin="round"></path>
+                                <path opacity="1" d="M22 22L20 20" stroke="#000" stroke-width="3.5"
+                                    stroke-linecap="round" stroke-linejoin="round"></path>
                             </g>
                         </svg>
                     </span>
                 </div>
 
-                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data" :props="defaultProps"
+                <el-tree ref="treeRef" style="max-width: 400px" class="filter-tree" :data="data" :props="defaultProps"
                     :default-expand-all="false" :filter-node-method="filterNode" @node-click="selectedNodeHandler">
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <div class="leaf-node" v-if="node.isLeaf"></div>
+                            <div class="fat-node" v-else></div>
+
                             <span>{{ node.label }}</span>
-                            <span>
+                            <!-- <span class="det">
                                 <a v-show="node.isLeaf"> 查看详情 </a>
-                            </span>
+                            </span> -->
                         </span>
                     </template>
+
 
                 </el-tree>
             </div>
@@ -230,10 +234,6 @@ onMounted(async () => {
 
 })
 
-const x = () => {
-    console.log(document.getElementById(`search-container`).offsetWidth);
-    return document.getElementById(`search-container`).offsetWidth - 20
-}
 
 const initDataByScene = (sceneInstance) => {
     let map = mapStore.getMap()
@@ -242,7 +242,7 @@ const initDataByScene = (sceneInstance) => {
     console.log(sceneInstance.title);
     if (sceneInstance.title == '预警岸段' ||
         sceneInstance.title == '过江通道' ||
-        sceneInstance.title == '实时监测设备' ) {
+        sceneInstance.title == '实时监测设备') {
         sceneInstance.allLayers.forEach(layerID => {
             let layerChildren = []
             let layerItem = {
@@ -265,8 +265,6 @@ const initDataByScene = (sceneInstance) => {
             data.push(layerItem)
         })
     }
-
-
 
     return data
 }
@@ -373,6 +371,8 @@ const initDataByScene = (sceneInstance) => {
             }
         }
 
+
+
         .filter-tree {
             //background-color: rgb(215, 200, 231);
             //color: rgb(247, 1, 1);
@@ -401,6 +401,15 @@ const initDataByScene = (sceneInstance) => {
 
         }
 
+        .el-tree.filter-tree {
+            svg {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+
+
 
     }
 
@@ -416,6 +425,7 @@ const initDataByScene = (sceneInstance) => {
 }
 
 // question  ----not useful
+
 .mapboxgl-popup-close-button {
     display: none;
 }
@@ -424,28 +434,48 @@ const initDataByScene = (sceneInstance) => {
     background-color: red;
 }
 
+:deep().mapboxgl-popup.mapboxgl-popup-anchor-bottom{
+    display: none;
+}
+
+
 .custom-tree-node {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
+    justify-content: flex-start;
+    font-size: calc(0.5vh + 0.5vw);
     padding-right: 8px;
 
+    /*
     .leaf-node {
-        position: absolute;
-        left: 1vw;
-        //width: 0.5vw;
-        //height: 0.5vw;
-        //border-radius: 1vw;
-        //background-color: rgb(30, 31, 30);
-        //line-height: 1vw;
+        width: calc(0.5vh + 0.5vw);
+        height: calc(0.5vh + 0.5vw);
+        background: url('/icons/minus.png');
+        background-size: contain;
+        line-height: 12px;
+        margin-right: 5px;
+        //z-index: 999;
+    }
+    */
+    
+    .fat-node {
+        width: calc(0.5vh + 0.5vw);
+        height: calc(0.5vh + 0.5vw);
+        background: url('/icons/add.png');
+        background-size: contain;
+        line-height: 12px;
+        margin-right: 5px;
+    }
+    .det{
+        right: 1vw;
     }
 }
 
 :deep(.content-container) {
     border: none;
 }
+
 
 .el-tree {
     color: #152478;
@@ -464,5 +494,42 @@ const initDataByScene = (sceneInstance) => {
 
 :deep(.el-tree-node .is-focusable) {
     background-color: #c1f4fc;
+}
+
+:deep().el-tree .el-tree-node__expand-icon.expanded {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+
+/* //有子节点 且未展开 */
+:deep().el-tree .el-tree-node.is-focusable .el-tree-node__expand-icon:before {
+    background: url('/icons/beach.png') no-repeat 0 3px;
+    content: '';
+    display: block;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    background-size: 16px;
+    padding-right: 18px;
+}
+
+/* //有子节点 且已展开 */
+:deep().el-tree .is-expanded .el-tree-node__expand-icon.expanded:before {
+    background: url('/icons/gate.png') no-repeat 0 3px;
+    content: '';
+    display: block;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    background-size: 16px;
+    padding-right: 18px;
+}
+
+:deep().el-tree-node__expand-icon.is-leaf {
+    display: none;
+}
+
+:deep() .el-icon {
+    display: none;
 }
 </style>

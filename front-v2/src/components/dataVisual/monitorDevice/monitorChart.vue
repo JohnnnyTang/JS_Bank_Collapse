@@ -4,15 +4,23 @@
         <div class="icon-container" @click="showMainPart = !showMainPart">
             <div class="icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
         </div>
-        <Transition name="slidefade">
-            <div v-show="showMainPart" class="main-part">
-                <button v-for="(option, index) in options" @click="showChart(option)" class="btn">
-                    {{ index }}
-                </button>
-                <div class="chart" id="chart"></div>
-            </div>
-        </Transition>
+        <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="false" :z="3" :w="0" :h="0" :x="1100":y="500"> -->
 
+            <Transition name="slidefade">
+
+                <div v-show="showMainPart" class="main-part">
+
+                    <div class="title">实时监测数据</div>
+                    <div class="buttons">
+                        <div class="button" v-for="(option, index) in options" @click="showChart(option)">
+                            {{ index }}
+                        </div>
+                    </div>
+
+                    <div class="chart" id="chart"></div>
+                </div>
+            </Transition>
+        <!-- </VueDragResize> -->
     </div>
 </template>
 
@@ -56,7 +64,7 @@ watch(props, async (newV, oldV) => {
         await dataAssitant.getMonitoringdata()
         dataAssitant.getProcessedDataObject()
         options.value = dataAssitant.getChartOptions().options
-        console.log(options.value);
+        console.log(dataAssitant);
     }
 })
 
@@ -76,7 +84,8 @@ onMounted(async () => {
     // let oneGnss = new MonitorDataAssistant(gnssMonitorInfo[0])
     // await oneGnss.getMonitoringdata()
     // oneGnss.getProcessedDataObject()
-    // oneGnss.getChartOptions()
+    // options.value = oneGnss.getChartOptions().options
+    // console.log(oneGnss);
 
     /////////for inclinometer 
     // let inclinometerInfo = (await BackEndRequest.getSpecMonitorInfo("2")).data
@@ -218,8 +227,14 @@ onMounted(async () => {
 .monitor-chart-container {
 
     user-select: none;
-    background-color: rgb(0, 217, 255);
 
+    //background-color: rgb(0, 217, 255);
+    /*
+    position: absolute ;
+    width: 100%;
+    height: 92vh;
+    pointer-events: none;
+*/
     .icon-container {
         position: absolute;
         right: 2vw;
@@ -256,24 +271,54 @@ onMounted(async () => {
 
     .main-part {
         position: absolute;
-        right: 2vw;
-        bottom: 10vh;
-        //height: 25vh;
-        // width: 25vw;
-        padding: 10px;
-        background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
 
-        .btn {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
+        height: auto;
+        width: auto;
+        padding: 10px;
+        //background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
+        background: #FFFFFF;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+
+
+        .title {
+            font-size: calc(1vw + 1vh);
+            font-weight: 500;
+            color: #FFFFFF;
+            text-shadow: 2px 2px 0 #4074b5, 2px -2px 0 #4074b5, -2px 2px 0 #4074b5, -2px -2px 0 #4074b5, 2px 0px 0 #4074b5, 0px 2px 0 #4074b5, -2px 0px 0 #4074b5, 0px -2px 0 #4074b5;
+
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
+
+        .button {
             border-radius: 10px;
-            background-color: white;
+            background-color: rgb(236, 234, 234);
+            width: auto;
+            height: 20px;
+            padding: 10px;
+            margin: 20px;
+            box-shadow: rgb(38, 57, 77) 0px 5px 10px -2px;
             color: rgb(3, 3, 100);
+            font-size: 20px;
+            line-height: 20px;
             font-weight: 600;
         }
 
         .chart {
-            width: 25vw;
-            height: 25vh;
-            background-color: aliceblue;
+            width: 28vw;
+            height: 35vh;
+            background-color: rgb(255, 255, 255);
         }
     }
 

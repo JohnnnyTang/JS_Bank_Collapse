@@ -1,6 +1,7 @@
 import BackEndRequest from '../../../api/backend'
 import * as echarts from 'echarts'
 import 'echarts-gl';
+import ecStat from 'echarts-stat';
 import dayjs from 'dayjs'
 
 ///////////toolset
@@ -16,25 +17,47 @@ const timeFormat = (time) => {
 const radius = (x, y, z) => {
     return Math.sqrt(x * x + y * y + z * z)
 }
+
+const value2time = (value, startTime) => {
+    let realTime = startTime.add(value, 'second')
+    return timeFormat(realTime)
+}
+
+
 //////////data process func
 const generateData_GNSS = (ogDataArray) => {
     let data = []
+    let time_xMove_scater_data = []
+    let time_yMove_scater_data = []
+    let time_zMove_scater_data = []
+    let ratio = []
+
     let xMoveRange = [999, -999]
     let yMoveRange = [999, -999]
+    let zMoveRange = [999, -999]
     let radiusRange = [999, -999]
+    let ratioRange = [999, -999]
+
+
     let showCount = ogDataArray.length
-    showCount = 50;//50 IS ENOUGH
+    showCount = 20;//50 IS ENOUGH
     let endTime = time(ogDataArray[0].measureTime);
     let startTime = time(ogDataArray[showCount].measureTime);
     for (let i = 0; i < showCount; i++) {
         if (ogDataArray[i].XMove < xMoveRange[0])
             xMoveRange[0] = ogDataArray[i].XMove
-        if (ogDataArray[i].xMoveRange > xMoveRange[1])
+        if (ogDataArray[i].xMove > xMoveRange[1])
             xMoveRange[1] = ogDataArray[i].XMove
         if (ogDataArray[i].YMove < yMoveRange[0])
             yMoveRange[0] = ogDataArray[i].YMove
         if (ogDataArray[i].YMove > yMoveRange[1])
             yMoveRange[1] = ogDataArray[i].YMove
+        if (ogDataArray[i].ZMove < zMoveRange[0])
+            zMoveRange[0] = ogDataArray[i].ZMove
+        if (ogDataArray[i].zMove > zMoveRange[1])
+            zMoveRange[1] = ogDataArray[i].ZMove
+
+
         let thisradius = radius(ogDataArray[i].XMove, ogDataArray[i].YMove, ogDataArray[i].ZMove)
         if (thisradius < radiusRange[0])
             radiusRange[0] = thisradius
@@ -43,14 +66,35 @@ const generateData_GNSS = (ogDataArray) => {
         let thistime = time(ogDataArray[i].measureTime)
         let deltaSeconds = timeDif(startTime, thistime)
         data.push([ogDataArray[i].XMove, ogDataArray[i].YMove, ogDataArray[i].ZMove, deltaSeconds])
+        time_xMove_scater_data.push([deltaSeconds, ogDataArray[i].XMove])
+        time_yMove_scater_data.push([deltaSeconds, ogDataArray[i].YMove])
+        time_zMove_scater_data.push([deltaSeconds, ogDataArray[i].ZMove])
+        if (i < showCount - 1) {
+            let nxtRadius = radius(ogDataArray[i + 1].XMove, ogDataArray[i + 1].YMove, ogDataArray[i + 1].ZMove)
+            let nxtDeletaSeconds = timeDif(startTime, time(ogDataArray[i + 1].measureTime))
+            let thisRatio = [ogDataArray[i].measureTime, (nxtRadius - thisradius) / (nxtDeletaSeconds - deltaSeconds)]
+            ratio.push(thisRatio)
+            if (thisRatio[1] < ratioRange[0])
+                ratioRange[0] = thisRatio[1]
+            if (thisRatio[1] > ratioRange[1])
+                ratioRange[1] = thisRatio[1]
+        }
     }
     return {
         xMoveRange,
         yMoveRange,
+        zMoveRange,
+        ratioRange,
         radiusRange,
         startTime,
         endTime,
-        data
+        data,
+        ratio,
+        scatterData: {
+            time_xMove_scater_data,
+            time_yMove_scater_data,
+            time_zMove_scater_data
+        }
     }
 }
 const generateData_Incline = (ogDataArray, metaData) => {
@@ -357,11 +401,220 @@ const generateOptions_GNSS = (processedData) => {
             },
         ]
     };
+
+    const regressionX = ecStat.regression("polynomial", processedData.scatterData.time_xMove_scater_data, 7)
+    const regressionY = ecStat.regression("polynomial", processedData.scatterData.time_yMove_scater_data, 7)
+    const regressionZ = ecStat.regression("polynomial", processedData.scatterData.time_zMove_scater_data, 7)
+
+    // scatter 
+    let optionScatter = {
+        title: {
+            text: 'GNSS-XYZ-位移时间曲线',
+            left: 'center',
+            top: 5,
+        },
+        grid: {
+            x: 30,
+            y: 90,
+            x2: 30,
+            y2: 30,
+            borderWidth: 1
+        },
+        xAxis: {
+            type: 'value',
+            show: true,
+            axisLabel: {
+                formatter: (value) => {
+                    return value2time(value, processedData.startTime)
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            show: true
+        },
+        legend: {
+            orient: 'horizontal',
+            align: 'left',
+            top: '40',
+            itemWidth: 8,
+            itemHeight: 8,
+            y: '20',
+            x: 'center',
+            formatter: (name) => {
+                return `{b|${name}} `;
+            },
+            textStyle: {
+                color: '#999999',
+                fontSize: 12,
+                align: 'left',
+                backgroundColor: "transparent",
+                rich: {
+                    b: {
+                        width: 150,
+                    },
+                },
+            },
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            }
+        },
+        series: [
+            {
+                symbolSize: 15,
+                name: 'XMove',
+                type: 'scatter',
+                data: processedData.scatterData.time_xMove_scater_data,
+                itemStyle: {
+                    color: '#FFEE58'
+                }
+            },
+            {
+                symbolSize: 15,
+                name: 'YMove',
+                type: 'scatter',
+                data: processedData.scatterData.time_yMove_scater_data,
+                itemStyle: {
+                    color: '#9CCC65'
+                }
+            },
+            {
+                symbolSize: 15,
+                name: 'ZMove',
+                type: 'scatter',
+                data: processedData.scatterData.time_zMove_scater_data,
+                itemStyle: {
+                    color: '#1976D2'
+                }
+            },
+            {
+                type: 'line',
+                name: 'XMove回归',
+                data: regressionX.points,
+                smooth: true,
+                symbolSize: 5,
+                itemStyle: {
+                    color: '#AAA041'
+                },
+                symbol: 'triangle',
+            },
+            {
+                type: 'line',
+                name: 'YMove回归',
+                data: regressionY.points,
+                smooth: true,
+                symbolSize: 5,
+                itemStyle: {
+                    color: '#7AA04E'
+                },
+                symbol: 'triangle',
+            },
+            {
+                type: 'line',
+                name: 'ZMove回归',
+                data: regressionZ.points,
+                smooth: true,
+                symbolSize: 5,
+                itemStyle: {
+                    color: '#0B437B'
+                },
+                symbol: 'triangle',
+            },
+        ]
+
+    }
+
+    // ratio
+    let optionRatio = {
+        tooltip: {
+            trigger: 'axis',
+            position: function (pt) {
+                return [pt[0], '10%'];
+            }
+        },
+        title: {
+            left: 'center',
+            text: 'GNSS综合位移变率'
+        },
+        grid: {
+            show: false,
+            left: '15%'
+        },
+        visualMap: [
+            {
+                show: true,
+                itemGap: 0,
+                top: 'middle',
+                left: '2%',
+                itemSymbol: 'rect',
+                type: 'piecewise',
+                text: [`${processedData.ratioRange[1].toFixed(4)}`, `${processedData.ratioRange[0].toFixed(4)}`],
+                realtime: false,
+                calculable: true,
+                seriesIndex: 0,
+                splitNumver: 6,
+                pieces: [
+                    { gt: 0.9, lte: 10, label: "", color: "#03071e" },
+                    { gt: 0.8, lte: 0.9, label: "", color: "#370617" },
+                    { gt: 0.7, lte: 0.8, label: "", color: "#6a040f" },
+                    { gt: 0.6, lte: 0.7, label: "", color: "#9d0208" },
+                    { gt: 0.5, lte: 0.6, label: "", color: "#d00000" },
+                    { gt: 0.4, lte: 0.5, label: "", color: "#dc2f02" },
+                    { gt: 0.3, lte: 0.4, label: "", color: "#e85d04" },
+                    { gt: 0.2, lte: 0.3, label: "", color: "#f48c06" },
+                    { gt: 0.1, lte: 0.2, label: "", color: "#faa307" },
+                    { gt: 0, lte: 0.1, label: "", color: "#ffba08" },
+                    { gt: -0.1, lte: 0, label: "", color: "#ffba08" },
+                    { gt: -0.2, lte: -0.1, label: "", color: "#faa307" },
+                    { gt: -0.3, lte: -0.2, label: "", color: "#f48c06" },
+                    { gt: -0.4, lte: -0.3, label: "", color: "#e85d04" },
+                    { gt: -0.5, lte: -0.4, label: "", color: "#dc2f02" },
+                    { gt: -0.6, lte: -0.5, label: "", color: "#d00000" },
+                    { gt: -0.7, lte: -0.6, label: "", color: "#9d0208" },
+                    { gt: -0.8, lte: -0.7, label: "", color: "#6a040f" },
+                    { gt: -0.9, lte: -0.8, label: "", color: "#370617" },
+                    { gt: -10, lte: -0.9, label: "", color: "#03071e" }
+                ]
+            },
+        ],
+        toolbox: {
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'time',
+            axisLabel: {
+                formatter: function (value) {
+                    return echarts.format.formatTime('hh:ss', value);
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%']
+        },
+        series: [
+            {
+                name: '位移变率',
+                type: 'line',
+                smooth: true,
+                symbol: 'none',
+                data: processedData.ratio
+            }
+        ]
+    };
+
+
     return {
-        option2dline,
-        option3Dline,
-        option3Dcube,
-        options: [option2dline, option3Dline, option3Dcube]
+        options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
     }
 }
 
@@ -749,7 +1002,7 @@ class MonitorDataAssistant {
                 leftPointer--;
             }
         } else {
-    
+
             let mid = Math.floor(offsetXArray.length / 2)
             let rightPointer = mid + 1
             let leftPointer = mid - 1
@@ -763,7 +1016,7 @@ class MonitorDataAssistant {
             }
         }
         let gaugeData = []
-    
+
         for (let i = 0; i < angleArray.length; i++) {
             let gaugeDataItem = {
                 value: angleArray[i],
@@ -778,7 +1031,7 @@ class MonitorDataAssistant {
             gaugeData.push(gaugeDataItem)
         }
         return gaugeData
-    
+
     }
 
 }
