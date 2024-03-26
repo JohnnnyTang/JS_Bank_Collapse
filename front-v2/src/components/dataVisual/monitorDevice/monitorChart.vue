@@ -36,7 +36,7 @@ const props = defineProps({
     oneSpecMonitorMetaInfo: Object,
 })
 const options = ref([])
-const showMainPart = ref(false)
+const showMainPart = ref(true)
 const iconSrc = computed(() => {
     return showMainPart.value ? './icons/resize.png' : './icons/watching.png'
 })
@@ -88,21 +88,25 @@ onMounted(async () => {
     // console.log(oneGnss);
 
     /////////for inclinometer 
-    let inclinometerInfo = (await BackEndRequest.getSpecMonitorInfo("2")).data
-    let oneInclinometer = new MonitorDataAssistant(inclinometerInfo[0])
-    await oneInclinometer.getMonitoringdata()
-    oneInclinometer.getProcessedDataObject()
-    options.value = oneInclinometer.getChartOptions().options
-    console.log(oneInclinometer);
+    // let inclinometerInfo = (await BackEndRequest.getSpecMonitorInfo("2")).data
+    // let oneInclinometer = new MonitorDataAssistant(inclinometerInfo[0])
+    // await oneInclinometer.getMonitoringdata()
+    // oneInclinometer.getProcessedDataObject()
+    // options.value = oneInclinometer.getChartOptions().options
+    // console.log(oneInclinometer);
 
 
 
-    /////////for manometer
-    // let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
-    // let oneManometer = new MonitorDataAssistant(manometerInfo[0])
-    // await oneManometer.getMonitoringdata()
-    // oneManometer.getProcessedDataObject()
-    // oneManometer.getChartOptions()
+    ///////for manometer
+    let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
+    let oneManometer = new MonitorDataAssistant(manometerInfo[0])
+    await oneManometer.getMonitoringdata()
+    oneManometer.getProcessedDataObject()
+    options.value = oneManometer.getChartOptions().options
+    console.log(oneManometer);
+
+  
+
 
 
     /////////for stress
@@ -115,6 +119,25 @@ onMounted(async () => {
 
     chartDom = document.getElementById('chart');
     myChart = echarts.init(chartDom);
+
+
+    function run(i) {
+        console.log(i);
+        myChart&&myChart.setOption({
+            series: [
+                {
+                    type: 'bar',
+                    name: oneManometer.processedData.depth_value_time[i],
+                    data: oneManometer.processedData.pressureArrBytime[i],
+                }
+            ]
+        });
+    }
+    let count = 1;
+    setInterval(function () {
+        run(count);
+        count = (count + 1) % 8
+    }, 3000);
 
     // window.addEventListener("keydown", (e) => {
     //     if (e.key == '1') {

@@ -159,11 +159,16 @@ const generateData_Manometer = (ogDataArray, metaData) => {
     let depthArray = []
     let legendData = []
     let pressureData_river = []
-    let showCount = 10   //50enough
+    let showCount = 8   //50enough
+
+    let depth_value_data = []
+    let depth_value_time = []
 
     let Depth_Data_Map = new Map()
     let Depth_Data = []
     let measureTime = []
+
+    let pressureArrBytime = []
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
@@ -171,6 +176,8 @@ const generateData_Manometer = (ogDataArray, metaData) => {
         Depth_Data.push([])
     }
     for (let i = 0; i < showCount; i++) {
+        let depth_data_item = []
+        let pressureOnetime = []
         for (let j = 0; j < pointNum; j++) {
             let item = []
             item.push(ogDataArray[i][`measureTime`])
@@ -178,9 +185,13 @@ const generateData_Manometer = (ogDataArray, metaData) => {
             item.push(legendData[j])
             pressureData_river.push(item)
             Depth_Data[j].push(ogDataArray[i][`pressure${j + 1}`])
+            depth_data_item.push([ogDataArray[i][`pressure${j + 1}`], depthArray[j]])
+            pressureOnetime.push(ogDataArray[i][`pressure${j + 1}`])
         }
         measureTime.push(timeFormat(time(ogDataArray[i][`measureTime`])))
-
+        depth_value_time.push(ogDataArray[i][`measureTime`])
+        depth_value_data.push(depth_data_item)
+        pressureArrBytime.push(pressureOnetime)
     }
     for (let i = 1; i <= pointNum; i++) {
         Depth_Data_Map.set(legendData[i - 1], Depth_Data[i - 1])
@@ -190,7 +201,10 @@ const generateData_Manometer = (ogDataArray, metaData) => {
         legendData,
         pressureData_river,
         Depth_Data_Map,
-        measureTime
+        measureTime,
+        depth_value_data,
+        depth_value_time,
+        pressureArrBytime
     }
 }
 const generateData_Stress = (ogDataArray, metaData) => {
@@ -876,24 +890,49 @@ const generateOptions_Incline = (processedData) => {
         xAxis: [
             {
                 type: 'value',
-                gridIndex: 0
+                gridIndex: 0,
+                name: '偏移量',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
             },
             {
                 type: 'value',
-                gridIndex: 1
+                gridIndex: 1,
+                name: '偏移量',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
             }
         ],
         yAxis: [
             {
                 type: 'value',
                 scale: true,
-                gridIndex: 0
-
+                gridIndex: 0,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
             },
             {
                 type: 'value',
                 scale: true,
-                gridIndex: 1
+                gridIndex: 1,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
 
             }
         ],
@@ -1067,15 +1106,124 @@ const generateOptions_Manometer = (processedData) => {
         }
     };
 
-    let optionBarSort = {
-
+    let optionDepthSeries = []
+    for (let i = 0; i < processedData.depth_value_time.length; i++) {
+        let seriesItem = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            data: processedData.depth_value_data[i]
+        }
+        optionDepthSeries.push(seriesItem)
     }
 
+
+    let optionDepthValue = {
+        title: {
+            text: "孔隙水压力计-压力深度曲线",
+            left: 'center'
+        },
+        grid: {
+            x: 30,
+            y: 90,
+            x2: 30,
+            y2: 10,
+            borderWidth: 1
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: {
+            type: 'value',
+            position: 'top',
+            nameLocation: 'middle',
+            name: '水压力(mPa)',
+            scale: true,
+            axisLabel: {
+                margin: 3,
+            }
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+            inverse: true,
+            nameLocation: 'middle',
+            name: '深度(m)',
+            axisLabel: {
+                margin: 3,
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: optionDepthSeries
+    }
+
+    let optionDynamicBar = {
+        grid: {
+            top: 40,
+            left: 50,
+            right: 70,
+            bottom: 50
+        },
+        xAxis: {
+            max: 'dataMax',
+            name: '水压力(mPa)',
+            nameLocation:'middle',
+            axisLabel:{
+                margin:3
+            }
+        },
+        yAxis: {
+            type: 'category',
+            name: '深度(m)',
+            nameLocation:'start',
+            data: processedData.legendData,
+            inverse: true,
+            animationDuration: 300,
+            animationDurationUpdate: 300,
+        },
+        series: [
+            {
+                realtimeSort: true,
+                name: processedData.depth_value_time[0],
+                type: 'bar',
+                data: processedData.pressureArrBytime[0],
+                label: {
+                    show: true,
+                    position: 'right',
+                    valueAnimation: true
+                },
+                showBackground: true,
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                        { offset: 0, color: '#83bff6' },
+                        { offset: 0.8, color: '#188df0' },
+                        { offset: 1, color: '#188df0' }
+                    ])
+                },
+            }
+        ],
+        tooltip: {
+
+        },
+        legend: {
+            show: true
+        },
+        animationDuration: 0,
+        animationDurationUpdate: 3000,
+        animationEasing: 'linear',
+        animationEasingUpdate: 'linear'
+    };
+
+
     return {
-        optionRiver,
-        optionPolarStack,
-        optionBarSort,
-        options: [optionRiver, optionPolarStack, optionBarSort]
+        options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar]
     }
 
 }
