@@ -6,20 +6,20 @@
         </div>
         <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="false" :z="3" :w="0" :h="0" :x="1100":y="500"> -->
 
-            <Transition name="slidefade">
+        <Transition name="slidefade">
 
-                <div v-show="showMainPart" class="main-part">
+            <div v-show="showMainPart" class="main-part">
 
-                    <div class="title">实时监测数据</div>
-                    <div class="buttons">
-                        <div class="button" v-for="(option, index) in options" @click="showChart(option)">
-                            {{ index }}
-                        </div>
+                <div class="title">实时监测数据</div>
+                <div class="buttons">
+                    <div class="button" v-for="(option, index) in options" @click="showChart(option)">
+                        {{ index }}
                     </div>
-
-                    <div class="chart" id="chart"></div>
                 </div>
-            </Transition>
+
+                <div class="chart" id="chart"></div>
+            </div>
+        </Transition>
         <!-- </VueDragResize> -->
     </div>
 </template>
@@ -88,11 +88,12 @@ onMounted(async () => {
     // console.log(oneGnss);
 
     /////////for inclinometer 
-    // let inclinometerInfo = (await BackEndRequest.getSpecMonitorInfo("2")).data
-    // let oneInclinometer = new MonitorDataAssistant(inclinometerInfo[0])
-    // await oneInclinometer.getMonitoringdata()
-    // oneInclinometer.getProcessedDataObject()
-    // oneInclinometer.getChartOptions()
+    let inclinometerInfo = (await BackEndRequest.getSpecMonitorInfo("2")).data
+    let oneInclinometer = new MonitorDataAssistant(inclinometerInfo[0])
+    await oneInclinometer.getMonitoringdata()
+    oneInclinometer.getProcessedDataObject()
+    options.value = oneInclinometer.getChartOptions().options
+    console.log(oneInclinometer);
 
 
 
@@ -292,7 +293,7 @@ onMounted(async () => {
             font-weight: 500;
             color: #FFFFFF;
             text-shadow: 2px 2px 0 #4074b5, 2px -2px 0 #4074b5, -2px 2px 0 #4074b5, -2px -2px 0 #4074b5, 2px 0px 0 #4074b5, 0px 2px 0 #4074b5, -2px 0px 0 #4074b5, 0px -2px 0 #4074b5;
-
+            letter-spacing: 0.2vw;
         }
 
         .buttons {

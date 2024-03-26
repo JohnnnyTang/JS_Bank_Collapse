@@ -103,14 +103,23 @@ const generateData_Incline = (ogDataArray, metaData) => {
     let legendData = []
     let xMovedata = []
     let yMovedata = []
+    let depth_value_data_x = []
+    let depth_value_data_y = []
+    let depth_value_data_3d = []
 
-    let showCount = 20   //50enough
+    let depth_value_time = []
+
+    let showCount = 5   //50enough
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
         legendData.push(String(metaData[`point${i}Depth`] + 'm'))
     }
     for (let i = 0; i < showCount; i++) {
+        let onetime_depth_value_data_x = []
+        let onetime_depth_value_data_y = []
+        let onetime_depth_value_time = null
+        let onetime_depth_value_data_3d = []
         for (let j = 0; j < pointNum; j++) {
             let item = []
             item.push(ogDataArray[i][`measureTime`])
@@ -122,13 +131,27 @@ const generateData_Incline = (ogDataArray, metaData) => {
             item2.push(legendData[j])
             xMovedata.push(item)
             yMovedata.push(item2)
+
+            onetime_depth_value_data_x.push([ogDataArray[i][`XMove${j + 1}`], depthArray[j]])
+            onetime_depth_value_data_y.push([ogDataArray[i][`YMove${j + 1}`], depthArray[j]])
+            onetime_depth_value_data_3d.push([ogDataArray[i][`XMove${j + 1}`], ogDataArray[i][`YMove${j + 1}`], depthArray[j]])
         }
+        onetime_depth_value_time = (ogDataArray[i]['measureTime'])
+
+        depth_value_data_x.push(onetime_depth_value_data_x)
+        depth_value_data_y.push(onetime_depth_value_data_y)
+        depth_value_data_3d.push(onetime_depth_value_data_3d)
+        depth_value_time.push(onetime_depth_value_time)
     }
 
     return {
         legendData,
         xMovedata,
-        yMovedata
+        yMovedata,
+        depth_value_data_x,
+        depth_value_data_y,
+        depth_value_data_3d,
+        depth_value_time
     }
 }
 const generateData_Manometer = (ogDataArray, metaData) => {
@@ -721,11 +744,233 @@ const generateOptions_Incline = (processedData) => {
             }
         ]
     };
-    // 动态柱状排序？
+
+    let depth_value_x_series = []
+    let depth_value_y_series = []
+    let depth_value_3d_series = []
+    for (let i = 0; i < processedData.depth_value_time.length; i++) {
+        let seriesItemX = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: processedData.depth_value_data_x[i]
+        }
+        depth_value_x_series.push(seriesItemX)
+        let seriesItemY = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data: processedData.depth_value_data_y[i]
+        }
+        depth_value_y_series.push(seriesItemY)
+        let serieItem3d = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line3D',
+            data: processedData.depth_value_data_3d[i],
+            smooth: true,
+            lineStyle: {
+                width: 3
+            }
+        }
+        depth_value_3d_series.push(serieItem3d)
+    }
+
+    // 深度 偏移曲线
+    let depth_value_xOption = {
+        title: {
+            text: "测斜仪-X向偏移曲线",
+            left: 'center'
+        },
+        grid: {
+            x: 30,
+            y: 90,
+            x2: 30,
+            y2: 30,
+            borderWidth: 1
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: {
+            type: 'value'
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_x_series
+
+    }
+    let depth_value_yOption = {
+        title: {
+            text: "测斜仪-Y向偏移曲线",
+            left: 'center'
+        },
+        grid: {
+            x: 30,
+            y: 90,
+            x2: 30,
+            y2: 30,
+            borderWidth: 1
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: {
+            type: 'value'
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_y_series
+    }
+    let depth_value_x_y_Option = {
+        color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
+        title: [{
+            text: '测斜仪-X向偏移曲线',
+            left: '10%'
+        }, {
+            text: '测斜仪-Y向偏移曲线',
+            right: '10%' // 设置第二个标题在右边
+        }],
+        grid: [{
+            left: '3%',
+            right: '55%',
+            top: 90,
+            bottom: 30,
+            containLabel: true
+        }, {
+            left: '58%',
+            right: '5%',
+            top: 90,
+            bottom: 30,
+            containLabel: true
+        }],
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: [
+            {
+                type: 'value',
+                gridIndex: 0
+            },
+            {
+                type: 'value',
+                gridIndex: 1
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 0
+
+            },
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 1
+
+            }
+        ],
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_x_series
+    };
+
+    // 合并另一个图表的 series 到 option 中
+    depth_value_x_y_Option.series.push(...depth_value_y_series);
+
+
+    //3d 深度偏移曲线
+    let option3Dline = {
+        title: {
+            text: "测斜仪-三维偏移曲线",
+            left: 'center'
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        tooltip: {},
+        type: 'continuous',
+        // visualMap: {
+        //     show: false,
+        //     dimension: 3,
+        //     min: 0,
+        //     max: timeDif(processedData.startTime, processedData.endTime),
+        //     inRange: {
+        //         color: [
+        //             '#313695',
+        //             '#4575b4',
+        //             '#74add1',
+        //             '#abd9e9',
+        //             '#e0f3f8',
+        //             '#ffffbf',
+        //             '#fee090',
+        //             '#fdae61',
+        //             '#f46d43',
+        //             '#d73027',
+        //             '#a50026'
+        //         ],
+        //         opacity: [0.5, 1.0]
+        //     }
+        // },
+        xAxis3D: {
+            type: 'value',
+            min: 'dataMin'
+        },
+        yAxis3D: {
+            type: 'value',
+            min: 'dataMin'
+        },
+        zAxis3D: {
+            type: 'value',
+            min: 'dataMin'
+        },
+        grid3D: {
+            top: 40, // 调整上边距
+            bottom: 0,
+            height: 300,
+            viewControl: {
+                projection: 'orthographic'
+            }
+        },
+        series: depth_value_3d_series
+    };
+
+
     return {
         xMoveOption,
         yMoveOption,
-        options: [xMoveOption, yMoveOption]
+        options: [xMoveOption, yMoveOption, option3Dline, depth_value_x_y_Option]
     }
 }
 
