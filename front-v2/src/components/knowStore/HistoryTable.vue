@@ -217,7 +217,7 @@ div.history-table-container {
     margin-left: 3vw;
     margin-bottom: 1.5vh;
 
-    border-radius: 1rem;
+    border-radius: 4px;
     box-shadow: 0px 8px 40px -10px rgba(0, 0, 0, 0.8);
     overflow: hidden;
 
@@ -229,7 +229,7 @@ div.history-table-container {
         background-color: rgb(240, 248, 255);
         border-top-right-radius: 1rem;
         border-top-left-radius: 1rem;
-        border-bottom: inset 4px rgb(0, 0, 180);
+        border-bottom: inset 4px rgb(0, 11, 75);
 
         display: flex;
         flex-flow: row nowrap;
@@ -253,7 +253,7 @@ div.history-table-container {
             font-weight: 600;
             font-size: calc(1.2vw + 0.6vh);
 
-            background: linear-gradient(to right, #4570e8 0%, #12339e 100%);
+            background: linear-gradient(to right, #1452fa 0%, #002292 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -337,12 +337,13 @@ div.history-table-container {
 }
 
 :deep(.el-table .el-table__cell) {
-    border-right: 2px inset #739efc;
+    // border-right: 2px inset #739efc;
+    border: 1px inset #739efc;
 }
 
 :deep(.el-table thead th.el-table__cell) {
     color: #f8faff;
-    background: rgba(51, 39, 212, 0.897);
+    background: rgb(0, 16, 158);
     font-size: calc(0.7vw + 0.4vh);
     height: 3vh;
     border-right: inset 2px #157acc;
@@ -379,7 +380,7 @@ div.history-table-container {
 :deep(.el-table tbody tr) {
     transition: all 0.6s cubic-bezier(0.68, -0.45, 0.265, 1.45);
     height: fit-content;
-    border-radius: 8px;
+    border-radius: 4px;
     div.cell {
         text-align: center;
         height: fit-content;
@@ -394,7 +395,7 @@ div.history-table-container {
 }
 
 :deep(.el-table tbody tr:nth-child(2n)) {
-    color: hsl(224, 79%, 33%);
+    color: rgba(0, 7, 37, 0.9);
     background: rgb(235, 242, 255);
     font-weight: 600;
 }
@@ -403,30 +404,30 @@ div.history-table-container {
     // color: hsl(233, 100%, 97%);
     // background: hsl(212, 100%, 78%);
     color: rgba(246, 250, 255, 0.9);
-    background: rgb(101, 63, 241);
+    background: rgb(17, 34, 187);
 }
 
 :deep(.el-table tbody tr:nth-child(2n + 1)) {
-    color: rgba(0, 29, 160, 0.9);
+    color: rgba(0, 7, 37, 0.9);
     background: rgb(179, 221, 255);
     font-weight: 600;
 }
 
 :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
     color: rgba(246, 250, 255, 0.9);
-    background: rgb(101, 63, 241);
+    background: rgb(17, 34, 187);
 }
 
 :deep(.el-table tbody tr td:first-child) {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
 }
 
 :deep(.el-table tbody tr td:last-child) {
     width: 2vw;
-    background: rgb(252, 251, 255);
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    // background: rgb(252, 251, 255);
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 
 :deep(.el-table tbody tr.highLight-row) {
@@ -467,7 +468,7 @@ div.history-table-container {
 :deep(.el-descriptions__body .el-descriptions__table .el-descriptions__cell) {
     font-size: calc(0.6vw + 0.3vh);
     text-align: center;
-    background-color: rgba(53, 83, 255, 0.75);
+    background-color: rgba(0, 37, 158, 0.8);
     color: rgba(246, 250, 255, 1);
     border-radius: 8px;
     // box-shadow: 0 0 0 1px #dbedff inset;

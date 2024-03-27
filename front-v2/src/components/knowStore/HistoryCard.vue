@@ -250,7 +250,7 @@ div.knowledge-card-container {
 
             background-color: aliceblue;
 
-            border-radius: 10px;
+            border-radius: 6px;
             box-shadow: 0px 8px 40px -10px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-flow: row wrap;
@@ -316,7 +316,7 @@ div.knowledge-card-container {
                         height: 100%;
                         filter: contrast(1.1) hue-rotate(12deg) brightness(0.9)
                             saturate(0.8);
-                        border-radius: 10px;
+                        border-radius: 6px;
                     }
                 }
             }
@@ -330,7 +330,7 @@ div.knowledge-card-container {
                 font-size: calc(0.5vh + 0.8vw);
                 font-weight: 600;
                 font-family: 'Microsoft YaHei';
-                border-bottom: 3px solid #3011d4;
+                border-bottom: 3px solid #0205a3;
 
                 // background: linear-gradient(
                 //     to right,
@@ -363,7 +363,7 @@ div.knowledge-card-container {
                     padding-left: 4%;
                     padding-right: 4%;
                     // background-color: rgb(92, 125, 154);
-                    border-bottom: 2px solid #3011d4;
+                    border-bottom: 2px solid #0018a3;
 
                     display: flex;
                     flex-flow: row nowrap;
@@ -383,8 +383,8 @@ div.knowledge-card-container {
                             // color: #0050b1;
                             background: linear-gradient(
                                 to right,
-                                #6345e8 0%,
-                                #51129e 100%
+                                #064fec 0%,
+                                #14129e 100%
                             );
                             -webkit-background-clip: text;
                             -webkit-text-fill-color: transparent;
@@ -399,7 +399,7 @@ div.knowledge-card-container {
                             height: 4vh;
                             line-height: 4vh;
                             // background-color: bisque;
-                            color: #5467e2;
+                            color: #045ed4;
 
                             font-size: calc(0.5vh + 0.65vw);
                             // font-weight: 600;
@@ -434,7 +434,7 @@ div.knowledge-card-container {
                         justify-content: center;
                         padding-left: 5%;
                         padding-right: 5%;
-                        border-radius: 10px;
+                        border-radius: 6px;
                         border-style: solid;
                         border-color: #7497c0d0;
 
@@ -476,10 +476,10 @@ div.knowledge-card-container {
             align-items: center;
             z-index: 4;
 
-            border-radius: 10px;
+            border-radius: 6px;
             column-gap: 0.4vw;
 
-            background: linear-gradient(135deg, #3011d4 0%, #2bc5fc 100%);
+            background: linear-gradient(135deg, #3011d4 0%, #0453fd 100%);
             color: #fff;
             transition: all 0.4s cubic-bezier(0.68, -0.45, 0.265, 1.45);
             &:hover {

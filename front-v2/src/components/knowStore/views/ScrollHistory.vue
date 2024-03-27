@@ -22,8 +22,11 @@
                 ref="scrollBar"
                 class="knowledge"
             >
-                <div class="knowledge-scroll-container">
-                    <HistoryTableVue @scrollToSeeMore="scrollToDesc"/>
+                <div
+                    class="knowledge-scroll-container"
+                    :class="{ 'not-active': scrollHistoryNotActive }"
+                >
+                    <HistoryTableVue @scrollToSeeMore="scrollToDesc" />
                     <HistoryCardVue
                         v-for="(infoItem, index) in knowledgeInfoList"
                         :key="index"
@@ -48,6 +51,7 @@ import HistoryTableVue from '../HistoryTable.vue'
 const loading = ref(true)
 const scrollBar = ref()
 const knowledgeInfoList = ref([])
+const scrollHistoryNotActive = ref(true)
 
 // const props = defineProps({
 //     knowledgeContainerWidth: {
@@ -73,7 +77,7 @@ const scroll = (e) => {
     if (
         e.target.className.includes('content-item-text') ||
         e.target.className.includes('cell') ||
-        e.target.className.includes('more-info-button') 
+        e.target.className.includes('more-info-button')
     ) {
         return
     }
@@ -113,6 +117,9 @@ onMounted(async () => {
         item.firstPage = true
     })
     loading.value = false
+    setTimeout(()=> {
+        scrollHistoryNotActive.value = false
+    }, 50)
 })
 
 // watch(knowledgeInfoList, (newVal, oldVal) => {
@@ -143,14 +150,21 @@ div.knowledge-scroll-container {
     width: fit-content;
     // overflow: hidden;
     margin-bottom: 1vh;
+    left: 0vw;
     // margin-right: 2vw;
     // padding-left: 2vw;
+    // left: 100vw;
+    &.not-active {
+        left: 100vw;
+        transition: all 1s cubic-bezier(0.68, -0.15, 0.265, 1.15);
+    }
 
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: flex-end;
     column-gap: 8.5vw;
+    transition: all 1s cubic-bezier(0.68, -0.15, 0.265, 1.15);
 
     div.knowledge-card-container {
         width: 28vw;

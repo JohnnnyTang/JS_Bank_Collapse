@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo">
+    <select id="getVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.TileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom
+                from ${name}
+            ) as result
+    </select>
+
+    <select id="getContourVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.ContourTileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom
+                from mzs_contour
+                where year = #{year} AND type = #{tide}
+            ) as result
+    </select>
+
+</mapper>

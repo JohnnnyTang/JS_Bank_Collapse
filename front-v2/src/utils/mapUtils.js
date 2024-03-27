@@ -52,6 +52,7 @@ const flytoFeature = (map,coord) => {
         zoom: 10,
         speed: 0.8
     })
+    console.log(map.getBounds())
 }
 
 const loadImage = async (map, url, imageID) => {

@@ -1,7 +1,12 @@
 package com.johnny.bank.config;
 
+import com.johnny.bank.model.common.DefaultDatasource;
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +27,31 @@ import java.util.Map;
  */
 @Configuration
 @EnableTransactionManagement
+@Slf4j
+@EnableConfigurationProperties(DefaultDatasource.class)
 public class DataSourceConfig {
+
+
+    private final DefaultDatasource defaultDatasource;
+
+    @Autowired
+    public DataSourceConfig(@Qualifier("defaultDatasource") DefaultDatasource defaultDatasource) {
+        this.defaultDatasource = defaultDatasource;
+    }
+
     /**
      * 默认基础数据源
      */
     @Bean("defaultSource")
-    @ConfigurationProperties("spring.datasource")
+//    @ConfigurationProperties(prefix = "spring.datasource.default")
     public DataSource defaultSource() {
-        return DataSourceBuilder.create().build();
+//        log.info(driverClassName, url, password, username);
+        return DataSourceBuilder.create()
+                .driverClassName(defaultDatasource.getDriverClassName())
+                .password(defaultDatasource.getPassword())
+                .username(defaultDatasource.getUsername())
+                .url(defaultDatasource.getUrl())
+                .build();
     }
 
 //    @Bean("oneSource")

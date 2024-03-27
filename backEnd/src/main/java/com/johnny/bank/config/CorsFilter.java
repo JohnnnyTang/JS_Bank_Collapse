@@ -3,6 +3,7 @@ package com.johnny.bank.config;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,18 +16,17 @@ import java.util.logging.LogRecord;
  * @Date: 2024/1/9
  * @Description:
  */
+//@Configuration
 public class CorsFilter implements Filter {
-    private final List<String> allowedOrigins = Arrays.asList("http://localhost:5173");
+    private final List<String> allowedOrigins = List.of("http://localhost:5173");
 
     public void destroy() {
 
     }
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        // Lets make sure that we are working with HTTP (that is, against HttpServletRequest and HttpServletResponse objects)
-        if (req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
-            HttpServletRequest request = (HttpServletRequest) req;
-            HttpServletResponse response = (HttpServletResponse) res;
+        // Let's make sure that we are working with HTTP (that is, against HttpServletRequest and HttpServletResponse objects)
+        if (req instanceof HttpServletRequest request && res instanceof HttpServletResponse response) {
 
             // Access-Control-Allow-Origin
             String origin = request.getHeader("Origin");

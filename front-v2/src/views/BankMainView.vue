@@ -31,7 +31,6 @@ import WarnNoticeVue from '../components/bankMain/WarnNotice.vue'
 mapboxgl.accessToken =
     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 
-
 const containerDom = ref(null)
 let map = null
 
@@ -54,7 +53,6 @@ const resizeObserver = new ResizeObserver((entries) => {
     mapFlyToRiver(map)
 })
 
-
 onMounted(() => {
     map = new mapboxgl.Map({
         container: 'map', // container ID
@@ -70,19 +68,43 @@ onMounted(() => {
     map.on('load', () => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
-
+        map.addSource('mapVector', {
+            type: 'vector',
+            tiles: [
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2021/before/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/before/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2023/before/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2020/before/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2020/after/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2021/after/{x}/{y}/{z}',
+                'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/after/{x}/{y}/{z}',
+            ],
+        })
+        map.addLayer({
+            id: '线1',
+            type: 'line',
+            source: 'mapVector',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(255, 214, 211, 0.98)',
+                'line-width': 4,
+            },
+        })
         resizeObserver.observe(containerDom.value)
     })
-
 })
 
 onUnmounted(() => {
     resizeObserver.disconnect()
     // resizeObserver.unobserve(containerDom.value)
-    console.log('onUnmounted');
-    map&&map.remove()
-    console.log('map.remove');
-
+    console.log('onUnmounted')
+    map && map.remove()
+    console.log('map.remove')
 })
 </script>
 
@@ -201,7 +223,5 @@ div.bank-main-container {
         //     }
         // }
     }
-
-
 }
 </style>

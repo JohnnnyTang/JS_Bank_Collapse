@@ -96,13 +96,13 @@ div.vertical-nav-container {
     height: fit-content;
     width: 4vw;
     background-color: aliceblue;
-    border-radius: 1.2rem;
+    border-radius: 6px;
 
     box-shadow: 0px 8px 40px -10px rgba(219, 248, 255, 0.8);
-    border: inset 1px #a243fa;
+    border: inset 1px #436efa;
 
     overflow: hidden;
-    transition: all 0.6s cubic-bezier(0.68, -0.45, 0.265, 1.45);
+    transition: all 0.6s cubic-bezier(0.68, -0.25, 0.265, 1.25);
     &:hover {
         width: 9.6vw;
         cursor: pointer;
@@ -120,11 +120,11 @@ div.vertical-nav-container {
         align-items: center;
         column-gap: 0.6vw;
 
-        border-radius: 1.2rem;
+        border-radius: 6px;
         // transition: all 0.3s cubic-bezier(0.68, -0.45, 0.265, 1.45);
 
         &:hover {
-            background: linear-gradient(to right, #bdaeff 0%, #6a0bdf 100%);
+            background: linear-gradient(to right, #6c84f1 0%, #191dff 100%);
             // transition-delay: 0.4s;
             color: aliceblue;
         }
@@ -170,14 +170,14 @@ div.vertical-nav-container {
         width: 9.6vw;
         height: 4.5vw;
         top: 0vh;
-        border-radius: 1.2rem;
+        border-radius: 6px;
         background: linear-gradient(
             to right,
-            #874acc 0%,
-            #6a0bdf 30%,
-            #6a0bdf 100%
+            #4a62cc 0%,
+            #0b0edf 40%,
+            #0b0edf 100%
         );
-        transition: all 0.4s cubic-bezier(0.68, -0.35, 0.265, 1.35);
+        transition: all 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
 
         z-index: 10;
 
