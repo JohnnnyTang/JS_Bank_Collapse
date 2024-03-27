@@ -1,5 +1,6 @@
 <template>
-    <div class="search-container">
+    <div class="search-container" id="search-container">
+        <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="false" :z="3" :w="0" :h="0" axis="y"> -->
         <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
             <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
             <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
@@ -30,22 +31,26 @@
                     </span>
                 </div>
 
-                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data" :props="defaultProps"
+                <el-tree ref="treeRef" style="max-width: 400px" class="filter-tree" :data="data" :props="defaultProps"
                     :default-expand-all="false" :filter-node-method="filterNode" @node-click="selectedNodeHandler">
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <div class="leaf-node" v-if="node.isLeaf"></div>
+                            <div class="fat-node" v-else></div>
+
                             <span>{{ node.label }}</span>
-                            <span>
+                            <!-- <span class="det">
                                 <a v-show="node.isLeaf"> 查看详情 </a>
-                            </span>
+                            </span> -->
                         </span>
                     </template>
+
 
                 </el-tree>
             </div>
         </Transition>
+        <!-- </VueDragResize> -->
 
         <!-- <Transition name="'slidefade">
             <featureDetail v-show="showfeatureDetail" :selectedFeature></featureDetail>
@@ -60,8 +65,10 @@ import featureDetail from './featureDetail.vue';
 import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, nextTick } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
-import { flytoFeature,flytoLarge } from '../../utils/mapUtils';
+import { flytoFeature, flytoLarge } from '../../utils/mapUtils';
 import { useMapStore } from '../../store/mapStore';
+import VueDragResize from 'vue-drag-resize/src'
+
 
 
 
@@ -71,6 +78,7 @@ const mapStore = useMapStore()
 const props = defineProps({
     selectedScene: Scene
 })
+const emit = defineEmits(['selectedFeature'])
 
 const showSearchMain = ref(false)
 const showfeatureDetail = ref(false)
@@ -165,6 +173,7 @@ let popUp = undefined;
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
+        emit('selectedFeature', nodeProp.data)
     }
 }
 
@@ -173,23 +182,30 @@ const showLeafDetailHandler = (node) => {
     let map = mapStore.getMap()
     selectedFeature.value = node.data;
     showfeatureDetail.value = true;
-    let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
-    flytoFeature(map, popupCoord)
+    //for channel and bank
 
-    popUp && popUp.remove()
-    popUp = new mapboxgl.Popup()
-        .setDOMContent(domwithComp)
-        .setLngLat(popupCoord)
-        .addTo(map);
+    // console.log(props.selectedScene);
+
+    if (props.selectedScene.title === '预警岸段' || props.selectedScene.title === '过江通道') {
+        //展示popUp弹窗
+        let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
+        flytoFeature(map, popupCoord)
+
+        popUp && popUp.remove()
+        popUp = new mapboxgl.Popup()
+            .setDOMContent(domwithComp)
+            .setLngLat(popupCoord)
+            .addTo(map);
+    }
+
+
 
 }
 
 const getPopupCoord = (coordsArray) => {
     if (coordsArray.length % 2) {
-        console.log(coordsArray.length, Math.floor(coordsArray.length / 2));
         return coordsArray[Math.floor(coordsArray.length / 2)]
     } else {
-        console.log(coordsArray.length, coordsArray.length / 2);
         let long = (coordsArray[coordsArray.length / 2][0] + coordsArray[coordsArray.length / 2 - 1][0]) / 2
         let lat = (coordsArray[coordsArray.length / 2][1] + coordsArray[coordsArray.length / 2 - 1][1]) / 2
         return [long, lat]
@@ -223,28 +239,32 @@ const initDataByScene = (sceneInstance) => {
     let map = mapStore.getMap()
     let data = []
     let idCount = 0
-    sceneInstance.allLayers.forEach(layerID => {
-        let layerChildren = []
-        let layerItem = {
-            id: idCount++,
-            label: layerID,
-            children: []
-        }
-        let layerSourceId = map.getLayer(layerID).source
-        let geojsonFeatures = map.getSource(layerSourceId)['_data']['features']
-        geojsonFeatures.forEach((feat) => {
-            let item = {
+    console.log(sceneInstance.title);
+    if (sceneInstance.title == '预警岸段' ||
+        sceneInstance.title == '过江通道' ||
+        sceneInstance.title == '实时监测设备') {
+        sceneInstance.allLayers.forEach(layerID => {
+            let layerChildren = []
+            let layerItem = {
                 id: idCount++,
-                label: feat["properties"]["bankName"] ? feat["properties"]["bankName"] : feat["properties"]["name"],
-                children: [],
-                ...feat["properties"]
+                label: layerID,
+                children: []
             }
-            layerChildren.push(item)
+            let layerSourceId = map.getLayer(layerID).source
+            let geojsonFeatures = map.getSource(layerSourceId)['_data']['features']
+            geojsonFeatures.forEach((feat) => {
+                let item = {
+                    id: idCount++,
+                    label: feat["properties"]["bankName"] ? feat["properties"]["bankName"] : feat["properties"]["name"],
+                    children: [],
+                    ...feat["properties"]
+                }
+                layerChildren.push(item)
+            })
+            layerItem.children = layerChildren
+            data.push(layerItem)
         })
-        layerItem.children = layerChildren
-        data.push(layerItem)
-    })
-
+    }
 
     return data
 }
@@ -257,10 +277,13 @@ const initDataByScene = (sceneInstance) => {
 <style lang="scss" scoped>
 .search-container {
     user-select: none;
+    position: absolute;
+    right: 0vw;
+    top: 0vh;
 
     .search-container-icon-container {
         position: absolute;
-        right: 2vw;
+        right: 2.5vw;
         top: 2.5vh;
         z-index: 10;
         width: 6.5vh;
@@ -348,6 +371,8 @@ const initDataByScene = (sceneInstance) => {
             }
         }
 
+
+
         .filter-tree {
             //background-color: rgb(215, 200, 231);
             //color: rgb(247, 1, 1);
@@ -376,6 +401,15 @@ const initDataByScene = (sceneInstance) => {
 
         }
 
+        .el-tree.filter-tree {
+            svg {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+
+
 
     }
 
@@ -390,26 +424,58 @@ const initDataByScene = (sceneInstance) => {
     }
 }
 
+// question  ----not useful
+
+.mapboxgl-popup-close-button {
+    display: none;
+}
+
+.mapboxgl-popup-content {
+    background-color: red;
+}
+
+:deep().mapboxgl-popup.mapboxgl-popup-anchor-bottom{
+    display: none;
+}
 
 
 .custom-tree-node {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
+    justify-content: flex-start;
+    font-size: calc(0.5vh + 0.5vw);
     padding-right: 8px;
 
+    /*
     .leaf-node {
-        position: absolute;
-        left: 1vw;
-        //width: 0.5vw;
-        //height: 0.5vw;
-        //border-radius: 1vw;
-        //background-color: rgb(30, 31, 30);
-        //line-height: 1vw;
+        width: calc(0.5vh + 0.5vw);
+        height: calc(0.5vh + 0.5vw);
+        background: url('/icons/minus.png');
+        background-size: contain;
+        line-height: 12px;
+        margin-right: 5px;
+        //z-index: 999;
+    }
+    */
+    
+    .fat-node {
+        width: calc(0.5vh + 0.5vw);
+        height: calc(0.5vh + 0.5vw);
+        background: url('/icons/add.png');
+        background-size: contain;
+        line-height: 12px;
+        margin-right: 5px;
+    }
+    .det{
+        right: 1vw;
     }
 }
+
+:deep(.content-container) {
+    border: none;
+}
+
 
 .el-tree {
     color: #152478;
@@ -428,5 +494,42 @@ const initDataByScene = (sceneInstance) => {
 
 :deep(.el-tree-node .is-focusable) {
     background-color: #c1f4fc;
+}
+
+:deep().el-tree .el-tree-node__expand-icon.expanded {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+}
+
+/* //有子节点 且未展开 */
+:deep().el-tree .el-tree-node.is-focusable .el-tree-node__expand-icon:before {
+    background: url('/icons/beach.png') no-repeat 0 3px;
+    content: '';
+    display: block;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    background-size: 16px;
+    padding-right: 18px;
+}
+
+/* //有子节点 且已展开 */
+:deep().el-tree .is-expanded .el-tree-node__expand-icon.expanded:before {
+    background: url('/icons/gate.png') no-repeat 0 3px;
+    content: '';
+    display: block;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    background-size: 16px;
+    padding-right: 18px;
+}
+
+:deep().el-tree-node__expand-icon.is-leaf {
+    display: none;
+}
+
+:deep() .el-icon {
+    display: none;
 }
 </style>

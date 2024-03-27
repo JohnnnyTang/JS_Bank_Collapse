@@ -1,29 +1,74 @@
 <template>
     <div class="feature-detail">
         <div class="headerInfo">
-            <div class="name">{{props.selectedFeature.value.bankName}}</div>
+            <div class="name" :style="{ 'font-size': fontSize }">{{ featureUniformInfo.name }}</div>
             <div class="secondInfo">
-                <div class="belongcity">{{props.selectedFeature.value.cityName}}</div>
-                <div class="belongriver">{{props.selectedFeature.value.riverName}}</div>
+                <div class="belongcity">{{ featureUniformInfo.secondInfo.info1 }}</div>
+                <div class="belongriver">{{ featureUniformInfo.secondInfo.info2 }}</div>
             </div>
         </div>
-        <div class="desc">{{props.selectedFeature.value.description}}</div>
+        <div class="desc">{{ featureUniformInfo.description }}</div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, computed } from 'vue';
 
-const props = defineProps({
-    selectedFeature:Object
+const fontSize = computed(() => {
+    let size = 30
+    if (props.selectedFeature.value.bankName) {
+        let length = props.selectedFeature.value.bankName.length
+        if (length < 4) size = 35
+        else if (length < 6) size = 26
+        else if (length < 12) size = 23
+        else size = 18
+    }
+    if (props.selectedFeature.value.name) {
+        let length = props.selectedFeature.value.name.length
+        if (length < 4) size = 35
+        else if (length < 6) size = 26
+        else if (length < 12) size = 23
+        else size = 18
+    }
+    return String(size) + 'px'
 })
 
-watch(props,(newV,oldV)=>{
-    console.log(newV.selectedFeature.value.bankName);
+const props = defineProps({
+    selectedFeature: Object
+})
+
+watch(props, (newV, oldV) => {
+    // console.log(newV.selectedFeature.value.bankName);
+    // console.log(newV.selectedFeature.value);
+})
+const featureUniformInfo = computed(() => {
+
+    if (props.selectedFeature.value["desc"]) {
+        // for channel
+        return {
+            name:props.selectedFeature.value["name"],
+            secondInfo:{
+                info1:props.selectedFeature.value["type"],
+                info2:null,
+            },
+            description:props.selectedFeature.value["desc"]
+        }
+    }
+    else {
+        // for bank
+        return {
+            name:props.selectedFeature.value["bankName"],
+            secondInfo:{
+                info1:props.selectedFeature.value["cityName"],
+                info2:props.selectedFeature.value["riverName"],
+            },
+            description:props.selectedFeature.value["description"]
+        }
+    }
 })
 
 onMounted(async () => {
-    
+
 })
 
 </script>
@@ -59,23 +104,22 @@ onMounted(async () => {
         flex-direction: row;
         justify-content: space-around;
         position: relative;
-        padding-bottom: 40px;
         font-weight: 900;
         color: #ECF4FD;
+        height: 40%;
 
         .name {
-            font-size: 40px;
+            padding-top: 3vh;
+            line-height: 1.1;
             text-shadow: 0 0 5px #D3F3F8;
-            position: absolute;
-            left: 5%;
-            top: 5%;
+            width: 50%;
         }
 
         .secondInfo {
-            position: absolute;
-            right: 5%;
-            top: 5%;
+            padding-top: 2vh;
+
             .belongcity {
+                margin-bottom: 1vh;
                 font-size: 25px;
                 text-shadow: 0 0 1px #D3F3F8;
                 text-align: right;
@@ -92,9 +136,29 @@ onMounted(async () => {
     .desc {
         padding-left: 5%;
         padding-right: 5%;
+        width: 88%;
         color: #ECF4FD;
         font-size: 15px;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 60%;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-color: rgba(255, 255, 255, 0.219);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #ffffff94;
+            border-radius: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background-color: #ffffff81;
+        }
     }
 }
 </style>

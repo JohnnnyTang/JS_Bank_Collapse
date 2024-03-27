@@ -1,29 +1,33 @@
 <template>
     <div class="layer-controller">
+        <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="true" :z="3" :w="0" :h="0" axis="y" :parentW="100" :parentH="200">  -->
 
-        <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
-            <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
-            <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
-            <!-- </el-tooltip> -->
-        </div>
 
-        <Transition name="slidefade">
-            <div class="layer-controller-main" v-show="showLayersCard">
-                <div class="layer-controller-main-title">图层管理</div>
-                <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
-
-                <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
-                    <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city }}
-                    </el-checkbox>
-                </el-checkbox-group>
+            <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
+                <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
+                <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
+                <!-- </el-tooltip> -->
             </div>
-        </Transition>
+
+            <Transition name="slidefade">
+                <div class="layer-controller-main" v-show="showLayersCard">
+                    <div class="layer-controller-main-title">图层管理</div>
+                    <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
+
+                    <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
+                        <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city }}
+                        </el-checkbox>
+                    </el-checkbox-group>
+                </div>
+            </Transition>
+        <!-- </VueDragResize> -->
     </div>
 </template>
 
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
+import VueDragResize from 'vue-drag-resize/src'
 import { onMounted, ref, computed, watch } from 'vue';
 import { useMapStore } from '../../store/mapStore';
 
@@ -69,6 +73,9 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .layer-controller {
     user-select: none;
+    position: absolute;
+    right: 0vw;
+    bottom: 0vh;
 
     // icon button
     .layer-controller-icon-container {
@@ -88,7 +95,7 @@ onMounted(async () => {
         align-items: center;
         justify-content: center;
 
-        
+
 
         .layer-controller-icon {
             width: 5vh;
@@ -123,7 +130,7 @@ onMounted(async () => {
         transition: 300ms;
         border-radius: 5px;
         border: solid 5px #2281da;
-        box-shadow:  rgb(241, 238, 238) 0px 5px 10px, rgba(246, 246, 247, 0.945) 0px 5px 5px;
+        box-shadow: rgb(241, 238, 238) 0px 5px 10px, rgba(246, 246, 247, 0.945) 0px 5px 5px;
 
         .layer-controller-main-title {
             display: flex;

@@ -43,7 +43,19 @@ export default class BackEndRequest {
         return backendInstance.get("/data/monitorInfo")
     }
 
-
+    static getSpecMonitorInfo(type){
+        //设备概述信息！！！！
+        switch(type){
+            case '1':
+                return backendInstance.get("/data/monitorInfo/type/1")
+            case '2':
+                return backendInstance.get("/data/monitorInfo/type/2");
+            case '3':
+                return backendInstance.get("/data/monitorInfo/type/3");
+            case '4':
+                return backendInstance.get("/data/monitorInfo/type/4");
+        }   
+    }
 
     static getMonitorDetailByType_Code(code, type) {
         //data
@@ -71,6 +83,7 @@ export default class BackEndRequest {
         switch (type) {
             case '1': {
                 return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                // return backendInstance.get(`/data/gnssInfo/id/${code}`)
             }
             case '2': {
                 return backendInstance.get(`/data/inclinometerInfo/id/${code}`)

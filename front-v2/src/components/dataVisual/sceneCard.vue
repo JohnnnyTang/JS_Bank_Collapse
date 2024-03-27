@@ -31,7 +31,7 @@ onMounted(async () => {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .card {
   // position: absolute;
   // top: 3vh;
@@ -125,7 +125,9 @@ onMounted(async () => {
       color: black;
       font-style: normal;
       font-weight: bolder;
+      font-size: larger;
       padding: 5px;
+      overflow: hidden
     }
   }
 }
