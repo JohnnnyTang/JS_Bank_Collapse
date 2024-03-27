@@ -643,7 +643,7 @@ const generateOptions_GNSS = (processedData) => {
             type: 'time',
             axisLabel: {
                 formatter: function (value) {
-                    return echarts.time.format('hh:ss', value);
+                    return echarts.format.formatTime('hh:ss', value);
                 }
             }
         },
@@ -665,7 +665,8 @@ const generateOptions_GNSS = (processedData) => {
 
     return {
         // options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
-        options: [optionScatter, optionRatio]
+        options: [optionScatter, optionRatio],
+        names: ['位移深度趋势图', '综合位移变率图'],
     }
 }
 
@@ -1020,7 +1021,8 @@ const generateOptions_Incline = (processedData) => {
 
     return {
         // options: [xMoveOption, yMoveOption, option3Dline, depth_value_x_y_Option]
-        options: [option3Dline, depth_value_x_y_Option]
+        options: [option3Dline, depth_value_x_y_Option],
+        names: ["三维偏移曲线", "X-Y偏移曲线"],
     }
 }
 
@@ -1083,11 +1085,10 @@ const generateOptions_Manometer = (processedData) => {
 
 
     //极坐标分series处理
-    // processedData.Depth_Data_Map.entries
     let optionPolarStack_Seriers = []
-    processedData.Depth_Data_Map.keys().forEach((key) => {
 
-        let data = processedData.Depth_Data_Map.get(key)
+    processedData.Depth_Data_Map.forEach((value, key) => {
+        let data = value 
         let item = {
             type: 'bar',
             data,
@@ -1100,6 +1101,7 @@ const generateOptions_Manometer = (processedData) => {
         }
         optionPolarStack_Seriers.push(item)
     })
+
     let optionPolarStack = {
         angleAxis: {
             //pressure
@@ -1233,7 +1235,8 @@ const generateOptions_Manometer = (processedData) => {
     };
 
     return {
-        options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar]
+        options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar],
+        names: ['河流图', '极坐标堆叠图', '压力深度趋势图', '压力深度柱状图'],
     }
 
 }
@@ -1437,11 +1440,11 @@ const generateOptions_Stress = (processedData) => {
             },
             title: {
                 text: `应力桩-水平垂直受力图`,
-                left:'center',
+                left: 'center',
                 fontSize: 20,
                 textStyle: {
                     color: '#00425C',
-                    fontWeight:'bolder',
+                    fontWeight: 'bolder',
                 }
             },
             grid: [
@@ -1563,7 +1566,7 @@ const generateOptions_Stress = (processedData) => {
                         // padding:[-5,0,20,0],
                         textStyle: {
                             color: '#00425C',
-                            fontWeight:'bolder',
+                            fontWeight: 'bolder',
                             fontSize: 15,
                         },
                         align: "center"
@@ -1599,10 +1602,10 @@ const generateOptions_Stress = (processedData) => {
                 }
             ],
             legend: {
-                top:'10%',
+                top: '10%',
                 itemGap: 60
             },
-            tooltip:{},
+            tooltip: {},
             series: []
         },
         options: []
@@ -1693,13 +1696,9 @@ const generateOptions_Stress = (processedData) => {
             }
         ]
     })
-
-
-
-
     return {
-        gaugeOption,
-        options: [gaugeOption, depth_value_hori_vert_Option, doubleBarOption]
+        options: [gaugeOption, depth_value_hori_vert_Option, doubleBarOption],
+        names: ['水平受力角仪表图', '水平-垂直受力深度趋势图', '水平-垂直受力柱状图']
     }
 
 }
@@ -1729,7 +1728,14 @@ class MonitorDataAssistant {
     }
     */
     constructor(specMonitorInfo) {
-        this.info = specMonitorInfo
+        this.info = specMonitorInfo ? specMonitorInfo : {};
+        this.chartOptions = {
+            options: [],
+            names: []
+        };
+        this.monitoringData = [];
+        this.monitoringMetaData = {};
+        this.processedData = {};
     }
 
     async getMonitoringdata() {
@@ -1779,6 +1785,7 @@ class MonitorDataAssistant {
                 console.warn('ERROR::getChartOptions');
                 break;
         }
+        console.log(this);
     }
 
 

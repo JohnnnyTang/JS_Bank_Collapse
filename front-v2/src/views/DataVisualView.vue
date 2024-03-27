@@ -4,8 +4,7 @@
         <sceneContainer />
         <layerControl />
         <searchContainer />
-        <monitorChart />
-
+        <monitorChart /> 
         <canvas id="GPUFrame"></canvas>
     </div>
 </template>
@@ -72,17 +71,16 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 div.data-visual-container {
     user-select: none;
-    position: absolute;
+    pointer-events: none;
+    position: relative;
     width: 100vw;
     height: 92vh;
-    top: 8vh;
-    left: 0;
-    background-color: rgb(126, 253, 8);
 
     #map {
         position: absolute;
         width: 100vw;
         height: 92vh;
+        pointer-events: all;
         background-color: rgb(124, 179, 203);
     }
 
