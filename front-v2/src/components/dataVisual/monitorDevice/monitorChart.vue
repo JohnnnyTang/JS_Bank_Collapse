@@ -26,17 +26,20 @@
 
 <script setup>
 import VueDragResize from 'vue-drag-resize/src'
-import { onMounted, watchEffect, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
 import 'echarts-gl';
 import { MonitorDataAssistant } from './ChartData'
+import { useSceneStore } from '../../../store/mapStore';
 
-const props = defineProps({
-    oneSpecMonitorMetaInfo: Object,
-})
+const sceneStore = useSceneStore()
+const selectedFeature = computed(() => sceneStore.selectedFeature)
+// const props = defineProps({
+//     oneSpecMonitorMetaInfo: Object,
+// })
 const options = ref([])
-const showMainPart = ref(true)
+const showMainPart = ref(false)
 const iconSrc = computed(() => {
     return showMainPart.value ? './icons/resize.png' : './icons/watching.png'
 })
@@ -45,22 +48,12 @@ let myChart
 let chartDom
 let dataAssitant
 
-// watchEffect(async () => {
-//     console.log(props);
-//     if (props.oneSpecMonitorMetaInfo) {
-//         console.log(props.oneSpecMonitorMetaInfo);
-//         dataAssitant = new MonitorDataAssistant(props.oneSpecMonitorMetaInfo)
-//         await dataAssitant.getMonitoringdata()
-//         dataAssitant.getProcessedDataObject()
-//         options.value = dataAssitant.getChartOptions()
-//     }
-// })
+watch(selectedFeature, async (newV, oldV) => {
 
-watch(props, async (newV, oldV) => {
-    if (newV.oneSpecMonitorMetaInfo) {
+    if (sceneStore.selectedScene.title != '实时监测设备') return;
+    if (newV) {
         myChart && myChart.clear()
-        console.log(newV.oneSpecMonitorMetaInfo);
-        dataAssitant = new MonitorDataAssistant(newV.oneSpecMonitorMetaInfo)
+        dataAssitant = new MonitorDataAssistant(newV)
         await dataAssitant.getMonitoringdata()
         dataAssitant.getProcessedDataObject()
         options.value = dataAssitant.getChartOptions().options
@@ -98,14 +91,14 @@ onMounted(async () => {
 
 
     ///////for manometer
-    let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
-    let oneManometer = new MonitorDataAssistant(manometerInfo[0])
-    await oneManometer.getMonitoringdata()
-    oneManometer.getProcessedDataObject()
-    options.value = oneManometer.getChartOptions().options
-    console.log(oneManometer);
+    // let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
+    // let oneManometer = new MonitorDataAssistant(manometerInfo[0])
+    // await oneManometer.getMonitoringdata()
+    // oneManometer.getProcessedDataObject()
+    // options.value = oneManometer.getChartOptions().options
+    // console.log(oneManometer);
 
-  
+
 
 
 
@@ -114,30 +107,30 @@ onMounted(async () => {
     // let oneStress = new MonitorDataAssistant(stressInfo[0])
     // await oneStress.getMonitoringdata()
     // oneStress.getProcessedDataObject()
-    // oneStress.getChartOptions()
-
+    // options.value = oneStress.getChartOptions().options 
+    // console.log(oneStress);
 
     chartDom = document.getElementById('chart');
     myChart = echarts.init(chartDom);
 
 
-    function run(i) {
-        console.log(i);
-        myChart&&myChart.setOption({
-            series: [
-                {
-                    type: 'bar',
-                    name: oneManometer.processedData.depth_value_time[i],
-                    data: oneManometer.processedData.pressureArrBytime[i],
-                }
-            ]
-        });
-    }
-    let count = 1;
-    setInterval(function () {
-        run(count);
-        count = (count + 1) % 8
-    }, 3000);
+    // function run(i) {
+    //     console.log(i);
+    //     myChart&&myChart.setOption({
+    //         series: [
+    //             {
+    //                 type: 'bar',
+    //                 name: oneManometer.processedData.depth_value_time[i],
+    //                 data: oneManometer.processedData.pressureArrBytime[i],
+    //             }
+    //         ]
+    //     });
+    // }
+    // let count = 1;
+    // setInterval(function () {
+    //     run(count);
+    //     count = (count + 1) % 8
+    // }, 3000);
 
     // window.addEventListener("keydown", (e) => {
     //     if (e.key == '1') {
@@ -171,79 +164,6 @@ onMounted(async () => {
         myChart.resize();
     }
 })
-
-
-/**
-=============Monitor Infomation================
-{
-    "begTime": "2024-01-02 00:00:00",
-    "code": "MZS120.529408_32.033683_1",
-    "elevation": 89.7,
-    "endTime": "2024-01-12 00:00:00",
-    "inTime": "2024-01-02 00:00:00",
-    "latitude": 32.033683,
-    "longitude": 120.529408,
-    "machineId": "Machine001",
-    "name": "GNSS",
-    "operateDesc": "Notes for Device1",
-    "operateFlag": 1,
-    "operateTime": "2024-01-06 00:00:00",
-    "operateUser": "chry",
-    "stationCode": "MZS",
-    "type": "1"
-}
-{
-    "begTime": "2024-01-02 00:00:00",
-    "code": "MZS120.528701_32.034685_2",
-    "elevation": 96.2,
-    "endTime": "2024-01-12 00:00:00",
-    "inTime": "2024-01-02 00:00:00",
-    "latitude": 32.034685,
-    "longitude": 120.528701,
-    "machineId": "Machine002",
-    "name": "测斜仪",
-    "operateDesc": "Notes for Device2",
-    "operateFlag": 1,
-    "operateTime": "2024-01-06 00:00:00",
-    "operateUser": "chry",
-    "stationCode": "MZS",
-    "type": "2"
-}
-{
-    "begTime": "2024-01-02 00:00:00",
-    "code": "MZS120.531984_32.032682_3",
-    "elevation": 98.7,
-    "endTime": "2024-01-12 00:00:00",
-    "inTime": "2024-01-02 00:00:00",
-    "latitude": 32.032682,
-    "longitude": 120.531984,
-    "machineId": "Machine003",
-    "name": "孔隙水压力计",
-    "operateDesc": "Notes for Device3",
-    "operateFlag": 1,
-    "operateTime": "2024-01-06 00:00:00",
-    "operateUser": "chry",
-    "stationCode": "MZS",
-    "type": "3"
-}
-{
-    "begTime": "2024-01-02 00:00:00",
-    "code": "MZS120.530415_32.033657_4",
-    "elevation": 100.2,
-    "endTime": "2024-01-12 00:00:00",
-    "inTime": "2024-01-02 00:00:00",
-    "latitude": 32.033657,
-    "longitude": 120.530415,
-    "machineId": "Machine004",
-    "name": "应力桩",
-    "operateDesc": "Notes for Device4",
-    "operateFlag": 1,
-    "operateTime": "2024-01-06 00:00:00",
-    "operateUser": "chry",
-    "stationCode": "MZS",
-    "type": "4"
-}
- */
 
 </script>
 

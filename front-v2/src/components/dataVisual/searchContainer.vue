@@ -66,7 +66,7 @@ import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, 
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
 import { flytoFeature, flytoLarge } from '../../utils/mapUtils';
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, useSceneStore } from '../../store/mapStore';
 import VueDragResize from 'vue-drag-resize/src'
 
 
@@ -74,15 +74,16 @@ import VueDragResize from 'vue-drag-resize/src'
 
 
 const mapStore = useMapStore()
+const sceneStore = useSceneStore()
 
-const props = defineProps({
-    selectedScene: Scene
-})
-const emit = defineEmits(['selectedFeature'])
+// const props = defineProps({
+//     selectedScene: Scene
+// })
+const selectedScene = computed(() => sceneStore.selectedScene)
+const selectedFeature = computed(() => sceneStore.selectedFeature)
 
 const showSearchMain = ref(false)
 const showfeatureDetail = ref(false)
-const selectedFeature = ref({})
 const iconSrc = computed(() => {
     return showSearchMain.value ? './icons/resize.png' : './icons/searching.png'
 })
@@ -160,6 +161,7 @@ const filterNode = (value, data, node) => {
 }
 
 const createPopUpComponent = () => {
+    //function createApp(rootComponent: Component, rootProps?: object): App
     const ap = createApp(featureDetail, { selectedFeature, })
     const container = document.createElement("div")
     const componentInstance = ap.mount(container)
@@ -173,20 +175,16 @@ let popUp = undefined;
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
-        emit('selectedFeature', nodeProp.data)
+        sceneStore.setSelectedFeature(nodeProp.data)
     }
 }
 
 const showLeafDetailHandler = (node) => {
-    // console.log(node.data);
     let map = mapStore.getMap()
-    selectedFeature.value = node.data;
     showfeatureDetail.value = true;
     //for channel and bank
 
-    // console.log(props.selectedScene);
-
-    if (props.selectedScene.title === '预警岸段' || props.selectedScene.title === '过江通道') {
+    if (selectedScene.value.title === '预警岸段' || selectedScene.value.title === '过江通道') {
         //展示popUp弹窗
         let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
         flytoFeature(map, popupCoord)
@@ -213,20 +211,29 @@ const getPopupCoord = (coordsArray) => {
 }
 
 
-watch(props, (newV) => {
-    // get scene layer info and init data
+// watch(props, (newV) => {
+//     // get scene layer info and init data
+//     popUp && popUp.remove()
+//     let map = mapStore.getMap()
+//     if (props.selectedScene.allLayers.length != 0) {
+//         // only for geojson?
+//         data.value = initDataByScene(newV.selectedScene)
+//     }
+
+// })
+watch(selectedScene, async(newV) => {
     popUp && popUp.remove()
     let map = mapStore.getMap()
-    if (props.selectedScene.allLayers.length != 0) {
+    if (newV.allLayers.length != 0) {
         // only for geojson?
-        data.value = initDataByScene(newV.selectedScene)
+        data.value = initDataByScene(newV)
     }
-
+},{
+    deep:true
 })
 
 
 watch(inputText, (v1, v) => {
-    // console.log(v1);
     treeRef.value.filter(v1)
 })
 
@@ -239,7 +246,6 @@ const initDataByScene = (sceneInstance) => {
     let map = mapStore.getMap()
     let data = []
     let idCount = 0
-    console.log(sceneInstance.title);
     if (sceneInstance.title == '预警岸段' ||
         sceneInstance.title == '过江通道' ||
         sceneInstance.title == '实时监测设备') {
@@ -434,7 +440,7 @@ const initDataByScene = (sceneInstance) => {
     background-color: red;
 }
 
-:deep().mapboxgl-popup.mapboxgl-popup-anchor-bottom{
+:deep().mapboxgl-popup.mapboxgl-popup-anchor-bottom {
     display: none;
 }
 
@@ -458,7 +464,7 @@ const initDataByScene = (sceneInstance) => {
         //z-index: 999;
     }
     */
-    
+
     .fat-node {
         width: calc(0.5vh + 0.5vw);
         height: calc(0.5vh + 0.5vw);
@@ -467,7 +473,8 @@ const initDataByScene = (sceneInstance) => {
         line-height: 12px;
         margin-right: 5px;
     }
-    .det{
+
+    .det {
         right: 1vw;
     }
 }

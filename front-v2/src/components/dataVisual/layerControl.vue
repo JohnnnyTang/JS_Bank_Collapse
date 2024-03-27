@@ -3,23 +3,24 @@
         <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="true" :z="3" :w="0" :h="0" axis="y" :parentW="100" :parentH="200">  -->
 
 
-            <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
-                <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
-                <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
-                <!-- </el-tooltip> -->
+        <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
+            <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
+            <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
+            <!-- </el-tooltip> -->
+        </div>
+
+        <Transition name="slidefade">
+            <div class="layer-controller-main" v-show="showLayersCard">
+                <div class="layer-controller-main-title">图层管理</div>
+                <div class="layer-controller-scene-title">{{ selectedScene.title }}</div>
+
+                <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
+                    <el-checkbox v-for="layerID in selectedScene.allLayers" :key="layerID" :label="layerID" :value="layerID">{{ layerID
+                        }}
+                    </el-checkbox>
+                </el-checkbox-group>
             </div>
-
-            <Transition name="slidefade">
-                <div class="layer-controller-main" v-show="showLayersCard">
-                    <div class="layer-controller-main-title">图层管理</div>
-                    <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
-
-                    <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
-                        <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city }}
-                        </el-checkbox>
-                    </el-checkbox-group>
-                </div>
-            </Transition>
+        </Transition>
         <!-- </VueDragResize> -->
     </div>
 </template>
@@ -29,18 +30,26 @@ import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import VueDragResize from 'vue-drag-resize/src'
 import { onMounted, ref, computed, watch } from 'vue';
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, useSceneStore } from '../../store/mapStore';
 
 const mapStore = useMapStore()
+const sceneStore = useSceneStore()
 const showLayersCard = ref(false)
-const props = defineProps({
-    allLayers: Array,
-    layerScene: String,
-})
-watch(props, () => {
-    checkedLayer.value = props.allLayers
-})
 const checkedLayer = ref([])
+const selectedScene = computed(() => sceneStore.selectedScene)
+
+
+// const props = defineProps({
+//     allLayers: Array,
+//     layerScene: String,
+// })
+// watch(props, () => {
+//     checkedLayer.value = props.allLayers
+// })
+
+watch(selectedScene, (newV, oldV) => {
+    checkedLayer.value = newV.allLayers
+})
 
 
 const handleCheckedLayerChange = () => {
@@ -50,7 +59,7 @@ const handleCheckedLayerChange = () => {
         map.setLayoutProperty(layerID, 'visibility', 'visible');
     })
     // invisible layer
-    let invisibleLayer = props.allLayers.filter(v => !checkedLayer.value.includes(v))
+    let invisibleLayer = selectedScene.value.allLayers.filter(v => !checkedLayer.value.includes(v))
     invisibleLayer.forEach(layerID => {
         map.setLayoutProperty(layerID, 'visibility', 'none');
     });

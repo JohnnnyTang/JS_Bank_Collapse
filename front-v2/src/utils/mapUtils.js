@@ -20,7 +20,6 @@ const initScratchMap = (ref) => {
     return new Promise((resolve, reject) => {
         // const map =
         scr.StartDash().then(() => {
-            console.log(ref)
             const map = new ScratchMap({
                 container: ref.id, // container ID
                 accessToken:

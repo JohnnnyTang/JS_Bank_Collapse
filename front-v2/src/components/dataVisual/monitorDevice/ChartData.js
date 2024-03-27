@@ -211,8 +211,12 @@ const generateData_Stress = (ogDataArray, metaData) => {
     let pointNum = metaData["pointNum"]
     let depthArray = []
     let legendData = []
-    let showCount = 20   //50enough
+    let showCount = 5   //50enough
     let horizontalAngle = []
+    let depth_value_hori_data = []
+    let depth_value_vert_data = []
+
+    let depth_value_time = []
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
@@ -221,16 +225,25 @@ const generateData_Stress = (ogDataArray, metaData) => {
 
     for (let i = 0; i < showCount; i++) {
         let horizontalAngleItem = []
+        let depth_value_hori_data_item = []
+        let depth_value_vert_data_item = []
         for (let j = 0; j < pointNum; j++) {
             horizontalAngleItem.push(ogDataArray[i][`horizontal${j + 1}`])
-
+            depth_value_hori_data_item.push([ogDataArray[i][`horizontal_stress${j + 1}`], depthArray[j]])
+            depth_value_vert_data_item.push([ogDataArray[i][`vertical_stress${j + 1}`], depthArray[j]])
         }
         horizontalAngle.push(horizontalAngleItem)
+        depth_value_hori_data.push(depth_value_hori_data_item)
+        depth_value_vert_data.push(depth_value_vert_data_item)
+        depth_value_time.push(ogDataArray[i][`measureTime`])
     }
 
     return {
         legendData,
-        horizontalAngle
+        horizontalAngle,
+        depth_value_time,
+        depth_value_hori_data,
+        depth_value_vert_data,
     }
 }
 
@@ -630,7 +643,7 @@ const generateOptions_GNSS = (processedData) => {
             type: 'time',
             axisLabel: {
                 formatter: function (value) {
-                    return echarts.format.formatTime('hh:ss', value);
+                    return echarts.time.format('hh:ss', value);
                 }
             }
         },
@@ -651,7 +664,8 @@ const generateOptions_GNSS = (processedData) => {
 
 
     return {
-        options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
+        // options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
+        options: [optionScatter, optionRatio]
     }
 }
 
@@ -941,9 +955,7 @@ const generateOptions_Incline = (processedData) => {
         },
         series: depth_value_x_series
     };
-
-    // 合并另一个图表的 series 到 option 中
-    depth_value_x_y_Option.series.push(...depth_value_y_series);
+    depth_value_x_y_Option.series.push(...depth_value_y_series)
 
 
     //3d 深度偏移曲线
@@ -1007,9 +1019,8 @@ const generateOptions_Incline = (processedData) => {
 
 
     return {
-        xMoveOption,
-        yMoveOption,
-        options: [xMoveOption, yMoveOption, option3Dline, depth_value_x_y_Option]
+        // options: [xMoveOption, yMoveOption, option3Dline, depth_value_x_y_Option]
+        options: [option3Dline, depth_value_x_y_Option]
     }
 }
 
@@ -1174,15 +1185,15 @@ const generateOptions_Manometer = (processedData) => {
         xAxis: {
             max: 'dataMax',
             name: '水压力(mPa)',
-            nameLocation:'middle',
-            axisLabel:{
-                margin:3
+            nameLocation: 'middle',
+            axisLabel: {
+                margin: 3
             }
         },
         yAxis: {
             type: 'category',
             name: '深度(m)',
-            nameLocation:'start',
+            nameLocation: 'start',
             data: processedData.legendData,
             inverse: true,
             animationDuration: 300,
@@ -1221,15 +1232,12 @@ const generateOptions_Manometer = (processedData) => {
         animationEasingUpdate: 'linear'
     };
 
-
     return {
         options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar]
     }
 
 }
 const generateOptions_Stress = (processedData) => {
-    // 水平应力和垂直应力的数据联动图表。
-    // https://echarts.apache.org/examples/zh/editor.html?c=dataset-link
 
     //gaugeOption 
     let gaugeData = MonitorDataAssistant.getOnegaugeData(processedData.horizontalAngle[0], processedData.legendData)
@@ -1287,10 +1295,411 @@ const generateOptions_Stress = (processedData) => {
         ]
     };
 
+    let depth_value_hori_series = []
+    let depth_value_vert_series = []
+    for (let i = 0; i < processedData.depth_value_time.length; i++) {
+        let seriesItemX = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: processedData.depth_value_hori_data[i]
+        }
+        depth_value_hori_series.push(seriesItemX)
+        let seriesItemY = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data: processedData.depth_value_vert_data[i]
+        }
+        depth_value_vert_series.push(seriesItemY)
+    }
+    let depth_value_hori_vert_Option = {
+        // color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
+        title: [{
+            text: '应力桩-水平受力偏移曲线',
+            left: '5%'
+        }, {
+            text: '应力桩-垂直受力偏移曲线',
+            right: '5%' // 设置第二个标题在右边
+        }],
+        grid: [{
+            left: '3%',
+            right: '55%',
+            top: 70,
+            bottom: 30,
+            containLabel: true
+        }, {
+            left: '58%',
+            right: '5%',
+            top: 70,
+            bottom: 30,
+            containLabel: true
+        }],
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: [
+            {
+                type: 'value',
+                gridIndex: 0,
+                name: '水平受力(N)',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
+            },
+            {
+                type: 'value',
+                gridIndex: 1,
+                name: '垂直受力(N)',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 0,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
+            },
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 1,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
+
+            }
+        ],
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_vert_series
+    };
+    depth_value_hori_vert_Option.series.push(...depth_value_hori_series)
+
+
+    // test doble-bar
+    const xData = processedData.legendData
+    const horiDataOneTime = []
+    const vertDataOneTime = []
+    for (let i = 0; i < processedData.legendData.length; i++) {
+        horiDataOneTime.push(processedData.depth_value_hori_data[0][i][0])
+        vertDataOneTime.push(processedData.depth_value_vert_data[0][i][0])
+    }
+    const timeLineData = [1];
+    let colors = [
+        {
+            borderColor: "#0096c7",
+            start: "#90e0ef",
+            end: "#0096c7"
+        },
+        {
+            borderColor: "#49A179",
+            start: "#49A179",
+            end: "#95d5b2"
+        },
+    ];
+    let doubleBarOption = {
+        baseOption: {
+            //timeline::在多个option 间进行切换、播放等操作 ::baseOption 和一个 switchableOption 会用来计算最终的 finalOption
+            timeline: {
+                show: false,
+                top: 0,
+                data: []
+            },
+            title: {
+                text: `应力桩-水平垂直受力图`,
+                left:'center',
+                fontSize: 20,
+                textStyle: {
+                    color: '#00425C',
+                    fontWeight:'bolder',
+                }
+            },
+            grid: [
+                // 3个grid
+                {
+                    show: false,
+                    left: '14%',
+                    top: '20%',
+                    bottom: '2%',
+                    containLabel: true,
+                    width: '30%'
+                },
+                {
+                    show: false,
+                    left: '52.5%',
+                    top: '19%',
+                    bottom: '7%',
+                    width: '0%'
+                },
+                {
+                    show: false,
+                    right: '12%',
+                    top: '20%',
+                    bottom: '2%',
+                    containLabel: true,
+                    width: '30%'
+                }
+            ],
+            xAxis: [
+                {
+                    type: 'value',
+                    inverse: true,
+                    axisLine: {
+                        show: true,
+                        onZero: true, // X 轴或者 Y 轴的轴线是否在另一个轴的 0 刻度上
+                        lineStyle: {
+                            color: colors[0].borderColor,
+                        }
+                    },
+                    axisTick: {
+                        show: true
+                    },
+                    position: 'bottom',// bottom 且 inverse ==>朝左
+                    axisLabel: {
+                        show: true,
+                        color: colors[0].borderColor,
+                        fontSize: 12,
+                        fontFamily: "DINPro-Regular"
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                },
+                {
+                    //中间不展示，只做轴
+                    gridIndex: 1,
+                    show: false
+                },
+                {
+                    gridIndex: 2,
+                    inverse: false,//正常向右，no inverse
+                    axisLine: {
+                        show: true,
+                        onZero: true,
+                        lineStyle: {
+                            color: colors[1].borderColor
+                        }
+                    },
+                    axisTick: {
+                        show: true
+                    },
+                    position: 'bottom',
+                    axisLabel: {
+                        show: true,
+                        color: colors[1].borderColor,
+                        fontSize: 12,
+                        fontFamily: "DINPro-Regular"
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'category',//按深度 category 
+                    inverse: true,
+                    position: 'right',//轴放右边，bar朝左边
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: '#00A5CA45'
+                        }
+                    },
+                    //不显示y轴线
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    data: xData,//深度
+                },
+                {
+                    //注意中间这个空图表的操作,左右图共享轴线
+                    gridIndex: 1,
+                    type: 'category',
+                    inverse: true,
+                    // position: 'left',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    // 只显示 居中的label, 不显示轴线,刻度线
+                    axisLabel: {
+                        show: true,
+                        // padding:[-5,0,20,0],
+                        textStyle: {
+                            color: '#00425C',
+                            fontWeight:'bolder',
+                            fontSize: 15,
+                        },
+                        align: "center"
+                    },
+                    data: xData.map(function (value) {
+                        return {
+                            value: value,
+                            textStyle: {
+                                align: 'center',
+                            }
+                        }
+                    })
+                },
+                {
+                    gridIndex: 2,
+                    type: 'category',
+                    inverse: true,
+                    position: 'left',
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: '#00A5CA45'
+                        }
+                    },
+                    //不显示y轴线
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    data: xData
+                }
+            ],
+            legend: {
+                top:'10%',
+                itemGap: 60
+            },
+            tooltip:{},
+            series: []
+        },
+        options: []
+    }
+    doubleBarOption.baseOption.timeline.data.push(timeLineData[0])
+    doubleBarOption.options.push({
+        series: [
+            {
+                name: "水平受力(N)",
+                type: "bar",
+                xAxisIndex: 0,
+                yAxisIndex: 0,
+                itemStyle: {
+                    normal: {
+                        label: {
+                            //bar的数值显示
+                            show: true,
+                            position: 'left',
+                            textStyle: {
+                                color: colors[0].borderColor,
+                                fontSize: 12
+                            }
+                        },
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[0].start
+                        },
+                        {
+                            offset: 1,
+                            color: colors[0].end
+                        }
+                        ]),
+                        borderColor: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[0].borderColor
+                        },
+                        {
+                            offset: 1,
+                            color: colors[0].end
+                        }
+                        ]),
+                        borderWidth: 1
+                    }
+                },
+                data: horiDataOneTime,
+                animationEasing: "elasticOut"
+            },
+            {
+                name: "垂直受力(N)",
+                type: "bar",
+                stack: "2",
+                // barWidth: 25,
+                xAxisIndex: 2,
+                yAxisIndex: 2,
+                itemStyle: {
+                    normal: {
+                        label: {
+                            show: true,
+                            position: 'right',
+                            textStyle: {
+                                color: colors[1].borderColor,
+                                fontSize: 12
+                            }
+                        },
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[1].start
+                        },
+                        {
+                            offset: 1,
+                            color: colors[1].end
+                        }
+                        ]),
+                        borderColor: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[1].start
+                        },
+                        {
+                            offset: 1,
+                            color: colors[1].borderColor
+                        }
+                        ]),
+                        borderWidth: 1
+                    }
+                },
+                data: vertDataOneTime,
+                animationEasing: "elasticOut"
+            }
+        ]
+    })
+
+
+
 
     return {
         gaugeOption,
-        options: [gaugeOption]
+        options: [gaugeOption, depth_value_hori_vert_Option, doubleBarOption]
     }
 
 }

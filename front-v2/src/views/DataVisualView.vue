@@ -1,11 +1,10 @@
 <template>
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
-        <sceneContainer @selectScene="selectSceneHandler" />
-        <layerControl :allLayers="selectedScene.allLayers" :layerScene="selectedScene.title" />
-        <searchContainer :selectedScene="selectedScene" @selected-feature="selectFeatureHandler" />
-        <monitorChart :oneSpecMonitorMetaInfo="oneSpecMonitorMetaInfo"></monitorChart>
-
+        <sceneContainer />
+        <layerControl />
+        <searchContainer />
+        <monitorChart />
 
         <canvas id="GPUFrame"></canvas>
     </div>
@@ -14,10 +13,10 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
 import { initMap, flytoLarge, flytoSmall, initScratchMap } from '../utils/mapUtils';
 import { Scene } from '../components/dataVisual/Scene';
-import { useMapStore } from '../store/mapStore'
+import { useMapStore, useSceneStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 import layerControl from '../components/dataVisual/layerControl.vue';
 import searchContainer from '../components/dataVisual/searchContainer.vue';
@@ -26,23 +25,18 @@ import monitorChart from '../components/dataVisual/monitorDevice/monitorChart.vu
 
 const mapContainerRef = ref();
 const mapStore = useMapStore()
+const sceneStore = useSceneStore()
+const selectedScene = computed(() => sceneStore.selectedScene)
 let map = null;
-const selectedScene = ref(new Scene())
-const selectedFeature = ref({})
-const oneSpecMonitorMetaInfo = ref({})
+const selectedFeature = computed(() => sceneStore.selectedFeature)
 
 
-const selectSceneHandler = (sceneInstance) => {
-    // flytoLarge(map)
-    selectedScene.value = sceneInstance
-}
-const selectFeatureHandler = (feature) => {
-    // console.log(selectedScene.value.title);
-    if (selectedScene.value.title === '实时监测设备') {
-        oneSpecMonitorMetaInfo.value = feature;
+// const selectFeatureHandler = (feature) => {
+//     if (selectedScene.value.title === '实时监测设备') {
+//         oneSpecMonitorMetaInfo.value = feature;
 
-    }
-}
+//     }
+// }
 
 
 watch(selectedScene, async (newV, oldV) => {
@@ -96,7 +90,7 @@ div.data-visual-container {
         position: absolute;
         width: 100vw;
         height: 92vh;
-        background-color:rgba(240, 248, 255, 0);
+        background-color: rgba(240, 248, 255, 0);
         z-index: 1;
         pointer-events: none;
     }
