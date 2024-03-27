@@ -21,7 +21,7 @@
                         (infoItem.district || '') +
                         '-' +
                         (infoItem.place || '') +
-                        '崩岸'
+                        '崩岸' 
                     }}
                 </div>
                 <div class="knowledge-content-container">
@@ -359,7 +359,6 @@ div.knowledge-card-container {
                     width: 80%;
                     height: 8vh;
                     margin-left: 6%;
-                    margin-right: 6%;
                     padding-left: 4%;
                     padding-right: 4%;
                     // background-color: rgb(92, 125, 154);

@@ -54,7 +54,29 @@ const routes = [
     },
     {
         path: '/modelStore',
-        component: () => import('../views/ModelStoreView.vue'),
+        redirect: '/modelStore/main',
+        children: [
+            {
+                path: 'main', // 默认子页面
+                component: () => import('../views/ModelStoreView.vue')
+            },
+            {
+                path: 'dataInterpretation',
+                component: () => import('../components/modelStore/views/DataInterpretation.vue'),
+            },
+            {
+                path: 'soilAnalysis',
+                component: () => import('../components/modelStore/views/SoilAnalysis.vue'),
+            },
+            {
+                path: 'stabilityAnalysis',
+                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
+            },
+            {
+                path: 'riskWarning',
+                component: () => import('../components/modelStore/views/RiskWarning.vue'),
+            },
+        ]
     },
     {
         path: '/bankTwin',
