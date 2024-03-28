@@ -5,11 +5,13 @@
             :key="index"
             :infoItem="infoItem"
         />
+        <BottomWaveVue/>
     </div>
 </template>
 
 <script setup>
 import ModelCardVue from '../components/modelStore/ModelCard.vue'
+import BottomWaveVue from '../components/modelStore/BottomWave.vue'
 
 const infoItemList = [
     {
@@ -46,7 +48,7 @@ div.model-store-container  {
     height: 92vh;
     overflow: hidden;
     display: flex;
-    background-color: rgb(236, 215, 250);
+    background-color: rgb(139, 167, 240);
 
 }
 </style>

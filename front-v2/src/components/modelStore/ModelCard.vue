@@ -70,7 +70,7 @@
                 @click="Detail"
                 :class="[infoItem.firstPage ? 'inactive' : 'active']"
             >
-                <div class="button-text">模型计算</div>
+                <div class="button-text">模型计算结果</div>
                 <div class="button-arrow"></div>
             </div>
         </div>
@@ -292,7 +292,7 @@ div.model-card-container {
 
         div.see-more-button {
             position: absolute;
-            width: 7vw;
+            width: 8.5vw;
             height: 5vh;
             line-height: 5vh;
             // background-color: aquamarine;
@@ -307,7 +307,7 @@ div.model-card-container {
             border-radius: 10px;
             column-gap: 0.4vw;
 
-            background: linear-gradient(135deg, #a84d8d 0%, #bcc3c5 100%);
+            background: linear-gradient(to right, #5467e2 0%, #71b0eb 50%, #74deec 100%);
             color: #fff;
             transition: all 0.4s cubic-bezier(0.68, -0.45, 0.265, 1.45);
             &:hover {
@@ -318,7 +318,7 @@ div.model-card-container {
             }
 
             div.button-text {
-                width: 4.5vw;
+                width: 5.5vw;
                 height: 5vh;
                 // background-color: aqua;
                 font-size: calc(0.5vh + 0.6vw);
