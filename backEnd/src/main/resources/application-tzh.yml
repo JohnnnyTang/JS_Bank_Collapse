@@ -27,3 +27,4 @@ springfox:
     swagger-ui:
       enabled: true
 
+mzsTilePath: D:/2024-work/shore_collapse/data/DEM/rasterTIle/

@@ -1,10 +1,12 @@
 package com.johnny.bank.controller.resource.map;
 
+import com.johnny.bank.service.resource.map.impl.RasterTileService;
 import com.johnny.bank.service.resource.map.impl.VectorTileService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,10 +20,13 @@ import org.springframework.web.bind.annotation.*;
 public class VectorTileController {
 
     private final VectorTileService vectorTileService;
+    private final RasterTileService rasterTileService;
+
 
     @Autowired
-    public VectorTileController(VectorTileService vectorTileService) {
+    public VectorTileController(VectorTileService vectorTileService, RasterTileService rasterTileService) {
         this.vectorTileService = vectorTileService;
+        this.rasterTileService = rasterTileService;
     }
 
     @CrossOrigin
@@ -47,5 +52,14 @@ public class VectorTileController {
             }
             throw new Exception("vector tile error");
         }
+    }
+
+    @CrossOrigin
+    @RequestMapping(
+            value = "/raster/mzs/{year}/{tide}/{x}/{y}/{z}",
+            method = RequestMethod.GET
+    )
+    public @ResponseBody byte[] getRasterTiles(@PathVariable String year, @PathVariable String tide,@PathVariable String x, @PathVariable String y, @PathVariable String z) throws Exception {
+        return rasterTileService.getMXZRasterInByte(year, tide, Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
     }
 }

@@ -17,5 +17,4 @@
                 where year = #{year} AND type = #{tide}
             ) as result
     </select>
-
 </mapper>

@@ -95,6 +95,68 @@ onMounted(() => {
                 'line-width': 4,
             },
         })
+        map.addSource('mapRaster', {
+            type: 'raster',
+            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2020/Before/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.509,32.023,120.555,32.0402]
+        })
+        map.addSource('mapRaster1', {
+            type: 'raster',
+            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2020/After/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.514,32.0236,120.555,32.0391]
+        })
+        map.addSource('mapRaster2', {
+            type: 'raster',
+            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2021/Before/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.5116,32.02316,120.555,32.0402]
+        })
+        map.addSource('mapRaster3', {
+            type: 'raster',
+            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2021/After/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.5097,32.02409,120.555,32.0402]
+        })
+        map.addSource('mapRaster4', {
+            type: 'raster',
+            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2022/Before/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.51,32.02,120.552,32.04046]
+        })
+        map.addSource('mapRaster5', {
+            type: 'raster',
+            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2022/After/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.50998,32.02379,120.5548,32.04148]
+        })
+        map.addSource('mapRaster6', {
+            type: 'raster',
+            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2023/Before/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.50548,32.0224,120.55304,32.0415]
+        })
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'mapRaster6',
+            
+        })
         resizeObserver.observe(containerDom.value)
     })
 })
