@@ -1,6 +1,6 @@
 <template>
     <div class="monitor-chart-parent">
-        <div class="monitor-chart-container" v-draggable="{ 'bounds': 'parent' }">
+        <div class="monitor-chart-container" v-draggable="{ 'bounds': 'parent', 'axis': 'x' }">
 
             <div class="icon-container" @click="showMainPart = !showMainPart">
                 <div class="icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
@@ -68,7 +68,7 @@ const showChart = (index) => {
         console.log('chart not prepared');
     }
 }
-
+ 
 
 onMounted(async () => {
 
@@ -179,41 +179,28 @@ onMounted(async () => {
     pointer-events: none;
     width: 90vw;
     left: 10vw;
-    height: 90vh;
+    height: 60vh;
     top: 1vh;
     bottom: 1vh;
     z-index: 3;
 
     .monitor-chart-container {
-
-        user-select: none;
         position: absolute;
         pointer-events: all;
-        top: 4vh;
+        top: 3vh;
         right: 2vw;
         width: auto;
         height: auto;
 
-
-        //background-color: rgb(0, 217, 255);
-        /*
-        position: absolute ;
-        width: 100%;
-        height: 92vh;
-        pointer-events: none;
-    */
         .icon-container {
             position: absolute;
-            right: 2vw;
-            bottom: 10vh;
-            z-index: 10;
-
-            //size and border
+            z-index: 999;
+            right: 0;
+            top: 0;
             width: 6.5vh;
             height: 6.5vh;
             background-color: rgb(255, 245, 245);
             border-radius: 6vh;
-            //center
             display: flex;
             align-items: center;
             justify-content: center;
@@ -238,19 +225,17 @@ onMounted(async () => {
 
         .main-part {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-
+            z-index: 3;
+            right: 0vw;
+            top: 0vh;
             display: flex;
             flex-direction: column;
             justify-content: space-evenly;
             align-items: center;
             height: auto;
             width: auto;
-            padding: 10px;
-            //background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
-            background: #FFFFFF;
+            padding: 1vh;
+            background: #ffffff;
             box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 
 

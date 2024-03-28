@@ -4,7 +4,7 @@
         <sceneContainer />
         <layerControl />
         <searchContainer />
-        <monitorChart /> 
+        <monitorChart />
         <canvas id="GPUFrame"></canvas>
     </div>
 </template>

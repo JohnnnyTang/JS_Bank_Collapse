@@ -1,6 +1,6 @@
 <template>
     <div class="search-container-parent">
-        <div class="search-container" id="search-container" v-draggable="{ 'bounds': 'parent' }">
+        <div class="search-container" id="search-container" v-draggable="{ 'bounds': 'parent', 'axis': 'x' }">
             <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
                 <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
                 <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
@@ -60,7 +60,7 @@
 
 <script setup>
 import mapboxgl from 'mapbox-gl';
-import featureDetail from './featureDetail.vue';
+import featureDetail from './featureDetails/featureDetail.vue';
 import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, nextTick } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
@@ -132,24 +132,7 @@ let data = ref([
                 type: 'Leaf'
             },
         ],
-    },
-    {
-        id: 3,
-        label: 'Level one 3',
-        type: 'F',
-        children: [
-            {
-                id: 7,
-                label: 'Level two 3-1',
-                type: 'Leaf'
-            },
-            {
-                id: 8,
-                label: 'Level two 3-2',
-                type: 'Leaf'
-            },
-        ],
-    },
+    }
 ])
 
 
@@ -285,25 +268,24 @@ const initDataByScene = (sceneInstance) => {
     pointer-events: none;
     width: 90vw;
     left: 10vw;
-    height: 90vh;
+    height: 50vh;
     top: 1vh;
     bottom: 1vh;
     z-index: 3;
 
-
     .search-container {
         position: absolute;
         pointer-events: all;
-        top: 4vh;
+        top: 21vh;
         right: 2vw;
-        width: auto;
         height: auto;
+        width: auto;
 
         .search-container-icon-container {
             position: absolute;
-            right: 2.5vw;
-            top: 2.5vh;
-            z-index: 10;
+            z-index: 999;
+            right: 0;
+            top: 0;
             width: 6.5vh;
             height: 6.5vh;
             background-color: rgb(255, 255, 255);
@@ -311,6 +293,7 @@ const initDataByScene = (sceneInstance) => {
             display: flex;
             align-items: center;
             justify-content: center;
+
 
             .search-container-icon {
                 width: 5vh;
@@ -331,17 +314,15 @@ const initDataByScene = (sceneInstance) => {
 
         .search-container-main {
             position: absolute;
-            right: 2vw;
-            top: 2vh;
+            z-index: 3;
+            right: 0vw;
+            top: 0vh;
             height: 40vh;
             width: 20vw;
             padding: 1vh;
             //linear-gradient(45deg, #C9E1F5, #E2FFEE);
-            background-color: #D3F3F8;
-            border-radius: 1vh;
-            box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+            background-color: #ffffff;
             transition: 300ms;
-            border: solid 5px #2281da;
 
             .input-container {
                 width: calc(100% - 6.5vh - 2vw);

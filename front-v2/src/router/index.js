@@ -48,8 +48,8 @@ const routes = [
     },
     {
         path: '/',
-        component: () => import("../views/BankMainView.vue")
-        // component: ()=> import("../components/dataVisual/test.vue")
+        // component: () => import("../views/BankMainView.vue")
+        component: ()=> import("../components/dataVisual/test.vue")
     },
     {
         path: '/modelStore',

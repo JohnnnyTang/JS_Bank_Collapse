@@ -438,6 +438,7 @@ export default class FlowLayer {
             this.randomSeed.n = Math.random()
             this.updateVoronoi()
             // console.log(this.voronoiFromBinding.name, this.voronoiToBinding.name)
+            console.log('render');                                               
 
             if (!this.swapPointer % 2) {
 

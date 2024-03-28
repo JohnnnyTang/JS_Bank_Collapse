@@ -1,5 +1,6 @@
 <template>
-    <canvas id="GPUFrame"></canvas>
+    <!-- <div id="map" ref="mapContainerRef"></div> -->
+    <!-- <canvas id="GPUFrame"></canvas>
     <div id="map" ref="mapContainerRef"></div>
 
     <div class="drag-parent">
@@ -10,42 +11,53 @@
                 <button>clickme</button>
             </div>
         </div>
-
-    </div>
+    </div> -->
+    <!-- <monitorDetail></monitorDetail> -->
+    <bankLineDetail></bankLineDetail>
+    <channelDetail></channelDetail>
 
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue';
 import { main } from '../../utils/m_demLayer/main'
-import { initScratchMap } from '../../utils/mapUtils'
+import { initScratchMap,initMap } from '../../utils/mapUtils'
+import monitorDetail from './featureDetails/monitorDetail.vue'
+import bankLineDetail from './featureDetails/bankLineDetail.vue';
+import channelDetail from './featureDetails/channelDetail.vue';
 
 // src\utils\m_demLayer\terrainLayer.js
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
 import FlowLayer from '../../utils/m_demLayer/flowLayer.js'
+import BackEndRequest from '../../api/backend';
 
 
 const mapContainerRef = ref();
-let flowlayer;
+
 
 onMounted(async () => {
-    const map = await initScratchMap(mapContainerRef.value)
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '1') {
-            map.addLayer(new TerrainLayer(14))
-        }
-        if (e.key === '2') {
-            map.removeLayer('TerrainLayer')
-        }
-        if (e.key === '3') {
-            flowlayer = new FlowLayer()
-            map.addLayer(flowlayer)
-        }
-        if (e.key === '4') {
-            map.removeLayer('FlowLayer')
-            flowlayer.hide()
-        }
-    })
+
+
+
+
+
+    // const map = await initMap(mapContainerRef)
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key === '1') {
+    //         map.addLayer(new TerrainLayer(14))
+    //     }
+    //     if (e.key === '2') {
+    //         map.removeLayer('TerrainLayer')
+    //     }
+    //     if (e.key === '3') {
+    //         flowlayer = new FlowLayer()
+    //         map.addLayer(flowlayer)
+    //     }
+    //     if (e.key === '4') {
+    //         map.removeLayer('FlowLayer')
+    //         flowlayer.hide()
+    //     }
+    // })
 
 
 
@@ -64,8 +76,9 @@ onMounted(async () => {
 
 .drag-parent {
     position: absolute;
-    width: 100vw;
-    height: 94vh;
+    width: 90vw;
+    left: 10vw;
+    height: 90vh;
     top: 4vh;
     pointer-events: none;
 
@@ -87,13 +100,12 @@ onMounted(async () => {
     }
 }
 
-
-
-
 #map {
     position: absolute;
     width: 100vw;
     height: 92vh;
     z-index: 0;
 }
+
+
 </style>

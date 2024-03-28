@@ -1,6 +1,6 @@
 <template>
     <div class="layer-controller">
-        <div class="layer-controller-content" v-draggable="{ 'bounds': 'parent' }">
+        <div class="layer-controller-content" v-draggable="{ 'bounds': 'parent','axis':'x' }">
             <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
                 <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
                 <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
@@ -84,25 +84,24 @@ onMounted(async () => {
     pointer-events: none;
     width: 90vw;
     left: 10vw;
-    height: 90vh;
+    height: 60vh;
     top: 1vh;
     bottom: 1vh;
     z-index: 3;
-
     .layer-controller-content {
         position: absolute;
         pointer-events: all;
-        top: 4vh;
+        top: 12vh;
         right: 2vw;
         width: auto;
         height: auto;
 
         // icon button
         .layer-controller-icon-container {
-
-            pointer-events: all;
-            left: 2vw;
-            z-index: 10;
+            position: absolute;
+            z-index: 999;
+            right: 0;
+            top: 0;
             width: 6.5vh;
             height: 6.5vh;
             background-color: rgb(255, 245, 245);
@@ -110,8 +109,6 @@ onMounted(async () => {
             display: flex;
             align-items: center;
             justify-content: center;
-
-
 
             .layer-controller-icon {
                 width: 5vh;
@@ -135,18 +132,16 @@ onMounted(async () => {
 
         // layer controller
         .layer-controller-main {
-            pointer-events: all;
             position: absolute;
-            right: 2vw;
-            //bottom: 3vh;
+            z-index: 3;
+            right: 0vw;
+            top: 0vh;
             height: 25vh;
             width: 12vw;
-            padding: 10px;
-            background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
+            padding: 1vh;
+            background: #ffffff;
             transition: 300ms;
-            border-radius: 5px;
-            border: solid 5px #2281da;
-            box-shadow: rgb(241, 238, 238) 0px 5px 10px, rgba(246, 246, 247, 0.945) 0px 5px 5px;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 
             .layer-controller-main-title {
                 display: flex;
