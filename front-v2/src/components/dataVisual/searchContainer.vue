@@ -168,7 +168,9 @@ const showLeafDetailHandler = (node) => {
         flytoFeature(map, popupCoord, 11)
 
         popUp && popUp.remove()
-        popUp = new mapboxgl.Popup()
+        popUp = new mapboxgl.Popup({
+            maxWidth: '1000px'
+        })
             .setDOMContent(domwithComp)
             .setLngLat(popupCoord)
             .addTo(map);
@@ -177,7 +179,9 @@ const showLeafDetailHandler = (node) => {
         let popupCoord = [node.data.longitude, node.data.latitude]
         flytoFeature(map, popupCoord, 15)
         popUp && popUp.remove()
-        popUp = new mapboxgl.Popup()
+        popUp = new mapboxgl.Popup({
+            maxWidth: '1000px'
+        })
             .setDOMContent(domwithComp)
             .setLngLat(popupCoord)
             .addTo(map);
@@ -423,21 +427,11 @@ const initDataByScene = (sceneInstance) => {
     }
 }
 
-
-
-
-// question  ----not useful
-
-.mapboxgl-popup-close-button {
-    display: none;
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip){
+    display: none
 }
-
-.mapboxgl-popup-content {
-    background-color: red;
-}
-
-:deep().mapboxgl-popup.mapboxgl-popup-anchor-bottom {
-    display: none;
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip){
+    display: none
 }
 
 

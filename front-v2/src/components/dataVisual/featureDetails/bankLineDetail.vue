@@ -1,6 +1,7 @@
 <template>
     <div class="container">
-        <div class="name">{{ bankLineInfo.bankName }}</div>
+        <div class="name"  :style="{ fontSize: fontSize(bankLineInfo.bankName) }">{{ bankLineInfo.bankName }}
+        </div>
         <div class="main-container">
 
             <div class="warning">
@@ -49,7 +50,18 @@ const warningIcon = ['/icons/warning3.png', '/icons/warning2.png', '/icons/warni
 const bankLineInfo = computed(() => useSceneStore().selectedFeature)
 const showdesc = ref(false)
 
-
+const fontSize = (name)=>{
+    if(name){
+        let length = name.length
+        if(length <= 8){
+            return 'calc(1.2vh + 1.0vw)';
+        }else if(length <= 10){
+            return 'calc(1.0vh + 0.9vw)'
+        }else{
+            return 'calc(0.8vh + 0.6vw)'
+        }
+    }
+}
 
 
 onMounted(async () => {
@@ -81,12 +93,12 @@ $Color5: rgb(6, 102, 192);
         position: relative;
         height: 8vh;
         line-height: 8vh;
+        font-size: calc(1.2vh + 1.0vw);
         width: 100%;
         text-align: center;
         color: white;
         background-color: $Color5;
         font-family: "Trebuchet MS", Helvetica, sans-serif;
-        font-size: calc(1.2vh + 1.0vw);
         text-shadow: 1px 1px 0 #bcbcbc, 1px 1px 0 #9c9c9c;
         font-weight: 600;
     }
@@ -181,10 +193,13 @@ $Color5: rgb(6, 102, 192);
 
                 .city {
                     font-size: calc(0.8vh + 0.7vw);
+                    line-height: calc(0.8vh + 1vw);
                 }
 
                 .river {
                     font-size: calc(0.8vh + 0.6vw);
+                    line-height: calc(0.8vh + 0.7vw);
+
                 }
             }
         }
@@ -226,10 +241,14 @@ $Color5: rgb(6, 102, 192);
         transition: all .3s cubic-bezier(.6, .4, 0, 1);
 
         .desc {
-            padding: 12px;
+            margin-left: 1vw;
+            padding-top: 1vh;
             font-size: calc(0.6vh + 0.75vw);
+            line-height: calc(0.7vh + 0.75vw);
             overflow-x: hidden;
             overflow-y: auto;
+            width: 12.5vw;
+            height: 20vh;
 
             &::-webkit-scrollbar {
                 width: 5px;
