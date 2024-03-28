@@ -12,9 +12,10 @@
             </div>
         </div>
     </div> -->
-    <!-- <monitorDetail></monitorDetail> -->
-    <bankLineDetail></bankLineDetail>
-    <channelDetail></channelDetail>
+    <monitorDetail v-draggable="{'bounds': 'parent'}"></monitorDetail>
+    <!-- <bankLineDetail></bankLineDetail>
+    <channelDetail></channelDetail> -->
+    <!-- <pureChart v-draggable="{'bounds': 'parent'}"></pureChart> -->
 
 </template>
 
@@ -25,6 +26,7 @@ import { initScratchMap,initMap } from '../../utils/mapUtils'
 import monitorDetail from './featureDetails/monitorDetail.vue'
 import bankLineDetail from './featureDetails/bankLineDetail.vue';
 import channelDetail from './featureDetails/channelDetail.vue';
+import pureChart from './monitorDevice/pureChart.vue';
 
 // src\utils\m_demLayer\terrainLayer.js
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'

@@ -1,6 +1,6 @@
 import BackEndRequest from '../../../api/backend'
 import * as echarts from 'echarts'
-import 'echarts-gl';
+// import 'echarts-gl';
 import ecStat from 'echarts-stat';
 import dayjs from 'dayjs'
 
@@ -1088,7 +1088,7 @@ const generateOptions_Manometer = (processedData) => {
     let optionPolarStack_Seriers = []
 
     processedData.Depth_Data_Map.forEach((value, key) => {
-        let data = value 
+        let data = value
         let item = {
             type: 'bar',
             data,
@@ -1245,6 +1245,12 @@ const generateOptions_Stress = (processedData) => {
     //gaugeOption 
     let gaugeData = MonitorDataAssistant.getOnegaugeData(processedData.horizontalAngle[0], processedData.legendData)
     let gaugeOption = {
+        grid: {
+            left: '3%',
+            right: '3%',
+            bottom:'3%',
+            containLabel: true
+        },
         title: {
             show: true,
             text: '水平应力角度',

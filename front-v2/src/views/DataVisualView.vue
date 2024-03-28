@@ -2,9 +2,9 @@
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
         <sceneContainer />
-        <layerControl />
-        <searchContainer />
-        <monitorChart />
+        <layerControl v-draggable="{'bounds': 'parent'}"/>
+        <searchContainer  v-draggable="{'bounds': 'parent'}"/>
+        <!-- <monitorChart /> -->
         <canvas id="GPUFrame"></canvas>
     </div>
 </template>

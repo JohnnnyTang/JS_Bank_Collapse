@@ -30,7 +30,7 @@
 import { onMounted, ref, computed, watch } from 'vue';
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
-import 'echarts-gl';
+// import 'echarts-gl';
 import { MonitorDataAssistant } from './ChartData'
 import { useSceneStore } from '../../../store/mapStore';
 

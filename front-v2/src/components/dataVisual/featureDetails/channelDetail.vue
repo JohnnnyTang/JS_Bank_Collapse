@@ -29,19 +29,17 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import BackEndRequest from '../../../api/backend';
-
-const warningLever = ['一级预警', '二级预警', '三级预警']
-const warningIcon = ['/icons/warning3.png', '/icons/warning2.png', '/icons/warning1.png']
-const channelinfo = ref({})
+import { useSceneStore } from '../../../store/mapStore';
+const channelinfo = computed(() => useSceneStore().selectedFeature)
 const showdesc = ref(false)
+
 
 onMounted(async () => {
 
     const data = (await BackEndRequest.getChannelData()).data
     channelinfo.value = data[0]
-    console.log(channelinfo.value);
 
 })
 
@@ -55,8 +53,6 @@ $Color4: rgb(47, 94, 211);
 $Color5: rgb(6, 102, 192);
 
 .container {
-    margin-left: 100px;
-    margin-top: 100px;
     user-select: none;
 
     position: relative;
@@ -93,7 +89,7 @@ $Color5: rgb(6, 102, 192);
             flex-direction: row;
             justify-content: space-between;
 
-            .type{
+            .type {
                 height: 6vh;
                 margin-left: 2vw;
                 line-height: 6vh;
@@ -219,6 +215,7 @@ $Color5: rgb(6, 102, 192);
         }
 
     }
+
     .slidefade-enter-active,
     .slidefade-leave-active {
         transition: opacity 100ms linear;

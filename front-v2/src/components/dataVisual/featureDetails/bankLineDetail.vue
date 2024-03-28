@@ -35,26 +35,28 @@
             </div>
         </Transition>
 
-
-
-
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import BackEndRequest from '../../../api/backend';
+import { useSceneStore } from '../../../store/mapStore';
+
 
 const warningLever = ['一级预警', '二级预警', '三级预警']
 const warningIcon = ['/icons/warning3.png', '/icons/warning2.png', '/icons/warning1.png']
-const bankLineInfo = ref({})
+const bankLineInfo = computed(() => useSceneStore().selectedFeature)
 const showdesc = ref(false)
+
+
+
 
 onMounted(async () => {
 
     const data = (await BackEndRequest.getbankLineData()).data
     bankLineInfo.value = data[0]
-    console.log(bankLineInfo);
+    // console.log(bankLineInfo);
 
 })
 
@@ -270,6 +272,7 @@ $Color5: rgb(6, 102, 192);
         }
 
     }
+
     .slidefade-enter-active,
     .slidefade-leave-active {
         transition: opacity 100ms linear;

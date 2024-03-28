@@ -1,6 +1,5 @@
 <template>
     <div class="container">
-        <!-- <div class="device-info-container"> -->
         <div class="info-content-container">
             <div class="device-detail-container">
                 <div class="device-name-text">{{ DEVICETYPEMAP[(+deviceInfo.type) - 1] }}</div>
@@ -13,6 +12,10 @@
                         <div class="device-bank-title">监测岸段</div>
                         <div class="device-bank-text">{{ STATIONMAP[deviceInfo.stationCode] }}</div>
                     </div>
+                </div>
+                <div class="device-button-container">
+                    <div class="device-status-button" @click="clickbuttonHandler">
+                        {{ buttonTxt }}</div>
                 </div>
             </div>
             <div class="detail-info-container">
@@ -45,33 +48,41 @@
                             {{ deviceInfo.elevation }}</div>
                     </div>
                 </div>
-                <div class="device-button-container">
-                    <div class="device-status-button"
-                        @click="updateDeviceStatus((+deviceInfo.type) - 1, deviceInfo.code, index)">
-                        查看图表</div>
-                </div>
+            </div>
+
+            <div class="chart" v-if="showChart">
+                <pureChart></pureChart>
             </div>
         </div>
-        <!-- </div> -->
     </div>
 
 
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import BackEndRequest from '../../../api/backend';
+import pureChart from '../monitorDevice/pureChart.vue';
+import { useSceneStore } from '../../../store/mapStore';
 
-const deviceInfo = ref({})
+const showChart = ref(false)
+const buttonTxt = ref("查看图表")
+
+const deviceInfo = computed(() => useSceneStore().selectedFeature)
 const STATIONMAP = {
     'MZS': '民主沙'
 }
 const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 const DEVICEPICMAP = ['/device/gnssBase.png', '/device/inclino.png', '/device/waterPress.png', '/device/changePress.png']
 
-onMounted(async () => {
+const clickbuttonHandler = () => {
+    showChart.value = !showChart.value
+    buttonTxt.value = showChart.value ? "设备概要" : "查看图表"
 
-    deviceInfo.value = (await BackEndRequest.getMonitorInfo()).data[3];
+}
+
+
+onMounted(async () => {
 
     deviceInfo.value["status"] = '正常运行';
     deviceInfo.value["updating"] = false;
@@ -81,7 +92,6 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-
 div.info-content-container {
     user-select: none;
     width: 25vw;
@@ -138,6 +148,7 @@ div.info-content-container {
             // background-color: rgb(127, 138, 255);
 
             img.device-pic-img {
+                pointer-events: none;
                 position: absolute;
                 top: 80%;
                 left: 50%;
@@ -169,6 +180,37 @@ div.info-content-container {
                     font-size: calc(0.7vh + 0.5vw);
                     font-weight: 600;
                     margin-bottom: 0.75vh;
+                }
+            }
+        }
+
+
+        div.device-button-container {
+            position: absolute;
+            left: 1vw;
+            width: 6vw;
+            bottom: -1.5vh;
+            height: 3.8vh;
+            font-size: calc(0.2vh + 0.75vw);
+            font-weight: 600;
+
+            div.device-status-button {
+                height: 3.8vh !important;
+                width: 6vw;
+                line-height: 3.5vh;
+                text-align: center;
+                // background-color: aliceblue;
+                color: #ffffffe6;
+
+                box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.35);
+                background: radial-gradient(ellipse at center, #2692da 0%, #0529ac 100%);
+                transition: all ease-in-out 0.3s;
+
+                &:hover {
+                    cursor: pointer;
+                    height: 4vh !important;
+                    box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
+                    color: #ffffff;
                 }
             }
         }
@@ -264,33 +306,13 @@ div.info-content-container {
             }
         }
 
-        div.device-button-container {
-            position: absolute;
-            width: 10vw;
-            height: 3.8vh;
-            right: 1vw;
-            font-size: calc(0.2vh + 0.75vw);
-            font-weight: 600;
-            div.device-status-button {
-                height: 3.8vh !important;
-                width: 8vw;
-                line-height: 3.5vh;
-                text-align: center;
-                // background-color: aliceblue;
-                color: #ffffffe6;
-
-                box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.35);
-                background: radial-gradient(ellipse at center, #2692da 0%, #0529ac 100%);
-                transition: all ease-in-out 0.3s;
-
-                &:hover {
-                    cursor: pointer;
-                    height: 4vh !important;
-                    box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
-                    color: #ffffff;
-                }
-            }
-        }
     }
+
+    div.chart {
+        position: absolute;
+        left: 8vw;
+    }
+
+
 }
 </style>
