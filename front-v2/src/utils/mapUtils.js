@@ -20,7 +20,6 @@ const initScratchMap = (ref) => {
     return new Promise((resolve, reject) => {
         // const map =
         scr.StartDash().then(() => {
-            console.log(ref)
             const map = new ScratchMap({
                 container: ref.id, // container ID
                 accessToken:
@@ -64,12 +63,12 @@ const flytoSmall = (map) => {
     })
 }
 
-const flytoFeature = (map, coord) => {
+const flytoFeature = (map, coord,zoom=10) => {
     map.flyTo({
         center: coord,
         pitch: 61.99999999999988,
         bearing: 0,
-        zoom: 10,
+        zoom: zoom,
         speed: 0.8,
         essential: true,
     })

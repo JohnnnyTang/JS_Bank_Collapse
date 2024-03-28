@@ -22,7 +22,7 @@ export class LocalTerrain {
     constructor(maxLevel) {
 
         ///////// Initialize CPU resource /////////
-        this.asLine = 0
+        this.asLine = 1
         this.bindingUsed = 0
         this.maxLevel = maxLevel
         this.maxBindingUsedNum = 5000

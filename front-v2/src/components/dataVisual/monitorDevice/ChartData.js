@@ -1,6 +1,6 @@
 import BackEndRequest from '../../../api/backend'
 import * as echarts from 'echarts'
-import 'echarts-gl';
+// import 'echarts-gl';
 import ecStat from 'echarts-stat';
 import dayjs from 'dayjs'
 
@@ -103,14 +103,23 @@ const generateData_Incline = (ogDataArray, metaData) => {
     let legendData = []
     let xMovedata = []
     let yMovedata = []
+    let depth_value_data_x = []
+    let depth_value_data_y = []
+    let depth_value_data_3d = []
 
-    let showCount = 20   //50enough
+    let depth_value_time = []
+
+    let showCount = 5   //50enough
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
         legendData.push(String(metaData[`point${i}Depth`] + 'm'))
     }
     for (let i = 0; i < showCount; i++) {
+        let onetime_depth_value_data_x = []
+        let onetime_depth_value_data_y = []
+        let onetime_depth_value_time = null
+        let onetime_depth_value_data_3d = []
         for (let j = 0; j < pointNum; j++) {
             let item = []
             item.push(ogDataArray[i][`measureTime`])
@@ -122,13 +131,27 @@ const generateData_Incline = (ogDataArray, metaData) => {
             item2.push(legendData[j])
             xMovedata.push(item)
             yMovedata.push(item2)
+
+            onetime_depth_value_data_x.push([ogDataArray[i][`XMove${j + 1}`], depthArray[j]])
+            onetime_depth_value_data_y.push([ogDataArray[i][`YMove${j + 1}`], depthArray[j]])
+            onetime_depth_value_data_3d.push([ogDataArray[i][`XMove${j + 1}`], ogDataArray[i][`YMove${j + 1}`], depthArray[j]])
         }
+        onetime_depth_value_time = (ogDataArray[i]['measureTime'])
+
+        depth_value_data_x.push(onetime_depth_value_data_x)
+        depth_value_data_y.push(onetime_depth_value_data_y)
+        depth_value_data_3d.push(onetime_depth_value_data_3d)
+        depth_value_time.push(onetime_depth_value_time)
     }
 
     return {
         legendData,
         xMovedata,
-        yMovedata
+        yMovedata,
+        depth_value_data_x,
+        depth_value_data_y,
+        depth_value_data_3d,
+        depth_value_time
     }
 }
 const generateData_Manometer = (ogDataArray, metaData) => {
@@ -136,11 +159,16 @@ const generateData_Manometer = (ogDataArray, metaData) => {
     let depthArray = []
     let legendData = []
     let pressureData_river = []
-    let showCount = 10   //50enough
+    let showCount = 8   //50enough
+
+    let depth_value_data = []
+    let depth_value_time = []
 
     let Depth_Data_Map = new Map()
     let Depth_Data = []
     let measureTime = []
+
+    let pressureArrBytime = []
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
@@ -148,6 +176,8 @@ const generateData_Manometer = (ogDataArray, metaData) => {
         Depth_Data.push([])
     }
     for (let i = 0; i < showCount; i++) {
+        let depth_data_item = []
+        let pressureOnetime = []
         for (let j = 0; j < pointNum; j++) {
             let item = []
             item.push(ogDataArray[i][`measureTime`])
@@ -155,9 +185,13 @@ const generateData_Manometer = (ogDataArray, metaData) => {
             item.push(legendData[j])
             pressureData_river.push(item)
             Depth_Data[j].push(ogDataArray[i][`pressure${j + 1}`])
+            depth_data_item.push([ogDataArray[i][`pressure${j + 1}`], depthArray[j]])
+            pressureOnetime.push(ogDataArray[i][`pressure${j + 1}`])
         }
         measureTime.push(timeFormat(time(ogDataArray[i][`measureTime`])))
-
+        depth_value_time.push(ogDataArray[i][`measureTime`])
+        depth_value_data.push(depth_data_item)
+        pressureArrBytime.push(pressureOnetime)
     }
     for (let i = 1; i <= pointNum; i++) {
         Depth_Data_Map.set(legendData[i - 1], Depth_Data[i - 1])
@@ -167,15 +201,22 @@ const generateData_Manometer = (ogDataArray, metaData) => {
         legendData,
         pressureData_river,
         Depth_Data_Map,
-        measureTime
+        measureTime,
+        depth_value_data,
+        depth_value_time,
+        pressureArrBytime
     }
 }
 const generateData_Stress = (ogDataArray, metaData) => {
     let pointNum = metaData["pointNum"]
     let depthArray = []
     let legendData = []
-    let showCount = 20   //50enough
+    let showCount = 5   //50enough
     let horizontalAngle = []
+    let depth_value_hori_data = []
+    let depth_value_vert_data = []
+
+    let depth_value_time = []
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
@@ -184,16 +225,25 @@ const generateData_Stress = (ogDataArray, metaData) => {
 
     for (let i = 0; i < showCount; i++) {
         let horizontalAngleItem = []
+        let depth_value_hori_data_item = []
+        let depth_value_vert_data_item = []
         for (let j = 0; j < pointNum; j++) {
             horizontalAngleItem.push(ogDataArray[i][`horizontal${j + 1}`])
-
+            depth_value_hori_data_item.push([ogDataArray[i][`horizontal_stress${j + 1}`], depthArray[j]])
+            depth_value_vert_data_item.push([ogDataArray[i][`vertical_stress${j + 1}`], depthArray[j]])
         }
         horizontalAngle.push(horizontalAngleItem)
+        depth_value_hori_data.push(depth_value_hori_data_item)
+        depth_value_vert_data.push(depth_value_vert_data_item)
+        depth_value_time.push(ogDataArray[i][`measureTime`])
     }
 
     return {
         legendData,
-        horizontalAngle
+        horizontalAngle,
+        depth_value_time,
+        depth_value_hori_data,
+        depth_value_vert_data,
     }
 }
 
@@ -614,7 +664,9 @@ const generateOptions_GNSS = (processedData) => {
 
 
     return {
-        options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
+        // options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
+        options: [optionScatter, optionRatio],
+        names: ['位移深度趋势图', '综合位移变率图'],
     }
 }
 
@@ -721,11 +773,256 @@ const generateOptions_Incline = (processedData) => {
             }
         ]
     };
-    // 动态柱状排序？
+
+    let depth_value_x_series = []
+    let depth_value_y_series = []
+    let depth_value_3d_series = []
+    for (let i = 0; i < processedData.depth_value_time.length; i++) {
+        let seriesItemX = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: processedData.depth_value_data_x[i]
+        }
+        depth_value_x_series.push(seriesItemX)
+        let seriesItemY = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data: processedData.depth_value_data_y[i]
+        }
+        depth_value_y_series.push(seriesItemY)
+        let serieItem3d = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line3D',
+            data: processedData.depth_value_data_3d[i],
+            smooth: true,
+            lineStyle: {
+                width: 3
+            }
+        }
+        depth_value_3d_series.push(serieItem3d)
+    }
+
+    // 深度 偏移曲线
+    let depth_value_xOption = {
+        title: {
+            text: "测斜仪-X向偏移曲线",
+            left: 'center'
+        },
+        grid: {
+            x: 30,
+            y: 90,
+            x2: 30,
+            y2: 30,
+            borderWidth: 1
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: {
+            type: 'value'
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_x_series
+
+    }
+    let depth_value_yOption = {
+        title: {
+            text: "测斜仪-Y向偏移曲线",
+            left: 'center'
+        },
+        grid: {
+            x: 30,
+            y: 90,
+            x2: 30,
+            y2: 30,
+            borderWidth: 1
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: {
+            type: 'value'
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_y_series
+    }
+    let depth_value_x_y_Option = {
+        color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
+        title: [{
+            text: '测斜仪-X向偏移曲线',
+            left: '10%'
+        }, {
+            text: '测斜仪-Y向偏移曲线',
+            right: '10%' // 设置第二个标题在右边
+        }],
+        grid: [{
+            left: '3%',
+            right: '55%',
+            top: 90,
+            bottom: 30,
+            containLabel: true
+        }, {
+            left: '58%',
+            right: '5%',
+            top: 90,
+            bottom: 30,
+            containLabel: true
+        }],
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: [
+            {
+                type: 'value',
+                gridIndex: 0,
+                name: '偏移量',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
+            },
+            {
+                type: 'value',
+                gridIndex: 1,
+                name: '偏移量',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 0,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
+            },
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 1,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
+
+            }
+        ],
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_x_series
+    };
+    depth_value_x_y_Option.series.push(...depth_value_y_series)
+
+
+    //3d 深度偏移曲线
+    let option3Dline = {
+        title: {
+            text: "测斜仪-三维偏移曲线",
+            left: 'center'
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        tooltip: {},
+        type: 'continuous',
+        // visualMap: {
+        //     show: false,
+        //     dimension: 3,
+        //     min: 0,
+        //     max: timeDif(processedData.startTime, processedData.endTime),
+        //     inRange: {
+        //         color: [
+        //             '#313695',
+        //             '#4575b4',
+        //             '#74add1',
+        //             '#abd9e9',
+        //             '#e0f3f8',
+        //             '#ffffbf',
+        //             '#fee090',
+        //             '#fdae61',
+        //             '#f46d43',
+        //             '#d73027',
+        //             '#a50026'
+        //         ],
+        //         opacity: [0.5, 1.0]
+        //     }
+        // },
+        xAxis3D: {
+            type: 'value',
+            min: 'dataMin'
+        },
+        yAxis3D: {
+            type: 'value',
+            min: 'dataMin'
+        },
+        zAxis3D: {
+            type: 'value',
+            min: 'dataMin'
+        },
+        grid3D: {
+            top: 40, // 调整上边距
+            bottom: 0,
+            height: 300,
+            viewControl: {
+                projection: 'orthographic'
+            }
+        },
+        series: depth_value_3d_series
+    };
+
+
     return {
-        xMoveOption,
-        yMoveOption,
-        options: [xMoveOption, yMoveOption]
+        // options: [xMoveOption, yMoveOption, option3Dline, depth_value_x_y_Option]
+        options: [option3Dline, depth_value_x_y_Option],
+        names: ["三维偏移曲线", "X-Y偏移曲线"],
     }
 }
 
@@ -788,11 +1085,10 @@ const generateOptions_Manometer = (processedData) => {
 
 
     //极坐标分series处理
-    // processedData.Depth_Data_Map.entries
     let optionPolarStack_Seriers = []
-    processedData.Depth_Data_Map.keys().forEach((key) => {
 
-        let data = processedData.Depth_Data_Map.get(key)
+    processedData.Depth_Data_Map.forEach((value, key) => {
+        let data = value
         let item = {
             type: 'bar',
             data,
@@ -805,6 +1101,7 @@ const generateOptions_Manometer = (processedData) => {
         }
         optionPolarStack_Seriers.push(item)
     })
+
     let optionPolarStack = {
         angleAxis: {
             //pressure
@@ -822,25 +1119,138 @@ const generateOptions_Manometer = (processedData) => {
         }
     };
 
-    let optionBarSort = {
-
+    let optionDepthSeries = []
+    for (let i = 0; i < processedData.depth_value_time.length; i++) {
+        let seriesItem = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            data: processedData.depth_value_data[i]
+        }
+        optionDepthSeries.push(seriesItem)
     }
 
+
+    let optionDepthValue = {
+        title: {
+            text: "孔隙水压力计-压力深度曲线",
+            left: 'center'
+        },
+        grid: {
+            x: 30,
+            y: 90,
+            x2: 30,
+            y2: 10,
+            borderWidth: 1
+        },
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: {
+            type: 'value',
+            position: 'top',
+            nameLocation: 'middle',
+            name: '水压力(mPa)',
+            scale: true,
+            axisLabel: {
+                margin: 3,
+            }
+        },
+        yAxis: {
+            type: 'value',
+            scale: true,
+            inverse: true,
+            nameLocation: 'middle',
+            name: '深度(m)',
+            axisLabel: {
+                margin: 3,
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: optionDepthSeries
+    }
+
+    let optionDynamicBar = {
+        grid: {
+            top: 40,
+            left: 50,
+            right: 70,
+            bottom: 50
+        },
+        xAxis: {
+            max: 'dataMax',
+            name: '水压力(mPa)',
+            nameLocation: 'middle',
+            axisLabel: {
+                margin: 3
+            }
+        },
+        yAxis: {
+            type: 'category',
+            name: '深度(m)',
+            nameLocation: 'start',
+            data: processedData.legendData,
+            inverse: true,
+            animationDuration: 300,
+            animationDurationUpdate: 300,
+        },
+        series: [
+            {
+                realtimeSort: true,
+                name: processedData.depth_value_time[0],
+                type: 'bar',
+                data: processedData.pressureArrBytime[0],
+                label: {
+                    show: true,
+                    position: 'right',
+                    valueAnimation: true
+                },
+                showBackground: true,
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                        { offset: 0, color: '#83bff6' },
+                        { offset: 0.8, color: '#188df0' },
+                        { offset: 1, color: '#188df0' }
+                    ])
+                },
+            }
+        ],
+        tooltip: {
+
+        },
+        legend: {
+            show: true
+        },
+        animationDuration: 0,
+        animationDurationUpdate: 3000,
+        animationEasing: 'linear',
+        animationEasingUpdate: 'linear'
+    };
+
     return {
-        optionRiver,
-        optionPolarStack,
-        optionBarSort,
-        options: [optionRiver, optionPolarStack, optionBarSort]
+        options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar],
+        names: ['河流图', '极坐标堆叠图', '压力深度趋势图', '压力深度柱状图'],
     }
 
 }
 const generateOptions_Stress = (processedData) => {
-    // 水平应力和垂直应力的数据联动图表。
-    // https://echarts.apache.org/examples/zh/editor.html?c=dataset-link
 
     //gaugeOption 
     let gaugeData = MonitorDataAssistant.getOnegaugeData(processedData.horizontalAngle[0], processedData.legendData)
     let gaugeOption = {
+        grid: {
+            left: '3%',
+            right: '3%',
+            bottom:'3%',
+            containLabel: true
+        },
         title: {
             show: true,
             text: '水平应力角度',
@@ -894,10 +1304,407 @@ const generateOptions_Stress = (processedData) => {
         ]
     };
 
+    let depth_value_hori_series = []
+    let depth_value_vert_series = []
+    for (let i = 0; i < processedData.depth_value_time.length; i++) {
+        let seriesItemX = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 0,
+            yAxisIndex: 0,
+            data: processedData.depth_value_hori_data[i]
+        }
+        depth_value_hori_series.push(seriesItemX)
+        let seriesItemY = {
+            name: `${processedData.depth_value_time[i]}`,
+            type: 'line',
+            smooth: true,
+            symbolSize: 10,
+            symbol: 'circle',
+            xAxisIndex: 1,
+            yAxisIndex: 1,
+            data: processedData.depth_value_vert_data[i]
+        }
+        depth_value_vert_series.push(seriesItemY)
+    }
+    let depth_value_hori_vert_Option = {
+        // color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
+        title: [{
+            text: '应力桩-水平受力偏移曲线',
+            left: '5%'
+        }, {
+            text: '应力桩-垂直受力偏移曲线',
+            right: '5%' // 设置第二个标题在右边
+        }],
+        grid: [{
+            left: '3%',
+            right: '55%',
+            top: 70,
+            bottom: 30,
+            containLabel: true
+        }, {
+            left: '58%',
+            right: '5%',
+            top: 70,
+            bottom: 30,
+            containLabel: true
+        }],
+        legend: {
+            top: 30,
+            formatter: function (value) {
+                return echarts.format.formatTime('hh:ss', value);
+            }
+        },
+        xAxis: [
+            {
+                type: 'value',
+                gridIndex: 0,
+                name: '水平受力(N)',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
+            },
+            {
+                type: 'value',
+                gridIndex: 1,
+                name: '垂直受力(N)',
+                position: 'top',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                    interval: 2,
+                }
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 0,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
+            },
+            {
+                type: 'value',
+                scale: true,
+                gridIndex: 1,
+                inverse: true,
+                name: '深度',
+                nameLocation: 'middle',
+                axisLabel: {
+                    margin: 1,
+                }
 
+            }
+        ],
+        tooltip: {
+            trigger: 'axis',
+        },
+        series: depth_value_vert_series
+    };
+    depth_value_hori_vert_Option.series.push(...depth_value_hori_series)
+
+
+    // test doble-bar
+    const xData = processedData.legendData
+    const horiDataOneTime = []
+    const vertDataOneTime = []
+    for (let i = 0; i < processedData.legendData.length; i++) {
+        horiDataOneTime.push(processedData.depth_value_hori_data[0][i][0])
+        vertDataOneTime.push(processedData.depth_value_vert_data[0][i][0])
+    }
+    const timeLineData = [1];
+    let colors = [
+        {
+            borderColor: "#0096c7",
+            start: "#90e0ef",
+            end: "#0096c7"
+        },
+        {
+            borderColor: "#49A179",
+            start: "#49A179",
+            end: "#95d5b2"
+        },
+    ];
+    let doubleBarOption = {
+        baseOption: {
+            //timeline::在多个option 间进行切换、播放等操作 ::baseOption 和一个 switchableOption 会用来计算最终的 finalOption
+            timeline: {
+                show: false,
+                top: 0,
+                data: []
+            },
+            title: {
+                text: `应力桩-水平垂直受力图`,
+                left: 'center',
+                fontSize: 20,
+                textStyle: {
+                    color: '#00425C',
+                    fontWeight: 'bolder',
+                }
+            },
+            grid: [
+                // 3个grid
+                {
+                    show: false,
+                    left: '14%',
+                    top: '20%',
+                    bottom: '2%',
+                    containLabel: true,
+                    width: '30%'
+                },
+                {
+                    show: false,
+                    left: '52.5%',
+                    top: '19%',
+                    bottom: '7%',
+                    width: '0%'
+                },
+                {
+                    show: false,
+                    right: '12%',
+                    top: '20%',
+                    bottom: '2%',
+                    containLabel: true,
+                    width: '30%'
+                }
+            ],
+            xAxis: [
+                {
+                    type: 'value',
+                    inverse: true,
+                    axisLine: {
+                        show: true,
+                        onZero: true, // X 轴或者 Y 轴的轴线是否在另一个轴的 0 刻度上
+                        lineStyle: {
+                            color: colors[0].borderColor,
+                        }
+                    },
+                    axisTick: {
+                        show: true
+                    },
+                    position: 'bottom',// bottom 且 inverse ==>朝左
+                    axisLabel: {
+                        show: true,
+                        color: colors[0].borderColor,
+                        fontSize: 12,
+                        fontFamily: "DINPro-Regular"
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                },
+                {
+                    //中间不展示，只做轴
+                    gridIndex: 1,
+                    show: false
+                },
+                {
+                    gridIndex: 2,
+                    inverse: false,//正常向右，no inverse
+                    axisLine: {
+                        show: true,
+                        onZero: true,
+                        lineStyle: {
+                            color: colors[1].borderColor
+                        }
+                    },
+                    axisTick: {
+                        show: true
+                    },
+                    position: 'bottom',
+                    axisLabel: {
+                        show: true,
+                        color: colors[1].borderColor,
+                        fontSize: 12,
+                        fontFamily: "DINPro-Regular"
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'category',//按深度 category 
+                    inverse: true,
+                    position: 'right',//轴放右边，bar朝左边
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: '#00A5CA45'
+                        }
+                    },
+                    //不显示y轴线
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    data: xData,//深度
+                },
+                {
+                    //注意中间这个空图表的操作,左右图共享轴线
+                    gridIndex: 1,
+                    type: 'category',
+                    inverse: true,
+                    // position: 'left',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    // 只显示 居中的label, 不显示轴线,刻度线
+                    axisLabel: {
+                        show: true,
+                        // padding:[-5,0,20,0],
+                        textStyle: {
+                            color: '#00425C',
+                            fontWeight: 'bolder',
+                            fontSize: 15,
+                        },
+                        align: "center"
+                    },
+                    data: xData.map(function (value) {
+                        return {
+                            value: value,
+                            textStyle: {
+                                align: 'center',
+                            }
+                        }
+                    })
+                },
+                {
+                    gridIndex: 2,
+                    type: 'category',
+                    inverse: true,
+                    position: 'left',
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: '#00A5CA45'
+                        }
+                    },
+                    //不显示y轴线
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    data: xData
+                }
+            ],
+            legend: {
+                top: '10%',
+                itemGap: 60
+            },
+            tooltip: {},
+            series: []
+        },
+        options: []
+    }
+    doubleBarOption.baseOption.timeline.data.push(timeLineData[0])
+    doubleBarOption.options.push({
+        series: [
+            {
+                name: "水平受力(N)",
+                type: "bar",
+                xAxisIndex: 0,
+                yAxisIndex: 0,
+                itemStyle: {
+                    normal: {
+                        label: {
+                            //bar的数值显示
+                            show: true,
+                            position: 'left',
+                            textStyle: {
+                                color: colors[0].borderColor,
+                                fontSize: 12
+                            }
+                        },
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[0].start
+                        },
+                        {
+                            offset: 1,
+                            color: colors[0].end
+                        }
+                        ]),
+                        borderColor: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[0].borderColor
+                        },
+                        {
+                            offset: 1,
+                            color: colors[0].end
+                        }
+                        ]),
+                        borderWidth: 1
+                    }
+                },
+                data: horiDataOneTime,
+                animationEasing: "elasticOut"
+            },
+            {
+                name: "垂直受力(N)",
+                type: "bar",
+                stack: "2",
+                // barWidth: 25,
+                xAxisIndex: 2,
+                yAxisIndex: 2,
+                itemStyle: {
+                    normal: {
+                        label: {
+                            show: true,
+                            position: 'right',
+                            textStyle: {
+                                color: colors[1].borderColor,
+                                fontSize: 12
+                            }
+                        },
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[1].start
+                        },
+                        {
+                            offset: 1,
+                            color: colors[1].end
+                        }
+                        ]),
+                        borderColor: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                            offset: 0,
+                            color: colors[1].start
+                        },
+                        {
+                            offset: 1,
+                            color: colors[1].borderColor
+                        }
+                        ]),
+                        borderWidth: 1
+                    }
+                },
+                data: vertDataOneTime,
+                animationEasing: "elasticOut"
+            }
+        ]
+    })
     return {
-        gaugeOption,
-        options: [gaugeOption]
+        options: [gaugeOption, depth_value_hori_vert_Option, doubleBarOption],
+        names: ['水平受力角仪表图', '水平-垂直受力深度趋势图', '水平-垂直受力柱状图']
     }
 
 }
@@ -927,7 +1734,14 @@ class MonitorDataAssistant {
     }
     */
     constructor(specMonitorInfo) {
-        this.info = specMonitorInfo
+        this.info = specMonitorInfo ? specMonitorInfo : {};
+        this.chartOptions = {
+            options: [],
+            names: []
+        };
+        this.monitoringData = [];
+        this.monitoringMetaData = {};
+        this.processedData = {};
     }
 
     async getMonitoringdata() {
@@ -977,6 +1791,7 @@ class MonitorDataAssistant {
                 console.warn('ERROR::getChartOptions');
                 break;
         }
+        console.log(this);
     }
 
 

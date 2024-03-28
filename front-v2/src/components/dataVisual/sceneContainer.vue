@@ -18,16 +18,16 @@ import sceneCard from './sceneCard.vue'
 import { ElMessage } from "element-plus"
 import { Scene, getBigRangeScenes, getSmallRangeScenes } from './Scene.js'
 import { flytoLarge, flytoSmall } from '../../utils/mapUtils'
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, useSceneStore } from '../../store/mapStore';
 
 const mapStore = useMapStore()
+const sceneStore = useSceneStore()
 
-const emit = defineEmits(['selectScene'])
+// const emit = defineEmits(['selectScene'])
 
 const clickSceneHandler = (scene) => {
-    // console.log(scene);
-    // ElMessage(scene.title)
-    emit('selectScene', scene)
+    sceneStore.setSelectedScene(scene)
+    // emit('selectScene', scene)
 }
 
 const switchHandler = () => {
@@ -69,6 +69,7 @@ onMounted(async () => {
 <style lang="scss">
 .scene-container {
     position: absolute;
+    pointer-events:all;
     background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
     height: 92vh;
     overflow: hidden;

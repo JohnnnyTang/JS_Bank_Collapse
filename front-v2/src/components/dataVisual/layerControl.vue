@@ -1,46 +1,53 @@
 <template>
-    <div class="layer-controller">
-        <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="true" :z="3" :w="0" :h="0" axis="y" :parentW="100" :parentH="200">  -->
 
+    <div class="layer-controller-content">
+        <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
+            <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
+            <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
+            <!-- </el-tooltip> -->
+        </div>
 
-            <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
-                <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
-                <div class="layer-controller-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
-                <!-- </el-tooltip> -->
+        <Transition name="slidefade">
+            <div class="layer-controller-main" v-if="showLayersCard">
+                <div class="layer-controller-main-title">图层管理</div>
+                <div class="layer-controller-scene-title">{{ selectedScene.title }}</div>
+
+                <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
+                    <el-checkbox v-for="layerID in selectedScene.allLayers" :key="layerID" :label="layerID"
+                        :value="layerID">{{ layerID
+                        }}
+                    </el-checkbox>
+                </el-checkbox-group>
             </div>
-
-            <Transition name="slidefade">
-                <div class="layer-controller-main" v-show="showLayersCard">
-                    <div class="layer-controller-main-title">图层管理</div>
-                    <div class="layer-controller-scene-title">{{ props.layerScene }}</div>
-
-                    <el-checkbox-group v-model="checkedLayer" @change="handleCheckedLayerChange">
-                        <el-checkbox v-for="city in allLayers" :key="city" :label="city" :value="city">{{ city }}
-                        </el-checkbox>
-                    </el-checkbox-group>
-                </div>
-            </Transition>
-        <!-- </VueDragResize> -->
+        </Transition>
     </div>
+
 </template>
 
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import VueDragResize from 'vue-drag-resize/src'
 import { onMounted, ref, computed, watch } from 'vue';
-import { useMapStore } from '../../store/mapStore';
+import { useMapStore, useSceneStore } from '../../store/mapStore';
 
 const mapStore = useMapStore()
+const sceneStore = useSceneStore()
 const showLayersCard = ref(false)
-const props = defineProps({
-    allLayers: Array,
-    layerScene: String,
-})
-watch(props, () => {
-    checkedLayer.value = props.allLayers
-})
 const checkedLayer = ref([])
+const selectedScene = computed(() => sceneStore.selectedScene)
+
+
+// const props = defineProps({
+//     allLayers: Array,
+//     layerScene: String,
+// })
+// watch(props, () => {
+//     checkedLayer.value = props.allLayers
+// })
+
+watch(selectedScene, (newV, oldV) => {
+    checkedLayer.value = newV.allLayers
+})
 
 
 const handleCheckedLayerChange = () => {
@@ -50,7 +57,7 @@ const handleCheckedLayerChange = () => {
         map.setLayoutProperty(layerID, 'visibility', 'visible');
     })
     // invisible layer
-    let invisibleLayer = props.allLayers.filter(v => !checkedLayer.value.includes(v))
+    let invisibleLayer = selectedScene.value.allLayers.filter(v => !checkedLayer.value.includes(v))
     invisibleLayer.forEach(layerID => {
         map.setLayoutProperty(layerID, 'visibility', 'none');
     });
@@ -71,37 +78,34 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-.layer-controller {
+.layer-controller-content {
     user-select: none;
     position: absolute;
-    right: 0vw;
-    bottom: 0vh;
+    pointer-events: all;
+    top: 12vh;
+    right: 2vw;
+    height: auto;
+    width: auto;
+    z-index: 3;
 
     // icon button
     .layer-controller-icon-container {
-        //position
         position: absolute;
-        right: 2vw;
-        bottom: 3vh;
-        z-index: 10;
-
-        //size and border
+        z-index: 999;
+        right: 0;
+        top: 0;
         width: 6.5vh;
         height: 6.5vh;
         background-color: rgb(255, 245, 245);
         border-radius: 6vh;
-        //center
         display: flex;
         align-items: center;
         justify-content: center;
-
-
 
         .layer-controller-icon {
             width: 5vh;
             height: 5vh;
             background-size: contain;
-            //background-image: url('./icons/layers.png');
             transition: 300ms;
 
             &:hover {
@@ -121,16 +125,15 @@ onMounted(async () => {
     // layer controller
     .layer-controller-main {
         position: absolute;
-        right: 2vw;
-        bottom: 3vh;
+        z-index: 3;
+        right: 0vw;
+        top: 0vh;
         height: 25vh;
         width: 12vw;
-        padding: 10px;
-        background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
+        padding: 1vh;
+        background: #ffffff;
         transition: 300ms;
-        border-radius: 5px;
-        border: solid 5px #2281da;
-        box-shadow: rgb(241, 238, 238) 0px 5px 10px, rgba(246, 246, 247, 0.945) 0px 5px 5px;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 
         .layer-controller-main-title {
             display: flex;
@@ -160,7 +163,7 @@ onMounted(async () => {
         .el-checkbox-group {
             height: 20vh;
             overflow-x: hidden;
-            overflow-y: scroll;
+            overflow-y: auto;
 
             &::-webkit-scrollbar {
                 width: 5px;
@@ -199,14 +202,18 @@ onMounted(async () => {
 
     }
 
-    .slidefade-enter-active,
-    .slidefade-leave-active {
-        transition: opacity 300ms linear;
-    }
 
-    .slidefade-enter-from,
-    .slidefade-leave-to {
-        opacity: 0;
-    }
+}
+
+
+
+.slidefade-enter-active,
+.slidefade-leave-active {
+    transition: opacity 300ms linear;
+}
+
+.slidefade-enter-from,
+.slidefade-leave-to {
+    opacity: 0;
 }
 </style>

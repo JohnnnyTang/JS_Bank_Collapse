@@ -1,6 +1,6 @@
 <template>
+
     <div class="search-container" id="search-container">
-        <!-- <VueDragResize :isActive="true" :isResizable="false" :parentLimitation="false" :z="3" :w="0" :h="0" axis="y"> -->
         <div class="search-container-icon-container" @click="showSearchMain = !showSearchMain">
             <!-- <el-tooltip :content="showSearchMain ? '最小化' : '要素检索'" placement="top" effect="light" :show-arrow="false"> -->
             <div class="search-container-icon" :style="{ backgroundImage: `url(${iconSrc})` }"></div>
@@ -41,8 +41,8 @@
 
                             <span>{{ node.label }}</span>
                             <!-- <span class="det">
-                                <a v-show="node.isLeaf"> 查看详情 </a>
-                            </span> -->
+                                    <a v-show="node.isLeaf"> 查看详情 </a>
+                                </span> -->
                         </span>
                     </template>
 
@@ -50,39 +50,35 @@
                 </el-tree>
             </div>
         </Transition>
-        <!-- </VueDragResize> -->
-
-        <!-- <Transition name="'slidefade">
-            <featureDetail v-show="showfeatureDetail" :selectedFeature></featureDetail>
-        </Transition> -->
 
     </div>
+
+
 </template>
 
 <script setup>
 import mapboxgl from 'mapbox-gl';
-import featureDetail from './featureDetail.vue';
+import popUpContent from './featureDetails/popUpContent.vue';
 import { onMounted, ref, computed, watch, reactive, createApp, defineComponent, nextTick } from 'vue';
 import { ElMessage } from "element-plus"
 import { Scene } from './Scene';
 import { flytoFeature, flytoLarge } from '../../utils/mapUtils';
-import { useMapStore } from '../../store/mapStore';
-import VueDragResize from 'vue-drag-resize/src'
+import { useMapStore, useSceneStore } from '../../store/mapStore';
 
 
 
 
 
 const mapStore = useMapStore()
+const sceneStore = useSceneStore()
 
-const props = defineProps({
-    selectedScene: Scene
-})
-const emit = defineEmits(['selectedFeature'])
+// const props = defineProps({
+//     selectedScene: Scene
+// })
+const selectedScene = computed(() => sceneStore.selectedScene)
+const selectedFeature = computed(() => sceneStore.selectedFeature)
 
 const showSearchMain = ref(false)
-const showfeatureDetail = ref(false)
-const selectedFeature = ref({})
 const iconSrc = computed(() => {
     return showSearchMain.value ? './icons/resize.png' : './icons/searching.png'
 })
@@ -133,24 +129,7 @@ let data = ref([
                 type: 'Leaf'
             },
         ],
-    },
-    {
-        id: 3,
-        label: 'Level one 3',
-        type: 'F',
-        children: [
-            {
-                id: 7,
-                label: 'Level two 3-1',
-                type: 'Leaf'
-            },
-            {
-                id: 8,
-                label: 'Level two 3-2',
-                type: 'Leaf'
-            },
-        ],
-    },
+    }
 ])
 
 
@@ -160,7 +139,8 @@ const filterNode = (value, data, node) => {
 }
 
 const createPopUpComponent = () => {
-    const ap = createApp(featureDetail, { selectedFeature, })
+    //function createApp(rootComponent: Component, rootProps?: object): App
+    const ap = createApp(popUpContent)
     const container = document.createElement("div")
     const componentInstance = ap.mount(container)
     return container;//返回挂载了组件的dom
@@ -173,26 +153,35 @@ let popUp = undefined;
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
-        emit('selectedFeature', nodeProp.data)
+        sceneStore.setSelectedFeature(nodeProp.data)
     }
 }
 
 const showLeafDetailHandler = (node) => {
-    // console.log(node.data);
     let map = mapStore.getMap()
-    selectedFeature.value = node.data;
-    showfeatureDetail.value = true;
     //for channel and bank
 
-    // console.log(props.selectedScene);
-
-    if (props.selectedScene.title === '预警岸段' || props.selectedScene.title === '过江通道') {
+    if (selectedScene.value.title === '预警岸段' || selectedScene.value.title === '过江通道') {
         //展示popUp弹窗
+        console.log('show popup');
         let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
-        flytoFeature(map, popupCoord)
+        flytoFeature(map, popupCoord, 11)
 
         popUp && popUp.remove()
-        popUp = new mapboxgl.Popup()
+        popUp = new mapboxgl.Popup({
+            maxWidth: '1000px'
+        })
+            .setDOMContent(domwithComp)
+            .setLngLat(popupCoord)
+            .addTo(map);
+    }
+    else if (selectedScene.value.title === '实时监测设备') {
+        let popupCoord = [node.data.longitude, node.data.latitude]
+        flytoFeature(map, popupCoord, 15)
+        popUp && popUp.remove()
+        popUp = new mapboxgl.Popup({
+            maxWidth: '1000px'
+        })
             .setDOMContent(domwithComp)
             .setLngLat(popupCoord)
             .addTo(map);
@@ -213,20 +202,29 @@ const getPopupCoord = (coordsArray) => {
 }
 
 
-watch(props, (newV) => {
-    // get scene layer info and init data
+// watch(props, (newV) => {
+//     // get scene layer info and init data
+//     popUp && popUp.remove()
+//     let map = mapStore.getMap()
+//     if (props.selectedScene.allLayers.length != 0) {
+//         // only for geojson?
+//         data.value = initDataByScene(newV.selectedScene)
+//     }
+
+// })
+watch(selectedScene, async (newV) => {
     popUp && popUp.remove()
     let map = mapStore.getMap()
-    if (props.selectedScene.allLayers.length != 0) {
+    if (newV.allLayers.length != 0) {
         // only for geojson?
-        data.value = initDataByScene(newV.selectedScene)
+        data.value = initDataByScene(newV)
     }
-
+}, {
+    deep: true
 })
 
 
 watch(inputText, (v1, v) => {
-    // console.log(v1);
     treeRef.value.filter(v1)
 })
 
@@ -239,7 +237,6 @@ const initDataByScene = (sceneInstance) => {
     let map = mapStore.getMap()
     let data = []
     let idCount = 0
-    console.log(sceneInstance.title);
     if (sceneInstance.title == '预警岸段' ||
         sceneInstance.title == '过江通道' ||
         sceneInstance.title == '实时监测设备') {
@@ -278,14 +275,21 @@ const initDataByScene = (sceneInstance) => {
 .search-container {
     user-select: none;
     position: absolute;
-    right: 0vw;
-    top: 0vh;
+    pointer-events: all;
+    top: 21vh;
+    right: 2vw;
+    // height: 40vh;
+    // width: 20vw;
+    height: auto;
+    width: auto;
+    z-index: 3;
+
 
     .search-container-icon-container {
         position: absolute;
-        right: 2.5vw;
-        top: 2.5vh;
-        z-index: 10;
+        z-index: 999;
+        right: 0;
+        top: 0;
         width: 6.5vh;
         height: 6.5vh;
         background-color: rgb(255, 255, 255);
@@ -293,6 +297,7 @@ const initDataByScene = (sceneInstance) => {
         display: flex;
         align-items: center;
         justify-content: center;
+
 
         .search-container-icon {
             width: 5vh;
@@ -313,17 +318,15 @@ const initDataByScene = (sceneInstance) => {
 
     .search-container-main {
         position: absolute;
-        right: 2vw;
-        top: 2vh;
+        z-index: 3;
+        right: 0vw;
+        top: 0vh;
         height: 40vh;
         width: 20vw;
         padding: 1vh;
         //linear-gradient(45deg, #C9E1F5, #E2FFEE);
-        background-color: #D3F3F8;
-        border-radius: 1vh;
-        box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
+        background-color: #ffffff;
         transition: 300ms;
-        border: solid 5px #2281da;
 
         .input-container {
             width: calc(100% - 6.5vh - 2vw);
@@ -424,18 +427,11 @@ const initDataByScene = (sceneInstance) => {
     }
 }
 
-// question  ----not useful
-
-.mapboxgl-popup-close-button {
-    display: none;
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip){
+    display: none
 }
-
-.mapboxgl-popup-content {
-    background-color: red;
-}
-
-:deep().mapboxgl-popup.mapboxgl-popup-anchor-bottom{
-    display: none;
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip){
+    display: none
 }
 
 
@@ -458,7 +454,7 @@ const initDataByScene = (sceneInstance) => {
         //z-index: 999;
     }
     */
-    
+
     .fat-node {
         width: calc(0.5vh + 0.5vw);
         height: calc(0.5vh + 0.5vw);
@@ -467,7 +463,8 @@ const initDataByScene = (sceneInstance) => {
         line-height: 12px;
         margin-right: 5px;
     }
-    .det{
+
+    .det {
         right: 1vw;
     }
 }

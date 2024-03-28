@@ -33,9 +33,6 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .card {
-  // position: absolute;
-  // top: 3vh;
-  // left: 1vw;
   margin: 10px;
   width: 16vw;
   border-radius: 10px;

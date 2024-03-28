@@ -2,6 +2,7 @@ import { ElMessage } from 'element-plus'
 import mapboxgl from 'mapbox-gl'
 import BackEndRequest from '../../api/backend.js'
 import { loadImage, pulsing } from '../../utils/mapUtils.js'
+import { useSceneStore } from '../../store/mapStore.js'
 
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
 import FlowLayer from '../../utils/m_demLayer/flowLayer.js'
@@ -9,6 +10,7 @@ import FlowLayer from '../../utils/m_demLayer/flowLayer.js'
 
 let terrainLayer = new TerrainLayer(14)
 let flowLayer = new FlowLayer()
+
 
 
 // Data Prepare
@@ -415,7 +417,6 @@ const initLayers = async (sceneInstance, map) => {
         /////small Scene
         case '实时监测设备':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
-            console.log(monitorInfo)
             let monitorDevice = generateGeoJson(
                 monitorInfo,
                 (element) => {
@@ -424,7 +425,6 @@ const initLayers = async (sceneInstance, map) => {
                 'Point',
             )
             // debugger
-            console.log(monitorDevice)
             const { gnss, incline, stress, manometer } =
                 DataPioneer.getDifMonitorData(monitorDevice)
 
@@ -577,6 +577,9 @@ const initLayers = async (sceneInstance, map) => {
     //     },
     //     'building' // Place layer under labels, roads and buildings.
     // );
+    const sceneStore = useSceneStore()
+    sceneStore.setSelectedScene(sceneInstance)
+
 }
 
 // Scene
@@ -591,11 +594,10 @@ class Scene {
         this.layer_src_map = new Map()
     }
     async initAllLayers(map) {
+   
         // question！！！
         // prepare for layer source, add Layers and all visible
-        // console.log(111);
         // if (map.loaded()) {
-        //     console.log(1111);
         //     await initLayers(this, map)
         // }
         // else {
@@ -603,10 +605,10 @@ class Scene {
         //     map.on('load', async () => {
         //         console.log('11122');
         //         await initLayers(this, map)
-
         //     })
         // }
         await initLayers(this, map)
+
     }
 
     showLayers(map, showArrays) {
