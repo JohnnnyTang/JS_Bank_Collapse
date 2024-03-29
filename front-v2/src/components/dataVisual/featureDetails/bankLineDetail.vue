@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="name"  :style="{ fontSize: fontSize(bankLineInfo.bankName) }">{{ bankLineInfo.bankName }}
+        <div class="name" :style="{ fontSize: fontSize(bankLineInfo.bankName) }">{{ bankLineInfo.bankName }}
         </div>
         <div class="main-container">
 
@@ -50,14 +50,14 @@ const warningIcon = ['/icons/warning3.png', '/icons/warning2.png', '/icons/warni
 const bankLineInfo = computed(() => useSceneStore().selectedFeature)
 const showdesc = ref(false)
 
-const fontSize = (name)=>{
-    if(name){
+const fontSize = (name) => {
+    if (name) {
         let length = name.length
-        if(length <= 8){
+        if (length <= 8) {
             return 'calc(1.2vh + 1.0vw)';
-        }else if(length <= 10){
+        } else if (length <= 10) {
             return 'calc(1.0vh + 0.9vw)'
-        }else{
+        } else {
             return 'calc(0.8vh + 0.6vw)'
         }
     }
@@ -66,8 +66,7 @@ const fontSize = (name)=>{
 
 onMounted(async () => {
 
-    const data = (await BackEndRequest.getbankLineData()).data
-    bankLineInfo.value = data[0]
+
     // console.log(bankLineInfo);
 
 })
@@ -237,7 +236,6 @@ $Color5: rgb(6, 102, 192);
         height: 27vh;
         color: $Color3;
         background-color: $Color2;
-        text-indent: 3em;
         transition: all .3s cubic-bezier(.6, .4, 0, 1);
 
         .desc {
@@ -249,6 +247,7 @@ $Color5: rgb(6, 102, 192);
             overflow-y: auto;
             width: 12.5vw;
             height: 20vh;
+            text-indent: 2em;
 
             &::-webkit-scrollbar {
                 width: 5px;

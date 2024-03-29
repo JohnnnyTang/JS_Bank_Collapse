@@ -37,14 +37,6 @@ const checkedLayer = ref([])
 const selectedScene = computed(() => sceneStore.selectedScene)
 
 
-// const props = defineProps({
-//     allLayers: Array,
-//     layerScene: String,
-// })
-// watch(props, () => {
-//     checkedLayer.value = props.allLayers
-// })
-
 watch(selectedScene, (newV, oldV) => {
     checkedLayer.value = newV.allLayers
 })
@@ -82,7 +74,7 @@ onMounted(async () => {
     user-select: none;
     position: absolute;
     pointer-events: all;
-    top: 12vh;
+    top: 48vh;
     right: 2vw;
     height: auto;
     width: auto;

@@ -59,8 +59,8 @@ const sceneContainerInfo2 = {
 }
 const sceneContainerInfo = ref(sceneContainerInfo1)
 
-
 onMounted(async () => {
+
 
 })
 
@@ -69,7 +69,7 @@ onMounted(async () => {
 <style lang="scss">
 .scene-container {
     position: absolute;
-    pointer-events:all;
+    pointer-events: all;
     background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
     height: 92vh;
     overflow: hidden;

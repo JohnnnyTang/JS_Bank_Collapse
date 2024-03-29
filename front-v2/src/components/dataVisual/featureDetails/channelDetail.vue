@@ -178,7 +178,6 @@ $Color5: rgb(6, 102, 192);
         height: 18vh;
         color: $Color3;
         background-color: $Color2;
-        text-indent: 3em;
         transition: all .3s cubic-bezier(.6, .4, 0, 1);
 
         .desc {
@@ -190,6 +189,8 @@ $Color5: rgb(6, 102, 192);
             height: 10.5vh;
             margin-left: 1vw;
             padding-top: 1vh;
+            text-indent: 2em;
+
 
             &::-webkit-scrollbar {
                 width: 5px;

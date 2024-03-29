@@ -26,12 +26,13 @@ const initScratchMap = (ref) => {
                     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
                 style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
                 center: [120.312, 31.917], // starting position [lng, lat]
-                maxZoom: 18,
+                maxZoom: 14,
                 zoom: 8,
                 projection: 'mercator',
                 GPUFrame: GPUFrame,
                 antialias: true,
-                maxZoom: 18,
+                minZoom: 8,
+
             }).on('load', () => {
                 resolve(map)
                 // map.addLayer(new TerrainLayer(14))
@@ -63,7 +64,7 @@ const flytoSmall = (map) => {
     })
 }
 
-const flytoFeature = (map, coord,zoom=10) => {
+const flytoFeature = (map, coord, zoom = 10) => {
     map.flyTo({
         center: coord,
         pitch: 61.99999999999988,
