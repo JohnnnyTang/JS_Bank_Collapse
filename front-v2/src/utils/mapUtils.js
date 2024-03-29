@@ -1,6 +1,8 @@
 import mapboxgl from 'mapbox-gl'
-import { useMapStore } from '../store/mapStore'
+import { createApp } from 'vue'
+import { useMapStore, useSceneStore } from '../store/mapStore'
 import * as scr from './scratch/scratch.js'
+import popUpContent from '../components/dataVisual/featureDetails/popUpContent.vue'
 
 const initMap = (ref) => {
     return new mapboxgl.Map({
@@ -86,6 +88,92 @@ const loadImage = async (map, url, imageID) => {
         })
     })
 }
+
+const createPopUp = () => {
+
+    const ap = createApp(popUpContent)
+    const container = document.createElement("div")
+    const componentInstance = ap.mount(container)
+
+    const domwithComp = container
+    const popUp = new mapboxgl.Popup({
+        maxWidth: '1000px',
+        offset: 25
+    }).setDOMContent(domwithComp)
+    // .setLngLat(popupCoord)
+    // .addTo(map); undefined;
+    return popUp
+}
+
+
+
+
+
+
+const addMarkerToMap = (map, markerPos, markerid, IconUrl, popUpInstance, featureInfo) => {
+
+    // var container = document.createElement("div");
+    // container.id = "container";
+    // container.style.width = "30px";
+    // container.style.height = "30px";
+    // container.style.backgroundColor = "white";
+    // container.style.borderRadius = "50%";
+    // container.style.cursor = 'pointer'
+
+
+    // // 创建 icon 元素并添加到 container 中
+    // var icon = document.createElement("div");
+    // icon.id = "icon";
+    // icon.style.width = "28px";
+    // icon.style.height = "28px";
+    // icon.style.backgroundSize = "contain";
+    // icon.style.backgroundImage = `url(${IconUrl})`;
+
+    // container.appendChild(icon);
+
+
+
+    const el = document.createElement('div');
+    el.id = markerid
+    el.style.width = '25px'
+    el.style.height = '25px'
+    el.style.backgroundImage = `url(${IconUrl})`
+    el.style.backgroundSize = 'contain'
+    el.style.cursor = 'pointer'
+
+
+    let marker = new mapboxgl.Marker({
+        element: el,
+        rotationAlignment: 'horizon',
+        offset: [0, -25]
+    })
+        .setPopup(popUpInstance)
+        .setLngLat(markerPos)
+        .addTo(map);
+
+    marker.getElement().addEventListener('click', () => {
+        useSceneStore().setSelectedFeature(featureInfo)
+        let popUp = marker.getPopup()
+        popUp.setLngLat(markerPos)
+        flytoFeature(map, markerPos)
+    });
+
+    return marker
+
+}
+
+const getCenterCoord = (coordsArray) => {
+    if (coordsArray.length % 2) {
+        return coordsArray[Math.floor(coordsArray.length / 2)]
+    } else {
+        let long = (coordsArray[coordsArray.length / 2][0] + coordsArray[coordsArray.length / 2 - 1][0]) / 2
+        let lat = (coordsArray[coordsArray.length / 2][1] + coordsArray[coordsArray.length / 2 - 1][1]) / 2
+        return [long, lat]
+    }
+}
+
+
+
 
 const size = 80
 const squareThreeDivideTwo = Math.sqrt(3) / 2.0
@@ -712,4 +800,7 @@ export {
     loadImage,
     pulsing,
     initScratchMap,
+    addMarkerToMap,
+    getCenterCoord,
+    createPopUp
 }

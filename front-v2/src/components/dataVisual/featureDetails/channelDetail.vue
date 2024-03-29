@@ -51,8 +51,8 @@ const fontSize = (name) => {
 
 onMounted(async () => {
 
-    const data = (await BackEndRequest.getChannelData()).data
-    channelinfo.value = data[0]
+    // const data = (await BackEndRequest.getChannelData()).data
+    // channelinfo.value = data[0]
 
 })
 

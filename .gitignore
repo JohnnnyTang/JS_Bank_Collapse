@@ -3,6 +3,7 @@
 .vscode/
 mask/
 /data/
+/db/
 
 
 # dependencies

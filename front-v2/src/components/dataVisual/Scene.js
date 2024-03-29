@@ -1,7 +1,7 @@
 import { ElMessage } from 'element-plus'
 import mapboxgl from 'mapbox-gl'
 import BackEndRequest from '../../api/backend.js'
-import { loadImage, pulsing } from '../../utils/mapUtils.js'
+import { loadImage, pulsing, addMarkerToMap, getCenterCoord, createPopUp } from '../../utils/mapUtils.js'
 import { useSceneStore } from '../../store/mapStore.js'
 
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
@@ -298,6 +298,7 @@ const initLayers = async (sceneInstance, map) => {
                 'LineString',
             )
             await bankData.requestData(BackEndRequest.getbankLineData)
+
             const { level1, level2, level3 } = DataPioneer.getDifBankData(
                 bankData.origin2geojson(),
             )
@@ -404,6 +405,28 @@ const initLayers = async (sceneInstance, map) => {
                 '二级预警岸段',
                 '三级预警岸段',
             )
+
+
+            // add marker here
+            let popUp = createPopUp()
+            bankData.data.forEach((item) => {
+                let centerCoord = getCenterCoord(item['coord'])
+                if (item.warningLevel === 1) {
+                    let marker = addMarkerToMap(map, centerCoord, item['id'], '/icons/warning3.png', popUp, item)
+                    // sceneInstance.markers.push(marker)
+                }
+                // else if (item.warningLevel === 2) {
+                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning2.png', undefined)
+                // }
+                // else if (item.warningLevel === 3) {
+                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning1.png', undefined)
+
+                // }
+            })
+
+
+
+
 
             break
 
@@ -592,9 +615,10 @@ class Scene {
         this.layerSrc = []
         this.allLayers = []
         this.layer_src_map = new Map()
+        this.markers = []
     }
     async initAllLayers(map) {
-   
+
         // question！！！
         // prepare for layer source, add Layers and all visible
         // if (map.loaded()) {
@@ -640,10 +664,18 @@ class Scene {
         })
         this.allLayers = []
 
+        // source 是否需要删除？
         this.layerSrc.forEach((sourceID) => {
             map.getSource(sourceID) && map.removeSource(sourceID)
         })
         this.layerSrc = []
+
+        this.markers.forEach((marker) => {
+            marker.remove()
+        })
+        this.markers = []
+
+
         // }
         // else {
         //     ElMessage('map not loaded!')
@@ -689,8 +721,8 @@ const getBigRangeScenes = () => {
 
     let chongy = new Scene()
     chongy.title = '平面冲淤'
-    ;(chongy.desc = '呈现整个江河岸段的冲淤情况'),
-        (chongy.iconSrc = './icons/shore.png')
+        ; (chongy.desc = '呈现整个江河岸段的冲淤情况'),
+            (chongy.iconSrc = './icons/shore.png')
 
     bigRangeScenes.push(
         typiclaCollapse,
@@ -722,6 +754,6 @@ const getSmallRangeScenes = () => {
     return smallRangeScenes
 }
 
-const mapboxAddLayer = (scene, source) => {}
+const mapboxAddLayer = (scene, source) => { }
 
 export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers }

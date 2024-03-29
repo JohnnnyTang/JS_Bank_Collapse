@@ -4,8 +4,10 @@
         <div class="scene-title"> {{ sceneContainerInfo.sceneTitle }} </div>
         <div class="switch-icon" @click="switchHandler"></div>
         <div class="card-container">
-            <sceneCard v-for="(info, index) in sceneContainerInfo.sceneCardInfo" :key="index" :title="info.title"
-                :desc="info.desc" :iconSrc="info.iconSrc" @click="clickSceneHandler(info)"></sceneCard>
+            <sceneCard v-for="(info, index) in  sceneContainerInfo.sceneCardInfo " :key="index" :title="info.title"
+                :desc="info.desc" :iconSrc="info.iconSrc" @click="clickSceneHandler(info, index)"
+                :class="{ active: selectedIndex === index }">
+            </sceneCard>
             <hr>
         </div>
 
@@ -22,11 +24,13 @@ import { useMapStore, useSceneStore } from '../../store/mapStore';
 
 const mapStore = useMapStore()
 const sceneStore = useSceneStore()
+const selectedIndex = ref(0)
 
 // const emit = defineEmits(['selectScene'])
 
-const clickSceneHandler = (scene) => {
+const clickSceneHandler = (scene, index) => {
     sceneStore.setSelectedScene(scene)
+    selectedIndex.value = index;
     // emit('selectScene', scene)
 }
 
@@ -47,6 +51,8 @@ const switchHandler = () => {
     }
 }
 
+
+
 const sceneCardInfo1 = getBigRangeScenes()
 const sceneCardInfo2 = getSmallRangeScenes()
 const sceneContainerInfo1 = {
@@ -66,7 +72,7 @@ onMounted(async () => {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .scene-container {
     position: absolute;
     pointer-events: all;
@@ -146,4 +152,11 @@ onMounted(async () => {
 
 
 }
+
+.active {
+    box-shadow: 0 0 5px 5px rgba(27, 96, 160, 0.623);
+    transform: scale(1.02);
+    /* 选中项的背景色为黄色 */
+}
+
 </style>

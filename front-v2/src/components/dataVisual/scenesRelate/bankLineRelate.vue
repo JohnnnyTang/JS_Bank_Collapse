@@ -95,10 +95,6 @@ const chartProcess = (data) => {
         warningByRiver['三级预警'].push(level3)
     }
 
-    console.log(Object.keys(dataMapByRiver));
-    console.log(warningByRiver);
-
-
     // 分河段 柱状按预警堆叠图
     let series1 = []
 
@@ -202,12 +198,7 @@ const chartProcess = (data) => {
             }
         ]
     }
-
-
-
     return [option1, option2]
-
-
 
 }
 
@@ -218,9 +209,6 @@ onMounted(async () => {
     const data = (await BackEndRequest.getbankLineData()).data
     Info.value.banklineNum = data.length
     Info.value.updateTime = data[0]["updateTime"]
-    console.log(data);
-
-
 
     let chartdom = document.querySelector('#chart')
     myChart = echarts.init(chartdom);
@@ -321,7 +309,7 @@ onMounted(async () => {
                     display: block;
                     width: 60vw;
                     height: 14vh;
-                    background: rgb(104,175,235);
+                    background: rgb(104, 175, 235);
                     animation: rotation_481 5000ms infinite linear;
                 }
 

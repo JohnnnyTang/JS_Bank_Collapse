@@ -66,9 +66,6 @@ const fontSize = (name) => {
 
 onMounted(async () => {
 
-
-    // console.log(bankLineInfo);
-
 })
 
 </script>

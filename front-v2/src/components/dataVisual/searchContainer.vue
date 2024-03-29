@@ -72,9 +72,7 @@ import { useMapStore, useSceneStore } from '../../store/mapStore';
 const mapStore = useMapStore()
 const sceneStore = useSceneStore()
 
-// const props = defineProps({
-//     selectedScene: Scene
-// })
+
 const selectedScene = computed(() => sceneStore.selectedScene)
 const selectedFeature = computed(() => sceneStore.selectedFeature)
 
@@ -140,8 +138,6 @@ const ICON = (node) => {
             return '/icons/minus.png'
         }
     }
-
-
     return ''
 }
 
@@ -166,6 +162,7 @@ let popUp = undefined;
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
+        console.log('selectedFeature--', nodeProp.data);
         sceneStore.setSelectedFeature(nodeProp.data)
     }
 }
@@ -181,7 +178,8 @@ const showLeafDetailHandler = (node) => {
 
         popUp && popUp.remove()
         popUp = new mapboxgl.Popup({
-            maxWidth: '1000px'
+            maxWidth: '1000px',
+            offset: 25
         })
             .setDOMContent(domwithComp)
             .setLngLat(popupCoord)
@@ -198,9 +196,6 @@ const showLeafDetailHandler = (node) => {
             .setLngLat(popupCoord)
             .addTo(map);
     }
-
-
-
 }
 
 const getPopupCoord = (coordsArray) => {

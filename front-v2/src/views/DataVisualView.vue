@@ -6,11 +6,11 @@
         <layerControl></layerControl>
         <!-- <searchContainer v-draggable="{ 'bounds': 'parent' }" /> -->
         <searchContainer></searchContainer>
-        <bankLineRelate></bankLineRelate>
-        
-        
-        <!-- <monitorChart /> -->
+        <fullscreen></fullscreen>
         <canvas id="GPUFrame"></canvas>
+
+        <bankLineRelate v-if="selectedScene.title === '预警岸段'"></bankLineRelate>
+        <!-- <monitorChart /> -->
 
 
     </div>
@@ -20,15 +20,15 @@
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
-import { initMap, flytoLarge, flytoSmall, initScratchMap } from '../utils/mapUtils';
+import { initMap, flytoLarge, flytoSmall, initScratchMap, addMarkerToMap } from '../utils/mapUtils';
 import { Scene } from '../components/dataVisual/Scene';
 import { useMapStore, useSceneStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 import layerControl from '../components/dataVisual/layerControl.vue';
 import searchContainer from '../components/dataVisual/searchContainer.vue';
-import monitorChart from '../components/dataVisual/monitorDevice/monitorChart.vue';
 import BackEndRequest from '../api/backend';
 import bankLineRelate from '../components/dataVisual/scenesRelate/bankLineRelate.vue';
+import fullscreen from '../components/dataVisual/fullscreen.vue';
 
 
 const mapContainerRef = ref();
@@ -37,7 +37,6 @@ const sceneStore = useSceneStore()
 const selectedScene = computed(() => sceneStore.selectedScene)
 let map = null;
 const selectedFeature = computed(() => sceneStore.selectedFeature)
-let firstTime = true
 
 
 watch(selectedScene, async (newV, oldV) => {
@@ -45,10 +44,7 @@ watch(selectedScene, async (newV, oldV) => {
     oldV && oldV.removeLayers(map)
     if (!newV.allLayers.length) {
         await newV.initAllLayers(map)
-        if (firstTime) {
-            firstTime = false
-            console.log(selectedScene);
-        }
+    
     }
     else {
         newV.showLayers(map, [])
@@ -68,6 +64,9 @@ onMounted(async () => {
     const defaultScene = new Scene()
     defaultScene.title = '预警岸段'
     sceneStore.setSelectedScene(defaultScene)
+
+    //test 
+    // addMarkerToMap(map, [119.9617548378, 32.04382454852],'testMarker','/icons/warning3.png')
 
 
 })
@@ -126,5 +125,14 @@ div.data-visual-container {
         border-style: solid;
         // border-color: blue($color: #000000);
     }
+}
+
+#warning1-marker {
+    background-image: url('https://docs.mapbox.com/mapbox-gl-js/assets/washington-monument.jpg');
+    background-size: contain;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
 }
 </style>

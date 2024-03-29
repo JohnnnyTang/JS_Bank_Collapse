@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div class="top-section">
+    <div class="top-section" :class="$attrs.class">
       <div class="border">
         <div class="title-text">
           {{ props.title }}
@@ -126,6 +126,11 @@ onMounted(async () => {
       padding: 5px;
       overflow: hidden
     }
+  }
+
+  .top-section.active{
+    background: linear-gradient(45deg, #C9E1F5, #5af4ff);
+
   }
 }
 </style>
