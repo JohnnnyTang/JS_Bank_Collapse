@@ -37,7 +37,7 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <div class="iconAndlable">
-                                <div class="icon" :style="{ backgroundImage: `url(${ICON(node)})` }"></div>
+                                <div class="icon"></div>
                                 <div class="label">{{ node.label }}</div>
                             </div>
                             <span class="desc">

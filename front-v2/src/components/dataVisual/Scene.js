@@ -409,18 +409,19 @@ const initLayers = async (sceneInstance, map) => {
 
             // add marker here
             let popUp = createPopUp()
+            let count = 0
             bankData.data.forEach((item) => {
                 let centerCoord = getCenterCoord(item['coord'])
+
                 if (item.warningLevel === 1) {
-                    let marker = addMarkerToMap(map, centerCoord, item['id'], '/icons/warning3.png', popUp, item)
-                    // sceneInstance.markers.push(marker)
+                    addMarkerToMap(map, centerCoord, 'warning1-marker', '/icons/warning3.png', popUp, item)
+                    count++
                 }
                 // else if (item.warningLevel === 2) {
-                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning2.png', undefined)
+                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning2.png', popUp, item)
                 // }
                 // else if (item.warningLevel === 3) {
-                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning1.png', undefined)
-
+                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning1.png', popUp, item)
                 // }
             })
 
@@ -612,9 +613,8 @@ class Scene {
         this.title = ''
         this.desc = ''
         this.iconSrc = ''
-        this.layerSrc = []
-        this.allLayers = []
-        this.layer_src_map = new Map()
+        this.layerSrc = []//only id
+        this.allLayers = []//only id
         this.markers = []
     }
     async initAllLayers(map) {
@@ -670,11 +670,11 @@ class Scene {
         })
         this.layerSrc = []
 
-        this.markers.forEach((marker) => {
-            marker.remove()
-        })
-        this.markers = []
-
+        //hide marker
+        let markersDoms = document.getElementsByClassName('mapboxgl-marker mapboxgl-marker-anchor-center')
+        for (let i = markersDoms.length - 1; i >= 0; i--) {
+            markersDoms[i].remove()
+        }
 
         // }
         // else {

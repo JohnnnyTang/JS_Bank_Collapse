@@ -2,16 +2,13 @@
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
         <sceneContainer />
-        <!-- <layerControl v-draggable="{ 'bounds': 'parent' }" /> -->
         <layerControl></layerControl>
-        <!-- <searchContainer v-draggable="{ 'bounds': 'parent' }" /> -->
         <searchContainer></searchContainer>
         <fullscreen></fullscreen>
-        <canvas id="GPUFrame"></canvas>
-
         <bankLineRelate v-if="selectedScene.title === '预警岸段'"></bankLineRelate>
-        <!-- <monitorChart /> -->
-
+        <channelRelate v-if="selectedScene.title === '过江通道'"></channelRelate>
+        
+        <canvas id="GPUFrame"></canvas>
 
     </div>
 </template>
@@ -27,8 +24,9 @@ import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 import layerControl from '../components/dataVisual/layerControl.vue';
 import searchContainer from '../components/dataVisual/searchContainer.vue';
 import BackEndRequest from '../api/backend';
-import bankLineRelate from '../components/dataVisual/scenesRelate/bankLineRelate.vue';
 import fullscreen from '../components/dataVisual/fullscreen.vue';
+import bankLineRelate from '../components/dataVisual/scenesRelate/bankLineRelate.vue';
+import channelRelate from '../components/dataVisual/scenesRelate/channelRelate.vue';
 
 
 const mapContainerRef = ref();
@@ -41,10 +39,10 @@ const selectedFeature = computed(() => sceneStore.selectedFeature)
 
 watch(selectedScene, async (newV, oldV) => {
     map = mapStore.getMap()
-    oldV && oldV.removeLayers(map)
+    oldV.allLayers.length && oldV.removeLayers(map)
+    console.log('1');
     if (!newV.allLayers.length) {
         await newV.initAllLayers(map)
-    
     }
     else {
         newV.showLayers(map, [])
@@ -114,9 +112,14 @@ div.data-visual-container {
 
     .mapboxgl-popup-content {
         padding: 0;
+        background-color: transparent;
+        border:none
     }
 
     .mapboxgl-popup-tip {
+        // background-color: transparent;
+
+        // border-top-color: transparent;
         border-top-color: rgb(161, 214, 255);
         border-top-width: 30px;
         border-left-width: 7px;

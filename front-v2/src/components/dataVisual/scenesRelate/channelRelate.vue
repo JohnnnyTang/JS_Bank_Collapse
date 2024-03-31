@@ -2,7 +2,7 @@
     <div class="bankLineRelate-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">崩岸预警信息</div>
+            <div class="title">过江通道信息</div>
         </div>
         <div class="card">
             <div class="content">
@@ -11,12 +11,12 @@
 
                         <div class="desc-content">
                             <div class="in-db-bank-container">
-                                <div class="in-db-bank">在库崩岸</div>
-                                <div class="in-db-bank-num">{{ Info.banklineNum }}</div>
+                                <div class="in-db-bank">在库通道</div>
+                                <div class="in-db-bank-num">{{ Info.channelNum }}</div>
                             </div>
                             <div class="bank-desc">
                                 <div class="bank-desc-text">
-                                    长江江苏段预警岸段场景涵盖了的南京、扬中、镇扬、扬中、澄通等各河段及河口段的众多崩岸信息。
+                                    涵盖长江江苏段已建成、在建以及规划中的桥梁和隧道，为促进南北岸交通互联、助力过江通道的发展提供支持。
                                 </div>
                             </div>
 
@@ -25,7 +25,6 @@
                                 <div class="last-update-text">{{ Info.updateTime }}</div>
                             </div>
                         </div>
-
 
                         <div class="chart" id="chart"></div>
 
@@ -47,189 +46,85 @@ let myChart = null
 
 
 const chartProcess = (data) => {
-    let dataMapByRiver = {}
-    let dataMapByWarning = {}
 
+    let builtNum = 0
+    let buildingNum = 0
+    let planningNum = 0
     for (let i = 0; i < data.length; i++) {
         let item = data[i]
-        if (!dataMapByRiver[item["riverName"]]) {
-            dataMapByRiver[item["riverName"]] = []
-            dataMapByRiver[item["riverName"]].push(item)
-        } else {
-            dataMapByRiver[item["riverName"]].push(item)
-        }
-
-        if (!dataMapByWarning[item["warningLevel"]]) {
-            dataMapByWarning[item["warningLevel"]] = []
-            dataMapByWarning[item["warningLevel"]].push(item)
-        } else {
-            dataMapByWarning[item["warningLevel"]].push(item)
+        if (item.type === '规划通道') {
+            planningNum++
+        } else if (item.type === '已建通道') {
+            builtNum++
+        } else if (item.type === '在建通道') {
+            buildingNum++
         }
     }
 
-    let warningByRiver = {
-        '一级预警': [],
-        '二级预警': [],
-        '三级预警': [],
-    }
 
-    const sum = (arr) => {
-        let total = 0
-        for (let i = 0; i < arr.length; i++) {
-            total += arr[i]
-        }
-        return total
-    }
 
-    for (let riverName in dataMapByRiver) {
-        let level1, level2, level3
-        level1 = level2 = level3 = 0
-        let oneRiverData = dataMapByRiver[riverName]
-        for (let i = 0; i < oneRiverData.length; i++) {
-            oneRiverData[i]["warningLevel"] === 1 && level1++;
-            oneRiverData[i]["warningLevel"] === 2 && level2++;
-            oneRiverData[i]["warningLevel"] === 3 && level3++;
-        }
-        warningByRiver['一级预警'].push(level1)
-        warningByRiver['二级预警'].push(level2)
-        warningByRiver['三级预警'].push(level3)
-    }
-
-    // 分河段 柱状按预警堆叠图
-    let series1 = []
-
-    for (let i = 0; i < Object.keys(warningByRiver).length; i++) {
-
-        let item = {
-            name: Object.keys(warningByRiver)[i],
-            type: 'bar',
-            stack: 'total',
-            label: {
-                show: true
-            },
-            emphasis: {
-                focus: 'series'
-            },
-            data: warningByRiver[Object.keys(warningByRiver)[i]]
-        }
-        series1.push(item)
-    }
-
-    let option1 = {
-        color:
-            ['rgb(219,25,35)', 'rgb(240,122,56)', 'rgb(35,94,243)']
-        ,
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                // Use axis to trigger tooltip
-                type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+    let option = {
+        legend: {
+            top: 'bottom'
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: { show: true },
+                dataView: { show: true, readOnly: false },
+                restore: { show: true },
             }
-        },
-        legend: {
-            top: '5%',
-            left: 'center'
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'value'
-        },
-        yAxis: {
-            type: 'category',
-            data: Object.keys(dataMapByRiver)
-        },
-        series: series1
-    };
-
-    let option2 = {
-        color:
-            ['rgb(219,25,35)', 'rgb(240,122,56)', 'rgb(35,94,243)']
-        ,
-        grid: {
-            top: 50
-        },
-        // tooltip: {
-        //     trigger: 'item'
-        // },
-        legend: {
-            top: '5%',
-            left: 'center'
         },
         series: [
             {
-                name: 'Access From',
+                name: 'Nightingale Chart',
                 type: 'pie',
-                radius: ['40%', '70%'],
-                center: ['50%', '55%'],
-                avoidLabelOverlap: false,
+                radius: [15, 80],
+                center: ['50%', '45%'],
+                roseType: 'area',
                 itemStyle: {
-                    borderRadius: 10,
-                    borderColor: '#fff',
-                    borderWidth: 2
+                    borderRadius: 5
                 },
+
                 label: {
                     normal: {
                         formatter: '{b}:{c}',
                         show: true,
                         position: 'outside'
-                    },
-
-                },
-                emphasis: {
-                    label: {
-                        show: true,
-                        fontSize: 15,
-                        fontWeight: 'bold'
                     }
                 },
                 labelLine: {
-                    show: false
+                    showAbove:false,
+                    length2:5,
                 },
                 data: [
-                    { value: sum(warningByRiver['一级预警']), name: '一级预警' },
-                    { value: sum(warningByRiver['二级预警']), name: '二级预警' },
-                    { value: sum(warningByRiver['三级预警']), name: '三级预警' },
+                    { value: builtNum, name: '已建通道' },
+                    { value: buildingNum, name: '在建通道' },
+                    { value: planningNum, name: '规划通道' },
                 ]
             }
         ]
-    }
-    return [option1, option2]
+    };
+
+    return option
 
 }
 
 
 
 onMounted(async () => {
-
-    const data = (await BackEndRequest.getbankLineData()).data
-    Info.value.banklineNum = data.length
+    const data = (await BackEndRequest.getChannelData()).data
+    console.log(data);
+    Info.value.channelNum = data.length
     Info.value.updateTime = data[0]["updateTime"]
 
     let chartdom = document.querySelector('#chart')
     myChart = echarts.init(chartdom);
 
-    let optons = chartProcess(data)
-    let index = 0
-    // myChart.setOption(optons[index])
-    setTimeout(() => {
-        myChart.setOption(optons[index])
-    }, 0);
+    let opton = chartProcess(data)
+    myChart.setOption(opton)
 
-    setInterval(() => {
-        if (index === 0) {
-            index = 1
-        }
-        else if (index === 1) {
-            index = 0
-        }
-        myChart.clear()
-        myChart.setOption(optons[index])
-    }, 5000)
+
 
 
 })
@@ -266,7 +161,7 @@ onMounted(async () => {
             width: 5vh;
             height: 5vh;
             margin-right: 1vw;
-            background-image: url('/icons/collapse.png');
+            background-image: url('/icons/gate.png');
             background-size: contain;
             background-repeat: no-repeat
         }

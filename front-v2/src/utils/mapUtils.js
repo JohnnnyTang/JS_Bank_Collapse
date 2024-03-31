@@ -69,13 +69,13 @@ const flytoSmall = (map) => {
 const flytoFeature = (map, coord, zoom = 10) => {
     map.flyTo({
         center: coord,
-        pitch: 61.99999999999988,
+        // pitch: 61.99999999999988,
+        pitch: 20,
         bearing: 0,
         zoom: zoom,
         speed: 0.8,
         essential: true,
     })
-    console.log(map.getBounds())
 }
 
 const loadImage = async (map, url, imageID) => {
@@ -110,7 +110,7 @@ const createPopUp = () => {
 
 
 
-const addMarkerToMap = (map, markerPos, markerid, IconUrl, popUpInstance, featureInfo) => {
+const addMarkerToMap = (map, markerPos, markerClass, IconUrl, popUpInstance, featureInfo) => {
 
     // var container = document.createElement("div");
     // container.id = "container";
@@ -134,9 +134,9 @@ const addMarkerToMap = (map, markerPos, markerid, IconUrl, popUpInstance, featur
 
 
     const el = document.createElement('div');
-    el.id = markerid
-    el.style.width = '25px'
-    el.style.height = '25px'
+    el.classList.add(markerClass);
+    el.style.width = '35px'
+    el.style.height = '35px'
     el.style.backgroundImage = `url(${IconUrl})`
     el.style.backgroundSize = 'contain'
     el.style.cursor = 'pointer'
