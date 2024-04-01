@@ -79,6 +79,7 @@ onMounted(async () => {
     background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
     height: 92vh;
     overflow: hidden;
+    z-index: 3;
 
 
 

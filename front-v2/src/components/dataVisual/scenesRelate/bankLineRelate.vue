@@ -245,7 +245,7 @@ onMounted(async () => {
     right: 1vw;
     top: 1vh;
     height: 20vh;
-
+    z-index: 5;
     width: 30vw;
     height: 35vh;
     background-color: rgb(229, 233, 236);

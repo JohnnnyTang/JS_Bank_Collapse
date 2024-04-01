@@ -186,6 +186,7 @@ const generateGeoJson = (itemArr, getCoords, type) => {
 }
 
 const initLayers = async (sceneInstance, map) => {
+    let popUp = createPopUp()
     switch (sceneInstance.title) {
         /////Large Scene
         case '过江通道':
@@ -289,6 +290,19 @@ const initLayers = async (sceneInstance, map) => {
                 },
             })
             sceneInstance.allLayers.push('已建通道', '在建通道', '规划通道')
+
+            popUp = createPopUp()
+            channel.data.forEach((item) => {
+                let centerCoord = getCenterCoord(item['llCoords'])
+                if (item.type === '在建通道') {
+                    addMarkerToMap(map, centerCoord, 'building-marker', '/icons/building.png', popUp, item)
+                }
+                else if (item.type === '规划通道') {
+                    addMarkerToMap(map, centerCoord, 'planning-marker', '/icons/planing.png', popUp, item)
+                }
+            })
+
+
 
             break
         case '预警岸段':
@@ -408,7 +422,7 @@ const initLayers = async (sceneInstance, map) => {
 
 
             // add marker here
-            let popUp = createPopUp()
+       
             let count = 0
             bankData.data.forEach((item) => {
                 let centerCoord = getCenterCoord(item['coord'])
@@ -424,11 +438,6 @@ const initLayers = async (sceneInstance, map) => {
                 //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning1.png', popUp, item)
                 // }
             })
-
-
-
-
-
             break
 
         case '全江地形':

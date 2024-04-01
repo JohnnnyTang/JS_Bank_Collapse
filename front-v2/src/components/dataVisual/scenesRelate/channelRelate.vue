@@ -67,20 +67,12 @@ const chartProcess = (data) => {
         legend: {
             top: 'bottom'
         },
-        toolbox: {
-            show: true,
-            feature: {
-                mark: { show: true },
-                dataView: { show: true, readOnly: false },
-                restore: { show: true },
-            }
-        },
         series: [
             {
                 name: 'Nightingale Chart',
                 type: 'pie',
                 radius: [15, 80],
-                center: ['50%', '45%'],
+                center: ['50%', '40%'],
                 roseType: 'area',
                 itemStyle: {
                     borderRadius: 5
@@ -88,14 +80,48 @@ const chartProcess = (data) => {
 
                 label: {
                     normal: {
-                        formatter: '{b}:{c}',
+                        fontSize: 15,
+                        formatter: (params) => {
+                            switch (params.name) {
+                                case '规划通道':
+                                    return "{planning|}" + '\n' + params.data.value + ' 条'
+                                case '已建通道':
+                                    return "{built|}" + '\n' + params.data.value + ' 条'
+                                case '在建通道':
+                                    return "{building|}" + '\n' + params.data.value + ' 条'
+                            }
+
+                        },
                         show: true,
-                        position: 'outside'
+                        position: 'outside',
+                        rich: {
+                            planning: {
+                                height: 35,
+                                align: 'left',
+                                backgroundColor: {
+                                    image: '/icons/planing.png'
+                                }
+                            },
+                            built: {
+                                height: 35,
+                                align: 'left',
+                                backgroundColor: {
+                                    image: '/icons/gate.png'
+                                }
+                            },
+                            building: {
+                                height: 35,
+                                align: 'left',
+                                backgroundColor: {
+                                    image: '/icons/building.png'
+                                }
+                            }
+                        }
                     }
                 },
                 labelLine: {
-                    showAbove:false,
-                    length2:5,
+                    showAbove: false,
+                    length2: 5,
                 },
                 data: [
                     { value: builtNum, name: '已建通道' },
@@ -114,7 +140,6 @@ const chartProcess = (data) => {
 
 onMounted(async () => {
     const data = (await BackEndRequest.getChannelData()).data
-    console.log(data);
     Info.value.channelNum = data.length
     Info.value.updateTime = data[0]["updateTime"]
 
@@ -124,7 +149,11 @@ onMounted(async () => {
     let opton = chartProcess(data)
     myChart.setOption(opton)
 
+    setInterval(() => {
+        myChart.clear()
+        myChart.setOption(opton)
 
+    }, 4000);
 
 
 })
@@ -140,6 +169,7 @@ onMounted(async () => {
     right: 1vw;
     top: 1vh;
     height: 20vh;
+    z-index: 5;
 
     width: 30vw;
     height: 35vh;

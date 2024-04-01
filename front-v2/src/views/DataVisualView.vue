@@ -40,7 +40,6 @@ const selectedFeature = computed(() => sceneStore.selectedFeature)
 watch(selectedScene, async (newV, oldV) => {
     map = mapStore.getMap()
     oldV.allLayers.length && oldV.removeLayers(map)
-    console.log('1');
     if (!newV.allLayers.length) {
         await newV.initAllLayers(map)
     }
