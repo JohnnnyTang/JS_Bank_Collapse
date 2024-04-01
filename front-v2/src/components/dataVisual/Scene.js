@@ -5,11 +5,11 @@ import { loadImage, pulsing, addMarkerToMap, getCenterCoord, createPopUp } from 
 import { useSceneStore } from '../../store/mapStore.js'
 
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
-import FlowLayer from '../../utils/m_demLayer/flowLayer.js'
+import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 // BackEndRequest.getDataNodeData()
 
 let terrainLayer = new TerrainLayer(14)
-let flowLayer = new FlowLayer()
+let flowLayer = new SteadyFlowLayer()
 
 
 

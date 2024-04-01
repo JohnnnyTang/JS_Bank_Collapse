@@ -1,20 +1,89 @@
 import * as scr from '../scratch/scratch.js'
-
 import TerrainLayer from './terrainLayer.js'
-import FlowLayer from './flowLayer.js'
+import SteadyFlowLayer from './steadyFlowLayer.js'
 import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import "mapbox-gl/dist/mapbox-gl.css"
+
+
+// mapboxgl.accessToken =
+//   "pk.eyJ1IjoieWNzb2t1IiwiYSI6ImNrenozdWdodDAza3EzY3BtdHh4cm5pangifQ.ZigfygDi2bK4HXY1pWh-wg";
+
+// DOM Configuration //////////////////////////////////////////////////////////////////////////////////////////////////////
+// const GPUFrame = document.getElementById('GPUFrame')
+// log
+// GPUFrame.style.pointerEvents = 'none'
+// GPUFrame.style.zIndex = '1'
+
+// const mapDiv = document.createElement('div')
+// mapDiv.style.height = '100%'
+// mapDiv.style.width = '100%'
+// mapDiv.style.zIndex = '0'
+// mapDiv.id = 'map'
+// document.body.appendChild(mapDiv)
+
+// StartDash //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// const terrain = new TerrainLayer(14)
+// const flow = new SteadyFlowLayer()
+// let mapp
+
+// scr.StartDash().then(() => {
+//     const map = new ScratchMap({
+//         accessToken:
+//             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+//         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+//         center: [120.980697, 31.684162],
+//         projection: 'mercator',
+//         GPUFrame: GPUFrame,
+//         container: 'map',
+//         antialias: true,
+//         maxZoom: 18,
+//         zoom: 9,
+//     }).on('load', () => {
+//         mapp = map
+//         map.addLayer(terrain)
+//         // map.addLayer(flow)
+//     })
+// })
+
+// window.addEventListener('keydown', (e) => {
+//     if (e.key === 'Enter') {
+//         // flow.hide()
+//         terrain.hide()
+//         mapp.triggerRepaint()
+//         console.log(terrain.hide)
+//     }
+//     if (e.key === '1') {
+//         // flow.show()
+//         terrain.show()
+//         mapp.triggerRepaint()
+//     }
+// })
 
 const main = () => {
-    mapboxgl.accessToken =
-        'pk.eyJ1IjoieWNzb2t1IiwiYSI6ImNrenozdWdodDAza3EzY3BtdHh4cm5pangifQ.ZigfygDi2bK4HXY1pWh-wg'
-
     // DOM Configuration //////////////////////////////////////////////////////////////////////////////////////////////////////
     const GPUFrame = document.getElementById('GPUFrame')
+    GPUFrame.style.pointerEvents = 'none'
+    GPUFrame.style.zIndex = '1'
+
+    // const mapDiv = document.createElement('div')
+    // mapDiv.style.height = '100%'
+    // mapDiv.style.width = '100%'
+    // mapDiv.style.zIndex = '0'
+    // mapDiv.id = 'map'
+    // document.body.appendChild(mapDiv)
+
     // StartDash //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const terrain = new TerrainLayer(14)
+    const flow = new SteadyFlowLayer()
+    let mapp
+
     scr.StartDash().then(() => {
         const map = new ScratchMap({
-            style: 'mapbox://styles/ycsoku/cldjl0d2m000501qlpmmex490',
+            accessToken:
+                'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+            style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
             center: [120.980697, 31.684162],
             projection: 'mercator',
             GPUFrame: GPUFrame,
@@ -23,12 +92,41 @@ const main = () => {
             maxZoom: 18,
             zoom: 9,
         }).on('load', () => {
-            map.addLayer(new TerrainLayer(14))
-            // console.log('terrain');
-            const fLayer = new FlowLayer()
-            map.addLayer(fLayer)
-            fLayer.hide()
+            mapp = map
+            // map.addLayer(terrain)
+            // map.addLayer(flow)
         })
+    })
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === '1') {
+            // flow.hide()
+            if (mapp.getLayer('TerrainLayer')) terrain.show()
+            else mapp.addLayer(terrain)
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '2') {
+            if (mapp.getLayer('TerrainLayer')) {
+                terrain.hide()
+                mapp.removeLayer('TerrainLayer')
+            }
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '3') {
+            if (mapp.getLayer('FlowLayer')) flow.show()
+            else mapp.addLayer(flow)
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '4') {
+            if (mapp.getLayer('FlowLayer')) {
+                flow.hide()
+                // mapp.removeLayer('FlowLayer')
+            }
+            mapp.triggerRepaint()
+        }
     })
 }
 
@@ -72,17 +170,16 @@ class ScratchMap extends mapboxgl.Map {
             canvas: options.GPUFrame,
             alphaMode: 'premultiplied',
         })
+        this.depthTexture = this.screen.createScreenDependentTexture(
+            'Texture (Map Common Depth)',
+            'depth32float',
+        )
 
         // Pass
         this.outputPass = scr.renderPass({
             name: 'Render Pass (Scratch map)',
             colorAttachments: [{ colorResource: this.screen }],
-            depthStencilAttachment: {
-                depthStencilResource: this.screen.createScreenDependentTexture(
-                    'Texture (Map Depth)',
-                    'depth24plus',
-                ),
-            },
+            depthStencilAttachment: { depthStencilResource: this.depthTexture },
         })
 
         // Make stages

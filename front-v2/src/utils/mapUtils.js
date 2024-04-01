@@ -34,7 +34,6 @@ const initScratchMap = (ref) => {
                 GPUFrame: GPUFrame,
                 antialias: true,
                 minZoom: 8,
-
             }).on('load', () => {
                 resolve(map)
                 // map.addLayer(new TerrainLayer(14))
@@ -90,28 +89,28 @@ const loadImage = async (map, url, imageID) => {
 }
 
 const createPopUp = () => {
-
     const ap = createApp(popUpContent)
-    const container = document.createElement("div")
+    const container = document.createElement('div')
     const componentInstance = ap.mount(container)
 
     const domwithComp = container
     const popUp = new mapboxgl.Popup({
         maxWidth: '1000px',
-        offset: 25
+        offset: 25,
     }).setDOMContent(domwithComp)
     // .setLngLat(popupCoord)
     // .addTo(map); undefined;
     return popUp
 }
 
-
-
-
-
-
-const addMarkerToMap = (map, markerPos, markerClass, IconUrl, popUpInstance, featureInfo) => {
-
+const addMarkerToMap = (
+    map,
+    markerPos,
+    markerClass,
+    IconUrl,
+    popUpInstance,
+    featureInfo,
+) => {
     // var container = document.createElement("div");
     // container.id = "container";
     // container.style.width = "30px";
@@ -119,7 +118,6 @@ const addMarkerToMap = (map, markerPos, markerClass, IconUrl, popUpInstance, fea
     // container.style.backgroundColor = "white";
     // container.style.borderRadius = "50%";
     // container.style.cursor = 'pointer'
-
 
     // // 创建 icon 元素并添加到 container 中
     // var icon = document.createElement("div");
@@ -131,49 +129,48 @@ const addMarkerToMap = (map, markerPos, markerClass, IconUrl, popUpInstance, fea
 
     // container.appendChild(icon);
 
-
-
-    const el = document.createElement('div');
-    el.classList.add(markerClass);
+    const el = document.createElement('div')
+    el.classList.add(markerClass)
     el.style.width = '35px'
     el.style.height = '35px'
     el.style.backgroundImage = `url(${IconUrl})`
     el.style.backgroundSize = 'contain'
     el.style.cursor = 'pointer'
 
-
     let marker = new mapboxgl.Marker({
         element: el,
         rotationAlignment: 'horizon',
-        offset: [0, -25]
+        offset: [0, -25],
     })
         .setPopup(popUpInstance)
         .setLngLat(markerPos)
-        .addTo(map);
+        .addTo(map)
 
     marker.getElement().addEventListener('click', () => {
         useSceneStore().setSelectedFeature(featureInfo)
         let popUp = marker.getPopup()
         popUp.setLngLat(markerPos)
         flytoFeature(map, markerPos)
-    });
+    })
 
     return marker
-
 }
 
 const getCenterCoord = (coordsArray) => {
     if (coordsArray.length % 2) {
         return coordsArray[Math.floor(coordsArray.length / 2)]
     } else {
-        let long = (coordsArray[coordsArray.length / 2][0] + coordsArray[coordsArray.length / 2 - 1][0]) / 2
-        let lat = (coordsArray[coordsArray.length / 2][1] + coordsArray[coordsArray.length / 2 - 1][1]) / 2
+        let long =
+            (coordsArray[coordsArray.length / 2][0] +
+                coordsArray[coordsArray.length / 2 - 1][0]) /
+            2
+        let lat =
+            (coordsArray[coordsArray.length / 2][1] +
+                coordsArray[coordsArray.length / 2 - 1][1]) /
+            2
         return [long, lat]
     }
 }
-
-
-
 
 const size = 80
 const squareThreeDivideTwo = Math.sqrt(3) / 2.0
@@ -802,5 +799,5 @@ export {
     initScratchMap,
     addMarkerToMap,
     getCenterCoord,
-    createPopUp
+    createPopUp,
 }

@@ -12,8 +12,8 @@ struct VertexOutput {
 };
 
 struct StaticUniformBlock {
+    groupSize: vec2u,
     extent: vec4f,
-    maxSpeed: f32,
 }
 
 struct DynamicUniformBlock {
@@ -30,6 +30,7 @@ struct FrameUniformBlock {
     mapBounds: vec4f,
     zoomLevel: f32,
     progressRate: f32,
+    maxSpeed: f32,
 };
 
 // Uniform bindings
@@ -39,9 +40,6 @@ struct FrameUniformBlock {
 
 // Storage bindings
 @group(1) @binding(0) var<storage> particles: array<f32>;
-
-// Texture bindings
-@group(2) @binding(0) var flowTexture: texture_2d<f32>;
 
 const PI = 3.141592653;
 
@@ -58,25 +56,6 @@ fn translateRelativeToEye(high: vec3f, low: vec3f) -> vec3f {
     let lowDiff = low - dynamicUniform.centerLow;
 
     return highDiff + lowDiff;
-}
-
-fn uvCorrection(uv: vec2f, dim: vec2f) -> vec2f {
-
-    return clamp(uv, vec2f(0.0), dim - vec2f(1.0));
-}
-
-fn linearSampling(uv: vec2f, dim: vec2f) -> vec4f {
-
-    let tl = textureLoad(flowTexture, vec2i(uvCorrection(uv, dim).xy), 0);
-    let tr = textureLoad(flowTexture, vec2i(uvCorrection(uv + vec2f(1.0, 0.0), dim).xy), 0);
-    let bl = textureLoad(flowTexture, vec2i(uvCorrection(uv + vec2f(0.0, 1.0), dim).xy), 0);
-    let br = textureLoad(flowTexture, vec2i(uvCorrection(uv + vec2f(1.0, 1.0), dim).xy), 0);
-
-    let mix_x = fract(uv.x);
-    let mix_y = fract(uv.y);
-    let top = mix(tl, tr, mix_x);
-    let bottom = mix(bl, br, mix_x);
-    return mix(top, bottom, mix_y);
 }
 
 fn currentExtent() -> vec4f {
@@ -123,10 +102,17 @@ fn vMain(input: VertexInput) -> VertexOutput {
         vec2f(1.0, 1.0)
     );
 
-    let position = vec2f(
-        particles[input.instanceIndex * 4 + 0],
-        particles[input.instanceIndex * 4 + 1],
+    let currentPosition = vec2f(
+        particles[input.instanceIndex * 6 + 0],
+        particles[input.instanceIndex * 6 + 1],
     );
+
+    let lastPosition = vec2f(
+        particles[input.instanceIndex * 6 + 2],
+        particles[input.instanceIndex * 6 + 3],
+    );
+
+    let position = select(currentPosition, lastPosition, input.vertexIndex % 2 == 0);
 
     let cExtent = currentExtent();
     let x = mix(cExtent.x, cExtent.z, position.x);
@@ -140,13 +126,13 @@ fn vMain(input: VertexInput) -> VertexOutput {
     let vertexPos_CS = vertexPos_SS * position_CS.w;
 
     var output: VertexOutput;
-    output.position = vec4f(vertexPos_CS, 0.0, position_CS.w);
-    // output.position = position_CS;
+    // output.position = vec4f(vertexPos_CS, 0.0, position_CS.w);
+    output.position = position_CS;
     // output.position = vec4f((position * 2.0 - 1.0) * 0.5, 0.0, 1.0);
     output.uv = vec2f(uv.x, 1.0 - uv.y);
     output.hide = select(0.0, 1.0, cExtent.z <= cExtent.x || cExtent.w <= cExtent.y);
     output.coords = offset;
-    output.velocity = vec2f(particles[input.instanceIndex * 4 + 2], particles[input.instanceIndex * 4 + 3]);
+    output.velocity = vec2f(particles[input.instanceIndex * 6 + 4], particles[input.instanceIndex * 6 + 5]);
     return output;
 }
 
@@ -164,16 +150,14 @@ fn fMain(input: VertexOutput) -> @location(0) vec4f {
         0xd53e4f
     );
 
-    let dim = vec2f(textureDimensions(flowTexture, 0).xy);
-    let pos = linearSampling(input.uv * dim, dim).rg;
     let velocity = input.velocity;
     // if (input.hide == 1.0 || (velocity.x == 0.0 && velocity.y == 0.0) || length(input.coords) > 1.0) {
     if (input.hide == 1.0 || length(velocity) == 0.0) {
         discard;
     }
 
-    let color = velocityColor(length(velocity) / staticUniform.maxSpeed, rampColors0);
+    let color = velocityColor(length(velocity) / frameUniform.maxSpeed, rampColors0);
     // return vec4f(color, 0.0, 1.0);
-    return vec4f(color, 0.5);
-    // return vec4f(0.5);
+    // return vec4f(color, 0.5);
+    return vec4f(1.0);
 }

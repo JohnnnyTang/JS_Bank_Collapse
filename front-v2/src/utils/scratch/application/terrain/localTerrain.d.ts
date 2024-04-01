@@ -25,4 +25,8 @@ export class LocalTerrain {
     get pipeline(): RenderPipeline;
 
     get binding(): Binding;
+
+    hide():void;
+
+    show():void;
 }
