@@ -1,15 +1,8 @@
 <template>
     <div class="dataInterpretation-container">
-        <div class="model-title-container">
-            <div
-                class="return-arrow"
-                @click="returnMain"
-            >
-            </div>
-            <div class="title-text">
-                风险预警模型
-            </div>
-        </div>
+        <ModelTitleVue
+            :ModelName = "ModelName"
+        />
         <div class="model-content-container">
             <div class="model-information-container">
                 <div class="model-information-wrapper">
@@ -73,6 +66,10 @@
   
 <script setup>
 import { useRouter } from 'vue-router'
+import ModelTitleVue from '../ModelTitle.vue';
+
+const ModelName = "风险预警模型"
+
 const router = useRouter()
 const returnMain = () => {
     router.push('/modelStore')
@@ -87,40 +84,6 @@ div.dataInterpretation-container {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-
-    div.model-title-container {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-        height: 5vh;
-        text-align: left;
-        padding-top: 5px;
-        padding-left: 20px;
-        // background: linear-gradient(
-        //     to right, #8b99d3 0%, rgb(98, 208, 228) 100%
-        // );
-        background-color: bisque;
-
-        div.return-arrow {
-            width: 2vw;
-            height: 4vh;
-            background-image: url('/left-arrow.png');
-            background-size: contain;
-            transition: transform 0.25s ease;
-            &:hover {
-                cursor: pointer;
-                transform: scale(1.2);
-            }
-        }
-
-        div.title-text {
-            width: 20vw;
-            padding-left: 1%;
-            font-size: calc(1vh + 1vw);
-            font-weight: 600;
-            font-family: 'Microsoft YaHei';
-        }
-    }
 
     div.model-content-container {
         width:100%;

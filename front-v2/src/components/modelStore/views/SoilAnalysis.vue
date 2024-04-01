@@ -1,68 +1,24 @@
 <template>
-    <div class="dataInterpretation-container">
-        <div class="model-title-container">
-            <div
-                class="return-arrow"
-                @click="returnMain"
-            >
-            </div>
-            <div class="title-text">
-                土体变形分析模型
-            </div>
-        </div>
+    <div class="SoilAnalysis-container">
+        <ModelTitleVue
+          :ModelName="ModelName"
+        />
         <div class="model-content-container">
-            <div class="model-information-container">
-                <div class="model-information-wrapper">
-                    <div class="information-item-container">
-                        <div class="information-item-title">
-                            流程图
-                        </div>
-                        <div class="information-item-content">
-                            内容
-                        </div>
-                    </div>
-                    <div class="information-item-container">
-                        <div class="information-item-title">
-                            模型基本信息
-                        </div>
-                        <div class="information-item-content">
-                            内容
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ModelInfoVue/>
             <div class="model-data-container">
                 <div class="model-data-wrapper">
                     <div class="model-data-item">
-                        <div class="data-item-title">
-                            model1
+                        <div class="data-table-title">
+                            土体变形分析可视化结果
                         </div>
-                        <div class="data-item-content">
-                            model1-information
-                        </div>
-                    </div>
-                    <div class="model-data-item">
-                        <div class="data-item-title">
-                            model2
-                        </div>
-                        <div>
-                            model2-information
-                        </div>
-                    </div>
-                    <div class="model-data-item">
-                        <div class="data-item-title">
-                            model3
-                        </div>
-                        <div>
-                            model3-information
-                        </div>
-                    </div>
-                    <div class="model-data-item">
-                        <div class="data-item-title">
-                            model4
-                        </div>
-                        <div>
-                            model4-information
+                        <div class="data-table-body">
+                            <el-table :data="tableData" stripe style="width: 100%">
+                                <el-table-column prop="id" label="岸段" width="'20%''" />
+                                <el-table-column prop="para1" label="参数1" width="'20%'" />
+                                <el-table-column prop="para2" label="参数2" width="'20%'" />
+                                <el-table-column prop="para3" label="参数3" width="'20%'" />
+                                <el-table-column prop="time" label="计算时间" width="'20%'"/>
+                            </el-table>
                         </div>
                     </div>
                 </div>
@@ -73,54 +29,128 @@
   
 <script setup>
 import { useRouter } from 'vue-router'
+import ModelInfoVue from '../ModelInfo.vue'
+import ModelTitleVue from '../ModelTitle.vue';
+
+const ModelName = "土体变形分析模型"
+
 const router = useRouter()
 const returnMain = () => {
     router.push('/modelStore')
 }
+
+const tableData = [
+  {
+    id: '001',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '002',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '003',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+  {
+    id: '004',
+    para1: '1',
+    para2: '2',
+    para3: '3',
+    time: '2016-05-02'
+  },
+]
+
 </script>
   
 <style lang="scss" scoped>
 
-div.dataInterpretation-container {
+@keyframes slideBackgroundColor {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+div.SoilAnalysis-container {
     width:100%;
     height: 92vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-
-    div.model-title-container {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-        height: 5vh;
-        text-align: left;
-        padding-top: 5px;
-        padding-left: 20px;
-        // background: linear-gradient(
-        //     to right, #8b99d3 0%, rgb(98, 208, 228) 100%
-        // );
-        background-color: bisque;
-
-        div.return-arrow {
-            width: 2vw;
-            height: 4vh;
-            background-image: url('/left-arrow.png');
-            background-size: contain;
-            transition: transform 0.25s ease;
-            &:hover {
-                cursor: pointer;
-                transform: scale(1.2);
-            }
-        }
-
-        div.title-text {
-            width: 20vw;
-            padding-left: 1%;
-            font-size: calc(1vh + 1vw);
-            font-weight: 600;
-            font-family: 'Microsoft YaHei';
-        }
-    }
+    background: linear-gradient(to bottom right, #477ab1, #2aa9c9, #7a7cad);
+    background-size: 200% 200%;
+    animation: slideBackgroundColor 4s ease infinite;
 
     div.model-content-container {
         width:100%;
@@ -129,83 +159,122 @@ div.dataInterpretation-container {
         display: flex;
         flex-direction: row;
 
-        div.model-information-container {
-            display: flex;
-            width: 30vw;
-            height: 86vh;
-            justify-content: center;
-            align-items: center;
-            background-color: aquamarine;
-            
-            div.model-information-wrapper {
-                width: 98%;
-                height: 98%;
-                background-color: rgb(192, 185, 165);
-
-                div.information-item-container {
-                    position: relative;
-                    width:100%;
-                    height:50%;
-
-                    div.information-item-title {
-                        width: 100%;
-                        height: 3vh;
-                        background-color: rgb(114, 114, 114);
-                        line-height: 3vh;
-                        font-size: calc(1vh + 0.5vw);
-                        font-weight: 600;
-                        font-family: 'Microsoft YaHei';
-                    }
-
-                    div.information-item-content {
-                        width: 100%;
-                        height: 100%;
-                    }
-
-                }
-            }
-        }
-
         div.model-data-container {
             display: flex;
-            width: 70vw;
+            width: 60vw;
             height: 86vh;
             justify-content: center;
             align-items: center;
-            background-color: rgb(160, 38, 150);
+            // background-color: rgb(160, 38, 150);
 
             div.model-data-wrapper {
                 // position: relative;
                 display: flex;
+                justify-content: center;
                 flex-wrap: wrap;
                 // flex-direction: col;
                 width: 99%;
                 height: 98%;
-                background-color: rgb(192, 185, 165);
+                border: 3px solid #ccc;
+                border-radius: 10px;
+                // background-color: rgb(192, 185, 165);
 
                 div.model-data-item {
-                    width: 50%;
-                    height: 50%;
-                    background-color: aquamarine;
+                    display: flex;
+                    flex-direction: column;
+                    // align-items: center;
+                    width: 97%;
+                    height: 100%;
+                    // background-color: aquamarine;
 
-                    div.data-item-title {
+                    div.data-table-title {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
                         width: 100%;
-                        height: 10%;
-                        font-size: calc(0.5vh + 1vw);
+                        height: 6%;
+                        font-size: calc(1vh + 0.8vw);
                         font-weight: 600;
-                        font-family: 'Microsoft YaHei';
+                        font-family: 'Microsoft YaHei'; 
+                        color:rgb(238, 145, 69); 
+                        text-shadow: #b2b863 1px 1px;
                     }
 
-                    div.data-item-content {
+                    div.data-table-body {
+                        display: flex;
+                        text-align: center;
+                        justify-content: center;
                         width: 100%;
                         height: 90%;
+
+                        .el-table {
+                            width: 100%;
+                            height: 100%;
+                        }
                     }
                 }
             }
         }
+    }  
+}
+
+:deep(.el-table) {
+    overflow-y: auto;
+    background-color: rgba(241, 241, 223, 0.9)
+}
+// 设置表头
+:deep(.el-table thead th.el-table__cell) {
+    color: #010613;
+    background: rgba(224, 188, 24, 0.897);
+    font-size: calc(0.7vw + 0.4vh);
+    height: 3vh;
+    border-right: inset 2px #a5b611;
+    border-left: inset 2px #a5b611;
+    border-bottom: inset 4px #ff9305;
+    text-shadow: #e2dca3 1px 1px;
+    div.cell {
+        text-align: center;
+        height: 3vh;
+        line-height: 3vh;
     }
-    
-        
+    &:last-child {
+        width: 2vw;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+    &:first-child {
+        width: 2vw;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+}
+// 设置表身
+:deep(.el-table tbody tr:nth-child(2n)) {
+    line-height: 30px;
+    color: hsl(225, 15%, 5%);
+    background: rgb(231, 222, 168);
+    font-weight: 600;
+}
+:deep(.el-table tbody tr:nth-child(2n+1)) {
+    line-height: 30px;
+    color: hsl(225, 15%, 5%);
+    background: rgb(241, 241, 223);
+    font-weight: 600;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: #05a3ff;
+}
+::-webkit-scrollbar-track{
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  background: hsl(224, 79%, 33%);
 }
 
 </style>

@@ -70,7 +70,7 @@
                 @click="Detail"
                 :class="[infoItem.firstPage ? 'inactive' : 'active']"
             >
-                <div class="button-text">模型计算结果</div>
+                <div class="button-text">模型详情</div>
                 <div class="button-arrow"></div>
             </div>
         </div>
