@@ -1,7 +1,13 @@
 import { ElMessage } from 'element-plus'
 import mapboxgl from 'mapbox-gl'
 import BackEndRequest from '../../api/backend.js'
-import { loadImage, pulsing, addMarkerToMap, getCenterCoord, createPopUp } from '../../utils/mapUtils.js'
+import {
+    loadImage,
+    pulsing,
+    addMarkerToMap,
+    getCenterCoord,
+    createPopUp,
+} from '../../utils/mapUtils.js'
 import { useSceneStore } from '../../store/mapStore.js'
 
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
@@ -9,9 +15,7 @@ import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 // BackEndRequest.getDataNodeData()
 
 let terrainLayer = new TerrainLayer(14)
-let flowLayer = new SteadyFlowLayer()
-
-
+let flow = new SteadyFlowLayer()
 
 // Data Prepare
 class DataPioneer {
@@ -295,14 +299,25 @@ const initLayers = async (sceneInstance, map) => {
             channel.data.forEach((item) => {
                 let centerCoord = getCenterCoord(item['llCoords'])
                 if (item.type === '在建通道') {
-                    addMarkerToMap(map, centerCoord, 'building-marker', '/icons/building.png', popUp, item)
-                }
-                else if (item.type === '规划通道') {
-                    addMarkerToMap(map, centerCoord, 'planning-marker', '/icons/planing.png', popUp, item)
+                    addMarkerToMap(
+                        map,
+                        centerCoord,
+                        'building-marker',
+                        '/icons/building.png',
+                        popUp,
+                        item,
+                    )
+                } else if (item.type === '规划通道') {
+                    addMarkerToMap(
+                        map,
+                        centerCoord,
+                        'planning-marker',
+                        '/icons/planing.png',
+                        popUp,
+                        item,
+                    )
                 }
             })
-
-
 
             break
         case '预警岸段':
@@ -420,15 +435,21 @@ const initLayers = async (sceneInstance, map) => {
                 '三级预警岸段',
             )
 
-
             // add marker here
-       
+
             let count = 0
             bankData.data.forEach((item) => {
                 let centerCoord = getCenterCoord(item['coord'])
 
                 if (item.warningLevel === 1) {
-                    addMarkerToMap(map, centerCoord, 'warning1-marker', '/icons/warning3.png', popUp, item)
+                    addMarkerToMap(
+                        map,
+                        centerCoord,
+                        'warning1-marker',
+                        '/icons/warning3.png',
+                        popUp,
+                        item,
+                    )
                     count++
                 }
                 // else if (item.warningLevel === 2) {
@@ -442,10 +463,8 @@ const initLayers = async (sceneInstance, map) => {
 
         case '全江地形':
             map.addLayer(terrainLayer)
-            sceneInstance.allLayers.push(
-                'TerrainLayer',
-            )
-            break;
+            sceneInstance.allLayers.push('TerrainLayer')
+            break
 
         /////small Scene
         case '实时监测设备':
@@ -546,12 +565,15 @@ const initLayers = async (sceneInstance, map) => {
 
         case '岸段聚合场景':
             map.addLayer(terrainLayer)
-            map.addLayer(flowLayer)
+            // if (map.getLayer('FlowLayer')) flow.show()
+            // else map.addLayer(flow)
+            terrainLayer.show()
+            // flowLayer.show()
             sceneInstance.allLayers.push(
                 'TerrainLayer',
-                'FlowLayer'
+                // 'FlowLayer',
             )
-            break;
+            break
         default:
             console.log('wait developing...')
             ElMessage('wait developing...')
@@ -612,7 +634,6 @@ const initLayers = async (sceneInstance, map) => {
     // );
     const sceneStore = useSceneStore()
     sceneStore.setSelectedScene(sceneInstance)
-
 }
 
 // Scene
@@ -622,12 +643,11 @@ class Scene {
         this.title = ''
         this.desc = ''
         this.iconSrc = ''
-        this.layerSrc = []//only id
-        this.allLayers = []//only id
+        this.layerSrc = [] //only id
+        this.allLayers = [] //only id
         this.markers = []
     }
     async initAllLayers(map) {
-
         // question！！！
         // prepare for layer source, add Layers and all visible
         // if (map.loaded()) {
@@ -641,7 +661,6 @@ class Scene {
         //     })
         // }
         await initLayers(this, map)
-
     }
 
     showLayers(map, showArrays) {
@@ -670,6 +689,12 @@ class Scene {
         //remove layer , remove source
         this.allLayers.forEach((layerID) => {
             map.getLayer(layerID) && map.removeLayer(layerID)
+            if (layerID === 'TerrainLayer') {
+                terrainLayer.hide()
+            }
+            if (layerID === 'FlowLayer') {
+                flowLayer.hide()
+            }
         })
         this.allLayers = []
 
@@ -680,7 +705,9 @@ class Scene {
         this.layerSrc = []
 
         //hide marker
-        let markersDoms = document.getElementsByClassName('mapboxgl-marker mapboxgl-marker-anchor-center')
+        let markersDoms = document.getElementsByClassName(
+            'mapboxgl-marker mapboxgl-marker-anchor-center',
+        )
         for (let i = markersDoms.length - 1; i >= 0; i--) {
             markersDoms[i].remove()
         }
@@ -730,8 +757,8 @@ const getBigRangeScenes = () => {
 
     let chongy = new Scene()
     chongy.title = '平面冲淤'
-        ; (chongy.desc = '呈现整个江河岸段的冲淤情况'),
-            (chongy.iconSrc = './icons/shore.png')
+    ;(chongy.desc = '呈现整个江河岸段的冲淤情况'),
+        (chongy.iconSrc = './icons/shore.png')
 
     bigRangeScenes.push(
         typiclaCollapse,
@@ -763,6 +790,6 @@ const getSmallRangeScenes = () => {
     return smallRangeScenes
 }
 
-const mapboxAddLayer = (scene, source) => { }
+const mapboxAddLayer = (scene, source) => {}
 
 export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers }

@@ -35,6 +35,7 @@ const initScratchMap = (ref) => {
                 antialias: true,
                 minZoom: 8,
             }).on('load', () => {
+                console.log('initScratchMap ok');
                 resolve(map)
                 // map.addLayer(new TerrainLayer(14))
                 // map.addLayer(new FlowLayer())

@@ -3,6 +3,7 @@ import TerrainLayer from './terrainLayer.js'
 import SteadyFlowLayer from './steadyFlowLayer.js'
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
+import { initScratchMap } from '../mapUtils.js'
 
 
 // mapboxgl.accessToken =
@@ -60,7 +61,7 @@ import "mapbox-gl/dist/mapbox-gl.css"
 //     }
 // })
 
-const main = () => {
+const main =async () => {
     // DOM Configuration //////////////////////////////////////////////////////////////////////////////////////////////////////
     const GPUFrame = document.getElementById('GPUFrame')
     GPUFrame.style.pointerEvents = 'none'
@@ -77,26 +78,26 @@ const main = () => {
 
     const terrain = new TerrainLayer(14)
     const flow = new SteadyFlowLayer()
-    let mapp
+    let mapp = await initScratchMap({id:'GPUFrame'})
 
-    scr.StartDash().then(() => {
-        const map = new ScratchMap({
-            accessToken:
-                'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-            style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-            center: [120.980697, 31.684162],
-            projection: 'mercator',
-            GPUFrame: GPUFrame,
-            container: 'map',
-            antialias: true,
-            maxZoom: 18,
-            zoom: 9,
-        }).on('load', () => {
-            mapp = map
-            // map.addLayer(terrain)
-            // map.addLayer(flow)
-        })
-    })
+    // scr.StartDash().then(() => {
+    //     const map = new ScratchMap({
+    //         accessToken:
+    //             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+    //         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+    //         center: [120.980697, 31.684162],
+    //         projection: 'mercator',
+    //         GPUFrame: GPUFrame,
+    //         container: 'map',
+    //         antialias: true,
+    //         maxZoom: 18,
+    //         zoom: 9,
+    //     }).on('load', () => {
+    //         mapp = map
+    //         // map.addLayer(terrain)
+    //         // map.addLayer(flow)
+    //     })
+    // })
 
     window.addEventListener('keydown', (e) => {
         if (e.key === '1') {

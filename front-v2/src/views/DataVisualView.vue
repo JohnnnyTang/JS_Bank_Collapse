@@ -8,7 +8,7 @@
         <bankLineRelate v-if="selectedScene.title === '预警岸段'"></bankLineRelate>
         <channelRelate v-if="selectedScene.title === '过江通道'"></channelRelate>
         <monitorDeviceRelate v-if="selectedScene.title === '实时监测设备'"></monitorDeviceRelate>
-        
+
         <canvas id="GPUFrame"></canvas>
 
     </div>
@@ -29,7 +29,8 @@ import fullscreen from '../components/dataVisual/fullscreen.vue';
 import bankLineRelate from '../components/dataVisual/scenesRelate/bankLineRelate.vue';
 import channelRelate from '../components/dataVisual/scenesRelate/channelRelate.vue';
 import monitorDeviceRelate from '../components/dataVisual/scenesRelate/monitorDeviceRelate.vue';
-
+import TerrainLayer from '../utils/m_demLayer/terrainLayer';
+import SteadyFlowLayer from '../utils/m_demLayer/steadyFlowLayer';
 
 const mapContainerRef = ref();
 const mapStore = useMapStore()
@@ -50,6 +51,40 @@ watch(selectedScene, async (newV, oldV) => {
     }
 })
 
+let mapp = null;
+const terrain = new TerrainLayer(14)
+const flow = new SteadyFlowLayer()
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === '1') {
+        // flow.hide()
+        if (mapp.getLayer('TerrainLayer')) terrain.show()
+        else mapp.addLayer(terrain)
+
+        mapp.triggerRepaint()
+    }
+    if (e.key === '2') {
+        if (mapp.getLayer('TerrainLayer')) {
+            terrain.hide()
+            mapp.removeLayer('TerrainLayer')
+        }
+
+        mapp.triggerRepaint()
+    }
+    if (e.key === '3') {
+        if (mapp.getLayer('FlowLayer')) flow.show()
+        else mapp.addLayer(flow)
+
+        mapp.triggerRepaint()
+    }
+    if (e.key === '4') {
+        if (mapp.getLayer('FlowLayer')) {
+            flow.hide()
+            // mapp.removeLayer('FlowLayer')
+        }
+        mapp.triggerRepaint()
+    }
+})
 
 
 onMounted(async () => {
@@ -58,7 +93,7 @@ onMounted(async () => {
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
     flytoLarge(map)
-
+    mapp = map
 
     const defaultScene = new Scene()
     defaultScene.title = '预警岸段'
@@ -114,7 +149,7 @@ div.data-visual-container {
     .mapboxgl-popup-content {
         padding: 0;
         background-color: transparent;
-        border:none
+        border: none
     }
 
     .mapboxgl-popup-tip {

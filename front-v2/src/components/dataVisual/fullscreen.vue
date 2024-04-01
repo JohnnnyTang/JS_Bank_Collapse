@@ -18,7 +18,7 @@ const fullClick = () => {
 <style lang="scss" scoped>
 .icon-container {
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     right: 2vw;
     top: 56vh;
     width: 6.5vh;
