@@ -62,7 +62,6 @@ const chartProcess = (data) => {
     }
 
 
-
     let option = {
         legend: {
             top: 'bottom'

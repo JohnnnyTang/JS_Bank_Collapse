@@ -7,6 +7,7 @@
         <fullscreen></fullscreen>
         <bankLineRelate v-if="selectedScene.title === '预警岸段'"></bankLineRelate>
         <channelRelate v-if="selectedScene.title === '过江通道'"></channelRelate>
+        <monitorDeviceRelate v-if="selectedScene.title === '实时监测设备'"></monitorDeviceRelate>
         
         <canvas id="GPUFrame"></canvas>
 
@@ -27,6 +28,7 @@ import BackEndRequest from '../api/backend';
 import fullscreen from '../components/dataVisual/fullscreen.vue';
 import bankLineRelate from '../components/dataVisual/scenesRelate/bankLineRelate.vue';
 import channelRelate from '../components/dataVisual/scenesRelate/channelRelate.vue';
+import monitorDeviceRelate from '../components/dataVisual/scenesRelate/monitorDeviceRelate.vue';
 
 
 const mapContainerRef = ref();

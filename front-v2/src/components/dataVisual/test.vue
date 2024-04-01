@@ -17,7 +17,8 @@
     <channelDetail></channelDetail> -->
     <!-- <pureChart v-draggable="{'bounds': 'parent'}"></pureChart> -->
         <!-- <bankLineRelate v-draggable="{'bounds': 'parent'}"></bankLineRelate> -->
-        <channelRelate v-draggable="{'bounds': 'parent'}"></channelRelate>
+        <!-- <channelRelate v-draggable="{'bounds': 'parent'}"></channelRelate> -->
+        <monitorDeviceRelate v-draggable="{'bounds': 'parent'}"></monitorDeviceRelate>
 </template>
 
 <script setup>
@@ -30,6 +31,7 @@ import channelDetail from './featureDetails/channelDetail.vue';
 import pureChart from './monitorDevice/pureChart.vue';
 import bankLineRelate from './scenesRelate/bankLineRelate.vue';
 import channelRelate from './scenesRelate/channelRelate.vue';
+import monitorDeviceRelate from './scenesRelate/monitorDeviceRelate.vue';
 
 // src\utils\m_demLayer\terrainLayer.js
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'

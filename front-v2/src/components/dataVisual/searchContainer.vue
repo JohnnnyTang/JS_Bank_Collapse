@@ -45,15 +45,10 @@
                             </span>
                         </span>
                     </template>
-
-
                 </el-tree>
             </div>
         </Transition>
-
     </div>
-
-
 </template>
 
 <script setup>
@@ -162,7 +157,6 @@ let popUp = undefined;
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         showLeafDetailHandler(nodeProp)
-        console.log('selectedFeature--', nodeProp.data);
         sceneStore.setSelectedFeature(nodeProp.data)
     }
 }
