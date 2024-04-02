@@ -215,7 +215,7 @@ function fail(msg) {
 
 onMounted(async () => {
     main()
-
+    console.log('onMounted')
     window.addEventListener('keydown', async (e) => {
         if (e.key === '5') {
             await clearCanvas()
