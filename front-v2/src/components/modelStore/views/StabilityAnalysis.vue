@@ -15,11 +15,11 @@
                         @click="switchContent"
                     >
                 </div>
-                <div v-if="firstPage == false" class="model-info-container">
-                    <ModelInfoVue/>
-                </div>
-                <div v-if="firstPage == true" class="model-calculate-container">
-                    <div class="calculate-data-container">
+                <div class="model-calculate-container">
+                    <div v-if="firstPage == false" class="model-info-container">
+                        <ModelInfoVue/>
+                    </div>
+                    <div v-if="firstPage == true" class="calculate-data-container">
                         <div class="calculate-data-wrapper">
                             <div class="calculate-data-title">
                                 <div
@@ -319,6 +319,7 @@ div.stabilityAnalysis-container {
             }
 
             div.model-info-container {
+                display: flex;
                 width:100%;
                 height:100%;
             }

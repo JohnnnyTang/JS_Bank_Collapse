@@ -4,7 +4,9 @@
           :ModelName="ModelName"
         />
         <div class="model-content-container">
-            <ModelInfoVue/>
+            <div class="model-info-container">
+              <ModelInfoVue/>
+            </div>
             <div class="model-data-container">
                 <div class="model-data-wrapper">
                     <div class="model-data-item">
@@ -158,6 +160,11 @@ div.SoilAnalysis-container {
         overflow: hidden;
         display: flex;
         flex-direction: row;
+
+        div.model-info-container {
+          width: 40%;
+          height: 86vh;
+        }
 
         div.model-data-container {
             display: flex;

@@ -92,7 +92,7 @@ div.model-information-container {
             
     div.model-information-wrapper {
         width: 98%;
-        height: 98%;
+        height: 100%;
         // background-color: rgb(192, 185, 165);
 
         div.information-container {
@@ -106,7 +106,7 @@ div.model-information-container {
             margin-bottom: 10px;
             background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
             
-            border: 3px solid rgb(114, 114, 114);
+            // border: 3px solid rgb(114, 114, 114);
             border-radius: 5px;
             transition: transform 0.25s ease;
             &:hover {
@@ -134,7 +134,7 @@ div.model-information-container {
                 div.information-title-text {
                     width: 100%;
                     line-height: 5vh;
-                    font-size: calc(1.5vh + 0.5vw);
+                    font-size: calc(0.9vh + 0.9vw);
                     font-weight: 550;
                     font-family: 'Microsoft YaHei';
                     margin-left: 5px;
@@ -227,7 +227,7 @@ div.model-information-container {
             margin-bottom: 10px;
             background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
             
-            border: 3px solid rgb(114, 114, 114);
+            // border: 3px solid rgb(114, 114, 114);
             border-radius: 5px;
             transition: transform 0.25s ease;
             &:hover {
@@ -255,7 +255,7 @@ div.model-information-container {
                 div.process-title-text {
                     width: 100%;
                     line-height: 5vh;
-                    font-size: calc(1.5vh + 0.5vw);
+                    font-size: calc(0.9vh + 0.9vw);
                     font-weight: 550;
                     font-family: 'Microsoft YaHei';
                     margin-left: 5px;
@@ -273,6 +273,8 @@ div.model-information-container {
 
                 div.process-wrapper {
                     display: flex;
+                    justify-content: center;
+                    align-items: center;
                     flex-wrap: wrap;
                     width: 96%;
                     height: 94%;

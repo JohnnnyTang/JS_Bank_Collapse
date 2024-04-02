@@ -43,12 +43,25 @@ const infoItemList = [
 </script>
 
 <style lang="scss" scoped>
+@keyframes slideBackgroundColor {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
 div.model-store-container  {
     width: 100vw;
     height: 92vh;
     overflow: hidden;
     display: flex;
-    background-color: rgb(139, 167, 240);
-
+    // background-color: rgb(139, 167, 240);
+    background: linear-gradient(to bottom right, #477ab1, #2aa9c9, #7a7cad);
+    background-size: 200% 200%;
+    animation: slideBackgroundColor 4s ease infinite;
 }
 </style>
