@@ -1,9 +1,9 @@
 <template>
     <!-- <div id="map" ref="mapContainerRef"></div> -->
-    <!-- <canvas id="GPUFrame"></canvas>
+    <canvas id="GPUFrame"></canvas>
     <div id="map" ref="mapContainerRef"></div>
 
-    <div class="drag-parent">
+    <!-- <div class="drag-parent">
         <div class="drag-comp" v-draggable="{ 'bounds': 'parent' }">
             <div class="drag-comp-content">
                 <h1>title</h1>
@@ -12,39 +12,220 @@
             </div>
         </div>
     </div> -->
-    <monitorDetail v-draggable="{'bounds': 'parent'}"></monitorDetail>
+    <!-- <monitorDetail v-draggable="{'bounds': 'parent'}"></monitorDetail> -->
     <!-- <bankLineDetail></bankLineDetail>
     <channelDetail></channelDetail> -->
     <!-- <pureChart v-draggable="{'bounds': 'parent'}"></pureChart> -->
-
+    <!-- <bankLineRelate v-draggable="{'bounds': 'parent'}"></bankLineRelate> -->
+    <!-- <channelRelate v-draggable="{'bounds': 'parent'}"></channelRelate> -->
+    <!-- <monitorDeviceRelate v-draggable="{'bounds': 'parent'}"></monitorDeviceRelate> -->
 </template>
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { main } from '../../utils/m_demLayer/main'
-import { initScratchMap,initMap } from '../../utils/mapUtils'
+import mapboxgl from 'mapbox-gl'
+import "mapbox-gl/dist/mapbox-gl.css"
+// import { main } from '../../utils/m_demLayer/main'
+import { initScratchMap, initMap, ScratchMap } from '../../utils/mapUtils'
 import monitorDetail from './featureDetails/monitorDetail.vue'
 import bankLineDetail from './featureDetails/bankLineDetail.vue';
 import channelDetail from './featureDetails/channelDetail.vue';
 import pureChart from './monitorDevice/pureChart.vue';
+import bankLineRelate from './scenesRelate/bankLineRelate.vue';
+import channelRelate from './scenesRelate/channelRelate.vue';
+import monitorDeviceRelate from './scenesRelate/monitorDeviceRelate.vue';
+import BackEndRequest from '../../api/backend';
 
 // src\utils\m_demLayer\terrainLayer.js
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
-import FlowLayer from '../../utils/m_demLayer/flowLayer.js'
-import BackEndRequest from '../../api/backend';
+import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
+import * as scr from '../../utils/scratch/scratch'
+
 
 
 const mapContainerRef = ref();
 
+async function clearCanvas() {
+    const adapter = await navigator.gpu?.requestAdapter();
+    const device = await adapter?.requestDevice();
+    if (!device) {
+        fail('need a browser that supports WebGPU');
+        return;
+    }
+
+    // Get a WebGPU context from the canvas and configure it
+    const canvas = document.querySelector('#GPUFrame');
+    const context = canvas.getContext('webgpu');
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+    context.configure({
+        device,
+        format: presentationFormat,
+        alphaMode: 'premultiplied'
+    });
+
+    const module = device.createShaderModule({
+        label: 'our hardcoded red triangle shaders',
+        code: `
+      @vertex fn vs(
+        @builtin(vertex_index) vertexIndex : u32
+      ) -> @builtin(position) vec4f {
+        let pos = array(
+          vec2f( 0.0,  0.5),  // top center
+          vec2f(-0.5, -0.5),  // bottom left
+          vec2f( 0.5, -0.5)   // bottom right
+        );
+
+        return vec4f(pos[vertexIndex], 0.0, 1.0);
+      }
+
+      @fragment fn fs() -> @location(0) vec4f {
+        return vec4f(0, 0, 0, 0);
+      }
+    `,
+    });
+
+    const pipeline = device.createRenderPipeline({
+        label: 'our hardcoded red triangle pipeline',
+        layout: 'auto',
+        vertex: {
+            module,
+            entryPoint: 'vs',
+        },
+        fragment: {
+            module,
+            entryPoint: 'fs',
+            targets: [{ format: presentationFormat }],
+        },
+    });
+
+    const renderPassDescriptor = {
+        label: 'our basic canvas renderPass',
+        colorAttachments: [
+            {
+                // view: <- to be filled out when we render
+                clearValue: [0.0, 0.0, 0.0, 0],
+                loadOp: 'clear',
+                storeOp: 'store',
+            },
+        ],
+    };
+
+    function render() {
+        // Get the current texture from the canvas context and
+        // set it as the texture to render to.
+        renderPassDescriptor.colorAttachments[0].view =
+            context.getCurrentTexture().createView();
+
+        // make a command encoder to start encoding commands
+        const encoder = device.createCommandEncoder({ label: 'our encoder' });
+
+        // make a render pass encoder to encode render specific commands
+        const pass = encoder.beginRenderPass(renderPassDescriptor);
+        pass.setPipeline(pipeline);
+        pass.draw(3);  // call our vertex shader 3 times.
+        pass.end();
+
+        const commandBuffer = encoder.finish();
+        device.queue.submit([commandBuffer]);
+    }
+
+    render();
+}
+
+
+
+const main = async () => {
+    // DOM Configuration //////////////////////////////////////////////////////////////////////////////////////////////////////
+    const GPUFrame = document.getElementById('GPUFrame')
+    GPUFrame.style.pointerEvents = 'none'
+    GPUFrame.style.zIndex = '1'
+
+    // const mapDiv = document.createElement('div')
+    // mapDiv.style.height = '100%'
+    // mapDiv.style.width = '100%'
+    // mapDiv.style.zIndex = '0'
+    // mapDiv.id = 'map'
+    // document.body.appendChild(mapDiv)
+
+    // StartDash //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const terrain = new TerrainLayer(14)
+    const flow = new SteadyFlowLayer()
+    // let mapp
+    let mapp = await initScratchMap(mapContainerRef.value)
+
+    // scr.StartDash().then(() => {
+    //     const map = new ScratchMap({
+    //         accessToken:
+    //             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+    //         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+    //         center: [120.980697, 31.684162],
+    //         projection: 'mercator',
+    //         GPUFrame: GPUFrame,
+    //         container: 'map',
+    //         antialias: true,
+    //         maxZoom: 18,
+    //         zoom: 9,
+    //     }).on('load', () => {
+    //         mapp = map
+    //         // map.addLayer(terrain)
+    //         // map.addLayer(flow)
+    //     })
+    // })
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === '1') {
+            // flow.hide()
+            if (mapp.getLayer('TerrainLayer')) terrain.show()
+            else mapp.addLayer(terrain)
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '2') {
+            if (mapp.getLayer('TerrainLayer')) {
+                terrain.hide()
+                mapp.removeLayer('TerrainLayer')
+            }
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '3') {
+            if (mapp.getLayer('FlowLayer')) flow.show()
+            else mapp.addLayer(flow)
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '4') {
+            if (mapp.getLayer('FlowLayer')) {
+                flow.hide()
+                // mapp.removeLayer('FlowLayer')
+            }
+            mapp.triggerRepaint()
+        }
+    })
+}
+
+function fail(msg) {
+    // eslint-disable-next-line no-alert
+    alert(msg);
+}
+
+
+
 
 onMounted(async () => {
+    main()
 
-
+    window.addEventListener('keydown', async (e) => {
+        if (e.key === '5') {
+            await clearCanvas()
+        }
+    })
 
 
 
     // const map = await initMap(mapContainerRef)
-    // window.addEventListener('keydown', (e) => {
+    // window.addEventListener('keydown', async(e) => {
     //     if (e.key === '1') {
     //         map.addLayer(new TerrainLayer(14))
     //     }
@@ -52,18 +233,21 @@ onMounted(async () => {
     //         map.removeLayer('TerrainLayer')
     //     }
     //     if (e.key === '3') {
-    //         flowlayer = new FlowLayer()
     //         map.addLayer(flowlayer)
     //     }
     //     if (e.key === '4') {
     //         map.removeLayer('FlowLayer')
     //         flowlayer.hide()
     //     }
+    //     if (e.key === '5'){
+    //         await clearCanvas()
+    //     }
     // })
 
-
-
 })
+
+
+
 
 </script>
 
@@ -108,6 +292,4 @@ onMounted(async () => {
     height: 92vh;
     z-index: 0;
 }
-
-
 </style>

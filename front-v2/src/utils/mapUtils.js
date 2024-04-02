@@ -1,6 +1,8 @@
 import mapboxgl from 'mapbox-gl'
-import { useMapStore } from '../store/mapStore'
+import { createApp } from 'vue'
+import { useMapStore, useSceneStore } from '../store/mapStore'
 import * as scr from './scratch/scratch.js'
+import popUpContent from '../components/dataVisual/featureDetails/popUpContent.vue'
 
 const initMap = (ref) => {
     return new mapboxgl.Map({
@@ -18,7 +20,6 @@ const initMap = (ref) => {
 }
 const initScratchMap = (ref) => {
     return new Promise((resolve, reject) => {
-        // const map =
         scr.StartDash().then(() => {
             const map = new ScratchMap({
                 container: ref.id, // container ID
@@ -31,8 +32,9 @@ const initScratchMap = (ref) => {
                 projection: 'mercator',
                 GPUFrame: GPUFrame,
                 antialias: true,
-                maxZoom: 18,
+                minZoom: 8,
             }).on('load', () => {
+                console.log('initScratchMap ok');
                 resolve(map)
                 // map.addLayer(new TerrainLayer(14))
                 // map.addLayer(new FlowLayer())
@@ -63,16 +65,16 @@ const flytoSmall = (map) => {
     })
 }
 
-const flytoFeature = (map, coord,zoom=10) => {
+const flytoFeature = (map, coord, zoom = 10) => {
     map.flyTo({
         center: coord,
-        pitch: 61.99999999999988,
+        // pitch: 61.99999999999988,
+        pitch: 20,
         bearing: 0,
         zoom: zoom,
         speed: 0.8,
         essential: true,
     })
-    console.log(map.getBounds())
 }
 
 const loadImage = async (map, url, imageID) => {
@@ -84,6 +86,90 @@ const loadImage = async (map, url, imageID) => {
             resolve()
         })
     })
+}
+
+const createPopUp = () => {
+    const ap = createApp(popUpContent)
+    const container = document.createElement('div')
+    const componentInstance = ap.mount(container)
+
+    const domwithComp = container
+    const popUp = new mapboxgl.Popup({
+        maxWidth: '1000px',
+        offset: 25,
+    }).setDOMContent(domwithComp)
+    // .setLngLat(popupCoord)
+    // .addTo(map); undefined;
+    return popUp
+}
+
+const addMarkerToMap = (
+    map,
+    markerPos,
+    markerClass,
+    IconUrl,
+    popUpInstance,
+    featureInfo,
+) => {
+    // var container = document.createElement("div");
+    // container.id = "container";
+    // container.style.width = "30px";
+    // container.style.height = "30px";
+    // container.style.backgroundColor = "white";
+    // container.style.borderRadius = "50%";
+    // container.style.cursor = 'pointer'
+
+    // // 创建 icon 元素并添加到 container 中
+    // var icon = document.createElement("div");
+    // icon.id = "icon";
+    // icon.style.width = "28px";
+    // icon.style.height = "28px";
+    // icon.style.backgroundSize = "contain";
+    // icon.style.backgroundImage = `url(${IconUrl})`;
+
+    // container.appendChild(icon);
+
+    const el = document.createElement('div')
+    el.classList.add(markerClass)
+    el.style.width = '35px'
+    el.style.height = '35px'
+    el.style.backgroundImage = `url(${IconUrl})`
+    el.style.backgroundSize = 'contain'
+    el.style.cursor = 'pointer'
+
+    let marker = new mapboxgl.Marker({
+        element: el,
+        rotationAlignment: 'horizon',
+        offset: [0, -25],
+    })
+        .setPopup(popUpInstance)
+        .setLngLat(markerPos)
+        .addTo(map)
+
+    marker.getElement().addEventListener('click', () => {
+        useSceneStore().setSelectedFeature(featureInfo)
+        let popUp = marker.getPopup()
+        popUp.setLngLat(markerPos)
+        flytoFeature(map, markerPos)
+    })
+
+    return marker
+}
+
+const getCenterCoord = (coordsArray) => {
+    if (coordsArray.length % 2) {
+        return coordsArray[Math.floor(coordsArray.length / 2)]
+    } else {
+        let long =
+            (coordsArray[coordsArray.length / 2][0] +
+                coordsArray[coordsArray.length / 2 - 1][0]) /
+            2
+        let lat =
+            (coordsArray[coordsArray.length / 2][1] +
+                coordsArray[coordsArray.length / 2 - 1][1]) /
+            2
+        return [long, lat]
+    }
 }
 
 const size = 80
@@ -397,17 +483,16 @@ class ScratchMap extends mapboxgl.Map {
             canvas: options.GPUFrame,
             alphaMode: 'premultiplied',
         })
+        this.depthTexture = this.screen.createScreenDependentTexture(
+            'Texture (Map Common Depth)',
+            'depth32float',
+        )
 
         // Pass
         this.outputPass = scr.renderPass({
             name: 'Render Pass (Scratch map)',
             colorAttachments: [{ colorResource: this.screen }],
-            depthStencilAttachment: {
-                depthStencilResource: this.screen.createScreenDependentTexture(
-                    'Texture (Map Depth)',
-                    'depth24plus',
-                ),
-            },
+            depthStencilAttachment: { depthStencilResource: this.depthTexture },
         })
 
         // Make stages
@@ -711,4 +796,8 @@ export {
     loadImage,
     pulsing,
     initScratchMap,
+    ScratchMap,
+    addMarkerToMap,
+    getCenterCoord,
+    createPopUp,
 }

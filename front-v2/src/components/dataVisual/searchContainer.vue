@@ -36,24 +36,19 @@
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
-                            <div class="leaf-node" v-if="node.isLeaf"></div>
-                            <div class="fat-node" v-else></div>
-
-                            <span>{{ node.label }}</span>
-                            <!-- <span class="det">
-                                    <a v-show="node.isLeaf"> 查看详情 </a>
-                                </span> -->
+                            <div class="iconAndlable">
+                                <div class="icon"></div>
+                                <div class="label">{{ node.label }}</div>
+                            </div>
+                            <span class="desc">
+                                <a v-show="node.isLeaf"> 查看详情 </a>
+                            </span>
                         </span>
                     </template>
-
-
                 </el-tree>
             </div>
         </Transition>
-
     </div>
-
-
 </template>
 
 <script setup>
@@ -72,9 +67,7 @@ import { useMapStore, useSceneStore } from '../../store/mapStore';
 const mapStore = useMapStore()
 const sceneStore = useSceneStore()
 
-// const props = defineProps({
-//     selectedScene: Scene
-// })
+
 const selectedScene = computed(() => sceneStore.selectedScene)
 const selectedFeature = computed(() => sceneStore.selectedFeature)
 
@@ -132,6 +125,17 @@ let data = ref([
     }
 ])
 
+const ICON = (node) => {
+    if (!node.isLeaf) {
+        if (node.expanded == false) {
+            return '/icons/add.png'
+        } else {
+            return '/icons/minus.png'
+        }
+    }
+    return ''
+}
+
 
 const filterNode = (value, data, node) => {
     if (!value) return true
@@ -163,13 +167,13 @@ const showLeafDetailHandler = (node) => {
 
     if (selectedScene.value.title === '预警岸段' || selectedScene.value.title === '过江通道') {
         //展示popUp弹窗
-        console.log('show popup');
         let popupCoord = getPopupCoord(node.data.coord ? node.data.coord : node.data.llCoords)
         flytoFeature(map, popupCoord, 11)
 
         popUp && popUp.remove()
         popUp = new mapboxgl.Popup({
-            maxWidth: '1000px'
+            maxWidth: '1000px',
+            offset: 25
         })
             .setDOMContent(domwithComp)
             .setLngLat(popupCoord)
@@ -186,9 +190,6 @@ const showLeafDetailHandler = (node) => {
             .setLngLat(popupCoord)
             .addTo(map);
     }
-
-
-
 }
 
 const getPopupCoord = (coordsArray) => {
@@ -214,7 +215,6 @@ const getPopupCoord = (coordsArray) => {
 // })
 watch(selectedScene, async (newV) => {
     popUp && popUp.remove()
-    let map = mapStore.getMap()
     if (newV.allLayers.length != 0) {
         // only for geojson?
         data.value = initDataByScene(newV)
@@ -266,9 +266,6 @@ const initDataByScene = (sceneInstance) => {
     return data
 }
 
-
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -276,7 +273,7 @@ const initDataByScene = (sceneInstance) => {
     user-select: none;
     position: absolute;
     pointer-events: all;
-    top: 21vh;
+    top: 40vh;
     right: 2vw;
     // height: 40vh;
     // width: 20vw;
@@ -427,10 +424,11 @@ const initDataByScene = (sceneInstance) => {
     }
 }
 
-:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip){
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip) {
     display: none
 }
-:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip){
+
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip) {
     display: none
 }
 
@@ -438,34 +436,34 @@ const initDataByScene = (sceneInstance) => {
 .custom-tree-node {
     flex: 1;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-    font-size: calc(0.5vh + 0.5vw);
-    padding-right: 8px;
+    justify-content: space-between;
+    font-size: calc(0.7vh + 0.4vw);
+    line-height: calc(0.7vh + 0.4vw);
 
-    /*
-    .leaf-node {
-        width: calc(0.5vh + 0.5vw);
-        height: calc(0.5vh + 0.5vw);
-        background: url('/icons/minus.png');
-        background-size: contain;
-        line-height: 12px;
-        margin-right: 5px;
-        //z-index: 999;
+    .iconAndlable {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+
+        .icon {
+            width: calc(0.5vh + 0.4vw);
+            height: calc(0.5vh + 0.4vw);
+            background-size: contain;
+            line-height: 12px;
+        }
+
+        .lable {
+            color: #152478;
+            font-weight: 500;
+            margin-left: 1vw;
+        }
     }
-    */
 
-    .fat-node {
-        width: calc(0.5vh + 0.5vw);
-        height: calc(0.5vh + 0.5vw);
-        background: url('/icons/add.png');
-        background-size: contain;
-        line-height: 12px;
-        margin-right: 5px;
-    }
-
-    .det {
-        right: 1vw;
+    .desc {
+        margin-right: 1vw;
     }
 }
 
@@ -496,34 +494,6 @@ const initDataByScene = (sceneInstance) => {
 :deep().el-tree .el-tree-node__expand-icon.expanded {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
-}
-
-/* //有子节点 且未展开 */
-:deep().el-tree .el-tree-node.is-focusable .el-tree-node__expand-icon:before {
-    background: url('/icons/beach.png') no-repeat 0 3px;
-    content: '';
-    display: block;
-    width: 20px;
-    height: 20px;
-    font-size: 16px;
-    background-size: 16px;
-    padding-right: 18px;
-}
-
-/* //有子节点 且已展开 */
-:deep().el-tree .is-expanded .el-tree-node__expand-icon.expanded:before {
-    background: url('/icons/gate.png') no-repeat 0 3px;
-    content: '';
-    display: block;
-    width: 20px;
-    height: 20px;
-    font-size: 16px;
-    background-size: 16px;
-    padding-right: 18px;
-}
-
-:deep().el-tree-node__expand-icon.is-leaf {
-    display: none;
 }
 
 :deep() .el-icon {

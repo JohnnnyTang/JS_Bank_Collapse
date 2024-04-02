@@ -96,7 +96,6 @@ div.info-content-container {
     user-select: none;
     width: 25vw;
     position: relative;
-    margin-left: 2vw;
     height: 34vh;
     display: flex;
     justify-content: space-between;
@@ -218,7 +217,7 @@ div.info-content-container {
 
     div.detail-info-container {
         width: 16vw;
-        height: 31vh;
+        height: 34vh;
         background-color: rgb(163, 206, 245);
         box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.35);
         position: relative;
@@ -229,6 +228,7 @@ div.info-content-container {
         div.detail-info-flex {
             width: 14vw;
             height: 29vh;
+            margin-top: 2vh;
             // background-color: aliceblue;
 
             display: flex;

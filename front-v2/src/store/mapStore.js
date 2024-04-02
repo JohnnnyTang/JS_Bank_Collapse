@@ -1,6 +1,8 @@
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { Scene } from "../components/dataVisual/Scene";
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { Scene } from '../components/dataVisual/Scene'
+import SteadyFlowLayer from '../utils/m_demLayer/steadyFlowLayer'
+import TerrainLayer from '../utils/m_demLayer/terrainLayer'
 
 const useMapStore = defineStore('mapStore', () => {
     const map = ref(null)
@@ -29,10 +31,34 @@ const useSceneStore = defineStore('sceneStore', () => {
         _selectedFeature.value = feature
     }
 
-    return { selectedScene, selectedFeature, setSelectedScene, setSelectedFeature }
+    return {
+        selectedScene,
+        selectedFeature,
+        setSelectedScene,
+        setSelectedFeature,
+    }
 })
 
-export {
-    useMapStore,
-    useSceneStore
-}
+const useLayerStore = defineStore('layerStore', () => {
+    const _flowLayer = ref()
+    const _terrainLayer = ref()
+
+    const flowLayer = computed(() => _flowLayer.value)
+    const terrainLayer = computed(() => _terrainLayer.value)
+
+    function setFlowLayer(flowlayer_instance) {
+        _flowLayer.value = flowlayer_instance
+    }
+    function setTerrainLayer(terrainlayer_instance) {
+        _terrainLayer.value = terrainlayer_instance
+    }
+
+    return {
+        flowLayer,
+        terrainLayer,
+        setFlowLayer,
+        setTerrainLayer,
+    }
+})
+
+export { useMapStore, useSceneStore, useLayerStore }

@@ -1,17 +1,21 @@
 import { ElMessage } from 'element-plus'
 import mapboxgl from 'mapbox-gl'
 import BackEndRequest from '../../api/backend.js'
-import { loadImage, pulsing } from '../../utils/mapUtils.js'
+import {
+    loadImage,
+    pulsing,
+    addMarkerToMap,
+    getCenterCoord,
+    createPopUp,
+} from '../../utils/mapUtils.js'
 import { useSceneStore } from '../../store/mapStore.js'
-
+import { useLayerStore } from '../../store/mapStore.js'
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
-import FlowLayer from '../../utils/m_demLayer/flowLayer.js'
+import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 // BackEndRequest.getDataNodeData()
 
 let terrainLayer = new TerrainLayer(14)
-let flowLayer = new FlowLayer()
-
-
+let flow = new SteadyFlowLayer()
 
 // Data Prepare
 class DataPioneer {
@@ -186,6 +190,7 @@ const generateGeoJson = (itemArr, getCoords, type) => {
 }
 
 const initLayers = async (sceneInstance, map) => {
+    let popUp = createPopUp()
     switch (sceneInstance.title) {
         /////Large Scene
         case '过江通道':
@@ -290,6 +295,30 @@ const initLayers = async (sceneInstance, map) => {
             })
             sceneInstance.allLayers.push('已建通道', '在建通道', '规划通道')
 
+            popUp = createPopUp()
+            channel.data.forEach((item) => {
+                let centerCoord = getCenterCoord(item['llCoords'])
+                if (item.type === '在建通道') {
+                    addMarkerToMap(
+                        map,
+                        centerCoord,
+                        'building-marker',
+                        '/icons/building.png',
+                        popUp,
+                        item,
+                    )
+                } else if (item.type === '规划通道') {
+                    addMarkerToMap(
+                        map,
+                        centerCoord,
+                        'planning-marker',
+                        '/icons/planing.png',
+                        popUp,
+                        item,
+                    )
+                }
+            })
+
             break
         case '预警岸段':
             let bankData = new DataPioneer(
@@ -298,6 +327,7 @@ const initLayers = async (sceneInstance, map) => {
                 'LineString',
             )
             await bankData.requestData(BackEndRequest.getbankLineData)
+
             const { level1, level2, level3 } = DataPioneer.getDifBankData(
                 bankData.origin2geojson(),
             )
@@ -405,14 +435,40 @@ const initLayers = async (sceneInstance, map) => {
                 '三级预警岸段',
             )
 
+            // add marker here
+
+            let count = 0
+            bankData.data.forEach((item) => {
+                let centerCoord = getCenterCoord(item['coord'])
+
+                if (item.warningLevel === 1) {
+                    addMarkerToMap(
+                        map,
+                        centerCoord,
+                        'warning1-marker',
+                        '/icons/warning3.png',
+                        popUp,
+                        item,
+                    )
+                    count++
+                }
+                // else if (item.warningLevel === 2) {
+                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning2.png', popUp, item)
+                // }
+                // else if (item.warningLevel === 3) {
+                //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning1.png', popUp, item)
+                // }
+            })
             break
 
         case '全江地形':
-            map.addLayer(terrainLayer)
-            sceneInstance.allLayers.push(
-                'TerrainLayer',
-            )
-            break;
+            // sceneInstance.terrainLayer = terrainLayer
+            if (map.getLayer('TerrainLayer')) terrainLayer.show()
+            else map.addLayer(terrainLayer)
+            useLayerStore().setTerrainLayer(terrainLayer)
+            sceneInstance.allLayers.push('TerrainLayer')
+            map.triggerRepaint()
+            break
 
         /////small Scene
         case '实时监测设备':
@@ -512,13 +568,25 @@ const initLayers = async (sceneInstance, map) => {
             break
 
         case '岸段聚合场景':
-            map.addLayer(terrainLayer)
-            map.addLayer(flowLayer)
-            sceneInstance.allLayers.push(
-                'TerrainLayer',
-                'FlowLayer'
-            )
-            break;
+            // sceneInstance.terrainLayer = terrainLayer
+            // sceneInstance.flowLayer = flow
+            if (map.getLayer('TerrainLayer')) terrainLayer.show()
+            else map.addLayer(terrainLayer)
+            useLayerStore().setTerrainLayer(terrainLayer)
+
+            if (map.getLayer('FlowLayer')) flow.show()
+            else map.addLayer(flow)
+            useLayerStore().setFlowLayer(flow)
+
+            sceneInstance.allLayers.push('TerrainLayer', 'FlowLayer')
+            map.triggerRepaint()
+            break
+        // case '水利一张图':
+        //     // console.log('123213123')
+        //     // map.addLayer(flow)
+        //     // flow.show()
+        //     // sceneInstance.allLayers.push('FlowLayer')
+        //     break
         default:
             console.log('wait developing...')
             ElMessage('wait developing...')
@@ -579,7 +647,6 @@ const initLayers = async (sceneInstance, map) => {
     // );
     const sceneStore = useSceneStore()
     sceneStore.setSelectedScene(sceneInstance)
-
 }
 
 // Scene
@@ -589,12 +656,11 @@ class Scene {
         this.title = ''
         this.desc = ''
         this.iconSrc = ''
-        this.layerSrc = []
-        this.allLayers = []
-        this.layer_src_map = new Map()
+        this.layerSrc = [] //only id
+        this.allLayers = [] //only id
+        this.markers = []
     }
     async initAllLayers(map) {
-   
         // question！！！
         // prepare for layer source, add Layers and all visible
         // if (map.loaded()) {
@@ -608,7 +674,6 @@ class Scene {
         //     })
         // }
         await initLayers(this, map)
-
     }
 
     showLayers(map, showArrays) {
@@ -636,14 +701,28 @@ class Scene {
         // if (map.loaded()) {
         //remove layer , remove source
         this.allLayers.forEach((layerID) => {
-            map.getLayer(layerID) && map.removeLayer(layerID)
+            if (layerID === 'TerrainLayer') {
+                terrainLayer.hide()
+            } else if (layerID === 'FlowLayer') {
+                flow.hide()
+            } else map.getLayer(layerID) && map.removeLayer(layerID)
         })
         this.allLayers = []
 
+        // source 是否需要删除？
         this.layerSrc.forEach((sourceID) => {
             map.getSource(sourceID) && map.removeSource(sourceID)
         })
         this.layerSrc = []
+
+        //hide marker
+        let markersDoms = document.getElementsByClassName(
+            'mapboxgl-marker mapboxgl-marker-anchor-center',
+        )
+        for (let i = markersDoms.length - 1; i >= 0; i--) {
+            markersDoms[i].remove()
+        }
+
         // }
         // else {
         //     ElMessage('map not loaded!')

@@ -254,204 +254,7 @@ const generateData_Stress = (ogDataArray, metaData) => {
 const generateOptions_GNSS = (processedData) => {
 
     console.log(processedData);
-    // 2dline
-    const option2dline = {
-        gradientColor: ["#00d4ff", "#090979"],
-        animation: false,
-        grid: {
-            top: 40,
-            left: 50,
-            right: 40,
-            bottom: 50
-        },
-        xAxis: {
-            name: 'x',
-            minorTick: {
-                show: true
-            },
-            minorSplitLine: {
-                show: true
-            }
-        },
-        yAxis: {
-            name: 'y',
-            min: Math.floor(processedData.yMoveRange[0]),
-            max: Math.ceil(processedData.yMoveRange[1]),
-            minorTick: {
-                show: true
-            },
-            minorSplitLine: {
-                show: true
-            }
-        },
-        dataZoom: [
-            {
-                show: true,
-                type: 'inside',
-                filterMode: 'none',
-                xAxisIndex: [0],
-                startValue: -20,
-                endValue: 20
-            },
-            {
-                show: true,
-                type: 'inside',
-                filterMode: 'none',
-                yAxisIndex: [0],
-                startValue: -20,
-                endValue: 20
-            }
-        ],
-        series: [
-            {
-                type: 'line',
-                showSymbol: false,
-                clip: true,
-                data: processedData.data,
-                smooth: true,
-                lineStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgb(255, 11, 11)'
-                        },
-                        {
-                            offset: 1,
-                            color: '#F6EDED'
-                        }
-                    ]),
-                    width: 3
-                },
-            }
-        ]
-    };
-    // 3dline
-    let option3Dline = {
-        tooltip: {},
-        backgroundColor: '#fff',
-        type: 'continuous',
-        visualMap: {
-            show: false,
-            dimension: 3,
-            min: 0,
-            max: timeDif(processedData.startTime, processedData.endTime),
-            inRange: {
-                color: [
-                    '#313695',
-                    '#4575b4',
-                    '#74add1',
-                    '#abd9e9',
-                    '#e0f3f8',
-                    '#ffffbf',
-                    '#fee090',
-                    '#fdae61',
-                    '#f46d43',
-                    '#d73027',
-                    '#a50026'
-                ],
-                opacity: [0.5, 1.0]
-            }
-        },
-        xAxis3D: {
-            type: 'value'
-        },
-        yAxis3D: {
-            type: 'value'
-        },
-        zAxis3D: {
-            type: 'value'
-        },
-        grid3D: {
-            viewControl: {
-                projection: 'orthographic'
-            }
-        },
-        series: [
-            {
-                type: 'line3D',
-                data: processedData.data,
-                smooth: true,
-                // data,
-                lineStyle: {
-                    width: 4
-                }
-            }
-        ]
-    };
     // 3dcube
-    let option3Dcube = {
-        tooltip: {},
-        visualMap: {
-            show: false,
-            dimension: 2,
-            min: -1,
-            max: 1,
-            inRange: {
-                opacity: [0.8]
-            }
-        },
-        xAxis3D: {},
-        yAxis3D: {},
-        zAxis3D: {},
-        grid3D: {},
-        series: [
-            {
-                type: 'surface',
-                parametric: true,
-                color: '#2F5499',
-                // shading: 'albedo',
-                parametricEquation: {
-                    u: {
-                        min: -Math.PI,
-                        max: Math.PI,
-                        step: Math.PI / 10
-                    },
-                    v: {
-                        min: 0,
-                        max: Math.PI,
-                        step: Math.PI / 10
-                    },
-                    x: function (u, v) {
-                        return Math.sin(v) * Math.sin(u) * processedData.radiusRange[1];
-                    },
-                    y: function (u, v) {
-                        return Math.sin(v) * Math.cos(u) * processedData.radiusRange[1];
-                    },
-                    z: function (u, v) {
-                        return Math.cos(v) * processedData.radiusRange[1];
-                    }
-                }
-            },
-            {
-                type: 'surface',
-                parametric: true,
-                color: '#007FFF',
-                // shading: 'albedo',
-                parametricEquation: {
-                    u: {
-                        min: -Math.PI,
-                        max: Math.PI,
-                        step: Math.PI / 10
-                    },
-                    v: {
-                        min: 0,
-                        max: Math.PI,
-                        step: Math.PI / 10
-                    },
-                    x: function (u, v) {
-                        return Math.sin(v) * Math.sin(u) * processedData.radiusRange[0];
-                    },
-                    y: function (u, v) {
-                        return Math.sin(v) * Math.cos(u) * processedData.radiusRange[0];
-                    },
-                    z: function (u, v) {
-                        return Math.cos(v) * processedData.radiusRange[0];
-                    }
-                }
-            },
-        ]
-    };
-
     const regressionX = ecStat.regression("polynomial", processedData.scatterData.time_xMove_scater_data, 7)
     const regressionY = ecStat.regression("polynomial", processedData.scatterData.time_yMove_scater_data, 7)
     const regressionZ = ecStat.regression("polynomial", processedData.scatterData.time_zMove_scater_data, 7)
@@ -473,6 +276,7 @@ const generateOptions_GNSS = (processedData) => {
         xAxis: {
             type: 'value',
             show: true,
+            max: 'dataMax',
             axisLabel: {
                 formatter: (value) => {
                     return value2time(value, processedData.startTime)
@@ -485,23 +289,20 @@ const generateOptions_GNSS = (processedData) => {
         },
         legend: {
             orient: 'horizontal',
-            align: 'left',
-            top: '40',
-            itemWidth: 8,
-            itemHeight: 8,
-            y: '20',
-            x: 'center',
+            top: '30',
+            width: 300,
+            left: 0,
+            itemGap: 5,
             formatter: (name) => {
                 return `{b|${name}} `;
             },
             textStyle: {
                 color: '#999999',
-                fontSize: 12,
                 align: 'left',
                 backgroundColor: "transparent",
                 rich: {
                     b: {
-                        width: 150,
+                        width: 20,
                     },
                 },
             },
@@ -591,17 +392,20 @@ const generateOptions_GNSS = (processedData) => {
         },
         grid: {
             show: false,
-            left: '15%'
+            left: '20%'
         },
         visualMap: [
             {
                 show: true,
                 itemGap: 0,
                 top: 'middle',
-                left: '2%',
+                left: '0%',
                 itemSymbol: 'rect',
                 type: 'piecewise',
+                itemWidth: 15,
+                itemHeight: 10,
                 text: [`${processedData.ratioRange[1].toFixed(4)}`, `${processedData.ratioRange[0].toFixed(4)}`],
+                textGap: 15,
                 realtime: false,
                 calculable: true,
                 seriesIndex: 0,
@@ -630,20 +434,16 @@ const generateOptions_GNSS = (processedData) => {
                 ]
             },
         ],
-        toolbox: {
-            feature: {
-                dataZoom: {
-                    yAxisIndex: 'none'
-                },
-                restore: {},
-                saveAsImage: {}
-            }
-        },
         xAxis: {
             type: 'time',
             axisLabel: {
-                formatter: function (value) {
-                    return echarts.format.formatTime('hh:ss', value);
+                formatter: function (value, index) {
+                    // if (index === 0 || index === dataIndexArray.length - 1) {
+                    if (index % 2 === 0) {
+                        return echarts.format.formatTime('hh:ss', value);
+                    } else {
+                        return '';
+                    }
                 }
             }
         },
@@ -666,114 +466,11 @@ const generateOptions_GNSS = (processedData) => {
     return {
         // options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
         options: [optionScatter, optionRatio],
-        names: ['位移深度趋势图', '综合位移变率图'],
+        names: ['位移时间曲线', '综合位移变率'],
     }
 }
 
 const generateOptions_Incline = (processedData) => {
-    let xMoveOption = {
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'line',
-                lineStyle: {
-                    color: 'rgba(0,0,0,0.2)',
-                    width: 1,
-                    type: 'solid'
-                }
-            }
-        },
-        legend: {
-            data: processedData.legendData
-        },
-        singleAxis: {
-            top: 50,
-            bottom: 50,
-            axisTick: {},
-            axisLabel: {},
-            type: 'time',
-            axisPointer: {
-                animation: true,
-                label: {
-                    show: true
-                }
-            },
-            splitLine: {
-                show: true,
-                lineStyle: {
-                    type: 'dashed',
-                    opacity: 0.2
-                }
-            }
-        },
-        series: [
-            {
-                type: 'themeRiver',
-                itemStyle: {
-                    opacity: 0.7
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 25,
-                        shadowColor: 'rgba(0, 0, 0, 0.8)'
-                    }
-                },
-                data: processedData.xMovedata.slice(0, 25)
-            }
-        ]
-    };
-    let yMoveOption = {
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'line',
-                lineStyle: {
-                    color: 'rgba(0,0,0,0.2)',
-                    width: 1,
-                    type: 'solid'
-                }
-            }
-        },
-        legend: {
-            data: processedData.legendData
-        },
-        singleAxis: {
-            top: 50,
-            bottom: 50,
-            axisTick: {},
-            axisLabel: {},
-            type: 'time',
-            axisPointer: {
-                animation: true,
-                label: {
-                    show: true
-                }
-            },
-            splitLine: {
-                show: true,
-                lineStyle: {
-                    type: 'dashed',
-                    opacity: 0.2
-                }
-            }
-        },
-        series: [
-            {
-                type: 'themeRiver',
-                itemStyle: {
-                    opacity: 0.7
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 25,
-                        shadowColor: 'rgba(0, 0, 0, 0.8)'
-                    }
-                },
-                data: processedData.yMovedata.slice(0, 25)
-            }
-        ]
-    };
-
     let depth_value_x_series = []
     let depth_value_y_series = []
     let depth_value_3d_series = []
@@ -812,92 +509,33 @@ const generateOptions_Incline = (processedData) => {
         depth_value_3d_series.push(serieItem3d)
     }
 
-    // 深度 偏移曲线
-    let depth_value_xOption = {
-        title: {
-            text: "测斜仪-X向偏移曲线",
-            left: 'center'
-        },
-        grid: {
-            x: 30,
-            y: 90,
-            x2: 30,
-            y2: 30,
-            borderWidth: 1
-        },
-        legend: {
-            top: 30,
-            formatter: function (value) {
-                return echarts.format.formatTime('hh:ss', value);
-            }
-        },
-        xAxis: {
-            type: 'value'
-        },
-        yAxis: {
-            type: 'value',
-            scale: true,
-        },
-        tooltip: {
-            trigger: 'axis',
-        },
-        series: depth_value_x_series
-
-    }
-    let depth_value_yOption = {
-        title: {
-            text: "测斜仪-Y向偏移曲线",
-            left: 'center'
-        },
-        grid: {
-            x: 30,
-            y: 90,
-            x2: 30,
-            y2: 30,
-            borderWidth: 1
-        },
-        legend: {
-            top: 30,
-            formatter: function (value) {
-                return echarts.format.formatTime('hh:ss', value);
-            }
-        },
-        xAxis: {
-            type: 'value'
-        },
-        yAxis: {
-            type: 'value',
-            scale: true,
-        },
-        tooltip: {
-            trigger: 'axis',
-        },
-        series: depth_value_y_series
-    }
     let depth_value_x_y_Option = {
         color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
         title: [{
-            text: '测斜仪-X向偏移曲线',
+            text: 'X向偏移曲线',
             left: '10%'
         }, {
-            text: '测斜仪-Y向偏移曲线',
+            text: 'Y向偏移曲线',
             right: '10%' // 设置第二个标题在右边
         }],
         grid: [{
-            left: '3%',
-            right: '55%',
-            top: 90,
-            bottom: 30,
+            left: '5%',
+            right: '50%',
+            top: 80,
+            bottom: 20,
             containLabel: true
         }, {
-            left: '58%',
+            left: '55%',
             right: '5%',
-            top: 90,
-            bottom: 30,
+            top: 80,
+            bottom: 20,
             containLabel: true
         }],
         legend: {
             top: 30,
+            itemGap: 5,
+            itemWidth: 15,
+            itemHeight: 6,
             formatter: function (value) {
                 return echarts.format.formatTime('hh:ss', value);
             }
@@ -962,11 +600,17 @@ const generateOptions_Incline = (processedData) => {
     //3d 深度偏移曲线
     let option3Dline = {
         title: {
-            text: "测斜仪-三维偏移曲线",
+            text: "三维偏移曲线",
             left: 'center'
         },
         legend: {
-            top: 30,
+            top: 25,
+            left: '2%',
+            orient: 'horizontal',
+            itemGap: 5,
+            itemWidth: 15,
+            itemHeight: 6,
+
             formatter: function (value) {
                 return echarts.format.formatTime('hh:ss', value);
             }
@@ -1008,19 +652,16 @@ const generateOptions_Incline = (processedData) => {
             min: 'dataMin'
         },
         grid3D: {
-            top: 40, // 调整上边距
+            top: 35, // 调整上边距
             bottom: 0,
-            height: 300,
+            height: 210,
             viewControl: {
                 projection: 'orthographic'
             }
         },
         series: depth_value_3d_series
     };
-
-
     return {
-        // options: [xMoveOption, yMoveOption, option3Dline, depth_value_x_y_Option]
         options: [option3Dline, depth_value_x_y_Option],
         names: ["三维偏移曲线", "X-Y偏移曲线"],
     }
@@ -1043,14 +684,27 @@ const generateOptions_Manometer = (processedData) => {
                 }
             }
         },
+        title: {
+            text: "水压力河流图",
+            left: 'center'
+        },
         legend: {
+            top: 40,
             data: processedData.legendData
         },
         singleAxis: {
             top: 50,
             bottom: 50,
+            max: 'dataMax',
             axisTick: {},
-            axisLabel: {},
+            axisLabel: {
+                formatter: function (value, index) {
+                    // if (index === 0 || index === dataIndexArray.length - 1) {
+                    if (index % 2 === 0) {
+                        return echarts.format.formatTime('hh:ss', value);
+                    }
+                }
+            },
             type: 'time',
             axisPointer: {
                 animation: true,
@@ -1103,6 +757,10 @@ const generateOptions_Manometer = (processedData) => {
     })
 
     let optionPolarStack = {
+        title: {
+            text: "水压力极坐标堆叠图",
+            left: 'center'
+        },
         angleAxis: {
             //pressure
         },
@@ -1111,10 +769,14 @@ const generateOptions_Manometer = (processedData) => {
             data: processedData.measureTime,
             z: 10
         },
-        polar: {},
+        polar: {
+            center: ['50%', '60%'],
+            radius: '65%'
+        },
         series: optionPolarStack_Seriers,
         legend: {
             show: true,
+            top: 25,
             data: processedData.legendData
         }
     };
@@ -1135,18 +797,20 @@ const generateOptions_Manometer = (processedData) => {
 
     let optionDepthValue = {
         title: {
-            text: "孔隙水压力计-压力深度曲线",
+            text: "压力深度曲线",
             left: 'center'
         },
         grid: {
             x: 30,
-            y: 90,
+            y: 100,
             x2: 30,
             y2: 10,
             borderWidth: 1
         },
         legend: {
-            top: 30,
+            top: 25,
+            itemWidth: 18,
+            itemHeight: 5,
             formatter: function (value) {
                 return echarts.format.formatTime('hh:ss', value);
             }
@@ -1179,13 +843,16 @@ const generateOptions_Manometer = (processedData) => {
 
     let optionDynamicBar = {
         grid: {
-            top: 40,
+            top: 70,
             left: 50,
-            right: 70,
+            right: 50,
             bottom: 50
         },
+        title: {
+            text: "压力深度柱状图",
+            left: 'center'
+        },
         xAxis: {
-            max: 'dataMax',
             name: '水压力(mPa)',
             nameLocation: 'middle',
             axisLabel: {
@@ -1226,6 +893,7 @@ const generateOptions_Manometer = (processedData) => {
 
         },
         legend: {
+            top: 36,
             show: true
         },
         animationDuration: 0,
@@ -1236,7 +904,7 @@ const generateOptions_Manometer = (processedData) => {
 
     return {
         options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar],
-        names: ['河流图', '极坐标堆叠图', '压力深度趋势图', '压力深度柱状图'],
+        names: ['河流图', '极坐标堆叠图', '压力深度曲线'],
     }
 
 }
@@ -1245,10 +913,11 @@ const generateOptions_Stress = (processedData) => {
     //gaugeOption 
     let gaugeData = MonitorDataAssistant.getOnegaugeData(processedData.horizontalAngle[0], processedData.legendData)
     let gaugeOption = {
+        tooltip: {},
         grid: {
             left: '3%',
             right: '3%',
-            bottom:'3%',
+            bottom: '3%',
             containLabel: true
         },
         title: {
@@ -1260,6 +929,8 @@ const generateOptions_Stress = (processedData) => {
         },
         series: [
             {
+                center: ["50%", "64%"],
+                radius: "100%",
                 startAngle: 180,
                 endAngle: 0,
                 min: 0,
@@ -1298,7 +969,7 @@ const generateOptions_Stress = (processedData) => {
                     color: '#fff',
                     backgroundColor: 'inherit',
                     borderRadius: 3,
-                    formatter: '{value}%'
+                    formatter: '{value}°'
                 }
             }
         ]
@@ -1333,27 +1004,26 @@ const generateOptions_Stress = (processedData) => {
     let depth_value_hori_vert_Option = {
         // color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
         title: [{
-            text: '应力桩-水平受力偏移曲线',
-            left: '5%'
-        }, {
-            text: '应力桩-垂直受力偏移曲线',
-            right: '5%' // 设置第二个标题在右边
+            text: '水平-垂直受力偏移曲线',
+            left: '18%'
         }],
         grid: [{
-            left: '3%',
+            left: '5%',
             right: '55%',
             top: 70,
-            bottom: 30,
+            bottom: 20,
             containLabel: true
         }, {
-            left: '58%',
+            left: '55%',
             right: '5%',
             top: 70,
-            bottom: 30,
+            bottom: 20,
             containLabel: true
         }],
         legend: {
             top: 30,
+            itemWidth: 10,
+            itemHeight: 8,
             formatter: function (value) {
                 return echarts.format.formatTime('hh:ss', value);
             }
@@ -1365,6 +1035,9 @@ const generateOptions_Stress = (processedData) => {
                 name: '水平受力(N)',
                 position: 'top',
                 nameLocation: 'middle',
+                axisTick: {
+                    show: false // 不展示刻度线
+                },
                 axisLabel: {
                     margin: 1,
                     interval: 2,
@@ -1376,6 +1049,9 @@ const generateOptions_Stress = (processedData) => {
                 name: '垂直受力(N)',
                 position: 'top',
                 nameLocation: 'middle',
+                axisTick: {
+                    show: false // 不展示刻度线
+                },
                 axisLabel: {
                     margin: 1,
                     interval: 2,
@@ -1390,6 +1066,9 @@ const generateOptions_Stress = (processedData) => {
                 inverse: true,
                 name: '深度',
                 nameLocation: 'middle',
+                axisTick: {
+                    show: false // 不展示刻度线
+                },
                 axisLabel: {
                     margin: 1,
                 }
@@ -1401,6 +1080,9 @@ const generateOptions_Stress = (processedData) => {
                 inverse: true,
                 name: '深度',
                 nameLocation: 'middle',
+                axisTick: {
+                    show: false // 不展示刻度线
+                },
                 axisLabel: {
                     margin: 1,
                 }
@@ -1448,10 +1130,7 @@ const generateOptions_Stress = (processedData) => {
                 text: `应力桩-水平垂直受力图`,
                 left: 'center',
                 fontSize: 20,
-                textStyle: {
-                    color: '#00425C',
-                    fontWeight: 'bolder',
-                }
+          
             },
             grid: [
                 // 3个grid
@@ -1497,7 +1176,7 @@ const generateOptions_Stress = (processedData) => {
                     axisLabel: {
                         show: true,
                         color: colors[0].borderColor,
-                        fontSize: 12,
+                        fontSize: 10,
                         fontFamily: "DINPro-Regular"
                     },
                     splitLine: {
@@ -1526,7 +1205,7 @@ const generateOptions_Stress = (processedData) => {
                     axisLabel: {
                         show: true,
                         color: colors[1].borderColor,
-                        fontSize: 12,
+                        fontSize: 10,
                         fontFamily: "DINPro-Regular"
                     },
                     splitLine: {
@@ -1569,11 +1248,12 @@ const generateOptions_Stress = (processedData) => {
                     // 只显示 居中的label, 不显示轴线,刻度线
                     axisLabel: {
                         show: true,
+                        margin:5,
                         // padding:[-5,0,20,0],
                         textStyle: {
                             color: '#00425C',
                             fontWeight: 'bolder',
-                            fontSize: 15,
+                            fontSize: 12,
                         },
                         align: "center"
                     },
@@ -1609,7 +1289,8 @@ const generateOptions_Stress = (processedData) => {
             ],
             legend: {
                 top: '10%',
-                itemGap: 60
+                itemGap: 30,
+                left:'16%'
             },
             tooltip: {},
             series: []
@@ -1632,7 +1313,7 @@ const generateOptions_Stress = (processedData) => {
                             position: 'left',
                             textStyle: {
                                 color: colors[0].borderColor,
-                                fontSize: 12
+                                fontSize: 10
                             }
                         },
                         color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
@@ -1673,7 +1354,7 @@ const generateOptions_Stress = (processedData) => {
                             position: 'right',
                             textStyle: {
                                 color: colors[1].borderColor,
-                                fontSize: 12
+                                fontSize: 10
                             }
                         },
                         color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
@@ -1704,7 +1385,7 @@ const generateOptions_Stress = (processedData) => {
     })
     return {
         options: [gaugeOption, depth_value_hori_vert_Option, doubleBarOption],
-        names: ['水平受力角仪表图', '水平-垂直受力深度趋势图', '水平-垂直受力柱状图']
+        names: ['水平应力角度', '受力偏移曲线', '受力柱状图']
     }
 
 }
