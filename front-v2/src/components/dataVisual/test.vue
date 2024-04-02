@@ -23,8 +23,10 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { main } from '../../utils/m_demLayer/main'
-import { initScratchMap, initMap } from '../../utils/mapUtils'
+import mapboxgl from 'mapbox-gl'
+import "mapbox-gl/dist/mapbox-gl.css"
+// import { main } from '../../utils/m_demLayer/main'
+import { initScratchMap, initMap, ScratchMap } from '../../utils/mapUtils'
 import monitorDetail from './featureDetails/monitorDetail.vue'
 import bankLineDetail from './featureDetails/bankLineDetail.vue';
 import channelDetail from './featureDetails/channelDetail.vue';
@@ -38,6 +40,7 @@ import BackEndRequest from '../../api/backend';
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
 import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 import * as scr from '../../utils/scratch/scratch'
+
 
 
 const mapContainerRef = ref();
@@ -57,7 +60,7 @@ async function clearCanvas() {
     context.configure({
         device,
         format: presentationFormat,
-        alphaMode:'premultiplied'
+        alphaMode: 'premultiplied'
     });
 
     const module = device.createShaderModule({
@@ -129,6 +132,79 @@ async function clearCanvas() {
     render();
 }
 
+
+
+const main = async () => {
+    // DOM Configuration //////////////////////////////////////////////////////////////////////////////////////////////////////
+    const GPUFrame = document.getElementById('GPUFrame')
+    GPUFrame.style.pointerEvents = 'none'
+    GPUFrame.style.zIndex = '1'
+
+    // const mapDiv = document.createElement('div')
+    // mapDiv.style.height = '100%'
+    // mapDiv.style.width = '100%'
+    // mapDiv.style.zIndex = '0'
+    // mapDiv.id = 'map'
+    // document.body.appendChild(mapDiv)
+
+    // StartDash //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const terrain = new TerrainLayer(14)
+    const flow = new SteadyFlowLayer()
+    // let mapp
+    let mapp = await initScratchMap(mapContainerRef.value)
+
+    // scr.StartDash().then(() => {
+    //     const map = new ScratchMap({
+    //         accessToken:
+    //             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+    //         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+    //         center: [120.980697, 31.684162],
+    //         projection: 'mercator',
+    //         GPUFrame: GPUFrame,
+    //         container: 'map',
+    //         antialias: true,
+    //         maxZoom: 18,
+    //         zoom: 9,
+    //     }).on('load', () => {
+    //         mapp = map
+    //         // map.addLayer(terrain)
+    //         // map.addLayer(flow)
+    //     })
+    // })
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === '1') {
+            // flow.hide()
+            if (mapp.getLayer('TerrainLayer')) terrain.show()
+            else mapp.addLayer(terrain)
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '2') {
+            if (mapp.getLayer('TerrainLayer')) {
+                terrain.hide()
+                mapp.removeLayer('TerrainLayer')
+            }
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '3') {
+            if (mapp.getLayer('FlowLayer')) flow.show()
+            else mapp.addLayer(flow)
+
+            mapp.triggerRepaint()
+        }
+        if (e.key === '4') {
+            if (mapp.getLayer('FlowLayer')) {
+                flow.hide()
+                // mapp.removeLayer('FlowLayer')
+            }
+            mapp.triggerRepaint()
+        }
+    })
+}
+
 function fail(msg) {
     // eslint-disable-next-line no-alert
     alert(msg);
@@ -140,8 +216,8 @@ function fail(msg) {
 onMounted(async () => {
     main()
 
-    window.addEventListener('keydown',async(e)=>{
-        if(e.key === '5'){
+    window.addEventListener('keydown', async (e) => {
+        if (e.key === '5') {
             await clearCanvas()
         }
     })

@@ -20,7 +20,6 @@ const initMap = (ref) => {
 }
 const initScratchMap = (ref) => {
     return new Promise((resolve, reject) => {
-        // const map =
         scr.StartDash().then(() => {
             const map = new ScratchMap({
                 container: ref.id, // container ID
@@ -484,17 +483,16 @@ class ScratchMap extends mapboxgl.Map {
             canvas: options.GPUFrame,
             alphaMode: 'premultiplied',
         })
+        this.depthTexture = this.screen.createScreenDependentTexture(
+            'Texture (Map Common Depth)',
+            'depth32float',
+        )
 
         // Pass
         this.outputPass = scr.renderPass({
             name: 'Render Pass (Scratch map)',
             colorAttachments: [{ colorResource: this.screen }],
-            depthStencilAttachment: {
-                depthStencilResource: this.screen.createScreenDependentTexture(
-                    'Texture (Map Depth)',
-                    'depth24plus',
-                ),
-            },
+            depthStencilAttachment: { depthStencilResource: this.depthTexture },
         })
 
         // Make stages
@@ -798,6 +796,7 @@ export {
     loadImage,
     pulsing,
     initScratchMap,
+    ScratchMap,
     addMarkerToMap,
     getCenterCoord,
     createPopUp,

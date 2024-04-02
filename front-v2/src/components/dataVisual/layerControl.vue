@@ -1,5 +1,4 @@
 <template>
-
     <div class="layer-controller-content">
         <div class="layer-controller-icon-container" @click="showLayersCard = !showLayersCard">
             <!-- <el-tooltip :content="showLayersCard ? '最小化' : '图层管理'" placement="top" effect="light" :show-arrow="false"> -->
@@ -21,14 +20,13 @@
             </div>
         </Transition>
     </div>
-
 </template>
 
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted, ref, computed, watch } from 'vue';
-import { useMapStore, useSceneStore } from '../../store/mapStore';
+import { useMapStore, useSceneStore, useLayerStore } from '../../store/mapStore';
 
 const mapStore = useMapStore()
 const sceneStore = useSceneStore()
@@ -45,13 +43,36 @@ watch(selectedScene, (newV, oldV) => {
 const handleCheckedLayerChange = () => {
     let map = mapStore.getMap()
     // visible layer
+    console.log(selectedScene);
+
     checkedLayer.value.forEach(layerID => {
-        map.setLayoutProperty(layerID, 'visibility', 'visible');
+
+        // webgpu layer
+        if (layerID === 'FlowLayer') {
+            useLayerStore().flowLayer.show()
+        }
+        else if (layerID === 'TerrainLayer') {
+            useLayerStore().terrainLayer.show()
+        }
+        // normal layer
+        else {
+            map.setLayoutProperty(layerID, 'visibility', 'visible');
+        }
     })
     // invisible layer
     let invisibleLayer = selectedScene.value.allLayers.filter(v => !checkedLayer.value.includes(v))
     invisibleLayer.forEach(layerID => {
-        map.setLayoutProperty(layerID, 'visibility', 'none');
+
+        if (layerID === 'FlowLayer') {
+            useLayerStore().flowLayer.hide()
+        }
+        else if (layerID === 'TerrainLayer') {
+            useLayerStore().terrainLayer.hide()
+        }
+        else {
+            map.setLayoutProperty(layerID, 'visibility', 'none');
+        }
+
     });
 }
 

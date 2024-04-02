@@ -51,40 +51,9 @@ watch(selectedScene, async (newV, oldV) => {
     }
 })
 
-let mapp = null;
 const terrain = new TerrainLayer(14)
 const flow = new SteadyFlowLayer()
 
-window.addEventListener('keydown', (e) => {
-    if (e.key === '1') {
-        // flow.hide()
-        if (mapp.getLayer('TerrainLayer')) terrain.show()
-        else mapp.addLayer(terrain)
-
-        mapp.triggerRepaint()
-    }
-    if (e.key === '2') {
-        if (mapp.getLayer('TerrainLayer')) {
-            terrain.hide()
-            mapp.removeLayer('TerrainLayer')
-        }
-
-        mapp.triggerRepaint()
-    }
-    if (e.key === '3') {
-        if (mapp.getLayer('FlowLayer')) flow.show()
-        else mapp.addLayer(flow)
-
-        mapp.triggerRepaint()
-    }
-    if (e.key === '4') {
-        if (mapp.getLayer('FlowLayer')) {
-            flow.hide()
-            // mapp.removeLayer('FlowLayer')
-        }
-        mapp.triggerRepaint()
-    }
-})
 
 
 onMounted(async () => {
@@ -93,7 +62,40 @@ onMounted(async () => {
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
     flytoLarge(map)
-    mapp = map
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === '1') {
+            // flow.hide()
+            if (map.getLayer('TerrainLayer')) terrain.show()
+            else map.addLayer(terrain)
+
+            map.triggerRepaint()
+        }
+        if (e.key === '2') {
+            if (map.getLayer('TerrainLayer')) {
+                terrain.hide()
+                map.removeLayer('TerrainLayer')
+            }
+
+            map.triggerRepaint()
+        }
+        if (e.key === '3') {
+            if (map.getLayer('FlowLayer')) flow.show()
+            else map.addLayer(flow)
+
+            map.triggerRepaint()
+        }
+        if (e.key === '4') {
+            if (map.getLayer('FlowLayer')) {
+                flow.hide()
+                // map.removeLayer('FlowLayer')
+            }
+            map.triggerRepaint()
+        }
+    })
+
+
+
 
     const defaultScene = new Scene()
     defaultScene.title = '预警岸段'

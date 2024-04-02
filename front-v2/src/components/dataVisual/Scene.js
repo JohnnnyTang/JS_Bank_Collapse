@@ -9,7 +9,7 @@ import {
     createPopUp,
 } from '../../utils/mapUtils.js'
 import { useSceneStore } from '../../store/mapStore.js'
-
+import { useLayerStore } from '../../store/mapStore.js'
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
 import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 // BackEndRequest.getDataNodeData()
@@ -462,8 +462,12 @@ const initLayers = async (sceneInstance, map) => {
             break
 
         case '全江地形':
-            map.addLayer(terrainLayer)
+            // sceneInstance.terrainLayer = terrainLayer
+            if (map.getLayer('TerrainLayer')) terrainLayer.show()
+            else map.addLayer(terrainLayer)
+            useLayerStore().setTerrainLayer(terrainLayer)
             sceneInstance.allLayers.push('TerrainLayer')
+            map.triggerRepaint()
             break
 
         /////small Scene
@@ -564,16 +568,25 @@ const initLayers = async (sceneInstance, map) => {
             break
 
         case '岸段聚合场景':
-            map.addLayer(terrainLayer)
-            // if (map.getLayer('FlowLayer')) flow.show()
-            // else map.addLayer(flow)
-            terrainLayer.show()
-            // flowLayer.show()
-            sceneInstance.allLayers.push(
-                'TerrainLayer',
-                // 'FlowLayer',
-            )
+            // sceneInstance.terrainLayer = terrainLayer
+            // sceneInstance.flowLayer = flow
+            if (map.getLayer('TerrainLayer')) terrainLayer.show()
+            else map.addLayer(terrainLayer)
+            useLayerStore().setTerrainLayer(terrainLayer)
+
+            if (map.getLayer('FlowLayer')) flow.show()
+            else map.addLayer(flow)
+            useLayerStore().setFlowLayer(flow)
+
+            sceneInstance.allLayers.push('TerrainLayer', 'FlowLayer')
+            map.triggerRepaint()
             break
+        // case '水利一张图':
+        //     // console.log('123213123')
+        //     // map.addLayer(flow)
+        //     // flow.show()
+        //     // sceneInstance.allLayers.push('FlowLayer')
+        //     break
         default:
             console.log('wait developing...')
             ElMessage('wait developing...')
@@ -688,13 +701,11 @@ class Scene {
         // if (map.loaded()) {
         //remove layer , remove source
         this.allLayers.forEach((layerID) => {
-            map.getLayer(layerID) && map.removeLayer(layerID)
             if (layerID === 'TerrainLayer') {
                 terrainLayer.hide()
-            }
-            if (layerID === 'FlowLayer') {
-                flowLayer.hide()
-            }
+            } else if (layerID === 'FlowLayer') {
+                flow.hide()
+            } else map.getLayer(layerID) && map.removeLayer(layerID)
         })
         this.allLayers = []
 
