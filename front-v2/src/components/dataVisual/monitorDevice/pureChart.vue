@@ -1,14 +1,13 @@
 <template>
     <div class="pure-chart">
         <div class="buttons">
-            <div class="button" v-for="(name, index) in dataAssitant.chartOptions.names" @click="showChart(index)">
+            <div class="button" :class="{ active: selectedIndex === index }" v-for="(name, index) in dataAssitant.chartOptions.names" @click="showChart(index)">
                 {{ name }}
             </div>
         </div>
 
         <div class="chart" id="chart"></div>
     </div>
-
 </template>
 
 <script setup>
@@ -20,13 +19,14 @@ import { MonitorDataAssistant } from './ChartData'
 import { useSceneStore } from '../../../store/mapStore';
 
 const selectedFeature = computed(() => useSceneStore().selectedFeature)
-
+const selectedIndex = ref(0)
 
 let myChart
 let chartDom
 let dataAssitant = ref(new MonitorDataAssistant())
 
 const showChart = (index) => {
+    selectedIndex.value = index;
     if (myChart) {
         myChart.clear()
         myChart.setOption(dataAssitant.value.chartOptions.options[index])
@@ -36,12 +36,14 @@ const showChart = (index) => {
 }
 
 watch(selectedFeature, async (newV, oldV) => {
-    myChart&& myChart.clear()
+    selectedIndex.value = 0;
+    myChart && myChart.clear()
     if (newV) {
         dataAssitant.value = new MonitorDataAssistant(newV)
         await dataAssitant.value.getMonitoringdata()
         dataAssitant.value.getProcessedDataObject()
         dataAssitant.value.getChartOptions()
+        myChart.setOption(dataAssitant.value.chartOptions.options[0])
     }
 
 
@@ -60,6 +62,8 @@ onMounted(async () => {
     await dataAssitant.value.getMonitoringdata()
     dataAssitant.value.getProcessedDataObject()
     dataAssitant.value.getChartOptions()
+
+    myChart.setOption(dataAssitant.value.chartOptions.options[0])
 
 
     //#region  for test
@@ -184,6 +188,7 @@ $Color5: rgb(6, 102, 192);
         height: 5vh;
         align-items: center;
         font-size: calc(0.5vh + 0.5vw);
+        transition: 1s;
 
         .button {
             width: auto;
@@ -191,6 +196,19 @@ $Color5: rgb(6, 102, 192);
             background-color: $Color5 ;
             color: $Color2;
             padding: 7px;
+            margin-bottom: 1vh;
+          
+            
+            &:hover{
+                cursor: pointer;
+            }
+            &:active{
+                transform: scale(1.02);
+            }
+        }
+
+        .active{
+            background-color:  rgb(6, 142, 192);
         }
     }
 

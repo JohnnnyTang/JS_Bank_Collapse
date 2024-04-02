@@ -43,7 +43,6 @@ watch(selectedScene, (newV, oldV) => {
 const handleCheckedLayerChange = () => {
     let map = mapStore.getMap()
     // visible layer
-    console.log(selectedScene);
 
     checkedLayer.value.forEach(layerID => {
 

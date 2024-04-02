@@ -466,7 +466,7 @@ const generateOptions_GNSS = (processedData) => {
     return {
         // options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
         options: [optionScatter, optionRatio],
-        names: ['位移深度趋势图', '综合位移变率图'],
+        names: ['位移时间曲线', '综合位移变率'],
     }
 }
 
@@ -904,7 +904,7 @@ const generateOptions_Manometer = (processedData) => {
 
     return {
         options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar],
-        names: ['河流图', '极坐标堆叠图', '压力深度趋势图', '压力深度柱状图'],
+        names: ['河流图', '极坐标堆叠图', '压力深度曲线'],
     }
 
 }
@@ -1385,7 +1385,7 @@ const generateOptions_Stress = (processedData) => {
     })
     return {
         options: [gaugeOption, depth_value_hori_vert_Option, doubleBarOption],
-        names: ['水平受力角仪表图', '水平-垂直受力深度趋势图', '水平-垂直受力柱状图']
+        names: ['水平应力角度', '受力偏移曲线', '受力柱状图']
     }
 
 }
