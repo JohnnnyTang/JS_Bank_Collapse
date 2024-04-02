@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -22,4 +24,5 @@ public class TileBox {
     String name;
     Integer projection;
     String visualId;
+    List<String> fieldList;
 }

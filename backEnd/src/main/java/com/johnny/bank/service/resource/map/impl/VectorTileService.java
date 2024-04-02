@@ -1,6 +1,7 @@
 package com.johnny.bank.service.resource.map.impl;
 
 import com.johnny.bank.model.common.ContourTileBox;
+import com.johnny.bank.model.common.TileBox;
 import com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo;
 import com.johnny.bank.service.resource.map.IVectorTileService;
 import com.johnny.bank.utils.TileUtil;
@@ -8,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 /**
  * @Author: Johnny Tang
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class VectorTileService implements IVectorTileService {
 
     private final IVectorTileRepo IVectorTileRepo;
+    private final Map<String, String> tableNameMap = Map.of("placeLabel", "place_label_pt", "riverBg", "river_bg_vec", "riverLand", "river_land");
 
     @Autowired
     public VectorTileService(@Qualifier("VectorTileRepo") IVectorTileRepo IVectorTileRepo) {
@@ -27,7 +31,10 @@ public class VectorTileService implements IVectorTileService {
 
     @Override
     public byte[] getVectorTiles(String visualId, int x, int y, int z) {
-        return new byte[0];
+        if(!tableNameMap.containsKey(visualId)) return null;
+
+        TileBox tileBox = TileUtil.tile2boundingBox(x, y, z, tableNameMap.get(visualId));
+        return (byte[]) IVectorTileRepo.getVectorTile(tileBox);
     }
 
     @Override

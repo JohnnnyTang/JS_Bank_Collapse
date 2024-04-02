@@ -2,6 +2,11 @@ package com.johnny.bank.utils;
 
 import com.johnny.bank.model.common.TileBox;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,6 +21,9 @@ public class TileUtil {
      * @Author: Yiming
      * @Date: 2022/4/5
      */
+
+    private static Map<String, List<String>> fieldListMap = Map.of("place_label_pt", List.of("width", "height", "label"), "river_bg_vec", List.of("height"), "river_land", List.of("height"));
+
     public static double tile2lon(int x, int z) {
         return x / Math.pow(2.0, z) * 360.0 - 180;
     }
@@ -58,6 +66,7 @@ public class TileUtil {
         tileBox.setYMax(tile2lat(y, zoom));
         tileBox.setName(tableName);
         tileBox.setProjection(4326);
+        tileBox.setFieldList(fieldListMap.get(tableName));
         return tileBox;
     }
 
