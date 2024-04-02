@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@antv/g6": "^4.8.24",
     "@braks/revue-draggable": "^0.5.0",
     "@webgpu/types": "^0.1.40",
     "animejs": "^3.2.2",

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository("VectorTileRepo")
 public interface IVectorTileRepo {
-    byte[] getVectorTile(TileBox tileBox);
+    Object getVectorTile(TileBox tileBox);
 
     Object getContourVectorTile(ContourTileBox contourTileBox);
 }

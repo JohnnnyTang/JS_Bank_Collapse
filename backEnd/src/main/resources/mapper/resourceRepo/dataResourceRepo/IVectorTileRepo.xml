@@ -4,7 +4,10 @@
     <select id="getVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.TileBox">
         select st_asmvt(result, #{visualId}) tile
         from(
-                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom,
+                <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+                    ${field}
+                </foreach>
                 from ${name}
             ) as result
     </select>
@@ -12,7 +15,7 @@
     <select id="getContourVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.ContourTileBox">
         select st_asmvt(result, #{visualId}) tile
         from(
-                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, height, year, type
                 from mzs_contour
                 where year = #{year} AND type = #{tide}
             ) as result

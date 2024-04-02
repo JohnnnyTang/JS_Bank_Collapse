@@ -80,6 +80,24 @@ onMounted(() => {
                 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/after/{x}/{y}/{z}',
             ],
         })
+        map.addSource('riverBg', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/riverBg/{x}/{y}/{z}',
+            ],
+        })
+        map.addSource('riverLand', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/riverLand/{x}/{y}/{z}',
+            ],
+        })
+        map.addSource('ptVector', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/placeLabel/{x}/{y}/{z}',
+            ],
+        })
         map.addLayer({
             id: '线1',
             type: 'line',
@@ -95,67 +113,119 @@ onMounted(() => {
                 'line-width': 4,
             },
         })
+        map.addLayer({
+            id: 'fill1',
+            type: 'fill',
+            source: 'riverBg',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': 'rgba(23, 214, 86, 0.5)',
+            },
+        })
+        map.addLayer({
+            id: 'land1',
+            type: 'fill',
+            source: 'riverLand',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': 'rgba(13, 22, 211, 0.5)',
+            },
+        })
+        map.addLayer({
+            id: '点1',
+            type: 'symbol',
+            source: 'ptVector',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+            },
+            paint: {
+                'text-color': 'rgba(255, 214, 211, 1)',
+            },
+        })
         map.addSource('mapRaster', {
             type: 'raster',
-            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2020/Before/{x}/{y}/{z}'],
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
+            ],
             tileSize: 1024,
             minzoom: 10,
             maxzoom: 20,
-            bounds: [120.509,32.023,120.555,32.0402]
+            bounds: [120.509, 32.023, 120.555, 32.0402],
         })
         map.addSource('mapRaster1', {
             type: 'raster',
-            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2020/After/{x}/{y}/{z}'],
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2020/After/{x}/{y}/{z}',
+            ],
             tileSize: 1024,
             minzoom: 10,
             maxzoom: 20,
-            bounds: [120.514,32.0236,120.555,32.0391]
+            bounds: [120.514, 32.0236, 120.555, 32.0391],
         })
         map.addSource('mapRaster2', {
             type: 'raster',
-            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2021/Before/{x}/{y}/{z}'],
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2021/Before/{x}/{y}/{z}',
+            ],
             tileSize: 1024,
             minzoom: 10,
             maxzoom: 20,
-            bounds: [120.5116,32.02316,120.555,32.0402]
+            bounds: [120.5116, 32.02316, 120.555, 32.0402],
         })
         map.addSource('mapRaster3', {
             type: 'raster',
-            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2021/After/{x}/{y}/{z}'],
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2021/After/{x}/{y}/{z}',
+            ],
             tileSize: 1024,
             minzoom: 10,
             maxzoom: 20,
-            bounds: [120.5097,32.02409,120.555,32.0402]
+            bounds: [120.5097, 32.02409, 120.555, 32.0402],
         })
         map.addSource('mapRaster4', {
             type: 'raster',
-            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2022/Before/{x}/{y}/{z}'],
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2022/Before/{x}/{y}/{z}',
+            ],
             tileSize: 1024,
             minzoom: 10,
             maxzoom: 20,
-            bounds: [120.51,32.02,120.552,32.04046]
+            bounds: [120.51, 32.02, 120.552, 32.04046],
         })
         map.addSource('mapRaster5', {
             type: 'raster',
-            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2022/After/{x}/{y}/{z}'],
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2022/After/{x}/{y}/{z}',
+            ],
             tileSize: 1024,
             minzoom: 10,
             maxzoom: 20,
-            bounds: [120.50998,32.02379,120.5548,32.04148]
+            bounds: [120.50998, 32.02379, 120.5548, 32.04148],
         })
         map.addSource('mapRaster6', {
             type: 'raster',
-            tiles: ['http://127.0.0.1:8989/api/v1/tile/raster/mzs/2023/Before/{x}/{y}/{z}'],
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
+            ],
             tileSize: 1024,
             minzoom: 10,
             maxzoom: 20,
-            bounds: [120.50548,32.0224,120.55304,32.0415]
+            bounds: [120.50548, 32.0224, 120.55304, 32.0415],
         })
-        map.addLayer({
-            id: 'ras',
-            type: 'raster',
-            source: 'mapRaster6',
-            
+        // map.addLayer({
+        //     id: 'ras',
+        //     type: 'raster',
+        //     source: 'mapRaster6',
+        // })
+        map.on('click', (e) => {
+            var features = map.queryRenderedFeatures(e.point, {
+                layers: ['land1', 'fill1'],
+            })
+            console.log(features)
         })
         resizeObserver.observe(containerDom.value)
     })
