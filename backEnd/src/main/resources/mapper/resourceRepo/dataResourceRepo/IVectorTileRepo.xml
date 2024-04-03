@@ -20,4 +20,12 @@
                 where year = #{year} AND type = #{tide}
             ) as result
     </select>
+    <select id="getDepthLineVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.DepthLineTileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, year
+                from depth_line
+                where year = #{year}
+            ) as result
+    </select>
 </mapper>

@@ -15,6 +15,38 @@ import G6 from '@antv/g6'
 import { onMounted } from 'vue'
 import { paramTree } from './paramTree'
 
+G6.registerEdge('flow-line', {
+    draw(cfg, group) {
+        const startPoint = cfg.startPoint
+        const endPoint = cfg.endPoint
+
+        const { style } = cfg
+        const shape = group.addShape('path', {
+            attrs: {
+                stroke: style.stroke,
+                endArrow: style.endArrow,
+                path: [
+                    ['M', startPoint.x, startPoint.y],
+                    ['L', startPoint.x, (startPoint.y + endPoint.y) / 2],
+                    ['L', endPoint.x, (startPoint.y + endPoint.y) / 2],
+                    ['L', endPoint.x, endPoint.y],
+                ],
+            },
+        })
+
+        return shape
+    },
+})
+
+const defaultEdgeStyle = {
+    stroke: '#91d5ff',
+    endArrow: {
+        path: 'M 0,0 L 12, 6 L 9,0 L 12, -6 Z',
+        fill: '#91d5ff',
+        d: -20,
+    },
+}
+
 onMounted(() => {
     const container = document.getElementById('param-tree')
     // console.log(data)
@@ -41,6 +73,10 @@ onMounted(() => {
         },
         defaultNode: {
             size: 26,
+        },
+        defaultEdge: {
+            type: 'flow-line',
+            style: defaultEdgeStyle,
         },
         layout: {
             type: 'dendrogram',

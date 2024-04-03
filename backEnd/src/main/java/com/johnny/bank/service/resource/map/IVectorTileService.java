@@ -11,4 +11,6 @@ public interface IVectorTileService {
     byte[] getVectorTiles(String visualId, int x, int y, int z);
 
     byte[] getContourVectorTiles(int x, int y, int z, String year, String tide);
+
+    byte[] getDepthLineVectorTiles(int x, int y, int z, String year);
 }
