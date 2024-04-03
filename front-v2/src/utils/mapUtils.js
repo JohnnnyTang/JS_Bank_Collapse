@@ -6,7 +6,7 @@ import popUpContent from '../components/dataVisual/featureDetails/popUpContent.v
 
 const initMap = (ref) => {
     return new mapboxgl.Map({
-        container: ref.value, // container ID
+        container: ref.id, // container ID
         accessToken:
             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
