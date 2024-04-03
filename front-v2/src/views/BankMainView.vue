@@ -90,6 +90,12 @@ onMounted(() => {
                 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2017/{x}/{y}/{z}',
             ],
         })
+        map.addSource('riverSectionLabelSource', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/riverSection/{x}/{y}/{z}',
+            ],
+        })
         map.addSource('riverBg', {
             type: 'vector',
             tiles: [
@@ -155,6 +161,21 @@ onMounted(() => {
             },
             paint: {
                 'text-color': 'rgba(255, 214, 211, 0.75)',
+            },
+        })
+        map.addLayer({
+            id: 'riverSectionLabel',
+            type: 'line',
+            source: 'riverSectionLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(231, 214, 86, 0.9)',
+                'line-width': 4,
             },
         })
         map.addSource('mapRaster', {

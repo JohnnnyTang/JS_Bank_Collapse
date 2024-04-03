@@ -22,7 +22,12 @@ public class TileUtil {
      * @Date: 2022/4/5
      */
 
-    private static Map<String, List<String>> fieldListMap = Map.of("place_label_pt", List.of("width", "height", "label"), "river_bg_vec", List.of("height"), "river_land", List.of("height"));
+    private static Map<String, List<String>> fieldListMap = Map.of(
+            "place_label_pt", List.of("width", "height", "label"),
+            "river_bg_vec", List.of("height"),
+            "river_land", List.of("height"),
+            "river_section_label", List.of("label")
+    );
 
     public static double tile2lon(int x, int z) {
         return x / Math.pow(2.0, z) * 360.0 - 180;
