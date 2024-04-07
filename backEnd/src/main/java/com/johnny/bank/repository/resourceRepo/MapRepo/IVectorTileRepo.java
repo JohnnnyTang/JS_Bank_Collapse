@@ -1,6 +1,7 @@
 package com.johnny.bank.repository.resourceRepo.MapRepo;
 
 import com.johnny.bank.model.common.ContourTileBox;
+import com.johnny.bank.model.common.DepthLineTileBox;
 import com.johnny.bank.model.common.TileBox;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,6 @@ public interface IVectorTileRepo {
     Object getVectorTile(TileBox tileBox);
 
     Object getContourVectorTile(ContourTileBox contourTileBox);
+
+    Object getDepthLineVectorTile(DepthLineTileBox depthLineTileBox);
 }

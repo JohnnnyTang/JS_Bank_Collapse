@@ -80,6 +80,22 @@ onMounted(() => {
                 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/after/{x}/{y}/{z}',
             ],
         })
+        map.addSource('depthLineSource', {
+            type: 'vector',
+            tiles: [
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/1999/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2004/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2006/{x}/{y}/{z}',
+                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2015/{x}/{y}/{z}',
+                'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2017/{x}/{y}/{z}',
+            ],
+        })
+        map.addSource('riverSectionLabelSource', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/riverSection/{x}/{y}/{z}',
+            ],
+        })
         map.addSource('riverBg', {
             type: 'vector',
             tiles: [
@@ -109,17 +125,18 @@ onMounted(() => {
             },
             paint: {
                 'line-opacity': 1,
-                'line-color': 'rgba(255, 214, 211, 0.98)',
+                'line-color': 'rgba(255, 214, 211, 0.5)',
                 'line-width': 4,
             },
         })
+        
         map.addLayer({
             id: 'fill1',
             type: 'fill',
             source: 'riverBg',
             'source-layer': 'default',
             paint: {
-                'fill-color': 'rgba(23, 214, 86, 0.5)',
+                'fill-color': 'rgba(13, 22, 189, 0.5)',
             },
         })
         map.addLayer({
@@ -128,7 +145,7 @@ onMounted(() => {
             source: 'riverLand',
             'source-layer': 'default',
             paint: {
-                'fill-color': 'rgba(13, 22, 211, 0.5)',
+                'fill-color': 'rgba(23, 214, 86, 0.5)',
             },
         })
         map.addLayer({
@@ -143,7 +160,22 @@ onMounted(() => {
                 'text-anchor': 'left',
             },
             paint: {
-                'text-color': 'rgba(255, 214, 211, 1)',
+                'text-color': 'rgba(255, 214, 211, 0.75)',
+            },
+        })
+        map.addLayer({
+            id: 'riverSectionLabel',
+            type: 'line',
+            source: 'riverSectionLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(231, 214, 86, 0.9)',
+                'line-width': 4,
             },
         })
         map.addSource('mapRaster', {
@@ -215,6 +247,21 @@ onMounted(() => {
             minzoom: 10,
             maxzoom: 20,
             bounds: [120.50548, 32.0224, 120.55304, 32.0415],
+        })
+        map.addLayer({
+            id: '深泓线',
+            type: 'line',
+            source: 'depthLineSource',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(12, 214, 211, 0.5)',
+                'line-width': 4,
+            },
         })
         // map.addLayer({
         //     id: 'ras',

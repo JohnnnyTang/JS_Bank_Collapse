@@ -55,6 +55,31 @@ public class VectorTileController {
     }
 
     @CrossOrigin
+    @RequestMapping(value = "/vector/depthLine/{year}/{x}/{y}/{z}", method = RequestMethod.GET)
+    public void getDepthLineVectorTiles(@PathVariable String year, @PathVariable int x, @PathVariable int y, @PathVariable int z, HttpServletResponse response) throws Exception {
+        byte[] tileRes = vectorTileService.getDepthLineVectorTiles(x, y, z, year);
+        ServletOutputStream sos = null;
+        try {
+            response.setContentType("application/octet-stream");
+            sos = response.getOutputStream();
+            sos.write(tileRes);
+            sos.flush();
+            sos.close();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            try {
+                if (sos != null) {
+                    sos.close();
+                }
+            } catch (Exception exception) {
+                log.error(exception.getMessage());
+                throw new Exception(exception.getMessage());
+            }
+            throw new Exception("vector tile error");
+        }
+    }
+
+    @CrossOrigin
     @RequestMapping(value = "/vector/{layerName}/{x}/{y}/{z}", method = RequestMethod.GET)
     public void getCommonVectorTiles(@PathVariable String layerName,@PathVariable int x, @PathVariable int y, @PathVariable int z, HttpServletResponse response) throws Exception {
         byte[] tileRes = vectorTileService.getVectorTiles(layerName, x, y, z);

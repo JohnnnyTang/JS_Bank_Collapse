@@ -322,7 +322,7 @@ div.history-table-container {
             }
         }
     }
-}
+} 
 
 :deep(.el-scrollbar__wrap) {
     scroll-behavior: smooth;
