@@ -63,40 +63,6 @@ onMounted(async () => {
     map = mapStore.getMap()
     flytoLarge(map)
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '1') {
-            // flow.hide()
-            if (map.getLayer('TerrainLayer')) terrain.show()
-            else map.addLayer(terrain)
-
-            map.triggerRepaint()
-        }
-        if (e.key === '2') {
-            if (map.getLayer('TerrainLayer')) {
-                terrain.hide()
-                map.removeLayer('TerrainLayer')
-            }
-
-            map.triggerRepaint()
-        }
-        if (e.key === '3') {
-            if (map.getLayer('FlowLayer')) flow.show()
-            else map.addLayer(flow)
-
-            map.triggerRepaint()
-        }
-        if (e.key === '4') {
-            if (map.getLayer('FlowLayer')) {
-                flow.hide()
-                // map.removeLayer('FlowLayer')
-            }
-            map.triggerRepaint()
-        }
-    })
-
-
-
-
     const defaultScene = new Scene()
     defaultScene.title = '预警岸段'
     sceneStore.setSelectedScene(defaultScene)
