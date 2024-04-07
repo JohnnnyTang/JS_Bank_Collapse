@@ -114,6 +114,12 @@ onMounted(() => {
                 'http://127.0.0.1:8989/api/v1/tile/vector/placeLabel/{x}/{y}/{z}',
             ],
         })
+        map.addSource('riverLabelSource', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/riverName/{x}/{y}/{z}',
+            ],
+        })
         map.addLayer({
             id: '线1',
             type: 'line',
@@ -161,6 +167,21 @@ onMounted(() => {
             },
             paint: {
                 'text-color': 'rgba(255, 214, 211, 0.75)',
+            },
+        })
+        map.addLayer({
+            id: 'riverLabel',
+            type: 'symbol',
+            source: 'riverLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+            },
+            paint: {
+                'text-color': 'rgba(13, 22, 189, 0.8)',
             },
         })
         map.addLayer({

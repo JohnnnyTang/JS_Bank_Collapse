@@ -25,7 +25,8 @@ public class VectorTileService implements IVectorTileService {
     private final IVectorTileRepo IVectorTileRepo;
     private final Map<String, String> tableNameMap = Map.of(
             "placeLabel", "place_label_pt", "riverBg", "river_bg_vec",
-            "riverLand", "river_land", "riverSection", "river_section_label"
+            "riverLand", "river_land", "riverSection", "river_section_label",
+            "riverName", "river_name_label"
     );
 
     @Autowired

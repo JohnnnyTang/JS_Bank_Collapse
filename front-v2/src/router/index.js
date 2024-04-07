@@ -82,7 +82,17 @@ const routes = [
     },
     {
         path: '/bankTwin',
-        component: () => import('../views/BankTwinView.vue'),
+        redirect: '/bankTwin/main',
+        children: [
+            {
+                path: 'main', // 默认子页面
+                component: () => import('../views/BankTwinMainView.vue')
+            },
+            {
+                path: 'manage',
+                component: () => import('../views/BankTwinManageView.vue'),
+            },
+        ]
     },
 ]
 // 3、创建一个路由的对象
