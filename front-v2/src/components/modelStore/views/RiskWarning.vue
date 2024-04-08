@@ -5,7 +5,9 @@
         />
         <div class="model-content-container">
             <div class="model-info-container">
-              <ModelInfoVue/>
+              <ModelInfoVue
+                :modelInfo="modelInfo"
+              />
             </div>
             <div class="model-data-container">
               <div class="index-items-container">
@@ -214,6 +216,16 @@ import { ElMessageBox } from 'element-plus';
 import ModelTitleVue from '../ModelTitle.vue';
 import ModelInfoVue from '../ModelInfo.vue'
 import IndexCardVue from '../IndexCard.vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const modelInfo = {
+    application: route.query.application,
+    usescene: route.query.usescene,
+    input: route.query.input,
+    output: route.query.output,
+}
+
 const ModelName = "风险预警模型"
 const indexDataList = [
   {

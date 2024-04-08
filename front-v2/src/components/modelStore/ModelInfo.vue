@@ -21,6 +21,11 @@
                                     模型应用分类
                                 </div>
                             </div>
+                            <div class="information-item-content">
+                                <div class="item-content-text">
+                                    {{ props.modelInfo.application }}
+                                </div>
+                            </div>
                         </div>
                         <div class="information-item">
                             <div class="information-item-title">
@@ -29,6 +34,11 @@
                                 </div>
                                 <div class="item-title-text">
                                     模型使用场景
+                                </div>
+                            </div>
+                            <div class="information-item-content">
+                                <div class="item-content-text">
+                                    {{ props.modelInfo.usescene }}
                                 </div>
                             </div>
                         </div>
@@ -41,6 +51,11 @@
                                     模型输入参数
                                 </div>
                             </div>
+                            <div class="information-item-content">
+                                <div class="item-content-text">
+                                    {{ props.modelInfo.input }}
+                                </div>
+                            </div>
                         </div>
                         <div class="information-item">
                             <div class="information-item-title">
@@ -49,6 +64,11 @@
                                 </div>
                                 <div class="item-title-text">
                                     模型输出结果
+                                </div>
+                            </div>
+                            <div class="information-item-content">
+                                <div class="item-content-text">
+                                    {{ props.modelInfo.output }}
                                 </div>
                             </div>
                         </div>
@@ -77,6 +97,9 @@
 </template>
 
 <script setup>
+const props = defineProps({
+    modelInfo: Object
+})
 
 </script>
 
@@ -188,8 +211,9 @@ div.model-information-container {
                             flex-direction: row;
                             justify-content: center;
                             align-items: center;
-                            width: 100%;
-                            height: 40px;
+                            width: 150px;
+                            height: 35px;
+                            // border-bottom: #b1d5ec 2px dashed;
                             
                             div.item-title-text{
                                 width: 100%;
@@ -209,6 +233,22 @@ div.model-information-container {
                                     width: 100%;
                                     height: 100%;
                                 }
+                            }
+                        }
+
+                        div.information-item-content{
+                            display: flex;
+                            width: 100%;
+                            height: 75%;
+                            align-items: top;
+                            // background-color: #0d60fa;
+
+                            div.item-content-text{
+                                font-size: calc(0.5vh + 0.5vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                                margin-left: 5px;
+                                color: rgb(97, 148, 168);
                             }
                         }
                     }

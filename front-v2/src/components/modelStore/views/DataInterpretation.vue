@@ -5,7 +5,9 @@
         />
         <div class="model-content-container">
             <div class="model-info-container">
-                <ModelInfoVue/>
+                <ModelInfoVue
+                    :modelInfo="modelInfo"
+                />
             </div>
             <div class="model-data-container">
                 <div class="model-data-wrapper">
@@ -62,6 +64,16 @@ import watpreCardVue from '../WatpreCard.vue';
 import StrepileCardVue from '../StrepileCard.vue';
 import ModelInfoVue from '../ModelInfo.vue'
 import ModelTitleVue from '../ModelTitle.vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const modelInfo = {
+    application: route.query.application,
+    usescene: route.query.usescene,
+    input: route.query.input,
+    output: route.query.output,
+}
+console.log(modelInfo)
 
 const ModelName = '数据融合解译模型'
 

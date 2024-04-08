@@ -5,7 +5,9 @@
         />
         <div class="model-content-container">
             <div class="model-info-container">
-              <ModelInfoVue/>
+              <ModelInfoVue
+                :modelInfo="modelInfo"
+              />
             </div>
             <div class="model-data-container">
                 <div class="model-data-wrapper">
@@ -30,16 +32,19 @@
 </template>
   
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import ModelInfoVue from '../ModelInfo.vue'
 import ModelTitleVue from '../ModelTitle.vue';
 
-const ModelName = "土体变形分析模型"
-
-const router = useRouter()
-const returnMain = () => {
-    router.push('/modelStore')
+const route = useRoute()
+const modelInfo = {
+    application: route.query.application,
+    usescene: route.query.usescene,
+    input: route.query.input,
+    output: route.query.output,
 }
+
+const ModelName = "土体变形分析模型"
 
 const tableData = [
   {
