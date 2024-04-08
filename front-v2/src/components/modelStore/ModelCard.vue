@@ -97,12 +97,12 @@ const props = defineProps({
 
 // 卡片激活效果
 const infoItem = ref(props.infoItem)
-const isactive = () => {
-    infoItem.value.firstPage = true
-}
-const notactive = () => {
-    infoItem.value.firstPage = false
-}
+// const isactive = () => {
+//     infoItem.value.firstPage = true
+// }
+// const notactive = () => {
+//     infoItem.value.firstPage = false
+// }
 const changeactive = () => {
     infoItem.value.firstPage = !infoItem.value.firstPage
 }
