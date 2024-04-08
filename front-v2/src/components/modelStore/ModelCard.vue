@@ -4,8 +4,7 @@
             <div
                 class="model-card"
                 :class="[infoItem.firstPage ? 'inactive' : 'active']"
-                @mouseover="isactive"
-                @mouseleave="notactive"
+                @click="changeactive"
             >
                 <div class="image-wrapper">
                     <div class="image-div">
@@ -24,8 +23,7 @@
             <div
                 class="model-card"
                 :class="[infoItem.firstPage ? 'active' : 'inactive']"
-                @mouseover="isactive"
-                @mouseleave="notactive"
+                @click="changeactive"
             >
                 <div class="model-title-container second">
                     {{ infoItem.name }}
@@ -105,6 +103,9 @@ const isactive = () => {
 const notactive = () => {
     infoItem.value.firstPage = false
 }
+const changeactive = () => {
+    infoItem.value.firstPage = !infoItem.value.firstPage
+}
 
 // 路由设置
 const router = useRouter()
@@ -158,6 +159,10 @@ div.model-card-container {
             &.active {
                 opacity: 1;
                 z-index: 2;
+                cursor: pointer;
+                &:hover {
+                    transform: scale(1.02);
+                }
                 // div.image-wrapper {
                 //    opacity: 0;
                 // }
