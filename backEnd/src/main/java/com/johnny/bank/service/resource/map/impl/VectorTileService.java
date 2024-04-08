@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,15 +24,20 @@ import java.util.Map;
 public class VectorTileService implements IVectorTileService {
 
     private final IVectorTileRepo IVectorTileRepo;
-    private final Map<String, String> tableNameMap = Map.of(
+    private final Map<String, String> tableNameMap = new HashMap<>(Map.of(
             "placeLabel", "place_label_pt", "riverBg", "river_bg_vec",
             "riverLand", "river_land", "riverSection", "river_section_label",
-            "riverName", "river_name_label"
-    );
+            "riverName", "river_name_label", "mzsPlaceLabel", "mzs_place_label",
+            "mzsPlaceLine", "mzs_place_line", "mzsBankLabel", "mzs_bank_label",
+            "mzsSectionLine", "mzs_section_line", "mzsBankLine", "mzs_bank_line"
+    ));
 
     @Autowired
     public VectorTileService(@Qualifier("VectorTileRepo") IVectorTileRepo IVectorTileRepo) {
         this.IVectorTileRepo = IVectorTileRepo;
+        tableNameMap.put("mzsSectionLineLabel", "mzs_section_line_label");
+        tableNameMap.put("mzsBankAreaW", "mzs_bank_area_w");
+        tableNameMap.put("mzsBankAreaS", "mzs_bank_area_s");
     }
 
     @Override
