@@ -199,6 +199,9 @@ const onResize = (refDomWidth, refDomHeight) => {
     decLineNodeWidth.value = refDomHeight / 18
     bracketActiveTitleWidth.value = refDomWidth / 12.8
     bracketHoverTitleWidth.value = refDomWidth / 10
+    const bbox = navItemRefs.value[previousActive].getBoundingClientRect()
+    // console.log(bbox.x, bracketActiveTitleWidth.value)
+    activeBracketLeft.value = bbox.x - bracketActiveTitleWidth.value / 12.8
 }
 
 const resizeObserver = new ResizeObserver((entries) => {

@@ -4,6 +4,7 @@ import com.johnny.bank.model.common.TileBox;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,13 +23,23 @@ public class TileUtil {
      * @Date: 2022/4/5
      */
 
-    private static final Map<String, List<String>> fieldListMap = Map.of(
+    private static final Map<String, List<String>> fieldListMap = new HashMap<>(Map.of(
             "place_label_pt", List.of("width", "height", "label"),
             "river_bg_vec", List.of("height"),
             "river_land", List.of("height"),
             "river_section_label", List.of("label"),
-            "river_name_label", List.of("label")
-    );
+            "river_name_label", List.of("label"),
+            "mzs_place_label", List.of("label"),
+            "mzs_place_line", List.of("id"),
+            "mzs_bank_label", List.of("id", "label", "warn"),
+            "mzs_section_line", List.of("id", "label"),
+            "mzs_bank_line", List.of("id", "warn")
+    ));
+    static {
+        fieldListMap.put("mzs_section_line_label", List.of("id", "label"));
+        fieldListMap.put("mzs_bank_area_w", List.of("id", "warn"));
+        fieldListMap.put("mzs_bank_area_s", List.of("id", "stability"));
+    }
 
     public static double tile2lon(int x, int z) {
         return x / Math.pow(2.0, z) * 360.0 - 180;
