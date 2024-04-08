@@ -35,21 +35,15 @@ const clickSceneHandler = (scene, index) => {
 }
 
 const switchHandler = () => {
-
     //layer remove
-    
     selectedIndex.value = -1;
-
     if (sceneContainerInfo.value.sceneTitle === '长江江苏段') {
         flytoSmall(mapStore.getMap())
-
         sceneContainerInfo.value = sceneContainerInfo2
-
     }
     else {
         flytoLarge(mapStore.getMap())
         sceneContainerInfo.value = sceneContainerInfo1
-
     }
 }
 
@@ -82,8 +76,6 @@ onMounted(async () => {
     height: 92vh;
     overflow: hidden;
     z-index: 3;
-
-
 
     .scene-title {
         height: 4.5vh;

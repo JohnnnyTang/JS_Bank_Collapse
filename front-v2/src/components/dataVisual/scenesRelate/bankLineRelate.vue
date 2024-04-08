@@ -41,6 +41,7 @@
 import { onMounted, ref } from 'vue'
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
+import dayjs from 'dayjs';
 
 const Info = ref({})
 let myChart = null
@@ -201,35 +202,45 @@ const chartProcess = (data) => {
     return [option1, option2]
 
 }
+let index = 0
+const update = async() => {
+
+    const data = (await BackEndRequest.getbankLineData()).data
+    Info.value.banklineNum = data.length
+    var now = dayjs().format('YYYY-MM-DD HH:mm:ss')
+    Info.value.updateTime = now;
+
+    let optons = chartProcess(data)
+
+    if (index === 0) {
+        index = 1
+    }
+    else if (index === 1) {
+        index = 0
+    }
+    var now = dayjs().format('YYYY-MM-DD HH:mm:ss')
+    Info.value.updateTime = now;
+    myChart.clear()
+    myChart.setOption(optons[index])
+}
+
 
 
 
 onMounted(async () => {
 
-    const data = (await BackEndRequest.getbankLineData()).data
-    Info.value.banklineNum = data.length
-    Info.value.updateTime = data[0]["updateTime"]
-
     let chartdom = document.querySelector('#chart')
     myChart = echarts.init(chartdom);
 
-    let optons = chartProcess(data)
-    let index = 0
-    // myChart.setOption(optons[index])
     setTimeout(() => {
-        myChart.setOption(optons[index])
+        update()
     }, 0);
-
     setInterval(() => {
-        if (index === 0) {
-            index = 1
-        }
-        else if (index === 1) {
-            index = 0
-        }
-        myChart.clear()
-        myChart.setOption(optons[index])
-    }, 5000)
+        update()
+    }, 6000);
+
+
+
 
 
 })
