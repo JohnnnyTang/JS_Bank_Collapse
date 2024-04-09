@@ -35,7 +35,7 @@ const fullClick = () => {
         height: 5vh;
         background-size: contain;
         transition: 300ms;
-        background-image: url('./icons/full.png');
+        background-image: url('/icons/full.png');
 
         &:hover {
             cursor: pointer;

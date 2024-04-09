@@ -40,6 +40,7 @@
 import { onMounted, ref } from 'vue'
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
+import dayjs from 'dayjs';
 
 const Info = ref({})
 let myChart = null
@@ -89,7 +90,6 @@ const chartProcess = (data) => {
                                 case '在建通道':
                                     return "{building|}" + '\n' + params.data.value + ' 条'
                             }
-
                         },
                         show: true,
                         position: 'outside',
@@ -135,25 +135,32 @@ const chartProcess = (data) => {
 
 }
 
+const update = async () => {
+    const data = (await BackEndRequest.getChannelData()).data
+    Info.value.channelNum = data.length
+
+    var now = dayjs().format('YYYY-MM-DD HH:mm:ss')
+    Info.value.updateTime = now;
+
+    let opton = chartProcess(data)
+    myChart.clear()
+    myChart.setOption(opton)
+
+}
 
 
 onMounted(async () => {
-    const data = (await BackEndRequest.getChannelData()).data
-    Info.value.channelNum = data.length
-    Info.value.updateTime = data[0]["updateTime"]
 
     let chartdom = document.querySelector('#chart')
     myChart = echarts.init(chartdom);
 
-    let opton = chartProcess(data)
-    myChart.setOption(opton)
+    setTimeout(() => {
+        update()
+    }, 0);
 
     setInterval(() => {
-        myChart.clear()
-        myChart.setOption(opton)
-
-    }, 4000);
-
+        update()
+    }, 5000);
 
 })
 

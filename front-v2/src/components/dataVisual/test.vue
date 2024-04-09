@@ -1,7 +1,7 @@
 <template>
     <!-- <div id="map" ref="mapContainerRef"></div> -->
-    <canvas id="GPUFrame"></canvas>
-    <div id="map" ref="mapContainerRef"></div>
+    <!-- <canvas id="GPUFrame"></canvas>
+    <div id="map" ref="mapContainerRef"></div> -->
 
     <!-- <div class="drag-parent">
         <div class="drag-comp" v-draggable="{ 'bounds': 'parent' }">
@@ -19,6 +19,9 @@
     <!-- <bankLineRelate v-draggable="{'bounds': 'parent'}"></bankLineRelate> -->
     <!-- <channelRelate v-draggable="{'bounds': 'parent'}"></channelRelate> -->
     <!-- <monitorDeviceRelate v-draggable="{'bounds': 'parent'}"></monitorDeviceRelate> -->
+    <div id="mxdiv">
+        <canvas id="myCanvas"></canvas>
+    </div>
 </template>
 
 <script setup>
@@ -41,6 +44,8 @@ import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
 import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 import * as scr from '../../utils/scratch/scratch'
 
+// dwg
+import Mx from 'mxdraw'
 
 
 const mapContainerRef = ref();
@@ -214,35 +219,29 @@ function fail(msg) {
 
 
 onMounted(async () => {
-    main()
+/*
+cadFile......
+"/dwg/守护工程断面图/守护工程断面图-20240322.dwg"
+"/dwg/守护工程断面图/1.dwg"
+"/dwg/守护工程断面图/10.dwg"
+"/dwg/民主沙近岸测量范围-20240226-整体-展示版本2/buf/民主沙近岸测量范围-20240226-整体-展示版本2.dwg"
+*/
 
-    window.addEventListener('keydown', async (e) => {
-        if (e.key === '5') {
-            await clearCanvas()
-        }
-    })
+    Mx.MxFun.createMxObject({
+        canvasId: "myCanvas",
+        //cadFile: "http://localhost:8080/demo/buf/test.dwg.mxb1.wgh",
+        // cadFile:"/dwg/民主沙近岸测量范围-20240226-整体-展示版本2/buf/民主沙近岸测量范围-20240226-整体-展示版本2.dwg",
+        cadFile:"/dwg/守护工程断面图/7.dwg",
+        callback(mxDrawObject, { canvas, canvasParent }) {
+            canvasParent.className = "mxdiv";
+
+            mxDrawObject.addEvent("loadComplete", () => {
+                console.log("mx loadComplete");
+            });
+        },
+    });
 
 
-
-    // const map = await initMap(mapContainerRef)
-    // window.addEventListener('keydown', async(e) => {
-    //     if (e.key === '1') {
-    //         map.addLayer(new TerrainLayer(14))
-    //     }
-    //     if (e.key === '2') {
-    //         map.removeLayer('TerrainLayer')
-    //     }
-    //     if (e.key === '3') {
-    //         map.addLayer(flowlayer)
-    //     }
-    //     if (e.key === '4') {
-    //         map.removeLayer('FlowLayer')
-    //         flowlayer.hide()
-    //     }
-    //     if (e.key === '5'){
-    //         await clearCanvas()
-    //     }
-    // })
 
 })
 
@@ -258,6 +257,18 @@ onMounted(async () => {
     height: 92vh;
     z-index: 1;
     pointer-events: none;
+}
+
+.mxdiv {
+    position: absolute;
+    width: 100vw;
+    height: 92vh;
+}
+
+#myCanvas {
+    position: absolute;
+    width: 100vw;
+    height: 92vh;
 }
 
 .drag-parent {

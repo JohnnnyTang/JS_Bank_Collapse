@@ -4,12 +4,11 @@
             <div
                 class="model-card"
                 :class="[infoItem.firstPage ? 'inactive' : 'active']"
-                @mouseover="isactive"
-                @mouseleave="notactive"
+                @click="changeactive"
             >
                 <div class="image-wrapper">
                     <div class="image-div">
-                        <img :src="'/model.png'" alt="模型图标">
+                        <img :src="infoItem.picsrc" alt="模型图标">
                     </div>
                 </div>
                 <div class="model-title-container">
@@ -24,8 +23,7 @@
             <div
                 class="model-card"
                 :class="[infoItem.firstPage ? 'active' : 'inactive']"
-                @mouseover="isactive"
-                @mouseleave="notactive"
+                @click="changeactive"
             >
                 <div class="model-title-container second">
                     {{ infoItem.name }}
@@ -36,7 +34,7 @@
                             应用分类
                         </div>
                         <div class="content-item-text">
-                            这里是应用分类#这里是应用分类#这里是应用分类#这里是应用分类
+                            {{ infoItem.application }}
                         </div>
                     </div>
                     <div class="content-item-container">
@@ -44,7 +42,7 @@
                             使用场景
                         </div>
                         <div class="content-item-text">
-                            这里是使用场景#这里是使用场景#这里是使用场景#这里是使用场景
+                            {{ infoItem.usescene }}
                         </div>
                     </div>
                     <div class="content-item-container">
@@ -52,7 +50,7 @@
                             输入参数
                         </div>
                         <div class="content-item-text">
-                            这里是输入参数#这里是输入参数#这里是输入参数#这里是输入参数
+                            {{ infoItem.input }}
                         </div>
                     </div>
                     <div class="content-item-container">
@@ -60,7 +58,7 @@
                             输出结果
                         </div>
                         <div class="content-item-text">
-                            这里是输出结果#这里是输出结果#这里是输出结果#这里是输出结果
+                            {{ infoItem.output }}
                         </div>
                     </div>
                 </div>
@@ -87,29 +85,30 @@ const props = defineProps({
     },
 })
 
-// const SoilAnalysis = () => {
-//     router.push('/modelStore/soilAnalysis')
-// }
-// const StabilityAnalysis = () => {
-//     router.push('/modelStore/stabilityAnalysis')
-// }
-// const RiskWarning = () => {
-//     router.push('/modelStore/riskWarning')
-// }
-
 // 卡片激活效果
 const infoItem = ref(props.infoItem)
-const isactive = () => {
-    infoItem.value.firstPage = true
-}
-const notactive = () => {
-    infoItem.value.firstPage = false
+// const isactive = () => {
+//     infoItem.value.firstPage = true
+// }
+// const notactive = () => {
+//     infoItem.value.firstPage = false
+// }
+const changeactive = () => {
+    infoItem.value.firstPage = !infoItem.value.firstPage
 }
 
 // 路由设置
 const router = useRouter()
 const Detail = () => {
-    router.push('/modelStore/'+ infoItem.value.routerPath)
+    router.push({
+        path:'/modelStore/'+ infoItem.value.routerPath,
+        query: { 
+            application:infoItem.value.application,
+            usescene:infoItem.value.usescene,
+            input:infoItem.value.input,
+            output:infoItem.value.output,
+        }
+    })
 }
 
 </script>
@@ -118,7 +117,6 @@ const Detail = () => {
 div.model-card-container {
     width: 28vw;
     height: 78vh;
-    text-align: center;
 
     div.model-card-wrapper {
         // width: 23vw;
@@ -158,6 +156,10 @@ div.model-card-container {
             &.active {
                 opacity: 1;
                 z-index: 2;
+                cursor: pointer;
+                &:hover {
+                    transform: scale(1.02);
+                }
                 // div.image-wrapper {
                 //    opacity: 0;
                 // }
@@ -208,6 +210,7 @@ div.model-card-container {
                     -moz-transition: all 0.25s ease;
                     -o-transition: all 0.25s ease;
                     transition: all 0.25s ease;
+                    border: rgb(235, 232, 232) 3.5px solid;
 
                     img {
                         object-fit: cover;
@@ -229,6 +232,7 @@ div.model-card-container {
                 font-size: calc(1vh + 0.8vw);
                 font-weight: 600;
                 font-family: 'Microsoft YaHei';
+                text-align: center;
                 // border-top: 3px solid #9d5fd8;
 
                 &.second {
@@ -244,9 +248,13 @@ div.model-card-container {
                 padding: 20px;
                 border: 3px dashed rgb(202, 148, 202);
                 border-radius: 15px;
+                line-height: 3vh;
+                font-size: calc(0.6vh + 0.6vw);
+                text-align: left;
                 
                 &.second {
                     border: 0px;
+                    text-align: center;
                 }
 
                 div.content-item-container {
@@ -260,6 +268,7 @@ div.model-card-container {
                         height: 3vh;
                         line-height: 4vh;
                         left: -6vw;
+                        margin-bottom: 10px;
                         // background-color: aquamarine;
                         // color: #0050b1;
                         background: linear-gradient(
@@ -278,13 +287,14 @@ div.model-card-container {
                     div.content-item-text {
                         width: 100%;
                         height: 4vh;
-                        line-height: 4vh;
+                        line-height: 3vh;
                         // background-color: bisque;
                         color: #5467e2;
 
                         font-size: calc(0.5vh + 0.65vw);
                         // font-weight: 600;
                         font-family: 'Microsoft YaHei';
+                        text-align: left;
                     }
                 }
             }

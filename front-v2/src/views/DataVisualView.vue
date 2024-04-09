@@ -1,14 +1,18 @@
 <template>
     <div class="data-visual-container">
         <div id="map" ref="mapContainerRef"></div>
-        <sceneContainer />
+
+        <sceneContainer></sceneContainer>
+
+        <!-- toolset -->
         <layerControl></layerControl>
         <searchContainer></searchContainer>
         <fullscreen></fullscreen>
-        <bankLineRelate v-if="selectedScene.title === '预警岸段'"></bankLineRelate>
-        <channelRelate v-if="selectedScene.title === '过江通道'"></channelRelate>
-        <monitorDeviceRelate v-if="selectedScene.title === '实时监测设备'"></monitorDeviceRelate>
 
+        <!-- scenes desc -->
+        <sceneRelate></sceneRelate>
+
+        <!-- webgpu -->
         <canvas id="GPUFrame"></canvas>
 
     </div>
@@ -26,9 +30,8 @@ import layerControl from '../components/dataVisual/layerControl.vue';
 import searchContainer from '../components/dataVisual/searchContainer.vue';
 import BackEndRequest from '../api/backend';
 import fullscreen from '../components/dataVisual/fullscreen.vue';
-import bankLineRelate from '../components/dataVisual/scenesRelate/bankLineRelate.vue';
-import channelRelate from '../components/dataVisual/scenesRelate/channelRelate.vue';
-import monitorDeviceRelate from '../components/dataVisual/scenesRelate/monitorDeviceRelate.vue';
+import sceneRelate from '../components/dataVisual/scenesRelate/sceneRelate.vue';
+
 import TerrainLayer from '../utils/m_demLayer/terrainLayer';
 import SteadyFlowLayer from '../utils/m_demLayer/steadyFlowLayer';
 
@@ -62,40 +65,6 @@ onMounted(async () => {
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
     flytoLarge(map)
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '1') {
-            // flow.hide()
-            if (map.getLayer('TerrainLayer')) terrain.show()
-            else map.addLayer(terrain)
-
-            map.triggerRepaint()
-        }
-        if (e.key === '2') {
-            if (map.getLayer('TerrainLayer')) {
-                terrain.hide()
-                map.removeLayer('TerrainLayer')
-            }
-
-            map.triggerRepaint()
-        }
-        if (e.key === '3') {
-            if (map.getLayer('FlowLayer')) flow.show()
-            else map.addLayer(flow)
-
-            map.triggerRepaint()
-        }
-        if (e.key === '4') {
-            if (map.getLayer('FlowLayer')) {
-                flow.hide()
-                // map.removeLayer('FlowLayer')
-            }
-            map.triggerRepaint()
-        }
-    })
-
-
-
 
     const defaultScene = new Scene()
     defaultScene.title = '预警岸段'

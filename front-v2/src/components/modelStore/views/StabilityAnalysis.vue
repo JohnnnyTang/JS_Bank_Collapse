@@ -17,7 +17,9 @@
                 </div>
                 <div class="model-calculate-container">
                     <div v-if="firstPage == false" class="model-info-container">
-                        <ModelInfoVue/>
+                        <ModelInfoVue
+                            :modelInfo="modelInfo"
+                        />
                     </div>
                     <div v-if="firstPage == true" class="calculate-data-container">
                         <div class="calculate-data-wrapper">
@@ -99,6 +101,16 @@ import ModelTitleVue from '../ModelTitle.vue';
 import DataCardVue from '../DataCard.vue';
 import ResultCardVue from '../ResultCard.vue';
 import DataShowTableVue from '../DataShowTable.vue'
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+const modelInfo = {
+    application: route.query.application,
+    usescene: route.query.usescene,
+    input: route.query.input,
+    output: route.query.output,
+}
+
 
 const ModelName = '岸坡稳定性分析模型'
 
