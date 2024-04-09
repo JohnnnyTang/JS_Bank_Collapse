@@ -15,6 +15,33 @@
         </div>
         <BankBasicInfoVue />
         <RealtimeStatusVue />
+        <SectionRisk />
+        <div class="stable-status-container">
+            <dv-border-box12
+                :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
+                class="stable-border-box"
+            >
+                <div class="stable-status-header">断面稳定状态</div>
+                <div class="splitter-container">
+                    <dv-decoration3
+                        class="status-splitter"
+                        :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
+                    />
+                    <dv-decoration3
+                        class="status-splitter"
+                        :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
+                    />
+                    <dv-decoration3
+                        class="status-splitter"
+                        :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
+                    />
+                    <dv-decoration3
+                        class="status-splitter"
+                        :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
+                    />
+                </div>
+            </dv-border-box12>
+        </div>
         <div class="map-container" id="map"></div>
     </div>
 </template>
@@ -28,6 +55,7 @@ import { ETab } from 'e-datav-vue3'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
+import SectionRisk from '../components/bankTwin/SectionRisk.vue'
 
 const containerDom = ref(null)
 mapboxgl.accessToken =
@@ -172,6 +200,51 @@ div.twin-main-container {
         // background-color: antiquewhite;
     }
 
+    div.stable-status-container {
+        position: absolute;
+        top: 53vh;
+        right: 1vw;
+        height: 36vh;
+        width: 20vw;
+
+        // background-color: aliceblue;
+        z-index: 3;
+
+        div.stable-status-header {
+            height: 4vh;
+            line-height: 4vh;
+            width: 100%;
+
+            font-size: calc(0.8vw + 0.8vh);
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 0.3rem;
+
+            color: #0400fd;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+        }
+
+        div.splitter-container {
+            position: relative;
+            height: 2vh;
+            width: 95%;
+            margin-left: 2.5%;
+            overflow: hidden;
+
+            display: flex;
+
+            :deep(.status-splitter) {
+                position: relative;
+                width: 25%;
+                height: 100%;
+                flex-shrink: 0;
+                flex-grow: 0;
+            }
+        }
+    }
 }
 
 :deep(.iEdpB) {
@@ -183,4 +256,10 @@ div.twin-main-container {
     font-weight: bold;
 }
 
+:deep(.stable-border-box) {
+    backdrop-filter: blur(12px);
+    // box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
+    border-radius: 12px;
+    background-color: rgba(156, 195, 255, 0.4);
+}
 </style>

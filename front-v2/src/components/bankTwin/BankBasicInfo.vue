@@ -22,7 +22,7 @@
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">布设监测设备</div>
-                    <div class="val-text">30台</div>
+                    <div class="val-text">38台</div>
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">持续监测时间</div>
