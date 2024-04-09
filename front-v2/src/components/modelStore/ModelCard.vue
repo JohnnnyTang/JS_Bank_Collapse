@@ -107,6 +107,7 @@ const Detail = () => {
             usescene:infoItem.value.usescene,
             input:infoItem.value.input,
             output:infoItem.value.output,
+            processPicSrc:infoItem.value.processPicSrc,
         }
     })
 }
