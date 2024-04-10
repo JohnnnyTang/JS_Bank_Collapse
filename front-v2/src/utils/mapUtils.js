@@ -32,7 +32,7 @@ const initScratchMap = (ref) => {
                 projection: 'mercator',
                 GPUFrame: GPUFrame,
                 antialias: true,
-                minZoom: 8,
+                // minZoom: 8,
             }).on('load', () => {
                 console.log('initScratchMap ok');
                 resolve(map)
@@ -42,6 +42,7 @@ const initScratchMap = (ref) => {
         })
     })
 }
+
 
 const flytoLarge = (map) => {
     map.flyTo({

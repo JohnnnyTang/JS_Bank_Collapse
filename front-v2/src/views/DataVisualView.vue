@@ -61,7 +61,8 @@ const flow = new SteadyFlowLayer()
 
 onMounted(async () => {
 
-    let mapInstance = await initScratchMap(mapContainerRef.value)
+    // let mapInstance = await initScratchMap(mapContainerRef.value)
+    let mapInstance = initMap(mapContainerRef.value)
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
     flytoLarge(map)

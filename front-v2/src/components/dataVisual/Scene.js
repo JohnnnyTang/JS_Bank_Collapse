@@ -462,14 +462,159 @@ const initLayers = async (sceneInstance, map) => {
             break
 
         case '全江地形':
-            // sceneInstance.terrainLayer = terrainLayer
-            if (map.getLayer('TerrainLayer')) terrainLayer.show()
-            else map.addLayer(terrainLayer)
-            useLayerStore().setTerrainLayer(terrainLayer)
-            sceneInstance.allLayers.push('TerrainLayer')
-            map.triggerRepaint()
+            map.addSource('river-terrain-source', {
+                type: 'vector',
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/vector/riverBg/{x}/{y}/{z}',
+                ],
+            })
+            map.addLayer({
+                id: '全江地形',
+                type: 'fill',
+                source: 'river-terrain-source',
+                'source-layer': 'default',
+                paint: {
+                    'fill-color': [
+                        'match',
+                        ['get', 'height'],
+                        0,
+                        '#3EFA13',
+                        5,
+                        '#51E212',
+                        10,
+                        '#65CA11',
+                        15,
+                        '#78B210',
+                        20,
+                        '#8B9A0F',
+                        25,
+                        '#9F820F',
+                        30,
+                        '#B26A0E',
+                        35,
+                        '#C5520D',
+                        40,
+                        '#C5520D',
+                        45,
+                        '#D83A0C',
+                        50,
+                        '#EC220B',
+                        '#000000'
+                    ],
+                    // 'fill-color': '#3EFA13'
+                },
+            })
+
+
+            map.addSource('riverSectionLabelSource', {
+                type: 'vector',
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/vector/riverSection/{x}/{y}/{z}',
+                ],
+            })
+            map.addSource('riverLabelSource', {
+                type: 'vector',
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/vector/riverName/{x}/{y}/{z}',
+                ],
+            })
+
+            map.addLayer({
+                id: 'riverSectionLabel',
+                type: 'line',
+                source: 'riverSectionLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': 'rgba(231, 214, 86, 0.9)',
+                    'line-width': 4,
+                },
+            })
+            map.addLayer({
+                id: 'riverLabel',
+                type: 'symbol',
+                source: 'riverLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                },
+                paint: {
+                    'text-color': '#FC7C49',
+                },
+            })
+
+            // map.addSource('riverLand', {
+            //     type: 'vector',
+            //     tiles: [
+            //         'http://127.0.0.1:8989/api/v1/tile/vector/riverLand/{x}/{y}/{z}',
+            //     ],
+            // })
+            // map.addLayer({
+            //     id: 'land1',
+            //     type: 'fill',
+            //     source: 'riverLand',
+            //     'source-layer': 'default',
+            //     paint: {
+            //         'fill-color': '#000000',
+            //     },
+            // })
+
+            const el = document.createElement('div')
+            el.style.width = '35px'
+            el.style.height = '35px'
+            const marker = new mapboxgl.Marker({
+                element: el,
+                rotationAlignment: 'horizon',
+            })
+
+            map.on('click', '全江地形', (e) => {
+                map.getCanvas().style.cursor = 'pointer'
+                const feature = e.features[0];
+                el.textContent = feature["properties"]["height"]
+                marker
+                    .setLngLat(e.lngLat)
+                    .addTo(map);
+            })
+            map.on('mousemove', '全江地形', (e) => {
+                map.getCanvas().style.cursor = 'pointer'
+            })
+            map.on('mouseleave', '全江地形', (e) => {
+                map.getCanvas().style.cursor = ''
+            })
+
+            // sceneInstance.allLayers.push('全江地形')
+
             break
 
+        
+        case '水利一张图':
+            // map.addSource('wms', {
+            //     'type':'raster',
+            //     'tiles':[
+            //         // "http://218.94.6.92:6080/arcgis/rest/services/jssl_vector_L3_L17/MapServer/tile/{z}/{y}/{x}"
+            //         // `/waterServer/arcgis/rest/services/jssl_vector_L3_L17/MapServer/tile/{z}/{y}/{x}`
+            //         "/waterServer/arcgis/services/jssl_vector_L3_L17/MapServer/WMSServer?request=GetCapabilities&service=WMS&srs=EPSG:3857&format=image/png"
+            //     ],
+                
+            // })
+            // map.addLayer({
+            //     id:'wms',
+            //     'type':'raster',
+            //     'source':'wms',
+            //     'paint':{
+            //         // 'raster-opacity':0.0
+            //     }
+            // })
+
+            break;
+            
         /////small Scene
         case '实时监测设备':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
@@ -768,8 +913,8 @@ const getBigRangeScenes = () => {
 
     let chongy = new Scene()
     chongy.title = '平面冲淤'
-    ;(chongy.desc = '呈现整个江河岸段的冲淤情况'),
-        (chongy.iconSrc = './icons/shore.png')
+        ; (chongy.desc = '呈现整个江河岸段的冲淤情况'),
+            (chongy.iconSrc = './icons/shore.png')
 
     bigRangeScenes.push(
         typiclaCollapse,
@@ -801,6 +946,6 @@ const getSmallRangeScenes = () => {
     return smallRangeScenes
 }
 
-const mapboxAddLayer = (scene, source) => {}
+const mapboxAddLayer = (scene, source) => { }
 
 export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers }
