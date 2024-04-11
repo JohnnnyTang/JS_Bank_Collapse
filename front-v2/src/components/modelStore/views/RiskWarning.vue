@@ -16,6 +16,7 @@
                     v-for="(item, index) in indexDataList"
                     :title="item.title"
                     :data="item.data"
+                    :key="index"
                   />
                 </div>
               </div>

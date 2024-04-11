@@ -54,7 +54,18 @@ const dataset = {
 const pieOption = {
     dataset: [dataset],
     // color: ['#F26052', '#EBE8A1', '#6FBEEE', '#6be071'],
-    color: ['#0056af', '#257ac5', '#5eb0e8', '#84d5ff'],
+    // '#13a500', '#003a92', '#be7200', '#a50101'
+    // color: ['#0056af', '#257ac5', '#5eb0e8', '#84d5ff'],
+    // color: ['#a50101', '#be7200', '#003a92', '#13a500'],
+    visualMap: {
+        type: 'continuous',
+        min: 0,
+        max: 8,
+        inRange: {
+            color: ['rgb(188,208,254)', 'rgb(10,20,208)'],
+        },
+        show: false
+    },
     legend: {
         bottom: '0%',
         left: 'center',
@@ -70,7 +81,7 @@ const pieOption = {
             type: 'pie',
             // associate the series to be animated by id
             id: 'Score',
-            center: ['50%', '45%'],
+            center: ['52%', '45%'],
             radius: ['20%', '90%'],
             label: {
                 show: true,
@@ -87,7 +98,7 @@ const pieOption = {
             },
             itemStyle: {
                 borderRadius: 6,
-                borderColor: 'transparent',
+                borderColor: '#fff',
                 borderWidth: 2,
             },
             percentPrecision: 1,
@@ -99,13 +110,22 @@ const pieOption = {
 const barOption = {
     dataset: [dataset],
     // color: ['#F26052', '#EBE8A1', '#6FBEEE', '#97ED8A'],
-    color: ['#0056af', '#257ac5', '#5eb0e8', '#84d5ff'],
+    // color: ['#a50101', '#be7200', '#003a92', '#13a500'],
     grid: {
         left: '0%',
         right: '35%',
         bottom: '1%',
         top: '2.4%',
         containLabel: true,
+    },
+    visualMap: {
+        type: 'continuous',
+        min: 0,
+        max: 8,
+        inRange: {
+            color: ['rgb(188,208,254)', 'rgb(10,20,208)'],
+        },
+        show: false
     },
     xAxis: {
         type: 'value',
@@ -245,7 +265,7 @@ div.realtime-risk-container {
         transition: all 1s cubic-bezier(0.68, -0.25, 0.265, 1.15);
 
         &.pie-show {
-            transform: translateX(-6vw);
+            transform: translateX(-6.5vw);
         }
 
         div.risk-type-container {
@@ -259,7 +279,7 @@ div.realtime-risk-container {
                 width: 5vw;
                 margin-top: 1.75vh;
                 // margin-bottom: 1vh;
-                margin-left: 1vw;
+                margin-left: 0.7vw;
 
                 display: flex;
                 align-items: center;

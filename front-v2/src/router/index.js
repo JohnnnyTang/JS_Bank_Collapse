@@ -86,16 +86,21 @@ const routes = [
     },
     {
         path: '/bankTwin',
-        redirect: '/bankTwin/main',
+        component: () => import('../views/BankTwinMainView.vue')
+    },
+    {
+        path: '/bankManage',
+        redirect: '/bankManage/basic/mzs',
+        component: () => import('../views/BankTwinManageView.vue'),
         children: [
             {
-                path: 'main', // 默认子页面
-                component: () => import('../views/BankTwinMainView.vue')
+                path: 'basic/:id', // 默认子页面
+                component: () => import('../components/bankManage/BankBasicInfo.vue')
             },
             {
-                path: 'manage',
-                component: () => import('../views/BankTwinManageView.vue'),
-            },
+                path: 'monitor/:id', // 默认子页面
+                component: () => import('../components/bankManage/BankMonitorInfo.vue')
+            }
         ]
     },
 ]
