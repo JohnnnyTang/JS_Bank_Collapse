@@ -38,12 +38,66 @@ const switchHandler = () => {
     //layer remove
     selectedIndex.value = -1;
     if (sceneContainerInfo.value.sceneTitle === '长江江苏段') {
+        useSceneStore().selectedScene.removeLayers(mapStore.getMap())
+        //console.log('map add mzs relative layer');
+        let map = mapStore.getMap()
+        if(!map.getSource("mzsPlaceLabelSource"))
+        map.addSource('mzsPlaceLabelSource', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+            ],
+        })
+        if(!map.getSource('mzsPlaceLineSource'))
+        map.addSource('mzsPlaceLineSource', {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+            ],
+        })
+        map.addLayer({
+            id: 'mzsLine',
+            type: 'line',
+            source: 'mzsPlaceLineSource',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(118,186,236, 0.7)',
+                'line-width': 3,
+            },
+        })
+        map.addLayer({
+            id: 'mzsLabel',
+            type: 'symbol',
+            source: 'mzsPlaceLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+            },
+            paint: {
+                'text-color': 'rgba(76,109,206, 1.0)',
+            },
+        })
         flytoSmall(mapStore.getMap())
         sceneContainerInfo.value = sceneContainerInfo2
+        useSceneStore().setSelectedScene(new Scene());
     }
     else {
+ 
+        let map = mapStore.getMap()
+        if (map.getLayer('mzsLine')) map.removeLayer('mzsLine')
+        if (map.getLayer('mzsLabel')) map.removeLayer('mzsLabel')
+        //console.log('map remove mzs relative layer');
         flytoLarge(mapStore.getMap())
         sceneContainerInfo.value = sceneContainerInfo1
+
     }
 }
 
@@ -153,5 +207,4 @@ onMounted(async () => {
     transform: scale(1.02);
     /* 选中项的背景色为黄色 */
 }
-
 </style>

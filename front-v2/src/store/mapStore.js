@@ -61,4 +61,17 @@ const useLayerStore = defineStore('layerStore', () => {
     }
 })
 
-export { useMapStore, useSceneStore, useLayerStore }
+const useDataStore = defineStore('dataStore',()=>{
+    const _terrainHeight = ref('')
+    const terrainHeight = computed(()=>_terrainHeight.value)
+    function setTerrainHeight(value){
+        // console.log('setTerrainHeight',value);
+        _terrainHeight.value = value;
+    }
+    return {
+        terrainHeight,
+        setTerrainHeight
+    }
+})
+
+export { useMapStore, useSceneStore, useLayerStore,useDataStore }

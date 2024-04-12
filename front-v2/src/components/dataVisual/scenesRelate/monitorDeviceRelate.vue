@@ -46,12 +46,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
 import dayjs from 'dayjs';
 
-const Info = ref({})
 
 const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 const DEVICEPICMAP = ['/device/gnssBase.png', '/device/inclino.png', '/device/waterPress.png', '/device/changePress.png']
@@ -131,7 +130,7 @@ const updateInfo = async () => {
 }
 
 
-
+let updateInterval = null
 onMounted(async () => {
     // console.log("123123");
     myChart = echarts.init(document.getElementById('chart'))
@@ -139,11 +138,16 @@ onMounted(async () => {
     setTimeout(async() => {
         await updateInfo();
     }, 0);
-    setInterval(async () => {
+    updateInterval= setInterval(async () => {
         await updateInfo();
     }, 10 * 1000);
 
 })
+
+onUnmounted(()=>{
+    clearInterval(updateInterval)
+})
+
 </script>
 
 <style lang="scss" scoped>

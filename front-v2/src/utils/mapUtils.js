@@ -4,7 +4,7 @@ import { useMapStore, useSceneStore } from '../store/mapStore'
 import * as scr from './scratch/scratch.js'
 import popUpContent from '../components/dataVisual/featureDetails/popUpContent.vue'
 
-const initMap = (ref) => {
+const initMap = async (ref) => {
     return new mapboxgl.Map({
         container: ref.id, // container ID
         accessToken:
@@ -18,6 +18,33 @@ const initMap = (ref) => {
         ],
     })
 }
+
+const offlineMapStyle = {
+    "version": 8,
+    "sources": {
+        "offline-tiles": {
+            type: 'vector',
+            tiles: [
+                'http://127.0.0.1:9000/2020-10-planet-14.mbtiles/{z}/{x}/{y}.pbf'
+            ]
+        }
+    },
+    "layers": [
+        {
+            "id": "water",
+            "type": "fill",
+            "source": "offline-tiles",
+            "source-layer": "water",
+            "minzoom": 0,
+            "layout": {},
+            "paint": {
+                "fill-color": "rgb(124, 179, 211)"
+            }
+        },
+
+    ]
+}
+
 const initScratchMap = (ref) => {
     return new Promise((resolve, reject) => {
         scr.StartDash().then(() => {
@@ -26,6 +53,8 @@ const initScratchMap = (ref) => {
                 accessToken:
                     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
                 style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+
+                // style: offlineMapStyle,
                 center: [120.312, 31.917], // starting position [lng, lat]
                 maxZoom: 18,
                 zoom: 8,
@@ -89,8 +118,10 @@ const loadImage = async (map, url, imageID) => {
     })
 }
 
-const createPopUp = () => {
-    const ap = createApp(popUpContent)
+const createPopUp = (refHeight) => {
+    const ap = createApp(popUpContent, { height:refHeight, })
+    // const ap = createApp(popUpContent)
+
     const container = document.createElement('div')
     const componentInstance = ap.mount(container)
 
@@ -101,7 +132,7 @@ const createPopUp = () => {
     }).setDOMContent(domwithComp)
     // .setLngLat(popupCoord)
     // .addTo(map); undefined;
-    return popUp
+    return { popUp, componentInstance }
 }
 
 const addMarkerToMap = (

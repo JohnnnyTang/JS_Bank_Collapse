@@ -1,5 +1,6 @@
 import { ElMessage } from 'element-plus'
 import mapboxgl from 'mapbox-gl'
+import { ref } from 'vue'
 import BackEndRequest from '../../api/backend.js'
 import {
     loadImage,
@@ -9,13 +10,15 @@ import {
     createPopUp,
 } from '../../utils/mapUtils.js'
 import { useSceneStore } from '../../store/mapStore.js'
-import { useLayerStore } from '../../store/mapStore.js'
+import { useLayerStore, useDataStore } from '../../store/mapStore.js'
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
 import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
+
 // BackEndRequest.getDataNodeData()
 
 let terrainLayer = new TerrainLayer(14)
 let flow = new SteadyFlowLayer()
+let refHeight = ref('')
 
 // Data Prepare
 class DataPioneer {
@@ -189,8 +192,12 @@ const generateGeoJson = (itemArr, getCoords, type) => {
     return geojson
 }
 
+
+let globalpopup = null
 const initLayers = async (sceneInstance, map) => {
-    let popUp = createPopUp()
+
+    let { popUp, componentInstance } = createPopUp(refHeight)
+    globalpopup = popUp
     switch (sceneInstance.title) {
         /////Large Scene
         case '过江通道':
@@ -295,7 +302,6 @@ const initLayers = async (sceneInstance, map) => {
             })
             sceneInstance.allLayers.push('已建通道', '在建通道', '规划通道')
 
-            popUp = createPopUp()
             channel.data.forEach((item) => {
                 let centerCoord = getCenterCoord(item['llCoords'])
                 if (item.type === '在建通道') {
@@ -520,7 +526,7 @@ const initLayers = async (sceneInstance, map) => {
             })
 
             map.addLayer({
-                id: 'riverSectionLabel',
+                id: '河段划分',
                 type: 'line',
                 source: 'riverSectionLabelSource',
                 'source-layer': 'default',
@@ -535,7 +541,7 @@ const initLayers = async (sceneInstance, map) => {
                 },
             })
             map.addLayer({
-                id: 'riverLabel',
+                id: '河段描述',
                 type: 'symbol',
                 source: 'riverLabelSource',
                 'source-layer': 'default',
@@ -549,7 +555,16 @@ const initLayers = async (sceneInstance, map) => {
                     'text-color': '#FC7C49',
                 },
             })
-
+            sceneInstance.allLayers.push(
+                '全江地形',
+                '河段描述',
+                '河段划分',
+            )
+            sceneInstance.layerSrc.push(
+                'river-terrain-source',
+                'riverSectionLabelSource',
+                'riverLabelSource',
+            )
             // map.addSource('riverLand', {
             //     type: 'vector',
             //     tiles: [
@@ -566,22 +581,30 @@ const initLayers = async (sceneInstance, map) => {
             //     },
             // })
 
-            const el = document.createElement('div')
-            el.style.width = '35px'
-            el.style.height = '35px'
-            const marker = new mapboxgl.Marker({
-                element: el,
-                rotationAlignment: 'horizon',
+            // const el = document.createElement('div')
+            // el.style.width = '35px'
+            // el.style.height = '35px'
+            // const marker = new mapboxgl.Marker({
+            //     element: el,
+            //     rotationAlignment: 'horizon',
+            // })
+            // map.on('click', '全江地形', (e) => {
+            //     map.getCanvas().style.cursor = 'pointer'
+            //     const feature = e.features[0];
+            //     el.textContent = feature["properties"]["height"]
+            //     marker
+            //         .setLngLat(e.lngLat)
+            //         .addTo(map);
+            // })
+            map.on('click', '全江地形', (e) => {
+                const height = e.features[0]['properties']['height']
+                refHeight.value = '-' + height + 'm';
+                // useDataStore().setTerrainHeight('-' + height + 'm')
+                const popupCoord = e.lngLat
+                popUp && popUp.remove()
+                popUp.setOffset(0).setLngLat(popupCoord).addTo(map)
             })
 
-            map.on('click', '全江地形', (e) => {
-                map.getCanvas().style.cursor = 'pointer'
-                const feature = e.features[0];
-                el.textContent = feature["properties"]["height"]
-                marker
-                    .setLngLat(e.lngLat)
-                    .addTo(map);
-            })
             map.on('mousemove', '全江地形', (e) => {
                 map.getCanvas().style.cursor = 'pointer'
             })
@@ -593,28 +616,10 @@ const initLayers = async (sceneInstance, map) => {
 
             break
 
-        
-        case '水利一张图':
-            // map.addSource('wms', {
-            //     'type':'raster',
-            //     'tiles':[
-            //         // "http://218.94.6.92:6080/arcgis/rest/services/jssl_vector_L3_L17/MapServer/tile/{z}/{y}/{x}"
-            //         // `/waterServer/arcgis/rest/services/jssl_vector_L3_L17/MapServer/tile/{z}/{y}/{x}`
-            //         "/waterServer/arcgis/services/jssl_vector_L3_L17/MapServer/WMSServer?request=GetCapabilities&service=WMS&srs=EPSG:3857&format=image/png"
-            //     ],
-                
-            // })
-            // map.addLayer({
-            //     id:'wms',
-            //     'type':'raster',
-            //     'source':'wms',
-            //     'paint':{
-            //         // 'raster-opacity':0.0
-            //     }
-            // })
 
-            break;
-            
+        // case '水利一张图':
+        //     break;
+
         /////small Scene
         case '实时监测设备':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
@@ -710,11 +715,26 @@ const initLayers = async (sceneInstance, map) => {
                 '孔隙水压力计',
                 '应力桩',
             )
+
+
+            map.on('click', sceneInstance.allLayers, (e) => {
+                console.log(e.features[0].properties);
+                useSceneStore().setSelectedFeature(e.features[0].properties)
+                let popupCoord = e.lngLat
+                // flytoFeature(map, popupCoord, 15)
+                popUp && popUp.remove()
+                popUp.setLngLat(popupCoord).addTo(map);
+            })
+            map.on('mousemove', sceneInstance.allLayers, (e) => {
+                map.getCanvas().style.cursor = 'pointer'
+            })
+            map.on('mouseleave', sceneInstance.allLayers, (e) => {
+                map.getCanvas().style.cursor = ''
+            })
+
             break
 
         case '岸段聚合场景':
-            // sceneInstance.terrainLayer = terrainLayer
-            // sceneInstance.flowLayer = flow
             if (map.getLayer('TerrainLayer')) terrainLayer.show()
             else map.addLayer(terrainLayer)
             useLayerStore().setTerrainLayer(terrainLayer)
@@ -845,6 +865,7 @@ class Scene {
         // when scene checkout
         // if (map.loaded()) {
         //remove layer , remove source
+        globalpopup && globalpopup.remove()
         this.allLayers.forEach((layerID) => {
             if (layerID === 'TerrainLayer') {
                 terrainLayer.hide()
@@ -946,6 +967,70 @@ const getSmallRangeScenes = () => {
     return smallRangeScenes
 }
 
-const mapboxAddLayer = (scene, source) => { }
+function generateHTMLAndCSS(numValue) {
+
+    const highlightColor = 'rgb(163,206,245)'
+    const textColor = 'rgb(47,94,177)'
+    const numColor = 'rgb(47,94,211)'
+
+    // 创建外层容器元素
+    const descContainer = document.createElement('div');
+    descContainer.classList.add('desc');
+
+    // 创建当前高程文本元素
+    const nowText = document.createElement('div');
+    nowText.classList.add('now');
+    nowText.textContent = '当前高程';
+    nowText.style.color = textColor;
+
+    // 创建数字元素
+    const numElement = document.createElement('div');
+    numElement.classList.add('num');
+    numElement.textContent = numValue;
+    numElement.style.color = numColor;
+
+    // 将文本元素和数字元素添加到容器中
+    descContainer.appendChild(nowText);
+    descContainer.appendChild(numElement);
+
+    // 创建style标签并添加样式
+    const style = document.createElement('style');
+    style.textContent = `
+      .desc {
+        background-color: ${highlightColor};
+        width: 80px;
+        height: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 10px;
+        padding: 5px;
+      }
+      .now {
+        color: ${textColor};
+        font-size: 15px;
+        line-height: 15px;
+      }
+      .num {
+        color: ${numColor};
+        font-size: 20px;
+        line-height: 20px;
+        font-weight: 800;
+      }
+    `;
+
+    // 将style标签添加到head中
+    document.head.appendChild(style);
+
+    // 返回生成的HTML元素
+    return descContainer;
+}
+
+
+//   const htmlElement = generateHTMLAndCSS('rgb(163, 206, 245)', 'rgb(47, 94, 177)', 'rgb(47, 94, 211)', '10m');
+//   document.body.appendChild(htmlElement);
+
+
 
 export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers }

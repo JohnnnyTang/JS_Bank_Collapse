@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
 import dayjs from 'dayjs';
@@ -148,7 +148,7 @@ const update = async () => {
 
 }
 
-
+let updateInterval = null
 onMounted(async () => {
 
     let chartdom = document.querySelector('#chart')
@@ -158,13 +158,15 @@ onMounted(async () => {
         update()
     }, 0);
 
-    setInterval(() => {
+    updateInterval = setInterval(() => {
         update()
     }, 5000);
 
 })
 
-
+onUnmounted(()=>{
+    clearInterval(updateInterval)
+})
 
 </script>
 
