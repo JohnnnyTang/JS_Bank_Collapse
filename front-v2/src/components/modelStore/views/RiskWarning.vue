@@ -16,6 +16,7 @@
                     v-for="(item, index) in indexDataList"
                     :title="item.title"
                     :data="item.data"
+                    :key="index"
                   />
                 </div>
               </div>
@@ -224,6 +225,7 @@ const modelInfo = {
     usescene: route.query.usescene,
     input: route.query.input,
     output: route.query.output,
+    processPicSrc:route.query.processPicSrc,
 }
 
 const ModelName = "风险预警模型"

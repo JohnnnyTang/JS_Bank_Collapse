@@ -150,6 +150,7 @@ const routerPathIndexMap = {
     '/': 2,
     '/modelStore': 3,
     '/bankTwin': 4,
+    '/bankManage': 4,
 }
 
 let previousActive = 2

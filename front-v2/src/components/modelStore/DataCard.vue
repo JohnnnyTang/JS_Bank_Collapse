@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { onMounted, defineProps, defineEmits } from 'vue'
+import { onMounted, defineEmits } from 'vue'
 
 const emit = defineEmits(['showData']);
 const props = defineProps({

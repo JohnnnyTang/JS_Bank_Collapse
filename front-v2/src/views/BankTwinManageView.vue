@@ -1,11 +1,12 @@
 <template>
     <div class="bank-twin-container">
         <BankTwinNavVue />
+        <router-view />
     </div>
 </template>
 
 <script setup>
-import BankTwinNavVue from '../components/bankTwin/BankTwinNav.vue';
+import BankTwinNavVue from '../components/bankManage/BankTwinNav.vue';
 
 </script>
 
@@ -26,7 +27,9 @@ div.bank-twin-container {
 
     letter-spacing: 0.2rem;
 
-    background-color: rgb(222, 250, 215);
+    overflow: hidden;
+
+    background: linear-gradient(70deg, rgba(0,56,128,1) 0%, rgb(44, 151, 252) 100%);
 
 }
 

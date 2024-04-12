@@ -72,6 +72,7 @@ const modelInfo = {
     usescene: route.query.usescene,
     input: route.query.input,
     output: route.query.output,
+    processPicSrc:route.query.processPicSrc,
 }
 console.log(modelInfo)
 

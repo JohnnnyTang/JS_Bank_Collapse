@@ -3,9 +3,15 @@ package com.johnny.bank.utils;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
+import com.johnny.bank.model.configuration.TilePath;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -22,12 +28,17 @@ import java.util.List;
  * @version: 1.0
  */
 @Slf4j
+@Component
 public class ProcessUtil {
 
+    @Autowired
+    private TilePath tilePath;
     //    static String pythonDir = "C:/nhri/monitor/pythonDir/";
+
     static String outsideModelDir = "D:/zhuomian/水科院/python/";
     //    static String pythonDir = "/home/zym/python/";
     static String pythonStr = "python";
+
 //    static String pythonStr = "python3";
 
     public static Process cmdShp2Pgsql(List<String> commands) throws IOException {
@@ -49,6 +60,22 @@ public class ProcessUtil {
             commands.add((String) paramObject.get(paramKey));
         }
         processBuilder.command(commands);
+        return processBuilder.start();
+    }
+
+    public static Process buildMapTileServiceProcess(String worldTilePath) throws Exception {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        commands.add("node");
+        Resource resource = new ClassPathResource("node/index.js");
+        //获1.txt的取相对路径
+        String path = resource.getFile().getPath();
+        System.out.println(path);
+        commands.add(path);
+        commands.add(worldTilePath);
+        processBuilder.command(commands);
+        System.out.println(processBuilder);
+
         return processBuilder.start();
     }
 
