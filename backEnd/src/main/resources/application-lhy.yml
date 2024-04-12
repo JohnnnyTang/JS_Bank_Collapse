@@ -28,3 +28,8 @@ springfox:
       enabled: true
 
 mzsTilePath: E:/WATER/BankCollapse/backdata/rasterTIle/
+
+tile:
+  mzsTilePath: D:/2024-work/shore_collapse/data/DEM/rasterTIle/
+
+  worldTilePath: D:/2024-work/shore_collapse/data/mbtiles/data

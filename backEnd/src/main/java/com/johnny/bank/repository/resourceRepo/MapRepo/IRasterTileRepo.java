@@ -1,7 +1,9 @@
 package com.johnny.bank.repository.resourceRepo.MapRepo;
 
+import com.johnny.bank.model.configuration.TilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -19,14 +21,19 @@ import java.io.InputStream;
 @Slf4j
 public class IRasterTileRepo {
 
-    @Value("${mzsTilePath}")
-    String mzsRasterPath;
+    private final TilePath tilePathConfig;
+
+    @Autowired
+    public IRasterTileRepo(TilePath tilePath) {
+        this.tilePathConfig = tilePath;
+    }
+
 
     public byte[] getMXSRasterFile(String tilePath) throws Exception {
-        String fullPath = mzsRasterPath + tilePath;
+        String fullPath = tilePathConfig.getMzsTilePath() + tilePath;
         File file = new File(fullPath);
         if(!file.exists()) {
-            fullPath = mzsRasterPath + "blank.png";
+            fullPath = tilePathConfig.getMzsTilePath() + "blank.png";
         }
 //        System.out.println(mzsRasterPath);
         try (FileInputStream in = new FileInputStream(fullPath)){

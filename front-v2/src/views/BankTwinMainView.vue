@@ -15,6 +15,8 @@
         </div>
         <BankBasicInfoVue />
         <RealtimeStatusVue />
+        <SectionRisk />
+        <SectionStable />
         <div class="map-container" id="map"></div>
     </div>
 </template>
@@ -28,6 +30,9 @@ import { ETab } from 'e-datav-vue3'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
+import SectionRisk from '../components/bankTwin/SectionRisk.vue'
+import SectionStable from '../components/bankTwin/SectionStable.vue'
+import { mapInit } from '../components/bankManage/mapInit'
 
 const containerDom = ref(null)
 mapboxgl.accessToken =
@@ -60,7 +65,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 })
 
 const navToManage = () => {
-    router.push('/bankTwin/manage')
+    router.push('/bankManage')
 }
 
 onMounted(() => {
@@ -77,6 +82,8 @@ onMounted(() => {
     map.on('load', () => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
+
+        mapInit(map)
 
         resizeObserver.observe(containerDom.value)
     })
@@ -171,7 +178,6 @@ div.twin-main-container {
         box-shadow: 4px 8px 8px -4px rgba(0, 11, 34, 0.9);
         // background-color: antiquewhite;
     }
-
 }
 
 :deep(.iEdpB) {

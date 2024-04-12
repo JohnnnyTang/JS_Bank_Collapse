@@ -54,22 +54,98 @@
                         </div>
                     </dv-border-box12>
                 </div>
+
+                <div class="device-chart-container">
+                    <dv-border-box10
+                        :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
+                    >
+                        <div class="device-chart-dom" ref="chartDomRef"></div>
+                    </dv-border-box10>
+                </div>
             </div>
         </dv-border-box8>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3'
+import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
+import { deviceStatusData } from './data'
+import * as echarts from 'echarts'
 
 const deviceStatusDataList = ref([
     { name: 'GNSS', count: 13, percent: '100%' },
     { name: '测斜仪', count: 9, percent: '100%' },
     { name: '孔隙水压力计', count: 9, percent: '100%' },
     { name: '应力桩', count: 7, percent: '100%' },
+    { name: '视频监控', count: 3, percent: '100%' },
 ])
+
+const chartDomRef = ref(null)
+
+const option = {
+    grid: {
+        left: '2%',
+        right: '2%',
+        top: '2%',
+        bottom: '3%',
+    },
+    visualMap: {
+        type: 'continuous',
+        min: 1,
+        max: 14,
+        inRange: {
+            color: ['rgb(206,238,254)', 'rgb(4,70,168)'],
+        },
+        right: "5%",
+        top: 'center',
+        itemWidth: "40%",
+        itemHeight: "200%",
+    },
+    series: {
+        type: 'sunburst',
+        data: deviceStatusData,
+        center: ["42%", "50%"],
+        radius: ['20%', '100%'],
+        itemStyle: {
+            borderRadius: 7,
+            borderWidth: 2,
+        },
+        label: {
+            // show: true,
+            rotate: 'tangential',
+            fontSize: 12,
+            color: '#fff',
+            textBorderColor: 'inherit',
+            textBorderWidth: 1,
+        },
+        levels: [
+            {},
+            {
+                label: {
+                    rotate: 'tangential',
+                    textBorderColor: 'inherit',
+                    textBorderWidth: 1,
+                    fontSize: 12,
+                    fontWeight: 'bold',
+                },
+            },
+            {
+                label: {
+                    rotate: 'tangential',
+                    fontSize: 16,
+                },
+            }
+        ],
+    },
+}
+
+onMounted(() => {
+    const deviceStatusChart = echarts.init(chartDomRef.value)
+    deviceStatusChart.setOption(option)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -88,7 +164,7 @@ div.device-info-container {
         margin-left: 0.5vw;
         margin-right: 0.5vw;
         height: 55vh;
-        margin-top: 0.5vh;
+        margin-top: 0vh;
         margin-bottom: 0.5vh;
 
         div.monitor-title-container {
@@ -119,9 +195,9 @@ div.device-info-container {
 
         div.device-status-container {
             width: 95%;
-            margin-top: 1.5vh;
+            margin-top: 0.5vh;
             margin-left: 2.5%;
-            height: 22vh;
+            height: 24.2vh;
 
             div.small-title-container {
                 position: absolute;
@@ -161,12 +237,12 @@ div.device-info-container {
                 top: 5vh;
                 width: 95%;
                 margin-left: 2.5%;
-                height: 16vh;
+                height: 18vh;
 
                 // background-color: #c4fbff;
 
                 div.device-status-row {
-                    height: 20%;
+                    height: 16.6%;
                     width: 100%;
                     border-radius: 8px;
 
@@ -216,6 +292,27 @@ div.device-info-container {
             }
             // background-color: #2622fd;
         }
+
+        div.device-chart-container {
+            width: 95%;
+            margin-left: 2.5%;
+            height: 23vh;
+            margin-top: 1vh;
+            border-radius: 10px;
+            overflow: hidden;
+
+            // background-color: #6493ff;
+
+            div.device-chart-dom {
+                width: 96%;
+                margin-left: 2%;
+                height: 96%;
+                padding-top: 2%;
+                padding-bottom: 2%;
+
+                // background-color: #2a5fdb;
+            }
+        }
     }
     // border-radius: 12px;
 }
@@ -226,6 +323,11 @@ div.device-info-container {
 
 :deep(.dv-border-box-8) {
     background-color: rgba(156, 195, 255, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+:deep(.dv-border-box-10) {
+    background-color: rgba(255, 255, 255, 0.63);
     backdrop-filter: blur(8px);
 }
 </style>
