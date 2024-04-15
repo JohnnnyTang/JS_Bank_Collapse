@@ -19,32 +19,6 @@ const initMap = async (ref) => {
     })
 }
 
-const offlineMapStyle = {
-    "version": 8,
-    "sources": {
-        "offline-tiles": {
-            type: 'vector',
-            tiles: [
-                'http://127.0.0.1:9000/2020-10-planet-14.mbtiles/{z}/{x}/{y}.pbf'
-            ]
-        }
-    },
-    "layers": [
-        {
-            "id": "water",
-            "type": "fill",
-            "source": "offline-tiles",
-            "source-layer": "water",
-            "minzoom": 0,
-            "layout": {},
-            "paint": {
-                "fill-color": "rgb(124, 179, 211)"
-            }
-        },
-
-    ]
-}
-
 const initScratchMap = (ref) => {
     return new Promise((resolve, reject) => {
         scr.StartDash().then(() => {
@@ -52,9 +26,8 @@ const initScratchMap = (ref) => {
                 container: ref.id, // container ID
                 accessToken:
                     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-                style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-
-                // style: offlineMapStyle,
+                // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+                style: getStyleJson(),
                 center: [120.312, 31.917], // starting position [lng, lat]
                 maxZoom: 18,
                 zoom: 8,
@@ -118,8 +91,8 @@ const loadImage = async (map, url, imageID) => {
     })
 }
 
-const createPopUp = (refHeight) => {
-    const ap = createApp(popUpContent, { height: refHeight, })
+const createPopUp = (refHeight, refSectionName) => {
+    const ap = createApp(popUpContent, { height: refHeight, sectionName: refSectionName })
     // const ap = createApp(popUpContent)
 
     const container = document.createElement('div')
@@ -391,8 +364,7 @@ const getStyleJson = () => {
             },
 
         ],
-        // "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
-        glyphs:"/glyphs/mapbox/{fontstack}/{range}.pbf"
+        glyphs: "/glyphs/mapbox/{fontstack}/{range}.pbf"
     }
     return styleJson;
 }
@@ -401,8 +373,16 @@ const getStyleJson = () => {
 
 
 
-const size = 80
+const size = 120
 const squareThreeDivideTwo = Math.sqrt(3) / 2.0
+const colorMap = {
+    'warningLevel1': 'rbg(177,46,60)',
+    'warningLevel2': 'rbg(190,116,29)',
+    'warningLevel3': 'rbg(13,62,145)',
+    'warningLevel4': 'rbg(3,166,34)',
+}
+
+
 const pulsing = {
     point: {
         width: size,
@@ -665,7 +645,7 @@ const pulsing = {
 
             // Continuously repaint the map, resulting
             // in the smooth animation of the dot.
-            useMapStore().getMap().triggerRepaint()
+            // useMapStore().getMap().triggerRepaint()
 
             // Return `true` to let the map know that the image was updated.
             return true

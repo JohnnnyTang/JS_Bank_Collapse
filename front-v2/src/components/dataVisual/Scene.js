@@ -19,6 +19,7 @@ import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 let terrainLayer = new TerrainLayer(14)
 let flow = new SteadyFlowLayer()
 let refHeight = ref('')
+let sectionName = ref('')
 
 // Data Prepare
 class DataPioneer {
@@ -169,6 +170,27 @@ class DataPioneer {
             },
         }
     }
+    static generateGeoJson(itemArr, getCoords, type){
+        const features = []
+        itemArr.forEach((element) => {
+            let coords = getCoords(element)
+            let feature = {
+                type: 'Feature',
+                properties: element,
+                geometry: {
+                    coordinates: coords,
+                    type: type,
+                },
+            }
+            features.push(feature)
+        })
+        const geojson = {
+            type: 'FeatureCollection',
+            features: features,
+        }
+        return geojson
+    }
+    
 }
 
 const generateGeoJson = (itemArr, getCoords, type) => {
@@ -196,7 +218,7 @@ const generateGeoJson = (itemArr, getCoords, type) => {
 let globalpopup = null
 const initLayers = async (sceneInstance, map) => {
 
-    let { popUp, componentInstance } = createPopUp(refHeight)
+    let { popUp, componentInstance } = createPopUp(refHeight,sectionName)
     globalpopup = popUp
     switch (sceneInstance.title) {
         /////Large Scene
@@ -767,7 +789,7 @@ const initLayers = async (sceneInstance, map) => {
             })
 
             map.addLayer({
-                id: 'mzsSectionLine',
+                id: '守护工程断面',
                 type: 'line',
                 source: 'mzsSectionLineSource',
                 'source-layer': 'default',
@@ -783,23 +805,43 @@ const initLayers = async (sceneInstance, map) => {
                 },
             })
             map.addLayer({
-                id: 'mzsSectionLabel',
+                id: '守护工程断面标注',
                 type: 'symbol',
                 source: 'mzsSectionLineLabelSource',
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'label'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                    // 'text-offset': [0, 1.25],
+                    'text-offset': [0, 1.25],
                     'text-anchor': 'left',
+                    'text-size': 20,
                 },
                 paint: {
-                    'text-color': 'rgba(121, 214, 126, 0.9)',
+                    'text-color': '#040052',
                 },
             })
-            map.on('click','mzsSectionLine',(e)=>{
-                console.log(e.features[0]);
+            map.on('click','守护工程断面',(e)=>{
+                console.log('123');
+                const secName = e.features[0]['properties']['label']
+                sectionName.value = secName
+                const popupCoord = e.lngLat
+                popUp && popUp.remove()
+                popUp.setOffset(0).setLngLat(popupCoord).addTo(map)
             })
+            map.on('mousemove', '守护工程断面', (e) => {
+                map.getCanvas().style.cursor = 'pointer'
+            })
+            map.on('mouseleave', '守护工程断面', (e) => {
+                map.getCanvas().style.cursor = ''
+            })
+            sceneInstance.allLayers.push(
+                '守护工程断面',
+                '守护工程断面标注',
+            )
+            sceneInstance.layerSrc.push(
+                'mzsSectionLineSource',
+                'mzsSectionLineLabelSource',
+            )
 
             break;
         default:
@@ -953,12 +995,12 @@ const getSmallRangeScenes = () => {
 
     let flowFieldScene = new Scene()
     flowFieldScene.title = '近岸流场'
-    flowFieldScene.desc = '近岸流场'
+    flowFieldScene.desc = '近岸区域水流动态，助力监测管理。'
     flowFieldScene.iconSrc = './icons/flow.png'
 
     let terrScene = new Scene()
     terrScene.title = '三维地形'
-    terrScene.desc = '三维地形'
+    terrScene.desc = '立体地貌模拟，展现自然景观'
     terrScene.iconSrc = './icons/terrain.png'
 
     let watching = new Scene()
@@ -968,7 +1010,7 @@ const getSmallRangeScenes = () => {
 
     let duanMian = new Scene()
     duanMian.title = '断面形态'
-    duanMian.desc = '监测数据可视化,监测设备管理'
+    duanMian.desc = '截面轮廓，展示形状、结构或特征，'
     duanMian.iconSrc = './icons/transversal.png'
 
     smallRangeScenes.push(flowFieldScene, terrScene, watching, duanMian)
@@ -976,65 +1018,6 @@ const getSmallRangeScenes = () => {
     return smallRangeScenes
 }
 
-function generateHTMLAndCSS(numValue) {
-
-    const highlightColor = 'rgb(163,206,245)'
-    const textColor = 'rgb(47,94,177)'
-    const numColor = 'rgb(47,94,211)'
-
-    // 创建外层容器元素
-    const descContainer = document.createElement('div');
-    descContainer.classList.add('desc');
-
-    // 创建当前高程文本元素
-    const nowText = document.createElement('div');
-    nowText.classList.add('now');
-    nowText.textContent = '当前高程';
-    nowText.style.color = textColor;
-
-    // 创建数字元素
-    const numElement = document.createElement('div');
-    numElement.classList.add('num');
-    numElement.textContent = numValue;
-    numElement.style.color = numColor;
-
-    // 将文本元素和数字元素添加到容器中
-    descContainer.appendChild(nowText);
-    descContainer.appendChild(numElement);
-
-    // 创建style标签并添加样式
-    const style = document.createElement('style');
-    style.textContent = `
-      .desc {
-        background-color: ${highlightColor};
-        width: 80px;
-        height: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 10px;
-        padding: 5px;
-      }
-      .now {
-        color: ${textColor};
-        font-size: 15px;
-        line-height: 15px;
-      }
-      .num {
-        color: ${numColor};
-        font-size: 20px;
-        line-height: 20px;
-        font-weight: 800;
-      }
-    `;
-
-    // 将style标签添加到head中
-    document.head.appendChild(style);
-
-    // 返回生成的HTML元素
-    return descContainer;
-}
 
 
 //   const htmlElement = generateHTMLAndCSS('rgb(163, 206, 245)', 'rgb(47, 94, 177)', 'rgb(47, 94, 211)', '10m');
@@ -1042,4 +1025,4 @@ function generateHTMLAndCSS(numValue) {
 
 
 
-export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers }
+export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers,DataPioneer }

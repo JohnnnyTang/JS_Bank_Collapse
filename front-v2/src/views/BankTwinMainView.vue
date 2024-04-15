@@ -33,10 +33,11 @@ import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
 import SectionRisk from '../components/bankTwin/SectionRisk.vue'
 import SectionStable from '../components/bankTwin/SectionStable.vue'
 import { mapInit } from '../components/bankManage/mapInit'
+import { useMapStore } from '../store/mapStore'
 
 const containerDom = ref(null)
-mapboxgl.accessToken =
-    'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
+// mapboxgl.accessToken =
+//     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 
 let map = null
 
@@ -71,6 +72,8 @@ const navToManage = () => {
 onMounted(() => {
     map = new mapboxgl.Map({
         container: 'map', // container ID
+        accessToken:
+            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
         center: [120.542, 32.036], // starting position [lng, lat]
         zoom: 8, // starting zoom
@@ -79,11 +82,11 @@ onMounted(() => {
             [124.5709218840081, 35.31358005439914],
         ],
     })
-    map.on('load', () => {
+    map.on('load', async() => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
-
-        mapInit(map)
+        useMapStore().setMap(map)
+        await mapInit(map)
 
         resizeObserver.observe(containerDom.value)
     })
