@@ -62,6 +62,7 @@ const flow = new SteadyFlowLayer()
 onMounted(async () => {
 
     let mapInstance = await initScratchMap(mapContainerRef.value)
+    // let mapInstance = initMap(mapContainerRef.value)
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
     flytoLarge(map)
@@ -98,7 +99,7 @@ div.data-visual-container {
         width: 100vw;
         height: 92vh;
         pointer-events: all;
-        background-color: rgb(124, 179, 203);
+        background-color: hsl(194, 69%, 91%);;
     }
 
     #GPUFrame {

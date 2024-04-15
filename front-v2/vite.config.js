@@ -26,6 +26,11 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
+            '/waterServer':{
+                target: 'http://218.94.6.92:6080',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/waterServer/, ''),
+            }
         },
     },
 })

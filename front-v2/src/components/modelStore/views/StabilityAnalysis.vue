@@ -280,7 +280,7 @@ div.stabilityAnalysis-container {
         position: relative;
         overflow: hidden;
         width: 100%;
-        height: 95%;
+        height: 87.4vh;
 
         div.map-container {
         width: 100%;

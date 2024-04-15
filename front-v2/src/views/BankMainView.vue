@@ -20,6 +20,7 @@
 
 <script setup>
 import { onMounted, ref, onUnmounted } from 'vue'
+import { getStyleJson } from '../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import StableStatusVue from '../components/bankMain/StableStatus.vue'
@@ -56,7 +57,8 @@ const resizeObserver = new ResizeObserver((entries) => {
 onMounted(() => {
     map = new mapboxgl.Map({
         container: 'map', // container ID
-        style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+        // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+        style:getStyleJson(),
         center: [120.312, 31.917], // starting position [lng, lat]
         zoom: 3, // starting zoom
         bounds: [
@@ -219,6 +221,7 @@ onMounted(() => {
                 'fill-color': 'rgba(23, 214, 86, 0.5)',
             },
         })
+        // warning here!!
         map.addLayer({
             id: '点1',
             type: 'symbol',
@@ -227,11 +230,12 @@ onMounted(() => {
             layout: {
                 'text-field': ['get', 'label'],
                 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
                 // 'text-offset': [0, 1.25],
                 'text-anchor': 'left',
             },
             paint: {
-                'text-color': 'rgba(255, 214, 211, 0.75)',
+                'text-color': '#1FAEB3',
             },
         })
         map.addLayer({
@@ -471,6 +475,8 @@ onMounted(() => {
             console.log(features)
         })
         resizeObserver.observe(containerDom.value)
+
+
     })
 })
 
@@ -506,7 +512,7 @@ div.bank-main-container {
     left: 0;
     overflow: hidden;
 
-    background-color: rgb(215, 231, 250);
+    background-color: hsl(194, 69%, 91%);
 
     div.map-container {
         width: 100vw;
