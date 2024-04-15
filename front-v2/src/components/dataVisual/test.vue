@@ -8,24 +8,62 @@
                     <label class="tab" for="radio-1">近岸动力分析</label>
                     <input type="radio" id="radio-2" name="tabs" />
                     <label class="tab" for="radio-2">近岸演变分析</label>
-                    <!-- <input type="radio" id="radio-3" name="tabs" />
-            <label class="tab" for="radio-3">Completed</label> -->
                     <span class="glider"></span>
                 </div>
-                <el-tooltip :content="查看模型基本信息">
-                    <div class="icon detailIcon"></div>
+                <div :class="styleObj" ref="iconref" @click="iconClick()"></div>
+            </div>
+            <div class="main-page" v-if="!showDetail">
+                <div class="user-react">
+                    <div class="title">
+                        <div class="title-text">模型配置</div>
+                        <div class="123"></div>
+                    </div>
+                    <div class="buttons">
+                        <div class="button" v-for="(item, index) in buttonss" :key="index">
+                            <div>{{ item }}</div>
+                        </div>
 
-                </el-tooltip>
+                    </div>
+                </div>
+                <div class="data-panel">
+                    <div class="title">
+                        <div class="title-text">数据面板</div>
+                        <div class="123"></div>
+                    </div>
+                    <div class="dp-content">
+                        <el-tree style="max-width: 600px" :data="data" :props="defaultProps"
+                            @node-click="handleNodeClick" default-expand-all />
+                    </div>
+
+                </div>
+                <div class="layer-panel">
+                    <div class="title">
+                        <div class="title-text">图层面板</div>
+                        <div class="123"></div>
+                    </div>
+                    <div class="lp-content">
+
+                        <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate"
+                            @change="handleCheckAllChange">Check all</el-checkbox>
+                        <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+                            <el-checkbox v-for="city in cities" :key="city" :label="city" :value="city">{{ city
+                                }}</el-checkbox>
+                        </el-checkbox-group>
+
+                    </div>
+                </div>
             </div>
-            <div class="user-react">
-                交互按钮
+
+            <div v-if="showDetail" class="detail-page">
+                <ModelInfoVue :modelInfo="modelInfo" />
             </div>
-            <div class="data-panel">
-                数据面板
+
+
+            <div>
+
             </div>
-            <div class="layer-panel">
-                图层面板
-            </div>
+
+
         </div>
         <div class="map-container">
             <div id="map" ref="mapContainerRef"></div>
@@ -43,18 +81,135 @@ import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { initScratchMap, ScratchMap } from '../../utils/mapUtils'
 
-import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
-import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
-import * as scr from '../../utils/scratch/scratch'
+// import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
+// import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
+// import * as scr from '../../utils/scratch/scratch'
+// import nextTickStyle from 'eslint-plugin-vue/lib/rules/next-tick-style';
 
 // dwg
 // import Mx from 'mxdraw'
+//src\components\modelStore\modelInfoList.js
+import { infoItemList } from '../modelStore/modelInfoList.js'
+import ModelInfoVue from '../modelStore/ModelInfo.vue';
+
+
+
+const modelInfo = {
+    application: infoItemList[2].application,
+    usescene: infoItemList[2].usescene,
+    input: infoItemList[2].input,
+    output: infoItemList[2].output,
+    processPicSrc: infoItemList[2].processPicSrc,
+}
+
+
 
 
 const mapContainerRef = ref();
+const iconref = ref()
+const showDetail = ref(false)
+const styleObj = ref({
+    'detailIcon': true, 'returnIcon': false
+})
+const iconClick = () => {
+    styleObj.value = {
+        'detailIcon': !styleObj.value.detailIcon, 'returnIcon': !styleObj.value.returnIcon
+    }
+    showDetail.value = !showDetail.value
+}
+
+const buttonss = [
+    '选择水文条件',
+    '上传模型文件',
+    '设置模型参数',
+    '计算模型'
+]
 
 
+////////////tree///////////////
+const handleNodeClick = (data) => {
+    console.log(data)
+}
+const data = [
+    {
+        label: '输入数据',
+        children: [
+            {
+                label: 'Level two 1-1',
+                children: [
+                    {
+                        label: 'Level three 1-1-1',
+                    },
+                ],
+            },
+            {
+                label: 'Level two 2-2',
+                children: [
+                    {
+                        label: 'Level three 2-2-1',
+                    },
+                ],
+            },
+            {
+                label: 'Level two 2-2',
+                children: [
+                    {
+                        label: 'Level three 2-2-1',
+                    },
+                ],
+            },
+            {
+                label: 'Level two 2-2',
+                children: [
+                    {
+                        label: 'Level three 2-2-1',
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        label: '输出数据',
+        children: [
+            {
+                label: 'Level two 2-1',
+                children: [
+                    {
+                        label: 'Level three 2-1-1',
+                    },
+                ],
+            },
+            {
+                label: 'Level two 2-2',
+                children: [
+                    {
+                        label: 'Level three 2-2-1',
+                    },
+                ],
+            },
+        ],
+    },
+]
+const defaultProps = {
+    children: 'children',
+    label: 'label',
+}
 
+////////////layer///////////////
+const checkAll = ref(false)
+const isIndeterminate = ref(true)
+const checkedCities = ref(['Shanghai', 'Beijing'])
+const cities = ['Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen', 'Shanghai', 'Beijing', 'Guangzhou', 'Shenzhen']
+
+const handleCheckAllChange = (val) => {
+    checkedCities.value = val ? cities : []
+    isIndeterminate.value = false
+}
+const handleCheckedCitiesChange = (value) => {
+    const checkedCount = value.length
+    checkAll.value = checkedCount === cities.length
+    isIndeterminate.value = checkedCount > 0 && checkedCount < cities.length
+}
 
 
 onMounted(async () => {
@@ -93,31 +248,58 @@ div.model-content-container {
     flex-direction: row;
 
     div.model-item-container {
-        width: 25vw;
+        width: 20vw;
         height: 87.4vh;
         position: relative;
-        background-color: green;
         display: flex;
         flex-direction: column;
-        // justify-content: ;
 
         div.model-choice {
-            height: 10%;
+            height: 8vh;
             width: 100%;
             background-color: aliceblue;
             display: flex;
             justify-content: center;
-            
+
             align-items: center;
 
-            .detailIcon{
+
+
+            .el-popper.is-customized {
+                padding: 6px 12px;
+                background: linear-gradient(90deg, rgb(179, 255, 171), rgb(204, 229, 129));
+            }
+
+            .el-popper.is-customized .el-popper__arrow::before {
+                background: linear-gradient(45deg, #b2e68d, #bce689);
+                right: 0;
+            }
+
+            .detailIcon {
                 width: 4.5vh;
                 height: 4.5vh;
                 background-size: contain;
                 margin-left: 2.5vw;
                 background-image: url('/icons/searching.png');
+
                 &:hover {
-                        cursor: pointer;
+                    cursor: pointer;
+                    transform: scale(1.03);
+                    transition: 500ms;
+                }
+            }
+
+            .returnIcon {
+                width: 4.5vh;
+                height: 4.5vh;
+                background-size: contain;
+                margin-left: 2.5vw;
+                background-image: url('/back.png');
+
+                &:hover {
+                    cursor: pointer;
+                    transform: scale(1.03);
+                    transition: 500ms;
                 }
             }
 
@@ -207,25 +389,179 @@ div.model-content-container {
 
         }
 
-        div.user-react {
-            height: 20%;
-            width: 100%;
-            background-color: rgb(16, 86, 146);
+        div.main-page {
+            width: 20vw;
+            height: calc(87.4vh - 8vh);
+            display: flex;
+            flex-direction: column;
 
+            div.user-react {
+                height: 15vh;
+                width: 100%;
+                background-color: aliceblue;
+
+                .title {
+                    height: 5vh;
+                    width: 100%;
+                    background-color: rgb(150, 206, 255);
+
+                    .title-text {
+                        font-size: calc(1vw + 0.5vh);
+                        font-weight: 600;
+                        text-align: center;
+                        line-height: 5vh;
+                    }
+                }
+
+                .buttons {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    justify-content: space-evenly;
+
+                    .button {
+                        background-color: #659feb;
+                        padding: .3vh;
+                        border-radius: 0.5vh;
+                        border-color: white;
+                        border-width: 0.5vh;
+                        height: 3vh;
+                        width: 8vw;
+                        color: white;
+                        font-size: calc(0.8vw + 0.5vh);
+                        font-weight: 600;
+                        margin-left: 1vw;
+                        margin: .7vh;
+                        text-align: center;
+
+                        &:hover {
+                            cursor: pointer;
+                            background-color: #0642b1;
+                            transform: scale(1.01);
+                            box-shadow: #00183d 0px 0px 5px 0px;
+                            transition: .2s ease-in;
+                        }
+                    }
+                }
+
+
+            }
+
+            div.data-panel {
+                height: 35vh;
+                width: 100%;
+
+                .title {
+                    height: 5vh;
+                    width: 100%;
+                    background-color: rgb(150, 206, 255);
+
+
+                    .title-text {
+                        font-size: calc(1vw + 0.5vh);
+                        font-weight: 600;
+                        text-align: center;
+                        line-height: 5vh;
+                    }
+                }
+
+
+                .dp-content {
+                    height: 30vh;
+                    overflow-x: hidden;
+                    overflow-y: scroll;
+
+                    &::-webkit-scrollbar {
+                        width: 8px;
+                    }
+
+                    &::-webkit-scrollbar-track {
+                        background-color: rgba(6, 181, 197, 0.219);
+                    }
+
+                    &::-webkit-scrollbar-thumb {
+                        background-color: #15a1e294;
+                        border-radius: 5px;
+                    }
+
+                    &::-webkit-scrollbar-thumb:hover {
+                        background-color: #3af0f781;
+                    }
+
+
+                }
+            }
+
+            div.layer-panel {
+                height: 30%;
+                width: 100%;
+                flex-grow: 1; //fill the space
+
+
+
+                .title {
+                    height: 5vh;
+                    width: 100%;
+                    background-color: rgb(150, 206, 255);
+
+
+                    .title-text {
+                        font-size: calc(1vw + 0.5vh);
+                        font-weight: 600;
+                        text-align: center;
+                        line-height: 5vh;
+                    }
+                }
+
+                .lp-content {
+                    height: 25vh;
+                    overflow-x: hidden;
+                    overflow-y: auto;
+
+                    &::-webkit-scrollbar {
+                        width: 8px;
+                    }
+
+                    &::-webkit-scrollbar-track {
+                        background-color: rgba(6, 181, 197, 0.219);
+                    }
+
+                    &::-webkit-scrollbar-thumb {
+                        background-color: #15a1e294;
+                        border-radius: 5px;
+                    }
+
+                    &::-webkit-scrollbar-thumb:hover {
+                        background-color: #3af0f781;
+                    }
+
+                    .el-checkbox-group {
+                        background-color: aliceblue;
+
+                        .el-checkbox {
+                            padding-left: 2vw;
+                            margin: 0px;
+                            display: block;
+                            color: #000000;
+
+                            :deep() .el-checkbox__input {
+                                transform: translateY(2px);
+                            }
+
+                            :deep().el-checkbox__label {
+                                text-shadow: 1px 1px 0 #dfdada;
+                                color: #00183d;
+
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        div.data-panel {
-            height: 40%;
-            width: 100%;
-            background-color: rgb(150, 206, 255);
-
-        }
-
-        div.layer-panel {
-            height: 30%;
-            width: 100%;
-            background-color: rgb(255, 255, 255);
-            flex-grow: 1; //fill the space
+        div.detail-page {
+            width: 20vw;
+            height: calc(87.4vh - 8vh);
 
         }
 
@@ -233,7 +569,7 @@ div.model-content-container {
 
     div.map-container {
         position: relative;
-        width: 75vw;
+        width: 80vw;
         height: 87.4vh;
 
         #map {
@@ -254,8 +590,6 @@ div.model-content-container {
             pointer-events: none;
         }
     }
-
-
 
 }
 </style>
