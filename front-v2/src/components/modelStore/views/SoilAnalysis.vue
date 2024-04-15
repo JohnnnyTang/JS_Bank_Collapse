@@ -32,17 +32,16 @@
 </template>
   
 <script setup>
-import { useRoute } from 'vue-router'
 import ModelInfoVue from '../ModelInfo.vue'
 import ModelTitleVue from '../ModelTitle.vue';
+import { infoItemList } from '../modelInfoList.js'
 
-const route = useRoute()
 const modelInfo = {
-    application: route.query.application,
-    usescene: route.query.usescene,
-    input: route.query.input,
-    output: route.query.output,
-    processPicSrc:route.query.processPicSrc,
+    application: infoItemList[1].application,
+    usescene: infoItemList[1].usescene,
+    input: infoItemList[1].input,
+    output: infoItemList[1].output,
+    processPicSrc:infoItemList[1].processPicSrc,
 }
 
 const ModelName = "土体变形分析模型"

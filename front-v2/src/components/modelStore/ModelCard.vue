@@ -100,16 +100,7 @@ const changeactive = () => {
 // 路由设置
 const router = useRouter()
 const Detail = () => {
-    router.push({
-        path:'/modelStore/'+ infoItem.value.routerPath,
-        query: { 
-            application:infoItem.value.application,
-            usescene:infoItem.value.usescene,
-            input:infoItem.value.input,
-            output:infoItem.value.output,
-            processPicSrc:infoItem.value.processPicSrc,
-        }
-    })
+    router.push('/modelStore/'+ infoItem.value.routerPath)
 }
 
 </script>
