@@ -620,6 +620,7 @@ const initLayers = async (sceneInstance, map) => {
         // case '水利一张图':
         //     break;
 
+
         /////small Scene
         case '实时监测设备':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
@@ -734,82 +735,80 @@ const initLayers = async (sceneInstance, map) => {
 
             break
 
-        case '岸段聚合场景':
-            if (map.getLayer('TerrainLayer')) terrainLayer.show()
-            else map.addLayer(terrainLayer)
-            useLayerStore().setTerrainLayer(terrainLayer)
-
+        case '近岸流场':
             if (map.getLayer('FlowLayer')) flow.show()
             else map.addLayer(flow)
             useLayerStore().setFlowLayer(flow)
+            sceneInstance.allLayers.push('FlowLayer')
+            map.triggerRepaint()
+            break;
 
-            sceneInstance.allLayers.push('TerrainLayer', 'FlowLayer')
+        case '三维地形':
+            if (map.getLayer('TerrainLayer')) terrainLayer.show()
+            else map.addLayer(terrainLayer)
+            useLayerStore().setTerrainLayer(terrainLayer)
+            sceneInstance.allLayers.push('TerrainLayer')
             map.triggerRepaint()
             break
-        // case '水利一张图':
-        //     // console.log('123213123')
-        //     // map.addLayer(flow)
-        //     // flow.show()
-        //     // sceneInstance.allLayers.push('FlowLayer')
-        //     break
+
+        case '断面形态':
+            await loadImage(map, './geoStyle/warning2.png', 'section')
+            map.addSource('mzsSectionLineSource', {
+                type: 'vector',
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+                ],
+            })
+            map.addSource('mzsSectionLineLabelSource', {
+                type: 'vector',
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+                ],
+            })
+
+            map.addLayer({
+                id: 'mzsSectionLine',
+                type: 'line',
+                source: 'mzsSectionLineSource',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': '#7F02F3',
+                    'line-width': 7,
+                    'line-pattern':'section'
+                },
+            })
+            map.addLayer({
+                id: 'mzsSectionLabel',
+                type: 'symbol',
+                source: 'mzsSectionLineLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                },
+                paint: {
+                    'text-color': 'rgba(121, 214, 126, 0.9)',
+                },
+            })
+            map.on('click','mzsSectionLine',(e)=>{
+                console.log(e.features[0]);
+            })
+
+            break;
         default:
             console.log('wait developing...')
             ElMessage('wait developing...')
             break
     }
-    /*
-  // Add a new vector tile source with ID 'mapillary'.
-        map.addSource('mapillary', {
-            'type': 'vector',
-            'tiles': [
-                'https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=MLY|4142433049200173|72206abe5035850d6743b23a49c41333'
-            ],
-            'minzoom': 6,
-            'maxzoom': 14
-        });
-        map.addLayer(
-            {
-                'id': 'mapillary', // Layer ID
-                'type': 'line',
-                'source': 'mapillary', // ID of the tile source created above
-                // Source has several layers. We visualize the one with name 'sequence'.
-                'source-layer': 'sequence',
-                'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                },
-                'paint': {
-                    'line-opacity': 0.6,
-                    'line-color': 'rgb(53, 175, 109)',
-                    'line-width': 2
-                }
-            },
-            'road-label-simple' // Arrange our new layer beneath labels and above roads
-        );
 
 
-
-
-    */
-
-    // console.log('111');
-    // map.addSource('wms-test-source', {
-    //     'type': 'raster',
-    //     'tiles': [
-    //         // 'https://img.nj.gov/imagerywms/Natural2015?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.1&request=GetMap&srs=EPSG:3857&transparent=true&width=256&height=256&layers=Natural2015'
-    //         'http://support.supermap.com:8090/iserver/services/map-china400/wms111/China'
-    //     ],
-    //     'tileSize': 256
-    // });
-    // map.addLayer(
-    //     {
-    //         'id': 'wms-test-layer',
-    //         'type': 'raster',
-    //         'source': 'wms-test-source',
-    //         'paint': {}
-    //     },
-    //     'building' // Place layer under labels, roads and buildings.
-    // );
     const sceneStore = useSceneStore()
     sceneStore.setSelectedScene(sceneInstance)
 }
@@ -922,10 +921,6 @@ const getBigRangeScenes = () => {
     typiclaCollapse.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
     typiclaCollapse.iconSrc = './icons/collapse.png'
 
-    let warningArea = new Scene()
-    warningArea.title = '预警分区'
-    warningArea.desc = '标示潜在灾害风险区域，帮助提前预警和应对应急情况.'
-    warningArea.iconSrc = './icons/warning.png'
 
     let terrain = new Scene()
     terrain.title = '全江地形'
@@ -944,7 +939,6 @@ const getBigRangeScenes = () => {
         scene1,
         scene4,
         scene2,
-        warningArea,
         chongy,
     )
     return bigRangeScenes
@@ -952,17 +946,32 @@ const getBigRangeScenes = () => {
 const getSmallRangeScenes = () => {
     let smallRangeScenes = []
 
-    let aggregationScene = new Scene()
-    aggregationScene.title = '岸段聚合场景'
-    aggregationScene.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
-    aggregationScene.iconSrc = './icons/collapse.png'
+    // let aggregationScene = new Scene()
+    // aggregationScene.title = '岸段聚合场景'
+    // aggregationScene.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
+    // aggregationScene.iconSrc = './icons/collapse.png'
+
+    let flowFieldScene = new Scene()
+    flowFieldScene.title = '近岸流场'
+    flowFieldScene.desc = '近岸流场'
+    flowFieldScene.iconSrc = './icons/flow.png'
+
+    let terrScene = new Scene()
+    terrScene.title = '三维地形'
+    terrScene.desc = '三维地形'
+    terrScene.iconSrc = './icons/terrain.png'
 
     let watching = new Scene()
     watching.title = '实时监测设备'
     watching.desc = '监测数据可视化,监测设备管理'
     watching.iconSrc = './icons/watching.png'
 
-    smallRangeScenes.push(aggregationScene, watching)
+    let duanMian = new Scene()
+    duanMian.title = '断面形态'
+    duanMian.desc = '监测数据可视化,监测设备管理'
+    duanMian.iconSrc = './icons/transversal.png'
+
+    smallRangeScenes.push(flowFieldScene, terrScene, watching, duanMian)
 
     return smallRangeScenes
 }
