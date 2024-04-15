@@ -101,15 +101,14 @@ import ModelTitleVue from '../ModelTitle.vue';
 import DataCardVue from '../DataCard.vue';
 import ResultCardVue from '../ResultCard.vue';
 import DataShowTableVue from '../DataShowTable.vue'
-import { useRoute } from 'vue-router';
+import { infoItemList } from '../modelInfoList.js'
 
-const route = useRoute()
 const modelInfo = {
-    application: route.query.application,
-    usescene: route.query.usescene,
-    input: route.query.input,
-    output: route.query.output,
-    processPicSrc:route.query.processPicSrc,
+    application: infoItemList[2].application,
+    usescene: infoItemList[2].usescene,
+    input: infoItemList[2].input,
+    output: infoItemList[2].output,
+    processPicSrc:infoItemList[2].processPicSrc,
 }
 
 
