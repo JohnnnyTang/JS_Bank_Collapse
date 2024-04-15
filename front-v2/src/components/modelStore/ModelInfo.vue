@@ -87,7 +87,7 @@
                 <div class="process-content">
                     <div class="process-wrapper">
                         <div class="image-div">
-                            <img :src=" bmodelInfo.processPicSrc" alt="模型流程图">
+                            <img :src="modelInfo.processPicSrc" alt="模型流程图">
                         </div>
                     </div>
                 </div>

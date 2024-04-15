@@ -64,17 +64,15 @@ import watpreCardVue from '../WatpreCard.vue';
 import StrepileCardVue from '../StrepileCard.vue';
 import ModelInfoVue from '../ModelInfo.vue'
 import ModelTitleVue from '../ModelTitle.vue';
-import { useRoute } from 'vue-router';
+import { infoItemList } from '../modelInfoList.js'
 
-const route = useRoute();
 const modelInfo = {
-    application: route.query.application,
-    usescene: route.query.usescene,
-    input: route.query.input,
-    output: route.query.output,
-    processPicSrc:route.query.processPicSrc,
+    application: infoItemList[0].application,
+    usescene: infoItemList[0].usescene,
+    input: infoItemList[0].input,
+    output: infoItemList[0].output,
+    processPicSrc:infoItemList[0].processPicSrc,
 }
-console.log(modelInfo)
 
 const ModelName = '数据融合解译模型'
 
