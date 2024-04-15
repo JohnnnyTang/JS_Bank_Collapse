@@ -65,22 +65,18 @@ const routes = [
             {
                 path: 'dataInterpretation',
                 component: () => import('../components/modelStore/views/DataInterpretation.vue'),
-                props: true
             },
             {
                 path: 'soilAnalysis',
                 component: () => import('../components/modelStore/views/SoilAnalysis.vue'),
-                props: true
             },
             {
                 path: 'stabilityAnalysis',
                 component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
-                props: true
             },
             {
                 path: 'riskWarning',
                 component: () => import('../components/modelStore/views/RiskWarning.vue'),
-                props: true
             },
         ]
     },

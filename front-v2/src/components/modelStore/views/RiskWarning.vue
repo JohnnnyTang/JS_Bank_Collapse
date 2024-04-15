@@ -216,15 +216,14 @@ import { ElMessageBox } from 'element-plus';
 import ModelTitleVue from '../ModelTitle.vue';
 import ModelInfoVue from '../ModelInfo.vue'
 import IndexCardVue from '../IndexCard.vue';
-import { useRoute } from 'vue-router';
+import { infoItemList } from '../modelInfoList.js'
 
-const route = useRoute()
 const modelInfo = {
-    application: route.query.application,
-    usescene: route.query.usescene,
-    input: route.query.input,
-    output: route.query.output,
-    processPicSrc:route.query.processPicSrc,
+    application: infoItemList[3].application,
+    usescene: infoItemList[3].usescene,
+    input: infoItemList[3].input,
+    output: infoItemList[3].output,
+    processPicSrc:infoItemList[3].processPicSrc,
 }
 
 const ModelName = "风险预警模型"
