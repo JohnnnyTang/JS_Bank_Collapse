@@ -118,12 +118,12 @@ const updateSelection = (curRoute) =>{
 }
 
 onBeforeRouteUpdate((to, from) => {
-    console.log(to, from)
+    // console.log(to, from)
     updateSelection(to)
 })
 
 onMounted(() => {
-    console.log(route.params)
+    // console.log(route.params)
     updateSelection(route)
 })
 </script>

@@ -4,6 +4,7 @@ import com.johnny.bank.model.ProcessCmdOutput;
 import com.johnny.bank.model.configuration.TilePath;
 import com.johnny.bank.utils.ProcessUtil;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,8 @@ public class MapTileServiceThread extends Thread{
 
     private TilePath tilePath;
 
+    private Process cmdProcess;
+
     @PostConstruct
     public void init(){
         //启动线程实例
@@ -30,13 +33,13 @@ public class MapTileServiceThread extends Thread{
     @Override
     public void run() {
         try {
-            Process process = ProcessUtil.buildMapTileServiceProcess(tilePath.getWorldTilePath());
-            ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
+            cmdProcess = ProcessUtil.buildMapTileServiceProcess(tilePath.getWorldTilePath());
+            ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(cmdProcess.getInputStream());
             if(cmdOutput.getStatusCode() == 0) {
                 System.out.println("tile service start wrong");
             }
-            int code = process.waitFor();
-            process.destroy();
+            int code = cmdProcess.waitFor();
+            cmdProcess.destroy();
             if(code == 0) {
                 System.out.println("tile service end");
             }
@@ -47,6 +50,18 @@ public class MapTileServiceThread extends Thread{
             throw new RuntimeException(e);
         }
         log.info("running node base map service");
+    }
+
+    @PreDestroy
+    public void end(){
+        try {
+            if(cmdProcess != null) {
+                cmdProcess.destroy();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        log.info("close node base map service");
     }
 
     @Autowired
