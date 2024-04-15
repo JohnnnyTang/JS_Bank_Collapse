@@ -4,7 +4,7 @@
             <div
                 class="knowledge-card"
                 :class="[infoItem.firstPage ? 'active' : 'inactive']"
-                @click="changeInfoPage()"
+                @click="changeInfoPage"
             >
                 <div class="image-wrapper">
                     <div class="image-div">
@@ -21,7 +21,7 @@
                         (infoItem.district || '') +
                         '-' +
                         (infoItem.place || '') +
-                        '崩岸' 
+                        '崩岸'
                     }}
                 </div>
                 <div class="knowledge-content-container">
@@ -32,7 +32,7 @@
                                 {{ infoItem.time || '无数据' }}
                             </div>
                         </div>
-                        <div class="content-item-container right">
+                        <div class="content-item-container center">
                             <div class="content-item-title">类别</div>
                             <div
                                 class="content-item-text"
@@ -42,6 +42,10 @@
                             >
                                 {{ infoItem.type || '无数据' }}
                             </div>
+                        </div>
+                        <div class="content-item-container right">
+                            <div class="content-item-title">近岸冲刷</div>
+                            <div class="content-item-text number">200</div>
                         </div>
                     </div>
                     <div class="content-row-container">
@@ -56,7 +60,7 @@
                                 {{ infoItem.side || '无数据' }}
                             </div>
                         </div>
-                        <div class="content-item-container right">
+                        <div class="content-item-container center">
                             <div class="content-item-title">口门长度</div>
                             <div
                                 class="content-item-text number"
@@ -66,6 +70,10 @@
                             >
                                 {{ infoItem.length || '无数据' }}
                             </div>
+                        </div>
+                        <div class="content-item-container right">
+                            <div class="content-item-title">近岸坡陡</div>
+                            <div class="content-item-text number">1.231</div>
                         </div>
                     </div>
                     <div class="content-row-container">
@@ -80,7 +88,7 @@
                                 {{ infoItem.width || '无数据' }}
                             </div>
                         </div>
-                        <div class="content-item-container right">
+                        <div class="content-item-container center">
                             <div class="content-item-title">岸高</div>
                             <div
                                 class="content-item-text number"
@@ -89,6 +97,17 @@
                                 }"
                             >
                                 {{ infoItem.height || '无数据' }}
+                            </div>
+                        </div>
+                        <div class="content-item-container right">
+                            <div class="content-item-title">崩窝进口夹角</div>
+                            <div
+                                class="content-item-text number"
+                                :class="{
+                                    'no-data': infoItem.angle === null,
+                                }"
+                            >
+                                {{ infoItem.angle || '无数据' }}
                             </div>
                         </div>
                     </div>
@@ -104,7 +123,7 @@
                                 {{ infoItem.ratio || '无数据' }}
                             </div>
                         </div>
-                        <div class="content-item-container right">
+                        <div class="content-item-container center">
                             <div class="content-item-title">崩塌土方量</div>
                             <div
                                 class="content-item-text number"
@@ -113,47 +132,6 @@
                                 }"
                             >
                                 {{ infoItem.volume || '无数据' }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="see-more-button"
-                @click="changeInfoPage()"
-                :class="[infoItem.firstPage ? 'active' : 'inactive']"
-            >
-                <div class="button-text">
-                    {{ infoItem.firstPage ? '更多信息' : '基本信息' }}
-                </div>
-                <div class="button-arrow"></div>
-            </div>
-            <div
-                class="knowledge-card"
-                :class="[infoItem.firstPage ? 'inactive' : 'active']"
-                @click="changeInfoPage()"
-            >
-                <div class="knowledge-content-container second">
-                    <div class="content-row-container">
-                        <div class="content-item-container left">
-                            <div class="content-item-title">近岸冲刷</div>
-                            <div class="content-item-text number">200</div>
-                        </div>
-                        <div class="content-item-container right">
-                            <div class="content-item-title">近岸坡陡</div>
-                            <div class="content-item-text number">1.231</div>
-                        </div>
-                    </div>
-                    <div class="content-row-container">
-                        <div class="content-item-container left">
-                            <div class="content-item-title">崩窝进口夹角</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.angle === null,
-                                }"
-                            >
-                                {{ infoItem.angle || '无数据' }}
                             </div>
                         </div>
                         <div class="content-item-container right">
@@ -168,26 +146,146 @@
                             </div>
                         </div>
                     </div>
-                    <div class="content-row-container desc">
-                        <div class="content-item-container left">
-                            <div class="content-item-title">崩岸新闻描述</div>
-                            <el-scrollbar ref="vertScrollBar">
-                                <div
-                                    class="content-item-text number"
-                                    :class="{
-                                        'no-data':
-                                            infoItem.description === null,
-                                    }"
-                                    ref="scrollTextDom"
-                                    :data-key="index"
-                                >
-                                    &nbsp;&nbsp;{{
-                                        infoItem.description || '无数据'
-                                    }}
+                </div>
+            </div>
+            <div
+                class="see-more-button"
+                @click="directChangeInfoPage"
+                :class="[infoItem.firstPage ? 'active' : 'inactive']"
+            >
+                <div class="button-text">
+                    {{ infoItem.firstPage ? '更多信息' : '基本信息' }}
+                </div>
+                <div class="button-arrow"></div>
+            </div>
+            <div
+                class="knowledge-card"
+                :class="[infoItem.firstPage ? 'inactive' : 'active']"
+                @click="changeInfoPage"
+            >
+                <div class="knowledge-content-container second">
+                    <el-scrollbar class="accordion-scroll">
+                        <el-collapse
+                            v-model="activeNames"
+                            @change="handleChange"
+                        >
+                            <el-collapse-item title="基本情况" name="1">
+                                <div class="content-row-container desc">
+                                    <div class="content-item-container">
+                                        <el-scrollbar>
+                                            <div
+                                                class="content-item-text number"
+                                                :class="{
+                                                    'no-data':
+                                                        infoItem.description ===
+                                                        null,
+                                                }"
+                                                ref="scrollTextDom"
+                                                :data-key="index"
+                                            >
+                                                &nbsp;&nbsp;{{
+                                                    infoItem.description ||
+                                                    '无数据'
+                                                }}
+                                            </div>
+                                        </el-scrollbar>
+                                    </div>
                                 </div>
-                            </el-scrollbar>
-                        </div>
-                    </div>
+                            </el-collapse-item>
+                            <el-collapse-item title="原因分析" name="2">
+                                <div class="content-row-container desc">
+                                    <div class="content-item-container">
+                                        <el-scrollbar>
+                                            <div
+                                                class="content-item-text number"
+                                                :class="{
+                                                    'no-data':
+                                                        infoItem.description ===
+                                                        null,
+                                                }"
+                                                ref="scrollTextDom"
+                                                :data-key="index"
+                                            >
+                                                &nbsp;&nbsp;{{
+                                                    infoItem.description ||
+                                                    '无数据'
+                                                }}
+                                            </div>
+                                        </el-scrollbar>
+                                    </div>
+                                </div>
+                            </el-collapse-item>
+                            <el-collapse-item title="应急处置" name="3">
+                                <div class="content-row-container desc">
+                                    <div class="content-item-container">
+                                        <el-scrollbar>
+                                            <div
+                                                class="content-item-text number"
+                                                :class="{
+                                                    'no-data':
+                                                        infoItem.description ===
+                                                        null,
+                                                }"
+                                                ref="scrollTextDom"
+                                                :data-key="index"
+                                            >
+                                                &nbsp;&nbsp;{{
+                                                    infoItem.description ||
+                                                    '无数据'
+                                                }}
+                                            </div>
+                                        </el-scrollbar>
+                                    </div>
+                                </div>
+                            </el-collapse-item>
+                            <el-collapse-item title="后续工作" name="4">
+                                <div class="content-row-container desc">
+                                    <div class="content-item-container">
+                                        <el-scrollbar>
+                                            <div
+                                                class="content-item-text number"
+                                                :class="{
+                                                    'no-data':
+                                                        infoItem.description ===
+                                                        null,
+                                                }"
+                                                ref="scrollTextDom"
+                                                :data-key="index"
+                                            >
+                                                &nbsp;&nbsp;{{
+                                                    infoItem.description ||
+                                                    '无数据'
+                                                }}
+                                            </div>
+                                        </el-scrollbar>
+                                    </div>
+                                </div>
+                            </el-collapse-item>
+                            <el-collapse-item title="新闻视频" name="5">
+                                <div class="content-row-container desc">
+                                    <div class="content-item-container">
+                                        <el-scrollbar>
+                                            <div
+                                                class="content-item-text number"
+                                                :class="{
+                                                    'no-data':
+                                                        infoItem.description ===
+                                                        null,
+                                                }"
+                                                ref="scrollTextDom"
+                                                :data-key="index"
+                                            >
+                                                &nbsp;&nbsp;{{
+                                                    infoItem.description ||
+                                                    '无数据'
+                                                }}
+                                            </div>
+                                        </el-scrollbar>
+                                    </div>
+                                </div>
+                            </el-collapse-item>
+                        </el-collapse>
+                    </el-scrollbar>
                 </div>
             </div>
         </div>
@@ -209,15 +307,31 @@ const props = defineProps({
 
 const infoItem = ref(props.infoItem)
 
-const changeInfoPage = () => {
+const changeInfoPage = (e) => {
+    if (
+        e.target.className.includes('accordion-scroll') ||
+        e.target.className.includes('el-collapse')
+    ) {
+        return
+    }
     infoItem.value.firstPage = !infoItem.value.firstPage
     // firstPageActive.value = !firstPageActive.value;
+}
+
+const directChangeInfoPage = () => {
+    infoItem.value.firstPage = !infoItem.value.firstPage
+    // firstPageActive.value = !firstPageActive.value;
+}
+
+const activeNames = ref(['1'])
+const handleChange = (val) => {
+    console.log(val)
 }
 </script>
 
 <style lang="scss" scoped>
 div.knowledge-card-container {
-    width: 28vw;
+    width: 48vw;
     height: 78vh;
     // line-height: 78vh;
     text-align: center;
@@ -228,7 +342,7 @@ div.knowledge-card-container {
     // }
 
     div.knowledge-card-wrapper {
-        width: 23vw;
+        width: 44vw;
         height: 78vh;
         position: relative;
         left: 2vw;
@@ -240,7 +354,7 @@ div.knowledge-card-container {
         // }
 
         div.knowledge-card {
-            width: 19.5vw;
+            width: 40vw;
             height: 70vh;
             padding-left: 1vw;
             padding-right: 1vw;
@@ -272,7 +386,7 @@ div.knowledge-card-container {
                 cursor: pointer;
 
                 &:hover {
-                    transform: translate(0.1vw, -1.2vh) rotate(3deg);
+                    transform: translate(0.1vw, -1.2vh) rotate(1deg);
                 }
 
                 div.see-more-button,
@@ -292,12 +406,13 @@ div.knowledge-card-container {
                 height: 29vh;
 
                 div.image-div {
-                    width: calc(100% + 15%);
-                    -webkit-transform: translate(-10%, 0);
-                    -moz-transform: translate(-10%, 0);
-                    -o-transform: translate(-10%, 0);
-                    -ms-transform: translate(-10%, 0);
-                    transform: translate(-16%, 0);
+                    // width: calc(100% + 15%);
+                    width: 100%;
+                    // -webkit-transform: translate(-10%, 0);
+                    // -moz-transform: translate(-10%, 0);
+                    // -o-transform: translate(-10%, 0);
+                    // -ms-transform: translate(-10%, 0);
+                    // transform: translate(-16%, 0);
                     height: 28vh;
                     -webkit-box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
                     -moz-box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
@@ -352,25 +467,44 @@ div.knowledge-card-container {
 
                 &.second {
                     height: 70vh;
+                    width: 100%;
+
+                    div.accordion-scroll {
+                        height: 100%;
+                        width: 100%;
+                    }
+
+                    :deep(.el-collapse) {
+                        --el-collapse-border-color: #104da8;
+                        --el-collapse-header-height: 8vh;
+                        .el-collapse-item__header {
+                            padding-left: 3vw;
+                            font-weight: bold;
+                            font-size: calc(0.6vw + 0.7vh);
+                            &.is-active {
+                                color: #0453fd;
+                            }
+                        }
+                    }
                     // background-color: #2bc5fc;
                 }
 
                 div.content-row-container {
-                    width: 80%;
+                    width: 94%;
                     height: 8vh;
-                    margin-left: 6%;
-                    padding-left: 4%;
-                    padding-right: 4%;
+                    margin-left: 3%;
+                    // padding-left: 2%;
+                    // padding-right: 2%;
                     // background-color: rgb(92, 125, 154);
                     border-bottom: 2px solid #0018a3;
 
                     display: flex;
-                    flex-flow: row nowrap;
-                    justify-content: space-between;
+                    flex-flow: row wrap;
+                    justify-content: center;
 
                     div.content-item-container {
                         height: 8vh;
-                        width: 48%;
+                        width: 31%;
 
                         // background-color: rgb(63, 109, 149);
 
@@ -421,14 +555,18 @@ div.knowledge-card-container {
                             text-align: left;
                         }
 
+                        &.center {
+                            text-align: center;
+                        }
+
                         &.right {
                             text-align: right;
                         }
                     }
 
                     &.desc {
-                        width: 100%;
-                        height: 50vh;
+                        width: 80%;
+                        height: 36vh;
                         // background-color: aqua;
                         justify-content: center;
                         padding-left: 5%;
@@ -439,11 +577,11 @@ div.knowledge-card-container {
 
                         .el-scrollbar {
                             top: 0;
-                            height: 46vh;
+                            height: 36vh;
                         }
 
                         div.content-item-container {
-                            height: 50vh;
+                            height: 40vh;
                             width: 100%;
                             // background-color: #3011d4;
 
@@ -453,7 +591,7 @@ div.knowledge-card-container {
 
                             div.content-item-text {
                                 text-align: left;
-                                height: 46vh;
+                                height: 36vh;
                             }
                         }
                     }
