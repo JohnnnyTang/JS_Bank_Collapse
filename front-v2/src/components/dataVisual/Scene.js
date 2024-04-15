@@ -19,6 +19,7 @@ import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
 let terrainLayer = new TerrainLayer(14)
 let flow = new SteadyFlowLayer()
 let refHeight = ref('')
+let sectionName = ref('')
 
 // Data Prepare
 class DataPioneer {
@@ -169,6 +170,27 @@ class DataPioneer {
             },
         }
     }
+    static generateGeoJson(itemArr, getCoords, type){
+        const features = []
+        itemArr.forEach((element) => {
+            let coords = getCoords(element)
+            let feature = {
+                type: 'Feature',
+                properties: element,
+                geometry: {
+                    coordinates: coords,
+                    type: type,
+                },
+            }
+            features.push(feature)
+        })
+        const geojson = {
+            type: 'FeatureCollection',
+            features: features,
+        }
+        return geojson
+    }
+    
 }
 
 const generateGeoJson = (itemArr, getCoords, type) => {
@@ -196,7 +218,7 @@ const generateGeoJson = (itemArr, getCoords, type) => {
 let globalpopup = null
 const initLayers = async (sceneInstance, map) => {
 
-    let { popUp, componentInstance } = createPopUp(refHeight)
+    let { popUp, componentInstance } = createPopUp(refHeight,sectionName)
     globalpopup = popUp
     switch (sceneInstance.title) {
         /////Large Scene
@@ -620,6 +642,7 @@ const initLayers = async (sceneInstance, map) => {
         // case '水利一张图':
         //     break;
 
+
         /////small Scene
         case '实时监测设备':
             let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
@@ -734,82 +757,100 @@ const initLayers = async (sceneInstance, map) => {
 
             break
 
-        case '岸段聚合场景':
-            if (map.getLayer('TerrainLayer')) terrainLayer.show()
-            else map.addLayer(terrainLayer)
-            useLayerStore().setTerrainLayer(terrainLayer)
-
+        case '近岸流场':
             if (map.getLayer('FlowLayer')) flow.show()
             else map.addLayer(flow)
             useLayerStore().setFlowLayer(flow)
+            sceneInstance.allLayers.push('FlowLayer')
+            map.triggerRepaint()
+            break;
 
-            sceneInstance.allLayers.push('TerrainLayer', 'FlowLayer')
+        case '三维地形':
+            if (map.getLayer('TerrainLayer')) terrainLayer.show()
+            else map.addLayer(terrainLayer)
+            useLayerStore().setTerrainLayer(terrainLayer)
+            sceneInstance.allLayers.push('TerrainLayer')
             map.triggerRepaint()
             break
-        // case '水利一张图':
-        //     // console.log('123213123')
-        //     // map.addLayer(flow)
-        //     // flow.show()
-        //     // sceneInstance.allLayers.push('FlowLayer')
-        //     break
+
+        case '断面形态':
+            await loadImage(map, './geoStyle/warning2.png', 'section')
+            map.addSource('mzsSectionLineSource', {
+                type: 'vector',
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+                ],
+            })
+            map.addSource('mzsSectionLineLabelSource', {
+                type: 'vector',
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+                ],
+            })
+
+            map.addLayer({
+                id: '守护工程断面',
+                type: 'line',
+                source: 'mzsSectionLineSource',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': '#7F02F3',
+                    'line-width': 7,
+                    'line-pattern':'section'
+                },
+            })
+            map.addLayer({
+                id: '守护工程断面标注',
+                type: 'symbol',
+                source: 'mzsSectionLineLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                    'text-size': 20,
+                },
+                paint: {
+                    'text-color': '#040052',
+                },
+            })
+            map.on('click','守护工程断面',(e)=>{
+                console.log('123');
+                const secName = e.features[0]['properties']['label']
+                sectionName.value = secName
+                const popupCoord = e.lngLat
+                popUp && popUp.remove()
+                popUp.setOffset(0).setLngLat(popupCoord).addTo(map)
+            })
+            map.on('mousemove', '守护工程断面', (e) => {
+                map.getCanvas().style.cursor = 'pointer'
+            })
+            map.on('mouseleave', '守护工程断面', (e) => {
+                map.getCanvas().style.cursor = ''
+            })
+            sceneInstance.allLayers.push(
+                '守护工程断面',
+                '守护工程断面标注',
+            )
+            sceneInstance.layerSrc.push(
+                'mzsSectionLineSource',
+                'mzsSectionLineLabelSource',
+            )
+
+            break;
         default:
             console.log('wait developing...')
             ElMessage('wait developing...')
             break
     }
-    /*
-  // Add a new vector tile source with ID 'mapillary'.
-        map.addSource('mapillary', {
-            'type': 'vector',
-            'tiles': [
-                'https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=MLY|4142433049200173|72206abe5035850d6743b23a49c41333'
-            ],
-            'minzoom': 6,
-            'maxzoom': 14
-        });
-        map.addLayer(
-            {
-                'id': 'mapillary', // Layer ID
-                'type': 'line',
-                'source': 'mapillary', // ID of the tile source created above
-                // Source has several layers. We visualize the one with name 'sequence'.
-                'source-layer': 'sequence',
-                'layout': {
-                    'line-cap': 'round',
-                    'line-join': 'round'
-                },
-                'paint': {
-                    'line-opacity': 0.6,
-                    'line-color': 'rgb(53, 175, 109)',
-                    'line-width': 2
-                }
-            },
-            'road-label-simple' // Arrange our new layer beneath labels and above roads
-        );
 
 
-
-
-    */
-
-    // console.log('111');
-    // map.addSource('wms-test-source', {
-    //     'type': 'raster',
-    //     'tiles': [
-    //         // 'https://img.nj.gov/imagerywms/Natural2015?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.1&request=GetMap&srs=EPSG:3857&transparent=true&width=256&height=256&layers=Natural2015'
-    //         'http://support.supermap.com:8090/iserver/services/map-china400/wms111/China'
-    //     ],
-    //     'tileSize': 256
-    // });
-    // map.addLayer(
-    //     {
-    //         'id': 'wms-test-layer',
-    //         'type': 'raster',
-    //         'source': 'wms-test-source',
-    //         'paint': {}
-    //     },
-    //     'building' // Place layer under labels, roads and buildings.
-    // );
     const sceneStore = useSceneStore()
     sceneStore.setSelectedScene(sceneInstance)
 }
@@ -922,10 +963,6 @@ const getBigRangeScenes = () => {
     typiclaCollapse.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
     typiclaCollapse.iconSrc = './icons/collapse.png'
 
-    let warningArea = new Scene()
-    warningArea.title = '预警分区'
-    warningArea.desc = '标示潜在灾害风险区域，帮助提前预警和应对应急情况.'
-    warningArea.iconSrc = './icons/warning.png'
 
     let terrain = new Scene()
     terrain.title = '全江地形'
@@ -944,7 +981,6 @@ const getBigRangeScenes = () => {
         scene1,
         scene4,
         scene2,
-        warningArea,
         chongy,
     )
     return bigRangeScenes
@@ -952,80 +988,36 @@ const getBigRangeScenes = () => {
 const getSmallRangeScenes = () => {
     let smallRangeScenes = []
 
-    let aggregationScene = new Scene()
-    aggregationScene.title = '岸段聚合场景'
-    aggregationScene.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
-    aggregationScene.iconSrc = './icons/collapse.png'
+    // let aggregationScene = new Scene()
+    // aggregationScene.title = '岸段聚合场景'
+    // aggregationScene.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
+    // aggregationScene.iconSrc = './icons/collapse.png'
+
+    let flowFieldScene = new Scene()
+    flowFieldScene.title = '近岸流场'
+    flowFieldScene.desc = '近岸区域水流动态，助力监测管理。'
+    flowFieldScene.iconSrc = './icons/flow.png'
+
+    let terrScene = new Scene()
+    terrScene.title = '三维地形'
+    terrScene.desc = '立体地貌模拟，展现自然景观'
+    terrScene.iconSrc = './icons/terrain.png'
 
     let watching = new Scene()
     watching.title = '实时监测设备'
     watching.desc = '监测数据可视化,监测设备管理'
     watching.iconSrc = './icons/watching.png'
 
-    smallRangeScenes.push(aggregationScene, watching)
+    let duanMian = new Scene()
+    duanMian.title = '断面形态'
+    duanMian.desc = '截面轮廓，展示形状、结构或特征，'
+    duanMian.iconSrc = './icons/transversal.png'
+
+    smallRangeScenes.push(flowFieldScene, terrScene, watching, duanMian)
 
     return smallRangeScenes
 }
 
-function generateHTMLAndCSS(numValue) {
-
-    const highlightColor = 'rgb(163,206,245)'
-    const textColor = 'rgb(47,94,177)'
-    const numColor = 'rgb(47,94,211)'
-
-    // 创建外层容器元素
-    const descContainer = document.createElement('div');
-    descContainer.classList.add('desc');
-
-    // 创建当前高程文本元素
-    const nowText = document.createElement('div');
-    nowText.classList.add('now');
-    nowText.textContent = '当前高程';
-    nowText.style.color = textColor;
-
-    // 创建数字元素
-    const numElement = document.createElement('div');
-    numElement.classList.add('num');
-    numElement.textContent = numValue;
-    numElement.style.color = numColor;
-
-    // 将文本元素和数字元素添加到容器中
-    descContainer.appendChild(nowText);
-    descContainer.appendChild(numElement);
-
-    // 创建style标签并添加样式
-    const style = document.createElement('style');
-    style.textContent = `
-      .desc {
-        background-color: ${highlightColor};
-        width: 80px;
-        height: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 10px;
-        padding: 5px;
-      }
-      .now {
-        color: ${textColor};
-        font-size: 15px;
-        line-height: 15px;
-      }
-      .num {
-        color: ${numColor};
-        font-size: 20px;
-        line-height: 20px;
-        font-weight: 800;
-      }
-    `;
-
-    // 将style标签添加到head中
-    document.head.appendChild(style);
-
-    // 返回生成的HTML元素
-    return descContainer;
-}
 
 
 //   const htmlElement = generateHTMLAndCSS('rgb(163, 206, 245)', 'rgb(47, 94, 177)', 'rgb(47, 94, 211)', '10m');
@@ -1033,4 +1025,4 @@ function generateHTMLAndCSS(numValue) {
 
 
 
-export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers }
+export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers,DataPioneer }

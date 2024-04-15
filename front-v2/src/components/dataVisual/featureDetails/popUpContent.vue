@@ -5,6 +5,8 @@
     <monitorDetail v-else-if="selectedScene.title === '实时监测设备'"></monitorDetail>
     <terrainDetail v-else-if="selectedScene.title === '全江地形'" :height="props.height"></terrainDetail>
 
+    <sectionDetail v-else-if="selectedScene.title === '断面形态'" :sectionName="props.sectionName"></sectionDetail>
+
 </template>
 
 <script setup>
@@ -12,6 +14,7 @@ import bankLineDetail from './bankLineDetail.vue';
 import channelDetail from './channelDetail.vue';
 import monitorDetail from './monitorDetail.vue';
 import terrainDetail from './terrainDetail.vue';
+import sectionDetail from './sectionDetail.vue';
 
 import { onMounted, ref, computed, watch } from 'vue';
 import { useSceneStore,useDataStore } from '../../../store/mapStore';
@@ -20,7 +23,8 @@ const sceneStore = useSceneStore()
 const selectedScene = computed(() => sceneStore.selectedScene)
 
 const props = defineProps({
-    height: String
+    height: Object,
+    sectionName:Object
 })
 
 onMounted(async () => {

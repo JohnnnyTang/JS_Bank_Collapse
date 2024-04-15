@@ -99,7 +99,7 @@ div.data-visual-container {
         width: 100vw;
         height: 92vh;
         pointer-events: all;
-        background-color: rgb(124, 179, 203);
+        background-color: hsl(194, 69%, 91%);;
     }
 
     #GPUFrame {

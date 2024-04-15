@@ -9,7 +9,7 @@
 import { onMounted,ref,computed } from 'vue'
 
 const props = defineProps({
-    height: String
+    height: Object
 })
 
 

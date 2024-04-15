@@ -24,7 +24,7 @@ const createEmptyMap = () => {
         accessToken:
             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
         // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-        style: blankMapStyle,
+        style: getStyleJson(),
         center: [120.312, 31.917], // starting position [lng, lat]
         zoom: 3, // starting zoom
         bounds: [
