@@ -417,8 +417,9 @@ let myChart = null
 const changeSeries = async (val) => {
     chartOption.series[1] =
         deviceDataManageMap.value[curDevice.value][
-            defaultActiveMap.value[curDevice.value]
+            deviceSelection.value
         ].chartData.series[deviceNameMap[curDevice.value][val]]
+    console.log(chartOption.series[1])
     myChart.setOption(chartOption)
 }
 
@@ -429,14 +430,15 @@ const selectDevice = async (index, indexPath) => {
                 `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][index]}`,
             )
         ).data
-        console.log(
-            `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][index]}`,
-        )
-        console.log(deviceDataManageMap.value[curDevice.value][index].data)
+        // console.log(
+        //     `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][index]}`,
+        // )
+        // console.log(deviceDataManageMap.value[curDevice.value][index].data)
         deviceDataManageMap.value[curDevice.value][index].chartData =
             buildSeries(deviceDataManageMap.value[curDevice.value][index].data)
     }
     deviceSelection.value = index
+    // console.log(deviceNameMap[curDevice.value][chartSelection.value])
     chartOption.series[1] =
         deviceDataManageMap.value[curDevice.value][index].chartData.series[
             deviceNameMap[curDevice.value][chartSelection.value]
@@ -444,7 +446,7 @@ const selectDevice = async (index, indexPath) => {
     chartOption.xAxis.data =
         deviceDataManageMap.value[curDevice.value][index].chartData.time
     myChart.setOption(chartOption)
-    console.log('select device', index)
+    console.log('select device', index, chartOption)
 }
 
 onBeforeRouteUpdate((to, from) => {
