@@ -55,7 +55,7 @@ export default class SteadyFlowLayer {
         this.currentResourceUrl = 0
         this.maxParticleNum = 262144
         this.progressRate = scr.f32()
-        this.particleNum = scr.u32(65535)
+        this.particleNum = scr.u32(65536)
 
         // Compute
         this.blockSizeX = 16

@@ -821,7 +821,7 @@ const initLayers = async (sceneInstance, map) => {
                 },
             })
             map.on('click','守护工程断面',(e)=>{
-                console.log('123');
+
                 const secName = e.features[0]['properties']['label']
                 sectionName.value = secName
                 const popupCoord = e.lngLat
