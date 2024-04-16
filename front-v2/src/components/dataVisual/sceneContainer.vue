@@ -150,7 +150,7 @@ onMounted(async () => {
         right: 1vw;
         height: 4vh;
         width: 4vh;
-        background-image: url('./icons/switch.png');
+        background-image: url('/icons/switch.png');
         background-size: contain;
         animation: scaleAnim 1000ms infinite;
 

@@ -30,7 +30,7 @@ div.model-title-container {
     display: flex;
     align-items: center;
     flex-direction: row;
-    width: 100%;
+    width: calc(100% - 20px);
     height: 5%;
     text-align: left;
     padding-top: 5px;

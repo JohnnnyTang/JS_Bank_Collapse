@@ -18,7 +18,7 @@
                 <el-form-item>
                     <div class="button-container">
                         <el-button type="primary" @click="onSubmit">确定</el-button>
-                        <el-button @click=" emit('closeHyCondition')">取消</el-button>
+                        <el-button @click=" emit('close',);">取消</el-button>
                     </div>
                 </el-form-item>
             </el-form>
@@ -35,10 +35,10 @@ import { reactive } from 'vue'
 const form = reactive({
     condition: ''
 })
-const emit = defineEmits(['closeHyCondition']);
+const emit = defineEmits(['close','condition']);
 
 const onSubmit = () => {
-    console.log(form);
+    // console.log(form);
     if(form.condition === ''){
         ElMessage({
             type:'warning',
@@ -46,9 +46,11 @@ const onSubmit = () => {
             message:"请选择水文条件后再确定！"
         })
         return;
+    }else{
+        emit('condition',form.condition)
+        emit('close',);
+        return;
     }
-
-    emit('closeHyCondition',);
 }
 
 

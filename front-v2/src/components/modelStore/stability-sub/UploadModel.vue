@@ -6,10 +6,10 @@
 
         <div class="form">
 
-            <el-upload v-model:file-list="fileList" class="upload-demo"
+            <el-upload v-model:file-list="fileList" class="upload-demo" 
                 action="#" 
                 :http-request="handleUpload"
-                :on-change="handleChange">
+                :auto-upload="false">
                 <el-button type="primary">上传水动力模型文件</el-button>
                 <!-- <template #tip>
                     <div class="el-upload__tip">
@@ -30,28 +30,23 @@
 <script setup>
 
 import { ref } from 'vue'
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close','files'])
 
 
 ///////////file//////////////
 const fileList = ref([
-    // {
-    //     name: 'food.jpeg',
-    //     url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-    // },
 ])
 const handleUpload = (uploadFile) => {
-    console.log(uploadFile);
-}
-
-const handleChange = (uploadFile, uploadFiles) => {
-    // fileList.value = fileList.value.slice(-3)
-    console.log(uploadFile);
-    console.log(fileList.value);
+    console.log('handle upload');
 }
 
 const onSubmit = () => {
-    console.log(fileList.value);
+    /////just name
+    let filenamelist = []
+    fileList.value.forEach(file => {
+        filenamelist.push(file.name)
+    })
+    emit('files', filenamelist)
     emit('close');
 }
 
@@ -67,7 +62,6 @@ const onSubmit = () => {
     width: 20vw;
     z-index: 3;
     background-color: aliceblue;
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 
     .head {
         height: 5vh;

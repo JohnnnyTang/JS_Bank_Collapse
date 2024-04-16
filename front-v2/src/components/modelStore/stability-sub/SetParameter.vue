@@ -43,7 +43,7 @@ import { reactive } from 'vue'
 
 
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close','params']);
 
 
 
@@ -57,7 +57,8 @@ const form = reactive({
 })
 
 const onSubmit = () => {
-    console.log('submit!')
+    emit('params',form)
+    emit('close')
 }
 </script>
 
