@@ -54,15 +54,15 @@
     </select>
 
     <select id="findDataByTime" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time ASC;
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC;
+        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
     </select>
 
     <select id="findDataByTimeInStation" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time DESC;
+        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
     </select>
 
     <select id="ifContinueUpdateOfDevice" resultType="boolean">

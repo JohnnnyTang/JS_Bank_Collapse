@@ -177,15 +177,14 @@
                                                 class="content-item-text number"
                                                 :class="{
                                                     'no-data':
-                                                        infoItem.description ===
+                                                        detailInfo.basic ===
                                                         null,
                                                 }"
                                                 ref="scrollTextDom"
                                                 :data-key="index"
                                             >
                                                 &nbsp;&nbsp;{{
-                                                    infoItem.description ||
-                                                    '无数据'
+                                                    detailInfo.basic || '无数据'
                                                 }}
                                             </div>
                                         </el-scrollbar>
@@ -200,15 +199,14 @@
                                                 class="content-item-text number"
                                                 :class="{
                                                     'no-data':
-                                                        infoItem.description ===
+                                                        detailInfo.cause ===
                                                         null,
                                                 }"
                                                 ref="scrollTextDom"
                                                 :data-key="index"
                                             >
                                                 &nbsp;&nbsp;{{
-                                                    infoItem.description ||
-                                                    '无数据'
+                                                    detailInfo.cause || '无数据'
                                                 }}
                                             </div>
                                         </el-scrollbar>
@@ -223,15 +221,14 @@
                                                 class="content-item-text number"
                                                 :class="{
                                                     'no-data':
-                                                        infoItem.description ===
+                                                        detailInfo.plan ===
                                                         null,
                                                 }"
                                                 ref="scrollTextDom"
                                                 :data-key="index"
                                             >
                                                 &nbsp;&nbsp;{{
-                                                    infoItem.description ||
-                                                    '无数据'
+                                                    detailInfo.plan || '无数据'
                                                 }}
                                             </div>
                                         </el-scrollbar>
@@ -246,15 +243,14 @@
                                                 class="content-item-text number"
                                                 :class="{
                                                     'no-data':
-                                                        infoItem.description ===
+                                                        detailInfo.after ===
                                                         null,
                                                 }"
                                                 ref="scrollTextDom"
                                                 :data-key="index"
                                             >
                                                 &nbsp;&nbsp;{{
-                                                    infoItem.description ||
-                                                    '无数据'
+                                                    detailInfo.after || '无数据'
                                                 }}
                                             </div>
                                         </el-scrollbar>
@@ -264,23 +260,13 @@
                             <el-collapse-item title="新闻视频" name="5">
                                 <div class="content-row-container desc">
                                     <div class="content-item-container">
-                                        <el-scrollbar>
-                                            <div
-                                                class="content-item-text number"
-                                                :class="{
-                                                    'no-data':
-                                                        infoItem.description ===
-                                                        null,
-                                                }"
-                                                ref="scrollTextDom"
-                                                :data-key="index"
-                                            >
-                                                &nbsp;&nbsp;{{
-                                                    infoItem.description ||
-                                                    '无数据'
-                                                }}
-                                            </div>
-                                        </el-scrollbar>
+                                        <video
+                                            controls
+                                            autoplay
+                                            :src="detailInfo.video"
+                                            class="video-box"
+                                            style="height: 36vh; width: 100%"
+                                        ></video>
                                     </div>
                                 </div>
                             </el-collapse-item>
@@ -293,7 +279,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
 const props = defineProps({
     infoItem: {
@@ -305,12 +292,28 @@ const props = defineProps({
     },
 })
 
+const backendInstance = axios.create({
+    // baseURL: Vue.prototype.baseURL,
+    baseURL: '/api',
+})
+
+const detailInfo = ref({
+    basic: '',
+    cause: '',
+    plan: '',
+    after: '',
+    video: '',
+})
+
 const infoItem = ref(props.infoItem)
+console.log(infoItem)
 
 const changeInfoPage = (e) => {
     if (
         e.target.className.includes('accordion-scroll') ||
-        e.target.className.includes('el-collapse')
+        e.target.className.includes('el-collapse') ||
+        e.target.className.includes('content-item-container') ||
+        e.target.className.includes('video-box')
     ) {
         return
     }
@@ -327,6 +330,14 @@ const activeNames = ref(['1'])
 const handleChange = (val) => {
     console.log(val)
 }
+
+onMounted(async () => {
+    const requestInfo = await backendInstance.get(
+        '/data/detailHistory/uuid/' + infoItem.value.uuid,
+    )
+    // console.log(requestInfo.data)
+    detailInfo.value = requestInfo.data
+})
 </script>
 
 <style lang="scss" scoped>
@@ -478,6 +489,7 @@ div.knowledge-card-container {
                         --el-collapse-border-color: #104da8;
                         --el-collapse-header-height: 8vh;
                         .el-collapse-item__header {
+                            background-color: aliceblue;
                             padding-left: 3vw;
                             font-weight: bold;
                             font-size: calc(0.6vw + 0.7vh);
@@ -485,6 +497,13 @@ div.knowledge-card-container {
                                 color: #0453fd;
                             }
                         }
+
+                        .el-collapse-item__content {
+                            background-color: transparent;
+                        }
+                    }
+                    :deep(.el-collapse-item__wrap) {
+                        background-color: transparent !important;
                     }
                     // background-color: #2bc5fc;
                 }
@@ -565,12 +584,12 @@ div.knowledge-card-container {
                     }
 
                     &.desc {
-                        width: 80%;
+                        width: 94%;
                         height: 36vh;
                         // background-color: aqua;
                         justify-content: center;
-                        padding-left: 5%;
-                        padding-right: 5%;
+                        padding-left: 0%;
+                        padding-right: 0%;
                         border-radius: 6px;
                         border-style: solid;
                         border-color: #7497c0d0;

@@ -73,11 +73,11 @@
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC;
+        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
     </select>
 
     <select id="findDataByTimeInStation" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time DESC;
+        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
     </select>
 
     <select id="ifContinueUpdateOfDevice" resultType="boolean">

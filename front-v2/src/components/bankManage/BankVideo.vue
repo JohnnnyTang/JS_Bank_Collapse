@@ -86,20 +86,20 @@ import axios from 'axios';
 
 const defaultVal = [
     {
-        name: '民主沙监控1',
-        position: '32.0432963, 120.5122242',
+        name: '民主沙上游监控S01',
+        position: '32.04023206, 120.51992163',
         videoUrl:
             'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
     },
     {
-        name: '民主沙监控2',
-        position: '32.0381061, 120.5263473',
+        name: '民主沙中游监控S02',
+        position: '32.03683063, 120.52666202',
         videoUrl:
             'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
     },
     {
-        name: '民主沙监控3',
-        position: '32.0316674, 120.5402574',
+        name: '民主沙中游监控S03',
+        position: '32.02839471, 120.54611474',
         videoUrl:
             'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
     },

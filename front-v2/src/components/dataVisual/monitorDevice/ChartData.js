@@ -1426,6 +1426,7 @@ class MonitorDataAssistant {
     }
 
     async getMonitoringdata() {
+        console.log('aa',this.info)
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
 

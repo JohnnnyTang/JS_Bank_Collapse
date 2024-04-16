@@ -86,7 +86,7 @@ onMounted(() => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
         useMapStore().setMap(map)
-        await mapInit(map)
+        await mapInit(map, true)
 
         resizeObserver.observe(containerDom.value)
     })

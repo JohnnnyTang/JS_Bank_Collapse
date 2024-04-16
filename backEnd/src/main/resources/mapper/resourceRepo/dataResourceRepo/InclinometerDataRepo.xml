@@ -63,15 +63,15 @@
     </select>
 
     <select id="findDataByTime" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time ASC;
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC;
+        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
     </select>
 
     <select id="findDataByTimeInStation" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time DESC;
+        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
     </select>
 
     <select id="ifContinueUpdateOfDevice" resultType="boolean">

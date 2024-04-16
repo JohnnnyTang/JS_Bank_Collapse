@@ -68,7 +68,7 @@ const backendInstance = axios.create({
 })
 
 const scrollToDesc = (index) => {
-    console.log('scroll', index)
+    // console.log('scroll', index)
     scrollLeft = window.innerWidth * (index * 0.35 + 0.2)
     scrollBar.value.setScrollLeft(scrollLeft)
 }
@@ -78,7 +78,10 @@ const scroll = (e) => {
         e.target.className.includes('content-item-text') ||
         e.target.className.includes('cell') ||
         e.target.className.includes('more-info-button') ||
-        e.target.className.includes('el-collapse')
+        e.target.className.includes('el-collapse') ||
+        e.target.className.includes('desc') || 
+        e.target.className.includes('content-item-container') || 
+        e.target.className.includes('video-box')
     ) {
         return
     }
@@ -107,7 +110,7 @@ onMounted(async () => {
     scrollLeftMax =
         (((knowledgeInfoList.value.length + 1) * 36.5 - 60) / 100.0) *
         window.innerWidth
-    console.log(knowledgeInfoList.value)
+    // console.log(knowledgeInfoList.value)
     // scrollBarInside.value.style.width = scrollLeftMax + 'px'
     // 不知道为什么更新了数据之后 dom的clientWidth没有更新
     // knowledgeInfoList.value = (

@@ -1,7 +1,7 @@
 <template>
     <div class="bank-monitor-container">
         <BankVideo v-if="curPage=='video'"/>
-        <BankDevice v-else />
+        <BankDevice v-else :initDevice="initDevice"/>
     </div>
 </template>
 
@@ -13,15 +13,17 @@ import BankDevice from './BankDeviceData.vue'
 
 const route = useRoute()
 const curPage = ref("video")
+const initDevice = ref("gnss")
 
 onBeforeRouteUpdate((to, from) => {
-    console.log('111', to, from)
+    // console.log('111', to, from)
     curPage.value = to.params.id
 })
 
 onMounted(() => {
     // console.log(route.params)
     curPage.value = route.params.id
+    initDevice.value = curPage.value
 })
 </script>
 
