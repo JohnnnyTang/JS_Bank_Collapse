@@ -99,7 +99,7 @@ import ModelInfoVue from '../ModelInfo.vue';
 import ModelTitleVue from '../ModelTitle.vue';
 import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue';
 import SetParameter from '../stability-sub/SetParameter.vue';
-import UploadModel from '../stability-sub/uploadModel.vue';
+import UploadModel from '../stability-sub/UploadModel.vue';
 import { ElMessage } from 'element-plus';
 import SteadyFlowLayer from '../../../utils/m_demLayer/steadyFlowLayer';
 
@@ -239,10 +239,6 @@ const data = reactive([
                 label: 'fort.15',
                 children: []
             },
-            {
-                label: 'fort.16',
-                children: []
-            }
         ],
     },
     {
