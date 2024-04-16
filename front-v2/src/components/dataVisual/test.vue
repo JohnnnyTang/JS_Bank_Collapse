@@ -4,9 +4,9 @@
         <div class="model-item-container">
             <div class="model-choice">
                 <div class="basemap-radio-container">
-                    <input type="radio" id="radio-1" name="tabs" checked />
+                    <input type="radio" id="radio-1" name="tabs" checked  @click="radio1Click()"/>
                     <label class="tab" for="radio-1">近岸动力分析</label>
-                    <input type="radio" id="radio-2" name="tabs" />
+                    <input type="radio" id="radio-2" name="tabs"  @click="radio2Click()"/>
                     <label class="tab" for="radio-2">近岸演变分析</label>
                     <span class="glider"></span>
                 </div>
@@ -15,11 +15,11 @@
             <div class="main-page" v-if="!showDetail">
                 <div class="user-react">
                     <div class="title">
+                        <div class="title-icon uricon"></div>
                         <div class="title-text">模型配置</div>
-                        <div class="123"></div>
                     </div>
                     <div class="buttons">
-                        <div class="button" v-for="(item, index) in buttonss" :key="index">
+                        <div class="button" v-for="(item, index) in buttons" :key="index" @click="handleClick(index)">
                             <div>{{ item }}</div>
                         </div>
 
@@ -27,8 +27,8 @@
                 </div>
                 <div class="data-panel">
                     <div class="title">
+                        <div class="title-icon dpicon"></div>
                         <div class="title-text">数据面板</div>
-                        <div class="123"></div>
                     </div>
                     <div class="dp-content">
                         <el-tree style="max-width: 600px" :data="data" :props="defaultProps"
@@ -38,8 +38,8 @@
                 </div>
                 <div class="layer-panel">
                     <div class="title">
+                        <div class="title-icon lpicon"></div>
                         <div class="title-text">图层面板</div>
-                        <div class="123"></div>
                     </div>
                     <div class="lp-content">
 
@@ -58,25 +58,23 @@
                 <ModelInfoVue :modelInfo="modelInfo" />
             </div>
 
-
-            <div>
-
-            </div>
-
-
         </div>
         <div class="map-container">
             <div id="map" ref="mapContainerRef"></div>
             <canvas id="GPUFrame"></canvas>
-
         </div>
+
+        <HydrologicalCondition v-if="showHyCondition" v-on:close-hy-condition="showHyCondition = !showHyCondition">
+        </HydrologicalCondition>
+        <UploadModel v-if="showUploadModel" v-on:close="showUploadModel = !showUploadModel"></UploadModel>
+        <SetParameter v-if="showStParams" v-on:close="showStParams = !showStParams"></SetParameter>
 
     </div>
 
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 import { initScratchMap, ScratchMap } from '../../utils/mapUtils'
@@ -91,7 +89,19 @@ import { initScratchMap, ScratchMap } from '../../utils/mapUtils'
 //src\components\modelStore\modelInfoList.js
 import { infoItemList } from '../modelStore/modelInfoList.js'
 import ModelInfoVue from '../modelStore/ModelInfo.vue';
+import HydrologicalCondition from '../modelStore/stability-sub/HydrologicalCondition.vue';
+import SetParameter from '../modelStore/stability-sub/SetParameter.vue';
+import UploadModel from '../modelStore/stability-sub/UploadModel.vue';
+import { ElMessage } from 'element-plus';
 
+
+const showHyCondition = ref(false)
+const showStParams = ref(false)
+const showUploadModel = ref(false)
+const buttons = ref(['水文条件选择',
+    '模型文件上传',
+    '模型参数设置',
+    '模型计算'])
 
 
 const modelInfo = {
@@ -102,8 +112,14 @@ const modelInfo = {
     processPicSrc: infoItemList[2].processPicSrc,
 }
 
-
-
+const radio1Click=()=>{
+    console.log('1');
+    buttons.value = buttonss
+}
+const radio2Click=()=>{
+    console.log('2');
+    buttons.value = buttonss2
+}
 
 const mapContainerRef = ref();
 const iconref = ref()
@@ -118,12 +134,47 @@ const iconClick = () => {
     showDetail.value = !showDetail.value
 }
 
+///////////button//////////////
 const buttonss = [
-    '选择水文条件',
-    '上传模型文件',
-    '设置模型参数',
-    '计算模型'
+    '水文条件选择',
+    '模型文件上传',
+    '模型参数设置',
+    '模型计算'
 ]
+const buttonss2 = [
+    '断面形态分析',
+    '冲淤计算',
+    '坡度提取',
+    '河床分析'
+]
+
+
+const handleClick = (index) => {
+    switch (index) {
+        case 0:
+            showHyCondition.value = true
+            break
+        case 1:
+            showUploadModel.value = true
+            break
+        case 2:
+            showStParams.value = true
+            break
+        case 3:
+            ElMessage({
+                message: "模型计算中",
+                offset: 100
+            })
+            setTimeout(() => {
+                ElMessage({
+                    type: "success",
+                    offset: 100,
+                    message: "模型计算完成"
+                })
+            }, 2000)
+            break
+    }
+}
 
 
 ////////////tree///////////////
@@ -230,7 +281,6 @@ onMounted(async () => {
 
     const map = initScratchMap(mapContainerRef.value)
 
-
 })
 
 
@@ -260,7 +310,6 @@ div.model-content-container {
             background-color: aliceblue;
             display: flex;
             justify-content: center;
-
             align-items: center;
 
 
@@ -394,6 +443,31 @@ div.model-content-container {
             height: calc(87.4vh - 8vh);
             display: flex;
             flex-direction: column;
+            user-select: none;
+
+            div.title-icon {
+                height: 4vh;
+                width: 4vh;
+                line-height: 5vh;
+                margin-right: 1vw;
+                background-size: contain;
+            }
+
+            div.title {
+                height: 5vh;
+                width: 100%;
+                background-color: rgb(29, 128, 214);
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+
+                .title-text {
+                    color: white;
+                    text-shadow: 5px 5px 0 #4074b5, 2px -2px 0 #4074b5, -2px 2px 0 #4074b5, -2px -2px 0 #4074b5, 2px 0px 0 #4074b5, 0px 2px 0 #4074b5, -2px 0px 0 #4074b5, 0px -2px 0 #4074b5;
+                }
+            }
+
 
             div.user-react {
                 height: 15vh;
@@ -401,15 +475,17 @@ div.model-content-container {
                 background-color: aliceblue;
 
                 .title {
-                    height: 5vh;
-                    width: 100%;
-                    background-color: rgb(150, 206, 255);
+
+                    .uricon {
+                        background-image: url('/data.png');
+                    }
 
                     .title-text {
                         font-size: calc(1vw + 0.5vh);
                         font-weight: 600;
                         text-align: center;
                         line-height: 5vh;
+                        letter-spacing: 0.1vw;
                     }
                 }
 
@@ -420,7 +496,7 @@ div.model-content-container {
                     justify-content: space-evenly;
 
                     .button {
-                        background-color: #659feb;
+                        background-color: #4c97fa;
                         padding: .3vh;
                         border-radius: 0.5vh;
                         border-color: white;
@@ -452,10 +528,10 @@ div.model-content-container {
                 width: 100%;
 
                 .title {
-                    height: 5vh;
-                    width: 100%;
-                    background-color: rgb(150, 206, 255);
 
+                    .dpicon {
+                        background-image: url('/data-collection2.png');
+                    }
 
                     .title-text {
                         font-size: calc(1vw + 0.5vh);
@@ -497,13 +573,11 @@ div.model-content-container {
                 width: 100%;
                 flex-grow: 1; //fill the space
 
-
-
                 .title {
-                    height: 5vh;
-                    width: 100%;
-                    background-color: rgb(150, 206, 255);
 
+                    .lpicon {
+                        background-image: url('/icons/layers.png');
+                    }
 
                     .title-text {
                         font-size: calc(1vw + 0.5vh);
@@ -562,10 +636,15 @@ div.model-content-container {
         div.detail-page {
             width: 20vw;
             height: calc(87.4vh - 8vh);
+            display: flex;
+            scale: 0.95;
+            translate: 0% -3.5%;
 
+            // transform: translateY(-1%);
         }
 
     }
+
 
     div.map-container {
         position: relative;
@@ -591,5 +670,22 @@ div.model-content-container {
         }
     }
 
+}
+
+.conditions,
+.uploadModel {
+    animation: fadenum .3s ease-in-out;
+}
+
+@keyframes fadenum {
+    0% {
+        opacity: 0;
+        scale: 0;
+    }
+
+    100% {
+        opacity: 1;
+        scale: 1;
+    }
 }
 </style>
