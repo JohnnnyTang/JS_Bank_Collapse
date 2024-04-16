@@ -72,7 +72,7 @@ const routes = [
             },
             {
                 path: 'stabilityAnalysis',
-                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
+                component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
             },
             {
                 path: 'riskWarning',

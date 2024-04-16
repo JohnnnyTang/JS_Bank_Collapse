@@ -35,7 +35,7 @@ const initScratchMap = (ref) => {
                 GPUFrame: GPUFrame,
                 antialias: true,
                 // minZoom: 8,
-            }).on('load', () => {
+            }).on('load', async() => {
                 console.log('initScratchMap ok');
                 resolve(map)
                 // map.addLayer(new TerrainLayer(14))

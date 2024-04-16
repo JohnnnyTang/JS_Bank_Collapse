@@ -68,6 +68,16 @@ const handleCheckedLayerChange = () => {
         else if (layerID === 'TerrainLayer') {
             useLayerStore().terrainLayer.hide()
         }
+        // special layer with icon
+        else if (layerID === '一级预警岸段') {
+            removeLayerRelatedMarker('warning1-marker')
+        }
+        else if (layerID === '规划通道') {
+            removeLayerRelatedMarker('planning-marker')
+        }
+        else if (layerID === '在建通道') {
+            removeLayerRelatedMarker('building-marker')
+        }
         else {
             map.setLayoutProperty(layerID, 'visibility', 'none');
         }
@@ -85,7 +95,14 @@ onMounted(async () => {
 })
 
 
-
+const removeLayerRelatedMarker = (className) => {
+    let markersDoms = document.getElementsByClassName(
+        className
+    )
+    for (let i = markersDoms.length - 1; i >= 0; i--) {
+        markersDoms[i].remove()
+    }
+}
 
 </script>
 

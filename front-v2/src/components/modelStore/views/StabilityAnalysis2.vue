@@ -1,5 +1,7 @@
 <template>
 
+    <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" />
+
     <div class="model-content-container">
         <div class="model-item-container">
             <div class="model-choice">
@@ -44,8 +46,8 @@
                     <div class="lp-content">
 
                         <div class="checkBox">
-                            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-                                <el-checkbox v-for="city in cities" :key="city" :label="city" :value="city">{{ city
+                            <el-checkbox-group v-model="checkedlayers" @change="handleCheckedlayersChange">
+                                <el-checkbox v-for="city in layers" :key="city" :label="city" :value="city">{{ city
                                     }}</el-checkbox>
                             </el-checkbox-group>
                         </div>
@@ -77,8 +79,9 @@
 
         <div class="analysisCenter" v-show="showAnalysis">
             <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
-                src="http://localhost:5173/dataVisual">
-           
+                src="https://www.openstreetmap.org/export/embed.html"
+                >
+
             </iframe>
         </div>
 
@@ -89,25 +92,16 @@
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue';
-import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { initScratchMap, ScratchMap } from '../../utils/mapUtils'
-
-// import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
-// import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
-// import * as scr from '../../utils/scratch/scratch'
-// import nextTickStyle from 'eslint-plugin-vue/lib/rules/next-tick-style';
-
-// dwg
-// import Mx from 'mxdraw'
-//src\components\modelStore\modelInfoList.js
-import { infoItemList } from '../modelStore/modelInfoList.js'
-import ModelInfoVue from '../modelStore/ModelInfo.vue';
-import HydrologicalCondition from '../modelStore/stability-sub/HydrologicalCondition.vue';
-import SetParameter from '../modelStore/stability-sub/SetParameter.vue';
-import UploadModel from '../modelStore/stability-sub/uploadModel.vue';
+import { initScratchMap } from '../../../utils/mapUtils.js'
+import { infoItemList } from '../modelInfoList.js'
+import ModelInfoVue from '../ModelInfo.vue';
+import ModelTitleVue from '../ModelTitle.vue';
+import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue';
+import SetParameter from '../stability-sub/SetParameter.vue';
+import UploadModel from '../stability-sub/uploadModel.vue';
 import { ElMessage } from 'element-plus';
-import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer';
+import SteadyFlowLayer from '../../../utils/m_demLayer/steadyFlowLayer';
 
 
 const showHyCondition = ref(false)
@@ -130,13 +124,9 @@ const modelInfo = {
 const title1 = ref('模型配置')
 const showAnalysis = ref(false)
 const radio1Click = () => {
-    // buttons.value = buttonss
-    title1.value = '模型配置'
     showAnalysis.value = false
 }
 const radio2Click = () => {
-    // buttons.value = buttonss2
-    title1.value = '分析模块'
     showAnalysis.value = true
     data[0].children = [
         {
@@ -158,20 +148,6 @@ const iconClick = () => {
     }
     showDetail.value = !showDetail.value
 }
-
-///////////button//////////////
-const buttonss = [
-    '水文条件选择',
-    '模型文件上传',
-    '模型参数设置',
-    '模型计算'
-]
-const buttonss2 = [
-    '高程冲淤计算',
-    '冲淤等深线提取',
-    '河床坡度提取'
-]
-
 
 //////////model//////////////
 let condition = null;
@@ -206,20 +182,15 @@ const handleClick = (index) => {
                     offset: 100,
                     message: "模型计算完成"
                 })
-
-                // data[1].children.push({
-                //         'label': 'uvet流场数据',
-                //         'children': []
-                //     })
                 data[1].children = [
                     {
                         'label': 'uvet流场数据',
                         'children': []
                     }
                 ]
+                layers.value.push('flowLayer')
 
-
-            }, 1000)
+            }, 2000)
             break
     }
 }
@@ -259,7 +230,20 @@ const handleNodeClick = (data) => {
 const data = reactive([
     {
         label: '输入数据',
-        children: [],
+        children: [
+            {
+                label: 'fort.14',
+                children: []
+            },
+            {
+                label: 'fort.15',
+                children: []
+            },
+            {
+                label: 'fort.16',
+                children: []
+            }
+        ],
     },
     {
         label: '输出数据',
@@ -272,17 +256,17 @@ const defaultProps = {
 }
 
 ////////////layer///////////////
-const checkedCities = ref([])
-const cities = ['flowLayer']
+const checkedlayers = ref([])
+const layers = ref([])
 const flow = new SteadyFlowLayer();
 
-watch(checkedCities, (value) => {
+watch(checkedlayers, (value) => {
     console.log(value);
 
 })
 
 
-const handleCheckedCitiesChange = (value) => {
+const handleCheckedlayersChange = (value) => {
 
     if (value.includes('flowLayer')) {
         flow.show();
@@ -293,20 +277,6 @@ const handleCheckedCitiesChange = (value) => {
 
 
 onMounted(async () => {
-
-    // Mx.MxFun.createMxObject({
-    //     canvasId: "myCanvas",
-    //     //cadFile: "http://localhost:8080/demo/buf/test.dwg.mxb1.wgh",
-    //     // cadFile:"/dwg/民主沙近岸测量范围-20240226-整体-展示版本2/buf/民主沙近岸测量范围-20240226-整体-展示版本2.dwg",
-    //     cadFile:"/dwg/守护工程断面图/7.dwg",
-    //     callback(mxDrawObject, { canvas, canvasParent }) {
-    //         canvasParent.className = "mxdiv";
-
-    //         mxDrawObject.addEvent("loadComplete", () => {
-    //             console.log("mx loadComplete");
-    //         });
-    //     },
-    // });
 
     const map = await initScratchMap(mapContainerRef.value)
     map.addLayer(flow)
@@ -323,7 +293,7 @@ div.model-content-container {
     position: relative;
     overflow: hidden;
     width: 100vw;
-    height: 87.4vh;
+    height: 86vh;
     display: flex;
     flex-direction: row;
 
@@ -342,7 +312,7 @@ div.model-content-container {
             justify-content: center;
             align-items: center;
 
-            .title-icon{
+            .title-icon {
                 z-index: 2;
                 width: 4.5vh;
                 height: 4.5vh;
@@ -584,6 +554,7 @@ div.model-content-container {
                     height: 30vh;
                     overflow-x: hidden;
                     overflow-y: scroll;
+                    padding: 1vh;
 
                     &::-webkit-scrollbar {
                         width: 8px;
@@ -692,7 +663,7 @@ div.model-content-container {
     div.map-container {
         position: relative;
         width: 80vw;
-        height: 87.4vh;
+        height: 86vh;
 
         #map {
             position: absolute;
@@ -716,7 +687,11 @@ div.model-content-container {
 
 }
 
-.analysisCenter{
+.model-title-container{
+    background:linear-gradient(45deg,rgb(91, 219, 209),rgb(35, 119, 247));
+}
+
+.analysisCenter {
     width: 100vw;
     height: 87.4vh;
     position: absolute;
@@ -737,10 +712,24 @@ div.model-content-container {
         opacity: 0;
         scale: 0;
     }
-
     100% {
         opacity: 1;
         scale: 1;
     }
 }
+
+:deep(.el-tree-node__label){
+    font-size: calc(0.6vw + 0.5vh);
+    font-weight: 800;
+}
+
+:deep(.el-tree .el-tree-node__expand-icon.expanded) {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+
+:deep(.el-checkbox__label){
+    font-size:calc(0.6vw + 0.5vh);
+}
+
 </style>
