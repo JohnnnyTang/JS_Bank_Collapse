@@ -1,92 +1,95 @@
 <template>
+    <div class="all">
+        <ModelTitleVue :ModelName="'岸坡稳定性分析模型'"  v-show="!showAnalysis"/>
 
-    <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" />
-
-    <div class="model-content-container">
-        <div class="model-item-container">
-            <div class="model-choice">
-                <div class="basemap-radio-container">
-                    <input type="radio" id="radio-1" name="tabs" checked @click="radio1Click()" />
-                    <label class="tab" for="radio-1">近岸动力分析</label>
-                    <input type="radio" id="radio-2" name="tabs" @click="radio2Click()" />
-                    <label class="tab" for="radio-2">近岸演变分析</label>
-                    <span class="glider"></span>
-                </div>
-                <div :class="styleObj" class="title-icon" ref="iconref" @click="iconClick()"></div>
-            </div>
-            <div class="main-page" v-if="!showDetail">
-                <div class="user-react">
-                    <div class="title">
-                        <div class="title-icon uricon"></div>
-                        <div class="title-text">{{ title1 }}</div>
+        <div class="model-content-container"  v-show="!showAnalysis">
+            <div class="model-item-container">
+                <div class="model-choice" >
+                    <div class="basemap-radio-container">
+                        <input type="radio" id="radio-1" name="tabs" checked @click="radio1Click()" />
+                        <label class="tab" for="radio-1">近岸动力分析</label>
+                        <input type="radio" id="radio-2" name="tabs" @click="radio2Click()" />
+                        <label class="tab" for="radio-2">近岸演变分析</label>
+                        <span class="glider"></span>
                     </div>
-                    <div class="buttons">
-                        <div class="button" v-for="(item, index) in buttons" :key="index" @click="handleClick(index)">
-                            <div>{{ item }}</div>
+                    <div :class="styleObj" class="title-icon" ref="iconref" @click="iconClick()"></div>
+                </div>
+                <div class="main-page" v-if="!showDetail">
+                    <div class="user-react">
+                        <div class="title">
+                            <div class="title-icon uricon"></div>
+                            <div class="title-text">{{ title1 }}</div>
+                        </div>
+                        <div class="buttons">
+                            <div class="button" v-for="(item, index) in buttons" :key="index"
+                                @click="handleClick(index)">
+                                <div>{{ item }}</div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="data-panel">
+                        <div class="title">
+                            <div class="title-icon dpicon"></div>
+                            <div class="title-text">数据面板</div>
+                        </div>
+                        <div class="dp-content">
+                            <el-tree style="max-width: 600px" :data="data" :props="defaultProps"
+                                @node-click="handleNodeClick" default-expand-all />
                         </div>
 
                     </div>
-                </div>
-                <div class="data-panel">
-                    <div class="title">
-                        <div class="title-icon dpicon"></div>
-                        <div class="title-text">数据面板</div>
-                    </div>
-                    <div class="dp-content">
-                        <el-tree style="max-width: 600px" :data="data" :props="defaultProps"
-                            @node-click="handleNodeClick" default-expand-all />
-                    </div>
-
-                </div>
-                <div class="layer-panel">
-                    <div class="title">
-                        <div class="title-icon lpicon"></div>
-                        <div class="title-text">图层面板</div>
-                    </div>
-                    <div class="lp-content">
-
-                        <div class="checkBox">
-                            <el-checkbox-group v-model="checkedlayers" @change="handleCheckedlayersChange">
-                                <el-checkbox v-for="city in layers" :key="city" :label="city" :value="city">{{ city
-                                    }}</el-checkbox>
-                            </el-checkbox-group>
+                    <div class="layer-panel">
+                        <div class="title">
+                            <div class="title-icon lpicon"></div>
+                            <div class="title-text">图层面板</div>
                         </div>
+                        <div class="lp-content">
 
+                            <div class="checkBox">
+                                <el-checkbox-group v-model="checkedlayers" @change="handleCheckedlayersChange">
+                                    <el-checkbox v-for="city in layers" :key="city" :label="city" :value="city">{{ city
+                                        }}</el-checkbox>
+                                </el-checkbox-group>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div v-if="showDetail" class="detail-page">
-                <ModelInfoVue :modelInfo="modelInfo" />
-            </div>
+                <div v-if="showDetail" class="detail-page">
+                    <ModelInfoVue :modelInfo="modelInfo" />
+                </div>
 
-        </div>
-        <div class="main">
-            <div class="map-container">
-                <div id="map" ref="mapContainerRef"></div>
-                <canvas id="GPUFrame"></canvas>
             </div>
+            <div class="main">
+                <div class="map-container">
+                    <div id="map" ref="mapContainerRef"></div>
+                    <canvas id="GPUFrame"></canvas>
+                </div>
 
-            <HydrologicalCondition v-if="showHyCondition" v-on:close="showHyCondition = !showHyCondition"
-                v-on:condition="conditionHandler">
-            </HydrologicalCondition>
-            <UploadModel v-if="showUploadModel" v-on:close="showUploadModel = !showUploadModel"
-                v-on:files="fileHandler">
-            </UploadModel>
-            <SetParameter v-if="showStParams" v-on:close="showStParams = !showStParams" v-on:params="paramsHandler">
-            </SetParameter>
+                <HydrologicalCondition v-if="showHyCondition" v-on:close="showHyCondition = !showHyCondition"
+                    v-on:condition="conditionHandler">
+                </HydrologicalCondition>
+                <UploadModel v-if="showUploadModel" v-on:close="showUploadModel = !showUploadModel"
+                    v-on:files="fileHandler">
+                </UploadModel>
+                <SetParameter v-if="showStParams" v-on:close="showStParams = !showStParams" v-on:params="paramsHandler">
+                </SetParameter>
+            </div>
         </div>
 
         <div class="analysisCenter" v-show="showAnalysis">
+            <div class="background"></div>
             <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
-                src="https://www.openstreetmap.org/export/embed.html"
-                >
+                src="http://172.21.212.165:8050/#/analysis/73c29959-16f0-4478-8526-0927d1aff6f7">
 
             </iframe>
         </div>
 
-
     </div>
+
+
 
 </template>
 
@@ -99,7 +102,7 @@ import ModelInfoVue from '../ModelInfo.vue';
 import ModelTitleVue from '../ModelTitle.vue';
 import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue';
 import SetParameter from '../stability-sub/SetParameter.vue';
-import UploadModel from '../stability-sub/uploadModel.vue';
+import UploadModel from '../stability-sub/UploadModel.vue';
 import { ElMessage } from 'element-plus';
 import SteadyFlowLayer from '../../../utils/m_demLayer/steadyFlowLayer';
 
@@ -289,11 +292,18 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+
+div.all{
+    width: 100vw;
+    height: 92vh;
+    position: relative;
+}
+
 div.model-content-container {
     position: relative;
     overflow: hidden;
     width: 100vw;
-    height: 86vh;
+    height: calc(92vh - 6%);
     display: flex;
     flex-direction: row;
 
@@ -313,7 +323,7 @@ div.model-content-container {
             align-items: center;
 
             .title-icon {
-                z-index: 2;
+                z-index: 0;
                 width: 4.5vh;
                 height: 4.5vh;
                 background-size: contain;
@@ -321,7 +331,7 @@ div.model-content-container {
 
 
             .el-popper.is-customized {
-                z-index: 4;
+                z-index: 3;
                 padding: 6px 12px;
                 background: linear-gradient(90deg, rgb(179, 255, 171), rgb(204, 229, 129));
             }
@@ -329,7 +339,7 @@ div.model-content-container {
             .el-popper.is-customized .el-popper__arrow::before {
                 background: linear-gradient(45deg, #b2e68d, #bce689);
                 right: 0;
-                z-index: 4;
+                z-index: 3;
             }
 
             .detailIcon {
@@ -338,7 +348,7 @@ div.model-content-container {
                 background-size: contain;
                 margin-left: 2.5vw;
                 background-image: url('/icons/searching.png');
-                z-index: 2;
+                z-index: 0;
 
                 &:hover {
                     cursor: pointer;
@@ -362,7 +372,7 @@ div.model-content-container {
             }
 
             div.basemap-radio-container {
-                z-index: 4;
+                z-index: 3;
                 width: 14vw;
                 height: 4vh;
                 display: flex;
@@ -433,7 +443,7 @@ div.model-content-container {
                     height: 4vh;
                     width: 7vw;
                     background-color: #bcd8fc;
-                    z-index: 6;
+                    z-index: 5;
                     border-radius: 0.6vw; // just a high number to create pill effect
                     transition: 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
                 }
@@ -578,7 +588,6 @@ div.model-content-container {
             div.layer-panel {
                 height: 30%;
                 width: 100%;
-                flex-grow: 1; //fill the space
 
                 .title {
 
@@ -687,15 +696,33 @@ div.model-content-container {
 
 }
 
-.model-title-container{
-    background:linear-gradient(45deg,rgb(91, 219, 209),rgb(35, 119, 247));
+.model-title-container {
+    z-index: 5;
+    background: linear-gradient(45deg, rgb(91, 219, 209), rgb(35, 119, 247));
 }
 
 .analysisCenter {
-    width: 100vw;
-    height: 87.4vh;
-    position: absolute;
-    z-index: 3;
+    width: calc(100vw);
+    height: calc(100vh);
+    top:0vh;
+    position: fixed;
+    z-index: 0;
+    background-color: aliceblue;
+
+    .background{
+        // background-color: radial-gradient(circle, rgb(16, 2, 84) 0%, rgb(16, 31, 128) 40%, rgb(13, 80, 147) 80%, rgb(0, 134, 255) 100%);
+        background-color: #0642b1;
+        position: fixed;
+        top: 0;
+        height: 8.2vh;
+        width: 100vw;
+        z-index: 5;
+    }
+    iframe{
+        position: relative;
+
+        border-width: 0;
+    }
 }
 
 .conditions,
@@ -712,24 +739,24 @@ div.model-content-container {
         opacity: 0;
         scale: 0;
     }
+
     100% {
         opacity: 1;
         scale: 1;
     }
 }
 
-:deep(.el-tree-node__label){
+:deep(.el-tree-node__label) {
     font-size: calc(0.6vw + 0.5vh);
     font-weight: 800;
 }
 
 :deep(.el-tree .el-tree-node__expand-icon.expanded) {
-  -webkit-transform: rotate(0deg);
-  transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
 }
 
-:deep(.el-checkbox__label){
-    font-size:calc(0.6vw + 0.5vh);
+:deep(.el-checkbox__label) {
+    font-size: calc(0.6vw + 0.5vh);
 }
-
 </style>

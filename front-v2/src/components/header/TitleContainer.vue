@@ -274,6 +274,7 @@ div.dv-border-box-11 {
     position: relative;
     width: 100%;
     height: 100%;
+    z-index: 12;
 
     .dv-border-svg-container {
         position: absolute;

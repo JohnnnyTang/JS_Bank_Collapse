@@ -33,9 +33,12 @@ div.model-title-container {
     width: calc(100% - 20px);
     height: 5%;
     text-align: left;
-    padding-top: 5px;
+    // padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 20px;
+
+    background: linear-gradient(45deg, rgb(91, 219, 209), rgb(35, 119, 247));
+
 
     div.return-arrow {
         width: 2vw;
@@ -48,9 +51,11 @@ div.model-title-container {
             cursor: pointer;
             transform: scale(1.1);
         }
+
     }
 
     div.title-text {
+
         width: 20vw;
         padding-left: 1%;
         font-size: calc(1vh + 1vw);
