@@ -138,13 +138,13 @@ class DataPioneer {
                 case '1':
                     gnss.push(feat)
                     break
-                case '2':
+                case '4':
                     incline.push(feat)
                     break
                 case '3':
                     manometer.push(feat)
                     break
-                case '4':
+                case '2':
                     stress.push(feat)
                     break
                 default:

@@ -61,7 +61,6 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import BackEndRequest from '../../../api/backend';
 import pureChart from '../monitorDevice/pureChart.vue';
 import { useSceneStore } from '../../../store/mapStore';
 
@@ -72,8 +71,8 @@ const deviceInfo = computed(() => useSceneStore().selectedFeature)
 const STATIONMAP = {
     'MZS': '民主沙'
 }
-const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
-const DEVICEPICMAP = ['/device/gnssBase.png', '/device/inclino.png', '/device/waterPress.png', '/device/changePress.png']
+const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
+const DEVICEPICMAP = ['/gnssBase.png', '/changePress.png', '/waterPress.png', '/inclino.png']
 
 const clickbuttonHandler = () => {
     showChart.value = !showChart.value

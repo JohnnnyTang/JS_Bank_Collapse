@@ -65,16 +65,15 @@ export default class BackEndRequest {
                 return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
             }
             case '2': {
-                return backendInstance.get(`/data/inclinometerData/id/${code}`)
+                // return backendInstance.get(`/data/stressData/id/${code}`)
 
             }
             case '3': {
                 // return backendInstance.get(`/data/manometerData/id/${code}`)
                 return backendInstance.get(`/data/manometerData/day/1/device/${code}`)
-
             }
             case '4': {
-                return backendInstance.get(`/data/stressData/id/${code}`)
+                return backendInstance.get(`/data/inclinometerData/day/1/device/${code}`)
             }
         }
     }

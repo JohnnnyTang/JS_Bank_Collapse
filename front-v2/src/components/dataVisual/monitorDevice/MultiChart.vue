@@ -47,6 +47,7 @@ onMounted(async () => {
     // chartDomRef.style.width = '340px'
     // chartDomRef.style.height = '290px'
     await nextTick()
+    console.log("popup !!! feature", props.selectedFeature.value);
 
     myChart = echarts.init(chartDomRef)
     dataAssitant.value = new MonitorDataAssistant(props.selectedFeature.value)

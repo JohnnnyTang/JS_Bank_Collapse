@@ -53,7 +53,7 @@ import dayjs from 'dayjs';
 
 
 const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
-const DEVICEPICMAP = ['/device/gnssBase.png', '/device/inclino.png', '/device/waterPress.png', '/device/changePress.png']
+const DEVICEPICMAP = ['/gnssBase.png', '/inclino.png', '/waterPress.png', '/changePress.png']
 var DEVICECOUNT = [0, 0, 0, 0]
 const deviceInfos = ref([])
 let myChart = null

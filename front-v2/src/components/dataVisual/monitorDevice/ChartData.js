@@ -120,6 +120,39 @@ const generateData_Incline = (ogDataArray, metaData) => {
         depth_value_time
     }
 }
+
+const generateData_Incline_new = (ogDataArray) => {
+
+    let bottomMove = []
+    let middleMove = []
+    let topMove = []
+
+    let bMoveDay = []
+    let mMoveDay = []
+    let tMoveDay = []
+
+    ogDataArray.forEach((item) => {
+        bottomMove.push([item['measureTime'], item['bottomMove']])
+        middleMove.push([item['measureTime'], item['middleMove']])
+        topMove.push([item['measureTime'], item['topMove']])
+
+        bMoveDay.push([item['measureTime'], item['bottomMovePerDay']])
+        mMoveDay.push([item['measureTime'], item['middleMovePerDay']])
+        tMoveDay.push([item['measureTime'], item['topMovePerDay']])
+    })
+
+    return {
+        bottomMove,
+        middleMove,
+        topMove,
+
+        bMoveDay,
+        mMoveDay,
+        tMoveDay
+    }
+}
+
+
 const generateData_Manometer = (ogDataArray, metaData) => {
     let pointNum = metaData["pointNum"]
     let depthArray = []
@@ -493,8 +526,8 @@ const generateOptions_GNSS = (processedData) => {
 
     let option3 = {
         title: {
-            left:'center',
-            top:5,
+            left: 'center',
+            top: 5,
             text: 'GNSS-三维相对位移曲线',
             subtext: '近五小时',
             subtextStyle: {
@@ -758,6 +791,148 @@ const generateOptions_Incline = (processedData) => {
     }
 }
 
+const generateOptions_Incline_new = (processedData) => {
+
+    let option1 = {
+        title: {
+            left: 'center',
+            top: 5,
+            text: '测斜仪-偏移曲线',
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            valueFormatter: (value) => {
+                return value.toFixed(4)
+            }
+        },
+        xAxis: {
+            axisLine: {
+                show: true
+            },
+            axisTick: {
+                show: true
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+            type: 'time',
+            axisLabel: {
+                formatter: function (value, index) {
+                    // if (index === 0 || index === dataIndexArray.length - 1) {
+                    if (index % 2 === 0) {
+                        return echarts.format.formatTime('hh:ss', value);
+                    } else {
+                        return '';
+                    }
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            min: function (value) {
+                return value.min.toFixed(4)
+            },
+            max: function (value) {
+                // return 
+                return value.max.toFixed(4)
+            }
+        },
+        series: [
+            {
+                data: processedData.middleMove,
+
+                type: 'line'
+            },
+            {
+                data: processedData.bottomMove,
+                type: 'line'
+            },
+            {
+                data: processedData.topMove,
+                type: 'line'
+            }
+        ]
+    }
+
+    let option2 = {
+        title: {
+            left: 'center',
+            top: 5,
+            text: '测斜仪-相对偏移曲线',
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            valueFormatter: (value) => {
+                return value.toFixed(4)
+            }
+        },
+        xAxis: {
+            axisLine: {
+                show: true
+            },
+            axisTick: {
+                show: true
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+            type: 'time',
+            axisLabel: {
+                formatter: function (value, index) {
+                    // if (index === 0 || index === dataIndexArray.length - 1) {
+                    if (index % 2 === 0) {
+                        return echarts.format.formatTime('hh:ss', value);
+                    } else {
+                        return '';
+                    }
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            min: function (value) {
+                return value.min.toFixed(4)
+            },
+            max: function (value) {
+                // return 
+                return value.max.toFixed(4)
+            }
+        },
+        series: [
+            {
+                data: processedData.mMoveDay,
+                name:'中部相对偏移',
+                type: 'line'
+            },
+            {
+                name:'底部相对偏移',
+                data: processedData.bMoveDay,
+                type: 'line'
+            },
+            {
+                name:'顶部相对偏移',
+                data: processedData.tMoveDay,
+                type: 'line'
+            }
+        ]
+    }
+
+    return {
+        options: [option1, option2],
+        names: ["偏移曲线", "相对偏移曲线"],
+    }
+}
+
 const generateOptions_Manometer = (processedData) => {
 
     // 数据特征，全是正值，数值在10左右，比较稳定
@@ -1000,7 +1175,6 @@ const generateOptions_Manometer = (processedData) => {
 
 }
 const generateOptions_Manometer_new = (processedData) => {
-    console.log("!", processedData);
     let option1 = {
         title: {
             text: "水位折线"
@@ -1047,6 +1221,9 @@ const generateOptions_Manometer_new = (processedData) => {
         title: {
             text: "测温折线"
         },
+        tooltip: {
+            trigger: 'axis',
+        },
         grid: {
             left: '3%',
             right: '5%',
@@ -1060,10 +1237,10 @@ const generateOptions_Manometer_new = (processedData) => {
             type: 'value',
             min: function (value) {
                 // return value.min - 0.5
-                return value.min
+                return value.min -0.3
             },
             max: function (value) {
-                return value.max
+                return value.max +0.3
             }
         },
         series: [
@@ -1076,6 +1253,9 @@ const generateOptions_Manometer_new = (processedData) => {
     let option3 = {
         title: {
             text: "频率折线"
+        },
+        tooltip: {
+            trigger: 'axis',
         },
         grid: {
             left: '3%',
@@ -1627,13 +1807,12 @@ class MonitorDataAssistant {
     }
 
     async getMonitoringdata() {
-        console.log("INFO  ", this.info);
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
+
         console.log("DATA  ", this.monitoringData);
         //meta infomation -- pointnum
         this.monitoringMetaData = (await BackEndRequest.getMonitorInfoByType_Code(this.info["code"], this.info["type"])).data
-        console.log("META DATA  ", this.monitoringMetaData);
         return this.monitoringData
     }
 
@@ -1642,14 +1821,15 @@ class MonitorDataAssistant {
             case "1": //gnss
                 this.processedData = generateData_GNSS(this.monitoringData)
                 return this.processedData
-            case "2":
-                this.processedData = generateData_Incline(this.monitoringData, this.monitoringMetaData)
+            case "4":
+                // this.processedData = generateData_Incline(this.monitoringData, this.monitoringMetaData)
+                this.processedData = generateData_Incline_new(this.monitoringData)
                 return this.processedData
             case "3":
                 // this.processedData = generateData_Manometer(this.monitoringData, this.monitoringMetaData)
                 this.processedData = generateData_Manometer_new(this.monitoringData)
                 return this.processedData
-            case "4":
+            case "2":
                 this.processedData = generateData_Stress(this.monitoringData, this.monitoringMetaData)
                 return this.processedData
             default:
@@ -1663,15 +1843,16 @@ class MonitorDataAssistant {
             case "1": //gnss
                 this.chartOptions = generateOptions_GNSS(this.processedData)
                 return this.chartOptions
-            case "2":
-                this.chartOptions = generateOptions_Incline(this.processedData)
+            case "4":
+                // this.chartOptions = generateOptions_Incline(this.processedData)
+                this.chartOptions = generateOptions_Incline_new(this.processedData)
                 return this.chartOptions
             case "3":
                 // this.chartOptions = generateOptions_Manometer(this.processedData)
                 this.chartOptions = generateOptions_Manometer_new(this.processedData)
 
                 return this.chartOptions
-            case "4":
+            case "2":
                 this.chartOptions = generateOptions_Stress(this.processedData)
                 return this.chartOptions
             default:
