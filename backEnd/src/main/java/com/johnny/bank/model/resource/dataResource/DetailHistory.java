@@ -23,31 +23,15 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode()
 @ToString()
-@Document(collection = "historyInfo")
+@Document(collection = "detailHistoryInfo")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CollapseHistory {
+public class DetailHistory {
     @Id
     private String id;
     private String uuid;
-    private String district;
-    private String time;
-    private String river;
-    private String side;
-    private Double width;
-    private Double length;
-    private Double height;
-    private Double ratio;
-    private Double volume;
-    private String angle;
-    private Double curvature1;
-    private Double curvature2;
-    private Double curvature3;
-    private String steep;
-    private String place;
-    private String type;
-    private String description;
-    private String state;
-    private Date createTime;
-    private Date updateTime;
-    private Integer detail;
+    private String basic;
+    private String cause;
+    private String plan;
+    private String after;
+    private String video;
 }

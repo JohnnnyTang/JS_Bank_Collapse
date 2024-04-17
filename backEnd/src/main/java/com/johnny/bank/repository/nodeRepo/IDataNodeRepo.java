@@ -20,4 +20,8 @@ public interface IDataNodeRepo extends IBaseNodeRepo<DataNode> {
     @Query("{'usage': {'$exists': true}}")
     @Update("{'$set':  {'usage': ?0}}")
     void alterAllDataNodeUsageJson(JSONObject newUsageJson);
+
+    @Query("{'apiPrefix': {'$ne': ''}}")
+    @Update("{'$set':  {'apiPrefix': ?0}}")
+    void alterAllDataApiPrefix(String newPrefix);
 }

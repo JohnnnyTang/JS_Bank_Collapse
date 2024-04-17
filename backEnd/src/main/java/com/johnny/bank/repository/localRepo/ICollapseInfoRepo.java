@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 
 public interface ICollapseInfoRepo extends MongoRepository<CollapseHistory, String> {
-    @Query(value = "{'description': {$ne: null}}", sort = "{'description': -1}")
+    @Query(value = "{'detail': {$ne: null}}", sort = "{'detail': -1}")
     List<CollapseHistory> findInfoWithDescription();
 
-    @Query(value = "{}", sort = "{'description': -1}")
+    @Query(value = "{}", sort = "{'detail': -1}")
     List<CollapseHistory> findInfoSortByDescription();
 }

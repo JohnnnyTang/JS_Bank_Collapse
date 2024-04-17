@@ -20,10 +20,13 @@ import lombok.*;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ManometerData extends MonitorData {
-    private Double pressure1;
-    private Double pressure2;
-    private Double pressure3;
-    private Double pressure4;
-    private Double pressure5;
-    private Double pressure6;
+    private Double frequency;
+    private Double temperature;
+    private Double height;
+//    private Double pressure1;
+//    private Double pressure2;
+//    private Double pressure3;
+//    private Double pressure4;
+//    private Double pressure5;
+//    private Double pressure6;
 }

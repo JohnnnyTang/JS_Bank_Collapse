@@ -80,8 +80,7 @@
                                     "
                                     :class="{
                                         'in-scroll':
-                                            scope.row.description &&
-                                            scope.row.description != '',
+                                            (scope.row.detail != null)
                                     }"
                                 ></div>
                             </template>
@@ -165,7 +164,7 @@ const emit = defineEmits(['scrollToSeeMore'])
 
 function handleClick(index, row) {
     // console.log(1, index)
-    if (row.description && row.description != '') {
+    if (row.detail && row.detail != '') {
         emit('scrollToSeeMore', index)
     } else {
         for(let key in moreInfo.value) {
@@ -189,6 +188,7 @@ function handleClick(index, row) {
 onMounted(async () => {
     const requestInfo = await backendInstance.get('/data/historyInfo/desc/sort')
     historyList.value = requestInfo.data
+    // console.log(historyList.value[0])
     // console.log(requestInfo.data)
     let vw = window.innerWidth / 100
     let vh = window.innerHeight / 100

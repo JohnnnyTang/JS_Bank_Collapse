@@ -53,8 +53,6 @@ watch(selectedFeature, async (newV, oldV) => {
 
 
 onMounted(async () => {
-
-
     chartDom = document.getElementById('chart');
     myChart = echarts.init(chartDom);
 

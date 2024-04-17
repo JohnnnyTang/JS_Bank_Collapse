@@ -19,4 +19,9 @@ public class DataNodeService extends NodeService<DataNode> {
         ((IDataNodeRepo)IBaseNodeRepo).alterAllDataNodeUsageJson(newUsage);
         return true;
     }
+
+    public boolean updateDataNodeApi(String ipAddr, String port, String dbName) {
+        ((IDataNodeRepo)IBaseNodeRepo).alterAllDataApiPrefix("jdbc:postgresql://" + ipAddr + ":" + port + "/" + dbName + "?stringtype=unspecified");
+        return true;
+    }
 }

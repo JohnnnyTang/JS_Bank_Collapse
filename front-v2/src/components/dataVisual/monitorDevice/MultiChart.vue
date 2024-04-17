@@ -1,7 +1,13 @@
 <template>
     <div class="pure-chart">
         <div class="buttons">
-            <div class="button" :class="{ active: selectedIndex === index }" v-for="(name, index) in dataAssitant.chartOptions.names" @click="showChart(index)">
+            <div
+                class="button"
+                :class="{ active: selectedIndex === index }"
+                v-for="(name, index) in dataAssitant.chartOptions.names"
+                @click="showChart(index)"
+                :key="index"
+            >
                 {{ name }}
             </div>
         </div>
@@ -11,13 +17,13 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import 'echarts-gl';
+import 'echarts-gl'
 import { MonitorDataAssistant } from './ChartData'
 
 const props = defineProps({
-    selectedFeature: Object
+    selectedFeature: Object,
 })
 
 const selectedIndex = ref(1)
@@ -27,23 +33,22 @@ let chartDomRef
 let dataAssitant = ref(new MonitorDataAssistant())
 
 const showChart = (index) => {
-    selectedIndex.value = index;
+    selectedIndex.value = index
     if (myChart) {
         myChart.clear()
         myChart.setOption(dataAssitant.value.chartOptions.options[index])
     } else {
-        console.log('chart not prepared');
+        console.log('chart not prepared')
     }
 }
 
 onMounted(async () => {
+    console.log(chartDomRef.style)
+    // chartDomRef.style.width = '340px'
+    // chartDomRef.style.height = '290px'
+    await nextTick()
 
-    console.log(chartDomRef.style );
-    chartDomRef.style.width = '340px'
-    chartDomRef.style.height = '290px'
-    
-
-    myChart = echarts.init(chartDomRef);
+    myChart = echarts.init(chartDomRef)
 
     dataAssitant.value = new MonitorDataAssistant(props.selectedFeature.value)
     await dataAssitant.value.getMonitoringdata()
@@ -51,9 +56,7 @@ onMounted(async () => {
     dataAssitant.value.getChartOptions()
 
     myChart.setOption(dataAssitant.value.chartOptions.options[1])
-
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -87,31 +90,28 @@ $Color5: rgb(6, 102, 192);
         .button {
             width: auto;
             border-radius: 10px;
-            background-color: $Color5 ;
+            background-color: $Color5;
             color: $Color2;
             padding: 7px;
             margin-bottom: 1vh;
-          
-            
-            &:hover{
+
+            &:hover {
                 cursor: pointer;
             }
-            &:active{
+            &:active {
                 transform: scale(1.02);
             }
         }
 
-        .active{
-            background-color:  rgb(6, 142, 192);
+        .active {
+            background-color: rgb(6, 142, 192);
         }
     }
-
 
     .chart {
         width: 16vw;
         height: 34vh;
         background-color: rgb(255, 255, 255);
     }
-
 }
 </style>

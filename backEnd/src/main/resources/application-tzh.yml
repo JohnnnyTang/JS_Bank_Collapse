@@ -11,7 +11,6 @@ spring:
     hikari:
       maxLifeTime: 120000
       idle-timeout: 0
-      #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
     default:
       url: jdbc:postgresql://localhost:4321/shore?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
@@ -31,3 +30,6 @@ tile:
   mzsTilePath: D:/2024-work/shore_collapse/data/DEM/rasterTIle/
 
   worldTilePath: D:/2024-work/shore_collapse/data/mbtiles/data
+
+video:
+  yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4

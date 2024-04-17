@@ -187,7 +187,7 @@ onMounted(() => {
 
         resizeObserver.observe(containerDom.value)
 
-        mapInit(map)
+        mapInit(map, false)
     })
 })
 

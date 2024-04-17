@@ -82,6 +82,21 @@ onMounted(() => {
                 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/after/{x}/{y}/{z}',
             ],
         })
+        // map.addSource('worldBase', {
+        //     type: 'vector',
+        //     tiles: [
+        //         'http://127.0.0.1:8989/api/v1/proxy/tiles/world/{z}/{x}/{y}.pbf',
+        //     ],
+        // })
+        // map.addLayer({
+        //     id: 'mzsSectionArea1',
+        //     type: 'fill',
+        //     source: 'worldBase',
+        //     'source-layer': 'water',
+        //     paint: {
+        //         'fill-color': 'rgb(124, 179, 211)',
+        //     },
+        // })
         map.addSource('depthLineSource', {
             type: 'vector',
             tiles: [
