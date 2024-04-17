@@ -122,7 +122,7 @@ const navList = ref([
         iconUrl: '/knowledge.png',
     },
     {
-        name: '长江江苏段',
+        name: '江苏省长江',
         nameTwo: '崩岸监测预警应用系统',
         routerLink: '/',
         isActive: true,
