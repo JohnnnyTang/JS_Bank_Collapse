@@ -2,13 +2,16 @@
     <div class="machine-card-container">
         <div class="exchange-container">
             <div class="exchange-icon">
-                <img src="/icons/switch.png" alt="exchange">
+                <img
+                    src="/icons/switch.png"
+                    alt="exchange"
+                    @click="changePage()"
+                >
             </div>
         </div>
         <div 
             class="machine-card"
             :class="[strepile.firstPage ? 'active' : 'inactive']"
-            @click="changePage()"
         >
             <div class="machine-show-container">
                 <img src="/changePress.png" alt="设备图片">
@@ -28,7 +31,6 @@
         <div 
             class="machine-card second"
             :class="[strepile.firstPage ? 'inactive' : 'active']"
-            @click="changePage()"
         >
             <div class="machine-table-container">
                 <div class="table-text-container">
@@ -37,11 +39,18 @@
                     </div>
                 </div>
                 <div class="table-body-container">
-                    <el-table :data="tableData" stripe style="width: 100%">
+                    <el-table 
+                        :data="tableData"
+                        stripe
+                        style="width: 100%"
+                        v-loading="loading"
+                        element-loading-text="数据加载中"
+                        element-loading-background="rgba(244, 252, 239, 0.6)"
+                    >
                         <el-table-column prop="id" label="设备ID" width="'20%''" />
-                        <el-table-column prop="angle" label="水平角度" width="'20%'" />
-                        <el-table-column prop="horizontal" label="水平应力" width="'20%'" />
-                        <el-table-column prop="vertical" label="垂向应力" width="'20%'" />
+                        <el-table-column prop="top_angle" label="夹角" width="'20%'" />
+                        <el-table-column prop="top_power" label="最大主应力" width="'20%'" />
+                        <el-table-column prop="top_change" label="最大主应变" width="'20%'" />
                         <el-table-column prop="time" label="测量时间" width="'20%'"/>
                     </el-table>
                 </div>
@@ -49,15 +58,15 @@
             <div class="machine-data-container">
                 <div class="device-number-content">
                     <div class="device-number-data">
-                        已有设备数量:&nbsp;<span class="color-data">6</span></div>
+                        已有设备数量:&nbsp;<span class="color-data">{{ deviceNum }}</span></div>
                 </div>
                 <div class="record-number-content">
                     <div class="record-number-data">
-                        算法运行次数:&nbsp;<span class="color-data">20</span></div>
+                        算法运行次数:&nbsp;<span class="color-data">{{ CalculateTime }}</span></div>
                 </div>
                 <div class="time-number-content">
                     <div class="time-number-data">
-                        上次运行时间:<br><span class="color-data">2024-03-28 15:30:45</span></div>
+                        上次运行时间:<br><span class="color-data">{{ latestTime }}</span></div>
                 </div>
             </div>
         </div>
@@ -65,103 +74,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-const tableData = [
-  {
-    id: '001',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '002',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '003',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    angle: '1',
-    horizontal: '2',
-    vertical: '3',
-    time: '2016-05-02'
-  },
-]
+import DeviceRequest from './api.js';
+import { ref, onMounted } from 'vue'
+
+const tableData = ref([]);
+const deviceNum = ref(0);
+const CalculateTime = ref(0);
+const latestTime = ref("");
+const loading = ref(true)
 const props = defineProps({
     strepile: {
         type: Object,
     }
 })
+
 const strepile = ref(props.strepile)
 
 const changePage = () => {
     strepile.value.firstPage = !strepile.value.firstPage
 }
+
+onMounted(
+    async () => {
+        const gnssData = (await DeviceRequest.getStresspileAllData()).data.data;
+        deviceNum.value = ( await DeviceRequest.getStresspileMachineNum()).data.data;
+        CalculateTime.value = ( await DeviceRequest.getStresspileRecordNum()).data.data;
+        latestTime.value = ( await DeviceRequest.getStresspileRecordLatestTime()).data.data;
+        gnssData.forEach(item => {
+            tableData.value.push({
+                id: item.idGroup.machine_id,
+                top_angle: item.top_angle,
+                top_power: item.top_power,
+                top_change: item.top_change,
+                time: item.in_time
+            })
+        })
+        loading.value = false
+    }
+);
 
 </script>
 
@@ -188,6 +138,7 @@ div.machine-card-container {
             align-items: center;
             width: 100%px;
             height: 100%px;
+            z-index: 10;
             
             img {
                 widows: 100%;
