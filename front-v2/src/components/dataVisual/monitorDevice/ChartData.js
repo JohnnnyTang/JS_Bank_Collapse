@@ -26,70 +26,35 @@ const value2time = (value, startTime) => {
 
 //////////data process func
 const generateData_GNSS = (ogDataArray) => {
-    let data = []
+
     let time_xMove_scater_data = []
     let time_yMove_scater_data = []
     let time_zMove_scater_data = []
-    let ratio = []
-
-    let xMoveRange = [999, -999]
-    let yMoveRange = [999, -999]
-    let zMoveRange = [999, -999]
-    let radiusRange = [999, -999]
-    let ratioRange = [999, -999]
-
+    let gnss3d_data = []
+    let gnss_3Df_data = []
 
     let showCount = ogDataArray.length - 1
     showCount = Math.min(20, showCount)
+
     let endTime = time(ogDataArray[0].measureTime);
     let startTime = time(ogDataArray[showCount].measureTime);
     for (let i = 0; i < showCount; i++) {
-        if (ogDataArray[i].XMove < xMoveRange[0])
-            xMoveRange[0] = ogDataArray[i].XMove
-        if (ogDataArray[i].xMove > xMoveRange[1])
-            xMoveRange[1] = ogDataArray[i].XMove
-        if (ogDataArray[i].YMove < yMoveRange[0])
-            yMoveRange[0] = ogDataArray[i].YMove
-        if (ogDataArray[i].YMove > yMoveRange[1])
-            yMoveRange[1] = ogDataArray[i].YMove
-        if (ogDataArray[i].ZMove < zMoveRange[0])
-            zMoveRange[0] = ogDataArray[i].ZMove
-        if (ogDataArray[i].zMove > zMoveRange[1])
-            zMoveRange[1] = ogDataArray[i].ZMove
 
-
-        let thisradius = radius(ogDataArray[i].XMove, ogDataArray[i].YMove, ogDataArray[i].ZMove)
-        if (thisradius < radiusRange[0])
-            radiusRange[0] = thisradius
-        if (thisradius > radiusRange[1])
-            radiusRange[1] = thisradius
         let thistime = time(ogDataArray[i].measureTime)
         let deltaSeconds = timeDif(startTime, thistime)
-        data.push([ogDataArray[i].XMove, ogDataArray[i].YMove, ogDataArray[i].ZMove, deltaSeconds])
+
         time_xMove_scater_data.push([deltaSeconds, ogDataArray[i].XMove])
         time_yMove_scater_data.push([deltaSeconds, ogDataArray[i].YMove])
         time_zMove_scater_data.push([deltaSeconds, ogDataArray[i].ZMove])
-        if (i < showCount - 1) {
-            let nxtRadius = radius(ogDataArray[i + 1].XMove, ogDataArray[i + 1].YMove, ogDataArray[i + 1].ZMove)
-            let nxtDeletaSeconds = timeDif(startTime, time(ogDataArray[i + 1].measureTime))
-            let thisRatio = [ogDataArray[i].measureTime, (nxtRadius - thisradius) / (nxtDeletaSeconds - deltaSeconds)]
-            ratio.push(thisRatio)
-            if (thisRatio[1] < ratioRange[0])
-                ratioRange[0] = thisRatio[1]
-            if (thisRatio[1] > ratioRange[1])
-                ratioRange[1] = thisRatio[1]
-        }
+
+        gnss3d_data.push([ogDataArray[i].measureTime, ogDataArray[i].threeD])
+        gnss_3Df_data.push([ogDataArray[i].measureTime, ogDataArray[i].threeDf])
     }
     return {
-        xMoveRange,
-        yMoveRange,
-        zMoveRange,
-        ratioRange,
-        radiusRange,
         startTime,
         endTime,
-        data,
-        ratio,
+        gnss3d_data,
+        gnss_3Df_data,
         scatterData: {
             time_xMove_scater_data,
             time_yMove_scater_data,
@@ -211,7 +176,6 @@ const generateData_Manometer = (ogDataArray, metaData) => {
 }
 
 const generateData_Manometer_new = (ogDataArray) => {
-    console.log(ogDataArray);
     let showCount = ogDataArray.length - 1
     showCount = Math.min(20, showCount)
 
@@ -221,11 +185,12 @@ const generateData_Manometer_new = (ogDataArray) => {
     let frequencyArray = []
 
     ogDataArray.forEach((item) => {
-        timeArray.push(timeFormat(time(item['measureTime'])))
-        heightArray.push(item['height'])
-        temperatureArray.push(item['temperature'])
-        frequencyArray.push(item['frequency'])
+        timeArray.push(item['measureTime'])
+        heightArray.push([item['measureTime'], item['height']])
+        temperatureArray.push([item['measureTime'], item['temperature']])
+        frequencyArray.push([item['measureTime'], item['frequency']])
     })
+
     return {
         timeArray,
         heightArray,
@@ -305,6 +270,7 @@ const generateOptions_GNSS = (processedData) => {
             type: 'value',
             show: true,
             max: 'dataMax',
+            min: 'dataMin',
             axisLabel: {
                 formatter: (value) => {
                     return value2time(value, processedData.startTime)
@@ -317,9 +283,9 @@ const generateOptions_GNSS = (processedData) => {
         },
         legend: {
             orient: 'horizontal',
-            top: '30',
+            top: '40',
             width: 300,
-            left: 0,
+            left: 'center',
             itemGap: 5,
             formatter: (name) => {
                 return `{b|${name}} `;
@@ -343,7 +309,7 @@ const generateOptions_GNSS = (processedData) => {
         },
         series: [
             {
-                symbolSize: 15,
+                symbolSize: 10,
                 name: 'XMove',
                 type: 'scatter',
                 data: processedData.scatterData.time_xMove_scater_data,
@@ -352,7 +318,7 @@ const generateOptions_GNSS = (processedData) => {
                 }
             },
             {
-                symbolSize: 15,
+                symbolSize: 10,
                 name: 'YMove',
                 type: 'scatter',
                 data: processedData.scatterData.time_yMove_scater_data,
@@ -361,7 +327,7 @@ const generateOptions_GNSS = (processedData) => {
                 }
             },
             {
-                symbolSize: 15,
+                symbolSize: 10,
                 name: 'ZMove',
                 type: 'scatter',
                 data: processedData.scatterData.time_zMove_scater_data,
@@ -371,7 +337,7 @@ const generateOptions_GNSS = (processedData) => {
             },
             {
                 type: 'line',
-                name: 'XMove回归',
+                // name: 'XMove回归',
                 data: regressionX.points,
                 smooth: true,
                 symbolSize: 5,
@@ -382,7 +348,7 @@ const generateOptions_GNSS = (processedData) => {
             },
             {
                 type: 'line',
-                name: 'YMove回归',
+                // name: 'YMove回归',
                 data: regressionY.points,
                 smooth: true,
                 symbolSize: 5,
@@ -393,7 +359,7 @@ const generateOptions_GNSS = (processedData) => {
             },
             {
                 type: 'line',
-                name: 'ZMove回归',
+                // name: 'ZMove回归',
                 data: regressionZ.points,
                 smooth: true,
                 symbolSize: 5,
@@ -406,21 +372,28 @@ const generateOptions_GNSS = (processedData) => {
 
     }
 
-    // ratio
+    // gnss3d_data
     let optionRatio = {
         tooltip: {
             trigger: 'axis',
             position: function (pt) {
                 return [pt[0], '10%'];
+            },
+            valueFormatter: (value) => {
+                return value.toFixed(4)
             }
         },
         title: {
             left: 'center',
-            text: 'GNSS综合位移变率'
+            text: 'GNSS-三维累计位移曲线',
+            top: 5
         },
         grid: {
             show: false,
-            left: '25%'
+            left: '20%',
+            top: '15%',
+            bottom: '15%',
+            right: '5%'
         },
         visualMap: [
             {
@@ -431,41 +404,60 @@ const generateOptions_GNSS = (processedData) => {
                 itemSymbol: 'rect',
                 type: 'piecewise',
                 itemWidth: 15,
-                itemHeight: 10,
-                //text: [`${processedData.ratioRange[1].toFixed(4)}`, `${processedData.ratioRange[0].toFixed(4)}`],
-                text: ['1.0', '-1.0'],
-                textGap: 20,
+                itemHeight: 15,
+                text: ['10.0', '0.0'],
+                textGap: 100,
                 realtime: false,
                 calculable: true,
                 seriesIndex: 0,
                 splitNumver: 6,
                 pieces: [
-                    { gt: 0.9, lte: 10, label: "", color: "#03071e" },
-                    { gt: 0.8, lte: 0.9, label: "", color: "#370617" },
-                    { gt: 0.7, lte: 0.8, label: "", color: "#6a040f" },
-                    { gt: 0.6, lte: 0.7, label: "", color: "#9d0208" },
-                    { gt: 0.5, lte: 0.6, label: "", color: "#d00000" },
-                    { gt: 0.4, lte: 0.5, label: "", color: "#dc2f02" },
-                    { gt: 0.3, lte: 0.4, label: "", color: "#e85d04" },
-                    { gt: 0.2, lte: 0.3, label: "", color: "#f48c06" },
-                    { gt: 0.1, lte: 0.2, label: "", color: "#faa307" },
-                    { gt: 0, lte: 0.1, label: "", color: "#ffba08" },
-                    { gt: -0.1, lte: 0, label: "", color: "#ffba08" },
-                    { gt: -0.2, lte: -0.1, label: "", color: "#faa307" },
-                    { gt: -0.3, lte: -0.2, label: "", color: "#f48c06" },
-                    { gt: -0.4, lte: -0.3, label: "", color: "#e85d04" },
-                    { gt: -0.5, lte: -0.4, label: "", color: "#dc2f02" },
-                    { gt: -0.6, lte: -0.5, label: "", color: "#d00000" },
-                    { gt: -0.7, lte: -0.6, label: "", color: "#9d0208" },
-                    { gt: -0.8, lte: -0.7, label: "", color: "#6a040f" },
-                    { gt: -0.9, lte: -0.8, label: "", color: "#370617" },
-                    { gt: -10, lte: -0.9, label: "", color: "#03071e" }
+                    { gt: 9, lte: 10, label: "", color: "#ff1414" },
+                    { gt: 8, lte: 9, label: "", color: "#fc4b00" },
+                    { gt: 7, lte: 8, label: "", color: "#f46c00" },
+                    { gt: 6, lte: 7, label: "", color: "#e78800" },
+                    { gt: 5, lte: 6, label: "", color: "#d7a000" },
+                    { gt: 4, lte: 5, label: "", color: "#c5b500" },
+                    { gt: 3, lte: 4, label: "", color: "#b0c900" },
+                    { gt: 2, lte: 3, label: "", color: "#93dc00" },
+                    { gt: 1, lte: 2, label: "", color: "#6bee00" },
+                    { gt: 0, lte: 1, label: "", color: "#0fff37" },
+                    /////
+                    // { gt: 0.9, lte: 1.0, label: "", color: "#03071e" },
+                    // { gt: 0.8, lte: 0.9, label: "", color: "#370617" },
+                    // { gt: 0.7, lte: 0.8, label: "", color: "#6a040f" },
+                    // { gt: 0.6, lte: 0.7, label: "", color: "#9d0208" },
+                    // { gt: 0.5, lte: 0.6, label: "", color: "#d00000" },
+                    // { gt: 0.4, lte: 0.5, label: "", color: "#dc2f02" },
+                    // { gt: 0.3, lte: 0.4, label: "", color: "#e85d04" },
+                    // { gt: 0.2, lte: 0.3, label: "", color: "#f48c06" },
+                    // { gt: 0.1, lte: 0.2, label: "", color: "#faa307" },
+                    // { gt: 0, lte: 0.1, label: "", color: "#ffba08" },
+                    // { gt: -0.1, lte: 0, label: "", color: "#ffba08" },
+                    // { gt: -0.2, lte: -0.1, label: "", color: "#faa307" },
+                    // { gt: -0.3, lte: -0.2, label: "", color: "#f48c06" },
+                    // { gt: -0.4, lte: -0.3, label: "", color: "#e85d04" },
+                    // { gt: -0.5, lte: -0.4, label: "", color: "#dc2f02" },
+                    // { gt: -0.6, lte: -0.5, label: "", color: "#d00000" },
+                    // { gt: -0.7, lte: -0.6, label: "", color: "#9d0208" },
+                    // { gt: -0.8, lte: -0.7, label: "", color: "#6a040f" },
+                    // { gt: -0.9, lte: -0.8, label: "", color: "#370617" },
+                    // { gt: -10, lte: -1.0, label: "", color: "#03071e" }
                 ]
             },
         ],
+        // markLine:{
+        //     data: [{ 
+        //         value:5.0,
+        //         lineStyle: {
+        //     }]
+        // },
         xAxis: {
             type: 'time',
             min: 'dataMin',
+            axisLine: {
+                show: true
+            },
             axisLabel: {
                 formatter: function (value, index) {
                     // if (index === 0 || index === dataIndexArray.length - 1) {
@@ -479,24 +471,93 @@ const generateOptions_GNSS = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            boundaryGap: [0, '100%']
+            boundaryGap: [0, '100%'],
+            min: function (v) {
+                return 0
+            },
+            max: function (v) {
+                return Math.ceil(v.max)
+            },
         },
         series: [
             {
-                name: '位移变率',
+                name: '三维位移',
                 type: 'line',
                 smooth: true,
-                symbol: 'none',
-                data: processedData.ratio
+                symbol: 'emptyCircle',
+                symbolSize: 6,
+                data: processedData.gnss3d_data
             }
         ]
     };
 
+    let option3 = {
+        title: {
+            left:'center',
+            top:5,
+            text: 'GNSS-三维相对位移曲线',
+            subtext: '近五小时',
+            subtextStyle: {
+                color: 'rgb(34,45,148)',
+                fontSize: 12,
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            valueFormatter: (value) => {
+                return value.toFixed(4)
+            }
+        },
+        xAxis: {
+            axisLine: {
+                show: true
+            },
+            axisTick: {
+                show: true
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+            type: 'time',
+            axisLabel: {
+                formatter: function (value, index) {
+                    // if (index === 0 || index === dataIndexArray.length - 1) {
+                    if (index % 2 === 0) {
+                        return echarts.format.formatTime('hh:ss', value);
+                    } else {
+                        return '';
+                    }
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            min: function (value) {
+                return Math.floor(value.min * 10) / 10;
+            },
+            max: function (value) {
+                // return 
+                return Math.ceil(value.max * 10) / 10;
+            }
+        },
+        series: [
+            {
+                data: processedData.gnss_3Df_data,
+                type: 'line'
+            }
+        ]
+    }
+
 
     return {
         // options: [option2dline, option3Dline, option3Dcube, optionScatter, optionRatio]
-        options: [optionScatter, optionRatio],
-        names: ['位移时间曲线', '综合位移变率'],
+        options: [optionScatter, optionRatio, option3],
+        names: ['各维度位移', '三维位移', '相对位移'],
     }
 }
 
@@ -939,13 +1000,41 @@ const generateOptions_Manometer = (processedData) => {
 
 }
 const generateOptions_Manometer_new = (processedData) => {
+    console.log("!", processedData);
     let option1 = {
+        title: {
+            text: "水位折线"
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
         xAxis: {
-            type: time,
-            data: processedData.timeArray
+            axisLine: {
+                show: true
+            },
+            axisTick: {
+                show: true
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+
+            type: 'time',
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            min: function (value) {
+                return Math.floor(value.min * 10) / 10;
+            },
+            max: function (value) {
+                // return 
+                return Math.ceil(value.max * 10) / 10;
+            }
         },
         series: [
             {
@@ -955,12 +1044,27 @@ const generateOptions_Manometer_new = (processedData) => {
         ]
     };
     let option2 = {
+        title: {
+            text: "测温折线"
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
         xAxis: {
-            type: time,
-            data: processedData.timeArray
+            type: 'time',
         },
         yAxis: {
-            type: 'value'
+            type: 'value',
+            min: function (value) {
+                // return value.min - 0.5
+                return value.min
+            },
+            max: function (value) {
+                return value.max
+            }
         },
         series: [
             {
@@ -969,9 +1073,39 @@ const generateOptions_Manometer_new = (processedData) => {
             }
         ]
     };
+    let option3 = {
+        title: {
+            text: "频率折线"
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'time',
+        },
+        yAxis: {
+            type: 'value',
+            min: function (value) {
+                return value.min
+            },
+            max: function (value) {
+                return value.max
+            }
+        },
+        series: [
+            {
+                data: processedData.frequencyArray,
+                type: 'line'
+            }
+        ]
+    }
+
     return {
-        names: ['水位折线图', '测温折线图'],
-        options: [option1,option2]
+        names: ['水位折线图', '测温折线图', '频率折线图'],
+        options: [option1, option2, option3]
     }
 
 }
@@ -1493,13 +1627,13 @@ class MonitorDataAssistant {
     }
 
     async getMonitoringdata() {
-        console.log(this.info);
+        console.log("INFO  ", this.info);
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
-        console.log(this.monitoringData);
+        console.log("DATA  ", this.monitoringData);
         //meta infomation -- pointnum
         this.monitoringMetaData = (await BackEndRequest.getMonitorInfoByType_Code(this.info["code"], this.info["type"])).data
-        console.log(this.monitoringMetaData);
+        console.log("META DATA  ", this.monitoringMetaData);
         return this.monitoringData
     }
 
@@ -1512,8 +1646,8 @@ class MonitorDataAssistant {
                 this.processedData = generateData_Incline(this.monitoringData, this.monitoringMetaData)
                 return this.processedData
             case "3":
-                this.processedData = generateData_Manometer(this.monitoringData, this.monitoringMetaData)
-                // this.processedData = generateData_Manometer_new(this.monitoringData)
+                // this.processedData = generateData_Manometer(this.monitoringData, this.monitoringMetaData)
+                this.processedData = generateData_Manometer_new(this.monitoringData)
                 return this.processedData
             case "4":
                 this.processedData = generateData_Stress(this.monitoringData, this.monitoringMetaData)
@@ -1533,8 +1667,8 @@ class MonitorDataAssistant {
                 this.chartOptions = generateOptions_Incline(this.processedData)
                 return this.chartOptions
             case "3":
-                this.chartOptions = generateOptions_Manometer(this.processedData)
-                // this.chartOptions = generateOptions_Manometer_new(this.processedData)
+                // this.chartOptions = generateOptions_Manometer(this.processedData)
+                this.chartOptions = generateOptions_Manometer_new(this.processedData)
 
                 return this.chartOptions
             case "4":

@@ -264,43 +264,38 @@ const mapInit = async (map, vis) => {
             map.getCanvas().style.cursor = ''
         })
 
-        //"MZS120.529408_32.033683_1"  gnss
-        //"MZS120.528701_32.034685_2" 测斜仪
-        //"MZS120.530415_32.033657_4" 应力桩
-        //"MZS120.531984_32.032682_3" 孔隙水压力计
-
-        setTimeout(() => {
-            setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-            // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
-        }, 2000)
+        // setTimeout(() => {
+        //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+        //     // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
+        // }, 2000)
 
         ///////DEBUG////////
-        // window.addEventListener('keydown', (e) => {
-        //     if (e.key === '1') {
-        //         setWarningDeviceStyle(map, '测斜仪', "MZS120.528701_32.034685_2")
-        //     }
-        //     if (e.key === '2') {
-        //         setWarningDeviceStyle(map, 'GNSS', "MZS120.529408_32.033683_1")
-        //     }
-        //     if (e.key === '3') {
-        //         setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.531984_32.032682_3")
-        //     }
-        //     if (e.key === '4') {
-        //         setWarningDeviceStyle(map, '应力桩', "MZS120.530415_32.033657_4")
-        //     }
-        //     if (e.key === '5') {
-        //         removeWarningDeviceStyle(map, '测斜仪', "MZS120.528701_32.034685_2")
-        //     }
-        //     if (e.key === '6') {
-        //         removeWarningDeviceStyle(map, 'GNSS', "MZS120.529408_32.033683_1")
-        //     }
-        //     if (e.key === '7') {
-        //         removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.531984_32.032682_3")
-        //     }
-        //     if (e.key === '8') {
-        //         removeWarningDeviceStyle(map, '应力桩', "MZS120.530415_32.033657_4")
-        //     }
-        // })
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '1') {
+                setWarningDeviceStyle(map, '测斜仪', "MZS120.528701_32.034685_2")
+            }
+            if (e.key === '2') {
+                setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+            }
+            if (e.key === '3') {
+                setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
+            }
+            if (e.key === '4') {
+                setWarningDeviceStyle(map, '应力桩', "MZS120.530415_32.033657_4")
+            }
+            // if (e.key === '5') {
+            //     removeWarningDeviceStyle(map, '测斜仪', "MZS120.528701_32.034685_2")
+            // }
+            // if (e.key === '6') {
+            //     removeWarningDeviceStyle(map, 'GNSS', "MZS120.529408_32.033683_1")
+            // }
+            // if (e.key === '7') {
+            //     removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.531984_32.032682_3")
+            // }
+            // if (e.key === '8') {
+            //     removeWarningDeviceStyle(map, '应力桩', "MZS120.530415_32.033657_4")
+            // }
+        })
     }
 }
 
