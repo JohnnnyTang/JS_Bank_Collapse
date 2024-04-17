@@ -46,12 +46,12 @@
                     </template>
                     <el-sub-menu index="3-1">
                         <template #title>数据预警</template>
-                        <el-menu-item index="3-1-1">GNSS</el-menu-item>
-                        <el-menu-item index="3-1-2">测斜仪</el-menu-item>
-                        <el-menu-item index="3-1-3">孔隙水压力计</el-menu-item>
-                        <el-menu-item index="3-1-4">应力桩</el-menu-item>
-                        <el-menu-item index="3-1-5">实时风险</el-menu-item>
-                        <el-menu-item index="3-1-6">岸坡稳定</el-menu-item>
+                        <el-menu-item index="warn/gnss">GNSS</el-menu-item>
+                        <el-menu-item index="warn/inclinometer">测斜仪</el-menu-item>
+                        <el-menu-item index="warn/manometer">孔隙水压力计</el-menu-item>
+                        <el-menu-item index="warn/stress">应力桩</el-menu-item>
+                        <el-menu-item index="warn/risk">实时风险</el-menu-item>
+                        <el-menu-item index="warn/stable">岸坡稳定</el-menu-item>
                     </el-sub-menu>
                     <el-sub-menu index="3-2">
                         <template #title>报警记录</template>

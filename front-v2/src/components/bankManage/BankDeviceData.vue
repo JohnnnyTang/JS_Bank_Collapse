@@ -108,6 +108,7 @@ const optionsMap = reactive({
 
 const deviceSelection = ref(defaultActiveMap.value[curDevice.value])
 
+console.log('props', props.initDevice)
 const chartSelection = ref(optionsMap[props.initDevice][0])
 
 const deviceNameMap = {
@@ -1746,8 +1747,12 @@ const selectDevice = async (index, indexPath) => {
 }
 
 onBeforeRouteUpdate((to, from) => {
-    // console.log(to, from)
+    console.log('device route',to, from)
     // console.log(to)
+    if(to.params.id == 'video') {
+        console.log('to')
+        return
+    }
     curDevice.value = to.params.id
     deviceSelection.value = defaultActiveMap.value[curDevice.value]
     chartSelection.value = optionsMap[curDevice.value][0]

@@ -8,16 +8,16 @@
             <thead>
                 <tr>
                     <th><h3>名称</h3></th>
-                    <th><h3>测点名称</h3></th>
+                    <th><h3>断面名称</h3></th>
                     <th><h3>预警时间</h3></th>
                     <th><h3>预警等级</h3></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>GNSS-BB1</td>
-                    <td>测点B</td>
-                    <td>19:46</td>
+                    <td>GNSS-CL01</td>
+                    <td>断面2</td>
+                    <td>8:46</td>
                     <td
                         class="danger"
                         :class="{ active: curActiveIndex === 0 }"
@@ -26,33 +26,33 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>测斜仪-AA1</td>
-                    <td>测点A</td>
-                    <td>19:26</td>
-                    <td class="focus" :class="{ active: curActiveIndex === 1 }">
-                        关注
+                    <td>GNSS-CL02</td>
+                    <td>断面2</td>
+                    <td>8:26</td>
+                    <td class="danger" :class="{ active: curActiveIndex === 1 }">
+                        危险
                     </td>
                 </tr>
                 <tr>
-                    <td>GNSS-AB2</td>
-                    <td>测点A</td>
-                    <td>19:16</td>
-                    <td class="focus" :class="{ active: curActiveIndex === 2 }">
-                        关注
+                    <td>GNSS-CL03</td>
+                    <td>断面2</td>
+                    <td>8:26</td>
+                    <td class="danger" :class="{ active: curActiveIndex === 2 }">
+                        危险
                     </td>
                 </tr>
                 <tr>
-                    <td>应变桩-AC2</td>
-                    <td>测点A</td>
-                    <td>19:36</td>
+                    <td>应力桩-YL01</td>
+                    <td>断面2</td>
+                    <td>8:36</td>
                     <td class="warn" :class="{ active: curActiveIndex === 3 }">
                         警告
                     </td>
                 </tr>
                 <tr>
-                    <td>孔隙水压力-BD2</td>
-                    <td>测点B</td>
-                    <td>19:46</td>
+                    <td>GNSS-CL04</td>
+                    <td>断面2</td>
+                    <td>8:16</td>
                     <td class="focus" :class="{ active: curActiveIndex === 4 }">
                         关注
                     </td>

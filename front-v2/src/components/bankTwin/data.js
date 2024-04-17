@@ -1,4 +1,4 @@
-import { getHoursBackIn } from '../../utils/timeUtils'
+import { getHoursBackIn, getDatesBefore } from '../../utils/timeUtils'
 
 const deviceStatusData = [
     {
@@ -162,6 +162,7 @@ const stableStatusLineData = [
 ]
 
 const hoursBackList = getHoursBackIn(24, 3)
+const daysBackList = getDatesBefore(6)
 
 function genRandomStableData(num) {
     let res = [[], [], [], []]
@@ -179,19 +180,19 @@ function genRandomStableData(num) {
 }
 
 const sectionStableDataMap = {
-    JC01: genRandomStableData(9),
-    JC02: genRandomStableData(9),
-    JC03: genRandomStableData(9),
-    JC04: genRandomStableData(9),
-    JC05: genRandomStableData(9),
-    JC06: genRandomStableData(9),
-    JC07: genRandomStableData(9),
-    JC08: genRandomStableData(9),
-    JC09: genRandomStableData(9),
-    JC10: genRandomStableData(9),
-    JC11: genRandomStableData(9),
-    JC12: genRandomStableData(9),
-    JC13: genRandomStableData(9),
+    JC01: genRandomStableData(6),
+    JC02: genRandomStableData(6),
+    JC03: genRandomStableData(6),
+    JC04: genRandomStableData(6),
+    JC05: genRandomStableData(6),
+    JC06: genRandomStableData(6),
+    JC07: genRandomStableData(6),
+    JC08: genRandomStableData(6),
+    JC09: genRandomStableData(6),
+    JC10: genRandomStableData(6),
+    JC11: genRandomStableData(6),
+    JC12: genRandomStableData(6),
+    JC13: genRandomStableData(6),
 }
 
 // There should not be negative values in rawData
@@ -309,7 +310,7 @@ function genChartSeries(chartIns, colors, dataList, seriesNum) {
         },
         xAxis: {
             type: 'category',
-            data: hoursBackList,
+            data: daysBackList,
             axisLabel: {
                 fontSize: 16,
                 fontWeight: 'bold',

@@ -93,7 +93,19 @@ const mapInit = async (map, vis) => {
         source: 'mzsBankAreaSSource',
         'source-layer': 'default',
         paint: {
-            'fill-color': 'rgba(233, 23, 86, 0.6)',
+            'fill-color': [
+                'match',
+                ['get', 'stability'],
+                '稳定',
+                '#18b915',
+                '较稳定',
+                '#06bef1',
+                '较不稳定',
+                '#df8105',
+                '不稳定',
+                '#ee3603',
+                '#18b915',
+            ],
         },
     })
     map.addLayer({
@@ -102,7 +114,19 @@ const mapInit = async (map, vis) => {
         source: 'mzsBankAreaWSource',
         'source-layer': 'default',
         paint: {
-            'fill-color': 'rgba(233, 233, 86, 0.6)',
+            'fill-color': [
+                'match',
+                ['get', 'warn'],
+                '正常',
+                '#18b915',
+                '关注',
+                'rgba(131, 14, 223, 0.5)',
+                '预警',
+                'rgba(221, 224, 23, 0.5)',
+                '警告',
+                'rgba(221, 24, 23, 0.5)',
+                '#18b915',
+            ],
         },
     })
     map.addLayer({

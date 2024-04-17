@@ -48,6 +48,11 @@ const routes = [
     },
     {
         path: '/',
+        name: 'home',
+        component: () => import("../views/BankMainView.vue")
+    },
+    {
+        path: '/main',
         component: () => import("../views/BankMainView.vue")
     },
     {
@@ -96,6 +101,10 @@ const routes = [
             {
                 path: 'monitor/:id', // 默认子页面
                 component: () => import('../components/bankManage/BankMonitorInfo.vue')
+            },
+            {
+                path: 'warn/:id', // 默认子页面
+                component: () => import('../components/bankManage/BankWarnTable.vue')
             }
         ]
     },

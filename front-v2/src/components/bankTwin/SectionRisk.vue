@@ -44,10 +44,10 @@ const pieChartShow = ref(false)
 const dataset = {
     dimensions: ['name', 'score'],
     source: [
-        ['危险', 1],
-        ['警告', 1],
-        ['关注', 4],
-        ['正常', 8],
+        ['危险', 3],
+        ['警告', 2],
+        ['关注', 5],
+        ['正常', 16],
     ],
 }
 

@@ -26,7 +26,7 @@
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">持续监测时间</div>
-                    <div class="val-text">20天</div>
+                    <div class="val-text">12天</div>
                 </div>
             </div>
         </e-border-box-3>

@@ -58,7 +58,7 @@ onMounted(() => {
     map = new mapboxgl.Map({
         container: 'map', // container ID
         // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-        style:getStyleJson(),
+        style: getStyleJson(),
         center: [120.312, 31.917], // starting position [lng, lat]
         zoom: 3, // starting zoom
         bounds: [
@@ -202,14 +202,41 @@ onMounted(() => {
                 'line-width': 4,
             },
         })
-        
+
         map.addLayer({
             id: 'fill1',
             type: 'fill',
             source: 'riverBg',
             'source-layer': 'default',
             paint: {
-                'fill-color': 'rgba(13, 22, 189, 0.5)',
+                'fill-color': [
+                    'match',
+                    ['get', 'height'],
+                    0,
+                    '#00e4ff',
+                    5,
+                    '#06bef1',
+                    10,
+                    '#0a9fe6',
+                    15,
+                    '#0e82db',
+                    20,
+                    '#1261cf',
+                    25,
+                    '#1548c6',
+                    30,
+                    '#1f3fcd',
+                    35,
+                    '#2f31d7',
+                    40,
+                    '#4021e3',
+                    45,
+                    '#5310f0',
+                    50,
+                    '#6500fc',
+                    '#000000',
+                ],
+                // 'fill-color': '#3EFA13'
             },
         })
         map.addLayer({
@@ -218,7 +245,7 @@ onMounted(() => {
             source: 'riverLand',
             'source-layer': 'default',
             paint: {
-                'fill-color': 'rgba(23, 214, 86, 0.5)',
+                'fill-color': 'rgba(183, 214, 86, 0.7)',
             },
         })
         // warning here!!
@@ -239,21 +266,6 @@ onMounted(() => {
             },
         })
         map.addLayer({
-            id: 'riverLabel',
-            type: 'symbol',
-            source: 'riverLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(13, 22, 189, 0.8)',
-            },
-        })
-        map.addLayer({
             id: 'riverSectionLabel',
             type: 'line',
             source: 'riverSectionLabelSource',
@@ -266,6 +278,21 @@ onMounted(() => {
                 'line-opacity': 1,
                 'line-color': 'rgba(231, 214, 86, 0.9)',
                 'line-width': 4,
+            },
+        })
+        map.addLayer({
+            id: 'riverLabel',
+            type: 'symbol',
+            source: 'riverLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+            },
+            paint: {
+                'text-color': 'rgba(13, 22, 189, 0.8)',
             },
         })
         map.addSource('mapRaster', {
@@ -475,8 +502,6 @@ onMounted(() => {
             console.log(features)
         })
         resizeObserver.observe(containerDom.value)
-
-
     })
 })
 
