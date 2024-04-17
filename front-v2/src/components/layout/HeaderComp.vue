@@ -291,7 +291,7 @@ div.main-header-container {
         rgba(13, 80, 147, 1) 80%,
         rgba(0, 134, 255, 1) 100%
     );
-    z-index: 1;
+    // z-index: 1;
 
     div.header-logo-pic {
         height: 5vh;
@@ -301,6 +301,8 @@ div.main-header-container {
         background-size: contain;
         background-repeat: no-repeat;
         background-image: url('/logo.png');
+        position: relative;
+        z-index: 10;
     }
 
     div.header-nav-container {

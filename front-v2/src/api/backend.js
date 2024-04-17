@@ -61,7 +61,8 @@ export default class BackEndRequest {
         //data
         switch (type) {
             case '1': {
-                return backendInstance.get(`/data/gnssData/id/${code}`)
+                // return backendInstance.get(`/data/gnssData/id/${code}`)
+                return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
             }
             case '2': {
                 return backendInstance.get(`/data/inclinometerData/id/${code}`)

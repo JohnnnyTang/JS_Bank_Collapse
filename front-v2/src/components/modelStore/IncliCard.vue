@@ -2,13 +2,16 @@
     <div class="machine-card-container">
         <div class="exchange-container">
             <div class="exchange-icon">
-                <img src="/icons/switch.png" alt="exchange">
+                <img
+                    src="/icons/switch.png" 
+                    alt="exchange"
+                    @click="changePage()"
+                >
             </div>
         </div>
         <div 
             class="machine-card"
             :class="[incli.firstPage ? 'active' : 'inactive']"
-            @click="changePage()"
         >
             <div class="machine-show-container">
                 <img src="/inclino.png" alt="设备图片">
@@ -28,7 +31,6 @@
         <div 
             class="machine-card second"
             :class="[incli.firstPage ? 'inactive' : 'active']"
-            @click="changePage()"
         >
             <div class="machine-table-container">
                 <div class="table-text-container">
@@ -37,11 +39,18 @@
                     </div>
                 </div>
                 <div class="table-body-container">
-                    <el-table :data="tableData" stripe style="width: 100%">
+                    <el-table 
+                        :data="tableData"
+                        stripe
+                        style="width: 100%"
+                        v-loading="loading"
+                        element-loading-text="数据加载中"
+                        element-loading-background="rgba(244, 252, 239, 0.6)"
+                    >
                         <el-table-column prop="id" label="设备ID" width="'20%''" />
-                        <el-table-column prop="x_move" label="x位移(点位1)" width="'20%'" />
-                        <el-table-column prop="y_move" label="y位移(点位1)" width="'20%'" />
-                        <el-table-column prop="z_move" label="x位移(点位2)" width="'20%'" />
+                        <el-table-column prop="top_move_24h" label="顶部24h变化量" width="'20%'" />
+                        <el-table-column prop="middle_move_24h" label="中部24h变化量" width="'20%'" />
+                        <el-table-column prop="bottom_move_24h" label="底部24h变化量" width="'20%'" />
                         <el-table-column prop="time" label="测量时间" width="'20%'"/>
                     </el-table>
                 </div>
@@ -49,15 +58,15 @@
             <div class="machine-data-container">
                 <div class="device-number-content">
                     <div class="device-number-data">
-                        已有设备数量:&nbsp;<span class="color-data">6</span></div>
+                        已有设备数量:&nbsp;<span class="color-data">{{ deviceNum }}</span></div>
                 </div>
                 <div class="record-number-content">
                     <div class="record-number-data">
-                        算法运行次数:&nbsp;<span class="color-data">20</span></div>
+                        算法运行次数:&nbsp;<span class="color-data">{{ CalculateTime }}</span></div>
                 </div>
                 <div class="time-number-content">
                     <div class="time-number-data">
-                        上次运行时间:<br><span class="color-data">2024-03-28 15:30:45</span></div>
+                        上次运行时间:<br><span class="color-data">{{ latestTime }}</span></div>
                 </div>
             </div>
         </div>
@@ -65,93 +74,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-const tableData = [
-  {
-    id: '001',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '002',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '003',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    x_move: '1',
-    y_move: '2',
-    z_move: '3',
-    time: '2016-05-02'
-  },
-]
+import DeviceRequest from './api.js';
+import { ref, onMounted } from 'vue'
+
+const tableData = ref([]);
+const deviceNum = ref(0);
+const CalculateTime = ref(0);
+const latestTime = ref("");
+const loading = ref(true)
+
 const props = defineProps({
     incli: {
         type: Object,
@@ -162,6 +93,28 @@ const incli = ref(props.incli)
 const changePage = () => {
     incli.value.firstPage = !incli.value.firstPage
 }
+
+onMounted(
+    async () => {
+        const InclinometerData = (await DeviceRequest.getInclinometerAllData()).data.data;
+        deviceNum.value = ( await DeviceRequest.getInclinometerMachineNum()).data.data;
+        CalculateTime.value = ( await DeviceRequest.getInclinometerRecordNum()).data.data;
+        latestTime.value = ( await DeviceRequest.getInclinometerRecordLatestTime()).data.data;
+        InclinometerData.forEach(item => {
+            tableData.value.push({
+                id: item.idGroup.machine_id,
+                top_move: item.top_move,
+                middle_move: item.middle_move,
+                bottom_move: item.bottom_move,
+                top_move_24h: item.top_move_24h,
+                middle_move_24h: item.middle_move_24h,
+                bottom_move_24h: item.bottom_move_24h,
+                time: item.in_time
+            })
+        })
+        loading.value = false
+    }
+);
 
 </script>
 
@@ -188,6 +141,7 @@ div.machine-card-container {
             align-items: center;
             width: 100%px;
             height: 100%px;
+            z-index: 10;
             
             img {
                 widows: 100%;

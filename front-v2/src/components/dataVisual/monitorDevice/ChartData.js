@@ -40,7 +40,7 @@ const generateData_GNSS = (ogDataArray) => {
 
 
     let showCount = ogDataArray.length
-    showCount = 20;//50 IS ENOUGH
+    showCount = Math.min(20,showCount)
     let endTime = time(ogDataArray[0].measureTime);
     let startTime = time(ogDataArray[showCount].measureTime);
     for (let i = 0; i < showCount; i++) {
@@ -109,7 +109,8 @@ const generateData_Incline = (ogDataArray, metaData) => {
 
     let depth_value_time = []
 
-    let showCount = 5   //50enough
+    let showCount = ogDataArray.length
+    showCount = Math.min(5,showCount)
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
@@ -159,7 +160,8 @@ const generateData_Manometer = (ogDataArray, metaData) => {
     let depthArray = []
     let legendData = []
     let pressureData_river = []
-    let showCount = 8   //50enough
+    let showCount = ogDataArray.length
+    showCount = Math.min(8,showCount)
 
     let depth_value_data = []
     let depth_value_time = []
@@ -211,7 +213,8 @@ const generateData_Stress = (ogDataArray, metaData) => {
     let pointNum = metaData["pointNum"]
     let depthArray = []
     let legendData = []
-    let showCount = 5   //50enough
+    let showCount = ogDataArray.length
+    showCount = Math.min(5,showCount)
     let horizontalAngle = []
     let depth_value_hori_data = []
     let depth_value_vert_data = []
