@@ -79,6 +79,7 @@ const defaultActiveMap = ref({
     gnss: 'CL-01',
     manometer: 'KX-01',
     stress: 'YL-01',
+    inclinometer: 'CX-01',
 })
 
 const optionsMap = reactive({
@@ -95,6 +96,14 @@ const optionsMap = reactive({
         '中部应力',
         '底端应力',
     ],
+    inclinometer: [
+        '顶端移动',
+        '中部移动',
+        '底端移动',
+        '顶端日累计移动',
+        '中部日累计移动',
+        '底端日累计移动',
+    ],
 })
 
 const deviceSelection = ref(defaultActiveMap.value[curDevice.value])
@@ -109,7 +118,14 @@ const deviceNameMap = {
         三维累积位移: 'threeD',
         五小时相对变化: 'threeDF',
     },
-    inclinometer: {},
+    inclinometer: {
+        顶端移动: 'topMove',
+        中部移动: 'middleMove',
+        底端移动: 'bottomMove',
+        顶端日累计移动: 'topMovePerDay',
+        中部日累计移动: 'middleMovePerDay',
+        底端日累计移动: 'bottomMovePerDay',
+    },
     manometer: {
         频率: 'frequency',
         温度: 'temperature',
@@ -144,7 +160,17 @@ const deviceListMap = ref({
         'CL-09',
         'CL-10',
     ],
-    inclinometer: [],
+    inclinometer: [
+        'CX-01',
+        'CX-02',
+        'CX-03',
+        'CX-04',
+        'CX-05',
+        'CX-06',
+        'CX-07',
+        'CX-08',
+        'CX-09',
+    ],
     manometer: [
         'KX-01',
         'KX-02',
@@ -193,6 +219,17 @@ const deviceIdMap = {
         'YL-06': 'MZS120.548925_32.029361_2',
         'YL-07': 'MZS120.552209_32.028149_2',
     },
+    inclinometer: {
+        'CX-01': 'MZS120.51967889_32.04004108_4',
+        'CX-02': 'MZS120.51986665_32.03998992_4',
+        'CX-03': 'MZS120.52557975_32.03825056_4',
+        'CX-04': 'MZS120.52565217_32.03813574_4',
+        'CX-05': 'MZS120.52566826_32.03799363_4',
+        'CX-06': 'MZS120.51726088_32.04054582_4',
+        'CX-07': 'MZS120.51738292_32.04054923_4',
+        'CX-08': 'MZS120.51749021_32.04053105_4',
+        'CX-09': 'MZS120.51957026_32.04008655_4',
+    },
 }
 
 const deviceTableKeyListMap = ref({
@@ -204,7 +241,15 @@ const deviceTableKeyListMap = ref({
         { name: 'threeDf', label: '五小时相对变化' },
         { name: 'inTime', label: '时间' },
     ],
-    inclinometer: [],
+    inclinometer: [
+        { name: 'topMove', label: '顶端移动' },
+        { name: 'middleMove', label: '中部移动' },
+        { name: 'bottomMove', label: '底端角度' },
+        { name: 'topMovePerDay', label: '顶端日累计移动' },
+        { name: 'middleMovePerDay', label: '中部日累计移动' },
+        { name: 'bottomMovePerDay', label: '底端日累计移动' },
+        { name: 'inTime', label: '时间' },
+    ],
     manometer: [
         { name: 'frequency', label: '频率' },
         { name: 'temperature', label: '温度' },
@@ -278,7 +323,53 @@ const deviceDataManageMap = ref({
             chartData: {},
         },
     },
-    inclinometer: {},
+    inclinometer: {
+        'CX-01': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-02': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-03': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-04': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-05': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-06': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-07': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-08': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'CX-09': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+    },
     manometer: {
         'KX-01': {
             updateTime: null,
@@ -1021,12 +1112,12 @@ function buildSeries(dataList, deviceType) {
             return {
                 time: timeList,
                 series: {
-                    x_move: {
+                    topMove: {
                         series: {
-                            name: 'x_move',
+                            name: 'topMove',
                             type: 'line',
                             data: dataList.map(function (item) {
-                                return item['XMove']
+                                return item['topMove']
                             }),
                         },
                         visMap: gnssVisMap,
@@ -1081,12 +1172,12 @@ function buildSeries(dataList, deviceType) {
                             },
                         ],
                     },
-                    y_move: {
+                    middleMove: {
                         series: {
-                            name: 'y_move',
+                            name: 'middleMove',
                             type: 'line',
                             data: dataList.map(function (item) {
-                                return item['YMove']
+                                return item['middleMove']
                             }),
                         },
                         visMap: gnssVisMap,
@@ -1141,12 +1232,12 @@ function buildSeries(dataList, deviceType) {
                             },
                         ],
                     },
-                    z_move: {
+                    bottomMove: {
                         series: {
-                            name: 'z_move',
+                            name: 'bottomMove',
                             type: 'line',
                             data: dataList.map(function (item) {
-                                return item['ZMove']
+                                return item['bottomMove']
                             }),
                         },
                         visMap: gnssVisMap,
@@ -1201,12 +1292,12 @@ function buildSeries(dataList, deviceType) {
                             },
                         ],
                     },
-                    threeD: {
+                    topMovePerDay: {
                         series: {
-                            name: 'threeD',
+                            name: 'topMovePerDay',
                             type: 'line',
                             data: dataList.map(function (item) {
-                                return item['threeD']
+                                return item['topMovePerDay']
                             }),
                         },
                         visMap: gnssVisMap,
@@ -1261,12 +1352,72 @@ function buildSeries(dataList, deviceType) {
                             },
                         ],
                     },
-                    threeDF: {
+                    middleMovePerDay: {
                         series: {
-                            name: 'threeDF',
+                            name: 'middleMovePerDay',
                             type: 'line',
                             data: dataList.map(function (item) {
-                                return item['threeDf']
+                                return item['middleMovePerDay']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [
+                            {
+                                yAxis: 3,
+                                lineStyle: {
+                                    color: '#93CE07',
+                                },
+                            },
+                            {
+                                yAxis: -3,
+                                lineStyle: {
+                                    color: '#93CE07',
+                                },
+                            },
+                            {
+                                yAxis: 5,
+                                lineStyle: {
+                                    color: '#FBDB0F',
+                                },
+                            },
+                            {
+                                yAxis: -5,
+                                lineStyle: {
+                                    color: '#FBDB0F',
+                                },
+                            },
+                            {
+                                yAxis: 10,
+                                lineStyle: {
+                                    color: '#FC7D02',
+                                },
+                            },
+                            {
+                                yAxis: -10,
+                                lineStyle: {
+                                    color: '#FC7D02',
+                                },
+                            },
+                            {
+                                yAxis: 18,
+                                lineStyle: {
+                                    color: '#FD0100',
+                                },
+                            },
+                            {
+                                yAxis: -18,
+                                lineStyle: {
+                                    color: '#FD0100',
+                                },
+                            },
+                        ],
+                    },
+                    bottomMovePerDay: {
+                        series: {
+                            name: 'bottomMovePerDay',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['bottomMovePerDay']
                             }),
                         },
                         visMap: gnssVisMap,

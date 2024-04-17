@@ -77,12 +77,10 @@ public class FileUtil {
     public static String buildInclinoDataString(List<InclinometerData> inclinometerDataList) {
         StringBuilder out = new StringBuilder("x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6\n");
         for(InclinometerData inclinometerData:inclinometerDataList) {
-            out.append(inclinometerData.getXMove1()).append(",").append(inclinometerData.getYMove1()).append(",")
-                    .append(inclinometerData.getXMove2()).append(",").append(inclinometerData.getYMove2()).append(",")
-                    .append(inclinometerData.getXMove3()).append(",").append(inclinometerData.getYMove3()).append(",")
-                    .append(inclinometerData.getXMove4()).append(",").append(inclinometerData.getYMove4()).append(",")
-                    .append(inclinometerData.getXMove5()).append(",").append(inclinometerData.getYMove5()).append(",")
-                    .append(inclinometerData.getXMove6()).append(",").append(inclinometerData.getYMove6()).append("\n");
+            out.append(inclinometerData.getTopMove()).append(",").append(inclinometerData.getMiddleMove()).append(",")
+                    .append(inclinometerData.getBottomMove()).append(",").append(inclinometerData.getTopMovePerDay()).append(",")
+                    .append(inclinometerData.getMiddleMovePerDay()).append(",")
+                    .append(inclinometerData.getBottomMovePerDay()).append(",").append("\n");
         }
         return out.toString();
     }
