@@ -2,7 +2,7 @@
     <div class="realtime-risk-container">
         <div class="realtime-risk-title">
             <div class="realtime-risk-icon"></div>
-            <div class="risk-title-text">实时风险监测</div>
+            <div class="risk-title-text">实时预警监测</div>
         </div>
         <div
             class="risk-content-container"
@@ -34,10 +34,10 @@ const pieChartShow = ref(false)
 const dataset = {
     dimensions: ['name', 'score'],
     source: [
-        ['危险', 1],
-        ['警告', 1],
-        ['关注', 4],
-        ['正常', 8],
+        ['危险', 3],
+        ['警告', 2],
+        ['关注', 5],
+        ['正常', 16],
     ],
 }
 const pieOption = {
