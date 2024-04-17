@@ -20,16 +20,10 @@ import lombok.*;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InclinometerData extends MonitorData {
-    private Double xMove1;
-    private Double yMove1;
-    private Double xMove2;
-    private Double yMove2;
-    private Double xMove3;
-    private Double yMove3;
-    private Double xMove4;
-    private Double yMove4;
-    private Double xMove5;
-    private Double yMove5;
-    private Double xMove6;
-    private Double yMove6;
+    private Double topMove;
+    private Double middleMove;
+    private Double bottomMove;
+    private Double topMovePerDay;
+    private Double middleMovePerDay;
+    private Double bottomMovePerDay;
 }
