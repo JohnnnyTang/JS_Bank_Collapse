@@ -301,6 +301,8 @@ div.main-header-container {
         background-size: contain;
         background-repeat: no-repeat;
         background-image: url('/logo.png');
+        position: relative;
+        z-index: 10;
     }
 
     div.header-nav-container {

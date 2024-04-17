@@ -1,12 +1,12 @@
 <template>
     <div class="all">
-        <ModelTitleVue :ModelName="'岸坡稳定性分析模型'"  v-show="!showAnalysis"/>
+        <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" v-show="!showAnalysis" />
 
-        <div class="model-content-container"  v-show="!showAnalysis">
+        <div class="model-content-container" v-show="!showAnalysis">
             <div class="model-item-container">
-                <div class="model-choice" >
+                <div class="model-choice">
                     <div class="basemap-radio-container">
-                        <input type="radio" id="radio-1" name="tabs" checked @click="radio1Click()" />
+                        <input type="radio" id="radio-1" name="tabs" @click="radio1Click()" />
                         <label class="tab" for="radio-1">近岸动力分析</label>
                         <input type="radio" id="radio-2" name="tabs" @click="radio2Click()" />
                         <label class="tab" for="radio-2">近岸演变分析</label>
@@ -81,6 +81,7 @@
 
         <div class="analysisCenter" v-show="showAnalysis">
             <div class="background"></div>
+            <div class="back" @click="showAnalysis = !showAnalysis;"></div>
             <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
                 src="http://172.21.212.165:8050/#/analysis/73c29959-16f0-4478-8526-0927d1aff6f7">
 
@@ -126,17 +127,18 @@ const modelInfo = {
 
 const title1 = ref('模型配置')
 const showAnalysis = ref(false)
+const radio = ref('checked')
 const radio1Click = () => {
     showAnalysis.value = false
 }
 const radio2Click = () => {
     showAnalysis.value = true
-    data[0].children = [
-        {
-            'label': 'uvet流场数据',
-            'children': []
-        }
-    ]
+    // data[0].children = [
+    //     {
+    //         'label': 'uvet流场数据',
+    //         'children': []
+    //     }
+    // ]
 }
 
 const mapContainerRef = ref();
@@ -288,8 +290,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-
-div.all{
+div.all {
     width: 100vw;
     height: 92vh;
     position: relative;
@@ -668,7 +669,7 @@ div.model-content-container {
     div.map-container {
         position: relative;
         width: 80vw;
-        height: 86vh;
+        height: 87vh;
 
         #map {
             position: absolute;
@@ -700,23 +701,41 @@ div.model-content-container {
 .analysisCenter {
     width: calc(100vw);
     height: calc(100vh);
-    top:0vh;
+    top: 0vh;
     position: fixed;
     z-index: 0;
     background-color: aliceblue;
 
-    .background{
+    .background {
         // background-color: radial-gradient(circle, rgb(16, 2, 84) 0%, rgb(16, 31, 128) 40%, rgb(13, 80, 147) 80%, rgb(0, 134, 255) 100%);
-        background-color: #0642b1;
+        background-color: rgb(22,36,127);
         position: fixed;
         top: 0;
         height: 8.2vh;
         width: 100vw;
         z-index: 5;
     }
-    iframe{
-        position: relative;
 
+    .back {
+        position: fixed;
+        top: 9.2vh;
+        left: 1vw;
+        width: 3vh;
+        height: 3vh;
+        background-size: contain;
+        background-image: url('/back.png');
+        z-index: 15;
+
+        &:hover {
+            cursor: pointer;
+            transform: scale(1.03);
+            transition: 500ms;
+        }
+
+    }
+
+    iframe {
+        position: relative;
         border-width: 0;
     }
 }
