@@ -2,13 +2,16 @@
     <div class="machine-card-container">
         <div class="exchange-container">
             <div class="exchange-icon">
-                <img src="/icons/switch.png" alt="exchange">
+                <img
+                    src="/icons/switch.png"
+                    alt="exchange"
+                    @click="changePage()"
+                >
             </div>
         </div>
         <div 
             class="machine-card"
             :class="[watpre.firstPage ? 'active' : 'inactive']"
-            @click="changePage()"
         >
             <div class="machine-show-container">
                 <img src="/waterPress.png" alt="设备图片">
@@ -28,7 +31,6 @@
         <div 
             class="machine-card second"
             :class="[watpre.firstPage ? 'inactive' : 'active']"
-            @click="changePage()"
         >
             <div class="machine-table-container">
                 <div class="table-text-container">
@@ -37,11 +39,18 @@
                     </div>
                 </div>
                 <div class="table-body-container">
-                    <el-table :data="tableData" stripe style="width: 100%">
+                    <el-table
+                        :data="tableData"
+                        stripe
+                        style="width: 100%"
+                        v-loading="loading"
+                        element-loading-text="数据加载中"
+                        element-loading-background="rgba(244, 252, 239, 0.6)"
+                    >
                         <el-table-column prop="id" label="设备ID" width="'20%''" />
-                        <el-table-column prop="pressure1" label="压力1" width="'20%'" />
-                        <el-table-column prop="pressure1" label="压力2" width="'20%'" />
-                        <el-table-column prop="pressure1" label="压力3" width="'20%'" />
+                        <el-table-column prop="zx" label="频率" width="'20%'" />
+                        <el-table-column prop="wd" label="温度" width="'20%'" />
+                        <el-table-column prop="swgc" label="水位高程" width="'20%'" />
                         <el-table-column prop="time" label="测量时间" width="'20%'"/>
                     </el-table>
                 </div>
@@ -49,15 +58,15 @@
             <div class="machine-data-container">
                 <div class="device-number-content">
                     <div class="device-number-data">
-                        已有设备数量:&nbsp;<span class="color-data">6</span></div>
+                        已有设备数量:&nbsp;<span class="color-data">{{ deviceNum }}</span></div>
                 </div>
                 <div class="record-number-content">
                     <div class="record-number-data">
-                        算法运行次数:&nbsp;<span class="color-data">20</span></div>
+                        算法运行次数:&nbsp;<span class="color-data">{{ CalculateTime }}</span></div>
                 </div>
                 <div class="time-number-content">
                     <div class="time-number-data">
-                        上次运行时间:<br><span class="color-data">2024-03-28 15:30:45</span></div>
+                        上次运行时间:<br><span class="color-data">{{ latestTime }}</span></div>
                 </div>
             </div>
         </div>
@@ -65,93 +74,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-const tableData = [
-  {
-    id: '001',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '002',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '003',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-  {
-    id: '004',
-    pressure1: '1',
-    pressure2: '2',
-    pressure3: '3',
-    time: '2016-05-02'
-  },
-]
+import DeviceRequest from './api.js';
+import { ref, onMounted } from 'vue'
+
+const tableData = ref([]);
+const deviceNum = ref(0);
+const CalculateTime = ref(0);
+const latestTime = ref("");
+const loading = ref(true)
+
 const props = defineProps({
     watpre: {
         type: Object,
@@ -162,6 +93,25 @@ const watpre = ref(props.watpre)
 const changePage = () => {
     watpre.value.firstPage = !watpre.value.firstPage
 }
+
+onMounted(
+    async () => {
+        const ManometerData = (await DeviceRequest.getManometerAllData()).data.data;
+        deviceNum.value = ( await DeviceRequest.getManometerMachineNum()).data.data;
+        CalculateTime.value = ( await DeviceRequest.getManometerRecordNum()).data.data;
+        latestTime.value = ( await DeviceRequest.getManometerRecordLatestTime()).data.data;
+        ManometerData.forEach(item => {
+            tableData.value.push({
+                id: item.idGroup.machine_id,
+                zx: item.zx,
+                wd: item.wd,
+                swgc: item.swgc,
+                time: item.in_time
+            })
+        })
+        loading.value = false
+    }
+);
 
 </script>
 
@@ -188,6 +138,7 @@ div.machine-card-container {
             align-items: center;
             width: 100%px;
             height: 100%px;
+            z-index: 10;
             
             img {
                 widows: 100%;

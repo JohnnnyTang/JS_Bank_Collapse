@@ -9,24 +9,15 @@
         <result property="deviceCode" column="machine_id"/>
         <result property="measureTime" column="measure_time"/>
         <result property="inTime" column="in_time"/>
-        <result property="horizontal1" column="horizontal1"/>
-        <result property="horizontal2" column="horizontal2"/>
-        <result property="horizontal3" column="horizontal3"/>
-        <result property="horizontal4" column="horizontal4"/>
-        <result property="horizontal5" column="horizontal5"/>
-        <result property="horizontal6" column="horizontal6"/>
-        <result property="horizontal_stress1" column="horizontal_stress1"/>
-        <result property="horizontal_stress2" column="horizontal_stress2"/>
-        <result property="horizontal_stress3" column="horizontal_stress3"/>
-        <result property="horizontal_stress4" column="horizontal_stress4"/>
-        <result property="horizontal_stress5" column="horizontal_stress5"/>
-        <result property="horizontal_stress6" column="horizontal_stress6"/>
-        <result property="vertical_stress1" column="vertical_stress1"/>
-        <result property="vertical_stress2" column="vertical_stress2"/>
-        <result property="vertical_stress3" column="vertical_stress3"/>
-        <result property="vertical_stress4" column="vertical_stress4"/>
-        <result property="vertical_stress5" column="vertical_stress5"/>
-        <result property="vertical_stress6" column="vertical_stress6"/>
+        <result property="topAngle" column="top_angle"/>
+        <result property="middleAngle" column="middle_angle"/>
+        <result property="bottomAngle" column="bottom_angle"/>
+        <result property="topPower" column="top_power"/>
+        <result property="middlePower" column="middle_power"/>
+        <result property="bottomPower" column="bottom_power"/>
+        <result property="topChange" column="top_change"/>
+        <result property="middleChange" column="middle_change"/>
+        <result property="bottomChange" column="bottom_change"/>
     </resultMap>
     <select id="findAll" resultMap="stressPileDataMap">
         SELECT * FROM stresspile_record;
