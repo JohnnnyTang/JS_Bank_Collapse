@@ -111,14 +111,6 @@ onMounted(
         })
         loading.value = false
     }
-    // async () => {
-    //     deviceNum.value = ( await DeviceRequest.getGNSSRecordNum()).data.data;
-    // },
-
-    // async () => {
-    //     latestTime.value = ( await DeviceRequest.getGNSSRecordLatestTime()).data.data;
-    // }
-
 );
 
 </script>
