@@ -10,6 +10,8 @@ import com.johnny.bank.utils.DataNodeSyncUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,6 +23,9 @@ import java.util.List;
 public class MonitorInfoService implements IMonitorInfoService {
     private final IDataNodeRepo dataNodeRepo;
     private final IMonitorInfoRepo deviceInfoRepo;
+
+    private final List<String> deviceTypeList = new ArrayList<>(
+            Arrays.asList("Gnss", "Stress", "Manometer", "Inclinometer", "Inclinometer_O", "Video"));
 //    private final List<String> deviceTypeList = new ArrayList<>(){{
 //       add("gnss");
 //    }};
@@ -80,6 +85,13 @@ public class MonitorInfoService implements IMonitorInfoService {
                 "MonitorInfoGroup", "monitorInfoGroupOfTestBank");
     }
 
+    public DataNode getDeviceTypeDataNode(Character deviceType) {
+        String deviceTypeStr = deviceTypeList.get(Character.getNumericValue(deviceType)-1);
+        return dataNodeRepo.getNodeByCategoryAndName(
+                deviceTypeStr + "InfoGroup",
+                deviceTypeStr.toLowerCase() + "InfoGroupOfTestBank");
+    }
+
     @DynamicNodeData
     @Override
     public List<MonitorInfo> getDataByStationCode(DataNode dataNode, String stationCode) {
@@ -102,7 +114,8 @@ public class MonitorInfoService implements IMonitorInfoService {
     @DynamicNodeData
     public List<MonitorInfo> getDeviceByType(DataNode dataNode, Character deviceType) {
         List<MonitorInfo> monitorInfoList = deviceInfoRepo.findDeviceByType(deviceType);
-        DataNodeSyncUtil.SyncDeviceNodeWhenBaseGroupDataChanged(monitorInfoList, dataNodeRepo, dataNode);
+        DataNodeSyncUtil.SyncDeviceNodeWhenBaseGroupDataChanged(
+                monitorInfoList, dataNodeRepo, getDeviceTypeDataNode(deviceType));
         return monitorInfoList;
     }
 }

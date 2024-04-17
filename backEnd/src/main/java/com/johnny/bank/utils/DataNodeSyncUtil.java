@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class DataNodeSyncUtil {
     public static final List<String> deviceTypeList = new ArrayList<>(
-            Arrays.asList("Gnss", "Stress", "Manometer", "Inclinometer"));
+            Arrays.asList("Gnss", "Stress", "Manometer", "Inclinometer", "Inclinometer_O", "Video"));
 //    public static <T extends StaticInfoData> void SyncNodeAndData(
 //            List<T> dataList, IDataNodeRepo dataNodeRepo, DataNode parentNode) {
 //        List<String> nameList = new ArrayList<>();

@@ -9,12 +9,15 @@
         <result property="deviceCode" column="machine_id"/>
         <result property="measureTime" column="measure_time"/>
         <result property="inTime" column="in_time"/>
-        <result property="pressure1" column="pressure1"/>
-        <result property="pressure2" column="pressure1"/>
-        <result property="pressure3" column="pressure2"/>
-        <result property="pressure4" column="pressure2"/>
-        <result property="pressure5" column="pressure3"/>
-        <result property="pressure6" column="pressure3"/>
+<!--        <result property="pressure1" column="pressure1"/>-->
+<!--        <result property="pressure2" column="pressure1"/>-->
+<!--        <result property="pressure3" column="pressure2"/>-->
+<!--        <result property="pressure4" column="pressure2"/>-->
+<!--        <result property="pressure5" column="pressure3"/>-->
+<!--        <result property="pressure6" column="pressure3"/>-->
+        <result property="frequency" column="zx"/>
+        <result property="temperature" column="wd"/>
+        <result property="height" column="swgc"/>
     </resultMap>
     <select id="findAll" resultMap="manometerDataMap">
         SELECT * FROM manometer_record;

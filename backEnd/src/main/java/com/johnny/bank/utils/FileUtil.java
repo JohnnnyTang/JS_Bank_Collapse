@@ -90,9 +90,11 @@ public class FileUtil {
     public static String buildManoDataString(List<ManometerData> manometerDataList) {
         StringBuilder out = new StringBuilder("pressure1,pressure2,pressure3,pressure4,pressure5,pressure6\n");
         for(ManometerData manometerData:manometerDataList) {
-            out.append(manometerData.getPressure1()).append(",").append(manometerData.getPressure2()).append(",")
-                    .append(manometerData.getPressure3()).append(",").append(manometerData.getPressure4()).append(",")
-                    .append(manometerData.getPressure5()).append(",").append(manometerData.getPressure6()).append("\n");
+//            out.append(manometerData.getPressure1()).append(",").append(manometerData.getPressure2()).append(",")
+//                    .append(manometerData.getPressure3()).append(",").append(manometerData.getPressure4()).append(",")
+//                    .append(manometerData.getPressure5()).append(",").append(manometerData.getPressure6()).append("\n");
+            out.append(manometerData.getFrequency()).append(",").append(manometerData.getTemperature()).append(",")
+                    .append(manometerData.getHeight()).append("\n");
         }
         return out.toString();
     }
