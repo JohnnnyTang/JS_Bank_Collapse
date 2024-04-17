@@ -11,7 +11,7 @@
                         <div class="total-desc">
                             <div class="indb-device">
                                 <div class="indb-device-title">已接入设备</div>
-                                <div class="indb-device-num">{{ deviceInfos.length }}</div>
+                                <div class="indb-device-num">{{ DeviceSum }}</div>
                             </div>
                             <div class="last-update">
                                 <div class="last-update-title">上次更新</div>
@@ -53,9 +53,10 @@ import dayjs from 'dayjs';
 
 
 const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
-const DEVICEPICMAP = ['/device/gnssBase.png', '/device/inclino.png', '/device/waterPress.png', '/device/changePress.png']
+const DEVICEPICMAP = ['/gnssBase.png', '/inclino.png', '/waterPress.png', '/changePress.png']
 var DEVICECOUNT = [0, 0, 0, 0]
 const deviceInfos = ref([])
+const DeviceSum = ref(0)
 let myChart = null
 
 const countingStar = (arr) => {
@@ -64,14 +65,20 @@ const countingStar = (arr) => {
         let item = arr[i]
         if (item.type === '1') {
             DEVICECOUNT[0]++
-        } else if (item.type === '2') {
+        } else if (item.type === '4') {//4 是 测斜仪
             DEVICECOUNT[1]++
         } else if (item.type === '3') {
             DEVICECOUNT[2]++
-        } else if (item.type === '4') {
+        } else if (item.type === '2') {
             DEVICECOUNT[3]++
         }
+        // else{
+        //     // console.log('未知设备类型');
+        //     console.log(item.type);
+        // }
     }
+    // console.log('sum of DEVICECOUNT', DEVICECOUNT[0]+DEVICECOUNT[1]+DEVICECOUNT[2]+DEVICECOUNT[3]);
+    DeviceSum.value = DEVICECOUNT[0]+DEVICECOUNT[1]+DEVICECOUNT[2]+DEVICECOUNT[3]
 }
 
 const chartOption = () => {
@@ -118,6 +125,7 @@ const chartOption = () => {
 
 const updateInfo = async () => {
     const data = (await BackEndRequest.getMonitorInfo()).data
+    console.log(data);
     countingStar(data)
     deviceInfos.value = data
     var now = dayjs().format('YYYY-MM-DD HH:mm:ss')

@@ -6,9 +6,9 @@
             <div class="model-item-container">
                 <div class="model-choice">
                     <div class="basemap-radio-container">
-                        <input type="radio" id="radio-1" name="tabs" v-model="checky" @click="radio1Click()" />
+                        <input type="radio" id="radio-1" name="tabs" :checked="checky1" @click="radio1Click()" />
                         <label class="tab" for="radio-1">近岸动力分析</label>
-                        <input type="radio" id="radio-2" name="tabs" @click="radio2Click()" />
+                        <input type="radio" id="radio-2" name="tabs" :checked="checky2" @click="radio2Click()" />
                         <label class="tab" for="radio-2">近岸演变分析</label>
                         <span class="glider"></span>
                     </div>
@@ -81,7 +81,7 @@
 
         <div class="analysisCenter" v-show="showAnalysis">
             <div class="background"></div>
-            <div class="back" @click="showAnalysis = !showAnalysis;"></div>
+            <div class="back" @click="backHandle"></div>
             <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
                 src="http://172.21.212.165:8050/#/analysis/73c29959-16f0-4478-8526-0927d1aff6f7">
 
@@ -127,12 +127,24 @@ const modelInfo = {
 
 const title1 = ref('模型配置')
 const showAnalysis = ref(false)
-const checky1 = ref('checked')
+const checky1 = ref(true)
+const checky2 = ref(false)
+const backHandle = ()=>{
+    checky1.value = true;
+    checky2.value = false;
+    showAnalysis.value = false
+}
+
 const radio1Click = () => {
     showAnalysis.value = false
+    checky1.value = true
+    checky2.value = false
 }
 const radio2Click = () => {
     showAnalysis.value = true
+    checky2.value = true
+    checky1.value = false
+
 }
 
 const mapContainerRef = ref();
@@ -695,7 +707,9 @@ div.model-content-container {
 .analysisCenter {
     width: calc(100vw);
     height: calc(100vh);
-    top: calc( 3px - 5rem);
+    top: calc(3px - 5rem);
+    overflow: hidden;
+    bottom: 0;
     position: absolute;
     z-index: 0;
     background-color: aliceblue;
@@ -729,7 +743,7 @@ div.model-content-container {
     }
 
     iframe {
-        position: relative;
+        // position: relative;s
         border-width: 0;
     }
 }

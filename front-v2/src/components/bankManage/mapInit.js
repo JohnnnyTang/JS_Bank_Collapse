@@ -193,7 +193,6 @@ const mapInit = async (map, vis) => {
     if (vis) {
         //////////////monitor device////////////
         let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
-        console.log('mn info', monitorInfo)
         let monitorDevice = DataPioneer.generateGeoJson(
             monitorInfo,
             (element) => {
@@ -201,7 +200,6 @@ const mapInit = async (map, vis) => {
             },
             'Point',
         )
-        console.log("mn device", monitorDevice)
         // debugger
         const { gnss, incline, stress, manometer } =
             DataPioneer.getDifMonitorData(monitorDevice)
@@ -274,7 +272,7 @@ const mapInit = async (map, vis) => {
         let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
         map.on('click', deviceLayers, (e) => {
-            console.log(e.features[0].properties)
+            ///////test
             let p = e.features[0].properties
             const property = e.features[0].properties
             propertyRef.value = property
@@ -288,43 +286,33 @@ const mapInit = async (map, vis) => {
             map.getCanvas().style.cursor = ''
         })
 
-        //"MZS120.529408_32.033683_1"  gnss
-        //"MZS120.528701_32.034685_2" 测斜仪
-        //"MZS120.530415_32.033657_4" 应力桩
-        //"MZS120.531984_32.032682_3" 孔隙水压力计
-
-        setTimeout(() => {
-            setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-            // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
-        }, 2000)
+        // setTimeout(() => {
+        //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+        //     // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
+        // }, 2000)
 
         ///////DEBUG////////
-        // window.addEventListener('keydown', (e) => {
-        //     if (e.key === '1') {
-        //         setWarningDeviceStyle(map, '测斜仪', "MZS120.528701_32.034685_2")
-        //     }
-        //     if (e.key === '2') {
-        //         setWarningDeviceStyle(map, 'GNSS', "MZS120.529408_32.033683_1")
-        //     }
-        //     if (e.key === '3') {
-        //         setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.531984_32.032682_3")
-        //     }
-        //     if (e.key === '4') {
-        //         setWarningDeviceStyle(map, '应力桩', "MZS120.530415_32.033657_4")
-        //     }
-        //     if (e.key === '5') {
-        //         removeWarningDeviceStyle(map, '测斜仪', "MZS120.528701_32.034685_2")
-        //     }
-        //     if (e.key === '6') {
-        //         removeWarningDeviceStyle(map, 'GNSS', "MZS120.529408_32.033683_1")
-        //     }
-        //     if (e.key === '7') {
-        //         removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.531984_32.032682_3")
-        //     }
-        //     if (e.key === '8') {
-        //         removeWarningDeviceStyle(map, '应力桩', "MZS120.530415_32.033657_4")
-        //     }
-        // })
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '3') {
+                setWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
+            }
+            if (e.key === '1') {
+                setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+            }
+            if (e.key === '2') {
+                setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
+            }
+            if (e.key === '4'){
+                removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
+            }
+            if (e.key === '5'){
+                removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+            }
+            if (e.key === '6'){
+                removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
+            }
+ 
+        })
     }
 }
 
@@ -376,7 +364,6 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
         json,
         deviceCode
     )
-
     propertyRef.value = property
     const popUp = createPopUp(propertyRef)
     popUp.setLngLat([property.longitude, property.latitude]).addTo(map)
@@ -418,7 +405,6 @@ const createPopUp = (deviceProperty) => {
 
 const findProptyFromJson = (geoJson, code) => {
     const features = geoJson.features
-
     let prop
     features.forEach((item) => {
         if (item.properties.code === code) {
