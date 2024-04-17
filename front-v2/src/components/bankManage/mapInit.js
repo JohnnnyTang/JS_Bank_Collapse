@@ -271,6 +271,7 @@ const mapInit = async (map, vis) => {
 
         setTimeout(() => {
             setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+            // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
         }, 2000)
 
         ///////DEBUG////////

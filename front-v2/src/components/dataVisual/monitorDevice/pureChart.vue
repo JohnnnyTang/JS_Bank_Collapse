@@ -56,7 +56,9 @@ onMounted(async () => {
     chartDom = document.getElementById('chart');
     myChart = echarts.init(chartDom);
 
+    console.log('!!!',selectedFeature.value);
     dataAssitant.value = new MonitorDataAssistant(selectedFeature.value)
+    
     await dataAssitant.value.getMonitoringdata()
     dataAssitant.value.getProcessedDataObject()
     dataAssitant.value.getChartOptions()

@@ -69,7 +69,8 @@ export default class BackEndRequest {
 
             }
             case '3': {
-                return backendInstance.get(`/data/manometerData/id/${code}`)
+                // return backendInstance.get(`/data/manometerData/id/${code}`)
+                return backendInstance.get(`/data/manometerData/day/1/device/${code}`)
 
             }
             case '4': {

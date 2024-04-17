@@ -43,13 +43,12 @@ const showChart = (index) => {
 }
 
 onMounted(async () => {
-    console.log(chartDomRef.style)
+    // console.log(chartDomRef.style)
     // chartDomRef.style.width = '340px'
     // chartDomRef.style.height = '290px'
     await nextTick()
 
     myChart = echarts.init(chartDomRef)
-
     dataAssitant.value = new MonitorDataAssistant(props.selectedFeature.value)
     await dataAssitant.value.getMonitoringdata()
     dataAssitant.value.getProcessedDataObject()

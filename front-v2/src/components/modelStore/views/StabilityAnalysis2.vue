@@ -6,7 +6,7 @@
             <div class="model-item-container">
                 <div class="model-choice">
                     <div class="basemap-radio-container">
-                        <input type="radio" id="radio-1" name="tabs" @click="radio1Click()" />
+                        <input type="radio" id="radio-1" name="tabs" v-model="checky" @click="radio1Click()" />
                         <label class="tab" for="radio-1">近岸动力分析</label>
                         <input type="radio" id="radio-2" name="tabs" @click="radio2Click()" />
                         <label class="tab" for="radio-2">近岸演变分析</label>
@@ -127,18 +127,12 @@ const modelInfo = {
 
 const title1 = ref('模型配置')
 const showAnalysis = ref(false)
-const radio = ref('checked')
+const checky1 = ref('checked')
 const radio1Click = () => {
     showAnalysis.value = false
 }
 const radio2Click = () => {
     showAnalysis.value = true
-    // data[0].children = [
-    //     {
-    //         'label': 'uvet流场数据',
-    //         'children': []
-    //     }
-    // ]
 }
 
 const mapContainerRef = ref();
@@ -701,8 +695,8 @@ div.model-content-container {
 .analysisCenter {
     width: calc(100vw);
     height: calc(100vh);
-    top: 0vh;
-    position: fixed;
+    top: calc( 3px - 5rem);
+    position: absolute;
     z-index: 0;
     background-color: aliceblue;
 

@@ -39,8 +39,8 @@ const generateData_GNSS = (ogDataArray) => {
     let ratioRange = [999, -999]
 
 
-    let showCount = ogDataArray.length
-    showCount = Math.min(20,showCount)
+    let showCount = ogDataArray.length - 1
+    showCount = Math.min(20, showCount)
     let endTime = time(ogDataArray[0].measureTime);
     let startTime = time(ogDataArray[showCount].measureTime);
     for (let i = 0; i < showCount; i++) {
@@ -109,8 +109,8 @@ const generateData_Incline = (ogDataArray, metaData) => {
 
     let depth_value_time = []
 
-    let showCount = ogDataArray.length
-    showCount = Math.min(5,showCount)
+    let showCount = ogDataArray.length - 1
+    showCount = Math.min(5, showCount)
 
     for (let i = 1; i <= pointNum; i++) {
         depthArray.push(metaData[`point${i}Depth`])
@@ -160,8 +160,8 @@ const generateData_Manometer = (ogDataArray, metaData) => {
     let depthArray = []
     let legendData = []
     let pressureData_river = []
-    let showCount = ogDataArray.length
-    showCount = Math.min(8,showCount)
+    let showCount = ogDataArray.length - 1
+    showCount = Math.min(8, showCount)
 
     let depth_value_data = []
     let depth_value_time = []
@@ -209,12 +209,38 @@ const generateData_Manometer = (ogDataArray, metaData) => {
         pressureArrBytime
     }
 }
+
+const generateData_Manometer_new = (ogDataArray) => {
+    console.log(ogDataArray);
+    let showCount = ogDataArray.length - 1
+    showCount = Math.min(20, showCount)
+
+    let timeArray = []
+    let heightArray = []
+    let temperatureArray = []
+    let frequencyArray = []
+
+    ogDataArray.forEach((item) => {
+        timeArray.push(timeFormat(time(item['measureTime'])))
+        heightArray.push(item['height'])
+        temperatureArray.push(item['temperature'])
+        frequencyArray.push(item['frequency'])
+    })
+    return {
+        timeArray,
+        heightArray,
+        temperatureArray,
+        frequencyArray
+    }
+}
+
+
 const generateData_Stress = (ogDataArray, metaData) => {
     let pointNum = metaData["pointNum"]
     let depthArray = []
     let legendData = []
-    let showCount = ogDataArray.length
-    showCount = Math.min(5,showCount)
+    let showCount = ogDataArray.length - 1
+    showCount = Math.min(5, showCount)
     let horizontalAngle = []
     let depth_value_hori_data = []
     let depth_value_vert_data = []
@@ -256,7 +282,6 @@ const generateData_Stress = (ogDataArray, metaData) => {
 //////////chart options func
 const generateOptions_GNSS = (processedData) => {
 
-    console.log(processedData);
     // 3dcube
     const regressionX = ecStat.regression("polynomial", processedData.scatterData.time_xMove_scater_data, 7)
     const regressionY = ecStat.regression("polynomial", processedData.scatterData.time_yMove_scater_data, 7)
@@ -395,7 +420,7 @@ const generateOptions_GNSS = (processedData) => {
         },
         grid: {
             show: false,
-            left: '20%'
+            left: '25%'
         },
         visualMap: [
             {
@@ -407,8 +432,9 @@ const generateOptions_GNSS = (processedData) => {
                 type: 'piecewise',
                 itemWidth: 15,
                 itemHeight: 10,
-                text: [`${processedData.ratioRange[1].toFixed(4)}`, `${processedData.ratioRange[0].toFixed(4)}`],
-                textGap: 15,
+                //text: [`${processedData.ratioRange[1].toFixed(4)}`, `${processedData.ratioRange[0].toFixed(4)}`],
+                text: ['1.0', '-1.0'],
+                textGap: 20,
                 realtime: false,
                 calculable: true,
                 seriesIndex: 0,
@@ -439,6 +465,7 @@ const generateOptions_GNSS = (processedData) => {
         ],
         xAxis: {
             type: 'time',
+            min: 'dataMin',
             axisLabel: {
                 formatter: function (value, index) {
                     // if (index === 0 || index === dataIndexArray.length - 1) {
@@ -911,6 +938,43 @@ const generateOptions_Manometer = (processedData) => {
     }
 
 }
+const generateOptions_Manometer_new = (processedData) => {
+    let option1 = {
+        xAxis: {
+            type: time,
+            data: processedData.timeArray
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                data: processedData.heightArray,
+                type: 'line'
+            }
+        ]
+    };
+    let option2 = {
+        xAxis: {
+            type: time,
+            data: processedData.timeArray
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                data: processedData.temperatureArray,
+                type: 'line'
+            }
+        ]
+    };
+    return {
+        names: ['水位折线图', '测温折线图'],
+        options: [option1,option2]
+    }
+
+}
 const generateOptions_Stress = (processedData) => {
 
     //gaugeOption 
@@ -1133,7 +1197,7 @@ const generateOptions_Stress = (processedData) => {
                 text: `应力桩-水平垂直受力图`,
                 left: 'center',
                 fontSize: 20,
-          
+
             },
             grid: [
                 // 3个grid
@@ -1251,7 +1315,7 @@ const generateOptions_Stress = (processedData) => {
                     // 只显示 居中的label, 不显示轴线,刻度线
                     axisLabel: {
                         show: true,
-                        margin:5,
+                        margin: 5,
                         // padding:[-5,0,20,0],
                         textStyle: {
                             color: '#00425C',
@@ -1293,7 +1357,7 @@ const generateOptions_Stress = (processedData) => {
             legend: {
                 top: '10%',
                 itemGap: 30,
-                left:'16%'
+                left: '16%'
             },
             tooltip: {},
             series: []
@@ -1429,12 +1493,13 @@ class MonitorDataAssistant {
     }
 
     async getMonitoringdata() {
-        console.log('aa',this.info)
+        console.log(this.info);
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
-
+        console.log(this.monitoringData);
         //meta infomation -- pointnum
         this.monitoringMetaData = (await BackEndRequest.getMonitorInfoByType_Code(this.info["code"], this.info["type"])).data
+        console.log(this.monitoringMetaData);
         return this.monitoringData
     }
 
@@ -1448,6 +1513,7 @@ class MonitorDataAssistant {
                 return this.processedData
             case "3":
                 this.processedData = generateData_Manometer(this.monitoringData, this.monitoringMetaData)
+                // this.processedData = generateData_Manometer_new(this.monitoringData)
                 return this.processedData
             case "4":
                 this.processedData = generateData_Stress(this.monitoringData, this.monitoringMetaData)
@@ -1468,6 +1534,8 @@ class MonitorDataAssistant {
                 return this.chartOptions
             case "3":
                 this.chartOptions = generateOptions_Manometer(this.processedData)
+                // this.chartOptions = generateOptions_Manometer_new(this.processedData)
+
                 return this.chartOptions
             case "4":
                 this.chartOptions = generateOptions_Stress(this.processedData)
@@ -1476,7 +1544,6 @@ class MonitorDataAssistant {
                 console.warn('ERROR::getChartOptions');
                 break;
         }
-        console.log(this);
     }
 
 
