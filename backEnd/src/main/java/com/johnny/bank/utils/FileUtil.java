@@ -105,12 +105,17 @@ public class FileUtil {
                         "horizontal_stress3,vertical_stress3,horizontal_stress4,vertical_stress4," +
                         "horizontal_stress5,vertical_stress5,horizontal_stress6,vertical_stress6\n");
         for(StressPileData stressPileData:stressPileDataList) {
-            out.append(stressPileData.getHorizontal_stress1()).append(",").append(stressPileData.getVertical_stress1()).append(",")
-                    .append(stressPileData.getHorizontal_stress2()).append(",").append(stressPileData.getVertical_stress2()).append(",")
-                    .append(stressPileData.getHorizontal_stress3()).append(",").append(stressPileData.getVertical_stress3()).append(",")
-                    .append(stressPileData.getHorizontal_stress4()).append(",").append(stressPileData.getVertical_stress4()).append(",")
-                    .append(stressPileData.getHorizontal_stress5()).append(",").append(stressPileData.getVertical_stress5()).append(",")
-                    .append(stressPileData.getHorizontal_stress6()).append(",").append(stressPileData.getVertical_stress6()).append("\n");
+//            out.append(stressPileData.getHorizontal_stress1()).append(",").append(stressPileData.getVertical_stress1()).append(",")
+//                    .append(stressPileData.getHorizontal_stress2()).append(",").append(stressPileData.getVertical_stress2()).append(",")
+//                    .append(stressPileData.getHorizontal_stress3()).append(",").append(stressPileData.getVertical_stress3()).append(",")
+//                    .append(stressPileData.getHorizontal_stress4()).append(",").append(stressPileData.getVertical_stress4()).append(",")
+//                    .append(stressPileData.getHorizontal_stress5()).append(",").append(stressPileData.getVertical_stress5()).append(",")
+//                    .append(stressPileData.getHorizontal_stress6()).append(",").append(stressPileData.getVertical_stress6()).append("\n");
+            out.append(stressPileData.getBottomPower()).append(",").append(stressPileData.getBottomAngle()).append(",")
+                    .append(stressPileData.getBottomChange()).append(",").append(stressPileData.getMiddlePower()).append(",")
+                    .append(stressPileData.getMiddleAngle()).append(",").append(stressPileData.getMiddleChange()).append(",")
+                    .append(stressPileData.getTopAngle()).append(",").append(stressPileData.getTopPower()).append(",")
+                    .append(stressPileData.getTopChange()).append(",").append("\n");
         }
         String outStr = out.toString();
         return outStr.substring(0, outStr.length()-1);

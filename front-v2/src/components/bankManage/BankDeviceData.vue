@@ -78,11 +78,23 @@ const chartDom = ref()
 const defaultActiveMap = ref({
     gnss: 'CL-01',
     manometer: 'KX-01',
+    stress: 'YL-01',
 })
 
 const optionsMap = reactive({
     gnss: ['X位移', 'Y位移', 'Z位移', '三维累积位移', '五小时相对变化'],
     manometer: ['频率', '温度', '水位高度'],
+    stress: [
+        '顶端角度',
+        '中部角度',
+        '底端角度',
+        '顶端变化',
+        '中部变化',
+        '底端变化',
+        '顶端应力',
+        '中部应力',
+        '底端应力',
+    ],
 })
 
 const deviceSelection = ref(defaultActiveMap.value[curDevice.value])
@@ -103,7 +115,17 @@ const deviceNameMap = {
         温度: 'temperature',
         水位高度: 'height',
     },
-    stress: {},
+    stress: {
+        顶端角度: 'topAngle',
+        中部角度: 'middleAngle',
+        底端角度: 'bottomAngle',
+        顶端变化: 'topChange',
+        中部变化: 'middleChange',
+        底端变化: 'bottomChange',
+        顶端应力: 'topPower',
+        中部应力: 'middlePower',
+        底端应力: 'bottomPower',
+    },
 }
 
 const deviceListMap = ref({
@@ -134,7 +156,7 @@ const deviceListMap = ref({
         'KX-08',
         'KX-09',
     ],
-    stress: [],
+    stress: ['YL-01', 'YL-02', 'YL-03', 'YL-04', 'YL-05', 'YL-06', 'YL-07'],
 })
 
 const deviceIdMap = {
@@ -162,6 +184,15 @@ const deviceIdMap = {
         'KX-09': 'MZS120.52566826_32.03799363_3',
         'KX-10': 'MZS120.56944728_32.02070961_1',
     },
+    stress: {
+        'YL-01': 'MZS120.513203_32.042733_2',
+        'YL-02': 'MZS120.515433_32.04231_2',
+        'YL-03': 'MZS120.521221_32.040331_2',
+        'YL-04': 'MZS120.529078_32.034385_2',
+        'YL-05': 'MZS120.541648_32.030524_2',
+        'YL-06': 'MZS120.548925_32.029361_2',
+        'YL-07': 'MZS120.552209_32.028149_2',
+    },
 }
 
 const deviceTableKeyListMap = ref({
@@ -180,7 +211,18 @@ const deviceTableKeyListMap = ref({
         { name: 'height', label: '水位高度' },
         { name: 'inTime', label: '时间' },
     ],
-    stress: [],
+    stress: [
+        { name: 'topAngle', label: '顶端角度' },
+        { name: 'middleAngle', label: '中部角度' },
+        { name: 'bottomAngle', label: '底端角度' },
+        { name: 'topChange', label: '顶端变化' },
+        { name: 'middleChange', label: '中部变化' },
+        { name: 'bottomChange', label: '底端变化' },
+        { name: 'topPower', label: '顶端应力' },
+        { name: 'middlePower', label: '中部应力' },
+        { name: 'bottomPower', label: '底端应力' },
+        { name: 'inTime', label: '时间' },
+    ],
 })
 
 const deviceDataManageMap = ref({
@@ -289,7 +331,43 @@ const deviceDataManageMap = ref({
             chartData: {},
         },
     },
-    stress: {},
+    stress: {
+        'YL-01': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'YL-02': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'YL-03': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'YL-04': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'YL-05': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'YL-06': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+        'YL-07': {
+            updateTime: null,
+            data: [],
+            chartData: {},
+        },
+    },
 })
 
 const chartOption = {
@@ -1329,7 +1407,7 @@ function buildSeries(dataList, deviceType) {
                                 return item['height']
                             }),
                         },
-                        visMap: manoTempVisMap,
+                        visMap: manoHeightVisMap,
                         markLineData: [
                             {
                                 yAxis: -4,
@@ -1360,7 +1438,110 @@ function buildSeries(dataList, deviceType) {
                 },
             }
         case 'stress':
-            return {}
+            return {
+                time: timeList,
+                series: {
+                    topAngle: {
+                        series: {
+                            name: 'topAngle',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['topAngle']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    middleAngle: {
+                        series: {
+                            name: 'middleAngle',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['middleAngle']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    bottomAngle: {
+                        series: {
+                            name: 'bottomAngle',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['bottomAngle']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    topChange: {
+                        series: {
+                            name: 'topChange',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['topChange']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    middleChange: {
+                        series: {
+                            name: 'middleChange',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['middleChange']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    bottomChange: {
+                        series: {
+                            name: 'bottomChange',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['bottomChange']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    topPower: {
+                        series: {
+                            name: 'topPower',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['topPower']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    middlePower: {
+                        series: {
+                            name: 'middlePower',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['middlePower']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                    bottomPower: {
+                        series: {
+                            name: 'bottomPower',
+                            type: 'line',
+                            data: dataList.map(function (item) {
+                                return item['bottomPower']
+                            }),
+                        },
+                        visMap: gnssVisMap,
+                        markLineData: [],
+                    },
+                },
+            }
     }
 }
 
