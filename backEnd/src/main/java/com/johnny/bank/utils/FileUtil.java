@@ -77,12 +77,10 @@ public class FileUtil {
     public static String buildInclinoDataString(List<InclinometerData> inclinometerDataList) {
         StringBuilder out = new StringBuilder("x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6\n");
         for(InclinometerData inclinometerData:inclinometerDataList) {
-            out.append(inclinometerData.getXMove1()).append(",").append(inclinometerData.getYMove1()).append(",")
-                    .append(inclinometerData.getXMove2()).append(",").append(inclinometerData.getYMove2()).append(",")
-                    .append(inclinometerData.getXMove3()).append(",").append(inclinometerData.getYMove3()).append(",")
-                    .append(inclinometerData.getXMove4()).append(",").append(inclinometerData.getYMove4()).append(",")
-                    .append(inclinometerData.getXMove5()).append(",").append(inclinometerData.getYMove5()).append(",")
-                    .append(inclinometerData.getXMove6()).append(",").append(inclinometerData.getYMove6()).append("\n");
+            out.append(inclinometerData.getTopMove()).append(",").append(inclinometerData.getMiddleMove()).append(",")
+                    .append(inclinometerData.getBottomMove()).append(",").append(inclinometerData.getTopMovePerDay()).append(",")
+                    .append(inclinometerData.getMiddleMovePerDay()).append(",")
+                    .append(inclinometerData.getBottomMovePerDay()).append(",").append("\n");
         }
         return out.toString();
     }
@@ -105,12 +103,17 @@ public class FileUtil {
                         "horizontal_stress3,vertical_stress3,horizontal_stress4,vertical_stress4," +
                         "horizontal_stress5,vertical_stress5,horizontal_stress6,vertical_stress6\n");
         for(StressPileData stressPileData:stressPileDataList) {
-            out.append(stressPileData.getHorizontal_stress1()).append(",").append(stressPileData.getVertical_stress1()).append(",")
-                    .append(stressPileData.getHorizontal_stress2()).append(",").append(stressPileData.getVertical_stress2()).append(",")
-                    .append(stressPileData.getHorizontal_stress3()).append(",").append(stressPileData.getVertical_stress3()).append(",")
-                    .append(stressPileData.getHorizontal_stress4()).append(",").append(stressPileData.getVertical_stress4()).append(",")
-                    .append(stressPileData.getHorizontal_stress5()).append(",").append(stressPileData.getVertical_stress5()).append(",")
-                    .append(stressPileData.getHorizontal_stress6()).append(",").append(stressPileData.getVertical_stress6()).append("\n");
+//            out.append(stressPileData.getHorizontal_stress1()).append(",").append(stressPileData.getVertical_stress1()).append(",")
+//                    .append(stressPileData.getHorizontal_stress2()).append(",").append(stressPileData.getVertical_stress2()).append(",")
+//                    .append(stressPileData.getHorizontal_stress3()).append(",").append(stressPileData.getVertical_stress3()).append(",")
+//                    .append(stressPileData.getHorizontal_stress4()).append(",").append(stressPileData.getVertical_stress4()).append(",")
+//                    .append(stressPileData.getHorizontal_stress5()).append(",").append(stressPileData.getVertical_stress5()).append(",")
+//                    .append(stressPileData.getHorizontal_stress6()).append(",").append(stressPileData.getVertical_stress6()).append("\n");
+            out.append(stressPileData.getBottomPower()).append(",").append(stressPileData.getBottomAngle()).append(",")
+                    .append(stressPileData.getBottomChange()).append(",").append(stressPileData.getMiddlePower()).append(",")
+                    .append(stressPileData.getMiddleAngle()).append(",").append(stressPileData.getMiddleChange()).append(",")
+                    .append(stressPileData.getTopAngle()).append(",").append(stressPileData.getTopPower()).append(",")
+                    .append(stressPileData.getTopChange()).append(",").append("\n");
         }
         String outStr = out.toString();
         return outStr.substring(0, outStr.length()-1);

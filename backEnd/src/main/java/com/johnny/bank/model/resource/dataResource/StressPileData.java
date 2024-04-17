@@ -20,22 +20,13 @@ import lombok.*;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StressPileData extends MonitorData {
-    private Double horizontal1;
-    private Double horizontal2;
-    private Double horizontal3;
-    private Double horizontal4;
-    private Double horizontal5;
-    private Double horizontal6;
-    private Double horizontal_stress1;
-    private Double horizontal_stress2;
-    private Double horizontal_stress3;
-    private Double horizontal_stress4;
-    private Double horizontal_stress5;
-    private Double horizontal_stress6;
-    private Double vertical_stress1;
-    private Double vertical_stress2;
-    private Double vertical_stress3;
-    private Double vertical_stress4;
-    private Double vertical_stress5;
-    private Double vertical_stress6;
+    private Double topAngle;
+    private Double middleAngle;
+    private Double bottomAngle;
+    private Double topPower;
+    private Double middlePower;
+    private Double bottomPower;
+    private Double topChange;
+    private Double middleChange;
+    private Double bottomChange;
 }

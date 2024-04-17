@@ -9,18 +9,12 @@
         <result property="deviceCode" column="machine_id"/>
         <result property="measureTime" column="measure_time"/>
         <result property="inTime" column="in_time"/>
-        <result property="xMove1" column="x_move1"/>
-        <result property="yMove1" column="y_move1"/>
-        <result property="xMove2" column="x_move2"/>
-        <result property="yMove2" column="y_move2"/>
-        <result property="xMove3" column="x_move3"/>
-        <result property="yMove3" column="y_move3"/>
-        <result property="xMove4" column="x_move4"/>
-        <result property="yMove4" column="y_move4"/>
-        <result property="xMove5" column="x_move5"/>
-        <result property="yMove5" column="y_move5"/>
-        <result property="xMove6" column="x_move6"/>
-        <result property="yMove6" column="y_move6"/>
+        <result property="topMove" column="top_move"/>
+        <result property="middleMove" column="middle_move"/>
+        <result property="bottomMove" column="bottom_move"/>
+        <result property="topMovePerDay" column="top_move_24h"/>
+        <result property="middleMovePerDay" column="middle_move_24h"/>
+        <result property="bottomMovePerDay" column="bottom_move_24h"/>
     </resultMap>
     <select id="findAll" resultMap="inclinometerDataMap">
         SELECT * FROM inclinometer_record;

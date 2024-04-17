@@ -30,7 +30,12 @@ export default defineConfig({
                 target: 'http://218.94.6.92:6080',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/waterServer/, ''),
+            },
+            '/device': {
+                target: 'http://119.45.198.54:9999/api/v1',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/device/, ''),
             }
         },
-    },
+    }
 })
