@@ -218,7 +218,7 @@ div.model-information-container {
                             div.item-title-text{
                                 width: 100%;
                                 line-height: 3vh;
-                                font-size: calc(0.8vh + 0.5vw);
+                                font-size: calc(0.2vh + 0.8vw);
                                 font-weight: 550;
                                 font-family: 'Microsoft YaHei';
                                 margin-left: 5px;
