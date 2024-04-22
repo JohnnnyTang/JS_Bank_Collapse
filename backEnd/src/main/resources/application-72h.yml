@@ -1,0 +1,35 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: bank
+      authentication-database: admin
+      uri: mongodb://bankAdmin:20000601@localhost:27017/bank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+    default:
+      url: jdbc:postgresql://localhost:5432/bank_dev?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: 20000601
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+tile:
+  mzsTilePath: D:\2024-work\shore_collapse\data\rasterTIle\
+
+  worldTilePath: D:\2024-work\shore_collapse\data\baseMap
+
+video:
+  yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4
