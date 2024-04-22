@@ -3,7 +3,7 @@
         <div class="stable-status-title">
             <div class="stable-status-icon"></div>
             <div class="status-title-text">
-                {{ '预警状态评估-' + stableStatusTitle }}
+                {{ '风险状态评估-' + stableStatusTitle }}
             </div>
         </div>
         <div
