@@ -23,8 +23,11 @@ public interface IMonitorDataService<T extends MonitorData> {
 
     List<T> getDataByTimeOfDevice(DataNode dataNode, Timestamp begTime, Timestamp endTime, String deviceCode);
     List<T> getDataByMinOfDevice(DataNode dataNode, int minutes, String deviceCode);
+    List<T> getDataByMinBeforeStartOfDevice(DataNode dataNode, int minutesBefore, int minutesDur, String deviceCode);
     List<T> getDataByHourOfDevice(DataNode dataNode, int hours, String deviceCode);
+    List<T> getDataByHourBeforeStartOfDevice(DataNode dataNode, int hoursBefore, int hoursDur, String deviceCode);
     List<T> getDataByDayOfDevice(DataNode dataNode, int days, String deviceCode);
+    List<T> getDataByDayBeforeStartOfDevice(DataNode dataNode, int daysBefore, int daysDur, String deviceCode);
 
     List<T> getDataByTimeInStation(DataNode dataNode, Timestamp begTime, Timestamp endTime, String stationCode);
     List<T> getDataByMinInStation(DataNode dataNode, int minutes, String stationCode);

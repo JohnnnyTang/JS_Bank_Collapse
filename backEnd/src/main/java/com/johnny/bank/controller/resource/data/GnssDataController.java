@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/data/gnssData")
 public class GnssDataController extends BaseMonitorDataController<GnssData> {
-
     @Autowired
     public GnssDataController(@Qualifier("GnssDataService") MonitorDataService<GnssData> MonitorDataService) {
         super(MonitorDataService);
