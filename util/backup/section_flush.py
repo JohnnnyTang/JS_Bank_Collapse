@@ -37,11 +37,11 @@ from osgeo import gdal
 #             result.append(result1[i] - result2[i])
 #     return result
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print('参数错误')
+        print("参数错误")
     else:
-        with open(sys.argv[1], encoding='utf-8') as file:
+        with open(sys.argv[1], encoding="utf-8") as file:
             benchmark_path = file.readline().strip("\n")
             refer_path = file.readline().strip("\n")
             raster_path = file.readline().strip("\n")
@@ -58,20 +58,29 @@ if __name__ == '__main__':
         dataset = gdal.Open(raster_path)
         band = dataset.GetRasterBand(1)
         dem_data = band.ReadAsArray(
-            0, 0, dataset.RasterXSize, dataset.RasterYSize)
+            0, 0, dataset.RasterXSize, dataset.RasterYSize
+        )
         flush_result = []
         for i in range(point_number - 1):
-            flush_result.extend(section.excute(dataset, float(points[i][0]), float(
-                points[i][1]), float(points[i + 1][0]), float(points[i + 1][1])))
+            flush_result.extend(
+                section.excute(
+                    dataset,
+                    float(points[i][0]),
+                    float(points[i][1]),
+                    float(points[i + 1][0]),
+                    float(points[i + 1][1]),
+                )
+            )
 
-        with open(result_path, "w", encoding='utf-8') as file:
+        with open(result_path, "w", encoding="utf-8") as file:
             for i in range(2):
                 for j in range(len(contrast_result[i])):
-                    file.write(str(contrast_result[i][j]) + '\n')
-                file.write('\n')
+                    file.write(str(contrast_result[i][j]) + "\n")
+                file.write("\n")
 
             for i in range(len(flush_result)):
                 file.write(
-                    str(dem_data[flush_result[i][0]][flush_result[i][1]]) + "\n")
+                    str(dem_data[flush_result[i][0]][flush_result[i][1]]) + "\n"
+                )
             file.close()
         del dataset
