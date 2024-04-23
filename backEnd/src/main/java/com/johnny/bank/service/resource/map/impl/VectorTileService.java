@@ -38,6 +38,8 @@ public class VectorTileService implements IVectorTileService {
         tableNameMap.put("mzsSectionLineLabel", "mzs_section_line_label");
         tableNameMap.put("mzsBankAreaW", "mzs_bank_area_w");
         tableNameMap.put("mzsBankAreaS", "mzs_bank_area_s");
+        tableNameMap.put("mzsOverWaterBound", "mzs_overwater_bound");
+        tableNameMap.put("mzsUnderWaterBound", "mzs_underwater_bound");
     }
 
     @Override

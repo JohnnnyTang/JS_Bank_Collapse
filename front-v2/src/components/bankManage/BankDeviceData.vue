@@ -89,9 +89,9 @@ const optionsMap = reactive({
         '顶端角度',
         '中部角度',
         '底端角度',
-        '顶端变化',
-        '中部变化',
-        '底端变化',
+        '顶端最大应变',
+        '中部最大应变',
+        '底端最大应变',
         '顶端应力',
         '中部应力',
         '底端应力',
@@ -136,9 +136,9 @@ const deviceNameMap = {
         顶端角度: 'topAngle',
         中部角度: 'middleAngle',
         底端角度: 'bottomAngle',
-        顶端变化: 'topChange',
-        中部变化: 'middleChange',
-        底端变化: 'bottomChange',
+        顶端最大应变: 'topChange',
+        中部最大应变: 'middleChange',
+        底端最大应变: 'bottomChange',
         顶端应力: 'topPower',
         中部应力: 'middlePower',
         底端应力: 'bottomPower',
@@ -261,9 +261,9 @@ const deviceTableKeyListMap = ref({
         { name: 'topAngle', label: '顶端角度' },
         { name: 'middleAngle', label: '中部角度' },
         { name: 'bottomAngle', label: '底端角度' },
-        { name: 'topChange', label: '顶端变化' },
-        { name: 'middleChange', label: '中部变化' },
-        { name: 'bottomChange', label: '底端变化' },
+        { name: 'topChange', label: '顶端最大应变' },
+        { name: 'middleChange', label: '中部最大应变' },
+        { name: 'bottomChange', label: '底端最大应变' },
         { name: 'topPower', label: '顶端应力' },
         { name: 'middlePower', label: '中部应力' },
         { name: 'bottomPower', label: '底端应力' },
@@ -1703,7 +1703,7 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
     if (deviceDataManageMap.value[deviceType][deviceName].data.length == 0) {
         deviceDataManageMap.value[deviceType][deviceName].data = (
             await backendInstance.get(
-                `/data/${deviceType}Data/day/3/device/${deviceIdMap[deviceType][deviceName]}`,
+                `/data/${deviceType}Data/day/1/device/${deviceIdMap[deviceType][deviceName]}`,
             )
         ).data
         deviceDataManageMap.value[deviceType][deviceName].chartData =
@@ -1765,11 +1765,11 @@ onBeforeRouteUpdate((to, from) => {
 
 onMounted(async () => {
     console.log(
-        `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+        `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
     )
     const deviceData = (
         await backendInstance.get(
-            `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+            `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
         )
     ).data
     deviceDataManageMap.value[curDevice.value][

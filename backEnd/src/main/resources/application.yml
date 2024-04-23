@@ -1,4 +1,4 @@
 spring:
   profiles:
-    active: tzh
+    active: 72h
 
