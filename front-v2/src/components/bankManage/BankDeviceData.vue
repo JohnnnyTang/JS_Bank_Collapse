@@ -240,22 +240,22 @@ const deviceTableKeyListMap = ref({
         { name: 'ZMove', label: 'Z位移' },
         { name: 'threeD', label: '三维累积位移' },
         { name: 'threeDf', label: '五小时相对变化' },
-        { name: 'inTime', label: '时间' },
+        { name: 'measureTime', label: '时间' },
     ],
     inclinometer: [
         { name: 'topMove', label: '顶端移动' },
         { name: 'middleMove', label: '中部移动' },
-        { name: 'bottomMove', label: '底端角度' },
+        { name: 'bottomMove', label: '底端移动' },
         { name: 'topMovePerDay', label: '顶端日累计移动' },
         { name: 'middleMovePerDay', label: '中部日累计移动' },
         { name: 'bottomMovePerDay', label: '底端日累计移动' },
-        { name: 'inTime', label: '时间' },
+        { name: 'measureTime', label: '时间' },
     ],
     manometer: [
         { name: 'frequency', label: '频率' },
         { name: 'temperature', label: '温度' },
         { name: 'height', label: '水位高度' },
-        { name: 'inTime', label: '时间' },
+        { name: 'measureTime', label: '时间' },
     ],
     stress: [
         { name: 'topAngle', label: '顶端角度' },
@@ -267,7 +267,7 @@ const deviceTableKeyListMap = ref({
         { name: 'topPower', label: '顶端应力' },
         { name: 'middlePower', label: '中部应力' },
         { name: 'bottomPower', label: '底端应力' },
-        { name: 'inTime', label: '时间' },
+        { name: 'measureTime', label: '时间' },
     ],
 })
 
@@ -800,7 +800,7 @@ const manoHeightVisMap = {
 
 function buildSeries(dataList, deviceType) {
     const timeList = dataList.map(function (item) {
-        return item['inTime'].replace(' ', '\n')
+        return item['measureTime'].replace(' ', '\n')
     })
     switch (deviceType) {
         case 'gnss':
@@ -1703,7 +1703,7 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
     if (deviceDataManageMap.value[deviceType][deviceName].data.length == 0) {
         deviceDataManageMap.value[deviceType][deviceName].data = (
             await backendInstance.get(
-                `/data/${deviceType}Data/day/1/device/${deviceIdMap[deviceType][deviceName]}`,
+                `/data/${deviceType}Data/day/3/device/${deviceIdMap[deviceType][deviceName]}`,
             )
         ).data
         deviceDataManageMap.value[deviceType][deviceName].chartData =
@@ -1765,11 +1765,11 @@ onBeforeRouteUpdate((to, from) => {
 
 onMounted(async () => {
     console.log(
-        `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+        `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
     )
     const deviceData = (
         await backendInstance.get(
-            `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+            `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
         )
     ).data
     deviceDataManageMap.value[curDevice.value][
