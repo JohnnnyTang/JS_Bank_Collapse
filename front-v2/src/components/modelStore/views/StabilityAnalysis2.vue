@@ -300,6 +300,7 @@ div.all {
     width: 100vw;
     height: 92vh;
     position: relative;
+    overflow: hidden
 }
 
 div.model-content-container {

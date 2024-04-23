@@ -75,6 +75,16 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutes), current, deviceCode);
     }
 
+    @Override
+    @DynamicNodeData
+    public List<T> getDataByMinBeforeStartOfDevice(DataNode dataNode, int minutesBefore, int minutesDur, String deviceCode) {
+        return monitorDataRepo.findDataByTimeOfDevice(
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutesDur+minutesBefore),
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutesBefore),
+                deviceCode
+        );
+    }
+
     @DynamicNodeData
     @Override
     public List<T> getDataByHourOfDevice(DataNode dataNode, int hours, String deviceCode) {
@@ -83,12 +93,34 @@ public abstract class MonitorDataService<T extends MonitorData> implements IMoni
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.HOUR, hours), current, deviceCode);
     }
 
+    @Override
+    @DynamicNodeData
+    public List<T> getDataByHourBeforeStartOfDevice(DataNode dataNode, int hoursBefore, int hoursDur, String deviceCode) {
+        return monitorDataRepo.findDataByTimeOfDevice(
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.HOUR, hoursBefore+hoursDur),
+                TimeCalcUtil.calcTimeBeforeNow(Calendar.HOUR, hoursBefore),
+                deviceCode
+        );
+    }
+
     @DynamicNodeData
     @Override
     public List<T> getDataByDayOfDevice(DataNode dataNode, int days, String deviceCode) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return monitorDataRepo.findDataByTimeOfDevice(
                 TimeCalcUtil.calcTimeBeforeNow(Calendar.DATE, days), current, deviceCode);
+    }
+
+    @Override
+    @DynamicNodeData
+    public List<T> getDataByDayBeforeStartOfDevice(DataNode dataNode, int daysBefore, int daysDur, String deviceCode) {
+        Timestamp begTime = TimeCalcUtil.calcTimeBeforeNow(Calendar.DATE, daysBefore+daysDur);
+        Timestamp endTime = TimeCalcUtil.calcTimeBeforeNow(Calendar.DATE, daysBefore);
+        return monitorDataRepo.findDataByTimeOfDevice(
+                begTime,
+                endTime,
+                deviceCode
+        );
     }
 
     @DynamicNodeData

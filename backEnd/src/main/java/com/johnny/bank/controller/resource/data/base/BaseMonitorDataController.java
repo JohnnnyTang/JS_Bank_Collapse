@@ -79,6 +79,24 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
     }
 
     @Override
+    @GetMapping("/minute/beg/{minutesBefore}/dur/{minutesDur}/device/{deviceCode}")
+    public ResponseEntity<List<T>> getDataByMinBeforeBegOfDevice(@PathVariable int minutesBefore, @PathVariable int minutesDur, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.getDataByMinBeforeStartOfDevice(dataNode, minutesBefore, minutesDur, deviceCode));
+    }
+
+    @Override
+    @GetMapping("/hour/beg/{hoursBefore}/dur/{hoursDur}/device/{deviceCode}")
+    public ResponseEntity<List<T>> getDataByHourBeforeBegOfDevice(@PathVariable int hoursBefore, @PathVariable int hoursDur, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.getDataByHourBeforeStartOfDevice(dataNode, hoursBefore, hoursDur, deviceCode));
+    }
+
+    @Override
+    @GetMapping("/day/beg/{daysBefore}/dur/{daysDur}/device/{deviceCode}")
+    public ResponseEntity<List<T>> getDataByDayBeforeBegOfDevice(@PathVariable int daysBefore, @PathVariable int daysDur, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.getDataByDayBeforeStartOfDevice(dataNode, daysBefore, daysDur, deviceCode));
+    }
+
+    @Override
     @GetMapping("/time/station/{stationCode}")
     public ResponseEntity<List<T>> getDataByTimeInStation(@RequestParam Timestamp begTime,@RequestParam  Timestamp endTime, @PathVariable String stationCode) {
         return ResponseEntity.ok(monitorDataService.getDataByTimeInStation(dataNode, begTime, endTime, stationCode));
