@@ -6,10 +6,18 @@
             <div class="model-run-container">
                 <div class="model-run-title">{{ curRunModelName }}</div>
                 <div class="model-run-content">
-                    <SectionCalcVue v-show="curRunModelName == '计算断面选择'"/>
-                    <VelocityCalcVue v-show="curRunModelName == '动力指标计算'"/>
-                    <EvolveCalcVue v-show="curRunModelName == '演变分析指标计算'"/>
-                    <ElementCalcVue v-show="curRunModelName == '多指标因子配置'"/>
+                    <SectionCalcVue
+                        v-show="curRunModelName == '计算断面选择'"
+                    />
+                    <VelocityCalcVue
+                        v-show="curRunModelName == '动力指标计算'"
+                    />
+                    <EvolveCalcVue
+                        v-show="curRunModelName == '演变分析指标计算'"
+                    />
+                    <ElementCalcVue
+                        v-show="curRunModelName == '多指标因子配置'"
+                    />
                 </div>
             </div>
         </div>
@@ -27,12 +35,9 @@ import ElementCalcVue from '../riskCalc/ElementCalc.vue'
 
 const ModelName = '风险预警模型'
 
-const curRunModelName = ref('计算断面选择')
+const curRunModelName = ref('动力指标计算')
 
-
-
-onMounted(() => {
-})
+onMounted(() => {})
 </script>
 
 <style lang="scss" scoped>

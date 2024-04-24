@@ -198,7 +198,7 @@ def getSectionPointListUnderWater(points: list[tuple[float, float, float]]):
 
 def computePQIndex(
     year: int, pqList: list[float]
-) -> tuple[tuple[int, int, int, int], str]:
+) -> tuple[tuple[int, int, int, int], str, float]:
     index = year - 1990
     matrix: tuple[int, int, int, int] = (0, 0, 0, 0)
     message: str = ""
@@ -215,10 +215,10 @@ def computePQIndex(
         matrix = (0, 0, 0, 1)
         message = "较高风险"
 
-    return (matrix, message)
+    return (matrix, message, pqList[index])
 
 
-def computeKYIndex(vel: float) -> tuple[tuple[int, int, int, int], str]:
+def computeKYIndex(vel: float) -> tuple[tuple[int, int, int, int], str, float]:
     ky = 2.4231 * math.exp(-0.547 * vel)
     matrix: tuple[int, int, int, int] = (0, 0, 0, 0)
     message: str = ""
@@ -236,13 +236,13 @@ def computeKYIndex(vel: float) -> tuple[tuple[int, int, int, int], str]:
         matrix = (0, 0, 0, 1)
         message = "较高风险"
 
-    return (matrix, message)
+    return (matrix, message, ky)
 
 
 # 3. Zd
 def computeZdIndex(
     level: float, depth: float, condition: str
-) -> tuple[tuple[int, int, int, int], str]:
+) -> tuple[tuple[int, int, int, int], str, float]:
     Zd: float = 0.0
     if condition == "flood":
         Zd = 0.14 + level / depth
@@ -265,11 +265,13 @@ def computeZdIndex(
         matrix = (0, 0, 0, 1)
         message = "较高风险"
 
-    return (matrix, message)
+    return (matrix, message, Zd)
 
 
 # 4. Zb
-def computeZbIndex(depth: float) -> tuple[tuple[int, int, int, int], str]:
+def computeZbIndex(
+    depth: float,
+) -> tuple[tuple[int, int, int, int], str, float]:
     depth = abs(depth)
     matrix: tuple[int, int, int, int] = (0, 0, 0, 0)
     message: str = ""
@@ -287,7 +289,7 @@ def computeZbIndex(depth: float) -> tuple[tuple[int, int, int, int], str]:
         matrix = (0, 0, 0, 1)
         message = "较高风险"
 
-    return (matrix, message)
+    return (matrix, message, depth)
 
 
 # 5. Sa
@@ -334,7 +336,7 @@ def computeSaIndex(
 # 6. Ln
 def computeLnIndex(
     ZNow: list[float], yearNow: int, ZBefore: list[float], yearBefore: int
-) -> tuple[tuple[int, int, int, int], str]:
+) -> tuple[tuple[int, int, int, int], str, float]:
     totalNum: int = len(ZNow)
     LnList: list = []
 
@@ -344,7 +346,7 @@ def computeLnIndex(
             LnList.append(tLn)
 
     if len(LnList) == 0:
-        return ((1, 0, 0, 0), "较低风险")
+        return ((1, 0, 0, 0), "较低风险", 0)
     Ln = abs(min(LnList) / (yearNow - yearBefore))
 
     matrix: tuple[int, int, int, int] = (0, 0, 0, 0)
@@ -363,7 +365,7 @@ def computeLnIndex(
         matrix = (0, 0, 0, 1)
         message = "较高风险"
 
-    return (matrix, message)
+    return (matrix, message, Ln)
 
 
 def getRiskMatrix(
@@ -381,7 +383,7 @@ def getRiskMatrix(
     zb: float,
     sa: float,
     ln: float,
-) -> tuple[tuple[float, float, float, float], str]:
+) -> tuple[tuple[float, float, float, float], str, float]:
     hyMatrix: np.array = np.array([pqMatrix, kyMatrix, zdMatrix])  # type: ignore
     hyWeight: np.array = np.array([pq, ky, zd])  # type: ignore
     hyRisk: np.array = hyWeight @ hyMatrix  # type: ignore
@@ -405,4 +407,4 @@ def getRiskMatrix(
         message = "较高风险"
 
     resultMatrix: tuple[float, float, float, float] = tuple(bankRisk.tolist())
-    return (resultMatrix, message)
+    return (resultMatrix, message, sum)

@@ -2,10 +2,15 @@ import json
 import os
 import sys
 
-from multiUtil import (computeKYIndex, computePQIndex, computeZdIndex,
-                       getDeepestPointInfoOnSection,
-                       getLevelOfDeepestPointOnSection, getSectionPointList,
-                       getVelOfDeepestPointOnSection)
+from multiUtil import (
+    computeKYIndex,
+    computePQIndex,
+    computeZdIndex,
+    getDeepestPointInfoOnSection,
+    getLevelOfDeepestPointOnSection,
+    getSectionPointList,
+    getVelOfDeepestPointOnSection,
+)
 from osgeo import gdal
 
 if __name__ == "__main__":
