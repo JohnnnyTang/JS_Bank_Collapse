@@ -204,16 +204,16 @@ def computePQIndex(
     message: str = ""
     if pqList[index] < 0.5:
         matrix = (1, 0, 0, 0)
-        message = "低风险"
+        message = "较低风险"
     elif pqList[index] < 1:
         matrix = (0, 1, 0, 0)
-        message = "较低风险"
+        message = "低风险"
     elif pqList[index] < 2.3:
         matrix = (0, 0, 1, 0)
-        message = "较高风险"
+        message = "高风险"
     else:
         matrix = (0, 0, 0, 1)
-        message = "高风险"
+        message = "较高风险"
 
     return (matrix, message)
 
@@ -225,16 +225,16 @@ def computeKYIndex(vel: float) -> tuple[tuple[int, int, int, int], str]:
 
     if ky > 1.7:
         matrix = (1, 0, 0, 0)
-        message = "低风险"
+        message = "较低风险"
     elif ky > 1.3:
         matrix = (0, 1, 0, 0)
-        message = "较低风险"
+        message = "低风险"
     elif ky > 1:
         matrix = (0, 0, 1, 0)
-        message = "较高风险"
+        message = "高风险"
     else:
         matrix = (0, 0, 0, 1)
-        message = "高风险"
+        message = "较高风险"
 
     return (matrix, message)
 
@@ -260,10 +260,10 @@ def computeZdIndex(
         message = "低风险"
     elif Zd < 0.3:
         matrix = (0, 0, 1, 0)
-        message = "较高风险"
+        message = "高风险"
     else:
         matrix = (0, 0, 0, 1)
-        message = "高风险"
+        message = "较高风险"
 
     return (matrix, message)
 
@@ -276,16 +276,16 @@ def computeZbIndex(depth: float) -> tuple[tuple[int, int, int, int], str]:
 
     if depth < 20.0:
         matrix = (1, 0, 0, 0)
-        message = "低风险"
+        message = "较低风险"
     elif depth < 30.0:
         matrix = (0, 1, 0, 0)
-        message = "较低风险"
+        message = "低风险"
     elif depth < 40.0:
         matrix = (0, 0, 1, 0)
-        message = "较高风险"
+        message = "高风险"
     else:
         matrix = (0, 0, 0, 1)
-        message = "高风险"
+        message = "较高风险"
 
     return (matrix, message)
 
@@ -317,16 +317,16 @@ def computeSaIndex(
 
     if maxSa < 0.2:
         matrix = (1, 0, 0, 0)
-        message = "低风险"
+        message = "较低风险"
     elif maxSa < 0.33:
         matrix = (0, 1, 0, 0)
-        message = "较低风险"
+        message = "低风险"
     elif maxSa < 0.5:
         matrix = (0, 0, 1, 0)
-        message = "较高风险"
+        message = "高风险"
     else:
         matrix = (0, 0, 0, 1)
-        message = "高风险"
+        message = "较高风险"
 
     return (matrix, message, Sa)
 
@@ -352,16 +352,16 @@ def computeLnIndex(
 
     if Ln < 2.0:
         matrix = (1, 0, 0, 0)
-        message = "低风险"
+        message = "较低风险"
     elif Ln < 5.0:
         matrix = (0, 1, 0, 0)
-        message = "较低风险"
+        message = "低风险"
     elif Ln < 8.0:
         matrix = (0, 0, 1, 0)
-        message = "较高风险"
+        message = "高风险"
     else:
         matrix = (0, 0, 0, 1)
-        message = "高风险"
+        message = "较高风险"
 
     return (matrix, message)
 
