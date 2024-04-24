@@ -12,11 +12,11 @@ from multiUtil import (
 from osgeo import gdal
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 3:
         print("参数错误！")
     else:
-        # json 路径, 当前年, 对比年
-        [jsonPath, currentYear, beforeYear] = sys.argv[1:4]
+        # json 路径, 对比年
+        [jsonPath, beforeYear] = sys.argv[1:3]
 
         content: dict = {}
         # read json
@@ -24,6 +24,7 @@ if __name__ == "__main__":
             content = json.load(file)
         scene: str = content.get("scene")  # type: ignore
         dataFolderPath: str = content.get("dataFolderPath")  # type: ignore
+        currentYear: str = content.get("year")  # type: ignore
         vertex: tuple[tuple[float, float], tuple[float, float]] = [  # type: ignore
             tuple(point)
             for point in content.get("vertex")  # type: ignore
@@ -35,18 +36,11 @@ if __name__ == "__main__":
         beforeDemPath = os.path.join(
             dataFolderPath, "raster", f"{beforeYear}Before.tif"
         )
-        currentDemPath = os.path.join(
-            dataFolderPath, "raster", f"{currentYear}Before.tif"
-        )
 
         # section
-        currentDataset: gdal.Dataset = gdal.Open(currentDemPath)
-        currentSectionPoints = getSectionPointList(
-            currentDataset,
-            float(vertex[0][0]),
-            float(vertex[0][1]),
-            float(vertex[1][0]),
-            float(vertex[1][1]),
+        currentSectionPointsList: list = content.get("section")  # type: ignore
+        currentSectionPoints: tuple = tuple(
+            tuple(point) for point in currentSectionPointsList
         )
         beforeDataset: gdal.Dataset = gdal.Open(beforeDemPath)
         beforeSectionPoints = getSectionPointList(
@@ -85,4 +79,4 @@ if __name__ == "__main__":
             json.dump(content, f, ensure_ascii=False)
 
         # test
-        # D:\project\JS_Bank_Collapse\util\model\multi\test\result.json 2023 2021
+        # D:\project\JS_Bank_Collapse\util\model\multi\test\result.json 2021

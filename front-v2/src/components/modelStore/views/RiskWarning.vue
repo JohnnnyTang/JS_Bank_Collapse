@@ -25,14 +25,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { useMultiIndexStore } from '@/store/multiIndexStore'
+import { onMounted, ref } from 'vue'
 import ModelTitleVue from '../ModelTitle.vue'
+import ElementCalcVue from '../riskCalc/ElementCalc.vue'
+import EvolveCalcVue from '../riskCalc/EvolveCalc.vue'
 import ModelFlowVue from '../riskCalc/ModelFlow.vue'
 import SectionCalcVue from '../riskCalc/SectionCalc.vue'
 import VelocityCalcVue from '../riskCalc/VelocityCalc.vue'
-import EvolveCalcVue from '../riskCalc/EvolveCalc.vue'
-import ElementCalcVue from '../riskCalc/ElementCalc.vue'
-import { useMultiIndexStore } from '@/store/multiIndexStore'
 
 // TODO: pinia持久化
 const multiIndexStore = useMultiIndexStore()

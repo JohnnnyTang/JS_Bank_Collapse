@@ -8,10 +8,8 @@ from multiUtil import (
     computeZdIndex,
     getDeepestPointInfoOnSection,
     getLevelOfDeepestPointOnSection,
-    getSectionPointList,
     getVelOfDeepestPointOnSection,
 )
-from osgeo import gdal
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
@@ -45,13 +43,9 @@ if __name__ == "__main__":
         )
 
         # section
-        currentDataset: gdal.Dataset = gdal.Open(currentDemPath)
-        currentSectionPoints = getSectionPointList(
-            currentDataset,
-            float(vertex[0][0]),
-            float(vertex[0][1]),
-            float(vertex[1][0]),
-            float(vertex[1][1]),
+        currentSectionPointsList: list = content.get("section")  # type: ignore
+        currentSectionPoints: tuple = tuple(
+            tuple(point) for point in currentSectionPointsList
         )
 
         # params
