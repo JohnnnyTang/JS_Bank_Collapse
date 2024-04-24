@@ -6,6 +6,7 @@
  */
 export const drawSectionGraph = (echarts, points) => {
     const min = Math.min(...points)
+    const max = Math.max(...points)
     const index = points.indexOf(min)
     const option = {
         grid: {
@@ -24,11 +25,6 @@ export const drawSectionGraph = (echarts, points) => {
                 },
             },
         },
-        // legend: {
-        //     data: ['断面深度'],
-        //     top: 2,
-        //     right: 10,
-        // },
         xAxis: {
             type: 'category',
             data: points.map((_, index) => index),
@@ -43,6 +39,8 @@ export const drawSectionGraph = (echarts, points) => {
                 show: false,
             },
             scale: true,
+            max: Math.round(max + 2),
+            min: Math.round(min - 2),
         },
         series: [
             {
@@ -50,14 +48,7 @@ export const drawSectionGraph = (echarts, points) => {
                 data: points.map((value) => value.toFixed(2)),
                 type: 'line',
                 smooth: true,
-                symbol: 'circle',
-                itemStyle: {
-                    color: function (data) {
-                        if (data.dataIndex === index) {
-                            return 'red'
-                        }
-                    },
-                },
+                // symbol: 'circle',
                 areaStyle: {
                     opacity: 0.8,
                     color: '#d2f2ff',
@@ -76,24 +67,7 @@ export const drawSectionGraph = (echarts, points) => {
  */
 export const drawOutputGraph = (echarts, indexValues) => {
     if (indexValues[0] === null) {
-        let option = {
-            backgroundColor: '#d1e7ff',
-        }
-        option.graphic = {
-            type: 'text', // 类型：文本
-            left: 'center',
-            top: 'middle',
-            silent: true, // 不响应事件
-            invisible: false, // 有数据就隐藏
-            style: {
-                fill: '#2a5fdb',
-                fontWeight: 'bold',
-                text: '该时间段暂无数据',
-                fontFamily: 'Microsoft YaHei',
-                fontSize: '25px',
-            },
-        }
-        echarts.setOption(option)
+        return
     } else {
         const option = {
             grid: {
@@ -162,4 +136,181 @@ export const drawOutputGraph = (echarts, indexValues) => {
         }
         echarts.setOption(option)
     }
+}
+
+/**
+ *
+ * @param {any} echarts
+ * @param {number[]} points
+ * @param {number[]} rates
+ */
+export const drawRateGraph = (echarts, points, rates) => {
+    const min = Math.min(...points)
+    const max = Math.max(...points)
+
+    const length = points.length
+    const splitPoint = []
+    for (let index = 0; index < length; index += 10) {
+        splitPoint.push(index)
+    }
+    splitPoint.push(length - 1)
+
+    const ratePoints = []
+    for (
+        let index = 0, rateIndex = 0;
+        index < splitPoint.length;
+        index++, rateIndex++
+    ) {
+        if (index !== splitPoint.length - 1) {
+            const start = splitPoint[index]
+            const end = splitPoint[index + 1]
+            for (let j = start; j < end; j++) {
+                console.log(rateIndex)
+                ratePoints.push(rates[rateIndex])
+            }
+        }
+    }
+
+    const colors = ['#5c7bd9', '#ff7070']
+    const pieces = (() => {
+        const result = []
+        const length = splitPoint.length
+        splitPoint.forEach((value, index) => {
+            if (index !== length - 1) {
+                result.push({
+                    gt: value,
+                    lt: splitPoint[index + 1],
+                    color: colors[index % 2],
+                })
+            }
+        })
+        return result
+    })()
+
+    const option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985',
+                },
+            },
+        },
+        grid: {
+            width: '80%',
+            height: '70%',
+            top: '10%',
+            show: true,
+        },
+        visualMap: {
+            type: 'piecewise',
+            show: false,
+            dimension: 0,
+            seriesIndex: 0,
+            pieces: pieces,
+        },
+        xAxis: {
+            type: 'category',
+            data: points.map((_, index) => index),
+            position: 'bottom',
+            axisLine: {
+                show: true,
+                onZero: false,
+            },
+        },
+        yAxis: {
+            type: 'value',
+            splitLine: {
+                show: false,
+            },
+            scale: true,
+            max: Math.round(max + 1),
+            min: Math.round(min - 1),
+        },
+        series: [
+            {
+                name: '选择时间横截面',
+                type: 'line',
+                smooth: true,
+                data: points.map((value) => value.toFixed(2)),
+            },
+            {
+                name: '坡比',
+                type: 'line',
+                smooth: true,
+                data: ratePoints.map((value) => value.toFixed(6)),
+            },
+        ],
+    }
+    echarts.setOption(option)
+}
+
+/**
+ *
+ * @param {any} echarts
+ * @param {number[]} after
+ * @param {number[]} before
+ */
+export const drawCompareGraph = (echarts, after, before) => {
+    const min = Math.min(...after, ...before)
+    const max = Math.max(...after, ...before)
+    const option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985',
+                },
+            },
+        },
+        legend: {
+            data: ['选择时间横截面', '对比时间横截面'],
+        },
+        grid: {
+            width: '80%',
+            height: '70%',
+            top: '10%',
+            show: true,
+        },
+        xAxis: {
+            type: 'category',
+            data: before.map((_, index) => index),
+            position: 'bottom',
+        },
+        yAxis: {
+            type: 'value',
+            splitLine: {
+                show: false,
+            },
+            axisLine: {
+                show: false,
+            },
+            scale: true,
+            max: Math.round(max + 2),
+            min: Math.round(min - 2),
+        },
+        series: [
+            {
+                name: '选择时间横截面',
+                type: 'line',
+                smooth: true,
+                data: after.map((value) => value.toFixed(2)),
+            },
+            {
+                name: '对比时间横截面',
+                type: 'line',
+                smooth: true,
+                data: before.map((value) => value.toFixed(2)),
+                lineStyle: {
+                    color: '#ff7070',
+                },
+                itemStyle: {
+                    color: '#ff7070',
+                },
+            },
+        ],
+    }
+    echarts.setOption(option)
 }

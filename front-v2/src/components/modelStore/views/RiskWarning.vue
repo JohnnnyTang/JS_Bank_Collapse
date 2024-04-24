@@ -39,7 +39,7 @@ const multiIndexStore = useMultiIndexStore()
 
 const ModelName = '风险预警模型'
 
-const curRunModelName = ref('动力指标计算')
+const curRunModelName = ref('演变分析指标计算')
 
 console.log(multiIndexStore.taskIdMap)
 

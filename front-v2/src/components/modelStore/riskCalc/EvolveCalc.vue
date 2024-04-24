@@ -2,6 +2,7 @@
     <div class="velocity-calc-content">
         <div class="model-input">
             <div class="model-params-container card">
+                <div class="title-container">指标参数输入</div>
                 <el-form
                     ref="paramsFromRef"
                     :model="paramsForm"
@@ -12,28 +13,16 @@
                     <el-form-item
                         label="对比时间"
                         prop="year"
-                        style="width: 90%; margin: 8px"
+                        style="width: 90%; margin: 2%; color: black"
                     >
-                        <el-input v-model="paramsForm.year" />
+                        <el-input v-model="paramsForm.year" color="#abd5f8" />
                     </el-form-item>
-                    <el-form-item
-                        label="水文条件"
-                        prop="condition"
-                        style="width: 90%; margin: 8px"
-                    >
-                        <el-select
-                            v-model="paramsForm.condition"
-                            placeholder="枯季"
-                        >
-                            <el-option label="枯季" value="dry" />
-                            <el-option label="洪季" value="flood" />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item style="width: 90%; margin: 20px 8px">
+                    <el-form-item style="width: 90%; margin: 4%">
                         <el-button
                             type="primary"
                             @click="submitForm(paramsFromRef)"
                             :disabled="isDisable"
+                            color="#2a5fdb"
                         >
                             计算指标
                         </el-button>
@@ -44,17 +33,55 @@
                 </el-form>
             </div>
             <div class="section-graph-container card">
-                <div ref="sectionGraphRef" class="section-graph card"></div>
+                <div class="title-container">坡比</div>
+                <div
+                    class="card"
+                    style="
+                        flex: 1 1 0;
+                        width: 95%;
+                        color: #0953aa;
+                        background-color: #d1e7ff;
+                        font-size: x-large;
+                        font-weight: bold;
+                    "
+                    v-show="isFinish == false"
+                >
+                    目前暂无结果
+                </div>
+                <div
+                    ref="rateGraphRef"
+                    class="section-graph card"
+                    v-show="isFinish == true"
+                ></div>
             </div>
         </div>
         <div class="model-output">
             <div class="output-graph-container card">
-                <div ref="outputGraphRef" class="output-graph card"></div>
+                <div class="title-container">断面对比</div>
+                <div
+                    class="card"
+                    style="
+                        flex: 1 1 0;
+                        width: 95%;
+                        color: #0953aa;
+                        background-color: #d1e7ff;
+                        font-size: x-large;
+                        font-weight: bold;
+                    "
+                    v-show="isFinish == false"
+                >
+                    目前暂无结果
+                </div>
+                <div
+                    v-show="isFinish == true"
+                    ref="compareGraphRef"
+                    class="output-graph card"
+                ></div>
             </div>
             <div class="output-table-container card device-status-container">
                 <div class="small-title-container">
                     <span style="padding-right: 3%"></span>
-                    <div class="small-title-text">动力指标计算结果</div>
+                    <div class="small-title-text">演变指标计算结果</div>
                 </div>
                 <div class="device-status-content">
                     <div class="head device-status-row">
@@ -68,7 +95,7 @@
                         :key="index"
                     >
                         <div class="device-name device-item body">
-                            {{ ['PQ', 'KY', 'ZD'][index] }}
+                            {{ ['ZB', 'SA', 'LN'][index] }}
                         </div>
                         <div class="device-count device-item body">
                             {{ item[0] || '无数据' }}
@@ -87,57 +114,73 @@
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, reactive, ref } from 'vue'
-import { getPowerIndexResult, getSectionPoints } from './api.js'
-import { drawOutputGraph, drawSectionGraph } from './util.js'
+import {
+    getBeforeSectionPoints,
+    getEvolutionIndexResult,
+    getSectionPoints,
+} from './api.js'
+import { drawCompareGraph, drawRateGraph } from './util.js'
 
 const sectionPoints = ref(null)
+const beforeSectionPoints = ref(null)
 const indexValues = ref([[], [], []])
-const sectionGraphRef = ref(null)
-const outputGraphRef = ref(null)
+const rateGraphRef = ref(null)
+const compareGraphRef = ref(null)
 const paramsFromRef = ref(null)
-let outputGraphChart = null
+let compareGraphChart = null
+let rateChart = null
 
 const paramsForm = reactive({
     year: null,
-    condition: null,
 })
 const rules = reactive({
     year: [
         {
             required: true,
-            message: '请输入水文年份',
-        },
-    ],
-    condition: [
-        {
-            required: true,
-            message: '请输入水文条件',
+            message: '请输入对比年份',
         },
     ],
 })
 const isDisable = computed(() => {
-    console.log(paramsForm)
     if (paramsForm) {
-        console.log(!(paramsForm.year && paramsForm.condition))
-        return !(paramsForm.year && paramsForm.condition)
+        return !paramsForm.year
     } else {
         return true
     }
 })
 
+const isFinish = computed(() => indexValues.value[0].length !== 0)
+
 const submitForm = async () => {
-    const result = getPowerIndexResult()
+    const result = getEvolutionIndexResult()
     if (result.status === 'success') {
         ElMessage({
-            message: '动力指标计算成功',
+            message: '演化分析指标计算成功',
             type: 'success',
         })
-        indexValues.value = [result.data.PQ, result.data.KY, result.data.ZD]
-        outputGraphChart.clear()
-        drawOutputGraph(outputGraphChart, indexValues.value)
+        indexValues.value = [result.data.ZB, result.data.SA, result.data.Ln]
+        beforeSectionPoints.value = getBeforeSectionPoints()
+
+        setTimeout(() => {
+            rateChart.clear()
+            drawRateGraph(
+                rateChart,
+                sectionPoints.value.data.map((value) => value[2]),
+                result.data.SA[2],
+            )
+            rateChart.resize()
+
+            compareGraphChart.clear()
+            drawCompareGraph(
+                compareGraphChart,
+                sectionPoints.value.data.map((value) => value[2]),
+                beforeSectionPoints.value.data.map((value) => value[2]),
+            )
+            compareGraphChart.resize()
+        }, 10)
     } else {
         ElMessage({
-            message: '动力指标计算失败',
+            message: '演化指标计算失败',
             type: 'warning',
         })
     }
@@ -150,13 +193,8 @@ const resetForm = (formEl) => {
 
 onMounted(() => {
     sectionPoints.value = getSectionPoints()
-    const sectionChart = echarts.init(sectionGraphRef.value)
-    drawSectionGraph(
-        sectionChart,
-        sectionPoints.value.data.map((value) => value[2]),
-    )
-    outputGraphChart = echarts.init(outputGraphRef.value)
-    drawOutputGraph(outputGraphChart, [null, null, null])
+    rateChart = echarts.init(rateGraphRef.value)
+    compareGraphChart = echarts.init(compareGraphRef.value)
 })
 </script>
 
@@ -173,9 +211,11 @@ div.velocity-calc-content {
         flex-direction: column;
 
         .model-params-container {
+            flex-direction: column;
             flex: 1 1 0;
         }
         .section-graph-container {
+            flex-direction: column;
             flex: 1 1 0;
         }
     }
@@ -185,6 +225,7 @@ div.velocity-calc-content {
         flex-direction: column;
 
         .output-graph-container {
+            flex-direction: column;
             flex: 1 1 0;
         }
 
@@ -195,32 +236,36 @@ div.velocity-calc-content {
     }
 
     .card {
-        border-radius: 4px;
-        margin: 1px;
+        border-radius: 6px;
+        margin: 1%;
         background-color: #abd5f8;
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
+        box-shadow:
+            rgba(13, 70, 228, 0.6) 0px 2px 4px,
+            rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+            rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
     }
 
     .section-graph {
         height: 90%;
         width: 95%;
-        background-color: white;
+        background-color: hsla(210, 100%, 92%);
     }
 
     .model-params {
         height: 90%;
         width: 95%;
-        background-color: white;
+        background-color: #d1e7ff;
         display: block;
     }
 
     .output-graph {
         height: 90%;
         width: 95%;
-        background-color: white;
+        background-color: #d1e7ff;
         display: block;
     }
 }
@@ -236,8 +281,8 @@ div.device-status-container {
         margin-top: 1vh;
         margin-bottom: 0.5vh;
         left: 5px;
-        height: 7vh;
-        line-height: 7vh;
+        height: 6vh;
+        line-height: 6vh;
         display: flex;
         border-radius: 8px;
 
@@ -320,6 +365,31 @@ div.device-status-container {
             }
         }
     }
-    // background-color: #2622fd;
+}
+
+.title-container {
+    width: 93%;
+    margin-top: 1vh;
+    margin-bottom: 0.5vh;
+    padding-left: 2%;
+    height: 6vh;
+    line-height: 6vh;
+    display: flex;
+    border-radius: 8px;
+
+    background: linear-gradient(
+        90deg,
+        rgba(0, 56, 128, 1) 0%,
+        rgba(16, 104, 203, 1) 60%,
+        rgba(68, 159, 255, 1) 100%
+    );
+
+    text-align: left;
+    color: #c4fbff;
+    font-weight: bold;
+}
+:deep(.el-form-item__label) {
+    color: #0953aa;
+    font-weight: bold;
 }
 </style>

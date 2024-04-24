@@ -75,6 +75,7 @@ if __name__ == "__main__":
         content["ZB"] = ZBIndex
         content["SA"] = SAIndex
         content["LN"] = LNIndex
+        content["beforeSection"] = beforeSectionPoints
         with open(jsonPath, "w", encoding="utf8") as f:
             json.dump(content, f, ensure_ascii=False)
 

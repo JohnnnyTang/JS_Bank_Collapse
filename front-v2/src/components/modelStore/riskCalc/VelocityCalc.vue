@@ -46,7 +46,7 @@
                 </el-form>
             </div>
             <div class="section-graph-container card">
-                <div class="title-container">断面最深点</div>
+                <div class="title-container">断面形态</div>
                 <div ref="sectionGraphRef" class="section-graph card"></div>
             </div>
         </div>
@@ -139,7 +139,6 @@ const rules = reactive({
 })
 const isDisable = computed(() => {
     if (paramsForm) {
-        console.log(!(paramsForm.year && paramsForm.condition))
         return !(paramsForm.year && paramsForm.condition)
     } else {
         return true
