@@ -3,6 +3,7 @@ package com.johnny.bank.utils;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
+import com.johnny.bank.model.configuration.MultiIndexPath;
 import com.johnny.bank.model.configuration.TilePath;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.TaskNode;
@@ -35,6 +36,9 @@ public class ProcessUtil {
     private TilePath tilePath;
     //    static String pythonDir = "C:/nhri/monitor/pythonDir/";
 
+    @Autowired
+    private MultiIndexPath multiIndexPath;
+
     static String outsideModelDir = "D:/zhuomian/水科院/python/";
     //    static String pythonDir = "/home/zym/python/";
     static String pythonStr = "python";
@@ -56,6 +60,47 @@ public class ProcessUtil {
         commands.add(taskNode.getModelNode().getProgram());
         List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
         JSONObject paramObject = taskNode.getParamNode().getParams();
+        for(String paramKey: paramKeys) {
+            commands.add((String) paramObject.get(paramKey));
+        }
+        processBuilder.command(commands);
+        return processBuilder.start();
+    }
+
+    // 岸坡因子计算
+    public static Process buildSectionTaskNodeProcess(
+            TaskNode taskNode, String multiIndexDataPath, String multiIndexResPath
+    ) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        ModelNode modelNode = taskNode.getModelNode();
+        JSONObject modelUsage = modelNode.getUsage();
+        commands.add((String) modelUsage.get("exePrefix"));
+        commands.add(taskNode.getModelNode().getProgram());
+        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
+        JSONObject paramObject = taskNode.getParamNode().getParams();
+        for(String paramKey: paramKeys) {
+            commands.add((String) paramObject.get(paramKey));
+        }
+        commands.add(multiIndexDataPath);
+        commands.add(multiIndexResPath);
+        processBuilder.command(commands);
+        return processBuilder.start();
+    }
+
+    // 其他因子计算
+    public static Process buildOtherIndexTaskNodeProcess(
+            TaskNode taskNode, String fullJsonPath
+    ) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        ModelNode modelNode = taskNode.getModelNode();
+        JSONObject modelUsage = modelNode.getUsage();
+        commands.add((String) modelUsage.get("exePrefix"));
+        commands.add(taskNode.getModelNode().getProgram());
+        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
+        JSONObject paramObject = taskNode.getParamNode().getParams();
+        commands.add(fullJsonPath);
         for(String paramKey: paramKeys) {
             commands.add((String) paramObject.get(paramKey));
         }

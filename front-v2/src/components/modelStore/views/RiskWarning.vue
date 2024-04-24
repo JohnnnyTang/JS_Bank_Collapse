@@ -24,14 +24,19 @@ import SectionCalcVue from '../riskCalc/SectionCalc.vue'
 import VelocityCalcVue from '../riskCalc/VelocityCalc.vue'
 import EvolveCalcVue from '../riskCalc/EvolveCalc.vue'
 import ElementCalcVue from '../riskCalc/ElementCalc.vue'
+import { useMultiIndexStore } from '@/store/multiIndexStore'
+
+// TODO: pinia持久化
+const multiIndexStore = useMultiIndexStore()
 
 const ModelName = '风险预警模型'
 
 const curRunModelName = ref('计算断面选择')
 
-
+console.log(multiIndexStore.taskIdMap)
 
 onMounted(() => {
+    multiIndexStore.taskIdMap.section = '1'
 })
 </script>
 

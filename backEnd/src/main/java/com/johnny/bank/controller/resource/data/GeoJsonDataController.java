@@ -28,7 +28,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("GeoData/GeoJsonData")
+@RequestMapping("api/v1/fileData/json")
 public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService> {
 
     @Autowired
@@ -36,39 +36,39 @@ public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService
         super(geojsonDataService);
     }
 
-    @GetMapping("/findAll")
+    @GetMapping()
     public ResponseEntity<List<GeoJsonData>> findAll() {
         return ResponseEntity.ok(igeoDataService.findAll(dataNode));
     }
 
-    @GetMapping("/getTotalCount")
+    @GetMapping("/count")
     public ResponseEntity<Integer> getTotalCount(){
         return ResponseEntity.ok(igeoDataService.getTotalCount(dataNode));
     }
 
-    @GetMapping("/findById")
-    public ResponseEntity<GeoJsonData> findById(@RequestParam String id){
+    @GetMapping("/id/{id}")
+    public ResponseEntity<GeoJsonData> findById(@PathVariable String id){
         return ResponseEntity.ok(igeoDataService.findById(dataNode, id));
     }
 
-    @GetMapping("/findByIdList")
+    @GetMapping("/ids")
     public ResponseEntity<List<GeoJsonData>> findByIdList(@RequestParam List<String> ids){
         return ResponseEntity.ok(igeoDataService.findByIdList(dataNode, ids));
     }
 
-    @GetMapping("getFilePathById")
-    public ResponseEntity<String> getFilePathById(@RequestParam String id) {
+    @GetMapping("/path/id/{id}")
+    public ResponseEntity<String> getFilePathById(@PathVariable String id) {
         GeoJsonData geoJsonData = igeoDataService.findById(dataNode, id);
         return ResponseEntity.ok(geoJsonData.getPath());
     }
 
-    @PostMapping("/insertData")
+    @PostMapping()
     public ResponseEntity<String> insertData(@RequestBody JSONObject jsonObject)  {
         return ResponseEntity.ok(igeoDataService.insertData(dataNode, jsonObject));
     }
 
-    @GetMapping("/getFileById")
-    public ResponseEntity<FileSystemResource> getFileById(@RequestParam String id) {
+    @GetMapping("/file/id/{id}")
+    public ResponseEntity<FileSystemResource> getFileById(@PathVariable String id) {
         GeoJsonData geoJsonData = igeoDataService.findById(dataNode, id);
         String filePath = geoJsonData.getPath();
         String fileName = geoJsonData.getName();
@@ -88,7 +88,7 @@ public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService
         }
     }
 
-    @DeleteMapping("/deleteFileById")
+    @DeleteMapping()
     public ResponseEntity<String> deleteFileById(@RequestParam String id) {
         GeoJsonData geoJsonData = igeoDataService.findById(dataNode, id);
         String filePath = geoJsonData.getPath();
@@ -107,12 +107,11 @@ public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService
         }
     }
 
-    @GetMapping("/getGeoJsonById")
-    public String getGeoJsonById(@RequestParam String id) throws IOException {
+    @GetMapping("/jsonStr/id/{id}")
+    public String getGeoJsonById(@PathVariable String id) throws IOException {
         GeoJsonData geoJsonData = igeoDataService.findById(dataNode, id);
         String filePath = geoJsonData.getPath();
-        String geoJsonString = igeoDataService.readGeoJsonFile(filePath);
-//        JSONObject jsonObject = new JSONObject(Integer.parseInt(geoJsonString));
-        return geoJsonString;
+        //        JSONObject jsonObject = new JSONObject(Integer.parseInt(geoJsonString));
+        return igeoDataService.readGeoJsonFile(filePath);
     }
 }

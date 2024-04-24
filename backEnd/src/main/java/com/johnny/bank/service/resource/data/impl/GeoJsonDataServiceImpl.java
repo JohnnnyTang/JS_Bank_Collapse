@@ -47,31 +47,31 @@ public class GeoJsonDataServiceImpl implements IGeoJsonDataService {
     }
 
     @Override
-    @DynamicNodeData
+//    @DynamicNodeData
     public Integer getTotalCount(DataNode dataNode) {
         return geojsonDataRepo.getTotalCount();
     }
 
     @Override
-    @DynamicNodeData
+//    @DynamicNodeData
     public List<GeoJsonData> findAll(DataNode dataNode) {
         return geojsonDataRepo.findAll();
     }
 
     @Override
-    @DynamicNodeData
+//    @DynamicNodeData
     public GeoJsonData findById(DataNode dataNode, String id) {
         return geojsonDataRepo.findById(id);
     }
 
     @Override
-    @DynamicNodeData
+//    @DynamicNodeData
     public void deleteById(DataNode dataNode, String id) {
         geojsonDataRepo.deleteById(id);
     }
 
     @Override
-    @DynamicNodeData
+//    @DynamicNodeData
     public List<GeoJsonData> findByIdList(DataNode dataNode, List<String> ids) {
         return geojsonDataRepo.findByIdList(ids);
     }
@@ -79,7 +79,7 @@ public class GeoJsonDataServiceImpl implements IGeoJsonDataService {
     private GeoJsonData dataProcess(JSONObject jsonObject) {
         GeoJsonData geoJsonData;
         try {
-            geoJsonData = GeoJsonData.geojsonBuilder()
+            geoJsonData = GeoJsonData.geojsonBuilder().id(jsonObject.getString("id"))
                           .name(jsonObject.getString("name"))
                           .type(jsonObject.getString("type"))
                           .path(jsonObject.getString("path"))
@@ -96,7 +96,7 @@ public class GeoJsonDataServiceImpl implements IGeoJsonDataService {
     }
 
     @Override
-    @DynamicNodeData
+//    @DynamicNodeData
     public String insertData(DataNode dataNode, JSONObject jsonObject) {
         GeoJsonData geoJsonData = dataProcess(jsonObject);
         geojsonDataRepo.insertData(geoJsonData);

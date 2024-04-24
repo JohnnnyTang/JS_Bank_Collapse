@@ -2,10 +2,7 @@ package com.johnny.bank.model.resource.dataResource;
 
 import com.johnny.bank.model.resource.dataResource.base.GeoData;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * @projectName: backEnd
@@ -17,6 +14,9 @@ import lombok.NoArgsConstructor;
  * @version: 1.0
  */
 
+@EqualsAndHashCode(callSuper = true)
+@Data
+@NoArgsConstructor
 public class GeoJsonData extends GeoData {
     @Builder(builderMethodName = "geojsonBuilder")
     public GeoJsonData(@NotNull String id, @NotNull String name,

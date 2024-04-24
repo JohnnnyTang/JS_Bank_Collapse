@@ -29,8 +29,8 @@
     </delete>
 
     <insert id="insertData" parameterType="com.johnny.bank.model.resource.dataResource.GeoJsonData" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO geojsondata (name, type, path, createtime, updatetime)
-        VALUES (#{name}, #{type}, #{path}, #{createTime}, #{updateTime});
+        INSERT INTO geojsondata (id, name, type, path, createtime, updatetime)
+        VALUES (#{id}, #{name}, #{type}, #{path}, #{createTime}, #{updateTime});
     </insert>
 
     <select id="findByIdList" resultMap="geojsonMap">

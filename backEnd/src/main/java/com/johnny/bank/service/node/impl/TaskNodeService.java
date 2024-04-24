@@ -2,6 +2,7 @@ package com.johnny.bank.service.node.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
+import com.johnny.bank.model.configuration.MultiIndexPath;
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.ParamNode;
@@ -10,11 +11,14 @@ import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.nodeRepo.IModelNodeRepo;
 import com.johnny.bank.repository.nodeRepo.IParamNodeRepo;
 import com.johnny.bank.repository.nodeRepo.ITaskNodeRepo;
+import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IGeoJsonDataRepo;
 import com.johnny.bank.utils.ProcessUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +34,9 @@ public class TaskNodeService extends NodeService<TaskNode> {
     private IDataNodeRepo dataNodeRepo;
     private IModelNodeRepo modelNodeRepo;
     private IParamNodeRepo paramNodeRepo;
+    private MultiIndexPath multiIndexPath;
+    private IGeoJsonDataRepo geoJsonDataRepo;
+
 
     @Autowired
 //    @Qualifier("BaseNodeRepo")
@@ -81,12 +88,22 @@ public class TaskNodeService extends NodeService<TaskNode> {
 
     // TODO: 新增任务的业务逻辑、任务案例页面
 
-    public String createAndStartNewTask(TaskNode taskNode) throws IOException {
+    public String createAndStartNewTask(TaskNode taskNode) throws Exception {
         String nodeId = save(taskNode);
         taskNode = IBaseNodeRepo.findById(nodeId).orElse(null);
         if(taskNode == null) {
             return null;
-        } else new TaskThread(taskNode).start();
+        } else {
+            switch (taskNode.getModelNode().getId()) {
+                case "65b78631028eca632d0afae2":
+                    new CmdOutputTaskThread(taskNode).start();
+                    break;
+                case "":
+                    break;
+                default:
+                    throw new Exception("Not found this model");
+            }
+        }
         return nodeId;
     }
 
@@ -105,10 +122,21 @@ public class TaskNodeService extends NodeService<TaskNode> {
         this.paramNodeRepo = paramNodeRepo;
     }
 
-    public class TaskThread extends Thread {
+    @Autowired
+    public void setMultiIndexPath(MultiIndexPath multiIndexPath) {
+        this.multiIndexPath = multiIndexPath;
+    }
+
+    @Qualifier("GeoJsonDataRepo")
+    @Autowired
+    public void setGeoJsonDataRepo(IGeoJsonDataRepo geoJsonDataRepo) {
+        this.geoJsonDataRepo = geoJsonDataRepo;
+    }
+
+    public class CmdOutputTaskThread extends Thread {
         TaskNode taskNode;
 
-        public TaskThread(TaskNode taskNode) {
+        public CmdOutputTaskThread(TaskNode taskNode) {
             this.taskNode = taskNode;
         }
 
@@ -129,6 +157,94 @@ public class TaskNodeService extends NodeService<TaskNode> {
 //                    taskNode.setStatus("1");
                     JSONObject result = new JSONObject();
                     result.put("resultString", cmdOutput.getOutputString());
+                    updateNodeStatusResultById(taskNode.getId(), "2", result);
+//                    taskNode.getResult().put("resultString", cmdOutput.getOutputString());
+                }
+                else {
+                    updateNodeStatusById(taskNode.getId(), "-1");
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            log.info("running custom Thread");
+        }
+    }
+
+    public class SectionIndexTaskThread extends Thread {
+        TaskNode taskNode;
+
+        public SectionIndexTaskThread(TaskNode taskNode) {
+            this.taskNode = taskNode;
+        }
+
+        @Override
+        public void run() {
+            try {
+                updateNodeStatusById(taskNode.getId(), "1");
+                String fullJsonResPath = multiIndexPath.getDataPath() + taskNode.getId() + ".json";
+                Process process = ProcessUtil.buildSectionTaskNodeProcess(
+                        taskNode, fullJsonResPath, multiIndexPath.getResPath()
+                );
+                ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
+                log.info(cmdOutput.toString());
+                if(cmdOutput.getStatusCode() == 0) {
+                    updateNodeStatusById(taskNode.getId(), "-1");
+                }
+                int code = process.waitFor();
+                process.destroy();
+                if(code == 0) {
+                    JSONObject result = new JSONObject();
+                    result.put("resultString", cmdOutput.getOutputString());
+                    result.put("resJsonId", taskNode.getId());
+                    File resJson = new File(fullJsonResPath);
+                    if (resJson.exists()) {
+                        updateNodeStatusResultById(taskNode.getId(), "2", result);
+                    }
+                    else {
+                        updateNodeStatusResultById(taskNode.getId(), "-2", result);
+                    }
+                }
+                else {
+                    updateNodeStatusById(taskNode.getId(), "-1");
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            log.info("running custom Thread");
+        }
+    }
+
+    public class OtherMultiIndexTaskThread extends Thread {
+        TaskNode taskNode;
+
+        public OtherMultiIndexTaskThread(TaskNode taskNode) {
+            this.taskNode = taskNode;
+        }
+
+        @Override
+        public void run() {
+            try {
+                updateNodeStatusById(taskNode.getId(), "1");
+                String fullJsonPath = geoJsonDataRepo.findById(
+                        (String) taskNode.getParamNode().getParams().get("jsonId")
+                ).getPath();
+
+                Process process = ProcessUtil.buildOtherIndexTaskNodeProcess(
+                        taskNode, fullJsonPath
+                );
+                ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
+                log.info(cmdOutput.toString());
+                if(cmdOutput.getStatusCode() == 0) {
+//                    taskNode.setStatus("-1");
+                    updateNodeStatusById(taskNode.getId(), "-1");
+                }
+                int code = process.waitFor();
+                process.destroy();
+                if(code == 0) {
+//                    taskNode.setStatus("1");
+                    JSONObject result = new JSONObject();
+                    result.put("resultString", cmdOutput.getOutputString());
+                    result.put("resJsonId", taskNode.getParamNode().getParams().get(""));
                     updateNodeStatusResultById(taskNode.getId(), "2", result);
 //                    taskNode.getResult().put("resultString", cmdOutput.getOutputString());
                 }

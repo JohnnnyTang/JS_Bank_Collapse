@@ -33,3 +33,7 @@ tile:
 
 video:
   yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4
+
+multiIndex:
+  dataPath: D:\2024-work\shore_collapse\model\modelData
+  resPath: D:\2024-work\shore_collapse\model\modelRes
