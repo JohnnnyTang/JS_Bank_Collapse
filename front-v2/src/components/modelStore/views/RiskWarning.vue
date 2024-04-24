@@ -27,7 +27,7 @@ import ElementCalcVue from '../riskCalc/ElementCalc.vue'
 
 const ModelName = '风险预警模型'
 
-const curRunModelName = ref('计算断面选择')
+const curRunModelName = ref('多指标因子配置')
 
 
 
