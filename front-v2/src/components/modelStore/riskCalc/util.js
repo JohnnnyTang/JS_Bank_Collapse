@@ -8,14 +8,12 @@ export const drawSectionGraph = (echarts, points) => {
     const min = Math.min(...points)
     const index = points.indexOf(min)
     const option = {
-        title: {
-            text: '断面',
-            top: 2,
-            left: 6,
-        },
         grid: {
             width: '80%',
-            height: '50%',
+            height: '70%',
+            top: '10%',
+            show: true,
+            backgroundColor: '#2a5fdb',
         },
         tooltip: {
             trigger: 'axis',
@@ -26,11 +24,11 @@ export const drawSectionGraph = (echarts, points) => {
                 },
             },
         },
-        legend: {
-            data: ['断面深度'],
-            top: 2,
-            right: 10,
-        },
+        // legend: {
+        //     data: ['断面深度'],
+        //     top: 2,
+        //     right: 10,
+        // },
         xAxis: {
             type: 'category',
             data: points.map((_, index) => index),
@@ -38,8 +36,11 @@ export const drawSectionGraph = (echarts, points) => {
         },
         yAxis: {
             type: 'value',
+            splitLine: {
+                show: false,
+            },
             axisLine: {
-                show: true,
+                show: false,
             },
             scale: true,
         },
@@ -57,6 +58,10 @@ export const drawSectionGraph = (echarts, points) => {
                         }
                     },
                 },
+                areaStyle: {
+                    opacity: 0.8,
+                    color: '#d2f2ff',
+                },
             },
         ],
     }
@@ -70,73 +75,91 @@ export const drawSectionGraph = (echarts, points) => {
  * @param {number[]} indexValues
  */
 export const drawOutputGraph = (echarts, indexValues) => {
-    const option = {
-        title: {
-            text: '断面',
-            top: 2,
-            left: 6,
-        },
-        grid: {
-            width: '80%',
-            height: '50%',
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross',
-                label: {
-                    backgroundColor: '#6a7985',
-                },
+    if (indexValues[0] === null) {
+        let option = {
+            backgroundColor: '#d1e7ff',
+        }
+        option.graphic = {
+            type: 'text', // 类型：文本
+            left: 'center',
+            top: 'middle',
+            silent: true, // 不响应事件
+            invisible: false, // 有数据就隐藏
+            style: {
+                fill: '#2a5fdb',
+                fontWeight: 'bold',
+                text: '该时间段暂无数据',
+                fontFamily: 'Microsoft YaHei',
+                fontSize: '25px',
             },
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'shadow',
+        }
+        echarts.setOption(option)
+    } else {
+        const option = {
+            grid: {
+                top: '10%',
+                width: '80%',
+                height: '70%',
+                show: true,
+                backgroundColor: 'hsl(210, 90%, 70%)',
             },
-        },
-        xAxis: [
-            {
-                type: 'category',
-                data: ['造床流量当量', '流速', '水位变幅'],
-            },
-        ],
-        yAxis: [
-            {
-                type: 'value',
-            },
-        ],
-        series: [
-            {
-                name: 'Forest',
-                type: 'bar',
-                emphasis: {
-                    focus: 'series',
-                },
-                data: indexValues.map((value) => value.toFixed(2)),
-                itemStyle: {
-                    normal: {
-                        color: function (params) {
-                            var colorList = [
-                                '#C33531',
-                                '#EFE42A',
-                                '#64BD3D',
-                                '#EE9201',
-                                '#29AAE3',
-                                '#B74AE5',
-                                '#0AAF9F',
-                                '#E89589',
-                            ]
-                            return colorList[params.dataIndex]
-                        },
-                        label: {
-                            show: false,
-                        },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985',
                     },
                 },
             },
-        ],
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow',
+                },
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: ['造床流量当量', '流速', '水位变幅'],
+                },
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                },
+            ],
+            series: [
+                {
+                    name: 'Forest',
+                    type: 'bar',
+                    emphasis: {
+                        focus: 'series',
+                    },
+                    data: indexValues.map((value) => value[2].toFixed(2)),
+                    itemStyle: {
+                        normal: {
+                            color: function (params) {
+                                var colorList = [
+                                    '#C33531',
+                                    '#EFE42A',
+                                    '#64BD3D',
+                                    '#EE9201',
+                                    '#29AAE3',
+                                    '#B74AE5',
+                                    '#0AAF9F',
+                                    '#E89589',
+                                ]
+                                return colorList[params.dataIndex]
+                            },
+                            label: {
+                                show: false,
+                            },
+                        },
+                    },
+                },
+            ],
+        }
+        echarts.setOption(option)
     }
-
-    echarts.setOption(option)
 }
