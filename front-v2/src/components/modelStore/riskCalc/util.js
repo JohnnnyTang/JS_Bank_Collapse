@@ -7,7 +7,6 @@
 export const drawSectionGraph = (echarts, points) => {
     const min = Math.min(...points)
     const max = Math.max(...points)
-    const index = points.indexOf(min)
     const option = {
         grid: {
             width: '80%',
@@ -27,7 +26,7 @@ export const drawSectionGraph = (echarts, points) => {
         },
         xAxis: {
             type: 'category',
-            data: points.map((_, index) => index),
+            data: points.map((_, index) => index * 5),
             position: 'bottom',
         },
         yAxis: {
@@ -212,7 +211,7 @@ export const drawRateGraph = (echarts, points, rates) => {
         },
         xAxis: {
             type: 'category',
-            data: points.map((_, index) => index),
+            data: points.map((_, index) => index * 5),
             position: 'bottom',
             axisLine: {
                 show: true,
@@ -276,7 +275,7 @@ export const drawCompareGraph = (echarts, after, before) => {
         },
         xAxis: {
             type: 'category',
-            data: before.map((_, index) => index),
+            data: before.map((_, index) => index * 5),
             position: 'bottom',
         },
         yAxis: {

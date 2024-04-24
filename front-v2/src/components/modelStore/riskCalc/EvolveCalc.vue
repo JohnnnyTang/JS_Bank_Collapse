@@ -160,6 +160,7 @@ const submitForm = async () => {
         })
         indexValues.value = [result.data.ZB, result.data.SA, result.data.Ln]
         beforeSectionPoints.value = getBeforeSectionPoints()
+        resetForm(paramsFromRef.value)
 
         setTimeout(() => {
             rateChart.clear()

@@ -155,6 +155,7 @@ const submitForm = async () => {
             type: 'success',
         })
         indexValues.value = [result.data.PQ, result.data.KY, result.data.ZD]
+        resetForm(paramsFromRef.value)
         setTimeout(() => {
             outputGraphChart.clear()
             drawOutputGraph(outputGraphChart, indexValues.value)
