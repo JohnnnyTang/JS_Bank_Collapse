@@ -33,7 +33,7 @@
                 </el-form>
             </div>
             <div class="section-graph-container card">
-                <div class="title-container">坡比</div>
+                <div class="title-container">岸坡坡比</div>
                 <div
                     class="card"
                     style="
@@ -95,7 +95,7 @@
                         :key="index"
                     >
                         <div class="device-name device-item body">
-                            {{ ['ZB', 'SA', 'LN'][index] }}
+                            {{ ['潮滩高差', '岸坡坡比', '冲淤变幅'][index] }}
                         </div>
                         <div class="device-count device-item body">
                             {{ item[0] || '无数据' }}
@@ -272,12 +272,10 @@ div.velocity-calc-content {
 
 div.device-status-container {
     margin-top: 0.5vh;
-    margin-left: 2.5%;
     height: 24.2vh;
 
     div.small-title-container {
         width: 95%;
-        margin-left: 2.5%;
         margin-top: 1vh;
         margin-bottom: 0.5vh;
         left: 5px;
@@ -311,7 +309,6 @@ div.device-status-container {
     div.device-status-content {
         top: 5vh;
         width: 95%;
-        margin-left: 2.5%;
         height: 40vh;
 
         // background-color: #c4fbff;

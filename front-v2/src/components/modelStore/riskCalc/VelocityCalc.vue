@@ -90,7 +90,7 @@
                         :key="index"
                     >
                         <div class="device-name device-item body">
-                            {{ ['PQ', 'KY', 'ZD'][index] }}
+                            {{ ['造床流量当量', '流速', '水位变化'][index] }}
                         </div>
                         <div class="device-count device-item body">
                             {{ item[0] || '无数据' }}
@@ -259,12 +259,10 @@ div.velocity-calc-content {
 
 div.device-status-container {
     margin-top: 0.5vh;
-    margin-left: 2.5%;
     height: 24.2vh;
 
     div.small-title-container {
         width: 95%;
-        margin-left: 2.5%;
         margin-top: 1vh;
         margin-bottom: 0.5vh;
         left: 5px;
@@ -298,7 +296,6 @@ div.device-status-container {
     div.device-status-content {
         top: 5vh;
         width: 95%;
-        margin-left: 2.5%;
         height: 40vh;
 
         // background-color: #c4fbff;
