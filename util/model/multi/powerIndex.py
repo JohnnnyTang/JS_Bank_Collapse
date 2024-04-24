@@ -8,26 +8,27 @@ from multiUtil import (
     computeZdIndex,
     getDeepestPointInfoOnSection,
     getLevelOfDeepestPointOnSection,
+    getSectionPointList,
     getVelOfDeepestPointOnSection,
 )
+from osgeo import gdal
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 4:
         print("参数错误！")
     else:
-        [jsonPath] = sys.argv[1:2]
+        # json 路径, 水文年, 水文状况
+        [jsonPath, year, condition] = sys.argv[1:4]
 
         content: dict = {}
         # read json
         with open(jsonPath, "r", encoding="utf8") as file:
             content = json.load(file)
-        currentYear: str = content.get("currentYear")  # type: ignore
-        condition: str = content.get("condition")  # type: ignore
         scene: str = content.get("scene")  # type: ignore
         dataFolderPath: str = content.get("dataFolderPath")  # type: ignore
-        currentSectionPoints: list[tuple[float, float, float]] = [  # type: ignore
+        vertex: tuple[tuple[float, float], tuple[float, float]] = [  # type: ignore
             tuple(point)
-            for point in content.get("section")  # type: ignore
+            for point in content.get("vertex")  # type: ignore
         ]
 
         # path
@@ -38,6 +39,19 @@ if __name__ == "__main__":
         )
         velPath = os.path.join(
             dataFolderPath, "csv", f"{scene}-vel-{condition}.csv"
+        )
+        currentDemPath = os.path.join(
+            dataFolderPath, "raster", f"{year}Before.tif"
+        )
+
+        # section
+        currentDataset: gdal.Dataset = gdal.Open(currentDemPath)
+        currentSectionPoints = getSectionPointList(
+            currentDataset,
+            float(vertex[0][0]),
+            float(vertex[0][1]),
+            float(vertex[1][0]),
+            float(vertex[1][1]),
         )
 
         # params
@@ -58,7 +72,7 @@ if __name__ == "__main__":
 
         # pq
         pqList = [0.8 for i in range(0, 34)]
-        PQIndex = computePQIndex(int(currentYear), pqList)
+        PQIndex = computePQIndex(int(year), pqList)
         # ky
         KYIndex = computeKYIndex(vel)
         # Zd
@@ -72,4 +86,4 @@ if __name__ == "__main__":
             json.dump(content, f, ensure_ascii=False)
 
         # test
-        # D:\project\JS_Bank_Collapse\util\model\multi\test\result.json
+        # D:\project\JS_Bank_Collapse\util\model\multi\test\result.json 2022 dry

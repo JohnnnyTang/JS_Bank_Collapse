@@ -2,30 +2,28 @@ import json
 import os
 import sys
 
-from multiUtil import (computeLnIndex, computeSaIndex, computeZbIndex,
-                       getDeepestPointInfoOnSection,
-                       getLevelOfDeepestPointOnSection, getSectionPointList,
-                       getVelOfDeepestPointOnSection)
+from multiUtil import (
+    computeLnIndex,
+    computeSaIndex,
+    computeZbIndex,
+    getDeepestPointInfoOnSection,
+    getSectionPointList,
+)
 from osgeo import gdal
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print("参数错误！")
     else:
-        [jsonPath, beforeYear] = sys.argv[1:3]
+        # json 路径, 当前年, 对比年
+        [jsonPath, currentYear, beforeYear] = sys.argv[1:4]
 
         content: dict = {}
         # read json
         with open(jsonPath, "r", encoding="utf8") as file:
             content = json.load(file)
-        currentYear: str = content.get("currentYear")  # type: ignore
-        condition: str = content.get("condition")  # type: ignore
         scene: str = content.get("scene")  # type: ignore
         dataFolderPath: str = content.get("dataFolderPath")  # type: ignore
-        currentSectionPoints: list[tuple[float, float, float]] = [  # type: ignore
-            tuple(point)
-            for point in content.get("section")  # type: ignore
-        ]
         vertex: tuple[tuple[float, float], tuple[float, float]] = [  # type: ignore
             tuple(point)
             for point in content.get("vertex")  # type: ignore
@@ -34,17 +32,22 @@ if __name__ == "__main__":
         # path
         depthCsvPath = os.path.join(dataFolderPath, "csv", f"{scene}-depth.csv")
         indexPath = os.path.join(dataFolderPath, "csv", f"{scene}-index.pkl")
-        levelPath = os.path.join(
-            dataFolderPath, "csv", f"{scene}-level-{condition}.csv"
-        )
-        velPath = os.path.join(
-            dataFolderPath, "csv", f"{scene}-vel-{condition}.csv"
-        )
         beforeDemPath = os.path.join(
             dataFolderPath, "raster", f"{beforeYear}Before.tif"
         )
+        currentDemPath = os.path.join(
+            dataFolderPath, "raster", f"{currentYear}Before.tif"
+        )
 
-        # point
+        # section
+        currentDataset: gdal.Dataset = gdal.Open(currentDemPath)
+        currentSectionPoints = getSectionPointList(
+            currentDataset,
+            float(vertex[0][0]),
+            float(vertex[0][1]),
+            float(vertex[1][0]),
+            float(vertex[1][1]),
+        )
         beforeDataset: gdal.Dataset = gdal.Open(beforeDemPath)
         beforeSectionPoints = getSectionPointList(
             beforeDataset,
@@ -60,14 +63,6 @@ if __name__ == "__main__":
         ]
         deepestPointInfo = getDeepestPointInfoOnSection(
             currentPointCoord, depthCsvPath, indexPath
-        )
-        vel = getVelOfDeepestPointOnSection(
-            deepestPointInfo[0],
-            velPath,
-        )
-        level = getLevelOfDeepestPointOnSection(
-            deepestPointInfo[0],
-            levelPath,
         )
 
         # Zb
@@ -90,4 +85,4 @@ if __name__ == "__main__":
             json.dump(content, f, ensure_ascii=False)
 
         # test
-        # D:\project\JS_Bank_Collapse\util\model\multi\test\result.json 2021
+        # D:\project\JS_Bank_Collapse\util\model\multi\test\result.json 2023 2021

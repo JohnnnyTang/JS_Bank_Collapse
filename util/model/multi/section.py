@@ -6,24 +6,23 @@ from multiUtil import getSectionPointList
 from osgeo import gdal
 
 if __name__ == "__main__":
-    if len(sys.argv) != 10:
+    if len(sys.argv) != 9:
         print("参数错误！")
     else:
         [
-            x1,
+            x1,  # 起点
             y1,
-            x2,
+            x2,  # 终点
             y2,
-            currentYear,
-            condition,
-            scene,
-            dataFolderPath,
-            dstPath,
+            year,  # 年份
+            scene,  # 场景, 目前恒为 sanshawan
+            dataFolderPath,  # 数据文件夹
+            dstPath,  # 输出 json 路径
         ] = sys.argv[1:10]
 
         # section
         currentDemPath = os.path.join(
-            dataFolderPath, "raster", f"{currentYear}Before.tif"
+            dataFolderPath, "raster", f"{year}Before.tif"
         )
         currentDataset: gdal.Dataset = gdal.Open(currentDemPath)
         currentSectionPoints = getSectionPointList(
@@ -33,8 +32,6 @@ if __name__ == "__main__":
         # write json
         content = {
             "vertex": ((x1, y1), (x2, y2)),
-            "currentYear": currentYear,
-            "condition": condition,
             "scene": scene,
             "dataFolderPath": dataFolderPath,
             "section": currentSectionPoints,
@@ -43,4 +40,4 @@ if __name__ == "__main__":
             json.dump(content, f)
 
         # test
-        # 13415473 3768179 13415962 3767887 2023 dry minzhusha D:\project\JS_Bank_Collapse\util\model\multi\data D:\project\JS_Bank_Collapse\util\model\multi\test\result.json
+        # 13415473 3768179 13415962 3767887 2023 minzhusha D:\project\JS_Bank_Collapse\util\model\multi\data D:\project\JS_Bank_Collapse\util\model\multi\test\result.json
