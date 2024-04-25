@@ -118,4 +118,14 @@ public class MonitorInfoService implements IMonitorInfoService {
                 monitorInfoList, dataNodeRepo, getDeviceTypeDataNode(deviceType));
         return monitorInfoList;
     }
+
+    @DynamicNodeData
+    public List<String> getDeviceIdListByType(DataNode dataNode, Character deviceType) {
+        List<MonitorInfo> monitorInfoList = deviceInfoRepo.findDeviceByType(deviceType);
+        List<String> monitorIdList = new ArrayList<>();
+        for(MonitorInfo monitorInfo:monitorInfoList) {
+            monitorIdList.add(monitorInfo.getCode());
+        }
+        return monitorIdList;
+    }
 }

@@ -88,6 +88,11 @@ onMounted(() => {
         useMapStore().setMap(map)
         await mapInit(map, true)
 
+        map.on('click', (e) => {
+            console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
+
+        })
+
         resizeObserver.observe(containerDom.value)
     })
 })

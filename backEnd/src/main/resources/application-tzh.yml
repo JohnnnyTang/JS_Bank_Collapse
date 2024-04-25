@@ -16,6 +16,12 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: 20000601
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1275441282@qq.com
+    password: ezuxlysqewrgfhhi
+    from: 1275441282@qq.com
 mybatis:
   mapper-locations: classpath:mapper/resourceRepo/*/*.xml
   configuration:
@@ -33,3 +39,7 @@ tile:
 
 video:
   yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4
+
+multiIndex:
+  dataPath: D:\2024-work\shore_collapse\model\modelData
+  resPath: D:\2024-work\shore_collapse\model\modelRes

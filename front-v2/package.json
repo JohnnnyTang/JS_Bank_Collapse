@@ -31,6 +31,7 @@
     "mapbox-gl": "^3.2.0",
     "mxdraw": "^0.1.263",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "prettier": "^3.2.5",
     "sass": "^1.71.1",
     "uuid": "^9.0.1",

@@ -1,18 +1,15 @@
 <template>
-    <div
-        class="section-choose-content model-item-content"
-        ref="containerDom"
-    >
+    <div class="section-choose-content model-item-content" ref="containerDom">
         <div id="map" class="map-container"></div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
+import { onMounted, ref } from 'vue'
 mapboxgl.accessToken =
     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 

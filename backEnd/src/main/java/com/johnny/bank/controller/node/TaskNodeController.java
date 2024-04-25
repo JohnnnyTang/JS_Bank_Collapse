@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("api/v1/taskNode")
 public class TaskNodeController extends BaseNodeController<TaskNode> {
     @PostMapping("start")
-    public ResponseEntity<String> startCmdOutTask(@RequestBody TaskNode taskNode) throws IOException {
+    public ResponseEntity<String> startCmdOutTask(@RequestBody TaskNode taskNode) throws Exception {
         String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartNewTask(taskNode);
         return ResponseEntity.ok(taskNodeId);
     }

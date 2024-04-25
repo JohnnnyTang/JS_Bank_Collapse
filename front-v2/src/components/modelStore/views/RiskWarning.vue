@@ -6,10 +6,18 @@
             <div class="model-run-container">
                 <div class="model-run-title">{{ curRunModelName }}</div>
                 <div class="model-run-content">
-                    <SectionCalcVue v-show="curRunModelName == '计算断面选择'"/>
-                    <VelocityCalcVue v-show="curRunModelName == '动力指标计算'"/>
-                    <EvolveCalcVue v-show="curRunModelName == '演变分析指标计算'"/>
-                    <ElementCalcVue v-show="curRunModelName == '多指标因子配置'"/>
+                    <SectionCalcVue
+                        v-show="curRunModelName == '计算断面选择'"
+                    />
+                    <VelocityCalcVue
+                        v-show="curRunModelName == '动力指标计算'"
+                    />
+                    <EvolveCalcVue
+                        v-show="curRunModelName == '演变分析指标计算'"
+                    />
+                    <ElementCalcVue
+                        v-show="curRunModelName == '多指标因子配置'"
+                    />
                 </div>
             </div>
         </div>
@@ -17,21 +25,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { useMultiIndexStore } from '@/store/multiIndexStore'
+import { onMounted, ref } from 'vue'
 import ModelTitleVue from '../ModelTitle.vue'
+import ElementCalcVue from '../riskCalc/ElementCalc.vue'
+import EvolveCalcVue from '../riskCalc/EvolveCalc.vue'
 import ModelFlowVue from '../riskCalc/ModelFlow.vue'
 import SectionCalcVue from '../riskCalc/SectionCalc.vue'
 import VelocityCalcVue from '../riskCalc/VelocityCalc.vue'
-import EvolveCalcVue from '../riskCalc/EvolveCalc.vue'
-import ElementCalcVue from '../riskCalc/ElementCalc.vue'
+
+// TODO: pinia持久化
+const multiIndexStore = useMultiIndexStore()
 
 const ModelName = '风险预警模型'
 
 const curRunModelName = ref('多指标因子配置')
 
-
+console.log(multiIndexStore.taskIdMap)
 
 onMounted(() => {
+    multiIndexStore.taskIdMap.section = '1'
 })
 </script>
 

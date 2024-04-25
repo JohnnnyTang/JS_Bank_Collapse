@@ -1703,7 +1703,7 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
     if (deviceDataManageMap.value[deviceType][deviceName].data.length == 0) {
         deviceDataManageMap.value[deviceType][deviceName].data = (
             await backendInstance.get(
-                `/data/${deviceType}Data/day/1/device/${deviceIdMap[deviceType][deviceName]}`,
+                `/data/${deviceType}Data/day/3/device/${deviceIdMap[deviceType][deviceName]}`,
             )
         ).data
         deviceDataManageMap.value[deviceType][deviceName].chartData =
@@ -1765,11 +1765,11 @@ onBeforeRouteUpdate((to, from) => {
 
 onMounted(async () => {
     console.log(
-        `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+        `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
     )
     const deviceData = (
         await backendInstance.get(
-            `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+            `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
         )
     ).data
     deviceDataManageMap.value[curDevice.value][

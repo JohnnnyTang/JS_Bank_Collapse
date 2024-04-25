@@ -79,7 +79,7 @@ public class TestJob implements Job {
         try {
             log.info("task start to execute...");
             taskNodeService.createAndStartNewTask(taskNode);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
