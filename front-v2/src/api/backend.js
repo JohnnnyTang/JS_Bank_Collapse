@@ -43,9 +43,9 @@ export default class BackEndRequest {
         return backendInstance.get("/data/monitorInfo")
     }
 
-    static getSpecMonitorInfo(type){
+    static getSpecMonitorInfo(type) {
         //设备概述信息！！！！
-        switch(type){
+        switch (type) {
             case '1':
                 return backendInstance.get("/data/monitorInfo/type/1")
             case '2':
@@ -54,14 +54,13 @@ export default class BackEndRequest {
                 return backendInstance.get("/data/monitorInfo/type/3");
             case '4':
                 return backendInstance.get("/data/monitorInfo/type/4");
-        }   
+        }
     }
 
     static getMonitorDetailByType_Code(code, type) {
         //data
         switch (type) {
             case '1': {
-                // return backendInstance.get(`/data/gnssData/id/${code}`)
                 return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
             }
             case '2': {
@@ -69,7 +68,6 @@ export default class BackEndRequest {
 
             }
             case '3': {
-                // return backendInstance.get(`/data/manometerData/id/${code}`)
                 return backendInstance.get(`/data/manometerData/day/1/device/${code}`)
             }
             case '4': {
@@ -79,11 +77,11 @@ export default class BackEndRequest {
     }
 
 
-    static getMonitorInfoByType_Code(code,type){
+    static getMonitorInfoByType_Code(code, type) {
         //desc
         switch (type) {
             case '1': {
-                return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                return new Promise((resolve) => { resolve({ data: { pointNum: 0 } }) })
                 // return backendInstance.get(`/data/gnssInfo/id/${code}`)
             }
             case '2': {
@@ -96,6 +94,30 @@ export default class BackEndRequest {
                 return backendInstance.get(`/data/stressInfo/id/${code}`)
             }
         }
+    }
+
+    static getDangerousDevice() {
+
+        return new Promise((resolve) => {
+
+            const data = [
+                {
+                    deviceCode: 'MZS120.51749021_32.04053105_4',
+                    deviceType: '4'//测斜仪
+                },
+                {
+                    deviceCode: 'MZS120.51977143_32.04001152_1',
+                    deviceType: '1'
+                },
+                {
+                    deviceCode: 'MZS120.51749289_32.04059243_1',
+                    deviceType: 'GNSS'
+                }
+            ]
+
+            resolve({data:data})
+        })
+
     }
 
 }

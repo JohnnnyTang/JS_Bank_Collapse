@@ -1809,8 +1809,6 @@ class MonitorDataAssistant {
     async getMonitoringdata() {
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
-
-        console.log("DATA  ", this.monitoringData);
         //meta infomation -- pointnum
         this.monitoringMetaData = (await BackEndRequest.getMonitorInfoByType_Code(this.info["code"], this.info["type"])).data
         return this.monitoringData

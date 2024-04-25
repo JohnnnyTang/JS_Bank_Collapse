@@ -286,11 +286,6 @@ const mapInit = async (map, vis) => {
             map.getCanvas().style.cursor = ''
         })
 
-        // setTimeout(() => {
-        //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-        //     // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
-        // }, 2000)
-
         ///////DEBUG////////
         window.addEventListener('keydown', (e) => {
             if (e.key === '3') {
@@ -302,19 +297,40 @@ const mapInit = async (map, vis) => {
             if (e.key === '2') {
                 setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
             }
-            if (e.key === '4'){
+            if (e.key === '4') {
                 removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
             }
-            if (e.key === '5'){
+            if (e.key === '5') {
                 removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
             }
-            if (e.key === '6'){
+            if (e.key === '6') {
                 removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
             }
- 
         })
+
+        // setInterval(async()=>{
+        //     const data = (await BackEndRequest.getDangerousDevice()).data
+        //     warning(data,map)
+        // },5000)
+
+
     }
 }
+
+const warning = (data,map) => {
+    const typeMap = {
+        '1': 'GNSS',
+        '2': '应力桩',
+        '3': '孔隙水压力计',
+        '4': '测斜仪',
+    } 
+    for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        setWarningDeviceStyle(map, typeMap[item.deviceType], item.deviceCode)
+    }
+}
+
+
 
 const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
     const pulsingCVSMap = {
@@ -401,6 +417,22 @@ const createPopUp = (deviceProperty) => {
     // .setLngLat(popupCoord)
     // .addTo(map); undefined;
     return popUp
+}
+
+const createWarningPopUp = (deviceInfo) =>{
+    // const ap = createApp(MultiChart, { selectedFeature: deviceProperty })
+
+    // const container = document.createElement('div')
+    // const componentInstance = ap.mount(container)
+
+    // const domwithComp = container
+    // const popUp = new mapboxgl.Popup({
+    //     maxWidth: '1000px',
+    //     offset: 25,
+    // }).setDOMContent(domwithComp)
+    // // .setLngLat(popupCoord)
+    // // .addTo(map); undefined;
+    // return popUp
 }
 
 const findProptyFromJson = (geoJson, code) => {
