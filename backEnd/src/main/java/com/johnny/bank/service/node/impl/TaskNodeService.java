@@ -37,7 +37,6 @@ public class TaskNodeService extends NodeService<TaskNode> {
     private MultiIndexPath multiIndexPath;
     private IGeoJsonDataRepo geoJsonDataRepo;
 
-
     @Autowired
 //    @Qualifier("BaseNodeRepo")
     public void setBaseNodeRepo(ITaskNodeRepo IBaseNodeRepo) {
@@ -98,7 +97,8 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 case "65b78631028eca632d0afae2":
                     new CmdOutputTaskThread(taskNode).start();
                     break;
-                case "":
+                case "6628b15eca8d74119129b60c":
+                    new SectionIndexTaskThread(taskNode).start();
                     break;
                 default:
                     throw new Exception("Not found this model");
@@ -181,9 +181,9 @@ public class TaskNodeService extends NodeService<TaskNode> {
         public void run() {
             try {
                 updateNodeStatusById(taskNode.getId(), "1");
-                String fullJsonResPath = multiIndexPath.getDataPath() + taskNode.getId() + ".json";
+                String fullJsonResPath = multiIndexPath.getResPath() + taskNode.getId() + ".json";
                 Process process = ProcessUtil.buildSectionTaskNodeProcess(
-                        taskNode, fullJsonResPath, multiIndexPath.getResPath()
+                        taskNode, multiIndexPath.getDataPath(), fullJsonResPath
                 );
                 ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
                 log.info(cmdOutput.toString());

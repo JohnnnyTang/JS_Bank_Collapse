@@ -73,6 +73,8 @@ public class ProcessUtil {
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
+        commands.add("cmd /c conda activate intersections &&");
+
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
         commands.add((String) modelUsage.get("exePrefix"));
@@ -84,7 +86,9 @@ public class ProcessUtil {
         }
         commands.add(multiIndexDataPath);
         commands.add(multiIndexResPath);
-        processBuilder.command(commands);
+        String pyCmdStr = String.join(" ", commands);
+        System.out.printf(pyCmdStr);
+        processBuilder.command(pyCmdStr);
         return processBuilder.start();
     }
 

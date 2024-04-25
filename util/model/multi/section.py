@@ -18,7 +18,7 @@ if __name__ == "__main__":
             scene,  # 场景, 目前恒为 sanshawan
             dataFolderPath,  # 数据文件夹
             dstPath,  # 输出 json 路径
-        ] = sys.argv[1:10]
+        ] = sys.argv[1:9]
 
         # section
         currentDemPath = os.path.join(
