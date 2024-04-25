@@ -213,12 +213,127 @@
                 </div>
             </div>
         </div>
-        <div class="result-show-container"></div>
+        <div class="result-show-container">
+            <div class="result-set-title">
+                <div class="title-image-container">
+                    <img src="/alarm_icon.png" alt="风险">
+                </div>
+                <div class="title-text-container">
+                    <div class="title-text">崩塌风险计算结果</div>
+                </div>
+            </div>
+            <div class="result-set-wrapper">
+                <div class="place-holder"></div>
+                <div class="alarm-grade-container">
+                    <dv-border-box10
+                        class="style-1"
+                        :color="getAlarmColor(alarmGrade)"
+                    >
+                        <div class="alarm-grade-wrapper">
+                            <div class="alarm-item1-container">
+                                <div class="alarm-item1-decorator">
+                                    <dv-decoration-9
+                                        :color="getAlarmDecoratorColor(alarmGrade)"
+                                        style="width:80px;height:50px;text-align: center;display: flex; margin-left: 20px;"
+                                        :dur="5"
+                                    />
+                                </div>
+                                <div class="alarm-item1-text">
+                                    风险评级：
+                                </div>
+                                <div class="alarm-item1-resulttext" :style="{color:getAlarmColor(alarmGrade)[0]}">
+                                    {{ getAlarmText(alarmGrade) }}
+                                </div>
+                            </div>
+                            <div class="alarm-item2-container">
+                                <div class="alarm-itme2-text">
+                                    风险综合等级：
+                                </div>
+                                <div class="alarm-itme2-number" :style="{color:getAlarmColor(alarmGrade)[0]}">
+                                    {{ alarmLevel }}
+                                </div>
+                            </div>
+                        </div>
+                    </dv-border-box10>
+                </div>
+                <div class="risk-matrix-container">
+                    <div class="risk-matrix-wrapper">
+                        <div class="risk-matrix-title">
+                            <div class="risk-matrix-text">
+                                岸坡崩塌风险矩阵
+                            </div>
+                        </div>
+                        <div class="risk-matrix-content">
+                            <div class="matrix">
+                                <div class="cell-lowest">
+                                    <div class="text">较低风险</div>
+                                    <div class="number">0.6</div>
+                                </div>
+                                <div class="cell-low">
+                                    <div class="text">低风险</div>
+                                    <div class="number">0.2</div>
+                                </div>
+                                <div class="cell-high">
+                                    <div class="text">高风险</div>
+                                    <div class="number">0.1</div>
+                                </div>
+                                <div class="cell-highest">
+                                    <div class="text">较高风险</div>
+                                    <div class="number">0.1</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loss-matrix-container">
+                    <div class="loss-matrix-wrapper">
+                        <div class="loss-matrix-title">
+                            <div class="loss-matrix-text">
+                                社会经济损失矩阵
+                            </div>
+                        </div>
+                        <div class="loss-matrix-content">
+                            <div class="matrix">
+                                <div class="cell-important">
+                                    重要
+                                </div>
+                                <div class="cell-important">
+                                    重要
+                                </div>
+                                <div class="cell-important">
+                                    重要
+                                </div>
+                                <div class="cell-normal">
+                                    一般
+                                </div>
+                                <div class="cell-normal">
+                                    一般
+                                </div>
+                                <div class="cell-normal">
+                                    一般
+                                </div>
+                                <div class="cell-notimportant">
+                                    不重要
+                                </div>
+                                <div class="cell-notimportant">
+                                    不重要
+                                </div>
+                                <div class="cell-notimportant">
+                                    不重要
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3'
+import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3';
+// import { DvDecoration9 as DvDecoration9 } from '@kjgl77/datav-vue3';
+import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3';
 import { ElSelect, ElOption, ElInputNumber } from 'element-plus';
 import { ref } from 'vue'
 // 因子选择
@@ -369,6 +484,68 @@ const updataEvolveIndex3Value = (value) => {
         evolveIndex2.value = (1-value).toFixed(2);
     }
 }
+
+// 预警框颜色
+const alarmGrade = ref(0)
+const alarmShowerColorGroup = [
+    ['#828b89', '#828b89'],
+    ['rgba(18, 100, 214, 0.7)', 'rgba(231, 234, 238, 0.7)'],
+    ['rgba(220, 174, 7, 1)', 'rgba(231, 234, 238, 0.7)'],
+    ['rgba(239, 111, 6, 0.7)', 'rgba(231, 234, 238, 0.7)'],
+    ['rgba(244, 8, 8, 0.7)', 'rgba(231, 234, 238, 0.7)'],
+]
+const getAlarmColor = (alarmGrade) => {
+    if (alarmGrade === 0){
+        return alarmShowerColorGroup[0]
+    } else if (alarmGrade === 1) {
+        return alarmShowerColorGroup[1]
+    } else if (alarmGrade === 2) {
+        return alarmShowerColorGroup[2]
+    } else if (alarmGrade === 3) {
+        return alarmShowerColorGroup[3]
+    } else if (alarmGrade === 4) {
+        return alarmShowerColorGroup[4]
+    }
+}
+// 预警标识颜色
+const alarmDecoratorColorGroup = [
+    ['#828b89', '#828b89'],
+    ['rgba(18, 100, 214, 0.7)', 'rgba(11, 101, 227, 0.8)'],
+    ['rgba(220, 174, 7, 1)', 'rgba(183, 163, 47, 0.8)'],
+    ['rgba(239, 111, 6, 0.7)', 'rgba(199, 113, 15, 0.8)'],
+    ['rgba(244, 8, 8, 0.7)', 'rgba(213, 53, 29, 0.8)'],
+]
+const getAlarmDecoratorColor = (alarmGrade) => {
+    if (alarmGrade === 0) {
+        return alarmDecoratorColorGroup[0]
+    } else if (alarmGrade === 1) {
+        return alarmDecoratorColorGroup[1]
+    } else if (alarmGrade === 2) {
+        return alarmDecoratorColorGroup[2]
+    } else if (alarmGrade === 3) {
+        return alarmDecoratorColorGroup[3]
+    } else if (alarmGrade === 4) {
+        return alarmDecoratorColorGroup[4]
+    }
+}
+// 预警文字
+const getAlarmText = (alarmGrade) => {
+    if (alarmGrade === 0)
+        return ("未计算")
+    else if (alarmGrade === 1) {
+        return "较低风险"
+    } else if (alarmGrade === 2) {
+        return "低风险"
+    } else if (alarmGrade === 3) {
+        return "高风险"
+    } else if (alarmGrade === 4) {
+        return "较高风险"
+    }
+}
+
+// 预警综合等级
+const alarmLevel = ref(0.45)
+
 
 </script>
 
@@ -997,19 +1174,462 @@ div.model-item-content {
 
     div.result-show-container {
         display: flex;
+        position: relative;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
         width: 50%;
-        background-color: rgb(46, 48, 103);
+        height: 100%;
+        // background-color: rgb(46, 48, 103);
+
+        div.result-set-title {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            left: 0;
+            margin-top: 10px;
+            margin-left: 49.5%;
+            width: 49%;
+            height: 8%;
+            z-index: 10;
+            border-radius: 10px;
+            background-color: rgba(237, 215, 227, 0.95);
+            border: 3px solid rgb(217, 150, 217);
+
+            div.title-image-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                justify-content: center;
+                margin-left: -10px;
+                width: auto;
+                height: 100%;
+                // background-color: #a2dede;
+
+                img {
+                    width: 97%;
+                    height: 97%;
+                }
+            }
+
+            div.title-text-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: auto;
+                height: 100%;
+
+                div.title-text {
+                    font-size: calc(1.5vh + 0.9vw);
+                    font-weight: 550;
+                    font-family: 'Microsoft YaHei';
+                    color: rgb(88, 17, 10);
+                    text-shadow: 1px 0px 1px #7e70b1, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
+                }
+            }
+        }
+
+        div.result-set-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 95%;
+            height: 93%;
+            margin-top: 20px;
+            // margin-left: -20px;
+            // background-color: bisque;
+            border-radius: 10px;
+            border: 2.5px solid rgb(199, 39, 15);
+            box-shadow: 4px 8px 8px -4px rgb(231, 228, 161);
+
+            div.place-holder {
+                height: 6%;
+                width: 100%;
+                // background-color: black;
+            }
+
+            div.alarm-grade-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                height: 20%;
+                width: 100%;
+                // background-color: #001cb8;
+
+                div.alarm-grade-wrapper {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100%;
+                    width: 100%;
+                    
+                    div.alarm-item1-container {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                        width: 55%;
+                        height: 100%;
+                        // background-color: #001cb8;
+
+                        div.alarm-item1-decorator {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 20%;
+                            height: 100%;
+                            // background-color: #001cb8;
+                        }
+
+                        div.alarm-item1-text {
+                            display: flex;
+                            justify-content: right;
+                            align-items: center;
+                            width: 40%;
+                            height: 100%;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+                            color: rgb(22, 23, 25);
+                            text-shadow: 1px 0px 1px #c27d2e, 0px 1px 1px #d11dc2, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
+                        }
+
+                        div.alarm-item1-resulttext {
+                            display: flex;
+                            justify-content: left;
+                            align-items: center;
+                            width: 30%;
+                            height: 100%;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+                        }
+                    }
+
+                    div.alarm-item2-container {
+                        display: flex;
+                        flex-direction: row;
+                        width: 50%;
+                        height: 100%;
+                        // background-color: #2e334c;
+
+                        div.alarm-itme2-text {
+                            display: flex;
+                            justify-content: right;
+                            align-items: center;
+                            width: 70%;
+                            height: 100%;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+                            color: rgb(22, 23, 25);
+                            text-shadow: 1px 0px 1px #c27d2e, 0px 1px 1px #d11dc2, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
+                        }
+
+                        div.alarm-itme2-number {
+                            display: flex;
+                            justify-content: left;
+                            align-items: center;
+                            width: 30%;
+                            height: 100%;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+                        }
+
+                    }
+                }   
+
+            }
+
+            div.risk-matrix-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                height: 37%;
+                width: 100%;
+                // background-color: #11ffc4;
+
+                div.risk-matrix-wrapper {
+                    display: flex;
+                    flex-direction: row;
+                    // justify-content: center;
+                    align-items: center;
+                    width: 98%;
+                    height: 96%;
+                    background-color:rgba(0, 47, 117, 0.2);
+                    border-radius: 5px;
+                    transition: transform 0.25s ease;
+                    &:hover {
+                        cursor: pointer;
+                        transform: scale(1.01);
+                    }
+
+                    div.risk-matrix-title {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                        width: 20%;
+                        height: 100%;
+                        // background-color: #11ffc4;
+
+                        div.risk-matrix-text {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 35%;
+                            height: 85%;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+                            writing-mode: vertical-rl;
+                            color: #835b05;
+                            background-color: rgba(221, 231, 235, 0.902);
+                            border-radius: 10px;
+                            border: #4b5057 3px solid;
+                        }
+                    }
+                    
+                    div.risk-matrix-content {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 80%;
+                        height: 100%;
+                        // background-color: #001cb8;\
+
+                        .matrix {
+                            display: grid;
+                            margin-left: -70px;
+                            grid-template-columns: repeat(2, 1fr); 
+                            grid-template-rows: repeat(2, auto);
+                        }
+
+                        .cell-lowest {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            background-color: #6ab8df;
+                            border: 2px solid #ece6e6;
+                            padding: 20px; 
+
+                            .text {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+
+                            .number {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+                            
+                        }
+                        .cell-low {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            background-color: #d8d14e;
+                            border: 2px solid #ece6e6;
+                            padding: 20px; 
+                        
+                            .text {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+
+                            .number {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+
+                        }
+                        .cell-high {
+                            background-color: #dca225;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            border: 2px solid #ece6e6;
+                            padding: 20px; 
+                        
+                            .text {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+
+                            .number {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+                        }
+                        .cell-highest {
+                            background-color: #e82323;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            border: 2px solid #ece6e6;
+                            padding: 20px; 
+                        
+                            .text {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+
+                            .number {
+                                height: 50%;
+                                text-align: center;
+                                font-size: calc(0.8vh + 0.8vw);
+                                font-weight: 550;
+                                font-family: 'Microsoft YaHei';
+                            }
+                        }
+                    }
+                }
+            }
+
+            div.loss-matrix-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                height: 37%;
+                width: 100%;
+                // background-color: #11ffc4;
+
+                div.loss-matrix-wrapper {
+                    display: flex;
+                    flex-direction: row;
+                    // justify-content: center;
+                    align-items: center;
+                    width: 98%;
+                    height: 96%;
+                    background-color:rgba(82, 157, 190, 0.2);
+                    border-radius: 5px;
+                    transition: transform 0.25s ease;
+                    &:hover {
+                        cursor: pointer;
+                        transform: scale(1.01);
+                    }
+
+                    div.loss-matrix-title {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                        width: 20%;
+                        height: 100%;
+                        // background-color: #11ffc4;
+
+                        div.loss-matrix-text {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 35%;
+                            height: 85%;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+                            writing-mode: vertical-rl;
+                            color: #375ed6;
+                            background-color: rgba(235, 228, 221, 0.902);
+                            border-radius: 10px;
+                            border: #4b5057 3px solid;
+                        }
+                    }
+                    
+                    div.loss-matrix-content {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 80%;
+                        height: 100%;
+                        // background-color: #001cb8;
+
+                        .matrix {
+                            display: grid;
+                            margin-left: -70px;
+                            grid-template-columns: repeat(3, 1fr); 
+                            grid-template-rows: repeat(3, auto);
+                        }
+
+                        .cell-important {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            background-color: #9c58e5;
+                            border: 2px solid #ece6e6;
+                            padding: 20px;
+                            text-align: center;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';                            
+                        }
+                        .cell-normal {
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            background-color: #d8af4e;
+                            border: 2px solid #ece6e6;
+                            padding: 20px; 
+                            text-align: center;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+
+                        }
+                        .cell-notimportant {
+                            background-color: #68dc25;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            border: 2px solid #ece6e6;
+                            padding: 20px; 
+                            text-align: center;
+                            font-size: calc(0.8vh + 0.8vw);
+                            font-weight: 550;
+                            font-family: 'Microsoft YaHei';
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 :deep(.dv-border-box-8.style-1) {
     display: flex;
-    background-color: rgba(192, 201, 214, 0.1);
+    background-color: rgba(227, 121, 16, 0.1);
     backdrop-filter: blur(8px);
     width: 97%;
     height: 96%;
 }
+
 
 :deep(.dv-border-box-8.style-2) {
     display: flex;
@@ -1019,8 +1639,11 @@ div.model-item-content {
     height: 96%;
 }
 
-// ::v-deep .el-select {
-//   width: 80%;
-// }
+:deep(.dv-border-box-10.style-1) {
+    display: flex;
+    backdrop-filter: blur(8px);
+    width: 90%;
+    height: 60%;
+}
 
 </style>
