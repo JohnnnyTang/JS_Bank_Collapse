@@ -268,3 +268,15 @@ export const getEvolutionIndexResult = () => {
         message: '',
     }
 }
+
+export const getVelocityAndEvolveResult = () => {
+    const result = {
+
+    }
+    return {
+        status: 'success',
+        data: result,
+        message: '',
+    }
+}
+

@@ -336,6 +336,7 @@ import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3';
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3';
 import { ElSelect, ElOption, ElInputNumber } from 'element-plus';
 import { ref } from 'vue'
+import { getVelocityAndEvolveResult } from './api'
 // 因子选择
 const indexes = [
     {
@@ -546,10 +547,38 @@ const getAlarmText = (alarmGrade) => {
 // 预警综合等级
 const alarmLevel = ref(0.45)
 
+//模型计算流程
+const formalResult = getVelocityAndEvolveResult()
+const riskCalcData = {
+    velocity1: velocityIndex1,
+    velocity2: velocityIndex2,
+    velocity3: velocityIndex3,
+    evolve1: evolveIndex1,
+    evolve2: evolveIndex2,
+    evolve3: evolveIndex3,
+    formalResult: formalResult
+}
 
 </script>
 
 <style lang="scss" scoped>
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@mixin flex-center-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+@mixin flex-center-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 div.model-item-content {
     display: flex;
     flex-direction: row;
@@ -561,11 +590,8 @@ div.model-item-content {
     }
 
     div.weight-set-container {
-        display: flex;
+        @include flex-center-column();
         position: relative;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
         width: 50%;
         // background-color: aqua;
 
@@ -585,9 +611,7 @@ div.model-item-content {
             border: 3px solid rgb(114, 114, 114);
 
             div.title-image-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                @include flex-center();
                 width: 30%;
                 height: 100%;
                 // background-color: #a2dede;
@@ -599,9 +623,7 @@ div.model-item-content {
             }
             
             div.title-text-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                @include flex-center();
                 width: auto;
                 height: 100%;
 
@@ -633,10 +655,7 @@ div.model-item-content {
             }
 
             div.main-index-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
+                @include flex-center-column();
                 height: 24%;
                 width: 100%;
                 transition: transform 0.25s ease;
@@ -647,18 +666,12 @@ div.model-item-content {
                 // background-color: #a2dede;
                     
                 div.main-index-wrapper {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
+                    @include flex-center-column();
                     height: 100%;
                     width: 100%;
                     
                     div.index-selector {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: center;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 40%;
                         margin-bottom: 3px;
@@ -667,9 +680,7 @@ div.model-item-content {
                         box-shadow: -4px 4px 4px -2px rgb(151, 154, 214);
                     
                         div.main-index-text {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
+                            @include flex-center();
                             height: 100%;
                             width: 40%;
                             font-size: calc(1.0vh + 0.9vw);
@@ -729,9 +740,7 @@ div.model-item-content {
                     }
 
                     div.index-shower {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 40%;
                         margin-top: 3px;
@@ -740,9 +749,7 @@ div.model-item-content {
                         box-shadow: -4px 4px 4px -2px rgb(151, 154, 214);
 
                         div.main-index-shower {
-                            display: flex;
-                            flex-direction: row;
-                            align-items: center;
+                            @include flex-center-row();
                             width: 48%;
                             height: 100%;
                             margin-right: 5px;
@@ -750,9 +757,7 @@ div.model-item-content {
                             // background-color: #001cb8;
 
                             div.main-index-shower-text {
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
+                                @include flex-center();
                                 width: 40%;
                                 height: 100%;
                                 // background-color: #001cb8;
@@ -763,9 +768,7 @@ div.model-item-content {
                             }
 
                             div.main-index-shower-content {
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
+                                @include flex-center();
                                 margin-left: -10px;
                                 width: 60%;
                                 height: 40%;
@@ -774,9 +777,7 @@ div.model-item-content {
                         }
 
                         div.another-index-shower {
-                            display: flex;
-                            flex-direction: row;
-                            align-items: center;
+                            @include flex-center();
                             width: 48%;
                             height: 100%;
                             margin-right: 5px;
@@ -784,9 +785,7 @@ div.model-item-content {
                             // background-color: #494c5e;
 
                             div.another-index-shower-text {
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
+                                @include flex-center();
                                 width: 40%;
                                 height: 100%;
                                 margin-left: 10px;
@@ -798,9 +797,7 @@ div.model-item-content {
                             }
 
                             div.another-index-shower-content {
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
+                                @include flex-center();
                                 margin-left: -10px;
                                 width: 60%;
                                 height: 40%;
@@ -812,10 +809,7 @@ div.model-item-content {
             }
 
             div.velocity-index-container {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
+                @include flex-center-column();
                 height: 35%;
                 width: 100%;
                 transition: transform 0.25s ease;
@@ -827,18 +821,12 @@ div.model-item-content {
 
                 div.velocity-index-wrapper {
 
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
+                    @include flex-center-column();
                     height: 100%;
                     width: 100%;
 
                     div.velocity-index-title {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        flex-direction: row;
+                        @include flex-center-row();
                         margin-left: -40%;
                         width: 60%;
                         height: 15%;
@@ -868,10 +856,7 @@ div.model-item-content {
                     }
 
                     div.velocity-index-item1 {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: left;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 22%;
                         margin-bottom: 3px;
@@ -903,10 +888,7 @@ div.model-item-content {
                     }
 
                     div.velocity-index-item2 {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: left;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 22%;
                         margin-bottom: 3px;
@@ -928,9 +910,7 @@ div.model-item-content {
                         }
 
                         div.velocity-index-item2-content {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             height: 100%;
                             width: 50%;
 
@@ -938,10 +918,7 @@ div.model-item-content {
                     }
 
                     div.velocity-index-item3 {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: left;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 22%;
                         margin-bottom: 3px;
@@ -963,9 +940,7 @@ div.model-item-content {
                         }
 
                         div.velocity-index-item3-content {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             height: 100%;
                             width: 50%;
 
@@ -975,10 +950,7 @@ div.model-item-content {
             }
 
             div.evolve-index-container {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
+                @include flex-center-column();
                 height: 35%;
                 width: 100%;
                 transition: transform 0.25s ease;
@@ -989,18 +961,12 @@ div.model-item-content {
                 // background-color: #10b5b5;
                 div.evolve-index-wrapper {
 
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
+                    @include flex-center-column();
                     height: 100%;
                     width: 100%;
 
                     div.evolve-index-title {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        flex-direction: row;
+                        @include flex-center-row();
                         margin-left: -40%;
                         width: 60%;
                         height: 15%;
@@ -1030,10 +996,7 @@ div.model-item-content {
                     }
 
                     div.evolve-index-item1 {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: left;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 22%;
                         margin-bottom: 3px;
@@ -1055,9 +1018,7 @@ div.model-item-content {
                         }
 
                         div.evolve-index-item1-content {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             height: 100%;
                             width: 50%;
 
@@ -1065,10 +1026,7 @@ div.model-item-content {
                     }
 
                     div.evolve-index-item2 {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: left;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 22%;
                         margin-bottom: 3px;
@@ -1090,9 +1048,7 @@ div.model-item-content {
                         }
 
                         div.evolve-index-item2-content {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             height: 100%;
                             width: 50%;
 
@@ -1100,10 +1056,7 @@ div.model-item-content {
                     }
 
                     div.evolve-index-item3 {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: left;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 96%;
                         height: 22%;
                         margin-bottom: 3px;
@@ -1125,9 +1078,7 @@ div.model-item-content {
                         }
 
                         div.evolve-index-item3-content {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             height: 100%;
                             width: 50%;
 
@@ -1183,11 +1134,8 @@ div.model-item-content {
         // background-color: rgb(46, 48, 103);
 
         div.result-set-title {
+            @include flex-center-row();
             position: absolute;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
             top: 0;
             left: 0;
             margin-top: 10px;
@@ -1200,10 +1148,7 @@ div.model-item-content {
             border: 3px solid rgb(217, 150, 217);
 
             div.title-image-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                justify-content: center;
+                @include flex-center();
                 margin-left: -10px;
                 width: auto;
                 height: 100%;
@@ -1216,9 +1161,7 @@ div.model-item-content {
             }
 
             div.title-text-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                @include flex-center();
                 width: auto;
                 height: 100%;
 
@@ -1251,35 +1194,24 @@ div.model-item-content {
             }
 
             div.alarm-grade-container {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
+                @include flex-center-row();
                 height: 20%;
                 width: 100%;
                 // background-color: #001cb8;
 
                 div.alarm-grade-wrapper {
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: center;
-                    align-items: center;
+                    @include flex-center-row();
                     height: 100%;
                     width: 100%;
                     
                     div.alarm-item1-container {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: center;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 55%;
                         height: 100%;
                         // background-color: #001cb8;
 
                         div.alarm-item1-decorator {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             width: 20%;
                             height: 100%;
                             // background-color: #001cb8;
@@ -1347,19 +1279,13 @@ div.model-item-content {
             }
 
             div.risk-matrix-container {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
+                @include flex-center-row();
                 height: 37%;
                 width: 100%;
                 // background-color: #11ffc4;
 
                 div.risk-matrix-wrapper {
-                    display: flex;
-                    flex-direction: row;
-                    // justify-content: center;
-                    align-items: center;
+                    @include flex-center();
                     width: 98%;
                     height: 96%;
                     background-color:rgba(0, 47, 117, 0.2);
@@ -1371,18 +1297,13 @@ div.model-item-content {
                     }
 
                     div.risk-matrix-title {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: center;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 20%;
                         height: 100%;
                         // background-color: #11ffc4;
 
                         div.risk-matrix-text {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             width: 35%;
                             height: 85%;
                             font-size: calc(0.8vh + 0.8vw);
@@ -1397,9 +1318,7 @@ div.model-item-content {
                     }
                     
                     div.risk-matrix-content {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
+                        @include flex-center();
                         width: 80%;
                         height: 100%;
                         // background-color: #001cb8;\
@@ -1415,7 +1334,7 @@ div.model-item-content {
                             display: flex;
                             flex-direction: column;
                             justify-content: left;
-                            background-color: #6ab8df;
+                            background-color: rgba(124, 182, 219, 0.7);
                             border: 2px solid #ece6e6;
                             padding: 20px; 
 
@@ -1440,7 +1359,7 @@ div.model-item-content {
                             display: flex;
                             flex-direction: column;
                             justify-content: left;
-                            background-color: #d8d14e;
+                            background-color: rgba(215, 209, 100, 0.7);
                             border: 2px solid #ece6e6;
                             padding: 20px; 
                         
@@ -1462,7 +1381,7 @@ div.model-item-content {
 
                         }
                         .cell-high {
-                            background-color: #dca225;
+                            background-color: rgba(211, 164, 66, 0.7);
                             display: flex;
                             flex-direction: column;
                             justify-content: left;
@@ -1486,7 +1405,7 @@ div.model-item-content {
                             }
                         }
                         .cell-highest {
-                            background-color: #e82323;
+                            background-color: rgba(213, 59, 48, 0.7);
                             display: flex;
                             flex-direction: column;
                             justify-content: left;
@@ -1514,19 +1433,13 @@ div.model-item-content {
             }
 
             div.loss-matrix-container {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
+                @include flex-center-row();
                 height: 37%;
                 width: 100%;
                 // background-color: #11ffc4;
 
                 div.loss-matrix-wrapper {
-                    display: flex;
-                    flex-direction: row;
-                    // justify-content: center;
-                    align-items: center;
+                    @include flex-center-row();
                     width: 98%;
                     height: 96%;
                     background-color:rgba(82, 157, 190, 0.2);
@@ -1538,18 +1451,13 @@ div.model-item-content {
                     }
 
                     div.loss-matrix-title {
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: center;
-                        align-items: center;
+                        @include flex-center-row();
                         width: 20%;
                         height: 100%;
                         // background-color: #11ffc4;
 
                         div.loss-matrix-text {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
+                            @include flex-center();
                             width: 35%;
                             height: 85%;
                             font-size: calc(0.8vh + 0.8vw);
@@ -1564,9 +1472,7 @@ div.model-item-content {
                     }
                     
                     div.loss-matrix-content {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
+                        @include flex-center();
                         width: 80%;
                         height: 100%;
                         // background-color: #001cb8;
@@ -1582,7 +1488,7 @@ div.model-item-content {
                             display: flex;
                             flex-direction: column;
                             justify-content: left;
-                            background-color: #9c58e5;
+                            background-color: rgba(147, 91, 221, 0.5);
                             border: 2px solid #ece6e6;
                             padding: 20px;
                             text-align: center;
@@ -1594,7 +1500,7 @@ div.model-item-content {
                             display: flex;
                             flex-direction: column;
                             justify-content: left;
-                            background-color: #d8af4e;
+                            background-color: rgba(209, 177, 94, 0.6);
                             border: 2px solid #ece6e6;
                             padding: 20px; 
                             text-align: center;
@@ -1604,7 +1510,7 @@ div.model-item-content {
 
                         }
                         .cell-notimportant {
-                            background-color: #68dc25;
+                            background-color: rgba(135,217,75,0.35);
                             display: flex;
                             flex-direction: column;
                             justify-content: left;
