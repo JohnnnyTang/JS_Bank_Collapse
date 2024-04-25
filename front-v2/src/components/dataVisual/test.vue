@@ -8,7 +8,7 @@
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue';
-
+import BackEndRequest from '../../api/backend';
 
 onMounted(async () => {
 

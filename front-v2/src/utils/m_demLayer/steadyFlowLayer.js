@@ -36,7 +36,7 @@ export default class SteadyFlowLayer {
         // Layer
         this.type = 'custom'
         this.map = undefined
-        this.id = 'FlowLayer'
+        this.id = '近岸流场'
         this.renderingMode = '3d'
 
         // Attributes
