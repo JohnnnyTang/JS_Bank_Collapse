@@ -1,17 +1,27 @@
 <template>
     <div class="bankListDIV">
         <h3>崩岸预警信息</h3>
-        <el-table :data="tableData" size="small" style="width: 18vw; height: 42vh; margin: 0vw 1vw"
-            @row-dblclick="rowDoubleClick" v-loading="loading" :row-class-name="tableRowClassName">
+        <el-table
+            :data="tableData"
+            size="small"
+            style="width: 18vw; height: 42vh; margin: 0vw 1vw"
+            @row-dblclick="rowDoubleClick"
+            v-loading="loading"
+            :row-class-name="tableRowClassName"
+        >
             <el-table-column prop="bankName" label="名称" align="center" />
             <el-table-column prop="riverName" label="所处河段" align="center" />
-            <el-table-column prop="warningLevel" label="预警等级" align="center" />
+            <el-table-column
+                prop="warningLevel"
+                label="预警等级"
+                align="center"
+            />
         </el-table>
     </div>
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import BackEndRequest from '../../api/backendIns';
 
 let tableData = ref([]);
@@ -30,21 +40,19 @@ watch(tableData, (val) => {
     if (tableData.value != []) loading.value = false;
 });
 
-
 const tableRowClassName = (row) => {
     if (row.row.bankName === '民主沙') {
-        return 'highLight-row'
+        return 'highLight-row';
     }
-}
+};
 
 onMounted(async () => {
-    let data = (await BackEndRequest.getbankLineData()).data
-    let mzsIndex = data.findIndex((element) => element.bankName === '民主沙')
-    let mzsItem = data.find((element) => element.bankName === '民主沙')
-    data.splice(mzsIndex, 1)
-    data.unshift(mzsItem)
+    let data = (await BackEndRequest.getbankLineData()).data;
+    let mzsIndex = data.findIndex((element) => element.bankName === '民主沙');
+    let mzsItem = data.find((element) => element.bankName === '民主沙');
+    data.splice(mzsIndex, 1);
+    data.unshift(mzsItem);
     tableData.value = data;
-
 });
 </script>
 
@@ -104,18 +112,21 @@ onMounted(async () => {
     }
 
     @keyframes shine {
-
         0%,
         100% {
             color: #ffd900;
-            text-shadow: 0 0 10px #fffb06, 0 0 10px #fffb06;
+            text-shadow:
+                0 0 10px #fffb06,
+                0 0 10px #fffb06;
             font-size: large;
         }
 
         50% {
-            text-shadow: 0 0 10px #eeebdd, 0 0 10px #eeebdd;
+            text-shadow:
+                0 0 10px #eeebdd,
+                0 0 10px #eeebdd;
             font-size: medium;
         }
     }
-
-}</style>
+}
+</style>
