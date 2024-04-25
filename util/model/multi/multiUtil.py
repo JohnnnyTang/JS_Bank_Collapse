@@ -337,7 +337,7 @@ def computeSaIndex(
 def computeLnIndex(
     ZNow: list[float], yearNow: int, ZBefore: list[float], yearBefore: int
 ) -> tuple[tuple[int, int, int, int], str, float]:
-    totalNum: int = len(ZNow)
+    totalNum: int = min(len(ZNow), len(ZBefore))
     LnList: list = []
 
     for i in range(totalNum):
