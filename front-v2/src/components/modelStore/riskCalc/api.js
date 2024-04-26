@@ -6,6 +6,11 @@
  * @param {number} retry
  * @returns
  */
+import axios from "axios";
+const ModelInstance = axios.create({
+    baseURL: '/api',
+})
+
 export const extendFetch = async (url, option, timeout = 3000, retry = 3) => {
     let num = 0
     let response

@@ -10,7 +10,12 @@
                 </div>
             </div>
             <div class="weight-set-wrapper">
-                <div class="place-holder"></div>
+                <div class="place-holder">
+                    <dv-loading class="loading-icon" v-show="isRunning">运行中...</dv-loading>
+                    <div class="botton-wrapper" @click="RiskMatrixModelRun">
+                        <div class="botton-text">运行模型</div>   
+                    </div>
+                </div>
                 <div class="main-index-container">
                     <dv-border-box8
                         class="style-1"
@@ -18,11 +23,11 @@
                         :color="['rgb(96, 96, 94)', 'rgb(17, 20, 106)']"
                     >
                         <div class="main-index-wrapper">
-                            <div class="index-selector">
-                                <div class="main-index-text">
-                                    主因子选择：
-                                </div>
-                                <div class="main-index-content">
+                            <!-- <div class="index-selector"> -->
+                            <div class="main-index-text">
+                                因子权重设置：
+                            </div>
+                                <!-- <div class="main-index-content">
                                     <el-select
                                         v-model="mainIndex"
                                         placeholder="请选择主因子"
@@ -35,12 +40,12 @@
                                         :value="item.value"
                                     />
                                     </el-select>
-                                </div>
-                            </div>
+                                </div> -->
+                            <!-- </div> -->
                             <div class="index-shower">
                                 <div class="main-index-shower">
                                     <div class="main-index-shower-text">
-                                        主因子权重：
+                                        动力因子权重：
                                     </div>
                                     <div class="main-index-shower-content">
                                         <el-input-number
@@ -54,7 +59,7 @@
                                 </div>
                                 <div class="another-index-shower">
                                     <div class="another-index-shower-text">
-                                        次因子权重：
+                                        演变因子权重：
                                     </div>
                                     <div class="another-index-shower-content">
                                         <el-input-number
@@ -223,8 +228,7 @@
             </div>
             <div class="result-set-wrapper">
                 <div class="place-holder">
-                    <div class="botton-wrapper" @click="RiskMatrixModelRun">
-                        <div class="botton-text">运行模型</div>
+                    <div class="botton-wrapper">
                     </div>
                 </div>
                 <div class="alarm-grade-container">
@@ -336,22 +340,9 @@
 <script setup>
 import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3';
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3';
-import { ElSelect, ElOption, ElInputNumber, ElMessageBox } from 'element-plus';
+import { ElInputNumber } from 'element-plus';
 import { ref } from 'vue'
 import { riskMatrixModel } from './api'
-
-// 因子选择
-const indexes = [
-    {
-        value: 'velocity',
-        label: '动力因子',
-    },
-    {
-        value: 'evolve',
-        label: '演变因子',
-    },
-]
-const mainIndex = ref("")
 
 // 因子权重
 const mainIndexValue = ref(1)
@@ -370,11 +361,6 @@ const updateAnotherIndexValue = (value) => {
     mainIndexValue.value = Math.max(0, 1 - value).toFixed(3);
   }
 };
-const MainIndexChange = (value) => {
-    if (value === "") {
-        mainIndex.value = ""
-    }
-}
 
 // 动力因子值
 const velocityIndex1 = ref(0.16)
@@ -566,33 +552,13 @@ const jsonId = "662a3e4acff7845d51a7bb63"
 async function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+const isRunning = ref(false)
 const RiskMatrixModelRun = async () => {
-    if (mainIndex.value == "") {
-        ElMessageBox.alert( "未选择主因子!",'警告', {
-            confirmButtonText: '确定',
-        })
-        return
-    }
     if (velocityIndex1.value===null || velocityIndex2.value===null || velocityIndex3.value===null
         || evolveIndex1.value===null || evolveIndex2.value===null || evolveIndex3.value===null) {
         alert("因子权重不为空!")
     }
     // 设置主权重
-    var weight2 = velocityIndex1.value
-    var weight3 = velocityIndex2.value
-    var weight4 = velocityIndex3.value
-    var weight5 = evolveIndex1.value
-    var weight6 = evolveIndex2.value
-    var weight7 = evolveIndex3.value
-    if (mainIndex.value === "evolve") {
-        weight2 = evolveIndex1.value
-        weight3 = evolveIndex2.value
-        weight4 = evolveIndex3.value
-        weight5 = velocityIndex1.value
-        weight6 = velocityIndex2.value
-        weight7 = velocityIndex3.value
-    }
     const runModelData = {
         "modelNode": {
             "id": "662a4521ddd45f65873eb067"
@@ -603,12 +569,12 @@ const RiskMatrixModelRun = async () => {
                 "jsonId": "662a3e4acff7845d51a7bb63",
                 "weight0": mainIndexValue.value,
                 "weight1": anotherIndexValue.value,
-                "weight2": weight2,
-                "weight3": weight3,
-                "weight4": weight4,
-                "weight5": weight5,
-                "weight6": weight6,
-                "weight7": weight7
+                "weight2": velocityIndex1.value,
+                "weight3": velocityIndex2.value,
+                "weight4": velocityIndex3.value,
+                "weight5": evolveIndex1.value,
+                "weight6": evolveIndex2.value,
+                "weight7": evolveIndex3.value
             },
             "name": "multiIndexMatrixDefaultParamItem",
             "auth": "all",
@@ -627,6 +593,7 @@ const RiskMatrixModelRun = async () => {
         "category": "ModelTaskItem",
         "path": ",taskNode,matrixCalcModelTaskGroup,"
     }
+    isRunning.value = true
     const taskNodeId = await(riskMatrixModel.runModel(runModelData))
     const RunStatus = ref("")
     for (;;) {
@@ -659,6 +626,7 @@ const RiskMatrixModelRun = async () => {
     riskValue2.value = riskValueList[1].toFixed(3)
     riskValue3.value = riskValueList[2].toFixed(3)
     riskValue4.value = riskValueList[3].toFixed(3)
+    isRunning.value = false
 }
 
 </script>
@@ -759,9 +727,45 @@ div.model-item-content {
             box-shadow: -4px 8px 8px -4px rgb(0, 47, 117);
 
             div.place-holder {
-                height: 6%;
+                height: 10%;
                 width: 100%;
                 // background-color: black;
+
+                div.botton-wrapper {
+                    animation: float 2s ease-in-out infinite;
+                    transition: transform 0.25s ease;
+                    position: absolute;
+                    top: 4.5%;
+                    left: 2.5%;
+                    width: 18%;
+                    height: 5.5%;
+                    margin-top: 15px;
+                    margin-left: 74%;
+                    border: #02242d solid 3px;
+                    border-radius: 10px;
+                    background-color: rgba(33, 96, 183, 0.7);
+                    border-radius: 5px;
+                    &:hover {
+                        cursor: pointer;
+                        animation-play-state: paused;
+                        transform: scale(1.1);
+                    }
+                    z-index: 10;
+
+                    div.botton-text {
+                        @include flex-center();
+                        height: 100%;
+                        width: 100%;
+                        // background-color: #001cb8;
+                        font-size: calc(0.9vh + 0.7vw);
+                        font-weight: 550;
+                        font-family: 'Microsoft YaHei';
+                        color: rgb(241, 243, 247);
+                        // text-shadow: 0.3px 0px 0.3px #9283c4, 0px 1px 1px #061411, 1px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1pxd 2px 1px #CCCCCC, 1px 1px 1px #EEEEEE, 1px 1px 1px #CCCCCC, 1px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
+                    }
+
+                }
+
             }
 
             div.main-index-container {
@@ -776,83 +780,89 @@ div.model-item-content {
                 // background-color: #a2dede;
                     
                 div.main-index-wrapper {
-                    @include flex-center-column();
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: left;
                     height: 100%;
                     width: 100%;
                     
-                    div.index-selector {
-                        @include flex-center-row();
-                        width: 96%;
+                    // div.index-selector {
+                    //     @include flex-center-row();
+                    //     width: 96%;
+                    //     height: 40%;
+                    //     margin-bottom: 3px;
+                    //     border-radius: 10px;
+                    //     border: 2px solid rgba(190, 154, 210, 0.7);
+                    //     box-shadow: -4px 4px 4px -2px rgb(151, 154, 214);
+                    
+                    div.main-index-text {
+                        display: flex;
+                        justify-content: left;
+                        align-items: center;
                         height: 40%;
-                        margin-bottom: 3px;
-                        border-radius: 10px;
-                        border: 2px solid rgba(190, 154, 210, 0.7);
-                        box-shadow: -4px 4px 4px -2px rgb(151, 154, 214);
-                    
-                        div.main-index-text {
-                            @include flex-center();
-                            height: 100%;
-                            width: 40%;
-                            font-size: calc(1.0vh + 0.9vw);
-                            font-weight: 450;
-                            font-family: 'Microsoft YaHei';
-                            color: rgb(36, 48, 187);
-                            text-shadow: 1px 0px 1px #7e70b1, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
-                    
-                        }
+                        width: 100%;
+                        margin-left:30px;
+                        font-size: calc(1.0vh + 0.9vw);
+                        font-weight: 450;
+                        font-family: 'Microsoft YaHei';
+                        color: rgb(36, 48, 187);
+                        text-shadow: 1px 0px 1px #7e70b1, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
 
-                        div.main-index-content {
-
-                            display: flex;
-                            align-items: center;
-                            justify-content: left;
-                            height: 100%;
-                            width: 60%;
-
-                            :deep(.el-select) {
-                                height: 3.3vh;
-                                width: 90%;
-                                box-shadow:
-                                rgba(225, 188, 231, 0.8) 1px 1px,
-                                rgba(204, 159, 236, 0.7) -2px 2px,
-                                rgba(142, 187, 213, 0.6) -3px 4px;
-                                border-radius: 6px;
-                            }
-                            :deep(.el-select__wrapper) {
-                                height: 3.3vh;
-                                line-height: 3.3vh;
-                                border-radius: 6px;
-                                font-family: 'Microsoft YaHei';
-                                font-weight: bold;
-                                font-size: calc(0.5vw + 0.6vh);
-                                background-color: #ebdef0;
-                            }
-                            :deep(.el-select__placeholder) {
-                                color: #738ab6;
-                            }
-
-                            :deep(.el-icon) {
-                                width: 0.5vw;
-                                height: 0.5vw;
-
-                                svg {
-                                    width: 0.5vw;
-                                    height: 0.5vw;
-
-                                    path {
-                                        fill: #001cb8;
-                                    }
-                                }
-                            }
-        
-                        }
-                    
                     }
+
+                    // div.main-index-content {
+
+                    //     display: flex;
+                    //     align-items: center;
+                    //     justify-content: left;
+                    //     height: 100%;
+                    //     width: 60%;
+
+                    //     :deep(.el-select) {
+                    //         height: 3.3vh;
+                    //         width: 90%;
+                    //         box-shadow:
+                    //         rgba(225, 188, 231, 0.8) 1px 1px,
+                    //         rgba(204, 159, 236, 0.7) -2px 2px,
+                    //         rgba(142, 187, 213, 0.6) -3px 4px;
+                    //         border-radius: 6px;
+                    //     }
+                    //     :deep(.el-select__wrapper) {
+                    //         height: 3.3vh;
+                    //         line-height: 3.3vh;
+                    //         border-radius: 6px;
+                    //         font-family: 'Microsoft YaHei';
+                    //         font-weight: bold;
+                    //         font-size: calc(0.5vw + 0.6vh);
+                    //         background-color: #ebdef0;
+                    //     }
+                    //     :deep(.el-select__placeholder) {
+                    //         color: #738ab6;
+                    //     }
+
+                    //     :deep(.el-icon) {
+                    //         width: 0.5vw;
+                    //         height: 0.5vw;
+
+                    //         svg {
+                    //             width: 0.5vw;
+                    //             height: 0.5vw;
+
+                    //             path {
+                    //                 fill: #001cb8;
+                    //             }
+                    //         }
+                    //     // }
+    
+                    //     }
+                    
+                    // }
 
                     div.index-shower {
                         @include flex-center-row();
                         width: 96%;
-                        height: 40%;
+                        height: 47%;
                         margin-top: 3px;
                         border-radius: 10px;
                         border: 2px solid rgba(190, 154, 210, 0.7);
@@ -868,7 +878,7 @@ div.model-item-content {
 
                             div.main-index-shower-text {
                                 @include flex-center();
-                                width: 40%;
+                                width: 50%;
                                 height: 100%;
                                 // background-color: #001cb8;
                                 font-size: calc(0.7vh + 0.6vw);
@@ -880,8 +890,8 @@ div.model-item-content {
                             div.main-index-shower-content {
                                 @include flex-center();
                                 margin-left: -10px;
-                                width: 60%;
-                                height: 40%;
+                                width: 50%;
+                                height: 100%;
                                 // background-color: #6e76a2;
                             }
                         }
@@ -896,7 +906,7 @@ div.model-item-content {
 
                             div.another-index-shower-text {
                                 @include flex-center();
-                                width: 40%;
+                                width: 50%;
                                 height: 100%;
                                 margin-left: 10px;
                                 // background-color: #001cb8;
@@ -909,8 +919,8 @@ div.model-item-content {
                             div.another-index-shower-content {
                                 @include flex-center();
                                 margin-left: -10px;
-                                width: 60%;
-                                height: 40%;
+                                width: 50%;
+                                height: 100%;
                                 // background-color: #6e76a2;
                             }
                         }
@@ -1302,50 +1312,14 @@ div.model-item-content {
                 display: absolute;
                 justify-content: left;
                 align-items: center;
-                height: 6%;
+                height: 4%;
                 width: 100%;
                 // background-color: black;
-
-                div.botton-wrapper {
-                    animation: float 2s ease-in-out infinite;
-                    transition: transform 0.25s ease;
-                    position: absolute;
-                    top: 4.5%;
-                    left: 2.5%;
-                    width: 18%;
-                    height: 5.5%;
-                    margin-top: 15px;
-                    margin-left: 40px;
-                    border: #02242d solid 3px;
-                    border-radius: 10px;
-                    background-color: rgba(183, 55, 33, 0.7);
-                    border-radius: 5px;
-                    &:hover {
-                        cursor: pointer;
-                        animation-play-state: paused;
-                        transform: scale(1.1);
-                    }
-                    z-index: 10;
-
-                    div.botton-text {
-                        @include flex-center();
-                        height: 100%;
-                        width: 100%;
-                        // background-color: #001cb8;
-                        font-size: calc(0.9vh + 0.7vw);
-                        font-weight: 550;
-                        font-family: 'Microsoft YaHei';
-                        color: rgb(222, 227, 236);
-                        // text-shadow: 0.3px 0px 0.3px #9283c4, 0px 1px 1px #061411, 1px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1pxd 2px 1px #CCCCCC, 1px 1px 1px #EEEEEE, 1px 1px 1px #CCCCCC, 1px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
-                    }
-
-                }
-
             }
 
             div.alarm-grade-container {
                 @include flex-center-row();
-                height: 20%;
+                height: 18%;
                 width: 100%;
                 // background-color: #001cb8;
 
@@ -1430,8 +1404,9 @@ div.model-item-content {
 
             div.risk-matrix-container {
                 @include flex-center-row();
-                height: 37%;
+                height: 38%;
                 width: 100%;
+                margin-bottom: 10px;
                 // background-color: #11ffc4;
 
                 div.risk-matrix-wrapper {
@@ -1584,7 +1559,7 @@ div.model-item-content {
 
             div.loss-matrix-container {
                 @include flex-center-row();
-                height: 37%;
+                height: 38%;
                 width: 100%;
                 // background-color: #11ffc4;
 
@@ -1680,6 +1655,7 @@ div.model-item-content {
 
 :deep(.dv-border-box-8.style-1) {
     display: flex;
+    position: relative;
     background-color: rgba(227, 121, 16, 0.1);
     backdrop-filter: blur(8px);
     width: 97%;
@@ -1702,4 +1678,8 @@ div.model-item-content {
     height: 60%;
 }
 
+:deep(.dv-loading.loading-icon) {
+    display: flex;
+    margin-left:22%;
+}
 </style>
