@@ -1,5 +1,6 @@
 package com.johnny.bank.jobs;
 
+import ch.qos.logback.core.util.TimeUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.johnny.bank.model.resource.dataResource.*;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @projectName: backEnd
@@ -30,7 +32,7 @@ import java.util.List;
 public class GnssWarningJob implements Job {
 
     private static final List<String> mailList = List.of("249884523@qq.com", "1275441282@qq.com");
-    private static final List<String> phoneList = List.of("13382058110");
+    private static final List<String> phoneList = List.of("18678742441", "13382058110");
 //    private static final List<String> phoneList = List.of("18678742441");
 
     public List<List<GnssData>> before() {
@@ -132,6 +134,11 @@ public class GnssWarningJob implements Job {
                         throw new RuntimeException(e);
                     }
                     log.info(smsResponse.getMessage());
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
             DeviceWarning deviceWarning = DeviceWarning.builder()
