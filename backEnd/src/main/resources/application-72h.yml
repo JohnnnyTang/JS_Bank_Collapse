@@ -52,10 +52,10 @@ video:
   yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4
 
 multiIndex:
-  dataPath: D:\2024-work\shore_collapse\model\modelData\
+  dataPath: D:\2024-work\shore_collapse\model\modelData
   resPath: D:\2024-work\shore_collapse\model\modelRes\
 
 sms:
   accessTokenLoc: D:\2024-work\AccessKey.json
   signName: 江苏长江崩岸监测预警系统
-  verifyTemplateCode: SMS_465726259
+  verifyTemplateCode: SMS_465975002
