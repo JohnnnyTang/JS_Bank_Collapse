@@ -12,16 +12,17 @@
             <div class="content">
                 <div class="deviceType">
                     <div class="desc">设备信息</div>
-                    <div class="text">{{ deviceType }}</div>
+                    <div class="text">{{ info.deviceType }}</div>
                 </div>
                 <div class="deviceID">
-                    <div class="text">{{ deviceID }}</div>
+                    <div class="text">{{ info.deviceID }}</div>
                 </div>
                 <div class="reason">
                     <div class="desc">报警原因</div>
                     <div class="text">
-                        <span style="font-size: calc(0.5vh + 0.4vw); display: block; height: 40%; line-height:  calc(0.5vh + 0.4vw);">累计位移</span>
-                        <span style="color: red; height: 60%;">{{ reason }}</span>
+                        <span
+                            style="font-size: calc(0.5vh + 0.4vw); display: block; height: 40%; line-height:  calc(0.5vh + 0.4vw);">累计位移</span>
+                        <span style="color: red; height: 60%;">{{ info.dif+' m' }}</span>
                     </div>
                 </div>
 
@@ -29,8 +30,8 @@
                     <div class="desc">报警时间</div>
                     <!-- <div class="text">{{ time }}</div> -->
                     <div class="text">
-                        <div class="date">{{ yymmdd }}</div>
-                        <div class="second">{{ hhmmss }}</div>
+                        <div class="date">{{ info.yymmdd }}</div>
+                        <div class="second">{{ info.hhmmss }}</div>
                     </div>
                 </div>
             </div>
@@ -41,7 +42,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import dayjs from 'dayjs'
 
 const props = defineProps({
@@ -50,11 +51,28 @@ const props = defineProps({
 
 const deviceType = 'GNSS'
 const deviceID = 'MZS1234567_7654321cm'
-const reason = '99.9m'
-const yymmdd = dayjs().format('YYYY-MM-DD')
-const hhmmss = dayjs().format('HH:mm:ss')
+const reason = '14.684m'
+// const yymmdd = dayjs().format('YYYY-MM-DD')
+// const hhmmss = dayjs().format('HH:mm:ss')
+const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+
+const info = computed(() => {
+    let infom = props.warningInfo.warningInfo
+    let type ='GNSS'
+    let time = dayjs(infom.warnTime)
+
+
+    return {
+        deviceType: type,
+        yymmdd: time.format('YYYY-MM-DD'),
+        hhmmss: time.format('HH:mm:ss'),
+        deviceID: infom.deviceId,
+        dif: infom.threeDiff.toFixed(4)
+
+    }
+})
+
 onMounted(() => {
-    console.log('warning pop up onMounted');
 })
 
 
@@ -71,6 +89,7 @@ onMounted(() => {
     position: relative;
     width: 12vw;
     height: 18.5vh;
+    user-select: none;
 
     div.main {
         position: relative;
@@ -162,7 +181,7 @@ onMounted(() => {
                 .text {
                     width: 11vw;
                     margin-left: 0vw;
-                    font-size: calc(0.3vh + 0.6vw);
+                    font-size: calc(0.3vh + 0.4vw);
                     font-weight: 600;
                     text-align: center;
 
@@ -231,7 +250,7 @@ onMounted(() => {
 
     div.arrow {
         position: absolute;
-        left: 50%;
+        left: 45%;
         bottom: -0.5vh;
         width: 0;
         height: 0;

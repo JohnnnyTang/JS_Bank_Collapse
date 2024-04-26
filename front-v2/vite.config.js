@@ -17,14 +17,14 @@ export default defineConfig({
         host: '0.0.0.0',
         proxy: {
             '/api': {
-                target: 'http://172.21.213.47:8989/api/v1',
+                target: 'http://192.168.43.108:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
-            'http://127.0.0.1:5173/api': {
-                target: 'http://127.0.0.1:8989/api/v1',
+            'http://127.0.0.1:8989/api/v1/': {
+                target: 'http://192.168.43.108:8989/api/v1',
                 changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, ''),
+                rewrite: (path) => path.replace(/^\/v1/, ''),
             },
             '/waterServer':{
                 target: 'http://218.94.6.92:6080',
