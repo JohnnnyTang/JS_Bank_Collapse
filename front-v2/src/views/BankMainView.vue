@@ -34,6 +34,7 @@ mapboxgl.accessToken =
 
 const containerDom = ref(null)
 let map = null
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -73,13 +74,13 @@ onMounted(() => {
         map.addSource('mapVector', {
             type: 'vector',
             tiles: [
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2021/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2023/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2020/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2020/after/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2021/after/{x}/{y}/{z}',
-                'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/after/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2021/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2022/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2023/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2020/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2020/after/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2021/after/{x}/{y}/{z}',
+                tileServer+'/tile/vector/contour/2022/after/{x}/{y}/{z}',
             ],
         })
         // map.addSource('worldBase', {
@@ -100,91 +101,91 @@ onMounted(() => {
         map.addSource('depthLineSource', {
             type: 'vector',
             tiles: [
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/1999/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2004/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2006/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2015/{x}/{y}/{z}',
-                'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2017/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/1999/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/2004/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/2006/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/2015/{x}/{y}/{z}',
+                tileServer+'/tile/vector/depthLine/2017/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverSectionLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverSection/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverSection/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverBg', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverBg/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverBg/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverLand', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverLand/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverLand/{x}/{y}/{z}',
             ],
         })
         map.addSource('ptVector', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/placeLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/placeLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverName/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverName/{x}/{y}/{z}',
             ],
         })
 
         map.addSource('mzsPlaceLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsPlaceLineSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
             ],
         })
 
         map.addSource('mzsBankLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsBankLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsBankLineSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLine/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsBankLine/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsSectionLineSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsSectionLine/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsSectionLineLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsBankAreaWSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsBankAreaSSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
             ],
         })
         map.addLayer({

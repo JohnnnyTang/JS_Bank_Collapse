@@ -1,19 +1,18 @@
 <template>
 
-    <div class="test">
-        <div class="testTitle">TEST-PAGE</div>
-    </div>
+    <warningPop></warningPop>
 
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue';
+import BackEndRequest from '../../api/backend';
+import warningPop from '../bankTwin/warningPop.vue';
 
 
-onMounted(async () => {
-
+onMounted(()=>{
+    console.log('test!');
 })
-
 
 
 

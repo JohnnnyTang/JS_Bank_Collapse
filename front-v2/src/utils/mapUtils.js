@@ -189,7 +189,8 @@ const getStyleJson = () => {
                 type: 'vector',
                 tiles: [
                     // 'http://127.0.0.1:9000/2020-10-planet-14.mbtiles/{z}/{x}/{y}.pbf'
-                    'http://192.168.43.108:8989/api/v1/proxy/tiles/world/{z}/{x}/{y}.pbf',
+                    // 'http://127.0.0.1:8989/api/v1/proxy/tiles/world/{z}/{x}/{y}.pbf',
+                    '/api/proxy/tiles/world/{z}/{x}/{y}.pbf'
                 ],
                 minzoom: 0,
                 maxzoom: 12,//local TILES max zoom::12

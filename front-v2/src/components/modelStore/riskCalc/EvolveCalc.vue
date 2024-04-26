@@ -15,7 +15,11 @@
                         prop="year"
                         style="width: 90%; margin: 2%; color: black"
                     >
-                        <el-input v-model="paramsForm.year" color="#abd5f8" />
+                        <el-select v-model="paramsForm.year" placeholder="2023">
+                            <div v-for="(item, index) in yearList" :key="index">
+                                <el-option :label="item" :value="item" />
+                            </div>
+                        </el-select>
                     </el-form-item>
                     <el-form-item style="width: 90%; margin: 4%">
                         <el-button
@@ -32,52 +36,6 @@
                     </el-form-item>
                 </el-form>
             </div>
-            <div class="section-graph-container card">
-                <div class="title-container">岸坡坡比</div>
-                <div
-                    class="card"
-                    style="
-                        flex: 1 1 0;
-                        width: 95%;
-                        color: #0953aa;
-                        background-color: #d1e7ff;
-                        font-size: x-large;
-                        font-weight: bold;
-                    "
-                    v-show="isFinish == false"
-                >
-                    目前暂无结果
-                </div>
-                <div
-                    ref="rateGraphRef"
-                    class="section-graph card"
-                    v-show="isFinish == true"
-                ></div>
-            </div>
-        </div>
-        <div class="model-output">
-            <div class="output-graph-container card">
-                <div class="title-container">断面对比</div>
-                <div
-                    class="card"
-                    style="
-                        flex: 1 1 0;
-                        width: 95%;
-                        color: #0953aa;
-                        background-color: #d1e7ff;
-                        font-size: x-large;
-                        font-weight: bold;
-                    "
-                    v-show="isFinish == false"
-                >
-                    目前暂无结果
-                </div>
-                <div
-                    v-show="isFinish == true"
-                    ref="compareGraphRef"
-                    class="output-graph card"
-                ></div>
-            </div>
             <div class="output-table-container card device-status-container">
                 <div class="small-title-container">
                     <span style="padding-right: 3%"></span>
@@ -93,6 +51,8 @@
                         class="device-status-row body"
                         v-for="(item, index) in indexValues"
                         :key="index"
+                        v-loading="isLoading"
+                        element-loading-background="rgba(214, 235, 255,0.8)"
                     >
                         <div class="device-name device-item body">
                             {{ ['潮滩高差', '岸坡坡比', '冲淤变幅'][index] }}
@@ -107,28 +67,56 @@
                 </div>
             </div>
         </div>
+        <div class="model-output">
+            <div class="output-graph-container card">
+                <div class="title-container">断面对比及坡比</div>
+                <div
+                    class="card"
+                    style="
+                        flex: 1 1 0;
+                        width: 95%;
+                        color: #0953aa;
+                        background-color: #d1e7ff;
+                        font-size: x-large;
+                        font-weight: bold;
+                    "
+                    v-show="isFinish == false"
+                    v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                >
+                    目前暂无结果
+                </div>
+                <div
+                    v-show="isFinish == true"
+                    ref="rateGraphRef"
+                    class="output-graph card"
+                    v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                ></div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
+import { useMultiIndexStore } from '@/store/multiIndexStore'
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, reactive, ref } from 'vue'
-import {
-    getBeforeSectionPoints,
-    getEvolutionIndexResult,
-    getSectionPoints,
-} from './api.js'
-import { drawCompareGraph, drawRateGraph } from './util.js'
+import { getTaskJsonAPI, getTaskStatusAPI, postTaskStartAPI } from './api.js'
+import { drawRateGraph } from './util.js'
 
+const yearList = [2020, 2021, 2022, 2023]
+let compareGraphChart = null
+let rateChart = null
 const sectionPoints = ref(null)
 const beforeSectionPoints = ref(null)
 const indexValues = ref([[], [], []])
 const rateGraphRef = ref(null)
 const compareGraphRef = ref(null)
 const paramsFromRef = ref(null)
-let compareGraphChart = null
-let rateChart = null
+const multiIndexStore = useMultiIndexStore()
+const isLoading = ref(false)
 
 const paramsForm = reactive({
     year: null,
@@ -141,6 +129,7 @@ const rules = reactive({
         },
     ],
 })
+
 const isDisable = computed(() => {
     if (paramsForm) {
         return !paramsForm.year
@@ -152,38 +141,82 @@ const isDisable = computed(() => {
 const isFinish = computed(() => indexValues.value[0].length !== 0)
 
 const submitForm = async () => {
-    const result = getEvolutionIndexResult()
-    if (result.status === 'success') {
+    if (Number(multiIndexStore.resJson.year) < paramsForm.year) {
         ElMessage({
-            message: '演化分析指标计算成功',
-            type: 'success',
+            message:
+                '对比时间应在当前时间之前, 当前时间为' +
+                ' ' +
+                multiIndexStore.resJson.year +
+                ' 年',
+            type: 'warning',
         })
-        indexValues.value = [result.data.ZB, result.data.SA, result.data.Ln]
-        beforeSectionPoints.value = getBeforeSectionPoints()
-
-        setTimeout(() => {
-            rateChart.clear()
-            drawRateGraph(
-                rateChart,
-                sectionPoints.value.data.map((value) => value[2]),
-                result.data.SA[2],
-            )
-            rateChart.resize()
-
-            compareGraphChart.clear()
-            drawCompareGraph(
-                compareGraphChart,
-                sectionPoints.value.data.map((value) => value[2]),
-                beforeSectionPoints.value.data.map((value) => value[2]),
-            )
-            compareGraphChart.resize()
-        }, 10)
-    } else {
+        resetForm(paramsFromRef.value)
+        return
+    }
+    const taskIDResponse = await postTaskStartAPI(
+        'evolution',
+        multiIndexStore.taskId,
+        undefined,
+        paramsForm.year,
+    )
+    if (taskIDResponse.status === 'error') {
         ElMessage({
-            message: '演化指标计算失败',
+            message: '演化分析指标计算失败',
             type: 'warning',
         })
     }
+    isLoading.value = true
+
+    const intervalID = setInterval(async () => {
+        const statusResponse = await getTaskStatusAPI(taskIDResponse.data)
+        if (
+            statusResponse.status === 'error' ||
+            statusResponse.data === '-1' ||
+            statusResponse.data === '-2'
+        ) {
+            clearInterval(intervalID)
+            ElMessage({
+                message: '演化分析指标计算失败',
+                type: 'warning',
+            })
+            isLoading.value = false
+        }
+        if (statusResponse.data === '2') {
+            const jsonResponse = await getTaskJsonAPI(multiIndexStore.taskId)
+            if (jsonResponse.status === 'error') {
+                clearInterval(intervalID)
+                ElMessage({
+                    message: '演化分析指标计算失败',
+                    type: 'warning',
+                })
+                isLoading.value = false
+            }
+            const json = jsonResponse.data
+            multiIndexStore.resJson = json
+            indexValues.value = [json.ZB, json.SA, json.LN]
+            beforeSectionPoints.value = json.beforeSection
+
+            resetForm(paramsFromRef.value)
+            clearInterval(intervalID)
+
+            setTimeout(() => {
+                rateChart.clear()
+                drawRateGraph(
+                    rateChart,
+                    sectionPoints.value.map((value) => value[2]),
+                    beforeSectionPoints.value.map((value) => value[2]),
+                    json.SA[2],
+                )
+                rateChart.resize()
+            }, 10)
+
+            ElMessage({
+                message: '演化分析指标计算成功',
+                type: 'success',
+            })
+            isLoading.value = false
+        }
+    }, 1000)
 }
 
 const resetForm = (formEl) => {
@@ -192,9 +225,8 @@ const resetForm = (formEl) => {
 }
 
 onMounted(() => {
-    sectionPoints.value = getSectionPoints()
+    sectionPoints.value = multiIndexStore.resJson.section
     rateChart = echarts.init(rateGraphRef.value)
-    compareGraphChart = echarts.init(compareGraphRef.value)
 })
 </script>
 
@@ -214,7 +246,8 @@ div.velocity-calc-content {
             flex-direction: column;
             flex: 1 1 0;
         }
-        .section-graph-container {
+
+        .output-table-container {
             flex-direction: column;
             flex: 1 1 0;
         }
@@ -229,7 +262,7 @@ div.velocity-calc-content {
             flex: 1 1 0;
         }
 
-        .output-table-container {
+        .section-graph-container {
             flex-direction: column;
             flex: 1 1 0;
         }
@@ -317,7 +350,7 @@ div.device-status-container {
             height: 20%;
             width: 100%;
             border-radius: 8px;
-            margin-bottom: 1vh;
+            margin-bottom: 1.2vh;
 
             // background-color: #2622fd;
 

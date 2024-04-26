@@ -6,11 +6,7 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab
-                    style="z-index: 3; font-size: calc(0.6vw + 0.4vh)"
-                    :items="items"
-                    :columns="2"
-                ></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.6vw + 0.4vh)" :items="items" :columns="2"></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -82,7 +78,7 @@ onMounted(() => {
             [124.5709218840081, 35.31358005439914],
         ],
     })
-    map.on('load', async() => {
+    map.on('load', async () => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
         useMapStore().setMap(map)
@@ -197,4 +193,23 @@ div.twin-main-container {
     font-weight: bold;
 }
 
+
+
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip) {
+    display: none;
+}
+:deep(.mapboxgl-popup-tip) {
+    border: none;
+}
+:deep(.mapboxgl-popup-content){
+    background:none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+:deep(.mapboxgl-popup-close-button){
+    right: 5px;
+    top: 5px;
+    border: none;
+}
 </style>

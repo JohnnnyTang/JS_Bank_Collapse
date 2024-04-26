@@ -41,11 +41,7 @@ const ModelName = '风险预警模型'
 
 const curRunModelName = ref('计算断面选择')
 
-// console.log(multiIndexStore.taskIdMap)
-
-onMounted(() => {
-    // multiIndexStore.taskIdMap.section = '1'
-})
+onMounted(() => {})
 </script>
 
 <style lang="scss" scoped>
