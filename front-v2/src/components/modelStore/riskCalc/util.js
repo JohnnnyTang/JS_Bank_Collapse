@@ -114,14 +114,9 @@ export const drawOutputGraph = (echarts, indexValues) => {
                         normal: {
                             color: function (params) {
                                 var colorList = [
-                                    '#C33531',
-                                    '#EFE42A',
-                                    '#64BD3D',
-                                    '#EE9201',
-                                    '#29AAE3',
-                                    '#B74AE5',
-                                    '#0AAF9F',
-                                    '#E89589',
+                                    '#ef4444',
+                                    '#f59e0b',
+                                    '#22c55e',
                                 ]
                                 return colorList[params.dataIndex]
                             },

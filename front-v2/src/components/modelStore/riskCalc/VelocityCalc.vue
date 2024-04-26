@@ -15,7 +15,11 @@
                         prop="year"
                         style="width: 90%; margin: 2%; color: black"
                     >
-                        <el-input v-model="paramsForm.year" color="#abd5f8" />
+                        <el-select v-model="paramsForm.year" placeholder="2023">
+                            <div v-for="(item, index) in yearList" :key="index">
+                                <el-option :label="item" :value="item" />
+                            </div>
+                        </el-select>
                     </el-form-item>
                     <el-form-item
                         label="水文条件"
@@ -64,6 +68,8 @@
                         font-weight: bold;
                     "
                     v-show="isFinish == false"
+                    v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
                 >
                     目前暂无结果
                 </div>
@@ -71,6 +77,8 @@
                     v-show="isFinish == true"
                     ref="outputGraphRef"
                     class="output-graph card"
+                    v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
                 ></div>
             </div>
             <div class="output-table-container card device-status-container">
@@ -88,6 +96,8 @@
                         class="device-status-row body"
                         v-for="(item, index) in indexValues"
                         :key="index"
+                        v-loading="isLoading"
+                        element-loading-background="rgba(214, 235, 255,0.8)"
                     >
                         <div class="device-name device-item body">
                             {{ ['造床流量当量', '流速', '水位变化'][index] }}
@@ -106,19 +116,22 @@
 </template>
 
 <script setup>
+import { useMultiIndexStore } from '@/store/multiIndexStore'
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, reactive, ref } from 'vue'
-import { getPowerIndexResult, getSectionPoints } from './api.js'
+import { getTaskJsonAPI, getTaskStatusAPI, postTaskStartAPI } from './api.js'
 import { drawOutputGraph, drawSectionGraph } from './util.js'
 
+let outputGraphChart = null
+const yearList = new Array(34).fill(0).map((_, index) => index + 1990)
+const multiIndexStore = useMultiIndexStore()
 const sectionPoints = ref(null)
 const indexValues = ref([[], [], []])
 const sectionGraphRef = ref(null)
 const outputGraphRef = ref(null)
 const paramsFromRef = ref(null)
-let outputGraphChart = null
-
+const isLoading = ref(false)
 const paramsForm = reactive({
     year: null,
     condition: null,
@@ -144,29 +157,67 @@ const isDisable = computed(() => {
         return true
     }
 })
-
 const isFinish = computed(() => indexValues.value[0].length !== 0)
 
 const submitForm = async () => {
-    const result = getPowerIndexResult()
-    if (result.status === 'success') {
-        ElMessage({
-            message: '动力指标计算成功',
-            type: 'success',
-        })
-        indexValues.value = [result.data.PQ, result.data.KY, result.data.ZD]
-        resetForm(paramsFromRef.value)
-        setTimeout(() => {
-            outputGraphChart.clear()
-            drawOutputGraph(outputGraphChart, indexValues.value)
-            outputGraphChart.resize()
-        }, 10)
-    } else {
+    const taskIDResponse = await postTaskStartAPI(
+        'power',
+        multiIndexStore.taskId,
+        paramsForm.condition,
+        paramsForm.year,
+    )
+    if (taskIDResponse.status === 'error') {
         ElMessage({
             message: '动力指标计算失败',
             type: 'warning',
         })
     }
+    isLoading.value = true
+
+    const intervalID = setInterval(async () => {
+        const statusResponse = await getTaskStatusAPI(taskIDResponse.data)
+        if (
+            statusResponse.status === 'error' ||
+            statusResponse.data === '-1' ||
+            statusResponse.data === '-2'
+        ) {
+            clearInterval(intervalID)
+            ElMessage({
+                message: '动力指标计算失败',
+                type: 'warning',
+            })
+            isLoading.value = false
+        }
+        if (statusResponse.data === '2') {
+            const jsonResponse = await getTaskJsonAPI(multiIndexStore.taskId)
+            if (jsonResponse.status === 'error') {
+                clearInterval(intervalID)
+                ElMessage({
+                    message: '动力指标计算失败',
+                    type: 'warning',
+                })
+                isLoading.value = false
+            }
+            const json = jsonResponse.data
+            multiIndexStore.resJson = json
+            indexValues.value = [json.PQ, json.KY, json.ZD]
+
+            resetForm(paramsFromRef.value)
+            clearInterval(intervalID)
+
+            setTimeout(() => {
+                outputGraphChart.clear()
+                drawOutputGraph(outputGraphChart, indexValues.value)
+                outputGraphChart.resize()
+            }, 10)
+
+            ElMessage({
+                message: '动力指标计算成功',
+                type: 'success',
+            })
+            isLoading.value = false
+        }
+    }, 1000)
 }
 
 const resetForm = (formEl) => {
@@ -175,11 +226,11 @@ const resetForm = (formEl) => {
 }
 
 onMounted(() => {
-    sectionPoints.value = getSectionPoints()
+    sectionPoints.value = multiIndexStore.resJson.section
     const sectionChart = echarts.init(sectionGraphRef.value)
     drawSectionGraph(
         sectionChart,
-        sectionPoints.value.data.map((value) => value[2]),
+        sectionPoints.value.map((value) => value[2]),
     )
     outputGraphChart = echarts.init(outputGraphRef.value)
     drawOutputGraph(outputGraphChart, [null, null, null])
@@ -305,7 +356,7 @@ div.device-status-container {
             height: 20%;
             width: 100%;
             border-radius: 8px;
-            margin-bottom: 1vh;
+            margin-bottom: 1.2vh;
 
             // background-color: #2622fd;
 
