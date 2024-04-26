@@ -15,6 +15,7 @@ const propertyRef = ref({})
 const mapInit = async (map, vis) => {
 
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    console.log(tileServer);
 
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
@@ -455,8 +456,6 @@ const createPopUp = (deviceProperty) => {
         maxWidth: '1000px',
         offset: 25,
     }).setDOMContent(domwithComp)
-    // .setLngLat(popupCoord)
-    // .addTo(map); undefined;
     return popUp
 }
 
@@ -471,8 +470,6 @@ const createWarningPopup = (info) => {
         maxWidth: '1000px',
         offset: 25,
     }).setDOMContent(domwithComp)
-    // .setLngLat(popupCoord)
-    // .addTo(map); undefined;
     return popUp
 }
 

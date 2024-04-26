@@ -62,64 +62,6 @@ const generateData_GNSS = (ogDataArray) => {
         }
     }
 }
-const generateData_Incline = (ogDataArray, metaData) => {
-    let pointNum = metaData["pointNum"]
-    let depthArray = []
-    let legendData = []
-    let xMovedata = []
-    let yMovedata = []
-    let depth_value_data_x = []
-    let depth_value_data_y = []
-    let depth_value_data_3d = []
-
-    let depth_value_time = []
-
-    let showCount = ogDataArray.length - 1
-    showCount = Math.min(5, showCount)
-
-    for (let i = 1; i <= pointNum; i++) {
-        depthArray.push(metaData[`point${i}Depth`])
-        legendData.push(String(metaData[`point${i}Depth`] + 'm'))
-    }
-    for (let i = 0; i < showCount; i++) {
-        let onetime_depth_value_data_x = []
-        let onetime_depth_value_data_y = []
-        let onetime_depth_value_time = null
-        let onetime_depth_value_data_3d = []
-        for (let j = 0; j < pointNum; j++) {
-            let item = []
-            item.push(ogDataArray[i][`measureTime`])
-            item.push(ogDataArray[i][`XMove${j + 1}`])
-            item.push(legendData[j])
-            let item2 = []
-            item2.push(ogDataArray[i][`measureTime`])
-            item2.push(ogDataArray[i][`YMove${j + 1}`])
-            item2.push(legendData[j])
-            xMovedata.push(item)
-            yMovedata.push(item2)
-
-            onetime_depth_value_data_x.push([ogDataArray[i][`XMove${j + 1}`], depthArray[j]])
-            onetime_depth_value_data_y.push([ogDataArray[i][`YMove${j + 1}`], depthArray[j]])
-            onetime_depth_value_data_3d.push([ogDataArray[i][`XMove${j + 1}`], ogDataArray[i][`YMove${j + 1}`], depthArray[j]])
-        }
-        onetime_depth_value_time = (ogDataArray[i]['measureTime'])
-
-        depth_value_data_x.push(onetime_depth_value_data_x)
-        depth_value_data_y.push(onetime_depth_value_data_y)
-        depth_value_data_3d.push(onetime_depth_value_data_3d)
-        depth_value_time.push(onetime_depth_value_time)
-    }
-
-    return {
-        legendData,
-        xMovedata,
-        yMovedata,
-        depth_value_data_x,
-        depth_value_data_y,
-        depth_value_data_3d,
-        depth_value_time
-    }
-}
 
 const generateData_Incline_new = (ogDataArray) => {
 
@@ -152,61 +94,6 @@ const generateData_Incline_new = (ogDataArray) => {
     }
 }
 
-
-const generateData_Manometer = (ogDataArray, metaData) => {
-    let pointNum = metaData["pointNum"]
-    let depthArray = []
-    let legendData = []
-    let pressureData_river = []
-    let showCount = ogDataArray.length - 1
-    showCount = Math.min(8, showCount)
-
-    let depth_value_data = []
-    let depth_value_time = []
-
-    let Depth_Data_Map = new Map()
-    let Depth_Data = []
-    let measureTime = []
-
-    let pressureArrBytime = []
-
-    for (let i = 1; i <= pointNum; i++) {
-        depthArray.push(metaData[`point${i}Depth`])
-        legendData.push(String(metaData[`point${i}Depth`] + 'm'))
-        Depth_Data.push([])
-    }
-    for (let i = 0; i < showCount; i++) {
-        let depth_data_item = []
-        let pressureOnetime = []
-        for (let j = 0; j < pointNum; j++) {
-            let item = []
-            item.push(ogDataArray[i][`measureTime`])
-            item.push(ogDataArray[i][`pressure${j + 1}`])
-            item.push(legendData[j])
-            pressureData_river.push(item)
-            Depth_Data[j].push(ogDataArray[i][`pressure${j + 1}`])
-            depth_data_item.push([ogDataArray[i][`pressure${j + 1}`], depthArray[j]])
-            pressureOnetime.push(ogDataArray[i][`pressure${j + 1}`])
-        }
-        measureTime.push(timeFormat(time(ogDataArray[i][`measureTime`])))
-        depth_value_time.push(ogDataArray[i][`measureTime`])
-        depth_value_data.push(depth_data_item)
-        pressureArrBytime.push(pressureOnetime)
-    }
-    for (let i = 1; i <= pointNum; i++) {
-        Depth_Data_Map.set(legendData[i - 1], Depth_Data[i - 1])
-    }
-
-    return {
-        legendData,
-        pressureData_river,
-        Depth_Data_Map,
-        measureTime,
-        depth_value_data,
-        depth_value_time,
-        pressureArrBytime
-    }
-}
 
 const generateData_Manometer_new = (ogDataArray) => {
     let showCount = ogDataArray.length - 1
@@ -419,66 +306,70 @@ const generateOptions_GNSS = (processedData) => {
         title: {
             left: 'center',
             text: 'GNSS-三维累计位移曲线',
+            subtext: '近五小时',
+            subtextStyle: {
+                color: 'rgb(34,45,148)',
+                fontSize: 12,
+            },
             top: 5
         },
         grid: {
-            show: false,
-            left: '20%',
-            top: '15%',
-            bottom: '15%',
-            right: '5%'
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
         },
-        visualMap: [
-            {
-                show: true,
-                itemGap: 0,
-                top: 'middle',
-                left: '0%',
-                itemSymbol: 'rect',
-                type: 'piecewise',
-                itemWidth: 15,
-                itemHeight: 15,
-                text: ['10.0', '0.0'],
-                textGap: 100,
-                realtime: false,
-                calculable: true,
-                seriesIndex: 0,
-                splitNumver: 6,
-                pieces: [
-                    { gt: 9, lte: 10, label: "", color: "#ff1414" },
-                    { gt: 8, lte: 9, label: "", color: "#fc4b00" },
-                    { gt: 7, lte: 8, label: "", color: "#f46c00" },
-                    { gt: 6, lte: 7, label: "", color: "#e78800" },
-                    { gt: 5, lte: 6, label: "", color: "#d7a000" },
-                    { gt: 4, lte: 5, label: "", color: "#c5b500" },
-                    { gt: 3, lte: 4, label: "", color: "#b0c900" },
-                    { gt: 2, lte: 3, label: "", color: "#93dc00" },
-                    { gt: 1, lte: 2, label: "", color: "#6bee00" },
-                    { gt: 0, lte: 1, label: "", color: "#0fff37" },
-                    /////
-                    // { gt: 0.9, lte: 1.0, label: "", color: "#03071e" },
-                    // { gt: 0.8, lte: 0.9, label: "", color: "#370617" },
-                    // { gt: 0.7, lte: 0.8, label: "", color: "#6a040f" },
-                    // { gt: 0.6, lte: 0.7, label: "", color: "#9d0208" },
-                    // { gt: 0.5, lte: 0.6, label: "", color: "#d00000" },
-                    // { gt: 0.4, lte: 0.5, label: "", color: "#dc2f02" },
-                    // { gt: 0.3, lte: 0.4, label: "", color: "#e85d04" },
-                    // { gt: 0.2, lte: 0.3, label: "", color: "#f48c06" },
-                    // { gt: 0.1, lte: 0.2, label: "", color: "#faa307" },
-                    // { gt: 0, lte: 0.1, label: "", color: "#ffba08" },
-                    // { gt: -0.1, lte: 0, label: "", color: "#ffba08" },
-                    // { gt: -0.2, lte: -0.1, label: "", color: "#faa307" },
-                    // { gt: -0.3, lte: -0.2, label: "", color: "#f48c06" },
-                    // { gt: -0.4, lte: -0.3, label: "", color: "#e85d04" },
-                    // { gt: -0.5, lte: -0.4, label: "", color: "#dc2f02" },
-                    // { gt: -0.6, lte: -0.5, label: "", color: "#d00000" },
-                    // { gt: -0.7, lte: -0.6, label: "", color: "#9d0208" },
-                    // { gt: -0.8, lte: -0.7, label: "", color: "#6a040f" },
-                    // { gt: -0.9, lte: -0.8, label: "", color: "#370617" },
-                    // { gt: -10, lte: -1.0, label: "", color: "#03071e" }
-                ]
-            },
-        ],
+        // visualMap: [
+        //     {
+        //         show: true,
+        //         itemGap: 0,
+        //         top: 'middle',
+        //         left: '0%',
+        //         itemSymbol: 'rect',
+        //         type: 'piecewise',
+        //         itemWidth: 15,
+        //         itemHeight: 15,
+        //         text: ['10.0', '0.0'],
+        //         textGap: 100,
+        //         realtime: false,
+        //         calculable: true,
+        //         seriesIndex: 0,
+        //         splitNumver: 6,
+        //         pieces: [
+        //             { gt: 9, lte: 10, label: "", color: "#ff1414" },
+        //             { gt: 8, lte: 9, label: "", color: "#fc4b00" },
+        //             { gt: 7, lte: 8, label: "", color: "#f46c00" },
+        //             { gt: 6, lte: 7, label: "", color: "#e78800" },
+        //             { gt: 5, lte: 6, label: "", color: "#d7a000" },
+        //             { gt: 4, lte: 5, label: "", color: "#c5b500" },
+        //             { gt: 3, lte: 4, label: "", color: "#b0c900" },
+        //             { gt: 2, lte: 3, label: "", color: "#93dc00" },
+        //             { gt: 1, lte: 2, label: "", color: "#6bee00" },
+        //             { gt: 0, lte: 1, label: "", color: "#0fff37" },
+        //             /////
+        //             // { gt: 0.9, lte: 1.0, label: "", color: "#03071e" },
+        //             // { gt: 0.8, lte: 0.9, label: "", color: "#370617" },
+        //             // { gt: 0.7, lte: 0.8, label: "", color: "#6a040f" },
+        //             // { gt: 0.6, lte: 0.7, label: "", color: "#9d0208" },
+        //             // { gt: 0.5, lte: 0.6, label: "", color: "#d00000" },
+        //             // { gt: 0.4, lte: 0.5, label: "", color: "#dc2f02" },
+        //             // { gt: 0.3, lte: 0.4, label: "", color: "#e85d04" },
+        //             // { gt: 0.2, lte: 0.3, label: "", color: "#f48c06" },
+        //             // { gt: 0.1, lte: 0.2, label: "", color: "#faa307" },
+        //             // { gt: 0, lte: 0.1, label: "", color: "#ffba08" },
+        //             // { gt: -0.1, lte: 0, label: "", color: "#ffba08" },
+        //             // { gt: -0.2, lte: -0.1, label: "", color: "#faa307" },
+        //             // { gt: -0.3, lte: -0.2, label: "", color: "#f48c06" },
+        //             // { gt: -0.4, lte: -0.3, label: "", color: "#e85d04" },
+        //             // { gt: -0.5, lte: -0.4, label: "", color: "#dc2f02" },
+        //             // { gt: -0.6, lte: -0.5, label: "", color: "#d00000" },
+        //             // { gt: -0.7, lte: -0.6, label: "", color: "#9d0208" },
+        //             // { gt: -0.8, lte: -0.7, label: "", color: "#6a040f" },
+        //             // { gt: -0.9, lte: -0.8, label: "", color: "#370617" },
+        //             // { gt: -10, lte: -1.0, label: "", color: "#03071e" }
+        //         ]
+        //     },
+        // ],
         // markLine:{
         //     data: [{ 
         //         value:5.0,
@@ -506,7 +397,7 @@ const generateOptions_GNSS = (processedData) => {
             type: 'value',
             boundaryGap: [0, '100%'],
             min: function (v) {
-                return 0
+                return Math.floor(v.min)
             },
             max: function (v) {
                 return Math.ceil(v.max)
@@ -554,8 +445,6 @@ const generateOptions_GNSS = (processedData) => {
             axisTick: {
                 show: true
             },
-            min: 'dataMin',
-            max: 'dataMax',
             type: 'time',
             axisLabel: {
                 formatter: function (value, index) {
@@ -570,13 +459,12 @@ const generateOptions_GNSS = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (value) {
-                return Math.floor(value.min * 10) / 10;
+            min: function (v) {
+                return Math.floor(v.min)
             },
-            max: function (value) {
-                // return 
-                return Math.ceil(value.max * 10) / 10;
-            }
+            max: function (v) {
+                return Math.ceil(v.max)
+            },
         },
         series: [
             {
@@ -594,203 +482,6 @@ const generateOptions_GNSS = (processedData) => {
     }
 }
 
-const generateOptions_Incline = (processedData) => {
-    let depth_value_x_series = []
-    let depth_value_y_series = []
-    let depth_value_3d_series = []
-    for (let i = 0; i < processedData.depth_value_time.length; i++) {
-        let seriesItemX = {
-            name: `${processedData.depth_value_time[i]}`,
-            type: 'line',
-            smooth: true,
-            symbolSize: 10,
-            symbol: 'circle',
-            xAxisIndex: 0,
-            yAxisIndex: 0,
-            data: processedData.depth_value_data_x[i]
-        }
-        depth_value_x_series.push(seriesItemX)
-        let seriesItemY = {
-            name: `${processedData.depth_value_time[i]}`,
-            type: 'line',
-            smooth: true,
-            symbolSize: 10,
-            symbol: 'circle',
-            xAxisIndex: 1,
-            yAxisIndex: 1,
-            data: processedData.depth_value_data_y[i]
-        }
-        depth_value_y_series.push(seriesItemY)
-        let serieItem3d = {
-            name: `${processedData.depth_value_time[i]}`,
-            type: 'line3D',
-            data: processedData.depth_value_data_3d[i],
-            smooth: true,
-            lineStyle: {
-                width: 3
-            }
-        }
-        depth_value_3d_series.push(serieItem3d)
-    }
-
-    let depth_value_x_y_Option = {
-        color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
-        title: [{
-            text: 'X向偏移曲线',
-            left: '10%'
-        }, {
-            text: 'Y向偏移曲线',
-            right: '10%' // 设置第二个标题在右边
-        }],
-        grid: [{
-            left: '5%',
-            right: '50%',
-            top: 80,
-            bottom: 20,
-            containLabel: true
-        }, {
-            left: '55%',
-            right: '5%',
-            top: 80,
-            bottom: 20,
-            containLabel: true
-        }],
-        legend: {
-            top: 30,
-            itemGap: 5,
-            itemWidth: 15,
-            itemHeight: 6,
-            formatter: function (value) {
-                return echarts.format.formatTime('hh:ss', value);
-            }
-        },
-        xAxis: [
-            {
-                type: 'value',
-                gridIndex: 0,
-                name: '偏移量',
-                position: 'top',
-                nameLocation: 'middle',
-                axisLabel: {
-                    margin: 1,
-                    interval: 2,
-                }
-            },
-            {
-                type: 'value',
-                gridIndex: 1,
-                name: '偏移量',
-                position: 'top',
-                nameLocation: 'middle',
-                axisLabel: {
-                    margin: 1,
-                    interval: 2,
-                }
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                scale: true,
-                gridIndex: 0,
-                inverse: true,
-                name: '深度',
-                nameLocation: 'middle',
-                axisLabel: {
-                    margin: 1,
-                }
-            },
-            {
-                type: 'value',
-                scale: true,
-                gridIndex: 1,
-                inverse: true,
-                name: '深度',
-                nameLocation: 'middle',
-                axisLabel: {
-                    margin: 1,
-                }
-
-            }
-        ],
-        tooltip: {
-            trigger: 'axis',
-        },
-        series: depth_value_x_series
-    };
-    depth_value_x_y_Option.series.push(...depth_value_y_series)
-
-
-    //3d 深度偏移曲线
-    let option3Dline = {
-        title: {
-            text: "三维偏移曲线",
-            left: 'center'
-        },
-        legend: {
-            top: 25,
-            left: '2%',
-            orient: 'horizontal',
-            itemGap: 5,
-            itemWidth: 15,
-            itemHeight: 6,
-
-            formatter: function (value) {
-                return echarts.format.formatTime('hh:ss', value);
-            }
-        },
-        tooltip: {},
-        type: 'continuous',
-        // visualMap: {
-        //     show: false,
-        //     dimension: 3,
-        //     min: 0,
-        //     max: timeDif(processedData.startTime, processedData.endTime),
-        //     inRange: {
-        //         color: [
-        //             '#313695',
-        //             '#4575b4',
-        //             '#74add1',
-        //             '#abd9e9',
-        //             '#e0f3f8',
-        //             '#ffffbf',
-        //             '#fee090',
-        //             '#fdae61',
-        //             '#f46d43',
-        //             '#d73027',
-        //             '#a50026'
-        //         ],
-        //         opacity: [0.5, 1.0]
-        //     }
-        // },
-        xAxis3D: {
-            type: 'value',
-            min: 'dataMin'
-        },
-        yAxis3D: {
-            type: 'value',
-            min: 'dataMin'
-        },
-        zAxis3D: {
-            type: 'value',
-            min: 'dataMin'
-        },
-        grid3D: {
-            top: 35, // 调整上边距
-            bottom: 0,
-            height: 210,
-            viewControl: {
-                projection: 'orthographic'
-            }
-        },
-        series: depth_value_3d_series
-    };
-    return {
-        options: [option3Dline, depth_value_x_y_Option],
-        names: ["三维偏移曲线", "X-Y偏移曲线"],
-    }
-}
-
 const generateOptions_Incline_new = (processedData) => {
 
     let option1 = {
@@ -798,12 +489,17 @@ const generateOptions_Incline_new = (processedData) => {
             left: 'center',
             top: 5,
             text: '测斜仪-偏移曲线',
+            subtext: '近五小时',
+            subtextStyle: {
+                color: 'rgb(34,45,148)',
+                fontSize: 12,
+            }
         },
         grid: {
             left: '3%',
             right: '5%',
             bottom: '3%',
-            containLabel: true
+            containLabel: true,
         },
         tooltip: {
             trigger: 'axis',
@@ -835,17 +531,15 @@ const generateOptions_Incline_new = (processedData) => {
         yAxis: {
             type: 'value',
             min: function (value) {
-                return value.min.toFixed(4)
+                return Math.floor(value.min)
             },
             max: function (value) {
-                // return 
-                return value.max.toFixed(4)
+                return Math.floor(value.max)
             }
         },
         series: [
             {
                 data: processedData.middleMove,
-
                 type: 'line'
             },
             {
@@ -864,6 +558,11 @@ const generateOptions_Incline_new = (processedData) => {
             left: 'center',
             top: 5,
             text: '测斜仪-相对偏移曲线',
+            subtext: '近五小时',
+            subtextStyle: {
+                color: 'rgb(34,45,148)',
+                fontSize: 12,
+            }
         },
         grid: {
             left: '3%',
@@ -901,26 +600,25 @@ const generateOptions_Incline_new = (processedData) => {
         yAxis: {
             type: 'value',
             min: function (value) {
-                return value.min.toFixed(4)
+                return Math.floor(value.min)
             },
             max: function (value) {
-                // return 
-                return value.max.toFixed(4)
+                return Math.floor(value.max)
             }
         },
         series: [
             {
                 data: processedData.mMoveDay,
-                name:'中部相对偏移',
+                name: '中部相对偏移',
                 type: 'line'
             },
             {
-                name:'底部相对偏移',
+                name: '底部相对偏移',
                 data: processedData.bMoveDay,
                 type: 'line'
             },
             {
-                name:'顶部相对偏移',
+                name: '顶部相对偏移',
                 data: processedData.tMoveDay,
                 type: 'line'
             }
@@ -933,251 +631,18 @@ const generateOptions_Incline_new = (processedData) => {
     }
 }
 
-const generateOptions_Manometer = (processedData) => {
 
-    // 数据特征，全是正值，数值在10左右，比较稳定
-    // 考虑河流图，极坐标面积堆叠图，动态柱状排序
-
-    let optionRiver = {
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'line',
-                lineStyle: {
-                    color: 'rgba(0,0,0,0.2)',
-                    width: 1,
-                    type: 'solid'
-                }
-            }
-        },
-        title: {
-            text: "水压力河流图",
-            left: 'center'
-        },
-        legend: {
-            top: 40,
-            data: processedData.legendData
-        },
-        singleAxis: {
-            top: 50,
-            bottom: 50,
-            max: 'dataMax',
-            axisTick: {},
-            axisLabel: {
-                formatter: function (value, index) {
-                    // if (index === 0 || index === dataIndexArray.length - 1) {
-                    if (index % 2 === 0) {
-                        return echarts.format.formatTime('hh:ss', value);
-                    }
-                }
-            },
-            type: 'time',
-            axisPointer: {
-                animation: true,
-                label: {
-                    show: true
-                }
-            },
-            splitLine: {
-                show: true,
-                lineStyle: {
-                    type: 'dashed',
-                    opacity: 0.2
-                }
-            }
-        },
-        series: [
-            {
-                type: 'themeRiver',
-                itemStyle: {
-                    opacity: 0.9
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 25,
-                        shadowColor: 'rgba(0, 0, 0, 0.8)'
-                    }
-                },
-                data: processedData.pressureData_river
-            }
-        ]
-    };
-
-
-    //极坐标分series处理
-    let optionPolarStack_Seriers = []
-
-    processedData.Depth_Data_Map.forEach((value, key) => {
-        let data = value
-        let item = {
-            type: 'bar',
-            data,
-            coordinateSystem: 'polar',
-            name: key,
-            stack: 'a',
-            emphasis: {
-                focus: 'series'
-            }
-        }
-        optionPolarStack_Seriers.push(item)
-    })
-
-    let optionPolarStack = {
-        title: {
-            text: "水压力极坐标堆叠图",
-            left: 'center'
-        },
-        angleAxis: {
-            //pressure
-        },
-        radiusAxis: {
-            type: 'category',
-            data: processedData.measureTime,
-            z: 10
-        },
-        polar: {
-            center: ['50%', '60%'],
-            radius: '65%'
-        },
-        series: optionPolarStack_Seriers,
-        legend: {
-            show: true,
-            top: 25,
-            data: processedData.legendData
-        }
-    };
-
-    let optionDepthSeries = []
-    for (let i = 0; i < processedData.depth_value_time.length; i++) {
-        let seriesItem = {
-            name: `${processedData.depth_value_time[i]}`,
-            type: 'line',
-            smooth: true,
-            symbolSize: 10,
-            symbol: 'circle',
-            data: processedData.depth_value_data[i]
-        }
-        optionDepthSeries.push(seriesItem)
-    }
-
-
-    let optionDepthValue = {
-        title: {
-            text: "压力深度曲线",
-            left: 'center'
-        },
-        grid: {
-            x: 30,
-            y: 100,
-            x2: 30,
-            y2: 10,
-            borderWidth: 1
-        },
-        legend: {
-            top: 25,
-            itemWidth: 18,
-            itemHeight: 5,
-            formatter: function (value) {
-                return echarts.format.formatTime('hh:ss', value);
-            }
-        },
-        xAxis: {
-            type: 'value',
-            position: 'top',
-            nameLocation: 'middle',
-            name: '水压力(mPa)',
-            scale: true,
-            axisLabel: {
-                margin: 3,
-            }
-        },
-        yAxis: {
-            type: 'value',
-            scale: true,
-            inverse: true,
-            nameLocation: 'middle',
-            name: '深度(m)',
-            axisLabel: {
-                margin: 3,
-            }
-        },
-        tooltip: {
-            trigger: 'axis',
-        },
-        series: optionDepthSeries
-    }
-
-    let optionDynamicBar = {
-        grid: {
-            top: 70,
-            left: 50,
-            right: 50,
-            bottom: 50
-        },
-        title: {
-            text: "压力深度柱状图",
-            left: 'center'
-        },
-        xAxis: {
-            name: '水压力(mPa)',
-            nameLocation: 'middle',
-            axisLabel: {
-                margin: 3
-            }
-        },
-        yAxis: {
-            type: 'category',
-            name: '深度(m)',
-            nameLocation: 'start',
-            data: processedData.legendData,
-            inverse: true,
-            animationDuration: 300,
-            animationDurationUpdate: 300,
-        },
-        series: [
-            {
-                realtimeSort: true,
-                name: processedData.depth_value_time[0],
-                type: 'bar',
-                data: processedData.pressureArrBytime[0],
-                label: {
-                    show: true,
-                    position: 'right',
-                    valueAnimation: true
-                },
-                showBackground: true,
-                itemStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                        { offset: 0, color: '#83bff6' },
-                        { offset: 0.8, color: '#188df0' },
-                        { offset: 1, color: '#188df0' }
-                    ])
-                },
-            }
-        ],
-        tooltip: {
-
-        },
-        legend: {
-            top: 36,
-            show: true
-        },
-        animationDuration: 0,
-        animationDurationUpdate: 3000,
-        animationEasing: 'linear',
-        animationEasingUpdate: 'linear'
-    };
-
-    return {
-        options: [optionRiver, optionPolarStack, optionDepthValue, optionDynamicBar],
-        names: ['河流图', '极坐标堆叠图', '压力深度曲线'],
-    }
-
-}
 const generateOptions_Manometer_new = (processedData) => {
     let option1 = {
         title: {
-            text: "水位折线"
+            text: "水位折线",
+            left: 'center',
+            top: 5,
+            subtext: '近五小时',
+            subtextStyle: {
+                color: 'rgb(34,45,148)',
+                fontSize: 12,
+            }
         },
         grid: {
             left: '3%',
@@ -1219,7 +684,14 @@ const generateOptions_Manometer_new = (processedData) => {
     };
     let option2 = {
         title: {
-            text: "测温折线"
+            text: "测温折线",
+            left: 'center',
+            top: 5,
+            subtext: '近五小时',
+            subtextStyle: {
+                color: 'rgb(34,45,148)',
+                fontSize: 12,
+            }
         },
         tooltip: {
             trigger: 'axis',
@@ -1236,11 +708,11 @@ const generateOptions_Manometer_new = (processedData) => {
         yAxis: {
             type: 'value',
             min: function (value) {
-                // return value.min - 0.5
-                return value.min -0.3
+                return Math.floor(value.min);
             },
             max: function (value) {
-                return value.max +0.3
+                // return 
+                return Math.ceil(value.max);
             }
         },
         series: [
@@ -1252,7 +724,14 @@ const generateOptions_Manometer_new = (processedData) => {
     };
     let option3 = {
         title: {
-            text: "频率折线"
+            text: "频率折线",
+            left: 'center',
+            top: 5,
+            subtext: '近五小时',
+            subtextStyle: {
+                color: 'rgb(34,45,148)',
+                fontSize: 12,
+            }
         },
         tooltip: {
             trigger: 'axis',
@@ -1269,10 +748,11 @@ const generateOptions_Manometer_new = (processedData) => {
         yAxis: {
             type: 'value',
             min: function (value) {
-                return value.min
+                return Math.floor(value.min);
             },
             max: function (value) {
-                return value.max
+                // return 
+                return Math.ceil(value.max);
             }
         },
         series: [
@@ -1802,7 +1282,6 @@ class MonitorDataAssistant {
             names: []
         };
         this.monitoringData = [];
-        this.monitoringMetaData = {};
         this.processedData = {};
     }
 
@@ -1810,9 +1289,8 @@ class MonitorDataAssistant {
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
 
-        console.log("DATA  ", this.monitoringData);
+        console.log('monitoringData in 5 hours', this.monitoringData);
         //meta infomation -- pointnum
-        this.monitoringMetaData = (await BackEndRequest.getMonitorInfoByType_Code(this.info["code"], this.info["type"])).data
         return this.monitoringData
     }
 
@@ -1820,17 +1298,19 @@ class MonitorDataAssistant {
         switch (this.info["type"]) {
             case "1": //gnss
                 this.processedData = generateData_GNSS(this.monitoringData)
+                console.log('processed Data !', this.processedData);
+
                 return this.processedData
             case "4":
-                // this.processedData = generateData_Incline(this.monitoringData, this.monitoringMetaData)
                 this.processedData = generateData_Incline_new(this.monitoringData)
                 return this.processedData
             case "3":
-                // this.processedData = generateData_Manometer(this.monitoringData, this.monitoringMetaData)
                 this.processedData = generateData_Manometer_new(this.monitoringData)
                 return this.processedData
             case "2":
-                this.processedData = generateData_Stress(this.monitoringData, this.monitoringMetaData)
+                //应力桩
+                // this.processedData = generateData_Stress(this.monitoringData, this.monitoringMetaData)
+                this.processedData = {}
                 return this.processedData
             default:
                 console.warn('ERROR::getProcessedDataObject');
