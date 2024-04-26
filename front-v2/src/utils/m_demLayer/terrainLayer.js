@@ -8,7 +8,7 @@ export default class TerrainLayer extends scr.LocalTerrain {
 
         this.type = 'custom'
         this.map = undefined
-        this.id = 'TerrainLayer'
+        this.id = '三维地形'
         this.renderingMode = '3d'
     }
 

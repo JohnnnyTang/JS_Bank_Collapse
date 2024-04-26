@@ -18,6 +18,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @projectName: backEnd
@@ -73,7 +74,7 @@ public class ProcessUtil {
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
-        commands.add("cmd /c conda activate intersections &&");
+        commands.add("conda activate multiIndex &&");
 
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
@@ -88,7 +89,7 @@ public class ProcessUtil {
         commands.add(multiIndexResPath);
         String pyCmdStr = String.join(" ", commands);
         System.out.printf(pyCmdStr);
-        processBuilder.command(pyCmdStr);
+        processBuilder.command("cmd.exe", "/c", pyCmdStr);
         return processBuilder.start();
     }
 
@@ -98,6 +99,7 @@ public class ProcessUtil {
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
+        commands.add("conda activate multiIndex &&");
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
         commands.add((String) modelUsage.get("exePrefix"));
@@ -106,9 +108,12 @@ public class ProcessUtil {
         JSONObject paramObject = taskNode.getParamNode().getParams();
         commands.add(fullJsonPath);
         for(String paramKey: paramKeys) {
+            if(Objects.equals(paramKey, "jsonId")) continue;
             commands.add((String) paramObject.get(paramKey));
         }
-        processBuilder.command(commands);
+        String cmdStr = String.join(" ", commands);
+        log.info(cmdStr);
+        processBuilder.command("cmd", "/c", cmdStr);
         return processBuilder.start();
     }
 

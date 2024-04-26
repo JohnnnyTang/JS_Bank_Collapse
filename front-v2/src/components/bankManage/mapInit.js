@@ -3,57 +3,65 @@ import { DataPioneer } from '../dataVisual/Scene'
 import { pulsing, loadImage } from '../../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
 import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
+import warningPop from '../bankTwin/warningPop.vue'
 import { ref, createApp } from 'vue'
+import dayjs from 'dayjs'
+import axios from 'axios'
 
 const propertyRef = ref({})
 
+
+
 const mapInit = async (map, vis) => {
+
+    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsPlaceLineSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankLabelSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankLineSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsSectionLineSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsSectionLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsSectionLineLabelSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankAreaWSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankAreaSSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
         ],
     })
 
@@ -191,6 +199,49 @@ const mapInit = async (map, vis) => {
     })
 
     if (vis) {
+
+        const pulsingCVSMap = {
+            'GNSS': 'point',
+            '测斜仪': 'rectangle',
+            '孔隙水压力计': 'diamond',
+            '应力桩': 'triangle',
+        }
+        const pulsingMap = {
+            'GNSS': 'gnss-dot-pulsing',
+            '测斜仪': 'incline-dot-pulsing',
+            '孔隙水压力计': 'manometer-dot-pulsing',
+            '应力桩': 'stress-dot-pulsing',
+        }
+        map.addImage(
+            pulsingMap['GNSS'],
+            pulsing[pulsingCVSMap['GNSS']],
+            {
+                pixelRatio: 1,
+            },
+        )
+        map.addImage(
+            pulsingMap['测斜仪'],
+            pulsing[pulsingCVSMap['测斜仪']],
+            {
+                pixelRatio: 1,
+            },
+        )
+        map.addImage(
+            pulsingMap['孔隙水压力计'],
+            pulsing[pulsingCVSMap['孔隙水压力计']],
+            {
+                pixelRatio: 1,
+            },
+        )
+        map.addImage(
+            pulsingMap['应力桩'],
+            pulsing[pulsingCVSMap['应力桩']],
+            {
+                pixelRatio: 1,
+            },
+        )
+
+
         //////////////monitor device////////////
         let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
         let monitorDevice = DataPioneer.generateGeoJson(
@@ -287,9 +338,18 @@ const mapInit = async (map, vis) => {
         })
 
         // setTimeout(() => {
-        //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+        //     setWarningDeviceStyle(map, 'GNSS', "MZS120.55327892_32.02707923_1")
+        //     // setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
         //     // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
         // }, 2000)
+
+
+
+        warnInterval(map)
+        setTimeout(() => {
+            warnInterval(map)
+        }, 50000);
+
 
         ///////DEBUG////////
         window.addEventListener('keydown', (e) => {
@@ -302,21 +362,28 @@ const mapInit = async (map, vis) => {
             if (e.key === '2') {
                 setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
             }
-            if (e.key === '4'){
+            if (e.key === '4') {
                 removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
             }
-            if (e.key === '5'){
+            if (e.key === '5') {
                 removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
             }
-            if (e.key === '6'){
+            if (e.key === '6') {
                 removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
             }
- 
+
+            if (e.key == '7') {
+                const popup = createWarningPopup({ a: 'a' })
+                popup.setLngLat([115, 35]).addTo(map)
+
+            }
+
         })
     }
 }
 
-const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
+const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
+
     const pulsingCVSMap = {
         GNSS: 'point',
         测斜仪: 'rectangle',
@@ -329,22 +396,14 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
         孔隙水压力计: 'manometer-dot-pulsing',
         应力桩: 'stress-dot-pulsing',
     }
+
     const sourceMap = {
         GNSS: 'gnss-source',
         测斜仪: 'incline-source',
         孔隙水压力计: 'manometer-source',
         应力桩: 'stress-source',
     }
-
-    !map.hasImage(pulsingMap[deviceLayer]) &&
-        map.addImage(
-            pulsingMap[deviceLayer],
-            pulsing[pulsingCVSMap[deviceLayer]],
-            {
-                pixelRatio: 1,
-            },
-        )
-    !map.getLayer(`${deviceLayer}-${deviceCode}`) &&
+    if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
         map.addLayer({
             id: `${deviceLayer}-${deviceCode}`,
             type: 'symbol',
@@ -356,8 +415,7 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
             },
             filter: ['==', 'code', deviceCode],
         })
-
-
+    }
     let json = map.getSource(sourceMap[deviceLayer])['_data']
 
     let property = findProptyFromJson(
@@ -365,21 +423,20 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
         deviceCode
     )
     propertyRef.value = property
-    const popUp = createPopUp(propertyRef)
-    popUp.setLngLat([property.longitude, property.latitude]).addTo(map)
 
-    map.flyTo({
-        center: [property.longitude, property.latitude],
-        pitch: 61.99999999999988,
-        bearing: 0,
-        zoom: 15.845427972376211,
-        speed: 0.5,
-        essential: true,
-    })
+    // chart
+    // const popUp = createPopUp(propertyRef)
+    // popUp.setLngLat([property.longitude, property.latitude]).addTo(map)
+
+    // warning
+    const popup = createWarningPopup({ warningInfo: warnData })
+    popup.setLngLat([property.longitude, property.latitude]).addTo(map)
+
 
     map.on('render', () => {
         map.triggerRepaint()
     })
+    return [property.longitude, property.latitude]
 }
 
 const removeWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
@@ -403,6 +460,23 @@ const createPopUp = (deviceProperty) => {
     return popUp
 }
 
+const createWarningPopup = (info) => {
+    const ap = createApp(warningPop, { warningInfo: info })
+
+    const container = document.createElement('div')
+    const componentInstance = ap.mount(container)
+
+    const domwithComp = container
+    const popUp = new mapboxgl.Popup({
+        maxWidth: '1000px',
+        offset: 25,
+    }).setDOMContent(domwithComp)
+    // .setLngLat(popupCoord)
+    // .addTo(map); undefined;
+    return popUp
+}
+
+
 const findProptyFromJson = (geoJson, code) => {
     const features = geoJson.features
     let prop
@@ -414,5 +488,48 @@ const findProptyFromJson = (geoJson, code) => {
 
     return prop
 }
+
+
+const warnInterval = async (map) => {
+    const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+    const DeviceIDs = {
+        'GNSS': [],
+        '测斜仪': [],
+        '水压力计': [],
+        '应力桩': [],
+    }
+    let deviceInfo = (await axios.get('/api/data/monitorInfo')).data
+    deviceInfo.forEach((item) => {
+        const type = Number(item["type"]) - 1
+        if (type != 4) {
+            DeviceIDs[DEVICETYPEMAP[type]].push(item["code"])
+        }
+    })
+    const requestTime = 20;
+
+    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${requestTime}`)).data
+
+    let lastPos
+    allWarnData.forEach((item) => {
+        let id = item.deviceId
+        let type = 'GNSS'
+        lastPos = setWarningDeviceStyle(map, type, id, item)
+    })
+
+
+    if (lastPos) {
+        map.flyTo({
+            center: lastPos,
+            pitch: 61.99999999999988,
+            bearing: 0,
+            zoom: 15.845427972376211,
+            speed: 0.5,
+            essential: true,
+        })
+    }
+}
+
+
+
 
 export { mapInit }
