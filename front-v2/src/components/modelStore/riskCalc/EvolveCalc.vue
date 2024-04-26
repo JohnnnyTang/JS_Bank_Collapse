@@ -172,7 +172,7 @@ const submitForm = async () => {
             message:
                 '对比时间应在当前时间之前, 当前时间为' +
                 ' ' +
-                paramsForm.year +
+                multiIndexStore.resJson.year +
                 ' 年',
             type: 'warning',
         })
