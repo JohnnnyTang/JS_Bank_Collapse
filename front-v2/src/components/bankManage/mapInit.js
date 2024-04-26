@@ -3,288 +3,289 @@ import { DataPioneer } from '../dataVisual/Scene'
 import { pulsing, loadImage } from '../../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
 import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
+import warningPop from '../bankTwin/warningPop.vue'
 import { ref, createApp } from 'vue'
 
 const propertyRef = ref({})
 
 const mapInit = async (map, vis) => {
-    map.addSource('mzsPlaceLabelSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
-        ],
-    })
-    map.addSource('mzsPlaceLineSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
-        ],
-    })
-    map.addSource('mzsBankLabelSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLabel/{x}/{y}/{z}',
-        ],
-    })
-    map.addSource('mzsBankLineSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLine/{x}/{y}/{z}',
-        ],
-    })
-    map.addSource('mzsSectionLineSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
-        ],
-    })
-    map.addSource('mzsSectionLineLabelSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
-        ],
-    })
-    map.addSource('mzsBankAreaWSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
-        ],
-    })
-    map.addSource('mzsBankAreaSSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
-        ],
-    })
+    // map.addSource('mzsPlaceLabelSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsPlaceLineSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsBankLabelSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsBankLineSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLine/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsSectionLineSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsSectionLineLabelSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsBankAreaWSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsBankAreaSSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
+    //     ],
+    // })
 
-    map.addLayer({
-        id: 'mzsLine',
-        type: 'line',
-        source: 'mzsPlaceLineSource',
-        'source-layer': 'default',
-        layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-        },
-        paint: {
-            'line-opacity': 1,
-            'line-color': 'rgba(26, 87, 138, 0.6)',
-            'line-width': 2,
-        },
-    })
-    map.addLayer({
-        id: 'mzsLabel',
-        type: 'symbol',
-        source: 'mzsPlaceLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'left',
-        },
-        paint: {
-            'text-color': 'rgba(31, 14, 126, 0.75)',
-        },
-    })
-    map.addLayer({
-        id: 'mzsSectionArea1',
-        type: 'fill',
-        source: 'mzsBankAreaSSource',
-        'source-layer': 'default',
-        paint: {
-            'fill-color': [
-                'match',
-                ['get', 'stability'],
-                '稳定',
-                '#18b915',
-                '较稳定',
-                '#06bef1',
-                '较不稳定',
-                '#df8105',
-                '不稳定',
-                '#ee3603',
-                '#18b915',
-            ],
-        },
-    })
-    map.addLayer({
-        id: 'mzsSectionArea2',
-        type: 'fill',
-        source: 'mzsBankAreaWSource',
-        'source-layer': 'default',
-        paint: {
-            'fill-color': [
-                'match',
-                ['get', 'warn'],
-                '正常',
-                '#18b915',
-                '关注',
-                'rgba(131, 14, 223, 0.5)',
-                '预警',
-                'rgba(221, 224, 23, 0.5)',
-                '警告',
-                'rgba(221, 24, 23, 0.5)',
-                '#18b915',
-            ],
-        },
-    })
-    map.addLayer({
-        id: 'mzsBankLine',
-        type: 'line',
-        source: 'mzsBankLineSource',
-        'source-layer': 'default',
-        layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-        },
-        paint: {
-            'line-opacity': 1,
-            'line-color': 'rgba(31, 14, 223, 0.75)',
-            'line-width': 4,
-        },
-    })
-    map.addLayer({
-        id: 'mzsSectionLine',
-        type: 'line',
-        source: 'mzsSectionLineSource',
-        'source-layer': 'default',
-        layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-        },
-        paint: {
-            'line-opacity': 1,
-            'line-color': 'rgba(11, 214, 223, 0.75)',
-            'line-width': 4,
-        },
-    })
-    map.addLayer({
-        id: 'mzsBankLabel',
-        type: 'symbol',
-        source: 'mzsBankLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'left',
-        },
-        paint: {
-            'text-color': 'rgba(231, 214, 86, 0.9)',
-        },
-    })
-    map.addLayer({
-        id: 'mzsSectionLabel',
-        type: 'symbol',
-        source: 'mzsSectionLineLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'bottom',
-        },
-        paint: {
-            'text-color': 'rgba(81, 154, 86, 0.9)',
-        },
-    })
+    // map.addLayer({
+    //     id: 'mzsLine',
+    //     type: 'line',
+    //     source: 'mzsPlaceLineSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'line-cap': 'round',
+    //         'line-join': 'round',
+    //     },
+    //     paint: {
+    //         'line-opacity': 1,
+    //         'line-color': 'rgba(26, 87, 138, 0.6)',
+    //         'line-width': 2,
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsLabel',
+    //     type: 'symbol',
+    //     source: 'mzsPlaceLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'left',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(31, 14, 126, 0.75)',
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsSectionArea1',
+    //     type: 'fill',
+    //     source: 'mzsBankAreaSSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': [
+    //             'match',
+    //             ['get', 'stability'],
+    //             '稳定',
+    //             '#18b915',
+    //             '较稳定',
+    //             '#06bef1',
+    //             '较不稳定',
+    //             '#df8105',
+    //             '不稳定',
+    //             '#ee3603',
+    //             '#18b915',
+    //         ],
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsSectionArea2',
+    //     type: 'fill',
+    //     source: 'mzsBankAreaWSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': [
+    //             'match',
+    //             ['get', 'warn'],
+    //             '正常',
+    //             '#18b915',
+    //             '关注',
+    //             'rgba(131, 14, 223, 0.5)',
+    //             '预警',
+    //             'rgba(221, 224, 23, 0.5)',
+    //             '警告',
+    //             'rgba(221, 24, 23, 0.5)',
+    //             '#18b915',
+    //         ],
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsBankLine',
+    //     type: 'line',
+    //     source: 'mzsBankLineSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'line-cap': 'round',
+    //         'line-join': 'round',
+    //     },
+    //     paint: {
+    //         'line-opacity': 1,
+    //         'line-color': 'rgba(31, 14, 223, 0.75)',
+    //         'line-width': 4,
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsSectionLine',
+    //     type: 'line',
+    //     source: 'mzsSectionLineSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'line-cap': 'round',
+    //         'line-join': 'round',
+    //     },
+    //     paint: {
+    //         'line-opacity': 1,
+    //         'line-color': 'rgba(11, 214, 223, 0.75)',
+    //         'line-width': 4,
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsBankLabel',
+    //     type: 'symbol',
+    //     source: 'mzsBankLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'left',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(231, 214, 86, 0.9)',
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsSectionLabel',
+    //     type: 'symbol',
+    //     source: 'mzsSectionLineLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'bottom',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(81, 154, 86, 0.9)',
+    //     },
+    // })
 
-    if (vis) {
-        //////////////monitor device////////////
-        let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
-        let monitorDevice = DataPioneer.generateGeoJson(
-            monitorInfo,
-            (element) => {
-                return [element['longitude'], element['latitude']]
-            },
-            'Point',
-        )
-        // debugger
-        const { gnss, incline, stress, manometer } =
-            DataPioneer.getDifMonitorData(monitorDevice)
+    // if (vis) {
+    //     //////////////monitor device////////////
+    //     let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+    //     let monitorDevice = DataPioneer.generateGeoJson(
+    //         monitorInfo,
+    //         (element) => {
+    //             return [element['longitude'], element['latitude']]
+    //         },
+    //         'Point',
+    //     )
+    //     // debugger
+    //     const { gnss, incline, stress, manometer } =
+    //         DataPioneer.getDifMonitorData(monitorDevice)
 
-        map.addSource('gnss-source', {
-            type: 'geojson',
-            data: gnss,
-        })
-        map.addSource('incline-source', {
-            type: 'geojson',
-            data: incline,
-        })
-        map.addSource('stress-source', {
-            type: 'geojson',
-            data: stress,
-        })
-        map.addSource('manometer-source', {
-            type: 'geojson',
-            data: manometer,
-        })
+    //     map.addSource('gnss-source', {
+    //         type: 'geojson',
+    //         data: gnss,
+    //     })
+    //     map.addSource('incline-source', {
+    //         type: 'geojson',
+    //         data: incline,
+    //     })
+    //     map.addSource('stress-source', {
+    //         type: 'geojson',
+    //         data: stress,
+    //     })
+    //     map.addSource('manometer-source', {
+    //         type: 'geojson',
+    //         data: manometer,
+    //     })
 
-        // image source
+    //     // image source
 
-        await loadImage(map, '/geoStyle/gnss-dot.png', 'gnss-static')
-        await loadImage(map, '/geoStyle/incline-rect.png', 'incline-static')
-        await loadImage(map, '/geoStyle/manometer-dia.png', 'manometer-static')
-        await loadImage(map, '/geoStyle/stress-tri.png', 'stress-static')
+    //     await loadImage(map, '/geoStyle/gnss-dot.png', 'gnss-static')
+    //     await loadImage(map, '/geoStyle/incline-rect.png', 'incline-static')
+    //     await loadImage(map, '/geoStyle/manometer-dia.png', 'manometer-static')
+    //     await loadImage(map, '/geoStyle/stress-tri.png', 'stress-static')
 
-        map.addLayer({
-            id: 'GNSS',
-            type: 'symbol',
-            source: 'gnss-source',
-            layout: {
-                'icon-image': 'gnss-static',
-                'icon-size': 0.3,
-                'icon-allow-overlap': true,
-            },
-        })
-        map.addLayer({
-            id: '测斜仪',
-            type: 'symbol',
-            source: 'incline-source',
-            layout: {
-                'icon-image': 'incline-static',
-                'icon-size': 0.3,
-                'icon-allow-overlap': true,
-            },
-        })
-        map.addLayer({
-            id: '孔隙水压力计',
-            type: 'symbol',
-            source: 'manometer-source',
-            layout: {
-                'icon-image': 'manometer-static',
-                'icon-size': 0.3,
-                'icon-allow-overlap': true,
-            },
-        })
-        map.addLayer({
-            id: '应力桩',
-            type: 'symbol',
-            source: 'stress-source',
-            layout: {
-                'icon-image': 'stress-static',
-                'icon-size': 0.3,
-                'icon-allow-overlap': true,
-            },
-        })
+    //     map.addLayer({
+    //         id: 'GNSS',
+    //         type: 'symbol',
+    //         source: 'gnss-source',
+    //         layout: {
+    //             'icon-image': 'gnss-static',
+    //             'icon-size': 0.3,
+    //             'icon-allow-overlap': true,
+    //         },
+    //     })
+    //     map.addLayer({
+    //         id: '测斜仪',
+    //         type: 'symbol',
+    //         source: 'incline-source',
+    //         layout: {
+    //             'icon-image': 'incline-static',
+    //             'icon-size': 0.3,
+    //             'icon-allow-overlap': true,
+    //         },
+    //     })
+    //     map.addLayer({
+    //         id: '孔隙水压力计',
+    //         type: 'symbol',
+    //         source: 'manometer-source',
+    //         layout: {
+    //             'icon-image': 'manometer-static',
+    //             'icon-size': 0.3,
+    //             'icon-allow-overlap': true,
+    //         },
+    //     })
+    //     map.addLayer({
+    //         id: '应力桩',
+    //         type: 'symbol',
+    //         source: 'stress-source',
+    //         layout: {
+    //             'icon-image': 'stress-static',
+    //             'icon-size': 0.3,
+    //             'icon-allow-overlap': true,
+    //         },
+    //     })
 
-        let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
+    //     let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
-        map.on('click', deviceLayers, (e) => {
-            ///////test
-            let p = e.features[0].properties
-            const property = e.features[0].properties
-            propertyRef.value = property
-            const popUp = createPopUp(propertyRef)
-            popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
-        })
-        map.on('mousemove', deviceLayers, (e) => {
-            map.getCanvas().style.cursor = 'pointer'
-        })
-        map.on('mouseleave', deviceLayers, (e) => {
-            map.getCanvas().style.cursor = ''
-        })
+    //     map.on('click', deviceLayers, (e) => {
+    //         ///////test
+    //         let p = e.features[0].properties
+    //         const property = e.features[0].properties
+    //         propertyRef.value = property
+    //         const popUp = createPopUp(propertyRef)
+    //         popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+    //     })
+    //     map.on('mousemove', deviceLayers, (e) => {
+    //         map.getCanvas().style.cursor = 'pointer'
+    //     })
+    //     map.on('mouseleave', deviceLayers, (e) => {
+    //         map.getCanvas().style.cursor = ''
+    //     })
 
         // setTimeout(() => {
         //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
@@ -302,18 +303,25 @@ const mapInit = async (map, vis) => {
             if (e.key === '2') {
                 setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
             }
-            if (e.key === '4'){
+            if (e.key === '4') {
                 removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
             }
-            if (e.key === '5'){
+            if (e.key === '5') {
                 removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
             }
-            if (e.key === '6'){
+            if (e.key === '6') {
                 removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
             }
- 
+
+            if(e.key == '7'){
+                console.log('1');
+                const popup = createWarningPopup({a:'a'})
+                popup.setLngLat([115,35]).addTo(map)
+
+            }
+
         })
-    }
+    // }
 }
 
 const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
@@ -402,6 +410,23 @@ const createPopUp = (deviceProperty) => {
     // .addTo(map); undefined;
     return popUp
 }
+
+const createWarningPopup = (info) => {
+    const ap = createApp(warningPop, { warningInfo: info })
+
+    const container = document.createElement('div')
+    const componentInstance = ap.mount(container)
+
+    const domwithComp = container
+    const popUp = new mapboxgl.Popup({
+        maxWidth: '1000px',
+        offset: 25,
+    }).setDOMContent(domwithComp)
+    // .setLngLat(popupCoord)
+    // .addTo(map); undefined;
+    return popUp
+}
+
 
 const findProptyFromJson = (geoJson, code) => {
     const features = geoJson.features
