@@ -36,60 +36,6 @@
                     </el-form-item>
                 </el-form>
             </div>
-            <div class="section-graph-container card">
-                <div class="title-container">岸坡坡比</div>
-                <div
-                    class="card"
-                    style="
-                        flex: 1 1 0;
-                        width: 95%;
-                        color: #0953aa;
-                        background-color: #d1e7ff;
-                        font-size: x-large;
-                        font-weight: bold;
-                    "
-                    v-show="isFinish == false"
-                    v-loading="isLoading"
-                    element-loading-background="rgba(214, 235, 255,0.8)"
-                >
-                    目前暂无结果
-                </div>
-                <div
-                    ref="rateGraphRef"
-                    class="section-graph card"
-                    v-show="isFinish == true"
-                    v-loading="isLoading"
-                    element-loading-background="rgba(214, 235, 255,0.8)"
-                ></div>
-            </div>
-        </div>
-        <div class="model-output">
-            <div class="output-graph-container card">
-                <div class="title-container">断面对比</div>
-                <div
-                    class="card"
-                    style="
-                        flex: 1 1 0;
-                        width: 95%;
-                        color: #0953aa;
-                        background-color: #d1e7ff;
-                        font-size: x-large;
-                        font-weight: bold;
-                    "
-                    v-show="isFinish == false"
-                    v-loading="isLoading"
-                    element-loading-background="rgba(214, 235, 255,0.8)"
-                >
-                    目前暂无结果
-                </div>
-                <div
-                    v-show="isFinish == true"
-                    ref="compareGraphRef"
-                    class="output-graph card"
-                    v-loading="isLoading"
-                    element-loading-background="rgba(214, 235, 255,0.8)"
-                ></div>
-            </div>
             <div class="output-table-container card device-status-container">
                 <div class="small-title-container">
                     <span style="padding-right: 3%"></span>
@@ -121,6 +67,34 @@
                 </div>
             </div>
         </div>
+        <div class="model-output">
+            <div class="output-graph-container card">
+                <div class="title-container">断面对比及坡比</div>
+                <div
+                    class="card"
+                    style="
+                        flex: 1 1 0;
+                        width: 95%;
+                        color: #0953aa;
+                        background-color: #d1e7ff;
+                        font-size: x-large;
+                        font-weight: bold;
+                    "
+                    v-show="isFinish == false"
+                    v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                >
+                    目前暂无结果
+                </div>
+                <div
+                    v-show="isFinish == true"
+                    ref="rateGraphRef"
+                    class="output-graph card"
+                    v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                ></div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -130,7 +104,7 @@ import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { getTaskJsonAPI, getTaskStatusAPI, postTaskStartAPI } from './api.js'
-import { drawCompareGraph, drawRateGraph } from './util.js'
+import { drawRateGraph } from './util.js'
 
 const yearList = [2020, 2021, 2022, 2023]
 let compareGraphChart = null
@@ -230,17 +204,10 @@ const submitForm = async () => {
                 drawRateGraph(
                     rateChart,
                     sectionPoints.value.map((value) => value[2]),
+                    beforeSectionPoints.value.map((value) => value[2]),
                     json.SA[2],
                 )
                 rateChart.resize()
-
-                compareGraphChart.clear()
-                drawCompareGraph(
-                    compareGraphChart,
-                    sectionPoints.value.map((value) => value[2]),
-                    beforeSectionPoints.value.map((value) => value[2]),
-                )
-                compareGraphChart.resize()
             }, 10)
 
             ElMessage({
@@ -260,7 +227,6 @@ const resetForm = (formEl) => {
 onMounted(() => {
     sectionPoints.value = multiIndexStore.resJson.section
     rateChart = echarts.init(rateGraphRef.value)
-    compareGraphChart = echarts.init(compareGraphRef.value)
 })
 </script>
 
@@ -280,7 +246,8 @@ div.velocity-calc-content {
             flex-direction: column;
             flex: 1 1 0;
         }
-        .section-graph-container {
+
+        .output-table-container {
             flex-direction: column;
             flex: 1 1 0;
         }
@@ -295,7 +262,7 @@ div.velocity-calc-content {
             flex: 1 1 0;
         }
 
-        .output-table-container {
+        .section-graph-container {
             flex-direction: column;
             flex: 1 1 0;
         }
