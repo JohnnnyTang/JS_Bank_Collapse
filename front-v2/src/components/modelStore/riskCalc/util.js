@@ -104,7 +104,7 @@ export const drawOutputGraph = (echarts, indexValues) => {
             ],
             series: [
                 {
-                    name: 'Forest',
+                    name: '动力计算指标',
                     type: 'bar',
                     emphasis: {
                         focus: 'series',
@@ -224,7 +224,7 @@ export const drawRateGraph = (echarts, points, rates) => {
         },
         series: [
             {
-                name: '选择时间横截面',
+                name: '横截面深度',
                 type: 'line',
                 smooth: true,
                 data: points.map((value) => value.toFixed(2)),
