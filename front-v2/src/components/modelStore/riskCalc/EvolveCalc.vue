@@ -167,7 +167,7 @@ const isDisable = computed(() => {
 const isFinish = computed(() => indexValues.value[0].length !== 0)
 
 const submitForm = async () => {
-    if (Number(multiIndexStore.resJson.year) <= paramsForm.year) {
+    if (Number(multiIndexStore.resJson.year) < paramsForm.year) {
         ElMessage({
             message:
                 '对比时间应在当前时间之前, 当前时间为' +

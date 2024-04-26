@@ -5,7 +5,7 @@ export const useMultiIndexStore = defineStore(
     'multiIndex',
     () => {
         const resJson = ref({
-            year: '2020',
+            year: '2023',
             vertex: [
                 ['13415473', '3768179'],
                 ['13415962', '3767887'],
