@@ -83,7 +83,7 @@ public class ProcessUtil {
         List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
         JSONObject paramObject = taskNode.getParamNode().getParams();
         for(String paramKey: paramKeys) {
-            commands.add((String) paramObject.get(paramKey));
+            commands.add(paramObject.get(paramKey).toString());
         }
         commands.add(multiIndexDataPath);
         commands.add(multiIndexResPath);
@@ -109,7 +109,7 @@ public class ProcessUtil {
         commands.add(fullJsonPath);
         for(String paramKey: paramKeys) {
             if(Objects.equals(paramKey, "jsonId")) continue;
-            commands.add((String) paramObject.get(paramKey));
+            commands.add(paramObject.get(paramKey).toString());
         }
         String cmdStr = String.join(" ", commands);
         log.info(cmdStr);

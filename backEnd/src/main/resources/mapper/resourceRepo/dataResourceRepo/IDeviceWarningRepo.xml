@@ -31,7 +31,7 @@
     </select>
 
     <select id="findDataByTime" resultMap="deviceWarningMap">
-        SELECT * FROM device_warning WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY warn_time ASC;
+        SELECT * FROM device_warning WHERE warn_time BETWEEN #{begTime} AND #{endTime} ORDER BY warn_time ASC;
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="deviceWarningMap">

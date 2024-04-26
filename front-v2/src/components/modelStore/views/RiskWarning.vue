@@ -39,12 +39,12 @@ const multiIndexStore = useMultiIndexStore()
 
 const ModelName = '风险预警模型'
 
-const curRunModelName = ref('多指标因子配置')
+const curRunModelName = ref('计算断面选择')
 
-console.log(multiIndexStore.taskIdMap)
+// console.log(multiIndexStore.taskIdMap)
 
 onMounted(() => {
-    multiIndexStore.taskIdMap.section = '1'
+    // multiIndexStore.taskIdMap.section = '1'
 })
 </script>
 

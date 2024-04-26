@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
 public class GnssWarningJob implements Job {
 
     private static final List<String> mailList = List.of("249884523@qq.com", "1275441282@qq.com");
-    private static final List<String> phoneList = List.of("18678742441", "13382058110");
-//    private static final List<String> phoneList = List.of("18678742441");
+    private static final List<String> phoneList = List.of("18860847206", "13382058110");
+//    private static final List<String> phoneList = List.of("18860847206");
 
     public List<List<GnssData>> before() {
         MonitorInfoService monitorInfoService = BeanUtil.getBean(MonitorInfoService.class);
@@ -65,7 +65,7 @@ public class GnssWarningJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         List<List<GnssData>> warningGnssDataList = before();
         MonitorInfoService monitorInfoService = BeanUtil.getBean(MonitorInfoService.class);
-        if(warningGnssDataList.isEmpty()) {
+        if(warningGnssDataList.get(0).isEmpty() && warningGnssDataList.get(1).isEmpty()) {
             log.info("no warning");
             return;
         }
@@ -100,12 +100,17 @@ public class GnssWarningJob implements Job {
                     .build();
             gnssWarningService.save(deviceWarning);
         }
-        String warnStr = warnStrBuilder.toString();
-        log.info(warnStr);
-        for(String mailTo: mailList) {
-            mailUtil.sendSimpleMail(
-                    mailTo, "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", warnStr);
+        if(i > 0) {
+            warnStrBuilder.append("\n");
+            warnStrBuilder.append("河岸变形较大，崩岸风险很高，请注意相关防汛安全！");
+            String warnStr = warnStrBuilder.toString();
+            log.info(warnStr);
+            for(String mailTo: mailList) {
+                mailUtil.sendSimpleMail(
+                        mailTo, "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", warnStr);
+            }
         }
+
 
         for(GnssData gnssData: warningGnssDataList.get(1)) {
             MonitorInfo gnssInfo = monitorInfoService.getDataById(
