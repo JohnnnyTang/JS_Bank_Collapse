@@ -283,6 +283,7 @@ export const drawRateGraph = (echarts, after, before, rates) => {
                 data: ratePoints.map((value) => value.toFixed(4)),
                 yAxisIndex: 1,
                 xAxisIndex: 1,
+                barCategoryGap: '0%',
                 itemStyle: {
                     normal: {
                         color: function (params) {
