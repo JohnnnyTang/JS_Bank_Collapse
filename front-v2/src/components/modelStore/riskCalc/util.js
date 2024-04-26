@@ -7,7 +7,6 @@
 export const drawSectionGraph = (echarts, points) => {
     const min = Math.min(...points)
     const max = Math.max(...points)
-    const index = points.indexOf(min)
     const option = {
         grid: {
             width: '80%',
@@ -27,7 +26,7 @@ export const drawSectionGraph = (echarts, points) => {
         },
         xAxis: {
             type: 'category',
-            data: points.map((_, index) => index),
+            data: points.map((_, index) => index * 5),
             position: 'bottom',
         },
         yAxis: {
@@ -105,7 +104,7 @@ export const drawOutputGraph = (echarts, indexValues) => {
             ],
             series: [
                 {
-                    name: 'Forest',
+                    name: '动力计算指标',
                     type: 'bar',
                     emphasis: {
                         focus: 'series',
@@ -115,14 +114,9 @@ export const drawOutputGraph = (echarts, indexValues) => {
                         normal: {
                             color: function (params) {
                                 var colorList = [
-                                    '#C33531',
-                                    '#EFE42A',
-                                    '#64BD3D',
-                                    '#EE9201',
-                                    '#29AAE3',
-                                    '#B74AE5',
-                                    '#0AAF9F',
-                                    '#E89589',
+                                    '#ef4444',
+                                    '#f59e0b',
+                                    '#22c55e',
                                 ]
                                 return colorList[params.dataIndex]
                             },
@@ -141,14 +135,15 @@ export const drawOutputGraph = (echarts, indexValues) => {
 /**
  *
  * @param {any} echarts
- * @param {number[]} points
+ * @param {number[]} before
+ *  @param {number[]} after
  * @param {number[]} rates
  */
-export const drawRateGraph = (echarts, points, rates) => {
-    const min = Math.min(...points)
-    const max = Math.max(...points)
+export const drawRateGraph = (echarts, after, before, rates) => {
+    const min = Math.min(...after, ...before)
+    const max = Math.max(...after, ...before)
 
-    const length = points.length
+    const length = Math.min(after.length, before.length)
     const splitPoint = []
     for (let index = 0; index < length; index += 10) {
         splitPoint.push(index)
@@ -165,7 +160,6 @@ export const drawRateGraph = (echarts, points, rates) => {
             const start = splitPoint[index]
             const end = splitPoint[index + 1]
             for (let j = start; j < end; j++) {
-                console.log(rateIndex)
                 ratePoints.push(rates[rateIndex])
             }
         }
@@ -197,109 +191,81 @@ export const drawRateGraph = (echarts, points, rates) => {
                 },
             },
         },
-        grid: {
-            width: '80%',
-            height: '70%',
-            top: '10%',
-            show: true,
-        },
-        visualMap: {
-            type: 'piecewise',
-            show: false,
-            dimension: 0,
-            seriesIndex: 0,
-            pieces: pieces,
-        },
-        xAxis: {
-            type: 'category',
-            data: points.map((_, index) => index),
-            position: 'bottom',
-            axisLine: {
+        grid: [
+            {
+                top: '10%',
+                height: '40%',
                 show: true,
-                onZero: false,
-            },
-        },
-        yAxis: {
-            type: 'value',
-            splitLine: {
-                show: false,
-            },
-            scale: true,
-            max: Math.round(max + 1),
-            min: Math.round(min - 1),
-        },
-        series: [
-            {
-                name: '选择时间横截面',
-                type: 'line',
-                smooth: true,
-                data: points.map((value) => value.toFixed(2)),
             },
             {
-                name: '坡比',
-                type: 'line',
-                smooth: true,
-                data: ratePoints.map((value) => value.toFixed(6)),
+                top: '58%',
+                height: '35%',
+                show: true,
             },
         ],
-    }
-    echarts.setOption(option)
-}
-
-/**
- *
- * @param {any} echarts
- * @param {number[]} after
- * @param {number[]} before
- */
-export const drawCompareGraph = (echarts, after, before) => {
-    const min = Math.min(...after, ...before)
-    const max = Math.max(...after, ...before)
-    const option = {
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross',
-                label: {
-                    backgroundColor: '#6a7985',
+        legend: {
+            data: ['当前横截面', '对比横截面', '坡比'],
+            right: '10%',
+            top: '2%',
+        },
+        axisPointer: {
+            link: [
+                {
+                    xAxisIndex: 'all',
+                },
+            ],
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: before.map((_, index) => index * 5),
+                position: 'bottom',
+                //  axisLabel:{
+                //     show:false
+                //  }
+            },
+            {
+                gridIndex: 1,
+                type: 'category',
+                data: ratePoints.map((_, index) => index * 5),
+                position: 'bottom',
+                axisLine: {
+                    show: true,
+                    onZero: false,
                 },
             },
-        },
-        legend: {
-            data: ['选择时间横截面', '对比时间横截面'],
-        },
-        grid: {
-            width: '80%',
-            height: '70%',
-            top: '10%',
-            show: true,
-        },
-        xAxis: {
-            type: 'category',
-            data: before.map((_, index) => index),
-            position: 'bottom',
-        },
-        yAxis: {
-            type: 'value',
-            splitLine: {
-                show: false,
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                splitLine: {
+                    show: false,
+                },
+                scale: true,
+                max: Math.round(max + 1),
+                min: Math.round(min - 1),
             },
-            axisLine: {
-                show: false,
+            {
+                type: 'value',
+                splitLine: {
+                    show: false,
+                },
+                gridIndex: 1,
+                axisLine: {
+                    show: false,
+                },
+                scale: true,
             },
-            scale: true,
-            max: Math.round(max + 2),
-            min: Math.round(min - 2),
-        },
+        ],
         series: [
             {
-                name: '选择时间横截面',
+                name: '当前横截面',
                 type: 'line',
                 smooth: true,
                 data: after.map((value) => value.toFixed(2)),
             },
             {
-                name: '对比时间横截面',
+                name: '对比横截面',
                 type: 'line',
                 smooth: true,
                 data: before.map((value) => value.toFixed(2)),
@@ -308,6 +274,32 @@ export const drawCompareGraph = (echarts, after, before) => {
                 },
                 itemStyle: {
                     color: '#ff7070',
+                },
+            },
+            {
+                name: '坡比',
+                type: 'bar',
+                smooth: true,
+                data: ratePoints.map((value) => value.toFixed(4)),
+                yAxisIndex: 1,
+                xAxisIndex: 1,
+                itemStyle: {
+                    normal: {
+                        color: function (params) {
+                            let tempIndex = 0
+                            splitPoint.some((value, index) => {
+                                if (params.dataIndex < value) {
+                                    tempIndex = index - 1
+                                    return true
+                                }
+                            })
+                            const colorList = ['#059669', '#84cc16']
+                            return colorList[tempIndex % 2]
+                        },
+                        label: {
+                            show: false,
+                        },
+                    },
                 },
             },
         ],
