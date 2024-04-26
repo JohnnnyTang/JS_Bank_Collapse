@@ -10,53 +10,58 @@ import axios from 'axios'
 
 const propertyRef = ref({})
 
+
+
 const mapInit = async (map, vis) => {
+
+    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsPlaceLineSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankLabelSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankLineSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsBankLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsSectionLineSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsSectionLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsSectionLineLabelSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankAreaWSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankAreaSSource', {
         type: 'vector',
         tiles: [
-            'http://192.168.43.108:8989/api/v1/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
         ],
     })
 
@@ -500,11 +505,11 @@ const warnInterval = async (map) => {
             DeviceIDs[DEVICETYPEMAP[type]].push(item["code"])
         }
     })
-    const requestTime = 60;
+    const requestTime = 20;
 
     let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${requestTime}`)).data
 
-    let lastPos 
+    let lastPos
     allWarnData.forEach((item) => {
         let id = item.deviceId
         let type = 'GNSS'
@@ -512,7 +517,7 @@ const warnInterval = async (map) => {
     })
 
 
-    if(lastPos){
+    if (lastPos) {
         map.flyTo({
             center: lastPos,
             pitch: 61.99999999999988,
