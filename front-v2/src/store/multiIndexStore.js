@@ -4,16 +4,12 @@ import { ref } from 'vue'
 export const useMultiIndexStore = defineStore(
     'multiIndex',
     () => {
-        const taskIdMap = ref({
-            section: '',
-            water: '',
-            land: '',
-            multi: '',
+        const resJson = ref({
         })
 
-        const resJsonId = ref('')
+        const taskId = ref('')
 
-        return { taskIdMap, resJsonId }
+        return { resJson, taskId }
     },
     {
         persist: {
