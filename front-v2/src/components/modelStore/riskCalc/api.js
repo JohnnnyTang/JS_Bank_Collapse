@@ -1,3 +1,9 @@
+import axios from "axios"
+
+const ModelInstance = axios.create({
+    baseURL: '/api',
+})
+
 const fakeData = {
     year: '2023',
     vertex: [
@@ -269,14 +275,18 @@ export const getEvolutionIndexResult = () => {
     }
 }
 
-export const getVelocityAndEvolveResult = () => {
-    const result = {
-
+export class riskMatrixModel {
+    static runModel = (json) => {
+        return ModelInstance.post('/taskNode/start',json)
     }
-    return {
-        status: 'success',
-        data: result,
-        message: '',
+
+    static getRunStatus = (taskNodeId) => {
+        const url = '/taskNode/'+ taskNodeId +'/status'
+        return ModelInstance.get(url)
+    }
+
+    static getRunResult = (jsonId) => {
+        const url = '/fileData/json/jsonStr/id/' +jsonId
+        return ModelInstance.get(url)
     }
 }
-
