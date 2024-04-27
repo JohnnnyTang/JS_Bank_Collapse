@@ -6,7 +6,7 @@
  * @param {number} retry
  * @returns
  */
-import axios from "axios";
+import axios from 'axios'
 const ModelInstance = axios.create({
     baseURL: '/api',
 })
@@ -108,7 +108,7 @@ export const postTaskStartAPI = async (type, jsonID, condition, year) => {
     type === 'power' && (body.paramNode.params.condition = condition)
     body.paramNode.params.year = year.toString()
 
-    const id = await extendFetch('/api/taskNode/start', {
+    const response = await extendFetch('/api/taskNode/start', {
         method: 'post',
         headers: new Headers({
             'Content-Type': 'application/json',
@@ -122,7 +122,13 @@ export const postTaskStartAPI = async (type, jsonID, condition, year) => {
                 throw Error()
             }
         })
-        .then((value) => value)
+        .then((value) => {
+            return {
+                status: 'success',
+                data: value,
+                message: '',
+            }
+        })
         .catch(() => {
             return {
                 status: 'error',
@@ -131,11 +137,7 @@ export const postTaskStartAPI = async (type, jsonID, condition, year) => {
             }
         })
 
-    return {
-        status: 'success',
-        data: id,
-        message: '',
-    }
+    return response
 }
 
 /**
@@ -144,7 +146,7 @@ export const postTaskStartAPI = async (type, jsonID, condition, year) => {
  * @returns
  */
 export const getTaskStatusAPI = async (taskID) => {
-    const id = await extendFetch(`/api/taskNode/${taskID}/status`)
+    const response = await extendFetch(`/api/taskNode/${taskID}/status`)
         .then((res) => {
             if (res.status === 200) {
                 return res.json()
@@ -152,7 +154,13 @@ export const getTaskStatusAPI = async (taskID) => {
                 throw Error()
             }
         })
-        .then((value) => value)
+        .then((value) => {
+            return {
+                status: 'success',
+                data: value,
+                message: '',
+            }
+        })
         .catch(() => {
             return {
                 status: 'error',
@@ -161,11 +169,7 @@ export const getTaskStatusAPI = async (taskID) => {
             }
         })
 
-    return {
-        status: 'success',
-        data: id,
-        message: '',
-    }
+    return response
 }
 
 /**
@@ -174,7 +178,7 @@ export const getTaskStatusAPI = async (taskID) => {
  * @returns
  */
 export const getTaskJsonAPI = async (taskID) => {
-    const id = await extendFetch(`/api/fileData/json/jsonStr/id/${taskID}`)
+    const response = await extendFetch(`/api/fileData/json/jsonStr/id/${taskID}`)
         .then((res) => {
             if (res.status === 200) {
                 return res.json()
@@ -182,7 +186,13 @@ export const getTaskJsonAPI = async (taskID) => {
                 throw Error()
             }
         })
-        .then((value) => value)
+        .then((value) => {
+            return {
+                status: 'success',
+                data: value,
+                message: '',
+            }
+        })
         .catch(() => {
             return {
                 status: 'error',
@@ -191,25 +201,21 @@ export const getTaskJsonAPI = async (taskID) => {
             }
         })
 
-    return {
-        status: 'success',
-        data: id,
-        message: '',
-    }
+    return response
 }
 
 export class riskMatrixModel {
     static runModel = (json) => {
-        return ModelInstance.post('/taskNode/start',json)
+        return ModelInstance.post('/taskNode/start', json)
     }
 
     static getRunStatus = (taskNodeId) => {
-        const url = '/taskNode/'+ taskNodeId +'/status'
+        const url = '/taskNode/' + taskNodeId + '/status'
         return ModelInstance.get(url)
     }
 
     static getRunResult = (jsonId) => {
-        const url = '/fileData/json/jsonStr/id/' +jsonId
+        const url = '/fileData/json/jsonStr/id/' + jsonId
         return ModelInstance.get(url)
     }
 }

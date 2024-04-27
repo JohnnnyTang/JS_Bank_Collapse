@@ -3,49 +3,26 @@
         <div class="model-input">
             <div class="model-params-container card">
                 <div class="title-container">指标参数输入</div>
-                <el-form
-                    ref="paramsFromRef"
-                    :model="paramsForm"
-                    :rules="rules"
-                    class="model-params card"
-                    status-icon
-                >
-                    <el-form-item
-                        label="水文时间"
-                        prop="year"
-                        style="width: 90%; margin: 2%; color: black"
-                    >
+                <el-form ref="paramsFromRef" :model="paramsForm" :rules="rules" class="model-params card" status-icon>
+                    <el-form-item label="水文时间" prop="year" style="width: 90%; margin: 2%; color: black">
                         <el-select v-model="paramsForm.year" placeholder="2023">
                             <div v-for="(item, index) in yearList" :key="index">
                                 <el-option :label="item" :value="item" />
                             </div>
                         </el-select>
                     </el-form-item>
-                    <el-form-item
-                        label="水文条件"
-                        prop="condition"
-                        style="width: 90%; margin: 2%; color: black"
-                    >
-                        <el-select
-                            v-model="paramsForm.condition"
-                            placeholder="枯季"
-                        >
+                    <el-form-item label="水文条件" prop="condition" style="width: 90%; margin: 2%; color: black">
+                        <el-select v-model="paramsForm.condition" placeholder="枯季">
                             <el-option label="枯季" value="dry" />
                             <el-option label="洪季" value="flood" />
                         </el-select>
                     </el-form-item>
                     <el-form-item style="width: 90%; margin: 4%">
-                        <el-button
-                            type="primary"
-                            @click="submitForm(paramsFromRef)"
-                            :disabled="isDisable"
-                            color="#2a5fdb"
-                        >
+                        <el-button type="primary" @click="submitForm(paramsFromRef)" :disabled="isDisable"
+                            color="#2a5fdb">
                             计算指标
                         </el-button>
-                        <el-button @click="resetForm(paramsFromRef)"
-                            >重置</el-button
-                        >
+                        <el-button @click="resetForm(paramsFromRef)">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -57,29 +34,19 @@
         <div class="model-output">
             <div class="output-graph-container card">
                 <div class="title-container">动力计算指标</div>
-                <div
-                    class="card"
-                    style="
+                <div class="card" style="
                         flex: 1 1 0;
                         width: 95%;
                         color: #0953aa;
                         background-color: #d1e7ff;
                         font-size: x-large;
                         font-weight: bold;
-                    "
-                    v-show="isFinish == false"
-                    v-loading="isLoading"
-                    element-loading-background="rgba(214, 235, 255,0.8)"
-                >
+                    " v-show="isFinish == false" v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)">
                     目前暂无结果
                 </div>
-                <div
-                    v-show="isFinish == true"
-                    ref="outputGraphRef"
-                    class="output-graph card"
-                    v-loading="isLoading"
-                    element-loading-background="rgba(214, 235, 255,0.8)"
-                ></div>
+                <div v-show="isFinish == true" ref="outputGraphRef" class="output-graph card" v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"></div>
             </div>
             <div class="output-table-container card device-status-container">
                 <div class="small-title-container">
@@ -92,13 +59,8 @@
                         <div class="device-count device-item head">矩阵</div>
                         <div class="device-percent device-item head">风险</div>
                     </div>
-                    <div
-                        class="device-status-row body"
-                        v-for="(item, index) in indexValues"
-                        :key="index"
-                        v-loading="isLoading"
-                        element-loading-background="rgba(214, 235, 255,0.8)"
-                    >
+                    <div class="device-status-row body" v-for="(item, index) in indexValues" :key="index"
+                        v-loading="isLoading" element-loading-background="rgba(214, 235, 255,0.8)">
                         <div class="device-name device-item body">
                             {{ ['造床流量当量', '流速', '水位变化'][index] }}
                         </div>
@@ -119,11 +81,12 @@
 import { useMultiIndexStore } from '@/store/multiIndexStore'
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUpdate, onMounted, onUpdated, reactive, ref } from 'vue'
 import { getTaskJsonAPI, getTaskStatusAPI, postTaskStartAPI } from './api.js'
 import { drawOutputGraph, drawSectionGraph } from './util.js'
 
 let outputGraphChart = null
+let sectionChart = null
 const yearList = new Array(34).fill(0).map((_, index) => index + 1990)
 const multiIndexStore = useMultiIndexStore()
 const sectionPoints = ref(null)
@@ -177,6 +140,7 @@ const submitForm = async () => {
             message: '动力指标计算失败',
             type: 'warning',
         })
+        return
     }
     isLoading.value = true
 
@@ -231,16 +195,20 @@ const resetForm = (formEl) => {
     formEl.resetFields()
 }
 
+onUpdated(() => {
+    if (multiIndexStore.resJson.section) {
+        sectionPoints.value = multiIndexStore.resJson.section
+        sectionChart.resize()
+        drawSectionGraph(
+            sectionChart,
+            sectionPoints.value.map((value) => value[2]),
+        )
+    }
+})
+
 onMounted(() => {
-    console.log('velo props', props)
-    sectionPoints.value = multiIndexStore.resJson.section
-    const sectionChart = echarts.init(sectionGraphRef.value)
-    drawSectionGraph(
-        sectionChart,
-        sectionPoints.value.map((value) => value[2]),
-    )
+    sectionChart = echarts.init(sectionGraphRef.value)
     outputGraphChart = echarts.init(outputGraphRef.value)
-    drawOutputGraph(outputGraphChart, [null, null, null])
 })
 </script>
 
@@ -260,11 +228,13 @@ div.velocity-calc-content {
             flex-direction: column;
             flex: 1 1 0;
         }
+
         .section-graph-container {
             flex-direction: column;
             flex: 1 1 0;
         }
     }
+
     .model-output {
         flex: 1 1 0;
         display: flex;
@@ -330,12 +300,10 @@ div.device-status-container {
         display: flex;
         border-radius: 8px;
 
-        background: linear-gradient(
-            90deg,
-            rgba(0, 56, 128, 1) 0%,
-            rgba(16, 104, 203, 1) 60%,
-            rgba(68, 159, 255, 1) 100%
-        );
+        background: linear-gradient(90deg,
+                rgba(0, 56, 128, 1) 0%,
+                rgba(16, 104, 203, 1) 60%,
+                rgba(68, 159, 255, 1) 100%);
 
         text-align: left;
         color: #c4fbff;
@@ -401,10 +369,9 @@ div.device-status-container {
                         rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
                 }
 
-                box-shadow:
-                    rgba(13, 70, 228, 0.6) 0px 2px 4px,
-                    rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
-                    rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
             }
         }
     }
@@ -420,17 +387,16 @@ div.device-status-container {
     display: flex;
     border-radius: 8px;
 
-    background: linear-gradient(
-        90deg,
-        rgba(0, 56, 128, 1) 0%,
-        rgba(16, 104, 203, 1) 60%,
-        rgba(68, 159, 255, 1) 100%
-    );
+    background: linear-gradient(90deg,
+            rgba(0, 56, 128, 1) 0%,
+            rgba(16, 104, 203, 1) 60%,
+            rgba(68, 159, 255, 1) 100%);
 
     text-align: left;
     color: #c4fbff;
     font-weight: bold;
 }
+
 :deep(.el-form-item__label) {
     color: #0953aa;
     font-weight: bold;

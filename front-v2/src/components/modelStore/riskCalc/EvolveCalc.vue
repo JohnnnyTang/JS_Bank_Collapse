@@ -147,7 +147,7 @@ const isDisable = computed(() => {
 const isFinish = computed(() => indexValues.value[0].length !== 0)
 
 const submitForm = async () => {
-    if (Number(multiIndexStore.resJson.year) < paramsForm.year) {
+    if (Number(multiIndexStore.resJson.year) <= paramsForm.year) {
         ElMessage({
             message:
                 '对比时间应在当前时间之前, 当前时间为' +
@@ -170,6 +170,7 @@ const submitForm = async () => {
             message: '演化分析指标计算失败',
             type: 'warning',
         })
+        return
     }
     isLoading.value = true
 
@@ -206,7 +207,7 @@ const submitForm = async () => {
             clearInterval(intervalID)
 
             setTimeout(() => {
-                rateChart.clear()
+                sectionPoints.value = multiIndexStore.resJson.section
                 drawRateGraph(
                     rateChart,
                     sectionPoints.value.map((value) => value[2]),
@@ -231,8 +232,6 @@ const resetForm = (formEl) => {
 }
 
 onMounted(() => {
-    console.log('evolve props', props)
-    sectionPoints.value = multiIndexStore.resJson.section
     rateChart = echarts.init(rateGraphRef.value)
 })
 </script>
