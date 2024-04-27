@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { Scene } from '../components/dataVisual/Scene'
 import SteadyFlowLayer from '../utils/m_demLayer/steadyFlowLayer'
 import TerrainLayer from '../utils/m_demLayer/terrainLayer'
@@ -61,17 +61,83 @@ const useLayerStore = defineStore('layerStore', () => {
     }
 })
 
-const useDataStore = defineStore('dataStore',()=>{
-    const _terrainHeight = ref('')
-    const terrainHeight = computed(()=>_terrainHeight.value)
-    function setTerrainHeight(value){
-        // console.log('setTerrainHeight',value);
-        _terrainHeight.value = value;
+const totalLayer = [
+    '地形瓦片',
+    '河段划分',
+    '河段注记',
+    '沙岛',
+    '全江注记',
+    '深泓线',
+    '已建通道',
+    '在建通道',
+    '规划通道',
+    '一级预警岸段',
+    '二级预警岸段',
+    '三级预警岸段',
+    '民主沙地标',
+    '民主沙区划线',
+    '民主沙岸段线',
+    '民主沙岸段注记',
+    '守护工程断面',
+    '守护工程断面注记',
+    '稳定性分区',
+    '预警级别分区',
+    'GNSS',
+    '测斜仪',
+    '孔隙水压力计',
+    '应力桩',
+    '近岸流场',
+    '三维地形'
+]
+
+const layerStates = {}
+for (let i = 0; i < totalLayer.length; i++) {
+    layerStates[totalLayer[i]] = {
+        added: false,
+        showing: false,
     }
-    return {
-        terrainHeight,
-        setTerrainHeight
+}
+const useMapLayerStore = defineStore('mapLayerStore', () => {
+    const _mapLayerState = reactive(layerStates)
+    const mapLayerState = computed(() => _mapLayerState)
+
+    function layerAdded(id) {
+        _mapLayerState[id].added = true
     }
+    function layesrAdded(ids) {
+        ids.forEach(id => {
+            _mapLayerState[id].added = true
+        })
+    }
+    function layerShowing(id) {
+        _mapLayerState[id].showing = true
+    }
+    function layersShowing(ids) {
+        ids.forEach(id => {
+            _mapLayerState[id].showing = true
+        })
+    }
+
+
+    function layerRemove(id) {
+        _mapLayerState[id].added = false
+    }
+
+    function layersRemove(ids) {
+        ids.forEach(id => {
+            _mapLayerState[id].added = false
+        })
+    }
+    function layerHide(id) {
+        _mapLayerState[id].showing = false
+    }
+    function layersHide(ids) {
+        ids.forEach(id => {
+            _mapLayerState[id].showing = false
+        })
+    }
+    return { mapLayerState, layerAdded, layesrAdded, layerRemove, layerHide, layerShowing, layersHide, layersShowing, layersRemove }
 })
 
-export { useMapStore, useSceneStore, useLayerStore,useDataStore }
+
+export { useMapStore, useSceneStore, useLayerStore, useMapLayerStore }

@@ -5,9 +5,10 @@
         <sceneContainer></sceneContainer>
 
         <!-- toolset -->
-        <layerControl></layerControl>
+        <!-- <layerControl></layerControl>
         <searchContainer></searchContainer>
-        <fullscreen></fullscreen>
+        <fullscreen></fullscreen> -->
+        <totalController></totalController>
 
         <!-- scenes desc -->
         <sceneRelate></sceneRelate>
@@ -26,11 +27,12 @@ import { initMap, flytoLarge, flytoSmall, initScratchMap, addMarkerToMap } from 
 import { Scene } from '../components/dataVisual/Scene';
 import { useMapStore, useSceneStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
-import layerControl from '../components/dataVisual/layerControl.vue';
-import searchContainer from '../components/dataVisual/searchContainer.vue';
-import BackEndRequest from '../api/backend';
-import fullscreen from '../components/dataVisual/fullscreen.vue';
+// import layerControl from '../components/dataVisual/layerControl.vue';
+// import searchContainer from '../components/dataVisual/searchContainer.vue';
+// import BackEndRequest from '../api/backend';
+// import fullscreen from '../components/dataVisual/fullscreen.vue';
 import sceneRelate from '../components/dataVisual/scenesRelate/sceneRelate.vue';
+import totalController from '../components/dataVisual/common/totalController.vue'
 
 import TerrainLayer from '../utils/m_demLayer/terrainLayer';
 import SteadyFlowLayer from '../utils/m_demLayer/steadyFlowLayer';
@@ -68,7 +70,7 @@ onMounted(async () => {
     flytoLarge(map)
 
     const defaultScene = new Scene()
-    defaultScene.title = '预警岸段'
+    defaultScene.title = '全江概貌'
     sceneStore.setSelectedScene(defaultScene)
 
     //test 
@@ -99,7 +101,8 @@ div.data-visual-container {
         width: 100vw;
         height: 92vh;
         pointer-events: all;
-        background-color: hsl(194, 69%, 91%);;
+        background-color: hsl(194, 69%, 91%);
+        z-index: 1;
     }
 
     #GPUFrame {
@@ -107,7 +110,7 @@ div.data-visual-container {
         width: 100vw;
         height: 92vh;
         background-color: rgba(240, 248, 255, 0);
-        z-index: 1;
+        z-index: 2;
         pointer-events: none;
     }
 
@@ -145,5 +148,18 @@ div.data-visual-container {
     height: 50px;
     border-radius: 50%;
     cursor: pointer;
+}
+
+
+:deep(.el-tree-node__label) {
+    font-size: calc(0.6vw + 0.7vh);
+}
+
+:deep(.el-tree-node__content) {
+    padding: 0.5vh;
+}
+
+:deep(.el-tree) {
+    background-color: rgba($color: #000000, $alpha: 0.0);
 }
 </style>
