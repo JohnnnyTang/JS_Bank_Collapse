@@ -2,19 +2,23 @@ import BackEndRequest from '../../api/backend'
 import { DataPioneer } from '../dataVisual/Scene'
 import { pulsing, loadImage } from '../../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
-import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
+// import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
+import monitorDetailV2 from '../dataVisual/featureDetails/monitorDetailV2.vue'
 import warningPop from '../bankTwin/warningPop.vue'
-import { ref, createApp } from 'vue'
-import dayjs from 'dayjs'
+import { ref, createApp, h } from 'vue'
 import axios from 'axios'
+import { useSceneStore } from '../../store/mapStore'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const propertyRef = ref({})
+const zoomRef = ref()
 
 
 
 const mapInit = async (map, vis) => {
 
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    console.log(tileServer);
 
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
@@ -323,12 +327,21 @@ const mapInit = async (map, vis) => {
         let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
         map.on('click', deviceLayers, (e) => {
-            ///////test
-            let p = e.features[0].properties
-            const property = e.features[0].properties
-            propertyRef.value = property
-            const popUp = createPopUp(propertyRef)
-            popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+            console.log(e.features);
+            if (e.features.length > 1)
+                open(e.features, map)
+            else if (e.features.length === 1) {
+                let p = e.features[0].properties
+                const property = e.features[0].properties
+                useSceneStore().setSelectedFeature(property)
+
+                propertyRef.value = property
+                console.log(propertyRef.value);
+                const popUp = createPopUp(propertyRef, zoomRef)
+                popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+            }
+
+
         })
         map.on('mousemove', deviceLayers, (e) => {
             map.getCanvas().style.cursor = 'pointer'
@@ -336,19 +349,16 @@ const mapInit = async (map, vis) => {
         map.on('mouseleave', deviceLayers, (e) => {
             map.getCanvas().style.cursor = ''
         })
-
-        // setTimeout(() => {
-        //     setWarningDeviceStyle(map, 'GNSS', "MZS120.55327892_32.02707923_1")
-        //     // setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-        //     // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
-        // }, 2000)
+        map.on('zoom', () => {
+            zoomRef.value = map.getZoom()
+        })
 
 
-
-        warnInterval(map)
-        setTimeout(() => {
-            warnInterval(map)
-        }, 50000);
+        warnInterval(map, 20)
+        setInterval(() => {
+            warnInterval(map, 60)
+        }, 60 * 1000 * 20);
+        // request per 20minutes 
 
 
         ///////DEBUG////////
@@ -444,8 +454,8 @@ const removeWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
         map.removeLayer(`${deviceLayer}-${deviceCode}`)
 }
 
-const createPopUp = (deviceProperty) => {
-    const ap = createApp(MultiChart, { selectedFeature: deviceProperty })
+const createPopUp = (deviceProperty, zoom) => {
+    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
 
     const container = document.createElement('div')
     const componentInstance = ap.mount(container)
@@ -455,10 +465,9 @@ const createPopUp = (deviceProperty) => {
         maxWidth: '1000px',
         offset: 25,
     }).setDOMContent(domwithComp)
-    // .setLngLat(popupCoord)
-    // .addTo(map); undefined;
     return popUp
 }
+
 
 const createWarningPopup = (info) => {
     const ap = createApp(warningPop, { warningInfo: info })
@@ -471,8 +480,6 @@ const createWarningPopup = (info) => {
         maxWidth: '1000px',
         offset: 25,
     }).setDOMContent(domwithComp)
-    // .setLngLat(popupCoord)
-    // .addTo(map); undefined;
     return popUp
 }
 
@@ -490,7 +497,7 @@ const findProptyFromJson = (geoJson, code) => {
 }
 
 
-const warnInterval = async (map) => {
+const warnInterval = async (map, minute) => {
     const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
     const DeviceIDs = {
         'GNSS': [],
@@ -505,9 +512,8 @@ const warnInterval = async (map) => {
             DeviceIDs[DEVICETYPEMAP[type]].push(item["code"])
         }
     })
-    const requestTime = 20;
 
-    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${requestTime}`)).data
+    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
 
     let lastPos
     allWarnData.forEach((item) => {
@@ -529,6 +535,80 @@ const warnInterval = async (map) => {
     }
 }
 
+
+const open = (features, map) => {
+    const items = features
+    const selectedDevice = ref({})
+    let selectedCode
+    const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+
+    const radioGroupVNode = h('div', [
+        h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),
+        items.map(item => {
+            return h(
+                'div',
+                {
+                    key: item.properties.machineId,
+                    style: { marginBottom: '10px' }
+                },
+                [
+                    h('label', {},
+                        [
+                            h('input', {
+                                type: 'radio',
+                                name: 'options',
+                                value: item.properties.code,
+                                onChange: event => {
+                                    // 在这里处理选项变化事件
+                                    selectedCode = event.target.value;
+                                }
+                            }),
+                            h('span', {}, DEVICETYPEMAP[Number(item.properties.type) - 1] + '--' + item.properties.code)
+                        ]
+                    )
+                ]
+            );
+        })
+    ]);
+
+    ElMessageBox.confirm(
+        '该区域有多台设备，请选择目标设备',
+        {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            center: true,
+            message: radioGroupVNode
+        }
+    )
+        .then(() => {
+            console.log(selectedCode)
+            ElMessage({
+                type: 'info',
+                message: '加载设备详情',
+            })
+            debugger
+            let targetProperty
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].properties.code === selectedCode) {
+                    targetProperty = items[i].properties
+                }
+            }
+            console.log(targetProperty);
+
+            useSceneStore().setSelectedFeature(targetProperty)
+            propertyRef.value = targetProperty
+            const popUp = createPopUp(propertyRef, zoomRef)
+            popUp.setOffset(0).setLngLat([targetProperty.longitude, targetProperty.latitude]).addTo(map)
+
+        })
+        .catch((action) => {
+            ElMessage({
+                type: 'info',
+                message: '取消'
+            })
+        })
+}
 
 
 
