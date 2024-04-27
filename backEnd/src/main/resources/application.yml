@@ -1,4 +1,4 @@
 spring:
   profiles:
-    active: 72h
+    active: lhy
 
