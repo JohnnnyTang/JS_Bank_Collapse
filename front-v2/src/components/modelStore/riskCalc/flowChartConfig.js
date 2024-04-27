@@ -5,7 +5,7 @@ export const initialNodes = [
     {
         id: '1',
         type: 'flow',
-        label: '计算断面选择',
+        label: '评估断面选择',
         position: { x: 150, y: 5 },
         data: { name: '评估断面选择', status: 0, result: '' },
     },
@@ -39,14 +39,6 @@ export const initialNodes = [
 ]
 
 export const initialEdges = [
-    {
-        id: 'e1-3',
-        source: '1',
-        target: '3',
-        animated: true,
-        markerEnd: MarkerType.ArrowClosed,
-    },
-
     // an animated edge, specified by using `animated: true`
     {
         id: 'e1-2',
@@ -54,13 +46,24 @@ export const initialEdges = [
         target: '2',
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
+        style: { stroke: '#333', strokeWidth: 3 },
     },
+    {
+        id: 'e1-3',
+        source: '1',
+        target: '3',
+        animated: true,
+        markerEnd: MarkerType.ArrowClosed,
+        style: { stroke: '#333', strokeWidth: 3 },
+    },
+
     {
         id: 'e2-4',
         source: '2',
         target: '4',
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
+        style: { stroke: '#333', strokeWidth: 3 },
     },
     {
         id: 'e3-4',
@@ -68,5 +71,6 @@ export const initialEdges = [
         target: '4',
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
+        style: { stroke: '#333', strokeWidth: 3 },
     },
 ]

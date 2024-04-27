@@ -96,12 +96,10 @@
                                     造床流量当量指标：
                                 </div>
                                 <div class="velocity-index-item1-content">
-                                    <el-input-number
+                                    <el-input
                                         :min="0"
                                         :max="1"
-                                        :step="0.01"
                                         v-model="velocityIndex1"
-                                        style="width: 90%"
                                         placeholder="请输入0-1的指标权重"
                                         clearable
                                         @change="updataVelocityIndex1Value"
@@ -113,12 +111,10 @@
                                     流速指标：
                                 </div>
                                 <div class="velocity-index-item2-content">
-                                    <el-input-number
+                                    <el-input
                                         :min="0"
                                         :max="1"
-                                        :step="0.01"
                                         v-model="velocityIndex2"
-                                        style="width: 90%"
                                         placeholder="请输入0-1的指标权重"
                                         clearable
                                         @change="updataVelocityIndex2Value"
@@ -130,12 +126,10 @@
                                     水位变幅指标：
                                 </div>
                                 <div class="velocity-index-item3-content">
-                                    <el-input-number
+                                    <el-input
                                         :min="0"
                                         :max="1"
-                                        :step="0.01"
                                         v-model="velocityIndex3"
-                                        style="width: 90%"
                                         placeholder="请输入0-1的指标权重"
                                         clearable
                                         @change="updataVelocityIndex3Value"
@@ -166,12 +160,10 @@
                                     滩槽高差指标：
                                 </div>
                                 <div class="evolve-index-item1-content">
-                                    <el-input-number
+                                    <el-input
                                         :min="0"
                                         :max="1"
-                                        :step="0.01"
                                         v-model="evolveIndex1"
-                                        style="width: 90%"
                                         placeholder="请输入0-1的指标权重"
                                         clearable
                                         @change="updataEvolveIndex1Value"
@@ -183,12 +175,10 @@
                                     岸坡坡比指标：
                                 </div>
                                 <div class="evolve-index-item2-content">
-                                    <el-input-number
+                                    <el-input
                                         :min="0"
                                         :max="1"
-                                        :step="0.01"
                                         v-model="evolveIndex2"
-                                        style="width: 90%"
                                         placeholder="请输入0-1的指标权重"
                                         clearable
                                         @change="updataEvolveIndex2Value"
@@ -200,12 +190,10 @@
                                     冲淤变幅指标：
                                 </div>
                                 <div class="evolve-index-item3-content">
-                                    <el-input-number
+                                    <el-input
                                         :min="0"
                                         :max="1"
-                                        :step="0.01"
                                         v-model="evolveIndex3"
-                                        style="width: 90%"
                                         placeholder="请输入0-1的指标权重"
                                         clearable
                                         @change="updataEvolveIndex3Value"
@@ -241,7 +229,7 @@
                                 <div class="alarm-item1-decorator">
                                     <dv-decoration-9
                                         :color="getAlarmDecoratorColor(alarmGrade)"
-                                        style="width:80px;height:50px;text-align: center;display: flex; margin-left: 20px;"
+                                        style="width:100%;height:60%;text-align: center;display: flex; margin-left: 20%;"
                                         :dur="5"
                                     />
                                 </div>
@@ -340,25 +328,29 @@
 <script setup>
 import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3';
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3';
-import { ElInputNumber } from 'element-plus';
+import { ElInputNumber, ElInput } from 'element-plus';
 import { ref } from 'vue'
 import { riskMatrixModel } from './api'
+import { useMultiIndexStore } from '@/store/multiIndexStore'
+
+// 状态管理
+const multiIndexStore = useMultiIndexStore()
 
 // 因子权重
 const mainIndexValue = ref(1)
 const anotherIndexValue = ref(0)
 const updateMainIndexValue = (value) => {
   if (value + anotherIndexValue.value > 1) {
-    anotherIndexValue.value = (1 - value).toFixed(3);
+    anotherIndexValue.value = +((1 - value).toFixed(3));
   } else {
-    anotherIndexValue.value = Math.max(0, 1 - value).toFixed(3);
+    anotherIndexValue.value = +(Math.max(0, 1 - value).toFixed(3));
   }
 };
 const updateAnotherIndexValue = (value) => {
   if (value + mainIndexValue.value > 1) {
-    mainIndexValue.value = (1 - value).toFixed(3);
+    mainIndexValue.value = +((1 - value).toFixed(3));
   } else {
-    mainIndexValue.value = Math.max(0, 1 - value).toFixed(3);
+    mainIndexValue.value = +(Math.max(0, 1 - value).toFixed(3));
   }
 };
 
@@ -547,17 +539,17 @@ const riskValue2 = ref(0)
 const riskValue3 = ref(0)
 const riskValue4 = ref(0)
 
-const jsonId = "662a3e4acff7845d51a7bb63"
-
 async function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 const isRunning = ref(false)
+
 const RiskMatrixModelRun = async () => {
     if (velocityIndex1.value===null || velocityIndex2.value===null || velocityIndex3.value===null
         || evolveIndex1.value===null || evolveIndex2.value===null || evolveIndex3.value===null) {
         alert("因子权重不为空!")
     }
+    const jsonId = multiIndexStore.taskId;
     // 设置主权重
     const runModelData = {
         "modelNode": {
@@ -566,7 +558,7 @@ const RiskMatrixModelRun = async () => {
         "paramNode": {
             "modelId": "662a4521ddd45f65873eb067",
             "params": {
-                "jsonId": "662a3e4acff7845d51a7bb63",
+                "jsonId": jsonId,
                 "weight0": mainIndexValue.value,
                 "weight1": anotherIndexValue.value,
                 "weight2": velocityIndex1.value,
@@ -594,6 +586,7 @@ const RiskMatrixModelRun = async () => {
         "path": ",taskNode,matrixCalcModelTaskGroup,"
     }
     isRunning.value = true
+    multiIndexStore.updateMatrixCalcStatus(1)
     const taskNodeId = await(riskMatrixModel.runModel(runModelData))
     const RunStatus = ref("")
     for (;;) {
@@ -627,6 +620,8 @@ const RiskMatrixModelRun = async () => {
     riskValue3.value = riskValueList[2].toFixed(3)
     riskValue4.value = riskValueList[3].toFixed(3)
     isRunning.value = false
+    multiIndexStore.resJson = RunResult.data
+    multiIndexStore.updateMatrixCalcStatus(2)
 }
 
 </script>
@@ -1682,4 +1677,11 @@ div.model-item-content {
     display: flex;
     margin-left:22%;
 }
+
+:deep(.el-input) {
+    width: 80%;
+    text-align: center;
+    // justify-content: center;
+}
+
 </style>

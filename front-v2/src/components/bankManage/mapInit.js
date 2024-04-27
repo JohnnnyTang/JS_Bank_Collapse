@@ -546,33 +546,36 @@ const open = (features, map) => {
     const items = features
     const selectedDevice = ref({})
     let selectedCode
+    const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 
-
-    const radioGroupVNode = h('div', items.map(item => {
-        return h(
-            'div',
-            {
-                key: item.properties.machineId,
-                style: { marginBottom: '10px' }
-            },
-            [
-                h('label', {},
-                    [
-                        h('input', {
-                            type: 'radio',
-                            name: 'options',
-                            value: item.properties.code,
-                            onChange: event => {
-                                // 在这里处理选项变化事件
-                                selectedCode = event.target.value
-                            }
-                        }),
-                        h('span', {}, item.properties.name + '-' + item.properties.code)
-                    ]
-                )
-            ]
-        );
-    }));
+    const radioGroupVNode = h('div', [
+        h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),
+        items.map(item => {
+            return h(
+                'div',
+                {
+                    key: item.properties.machineId,
+                    style: { marginBottom: '10px' }
+                },
+                [
+                    h('label', {},
+                        [
+                            h('input', {
+                                type: 'radio',
+                                name: 'options',
+                                value: item.properties.code,
+                                onChange: event => {
+                                    // 在这里处理选项变化事件
+                                    selectedCode = event.target.value;
+                                }
+                            }),
+                            h('span', {}, DEVICETYPEMAP[Number(item.properties.type) - 1] + '--' + item.properties.code)
+                        ]
+                    )
+                ]
+            );
+        })
+    ]);
 
     ElMessageBox.confirm(
         '该区域有多台设备，请选择目标设备',

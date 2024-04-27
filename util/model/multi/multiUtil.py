@@ -318,8 +318,9 @@ def computeSaIndex(
     for i in range(0, totalNum, 10):
         selectedLSet.append(i)
         selectedZSet.append(Z[i])
-    selectedLSet.append(totalNum - 1)
-    selectedZSet.append(Z[totalNum - 1])
+    if selectedLSet[-1] != totalNum - 1:
+        selectedLSet.append(totalNum - 1)
+        selectedZSet.append(Z[totalNum - 1])
 
     Sa: list = [0.0 for i in range(len(selectedZSet) - 1)]
 

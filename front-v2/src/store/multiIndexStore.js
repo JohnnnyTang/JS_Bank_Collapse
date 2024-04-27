@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import {
+    initialNodes,
+    initialEdges,
+} from '../components/modelStore/riskCalc/flowChartConfig.js'
 
 export const useMultiIndexStore = defineStore(
     'multiIndex',
@@ -233,7 +237,72 @@ export const useMultiIndexStore = defineStore(
         })
         const taskId = ref('662a3e4acff7845d51a7bb63')
 
-        return { resJson, taskId }
+        const flowNode = ref(initialNodes)
+
+        const flowEdge = ref(initialEdges)
+
+        function updateSectionStatus(newStatus) {
+            flowNode.value[0].data.status = newStatus
+            console.log("update", flowEdge.value[2])
+            
+            if (newStatus == 2) {
+                flowNode.value[1].data.status = 0
+                flowNode.value[2].data.status = 0
+                flowNode.value[3].data.status = -1
+                flowEdge.value[0].style.stroke = '#10b981'
+                flowEdge.value[1].style.stroke = '#10b981'
+            }
+        }
+
+        function updateVelocityEvolveStatus(id, newStatus) {
+            flowNode.value[id].data.status = newStatus
+            // console.log('update', flowEdge)
+            if(newStatus== 2) {
+                flowEdge.value[+(id - 1)].animated = false
+                if(id == 1) {
+                    flowNode.value[1].data.result = [
+                        resJson.value.PQ[1],
+                        resJson.value.KY[1],
+                        resJson.value.ZD[1],
+                    ].join(',')
+                    flowEdge.value[2].style.stroke = '#10b981'
+                }
+                else {
+                    flowNode.value[2].data.result = [
+                        resJson.value.ZB[1],
+                        resJson.value.SA[1],
+                        resJson.value.LN[1],
+                    ].join(',')
+                    flowEdge.value[3].style.stroke = '#10b981'
+                }
+            }
+            if (
+                flowNode.value[1].data.status == 2 &&
+                flowNode.value[2].data.status == 2
+            ) {
+                flowNode.value[3].data.status = 0
+            }
+        }
+
+        function updateMatrixCalcStatus(newStatus) {
+            flowNode.value[3].data.status = newStatus
+            if (flowNode.value[3].data.status == 2) {
+                flowNode.value[3].data.result = [
+                    resJson.value.risk[1],
+                    resJson.value.risk[2]
+                ].join(',')
+            }
+        }
+
+        return {
+            resJson,
+            taskId,
+            flowNode,
+            flowEdge,
+            updateSectionStatus,
+            updateVelocityEvolveStatus,
+            updateMatrixCalcStatus,
+        }
     },
     {
         persist: {

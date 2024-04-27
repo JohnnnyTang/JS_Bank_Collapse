@@ -7,7 +7,7 @@
                 <div class="model-run-title">{{ curRunModelName }}</div>
                 <div class="model-run-content">
                     <SectionCalcVue
-                        v-show="curRunModelName == '计算断面选择'"
+                        v-show="curRunModelName == '评估断面选择'"
                     />
                     <VelocityCalcVue
                         v-show="curRunModelName == '动力指标计算'"
@@ -41,7 +41,7 @@ const multiIndexStore = useMultiIndexStore()
 
 const ModelName = '风险预警模型'
 
-const curRunModelName = ref('计算断面选择')
+const curRunModelName = ref('评估断面选择')
 
 const switchPage = (modelLabel) => {
     curRunModelName.value = modelLabel

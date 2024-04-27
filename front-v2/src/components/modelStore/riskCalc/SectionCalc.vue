@@ -188,6 +188,7 @@ const sectionSelectChange = () => {
     if (paramFill.includes(false)) {
         return
     } else {
+        multiIndexStore.updateSectionStatus(1)
         calcEnable.value = true
     }
 }
@@ -347,6 +348,7 @@ const calcModel = async () => {
                 progressStatus.value = 'success'
                 clearTimeout(statusCall)
                 drawPlainSectionGraph(sectionChart, jsonRes.section)
+                multiIndexStore.updateSectionStatus(2)
                 sectionChart.resize()
             }
         }, 1000)
@@ -536,6 +538,7 @@ onMounted(() => {
             if (paramFill.includes(false)) {
                 return
             } else {
+                multiIndexStore.updateSectionStatus(1)
                 calcEnable.value = true
             }
         })
@@ -543,7 +546,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-    resizeObserver.unobserve(containerDom.value)
+    resizeObserver.disconnect()
 })
 </script>
 
