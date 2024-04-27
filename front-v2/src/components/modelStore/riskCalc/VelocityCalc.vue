@@ -129,6 +129,7 @@ const isDisable = computed(() => {
 const isFinish = computed(() => indexValues.value[0].length !== 0)
 
 const submitForm = async () => {
+    multiIndexStore.updateVelocityEvolveStatus(1, 1)
     const taskIDResponse = await postTaskStartAPI(
         'power',
         multiIndexStore.taskId,
@@ -180,12 +181,13 @@ const submitForm = async () => {
                 drawOutputGraph(outputGraphChart, indexValues.value)
                 outputGraphChart.resize()
             }, 10)
-
+            multiIndexStore.updateVelocityEvolveStatus(1, 2)
             ElMessage({
                 message: '动力指标计算成功',
                 type: 'success',
             })
             isLoading.value = false
+            
         }
     }, 1000)
 }
