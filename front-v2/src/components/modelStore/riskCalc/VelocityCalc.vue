@@ -150,6 +150,12 @@ const rules = reactive({
         },
     ],
 })
+const props = defineProps({
+    show: {
+        type: Boolean,
+        required: true
+    }
+})
 const isDisable = computed(() => {
     if (paramsForm) {
         return !(paramsForm.year && paramsForm.condition)
@@ -226,6 +232,7 @@ const resetForm = (formEl) => {
 }
 
 onMounted(() => {
+    console.log('velo props', props)
     sectionPoints.value = multiIndexStore.resJson.section
     const sectionChart = echarts.init(sectionGraphRef.value)
     drawSectionGraph(

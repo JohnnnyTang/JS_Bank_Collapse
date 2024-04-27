@@ -787,9 +787,9 @@ div.section-choose-content {
 
         width: 12vh;
         height: 12vh;
-        background-color: #c1dfffb6;
+        background-color: #c1dfff2f;
         backdrop-filter: blur(6px);
-        border-radius: 6px;
+        border-radius: 40px;
 
         :deep(.el-progress) {
             width: 12vh;

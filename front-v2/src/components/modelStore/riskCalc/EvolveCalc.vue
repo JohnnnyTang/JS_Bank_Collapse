@@ -117,6 +117,12 @@ const compareGraphRef = ref(null)
 const paramsFromRef = ref(null)
 const multiIndexStore = useMultiIndexStore()
 const isLoading = ref(false)
+const props = defineProps({
+    show: {
+        type: Boolean,
+        required: true
+    }
+})
 
 const paramsForm = reactive({
     year: null,
@@ -225,6 +231,7 @@ const resetForm = (formEl) => {
 }
 
 onMounted(() => {
+    console.log('evolve props', props)
     sectionPoints.value = multiIndexStore.resJson.section
     rateChart = echarts.init(rateGraphRef.value)
 })
