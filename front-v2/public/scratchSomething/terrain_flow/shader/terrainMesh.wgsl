@@ -266,8 +266,9 @@ fn fMain(fsInput: VertexOutput) -> @location(0) vec4f {
     // let levelColor = textureLoad(lodMap, vec2i(texcoords.xy), 0).rgb;
 
      let paletteLength = f32(textureDimensions(palette).x);
-     let elevationLevel = (paletteLength * fsInput.depth*0.6) / paletteLength;
-    //let elevationLevel = fract(paletteLength * fsInput.depth) / paletteLength;
+    //  let elevationLevel = (paletteLength * fsInput.depth*0.6) / paletteLength;
+    let elevationLevel = floor(paletteLength * fsInput.depth) / paletteLength; 
+    // let elevationLevel = fract(paletteLength * fsInput.depth) / paletteLength;
      let paletteColor = textureSample(palette, lSampler, vec2f(elevationLevel + 0.2, 0.5));
     return paletteColor;
     //return vec4f(1.0 - fsInput.depth) * 1.0;

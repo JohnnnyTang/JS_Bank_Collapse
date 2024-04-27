@@ -35,12 +35,32 @@ const initScratchMap = (ref) => {
                 GPUFrame: GPUFrame,
                 antialias: true,
                 // minZoom: 8,
-            }).on('load', async() => {
+            }).on('load', async () => {
                 console.log('initScratchMap ok');
                 resolve(map)
                 // map.addLayer(new TerrainLayer(14))
                 // map.addLayer(new FlowLayer())
             })
+        })
+    })
+}
+
+const initLoadedMap = async (ref) => {
+    return new Promise((res) => {
+        let map = new mapboxgl.Map({
+            container: ref.value,
+            accessToken:
+                'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+            style: getStyleJson(), // style URL
+            center: [120.312, 31.917], // starting position [lng, lat]
+            zoom: 3, // starting zoom
+            bounds: [
+                [114.36611654985586, 30.55501729652339],
+                [124.5709218840081, 35.31358005439914],
+            ],
+        }).on('load', async () => {
+            console.log('map loaded!');
+            res(map)
         })
     })
 }
@@ -1010,5 +1030,6 @@ export {
     addMarkerToMap,
     getCenterCoord,
     createPopUp,
-    getStyleJson
+    getStyleJson,
+    initLoadedMap
 }
