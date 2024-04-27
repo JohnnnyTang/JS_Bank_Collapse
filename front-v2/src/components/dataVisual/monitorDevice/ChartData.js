@@ -120,44 +120,63 @@ const generateData_Manometer_new = (ogDataArray) => {
 }
 
 
-const generateData_Stress = (ogDataArray, metaData) => {
-    let pointNum = metaData["pointNum"]
-    let depthArray = []
-    let legendData = []
-    let showCount = ogDataArray.length - 1
-    showCount = Math.min(5, showCount)
-    let horizontalAngle = []
-    let depth_value_hori_data = []
-    let depth_value_vert_data = []
+const generateData_Stress = (ogDataArray) => {
 
-    let depth_value_time = []
+    let showCount = Math.min(ogDataArray.length, 20)
+    let btPower = []
+    let btAngle = []
+    let btChange = []
 
-    for (let i = 1; i <= pointNum; i++) {
-        depthArray.push(metaData[`point${i}Depth`])
-        legendData.push(String(metaData[`point${i}Depth`] + 'm'))
-    }
+    let midPower = []
+    let midAngle = []
+    let midChange = []
+
+    let topPower = []
+    let topAngle = []
+    let topChange = []
+
+    // {
+    //     "bottomAngle": 90.1106388918919,
+    //     "bottomChange": 80.6367641081081,
+    //     "bottomPower": 17.152630972973,
+    //     "deviceCode": "H231001003",
+    //     "deviceId": "MZS120.541648_32.030524_2",
+    //     "inTime": "2024-04-27 10:47:03",
+    //     "measureTime": "2024-04-27 10:42:00",
+    //     "middleAngle": 38.6089878918919,
+    //     "middleChange": 8.20612233783783,
+    //     "middlePower": 1.05193068378378,
+    //     "stationId": "MZS",
+    //     "topAngle": 72.627328,
+    //     "topChange": 23.0013858378378,
+    //     "topPower": 3.86017082162162
+    // }
 
     for (let i = 0; i < showCount; i++) {
-        let horizontalAngleItem = []
-        let depth_value_hori_data_item = []
-        let depth_value_vert_data_item = []
-        for (let j = 0; j < pointNum; j++) {
-            horizontalAngleItem.push(ogDataArray[i][`horizontal${j + 1}`])
-            depth_value_hori_data_item.push([ogDataArray[i][`horizontal_stress${j + 1}`], depthArray[j]])
-            depth_value_vert_data_item.push([ogDataArray[i][`vertical_stress${j + 1}`], depthArray[j]])
-        }
-        horizontalAngle.push(horizontalAngleItem)
-        depth_value_hori_data.push(depth_value_hori_data_item)
-        depth_value_vert_data.push(depth_value_vert_data_item)
-        depth_value_time.push(ogDataArray[i][`measureTime`])
+        let item = ogDataArray[i]
+        btPower.push([item.measureTime, item.bottomPower])
+        midPower.push([item.measureTime, item.middlePower])
+        topPower.push([item.measureTime, item.topPower])
+
+        btAngle.push([item.measureTime, item.bottomAngle])
+        midAngle.push([item.measureTime, item.middleAngle])
+        topAngle.push([item.measureTime, item.topAngle])
+
+        btChange.push([item.measureTime, item.bottomChange])
+        midChange.push([item.measureTime, item.middleChange])
+        topChange.push([item.measureTime, item.topChange])
     }
 
     return {
-        legendData,
-        horizontalAngle,
-        depth_value_time,
-        depth_value_hori_data,
-        depth_value_vert_data,
+        btAngle,
+        btChange,
+        btPower,
+        midAngle,
+        midChange,
+        midPower,
+        topAngle,
+        topChange,
+        topPower
     }
 }
 
@@ -771,482 +790,201 @@ const generateOptions_Manometer_new = (processedData) => {
 }
 const generateOptions_Stress = (processedData) => {
 
-    //gaugeOption 
-    let gaugeData = MonitorDataAssistant.getOnegaugeData(processedData.horizontalAngle[0], processedData.legendData)
-    let gaugeOption = {
-        tooltip: {},
+    let optionPower = {
+        title: {
+            left: 'center',
+            top: 5,
+            text: '测斜仪-受力',
+            // subtext: '近五小时',
+            // subtextStyle: {
+            //     color: 'rgb(34,45,148)',
+            //     fontSize: 12,
+            // }
+        },
         grid: {
             left: '3%',
-            right: '3%',
+            right: '5%',
             bottom: '3%',
             containLabel: true
         },
-        title: {
-            show: true,
-            text: '水平应力角度',
-            x: 'center',
-            y: 'top',
-            textAlign: 'left'
-        },
-        series: [
-            {
-                center: ["50%", "64%"],
-                radius: "100%",
-                startAngle: 180,
-                endAngle: 0,
-                min: 0,
-                max: 90,
-                type: 'gauge',
-                anchor: {
-                    show: true,
-                    showAbove: true,
-                    size: 18,
-                    itemStyle: {
-                        color: '#FAC858'
-                    }
-                },
-                pointer: {
-                    icon: 'path://M2.9,0.7L2.9,0.7c1.4,0,2.6,1.2,2.6,2.6v115c0,1.4-1.2,2.6-2.6,2.6l0,0c-1.4,0-2.6-1.2-2.6-2.6V3.3C0.3,1.9,1.4,0.7,2.9,0.7z',
-                    width: 8,
-                    length: '70%',
-                    offsetCenter: [0, '8%']
-                },
-                progress: {
-                    show: true,
-                    overlap: true,
-                    roundCap: true
-                },
-                axisLine: {
-                    roundCap: true
-                },
-                data: gaugeData,
-                title: {
-                    fontSize: 10
-                },
-                detail: {
-                    width: 20,
-                    height: 12,
-                    fontSize: 12,
-                    color: '#fff',
-                    backgroundColor: 'inherit',
-                    borderRadius: 3,
-                    formatter: '{value}°'
-                }
-            }
-        ]
-    };
-
-    let depth_value_hori_series = []
-    let depth_value_vert_series = []
-    for (let i = 0; i < processedData.depth_value_time.length; i++) {
-        let seriesItemX = {
-            name: `${processedData.depth_value_time[i]}`,
-            type: 'line',
-            smooth: true,
-            symbolSize: 10,
-            symbol: 'circle',
-            xAxisIndex: 0,
-            yAxisIndex: 0,
-            data: processedData.depth_value_hori_data[i]
-        }
-        depth_value_hori_series.push(seriesItemX)
-        let seriesItemY = {
-            name: `${processedData.depth_value_time[i]}`,
-            type: 'line',
-            smooth: true,
-            symbolSize: 10,
-            symbol: 'circle',
-            xAxisIndex: 1,
-            yAxisIndex: 1,
-            data: processedData.depth_value_vert_data[i]
-        }
-        depth_value_vert_series.push(seriesItemY)
-    }
-    let depth_value_hori_vert_Option = {
-        // color: ['#106776', '#3185fc', '#cbff8c', '#f2bac9', '#229631'],
-        title: [{
-            text: '水平-垂直受力偏移曲线',
-            left: '18%'
-        }],
-        grid: [{
-            left: '5%',
-            right: '55%',
-            top: 70,
-            bottom: 20,
-            containLabel: true
-        }, {
-            left: '55%',
-            right: '5%',
-            top: 70,
-            bottom: 20,
-            containLabel: true
-        }],
-        legend: {
-            top: 30,
-            itemWidth: 10,
-            itemHeight: 8,
-            formatter: function (value) {
-                return echarts.format.formatTime('hh:ss', value);
-            }
-        },
-        xAxis: [
-            {
-                type: 'value',
-                gridIndex: 0,
-                name: '水平受力(N)',
-                position: 'top',
-                nameLocation: 'middle',
-                axisTick: {
-                    show: false // 不展示刻度线
-                },
-                axisLabel: {
-                    margin: 1,
-                    interval: 2,
-                }
-            },
-            {
-                type: 'value',
-                gridIndex: 1,
-                name: '垂直受力(N)',
-                position: 'top',
-                nameLocation: 'middle',
-                axisTick: {
-                    show: false // 不展示刻度线
-                },
-                axisLabel: {
-                    margin: 1,
-                    interval: 2,
-                }
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                scale: true,
-                gridIndex: 0,
-                inverse: true,
-                name: '深度',
-                nameLocation: 'middle',
-                axisTick: {
-                    show: false // 不展示刻度线
-                },
-                axisLabel: {
-                    margin: 1,
-                }
-            },
-            {
-                type: 'value',
-                scale: true,
-                gridIndex: 1,
-                inverse: true,
-                name: '深度',
-                nameLocation: 'middle',
-                axisTick: {
-                    show: false // 不展示刻度线
-                },
-                axisLabel: {
-                    margin: 1,
-                }
-
-            }
-        ],
         tooltip: {
             trigger: 'axis',
+            valueFormatter: (value) => {
+                return value.toFixed(4)
+            }
         },
-        series: depth_value_vert_series
-    };
-    depth_value_hori_vert_Option.series.push(...depth_value_hori_series)
-
-
-    // test doble-bar
-    const xData = processedData.legendData
-    const horiDataOneTime = []
-    const vertDataOneTime = []
-    for (let i = 0; i < processedData.legendData.length; i++) {
-        horiDataOneTime.push(processedData.depth_value_hori_data[0][i][0])
-        vertDataOneTime.push(processedData.depth_value_vert_data[0][i][0])
-    }
-    const timeLineData = [1];
-    let colors = [
-        {
-            borderColor: "#0096c7",
-            start: "#90e0ef",
-            end: "#0096c7"
-        },
-        {
-            borderColor: "#49A179",
-            start: "#49A179",
-            end: "#95d5b2"
-        },
-    ];
-    let doubleBarOption = {
-        baseOption: {
-            //timeline::在多个option 间进行切换、播放等操作 ::baseOption 和一个 switchableOption 会用来计算最终的 finalOption
-            timeline: {
-                show: false,
-                top: 0,
-                data: []
+        xAxis: {
+            axisLine: {
+                show: true
             },
-            title: {
-                text: `应力桩-水平垂直受力图`,
-                left: 'center',
-                fontSize: 20,
-
+            axisTick: {
+                show: true
             },
-            grid: [
-                // 3个grid
-                {
-                    show: false,
-                    left: '14%',
-                    top: '20%',
-                    bottom: '2%',
-                    containLabel: true,
-                    width: '30%'
-                },
-                {
-                    show: false,
-                    left: '52.5%',
-                    top: '19%',
-                    bottom: '7%',
-                    width: '0%'
-                },
-                {
-                    show: false,
-                    right: '12%',
-                    top: '20%',
-                    bottom: '2%',
-                    containLabel: true,
-                    width: '30%'
-                }
-            ],
-            xAxis: [
-                {
-                    type: 'value',
-                    inverse: true,
-                    axisLine: {
-                        show: true,
-                        onZero: true, // X 轴或者 Y 轴的轴线是否在另一个轴的 0 刻度上
-                        lineStyle: {
-                            color: colors[0].borderColor,
-                        }
-                    },
-                    axisTick: {
-                        show: true
-                    },
-                    position: 'bottom',// bottom 且 inverse ==>朝左
-                    axisLabel: {
-                        show: true,
-                        color: colors[0].borderColor,
-                        fontSize: 10,
-                        fontFamily: "DINPro-Regular"
-                    },
-                    splitLine: {
-                        show: false
-                    },
-                },
-                {
-                    //中间不展示，只做轴
-                    gridIndex: 1,
-                    show: false
-                },
-                {
-                    gridIndex: 2,
-                    inverse: false,//正常向右，no inverse
-                    axisLine: {
-                        show: true,
-                        onZero: true,
-                        lineStyle: {
-                            color: colors[1].borderColor
-                        }
-                    },
-                    axisTick: {
-                        show: true
-                    },
-                    position: 'bottom',
-                    axisLabel: {
-                        show: true,
-                        color: colors[1].borderColor,
-                        fontSize: 10,
-                        fontFamily: "DINPro-Regular"
-                    },
-                    splitLine: {
-                        show: false
-                    },
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'category',//按深度 category 
-                    inverse: true,
-                    position: 'right',//轴放右边，bar朝左边
-                    axisLine: {
-                        show: true,
-                        lineStyle: {
-                            color: '#00A5CA45'
-                        }
-                    },
-                    //不显示y轴线
-                    axisTick: {
-                        show: false
-                    },
-                    axisLabel: {
-                        show: false
-                    },
-                    data: xData,//深度
-                },
-                {
-                    //注意中间这个空图表的操作,左右图共享轴线
-                    gridIndex: 1,
-                    type: 'category',
-                    inverse: true,
-                    // position: 'left',
-                    axisLine: {
-                        show: false
-                    },
-                    axisTick: {
-                        show: false
-                    },
-                    // 只显示 居中的label, 不显示轴线,刻度线
-                    axisLabel: {
-                        show: true,
-                        margin: 5,
-                        // padding:[-5,0,20,0],
-                        textStyle: {
-                            color: '#00425C',
-                            fontWeight: 'bolder',
-                            fontSize: 12,
-                        },
-                        align: "center"
-                    },
-                    data: xData.map(function (value) {
-                        return {
-                            value: value,
-                            textStyle: {
-                                align: 'center',
-                            }
-                        }
-                    })
-                },
-                {
-                    gridIndex: 2,
-                    type: 'category',
-                    inverse: true,
-                    position: 'left',
-                    axisLine: {
-                        show: true,
-                        lineStyle: {
-                            color: '#00A5CA45'
-                        }
-                    },
-                    //不显示y轴线
-                    axisTick: {
-                        show: false
-                    },
-                    axisLabel: {
-                        show: false
-                    },
-                    data: xData
-                }
-            ],
-            legend: {
-                top: '10%',
-                itemGap: 30,
-                left: '16%'
-            },
-            tooltip: {},
-            series: []
+            type: 'time',
+            min: 'dataMin',
+            max: 'dataMax'
         },
-        options: []
-    }
-    doubleBarOption.baseOption.timeline.data.push(timeLineData[0])
-    doubleBarOption.options.push({
+        yAxis: {
+            type: 'value',
+            min: function (v) {
+                return Math.floor(v.min)
+            },
+            max: function (v) {
+                return Math.ceil(v.max)
+            },
+        },
         series: [
             {
-                name: "水平受力(N)",
-                type: "bar",
-                xAxisIndex: 0,
-                yAxisIndex: 0,
-                itemStyle: {
-                    normal: {
-                        label: {
-                            //bar的数值显示
-                            show: true,
-                            position: 'left',
-                            textStyle: {
-                                color: colors[0].borderColor,
-                                fontSize: 10
-                            }
-                        },
-                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                            offset: 0,
-                            color: colors[0].start
-                        },
-                        {
-                            offset: 1,
-                            color: colors[0].end
-                        }
-                        ]),
-                        borderColor: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                            offset: 0,
-                            color: colors[0].borderColor
-                        },
-                        {
-                            offset: 1,
-                            color: colors[0].end
-                        }
-                        ]),
-                        borderWidth: 1
-                    }
-                },
-                data: horiDataOneTime,
-                animationEasing: "elasticOut"
+                name: '顶部受力',
+                data: processedData.topPower,
+                type: 'line'
             },
             {
-                name: "垂直受力(N)",
-                type: "bar",
-                stack: "2",
-                // barWidth: 25,
-                xAxisIndex: 2,
-                yAxisIndex: 2,
-                itemStyle: {
-                    normal: {
-                        label: {
-                            show: true,
-                            position: 'right',
-                            textStyle: {
-                                color: colors[1].borderColor,
-                                fontSize: 10
-                            }
-                        },
-                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                            offset: 0,
-                            color: colors[1].start
-                        },
-                        {
-                            offset: 1,
-                            color: colors[1].end
-                        }
-                        ]),
-                        borderColor: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                            offset: 0,
-                            color: colors[1].start
-                        },
-                        {
-                            offset: 1,
-                            color: colors[1].borderColor
-                        }
-                        ]),
-                        borderWidth: 1
-                    }
-                },
-                data: vertDataOneTime,
-                animationEasing: "elasticOut"
+                name: '中部受力',
+                data: processedData.midPower,
+                type: 'line'
+            },
+            {
+                name: '底部受力',
+                type: 'line',
+                data: processedData.btPower
             }
         ]
-    })
+    }
+    let optionAngle = {
+        title: {
+            left: 'center',
+            top: 5,
+            text: '测斜仪-应力角度',
+            // subtext: '近五小时',
+            // subtextStyle: {
+            //     color: 'rgb(34,45,148)',
+            //     fontSize: 12,
+            // }
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            valueFormatter: (value) => {
+                return value.toFixed(4)
+            }
+        },
+        xAxis: {
+            axisLine: {
+                show: true
+            },
+            axisTick: {
+                show: true
+            },
+            type: 'time',
+            min: 'dataMin',
+            max: 'dataMax'
+        },
+        yAxis: {
+            type: 'value',
+            min: function (v) {
+                return Math.floor(v.min)
+            },
+            max: function (v) {
+                return Math.ceil(v.max)
+            },
+        },
+        series: [
+            {
+                name: '顶部应力角',
+                data: processedData.topAngle,
+                type: 'line'
+            },
+            {
+                name: '中部应力角',
+                data: processedData.midAngle,
+                type: 'line'
+            },
+            {
+                name: '底部应力角',
+                type: 'line',
+                data: processedData.btAngle
+            }
+        ]
+    }
+    let optionChange = {
+        title: {
+            left: 'center',
+            top: 5,
+            text: '测斜仪-最大主应变',
+            // subtext: '近五小时',
+            // subtextStyle: {
+            //     color: 'rgb(34,45,148)',
+            //     fontSize: 12,
+            // }
+        },
+        grid: {
+            left: '3%',
+            right: '5%',
+            bottom: '3%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            valueFormatter: (value) => {
+                return value.toFixed(4)
+            }
+        },
+        xAxis: {
+            axisLine: {
+                show: true
+            },
+            axisTick: {
+                show: true
+            },
+            interval: 3,
+            type: 'time',
+            min: 'dataMin',
+            max: 'dataMax'
+        },
+        yAxis: {
+            type: 'value',
+            axisLine: {
+                show: true
+            },
+            axisTick: {
+                show: true
+            },
+            min: function (v) {
+                return Math.floor(v.min)
+            },
+            max: function (v) {
+                return Math.ceil(v.max)
+            },
+        },
+        series: [
+            {
+                name: '顶部最大主应变',
+                data: processedData.topChange,
+                type: 'line'
+            },
+            {
+                name: '中部最大主应变',
+                data: processedData.midChange,
+                type: 'line'
+            },
+            {
+                name: '底部最大主应变',
+                type: 'line',
+                data: processedData.btChange
+            }
+        ]
+    }
+
+
     return {
-        options: [gaugeOption, depth_value_hori_vert_Option, doubleBarOption],
-        names: ['水平应力角度', '受力偏移曲线', '受力柱状图']
+        options: [optionPower, optionAngle, optionChange],
+        names: ['受力', '应力角度', '最大主应变']
     }
 
 }
@@ -1309,8 +1047,8 @@ class MonitorDataAssistant {
                 return this.processedData
             case "2":
                 //应力桩
-                // this.processedData = generateData_Stress(this.monitoringData, this.monitoringMetaData)
-                this.processedData = {}
+                this.processedData = generateData_Stress(this.monitoringData)
+                console.log(this.processedData);
                 return this.processedData
             default:
                 console.warn('ERROR::getProcessedDataObject');

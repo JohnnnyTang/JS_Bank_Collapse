@@ -67,8 +67,8 @@ export default class BackEndRequest {
             }
             case '2': {
                 // return backendInstance.get(`/data/stressData/id/${code}`)
-                return new Promise((resolve) => { resolve({ data: [] }) })
-
+                // return new Promise((resolve) => { resolve({ data: [] }) })
+                return backendInstance.get(`/data/stressData/minute/30/device/${code}`)
             }
             case '3': {
                 // return backendInstance.get(`/data/manometerData/id/${code}`)

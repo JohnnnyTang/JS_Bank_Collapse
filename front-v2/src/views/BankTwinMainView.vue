@@ -84,10 +84,10 @@ onMounted(() => {
         useMapStore().setMap(map)
         await mapInit(map, true)
 
-        map.on('click', (e) => {
-            console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
+        // map.on('click', (e) => {
+        //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
 
-        })
+        // })
 
         resizeObserver.observe(containerDom.value)
     })
@@ -211,5 +211,9 @@ div.twin-main-container {
     right: 5px;
     top: 5px;
     border: none;
+}
+
+:deep(.el-overlay){
+    background-color: none;
 }
 </style>

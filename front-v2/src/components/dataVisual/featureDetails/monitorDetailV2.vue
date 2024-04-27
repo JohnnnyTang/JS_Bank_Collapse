@@ -1,5 +1,5 @@
 <template>
-    <div class="container" v-show="show">
+    <div class="container" v-show="show" >
         <div class="info-content-container">
             <div class="device-detail-container">
                 <div class="device-name-text">{{ DEVICETYPEMAP[(+deviceInfo.type) - 1] }}</div>
@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="chart" v-if="showChart" v-loading="true">
+            <div class="chart" v-if="showChart">
                 <pureChart></pureChart>
             </div>
         </div>
@@ -79,7 +79,6 @@ const show = computed(() => {
 const imgSrcPrefix = 'http://localhost:5173//device/all/'
 
 
-
 // const deviceInfo = computed(() => useSceneStore().selectedFeature)
 const deviceInfo = props.deviceInfo
 const STATIONMAP = {
@@ -93,6 +92,11 @@ const clickbuttonHandler = () => {
     buttonTxt.value = showChart.value ? "设备概要" : "查看图表"
 
 }
+// const scaleStyle = computed(() => {
+//     let scale = props.zoom.value / 18
+//     console.log(scale);
+//     return `transform: scale(${scale})`
+// })
 
 onMounted(async () => {
     deviceInfo.value["status"] = '正常运行';
