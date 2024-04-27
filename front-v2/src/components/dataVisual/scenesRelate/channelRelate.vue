@@ -2,7 +2,7 @@
     <div class="bankLineRelate-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">过江通道信息</div>
+            <div class="title">全江概貌场景</div>
         </div>
         <div class="card">
             <div class="content">

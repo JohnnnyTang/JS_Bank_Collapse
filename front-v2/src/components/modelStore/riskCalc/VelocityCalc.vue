@@ -2,55 +2,55 @@
     <div class="velocity-calc-content">
         <div class="model-input">
             <div class="model-params-container card">
-                <el-form
-                    ref="paramsFromRef"
-                    :model="paramsForm"
-                    class="model-params card"
-                    status-icon
-                >
-                    <el-form-item
-                        label="水文时间"
-                        prop="year"
-                        style="width: 90%; margin: 8px"
-                    >
-                        <el-input v-model="paramsForm.year" />
+                <div class="title-container">指标参数输入</div>
+                <el-form ref="paramsFromRef" :model="paramsForm" :rules="rules" class="model-params card" status-icon>
+                    <el-form-item label="水文时间" prop="year" style="width: 90%; margin: 2%; color: black">
+                        <el-select v-model="paramsForm.year" placeholder="2023">
+                            <div v-for="(item, index) in yearList" :key="index">
+                                <el-option :label="item" :value="item" />
+                            </div>
+                        </el-select>
                     </el-form-item>
-                    <el-form-item
-                        label="水文条件"
-                        prop="condition"
-                        style="width: 90%; margin: 8px"
-                    >
-                        <el-select
-                            v-model="paramsForm.condition"
-                            placeholder="枯季"
-                        >
+                    <el-form-item label="水文条件" prop="condition" style="width: 90%; margin: 2%; color: black">
+                        <el-select v-model="paramsForm.condition" placeholder="枯季">
                             <el-option label="枯季" value="dry" />
                             <el-option label="洪季" value="flood" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item style="width: 90%; margin: 20px 8px">
-                        <el-button
-                            type="primary"
-                            @click="submitForm(paramsFormRef)"
-                        >
+                    <el-form-item style="width: 90%; margin: 4%">
+                        <el-button type="primary" @click="submitForm(paramsFromRef)" :disabled="isDisable"
+                            color="#2a5fdb">
                             计算指标
                         </el-button>
-                        <el-button @click="resetForm(paramsFormRef)"
-                            >重置</el-button
-                        >
+                        <el-button @click="resetForm(paramsFromRef)">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div class="section-graph-container card">
+                <div class="title-container">断面形态</div>
                 <div ref="sectionGraphRef" class="section-graph card"></div>
             </div>
         </div>
         <div class="model-output">
             <div class="output-graph-container card">
-                <div ref="outputGraphRef" class="output-graph card"></div>
+                <div class="title-container">动力计算指标</div>
+                <div class="card" style="
+                        flex: 1 1 0;
+                        width: 95%;
+                        color: #0953aa;
+                        background-color: #d1e7ff;
+                        font-size: x-large;
+                        font-weight: bold;
+                    " v-show="isFinish == false" v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)">
+                    目前暂无结果
+                </div>
+                <div v-show="isFinish == true" ref="outputGraphRef" class="output-graph card" v-loading="isLoading"
+                    element-loading-background="rgba(214, 235, 255,0.8)"></div>
             </div>
             <div class="output-table-container card device-status-container">
                 <div class="small-title-container">
+                    <span style="padding-right: 3%"></span>
                     <div class="small-title-text">动力指标计算结果</div>
                 </div>
                 <div class="device-status-content">
@@ -59,19 +59,16 @@
                         <div class="device-count device-item head">矩阵</div>
                         <div class="device-percent device-item head">风险</div>
                     </div>
-                    <div
-                        class="device-status-row body"
-                        v-for="(item, index) in indexList"
-                        :key="index"
-                    >
+                    <div class="device-status-row body" v-for="(item, index) in indexValues" :key="index"
+                        v-loading="isLoading" element-loading-background="rgba(214, 235, 255,0.8)">
                         <div class="device-name device-item body">
-                            {{ ['PQ', 'KY', 'ZD'][index] }}
+                            {{ ['造床流量当量', '流速', '水位变化'][index] }}
                         </div>
                         <div class="device-count device-item body">
-                            {{ item[0] }}
+                            {{ item[0] || '无数据' }}
                         </div>
                         <div class="device-percent device-item body">
-                            {{ item[1] }}
+                            {{ item[1] || '无数据' }}
                         </div>
                     </div>
                 </div>
@@ -81,49 +78,137 @@
 </template>
 
 <script setup>
+import { useMultiIndexStore } from '@/store/multiIndexStore'
 import * as echarts from 'echarts'
-import { onMounted, reactive, ref } from 'vue'
-import { getPowerIndexResult, getSectionPoints } from './api.js'
+import { ElMessage } from 'element-plus'
+import { computed, onBeforeUpdate, onMounted, onUpdated, reactive, ref } from 'vue'
+import { getTaskJsonAPI, getTaskStatusAPI, postTaskStartAPI } from './api.js'
 import { drawOutputGraph, drawSectionGraph } from './util.js'
 
+let outputGraphChart = null
+let sectionChart = null
+const yearList = new Array(34).fill(0).map((_, index) => index + 1990)
+const multiIndexStore = useMultiIndexStore()
 const sectionPoints = ref(null)
-const PQ = ref(null)
-const KY = ref(null)
-const ZD = ref(null)
-const indexList = ref(null)
+const indexValues = ref([[], [], []])
 const sectionGraphRef = ref(null)
 const outputGraphRef = ref(null)
 const paramsFromRef = ref(null)
-
+const isLoading = ref(false)
 const paramsForm = reactive({
-    year: 0,
-    condition: 'dry',
+    year: null,
+    condition: null,
 })
+const rules = reactive({
+    year: [
+        {
+            required: true,
+            message: '请输入水文年份',
+        },
+    ],
+    condition: [
+        {
+            required: true,
+            message: '请输入水文条件',
+        },
+    ],
+})
+const props = defineProps({
+    show: {
+        type: Boolean,
+        required: true
+    }
+})
+const isDisable = computed(() => {
+    if (paramsForm) {
+        return !(paramsForm.year && paramsForm.condition)
+    } else {
+        return true
+    }
+})
+const isFinish = computed(() => indexValues.value[0].length !== 0)
 
-const submitForm = async (formEl) => {
-    //
+const submitForm = async () => {
+    const taskIDResponse = await postTaskStartAPI(
+        'power',
+        multiIndexStore.taskId,
+        paramsForm.condition,
+        paramsForm.year,
+    )
+    if (taskIDResponse.status === 'error') {
+        ElMessage({
+            message: '动力指标计算失败',
+            type: 'warning',
+        })
+        return
+    }
+    isLoading.value = true
+
+    const intervalID = setInterval(async () => {
+        const statusResponse = await getTaskStatusAPI(taskIDResponse.data)
+        if (
+            statusResponse.status === 'error' ||
+            statusResponse.data === '-1' ||
+            statusResponse.data === '-2'
+        ) {
+            clearInterval(intervalID)
+            ElMessage({
+                message: '动力指标计算失败',
+                type: 'warning',
+            })
+            isLoading.value = false
+        }
+        if (statusResponse.data === '2') {
+            const jsonResponse = await getTaskJsonAPI(multiIndexStore.taskId)
+            if (jsonResponse.status === 'error') {
+                clearInterval(intervalID)
+                ElMessage({
+                    message: '动力指标计算失败',
+                    type: 'warning',
+                })
+                isLoading.value = false
+            }
+            const json = jsonResponse.data
+            multiIndexStore.resJson = json
+            indexValues.value = [json.PQ, json.KY, json.ZD]
+
+            resetForm(paramsFromRef.value)
+            clearInterval(intervalID)
+
+            setTimeout(() => {
+                outputGraphChart.clear()
+                drawOutputGraph(outputGraphChart, indexValues.value)
+                outputGraphChart.resize()
+            }, 10)
+
+            ElMessage({
+                message: '动力指标计算成功',
+                type: 'success',
+            })
+            isLoading.value = false
+        }
+    }, 1000)
 }
 
 const resetForm = (formEl) => {
-    //
+    if (!formEl) return
+    formEl.resetFields()
 }
 
-onMounted(() => {
-    sectionPoints.value = getSectionPoints()
-    const result = getPowerIndexResult()
-    PQ.value = result.data.PQ
-    KY.value = result.data.KY
-    ZD.value = result.data.ZD
-    indexList.value = [PQ.value, KY.value, ZD.value]
-    console.log(indexList.value)
+onUpdated(() => {
+    if (multiIndexStore.resJson.section) {
+        sectionPoints.value = multiIndexStore.resJson.section
+        sectionChart.resize()
+        drawSectionGraph(
+            sectionChart,
+            sectionPoints.value.map((value) => value[2]),
+        )
+    }
+})
 
-    const sectionChart = echarts.init(sectionGraphRef.value)
-    drawSectionGraph(
-        sectionChart,
-        sectionPoints.value.data.map((value) => value[2]),
-    )
-    const outputGraphChart = echarts.init(outputGraphRef.value)
-    drawOutputGraph(outputGraphChart, [PQ.value[2], KY.value[2], ZD.value[2]])
+onMounted(() => {
+    sectionChart = echarts.init(sectionGraphRef.value)
+    outputGraphChart = echarts.init(outputGraphRef.value)
 })
 </script>
 
@@ -140,18 +225,23 @@ div.velocity-calc-content {
         flex-direction: column;
 
         .model-params-container {
+            flex-direction: column;
             flex: 1 1 0;
         }
+
         .section-graph-container {
+            flex-direction: column;
             flex: 1 1 0;
         }
     }
+
     .model-output {
         flex: 1 1 0;
         display: flex;
         flex-direction: column;
 
         .output-graph-container {
+            flex-direction: column;
             flex: 1 1 0;
         }
 
@@ -162,57 +252,58 @@ div.velocity-calc-content {
     }
 
     .card {
-        border-radius: 4px;
-        margin: 1px;
+        border-radius: 6px;
+        margin: 1%;
         background-color: #abd5f8;
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
+        box-shadow:
+            rgba(13, 70, 228, 0.6) 0px 2px 4px,
+            rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+            rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
     }
 
     .section-graph {
         height: 90%;
         width: 95%;
-        background-color: white;
+        background-color: hsla(210, 100%, 92%);
     }
 
     .model-params {
         height: 90%;
         width: 95%;
-        background-color: white;
+        background-color: #d1e7ff;
         display: block;
     }
 
     .output-graph {
         height: 90%;
         width: 95%;
-        background-color: white;
+        background-color: #d1e7ff;
         display: block;
     }
 }
 
 div.device-status-container {
     margin-top: 0.5vh;
-    margin-left: 2.5%;
     height: 24.2vh;
 
     div.small-title-container {
         width: 95%;
-        margin-left: 2.5%;
         margin-top: 1vh;
-        height: 3.5vh;
-        line-height: 3.5vh;
-        font-size: calc(0.6vw + 0.8vh);
+        margin-bottom: 0.5vh;
+        left: 5px;
+        height: 6vh;
+        line-height: 6vh;
         display: flex;
         border-radius: 8px;
 
-        background: linear-gradient(
-            90deg,
-            rgba(0, 56, 128, 1) 0%,
-            rgba(16, 104, 203, 1) 60%,
-            rgba(68, 159, 255, 1) 100%
-        );
+        background: linear-gradient(90deg,
+                rgba(0, 56, 128, 1) 0%,
+                rgba(16, 104, 203, 1) 60%,
+                rgba(68, 159, 255, 1) 100%);
 
         text-align: left;
         color: #c4fbff;
@@ -232,15 +323,15 @@ div.device-status-container {
     div.device-status-content {
         top: 5vh;
         width: 95%;
-        margin-left: 2.5%;
-        height: 18vh;
+        height: 40vh;
 
         // background-color: #c4fbff;
 
         div.device-status-row {
-            height: 16.6%;
+            height: 20%;
             width: 100%;
             border-radius: 8px;
+            margin-bottom: 1.2vh;
 
             // background-color: #2622fd;
 
@@ -255,9 +346,8 @@ div.device-status-container {
             div.device-item {
                 width: 28%;
                 height: 100%;
-                line-height: 3.2vh;
+                line-height: 6vh;
                 text-align: center;
-                font-size: calc(0.6vw + 0.5vh);
                 border-radius: 8px;
 
                 background-color: #d2f2ff;
@@ -279,13 +369,36 @@ div.device-status-container {
                         rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
                 }
 
-                box-shadow:
-                    rgba(13, 70, 228, 0.6) 0px 2px 4px,
-                    rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
-                    rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
             }
         }
     }
-    // background-color: #2622fd;
+}
+
+.title-container {
+    width: 93%;
+    margin-top: 1vh;
+    margin-bottom: 0.5vh;
+    padding-left: 2%;
+    height: 6vh;
+    line-height: 6vh;
+    display: flex;
+    border-radius: 8px;
+
+    background: linear-gradient(90deg,
+            rgba(0, 56, 128, 1) 0%,
+            rgba(16, 104, 203, 1) 60%,
+            rgba(68, 159, 255, 1) 100%);
+
+    text-align: left;
+    color: #c4fbff;
+    font-weight: bold;
+}
+
+:deep(.el-form-item__label) {
+    color: #0953aa;
+    font-weight: bold;
 }
 </style>

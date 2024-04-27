@@ -1,8 +1,10 @@
 <template>
 
-    <bankLineRelate v-if="selectedScene.title === '预警岸段'"></bankLineRelate>
-    <channelRelate v-if="selectedScene.title === '过江通道'"></channelRelate>
-    <monitorDeviceRelate v-if="selectedScene.title === '实时监测设备'"></monitorDeviceRelate>
+    <div class="p">
+        <channelRelate v-if="selectedScene.title === '全江概貌'"></channelRelate>
+        <bankLineRelate v-if="selectedScene.title === '典型崩岸'"></bankLineRelate>
+        <monitorDeviceRelate v-if="selectedScene.title === '民主沙预警监测'"></monitorDeviceRelate>
+    </div>
 
 </template>
 
@@ -17,4 +19,8 @@ const selectedScene = computed(() => useSceneStore().selectedScene)
 
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.p{
+    pointer-events: all;
+}
+</style>

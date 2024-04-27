@@ -61,17 +61,23 @@ export default class BackEndRequest {
         //data
         switch (type) {
             case '1': {
-                return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
+                // return backendInstance.get(`/data/gnssData/id/${code}`)
+                // return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
+                return backendInstance.get(`/data/gnssData/hour/5/device/${code}`)
             }
             case '2': {
                 // return backendInstance.get(`/data/stressData/id/${code}`)
-
+                // return new Promise((resolve) => { resolve({ data: [] }) })
+                return backendInstance.get(`/data/stressData/minute/30/device/${code}`)
             }
             case '3': {
-                return backendInstance.get(`/data/manometerData/day/1/device/${code}`)
+                // return backendInstance.get(`/data/manometerData/id/${code}`)
+                // return backendInstance.get(`/data/manometerData/day/1/device/${code}`)
+                return backendInstance.get(`/data/manometerData/hour/5/device/${code}`)
             }
             case '4': {
-                return backendInstance.get(`/data/inclinometerData/day/1/device/${code}`)
+                // return backendInstance.get(`/data/inclinometerData/day/1/device/${code}`)
+                return backendInstance.get(`/data/inclinometerData/hour/5/device/${code}`)
             }
         }
     }
@@ -96,29 +102,29 @@ export default class BackEndRequest {
         }
     }
 
-    static getDangerousDevice() {
+
+    static getMonitorWarningInfomation() {
 
         return new Promise((resolve) => {
-
-            const data = [
-                {
-                    deviceCode: 'MZS120.51749021_32.04053105_4',
-                    deviceType: '4'//测斜仪
-                },
-                {
-                    deviceCode: 'MZS120.51977143_32.04001152_1',
-                    deviceType: '1'
-                },
-                {
-                    deviceCode: 'MZS120.51749289_32.04059243_1',
-                    deviceType: 'GNSS'
-                }
-            ]
-
-            resolve({data:data})
+            resolve({
+                data: [
+                    {
+                        deviceCode: 'MZS120.55327892_32.02707923_1',
+                        warningValue: '16.64m',
+                        time:'123'
+                    },
+                    {
+                        deviceCode: 'MZS120.55649757_32.02592404_1',
+                        warningValue: '13.42m',
+                        time:'123'
+                    }
+                ]
+            })
         })
 
     }
+
+
 
 }
 

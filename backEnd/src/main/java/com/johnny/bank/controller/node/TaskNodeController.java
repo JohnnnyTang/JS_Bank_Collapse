@@ -1,6 +1,7 @@
 package com.johnny.bank.controller.node;
 
 import com.johnny.bank.controller.node.base.BaseNodeController;
+import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.node.TaskNode;
 import com.johnny.bank.service.node.impl.TaskNodeService;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,11 @@ public class TaskNodeController extends BaseNodeController<TaskNode> {
     @PutMapping("status/{id}/{status}")
     public ResponseEntity<Boolean> changeStatus(@PathVariable String id, @PathVariable String status) {
         return ResponseEntity.ok(((TaskNodeService) nodeServiceImpl).updateNodeStatusById(id, status));
+    }
+
+    @GetMapping("/{nodeId}/status")
+    public ResponseEntity<String> findStatusById(@PathVariable("nodeId") String productId) {
+        return ResponseEntity.ok((nodeServiceImpl.findById(productId)).getStatus());
     }
 
     @GetMapping("auto")

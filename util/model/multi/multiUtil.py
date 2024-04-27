@@ -2,8 +2,23 @@ import math
 import pickle
 
 import numpy as np
-from osgeo import gdal
+from osgeo import gdal, osr
 from scipy.spatial import cKDTree
+
+
+def lnglat2xy(
+    lnglat: tuple[float, float], srcSrs: int, dstSrs: int
+) -> tuple[float, float]:
+    src: osr.SpatialReference = osr.SpatialReference()
+    src.ImportFromEPSG(srcSrs)
+    src.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    dst: osr.SpatialReference = osr.SpatialReference()
+    dst.ImportFromEPSG(dstSrs)
+    dst.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
+    ct: osr.CoordinateTransformation = osr.CoordinateTransformation(src, dst)
+    transform = ct.TransformPoint(lnglat[0], lnglat[1])
+    return transform
 
 
 def geo2imagexy(dataset: gdal.Dataset, x: float, y: float):
@@ -337,7 +352,7 @@ def computeSaIndex(
 def computeLnIndex(
     ZNow: list[float], yearNow: int, ZBefore: list[float], yearBefore: int
 ) -> tuple[tuple[int, int, int, int], str, float]:
-    totalNum: int = len(ZNow)
+    totalNum: int = min(len(ZNow), len(ZBefore))
     LnList: list = []
 
     for i in range(totalNum):

@@ -7,6 +7,7 @@ import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.node.TaskNode;
+import com.johnny.bank.model.resource.dataResource.GeoJsonData;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.nodeRepo.IModelNodeRepo;
 import com.johnny.bank.repository.nodeRepo.IParamNodeRepo;
@@ -37,7 +38,6 @@ public class TaskNodeService extends NodeService<TaskNode> {
     private MultiIndexPath multiIndexPath;
     private IGeoJsonDataRepo geoJsonDataRepo;
 
-
     @Autowired
 //    @Qualifier("BaseNodeRepo")
     public void setBaseNodeRepo(ITaskNodeRepo IBaseNodeRepo) {
@@ -59,7 +59,14 @@ public class TaskNodeService extends NodeService<TaskNode> {
         if(taskNode.getParamNode().getId() != null) {
             Optional<ParamNode> paramNode = paramNodeRepo.findById(taskNode.getParamNode().getId());
             taskNode.setParamNode(paramNode.orElse(null));
-        } else taskNode.setParamNode(null);
+        }
+        else {
+            ParamNode newParamNode = taskNode.getParamNode();
+            newParamNode = paramNodeRepo.save(newParamNode);
+            log.info(newParamNode.toString());
+            taskNode.setParamNode(newParamNode);
+        }
+        // TODO: 没有的话创建paramNode
 
         return IBaseNodeRepo.save(taskNode).getId();
     }
@@ -85,9 +92,6 @@ public class TaskNodeService extends NodeService<TaskNode> {
 //        return ((ITaskNodeRepo)IBaseNodeRepo).queryById(id);
 //    }
 
-
-    // TODO: 新增任务的业务逻辑、任务案例页面
-
     public String createAndStartNewTask(TaskNode taskNode) throws Exception {
         String nodeId = save(taskNode);
         taskNode = IBaseNodeRepo.findById(nodeId).orElse(null);
@@ -98,7 +102,13 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 case "65b78631028eca632d0afae2":
                     new CmdOutputTaskThread(taskNode).start();
                     break;
-                case "":
+                case "662a2dafdcbfea190d03b033":
+                    new SectionIndexTaskThread(taskNode).start();
+                    break;
+                case "662a3c0e69037b3a4d26df1c":
+                case "662a427276ff9b32ec9053e5":
+                case "662a4521ddd45f65873eb067":
+                    new OtherMultiIndexTaskThread(taskNode).start();
                     break;
                 default:
                     throw new Exception("Not found this model");
@@ -181,9 +191,9 @@ public class TaskNodeService extends NodeService<TaskNode> {
         public void run() {
             try {
                 updateNodeStatusById(taskNode.getId(), "1");
-                String fullJsonResPath = multiIndexPath.getDataPath() + taskNode.getId() + ".json";
+                String fullJsonResPath = multiIndexPath.getResPath() + taskNode.getId() + ".json";
                 Process process = ProcessUtil.buildSectionTaskNodeProcess(
-                        taskNode, fullJsonResPath, multiIndexPath.getResPath()
+                        taskNode, multiIndexPath.getDataPath(), fullJsonResPath
                 );
                 ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
                 log.info(cmdOutput.toString());
@@ -199,6 +209,10 @@ public class TaskNodeService extends NodeService<TaskNode> {
                     File resJson = new File(fullJsonResPath);
                     if (resJson.exists()) {
                         updateNodeStatusResultById(taskNode.getId(), "2", result);
+                        GeoJsonData geoJsonData = GeoJsonData.geojsonBuilder()
+                                .id(taskNode.getId()).path(fullJsonResPath).type("geojson").name("multiRes")
+                                .build();
+                        geoJsonDataRepo.insertData(geoJsonData);
                     }
                     else {
                         updateNodeStatusResultById(taskNode.getId(), "-2", result);
@@ -244,7 +258,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
 //                    taskNode.setStatus("1");
                     JSONObject result = new JSONObject();
                     result.put("resultString", cmdOutput.getOutputString());
-                    result.put("resJsonId", taskNode.getParamNode().getParams().get(""));
+                    result.put("resJsonId", taskNode.getParamNode().getParams().get("jsonId"));
                     updateNodeStatusResultById(taskNode.getId(), "2", result);
 //                    taskNode.getResult().put("resultString", cmdOutput.getOutputString());
                 }

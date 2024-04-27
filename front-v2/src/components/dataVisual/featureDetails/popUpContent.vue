@@ -17,7 +17,7 @@ import terrainDetail from './terrainDetail.vue';
 import sectionDetail from './sectionDetail.vue';
 
 import { onMounted, ref, computed, watch } from 'vue';
-import { useSceneStore,useDataStore } from '../../../store/mapStore';
+import { useSceneStore } from '../../../store/mapStore';
 
 const sceneStore = useSceneStore()
 const selectedScene = computed(() => sceneStore.selectedScene)

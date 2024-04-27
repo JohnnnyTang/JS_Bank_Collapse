@@ -1,189 +1,277 @@
 <template>
-    <div class="warning-pop">
-        <div class="icon" v-show="testZoom < 12"></div>
+    <div class="warning-card">
 
-        <div class="content" v-show="testZoom >= 12">
-            <div class="header">
-                <div class="icon-title"></div>
-                <div class="title">警告！</div>
+        <div class="main">
+            <div class="title">
+                <div class="icon"></div>
+                <div class="text titletext">警告！</div>
             </div>
-            <hr>
-            <div class='con-tent'>
-                <div class="info">
-                    <div class="device-info">
-                        预警信息
-                    </div>
-                    <div class="deviceType">
-                        GNSS
-                    </div>
-                    <div class="deviceCode">
-                        <div class="code">设备码</div>
-                        <div class="text">
-                            Lorem ipsum dolor
-                        </div>
-                    </div>
-                    <div class="devicePos">
-                        <div class="pos">位置</div>
 
-                        <div class="text">
-                            123123123,123123123
-                        </div>
+            <hr>
+
+            <div class="content">
+                <div class="deviceType">
+                    <div class="desc">设备信息</div>
+                    <div class="text">{{ info.deviceType }}</div>
+                </div>
+                <div class="deviceID">
+                    <div class="text">{{ info.deviceID }}</div>
+                </div>
+                <div class="reason">
+                    <div class="desc">报警原因</div>
+                    <div class="text">
+                        <span
+                            style="font-size: calc(0.5vh + 0.4vw); display: block; height: 40%; line-height:  calc(0.5vh + 0.4vw);">累计位移</span>
+                        <span style="color: red; height: 60%;">{{ info.dif+' m' }}</span>
                     </div>
                 </div>
 
-
-
+                <div class="time">
+                    <div class="desc">报警时间</div>
+                    <!-- <div class="text">{{ time }}</div> -->
+                    <div class="text">
+                        <div class="date">{{ info.yymmdd }}</div>
+                        <div class="second">{{ info.hhmmss }}</div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <div class="arrow"></div>
     </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-
+import { computed, onMounted } from 'vue';
+import dayjs from 'dayjs'
 
 const props = defineProps({
-    zoom: Number
+    warningInfo: Object
 })
-const testZoom = 13;
+
+const deviceType = 'GNSS'
+const deviceID = 'MZS1234567_7654321cm'
+const reason = '14.684m'
+// const yymmdd = dayjs().format('YYYY-MM-DD')
+// const hhmmss = dayjs().format('HH:mm:ss')
+const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+
+const info = computed(() => {
+    let infom = props.warningInfo.warningInfo
+    let type ='GNSS'
+    let time = dayjs(infom.warnTime)
 
 
+    return {
+        deviceType: type,
+        yymmdd: time.format('YYYY-MM-DD'),
+        hhmmss: time.format('HH:mm:ss'),
+        deviceID: infom.deviceId,
+        dif: infom.threeDiff.toFixed(4)
+
+    }
+})
+
+onMounted(() => {
+})
 
 
 </script>
 
 <style lang="scss" scoped>
-/* The loader container */
-
-/* The dot */
-.warning-pop {
-    width: 10vw;
-    height: 20vh;
-    // background-color: #fac3b5;
-
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    // box-shadow: rgb(29, 72, 196) 0px 0px 25px 3px inset;
-    border-radius: 5%;
+.warning-card {
+    // position: absolute;
+    // left: 50%;
+    // top: 50%;
+    // transform: translateX(-50%) translateY(-50%);
 
 
-    .icon {
-        width: 4vh;
-        height: 4vh;
-        background-size: contain;
-        background-image: url('/alarm.png');
-        animation: warningScale 5s infinite;
-        border-radius: 40%;
-    }
+    position: relative;
+    width: 12vw;
+    height: 18.5vh;
+    user-select: none;
 
-    .content {
-        width: 10vw;
-        height: 20vh;
+    div.main {
         position: relative;
-        box-shadow: rgb(253, 80, 80) 0px 0px 5px 3px inset;
-        border-radius: calc(0.2vw + 0.5vh);
+        margin-top: 0.5vh;
+        margin-left: 1vw;
+        width: 11vw;
+        height: 18vh;
+        background-color: rgb(237, 239, 224);
+        box-shadow: rgb(255, 193, 160) 0px 0px 25px 3px inset;
+        border-radius: 5%;
 
-
-        .header {
-            width: 10vw;
+        .title {
+            width: 11vw;
             height: 5vh;
             display: flex;
             flex-direction: row;
+            justify-content: center;
+            // background-color: #e1c39b;
 
-
-            .icon-title {
+            .icon {
                 width: 4vh;
                 height: 4vh;
-                margin-top: 0.5vh;
-                margin-left: 0.5vw;
                 background-size: contain;
                 background-image: url('/alarm.png');
-                border-radius: 40%;
+                margin-right: 1vw;
+                margin-top: 0.5vh;
+                line-height: 5vh;
+                animation: warn .8s linear infinite;
             }
 
-            .title {
-                width: calc(10vw - 4vh);
-                height: 5vh;
-                text-align: center;
+            .titletext {
                 line-height: 5vh;
-                font-size: calc(1vw + 0.5vh);
-                font-weight: 800;
+                font-size: calc(1.0vw + 0.8vh);
+                color: rgb(253, 75, 75);
             }
+
         }
 
         hr {
             margin: 0;
-            border-top: 5px;
-            border-color: rgb(253, 80, 80);
+            border-top-width: 2px;
+            border-color: rgb(255, 0, 0);
         }
 
-        .con-tent {
-            position: relative;
-            width: 10vw;
-            height: 15vh;
+        .content {
+            margin-top: 0.5vh;
+            width: 11vw;
+            height: 12vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
 
-            .device-info {
-                position: relative;
+            div.desc {
                 width: 4vw;
-                height: 3vh;
+                height: 2.5vh;
+                font-size: calc(0.7vh + 0.5vw);
+                font-weight: 600;
+                background-color: rgba(255, 135, 111, 0.586);
                 text-align: center;
-                line-height: 5vh;
-                font-size: calc(0.7vw + 0.5vh);
-                font-weight: 800;
+                transform: translateX(-0.5vw) skew(-10deg);
             }
 
-
+            div.text {
+                height: 2.5vh;
+                line-height: 2.5vh;
+                font-size: calc(0.8vh + 0.6vw);
+                font-family: "Trebuchet MS";
+                color: rgba(54, 25, 92, 0.902);
+            }
 
             .deviceType {
-                width: 10vw;
-                height: 3vh;
+                height: 2.5vh;
                 display: flex;
                 flex-direction: row;
-                justify-content: center;
-                align-items: center;
+                justify-content: flex-start;
+                width: 11vw;
+
+                .text {
+                    width: 6vw;
+                    text-align: right;
+                }
             }
 
-            .deviceCode {
-                width: 10vw;
-                height: 3vh;
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
+            .deviceID {
+                height: 1.5vh;
+                width: 11vw;
+                transform: translateY(-20%);
+
+                .text {
+                    width: 11vw;
+                    margin-left: 0vw;
+                    font-size: calc(0.3vh + 0.4vw);
+                    font-weight: 600;
+                    text-align: center;
+
+                }
             }
 
-            .devicePos {
-                width: 10vw;
-                height: 3vh;
+            .reason {
                 display: flex;
                 flex-direction: row;
-                justify-content: center;
-                align-items: center;
+                justify-content: flex-start;
+                margin-top: 1vh;
+                text-align: right;
+
+                .text {
+                    width: 6vw;
+                    font-size: calc(0.5vh + 0.5vw);
+
+                }
+            }
+
+            .time {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                margin-top: 1.3vh;
+
+                .text {
+                    width: 5vw;
+                    height: 3vh;
+                    margin-left: 1.5vw;
+                    text-align: center;
+                    transform: translateY(-10%);
+
+                    // line-height: 1.5vh;
+                    // font-size: calc(0.3vh + 0.5vw);
+                    .date {
+                        width: 5vw;
+                        height: 1.3vh;
+                        line-height: 1.3vh;
+                        font-size: 1.2vh;
+                        // font-size: calc(0.3vh + 0.5vw);
+                    }
+
+                    .second {
+                        width: 5vw;
+                        height: 1.7vh;
+                        line-height: 1.7vh;
+                        font-size: 1.6vh;
+                        color: red;
+                    }
+                }
             }
 
         }
+
     }
 
+
+    div.text {
+        line-height: 4vh;
+        font-family: "Trebuchet MS", Helvetica, sans-serif;
+        font-weight: 600;
+
+
+    }
+
+    div.arrow {
+        position: absolute;
+        left: 45%;
+        bottom: -0.5vh;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 15px solid rgb(244, 215, 190);
+    }
 }
 
 
-@keyframes warningScale {
+@keyframes warn {
 
     0%,
     100% {
+        margin-top: 0.5vh;
         transform: scale(1.0);
-        box-shadow: rgb(247, 161, 161) 0px 0px 2px 2px;
-        background-color: rgb(247, 161, 161);
     }
 
-    75% {
+    50% {
+        margin-top: 0;
         transform: scale(1.1);
-        box-shadow: rgb(247, 101, 101) 0px 0px 4px 4px;
-        background-color: rgb(247, 101, 101);
     }
-
-
 }
 </style>
