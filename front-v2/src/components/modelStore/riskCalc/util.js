@@ -13,7 +13,7 @@ export const drawSectionGraph = (echarts, points) => {
             height: '70%',
             top: '10%',
             show: true,
-            backgroundColor: '#2a5fdb',
+            backgroundColor: '#d2f2ff',
         },
         tooltip: {
             trigger: 'axis',
@@ -50,7 +50,7 @@ export const drawSectionGraph = (echarts, points) => {
                 // symbol: 'circle',
                 areaStyle: {
                     opacity: 0.8,
-                    color: '#d2f2ff',
+                    color: '#2a5fdb',
                 },
             },
         ],
@@ -60,8 +60,8 @@ export const drawSectionGraph = (echarts, points) => {
 }
 
 export const drawPlainSectionGraph = (echarts, points) => {
-    const min = Math.min(...(points.map((value) => value[2])))
-    const max = Math.max(...(points.map((value) => value[2])))
+    const min = Math.min(...points.map((value) => value[2]))
+    const max = Math.max(...points.map((value) => value[2]))
     const index = points.indexOf(min)
     const option = {
         grid: {
@@ -71,7 +71,7 @@ export const drawPlainSectionGraph = (echarts, points) => {
             bottom: '5%',
             show: true,
             backgroundColor: '#dff2ff',
-            containLabel: true
+            containLabel: true,
         },
         tooltip: {
             trigger: 'axis',
