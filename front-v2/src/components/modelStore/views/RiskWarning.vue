@@ -2,7 +2,7 @@
     <div class="dataInterpretation-container">
         <ModelTitleVue :ModelName="ModelName" />
         <div class="model-content-container">
-            <ModelFlowVue />
+            <ModelFlowVue @change-model="switchPage"/>
             <div class="model-run-container">
                 <div class="model-run-title">{{ curRunModelName }}</div>
                 <div class="model-run-content">
@@ -11,12 +11,14 @@
                     />
                     <VelocityCalcVue
                         v-show="curRunModelName == '动力指标计算'"
+                        :show="curRunModelName == '动力指标计算'"
                     />
                     <EvolveCalcVue
                         v-show="curRunModelName == '演变分析指标计算'"
+                        :show="curRunModelName == '演变分析指标计算'"
                     />
                     <ElementCalcVue
-                        v-show="curRunModelName == '多指标因子配置'"
+                        v-show="curRunModelName == '风险矩阵配置计算'"
                     />
                 </div>
             </div>
@@ -39,7 +41,11 @@ const multiIndexStore = useMultiIndexStore()
 
 const ModelName = '风险预警模型'
 
-const curRunModelName = ref('多指标因子配置')
+const curRunModelName = ref('计算断面选择')
+
+const switchPage = (modelLabel) => {
+    curRunModelName.value = modelLabel
+}
 
 onMounted(() => {})
 </script>

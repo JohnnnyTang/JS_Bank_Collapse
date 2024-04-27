@@ -13,7 +13,7 @@ export const drawSectionGraph = (echarts, points) => {
             height: '70%',
             top: '10%',
             show: true,
-            backgroundColor: '#2a5fdb',
+            backgroundColor: '#d2f2ff',
         },
         tooltip: {
             trigger: 'axis',
@@ -50,7 +50,65 @@ export const drawSectionGraph = (echarts, points) => {
                 // symbol: 'circle',
                 areaStyle: {
                     opacity: 0.8,
-                    color: '#d2f2ff',
+                    color: '#2a5fdb',
+                },
+            },
+        ],
+    }
+
+    echarts.setOption(option)
+}
+
+export const drawPlainSectionGraph = (echarts, points) => {
+    const min = Math.min(...points.map((value) => value[2]))
+    const max = Math.max(...points.map((value) => value[2]))
+    const index = points.indexOf(min)
+    const option = {
+        grid: {
+            left: '3%',
+            right: '3%',
+            top: '5%',
+            bottom: '5%',
+            show: true,
+            backgroundColor: '#dff2ff',
+            containLabel: true,
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985',
+                },
+            },
+        },
+        xAxis: {
+            type: 'category',
+            data: points.map((_, index) => index),
+            position: 'bottom',
+        },
+        yAxis: {
+            type: 'value',
+            splitLine: {
+                show: false,
+            },
+            axisLine: {
+                show: false,
+            },
+            scale: true,
+            max: Math.round(max + 2),
+            min: Math.round(min - 2),
+        },
+        series: [
+            {
+                name: '断面深度',
+                data: points.map((value) => value[2].toFixed(2)),
+                type: 'line',
+                smooth: true,
+                // symbol: 'circle',
+                areaStyle: {
+                    opacity: 0.8,
+                    color: '#0046C2',
                 },
             },
         ],

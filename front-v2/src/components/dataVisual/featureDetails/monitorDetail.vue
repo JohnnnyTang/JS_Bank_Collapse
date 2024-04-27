@@ -50,7 +50,7 @@
                 </div>
             </div>
 
-            <div class="chart" v-if="showChart">
+            <div class="chart" v-show="showChart">
                 <pureChart></pureChart>
             </div>
         </div>

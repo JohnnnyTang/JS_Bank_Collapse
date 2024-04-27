@@ -7,7 +7,6 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import DataVVue3 from '@kjgl77/datav-vue3'
 import { DraggablePlugin } from '@braks/revue-draggable';
-
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 

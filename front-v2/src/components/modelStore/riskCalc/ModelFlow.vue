@@ -1,8 +1,14 @@
 <template>
     <div class="model-flow-container">
         <div class="model-flow-title">风险预警模型工作流</div>
-        <div class="model-flow-content">
-            <VueFlow v-model="elements"> </VueFlow>
+        <div class="model-flow-content" ref="modelFlowDom">
+            <VueFlow :nodes="nodes" :edges="edges" @node-click="FlowNodeClick">
+                <template #node-flow="props">
+                    <FlowNode
+                        :data="props.data"
+                    />
+                </template>
+            </VueFlow>
         </div>
     </div>
 </template>
@@ -11,52 +17,22 @@
 import { ref, onMounted } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import '@vue-flow/core/dist/style.css'
+import { initialNodes, initialEdges } from './flowChartConfig.js'
+import FlowNode from './FlowNode.vue'
 
-const elements = ref([
-    // nodes
+const nodes = ref(initialNodes)
+const edges = ref(initialEdges)
+const modelFlowDom = ref()
+const emit = defineEmits(['changeModel'])
 
-    // an input node, specified by using `type: 'input'`
-    {
-        id: '1',
-        type: 'input',
-        label: '计算断面选择',
-        position: { x: 150, y: 5 },
-    },
+const FlowNodeClick = (e) => {
+    console.log('click node', e.node.label)
+    emit("changeModel", e.node.label)
+}
 
-    // default node, you can omit `type: 'default'` as it's the fallback type
-    { id: '2', label: '动力指标计算', position: { x: 50, y: 200 } },
-
-    // An output node, specified by using `type: 'output'`
-    { id: '3', label: '演变分析指标计算', position: { x: 250, y: 200 } },
-
-    {
-        id: '4',
-        type: 'output',
-        label: '多指标因子配置',
-        position: { x: 150, y: 400 },
-    },
-
-    // A custom node, specified by using a custom type name
-    // we choose `type: 'special'` for this example
-
-    // edges
-
-    // simple default bezier edge
-    // consists of an id, source-id and target-id
-    { id: 'e1-3', source: '1', target: '3', animated: true },
-
-    // an animated edge, specified by using `animated: true`
-    { id: 'e1-2', source: '1', target: '2', animated: true },
-    { id: 'e2-4', source: '2', target: '4', animated: true },
-    { id: 'e3-4', source: '3', target: '4', animated: true },
-
-    // a custom edge, specified by using a custom type name
-    // we choose `type: 'special'` for this example
-])
 </script>
 
 <style lang="scss" scoped>
-
 div.model-flow-container {
     width: 24vw;
     height: 85vh;

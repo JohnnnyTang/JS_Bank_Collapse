@@ -35,19 +35,17 @@ const showChart = (index) => {
     }
 }
 
-watch(selectedFeature, async (newV, oldV) => {
-    selectedIndex.value = 0;
-    myChart && myChart.clear()
-    if (newV) {
-        dataAssitant.value = new MonitorDataAssistant(newV)
-        await dataAssitant.value.getMonitoringdata()
-        dataAssitant.value.getProcessedDataObject()
-        dataAssitant.value.getChartOptions()
-        myChart.setOption(dataAssitant.value.chartOptions.options[0])
-    }
-
-
-})
+// watch(selectedFeature, async (newV, oldV) => {
+//     selectedIndex.value = 0;
+//     myChart && myChart.clear()
+//     if (newV) {
+//         dataAssitant.value = new MonitorDataAssistant(newV)
+//         await dataAssitant.value.getMonitoringdata()
+//         dataAssitant.value.getProcessedDataObject()
+//         dataAssitant.value.getChartOptions()
+//         myChart.setOption(dataAssitant.value.chartOptions.options[0])
+//     }
+// })
 
 
 
@@ -55,6 +53,7 @@ watch(selectedFeature, async (newV, oldV) => {
 onMounted(async () => {
     chartDom = document.getElementById('chart');
     myChart = echarts.init(chartDom);
+    myChart.showLoading()
 
     console.log('!!!',selectedFeature.value);
     dataAssitant.value = new MonitorDataAssistant(selectedFeature.value)
@@ -62,6 +61,7 @@ onMounted(async () => {
     await dataAssitant.value.getMonitoringdata()
     dataAssitant.value.getProcessedDataObject()
     dataAssitant.value.getChartOptions()
+    myChart.hideLoading()
 
     myChart.setOption(dataAssitant.value.chartOptions.options[0])
 
