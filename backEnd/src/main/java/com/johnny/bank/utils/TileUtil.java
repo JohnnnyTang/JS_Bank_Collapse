@@ -38,7 +38,7 @@ public class TileUtil {
     static {
         fieldListMap.put("mzs_section_line_label", List.of("id", "label"));
         fieldListMap.put("mzs_bank_area_w", List.of("id", "warn"));
-        fieldListMap.put("mzs_bank_area_s", List.of("id", "stability"));
+        fieldListMap.put("mzs_bank_area_s", List.of("id", "stability", "stability_2019"));
         fieldListMap.put("mzs_overwater_bound", List.of("id"));
         fieldListMap.put("mzs_underwater_bound", List.of("id"));
     }

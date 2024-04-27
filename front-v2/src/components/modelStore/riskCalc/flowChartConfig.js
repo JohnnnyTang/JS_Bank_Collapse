@@ -46,7 +46,7 @@ export const initialEdges = [
         target: '2',
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
-        updatable: true
+        style: { stroke: '#333', strokeWidth: 3 },
     },
     {
         id: 'e1-3',
@@ -54,13 +54,7 @@ export const initialEdges = [
         target: '3',
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
-        style: {
-            'stroke-color': '#fff',
-        },
-        data: {
-            text: 'xyz'
-        },
-        updatable: true
+        style: { stroke: '#333', strokeWidth: 3 },
     },
 
     {
@@ -69,7 +63,7 @@ export const initialEdges = [
         target: '4',
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
-        updatable: true
+        style: { stroke: '#333', strokeWidth: 3 },
     },
     {
         id: 'e3-4',
@@ -77,6 +71,6 @@ export const initialEdges = [
         target: '4',
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
-        updatable: true
+        style: { stroke: '#333', strokeWidth: 3 },
     },
 ]

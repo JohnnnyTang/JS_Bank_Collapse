@@ -126,7 +126,7 @@ const barOption = {
             label: {
                 show: true,
                 formatter: '{@score}个',
-                fontSize: 24,
+                fontSize: 16,
                 fontFamily: 'Impact',
                 // fontWeight: 'bold',
                 color: '#fff',

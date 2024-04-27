@@ -546,7 +546,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-    resizeObserver.unobserve(containerDom.value)
+    resizeObserver.disconnect()
 })
 </script>
 

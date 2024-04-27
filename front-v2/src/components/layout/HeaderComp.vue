@@ -108,7 +108,7 @@ const hoverBracketLeft = ref(0)
 
 const navList = ref([
     {
-        name: '数据底板平台',
+        name: '崩岸专题信息',
         routerLink: '/dataVisual',
         isActive: false,
         oneRow: true,
@@ -122,8 +122,8 @@ const navList = ref([
         iconUrl: '/knowledge.png',
     },
     {
-        name: '江苏省长江',
-        nameTwo: '崩岸监测预警应用系统',
+        name: '江苏省长江崩岸',
+        nameTwo: '监测预警应用系统',
         routerLink: '/',
         isActive: true,
         oneRow: false,

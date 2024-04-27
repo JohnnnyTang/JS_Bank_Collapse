@@ -57,9 +57,9 @@ const mapFlyToRiver = (mapIns) => {
     )
 }
 
-const resizeObserver = new ResizeObserver((entries) => {
-    mapFlyToRiver(map)
-})
+// const resizeObserver = new ResizeObserver((entries) => {
+//     mapFlyToRiver(map)
+// })
 
 const navToManage = () => {
     router.push('/bankManage')
@@ -89,12 +89,12 @@ onMounted(() => {
 
         // })
 
-        resizeObserver.observe(containerDom.value)
+        // resizeObserver.observe(containerDom.value)
     })
 })
 
 onUnmounted(() => {
-    resizeObserver.disconnect()
+    // resizeObserver.disconnect()
     // resizeObserver.unobserve(containerDom.value)
     console.log('onUnmounted')
     map && map.remove()

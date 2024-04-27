@@ -86,7 +86,7 @@ const pieOption = {
             label: {
                 show: true,
                 formatter: '{@name}\n{d}%',
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: 'bold',
                 color: '#fff',
                 position: 'inside',
@@ -159,7 +159,7 @@ const barOption = {
             label: {
                 show: true,
                 formatter: '{@score}个',
-                fontSize: 24,
+                fontSize: 16,
                 fontFamily: 'Impact',
                 // fontWeight: 'bold',
                 color: '#fff',

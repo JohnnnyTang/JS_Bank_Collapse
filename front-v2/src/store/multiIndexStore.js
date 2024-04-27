@@ -243,31 +243,38 @@ export const useMultiIndexStore = defineStore(
 
         function updateSectionStatus(newStatus) {
             flowNode.value[0].data.status = newStatus
+            console.log("update", flowEdge.value[2])
+            
             if (newStatus == 2) {
                 flowNode.value[1].data.status = 0
                 flowNode.value[2].data.status = 0
                 flowNode.value[3].data.status = -1
+                flowEdge.value[0].style.stroke = '#10b981'
+                flowEdge.value[1].style.stroke = '#10b981'
             }
         }
 
         function updateVelocityEvolveStatus(id, newStatus) {
             flowNode.value[id].data.status = newStatus
-            flowEdge.value[id - 1].animated = false
-            flowEdge.value[id - 1].animated = false
-            console.log('update', flowEdge)
-            if (newStatus== 2 && id == 1) {
-                flowNode.value[1].data.result = [
-                    resJson.value.PQ[1],
-                    resJson.value.KY[1],
-                    resJson.value.ZD[1],
-                ].join(',')
-            }
-            else if(newStatus== 2 && id == 2) {
-                flowNode.value[2].data.result = [
-                    resJson.value.ZB[1],
-                    resJson.value.SA[1],
-                    resJson.value.LN[1],
-                ].join(',')
+            // console.log('update', flowEdge)
+            if(newStatus== 2) {
+                flowEdge.value[+(id - 1)].animated = false
+                if(id == 1) {
+                    flowNode.value[1].data.result = [
+                        resJson.value.PQ[1],
+                        resJson.value.KY[1],
+                        resJson.value.ZD[1],
+                    ].join(',')
+                    flowEdge.value[2].style.stroke = '#10b981'
+                }
+                else {
+                    flowNode.value[2].data.result = [
+                        resJson.value.ZB[1],
+                        resJson.value.SA[1],
+                        resJson.value.LN[1],
+                    ].join(',')
+                    flowEdge.value[3].style.stroke = '#10b981'
+                }
             }
             if (
                 flowNode.value[1].data.status == 2 &&

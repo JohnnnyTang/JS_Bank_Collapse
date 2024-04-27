@@ -341,16 +341,16 @@ const mainIndexValue = ref(1)
 const anotherIndexValue = ref(0)
 const updateMainIndexValue = (value) => {
   if (value + anotherIndexValue.value > 1) {
-    anotherIndexValue.value = (1 - value).toFixed(3);
+    anotherIndexValue.value = +((1 - value).toFixed(3));
   } else {
-    anotherIndexValue.value = Math.max(0, 1 - value).toFixed(3);
+    anotherIndexValue.value = +(Math.max(0, 1 - value).toFixed(3));
   }
 };
 const updateAnotherIndexValue = (value) => {
   if (value + mainIndexValue.value > 1) {
-    mainIndexValue.value = (1 - value).toFixed(3);
+    mainIndexValue.value = +((1 - value).toFixed(3));
   } else {
-    mainIndexValue.value = Math.max(0, 1 - value).toFixed(3);
+    mainIndexValue.value = +(Math.max(0, 1 - value).toFixed(3));
   }
 };
 
@@ -586,6 +586,7 @@ const RiskMatrixModelRun = async () => {
         "path": ",taskNode,matrixCalcModelTaskGroup,"
     }
     isRunning.value = true
+    multiIndexStore.updateMatrixCalcStatus(1)
     const taskNodeId = await(riskMatrixModel.runModel(runModelData))
     const RunStatus = ref("")
     for (;;) {
@@ -619,6 +620,8 @@ const RiskMatrixModelRun = async () => {
     riskValue3.value = riskValueList[2].toFixed(3)
     riskValue4.value = riskValueList[3].toFixed(3)
     isRunning.value = false
+    multiIndexStore.resJson = RunResult.data
+    multiIndexStore.updateMatrixCalcStatus(2)
 }
 
 </script>
