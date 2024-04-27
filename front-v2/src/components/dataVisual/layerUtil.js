@@ -2,6 +2,9 @@
 import SteadyFlowLayer from "../../utils/m_demLayer/steadyFlowLayer"
 import TerrainLayer from "../../utils/m_demLayer/terrainLayer"
 import { useLayerStore } from "../../store/mapStore"
+import BackEndRequest from "../../api/backend"
+import { DataPioneer } from "./Scene"
+import { loadImage } from "../../utils/mapUtils"
 const layers = [
     '地形瓦片',
     '河段划分',
@@ -30,9 +33,10 @@ const layers = [
     '近岸流场',
     '三维地形'
 ]
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
-const layerSrcMap = {
-    '地形瓦片': (map) => {
+const layerAddFunctionMap = {
+    '地形瓦片': async (map) => {
         !map.getSource('river-terrain-source') &&
             map.addSource('river-terrain-source', {
                 type: 'vector',
@@ -78,7 +82,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '河段划分': (map) => {
+    '河段划分': async (map) => {
         !map.getSource('riverSectionLabelSource') &&
             map.addSource('riverSectionLabelSource', {
                 type: 'vector',
@@ -103,7 +107,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '河段注记': (map) => {
+    '河段注记': async (map) => {
         !map.getSource('riverLabelSource') &&
             map.addSource('riverLabelSource', {
                 type: 'vector',
@@ -128,7 +132,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '沙岛': (map) => {
+    '沙岛': async (map) => {
         !map.getSource('riverLand') &&
             map.addSource('riverLand', {
                 type: 'vector',
@@ -147,8 +151,8 @@ const layerSrcMap = {
                 },
             })
     },
-    '全江注记': (map) => {
-        !map.getSource('river-terrain-source') &&
+    '全江注记': async (map) => {
+        !map.getSource('ptVector') &&
             map.addSource('ptVector', {
                 type: 'vector',
                 tiles: [
@@ -172,7 +176,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '深泓线': (map) => {
+    '深泓线': async (map) => {
 
         !map.getSource('depthLineSource') &&
             map.addSource('depthLineSource', {
@@ -203,12 +207,34 @@ const layerSrcMap = {
                 },
             })
     },
-    '已建通道': (map, built) => {
-        !map.getSource('channel-built-source') &&
-            map.addSource('channel-built-source', {
-                type: 'geojson',
-                data: built,
-            })
+    '已建通道': async (map) => {
+        if (!map.getSource('channel-built-source')) {
+            let channel = new DataPioneer(
+                '过江通道',
+                (e) => e['llCoords'],
+                'LineString',
+            )
+            await channel.requestData(BackEndRequest.getChannelData)
+            const { built, building, planning } = DataPioneer.getDifChannelData(
+                channel.origin2geojson(),
+            )
+            !map.getSource('channel-built-source') &&
+                map.addSource('channel-built-source', {
+                    type: 'geojson',
+                    data: built,
+                })
+            !map.getSource('channel-building-source') &&
+                map.addSource('channel-building-source', {
+                    type: 'geojson',
+                    data: building,
+                })
+
+            !map.getSource('channel-planning-source') &&
+                map.addSource('channel-planning-source', {
+                    type: 'geojson',
+                    data: planning,
+                })
+        }
         !map.getLayer('已建通道') &&
             map.addLayer({
                 id: '已建通道',
@@ -235,12 +261,35 @@ const layerSrcMap = {
                 },
             })
     },
-    '在建通道': (map, building) => {
-        !map.getSource('channel-building-source') &&
-            map.addSource('channel-building-source', {
-                type: 'geojson',
-                data: building,
-            })
+    '在建通道': async (map) => {
+        if (!map.getSource('channel-building-source')) {
+            let channel = new DataPioneer(
+                '过江通道',
+                (e) => e['llCoords'],
+                'LineString',
+            )
+            await channel.requestData(BackEndRequest.getChannelData)
+            const { built, building, planning } = DataPioneer.getDifChannelData(
+                channel.origin2geojson(),
+            )
+            !map.getSource('channel-built-source') &&
+                map.addSource('channel-built-source', {
+                    type: 'geojson',
+                    data: built,
+                })
+            !map.getSource('channel-building-source') &&
+                map.addSource('channel-building-source', {
+                    type: 'geojson',
+                    data: building,
+                })
+
+            !map.getSource('channel-planning-source') &&
+                map.addSource('channel-planning-source', {
+                    type: 'geojson',
+                    data: planning,
+                })
+        }
+
         !map.getLayer('在建通道') &&
             map.addLayer({
                 id: '在建通道',
@@ -267,12 +316,35 @@ const layerSrcMap = {
                 },
             })
     },
-    '规划通道': (map, planning) => {
-        !map.getSource('channel-planning-source') &&
-            map.addSource('channel-planning-source', {
-                type: 'geojson',
-                data: planning,
-            })
+    '规划通道': async (map) => {
+        if (!map.getSource('channel-planning-source')) {
+            let channel = new DataPioneer(
+                '过江通道',
+                (e) => e['llCoords'],
+                'LineString',
+            )
+            await channel.requestData(BackEndRequest.getChannelData)
+            const { built, building, planning } = DataPioneer.getDifChannelData(
+                channel.origin2geojson(),
+            )
+            !map.getSource('channel-built-source') &&
+                map.addSource('channel-built-source', {
+                    type: 'geojson',
+                    data: built,
+                })
+            !map.getSource('channel-building-source') &&
+                map.addSource('channel-building-source', {
+                    type: 'geojson',
+                    data: building,
+                })
+
+            !map.getSource('channel-planning-source') &&
+                map.addSource('channel-planning-source', {
+                    type: 'geojson',
+                    data: planning,
+                })
+        }
+
         !map.getLayer('规划通道') &&
             map.addLayer({
                 id: '规划通道',
@@ -299,13 +371,35 @@ const layerSrcMap = {
                 },
             })
     },
-    '一级预警岸段': async (map, level1) => {
+    '一级预警岸段': async (map) => {
+        if (!map.getSource('bank-level1-source')) {
+            let bankData = new DataPioneer(
+                '典型崩岸',
+                (e) => e['coord'],
+                'LineString',
+            )
+            await bankData.requestData(BackEndRequest.getbankLineData)
+            const { level1, level2, level3 } = DataPioneer.getDifBankData(
+                bankData.origin2geojson(),
+            )
+            !map.getSource('bank-level1-source') &&
+                map.addSource('bank-level1-source', {
+                    type: 'geojson',
+                    data: level1,
+                })
+            !map.getSource('bank-level2-source') &&
+                map.addSource('bank-level2-source', {
+                    type: 'geojson',
+                    data: level2,
+                })
+            !map.getSource('bank-level3-source') &&
+                map.addSource('bank-level3-source', {
+                    type: 'geojson',
+                    data: level3,
+                })
+        }
         await loadImage(map, '/geoStyle/warning1.png', 'warning1')
-        !map.getSource('bank-level1-source') &&
-            map.addSource('bank-level1-source', {
-                type: 'geojson',
-                data: level1,
-            })
+
         !map.getLayer('一级预警岸段') &&
             map.addLayer({
                 id: '一级预警岸段',
@@ -334,13 +428,35 @@ const layerSrcMap = {
             })
 
     },
-    '二级预警岸段': async (map, level2) => {
+    '二级预警岸段': async (map) => {
+        if (!map.getSource('bank-level2-source')) {
+            let bankData = new DataPioneer(
+                '典型崩岸',
+                (e) => e['coord'],
+                'LineString',
+            )
+            await bankData.requestData(BackEndRequest.getbankLineData)
 
-        !map.getSource('bank-level2-source') &&
-            map.addSource('bank-level2-source', {
-                type: 'geojson',
-                data: level2,
-            })
+            const { level1, level2, level3 } = DataPioneer.getDifBankData(
+                bankData.origin2geojson(),
+            )
+            !map.getSource('bank-level1-source') &&
+                map.addSource('bank-level1-source', {
+                    type: 'geojson',
+                    data: level1,
+                })
+            !map.getSource('bank-level2-source') &&
+                map.addSource('bank-level2-source', {
+                    type: 'geojson',
+                    data: level2,
+                })
+            !map.getSource('bank-level3-source') &&
+                map.addSource('bank-level3-source', {
+                    type: 'geojson',
+                    data: level3,
+                })
+        }
+
         await loadImage(map, '/geoStyle/warning2.png', 'warning2')
         !map.getLayer('二级预警岸段') &&
             map.addLayer({
@@ -369,14 +485,34 @@ const layerSrcMap = {
                 },
             })
     },
-    '三级预警岸段': async (map, level3) => {
+    '三级预警岸段': async (map) => {
 
-        !map.getSource('bank-level3-source') &&
-            map.addSource('bank-level3-source', {
-                type: 'geojson',
-                data: level3,
-            })
-
+        if (!map.getSource('bank-level3-source')) {
+            let bankData = new DataPioneer(
+                '典型崩岸',
+                (e) => e['coord'],
+                'LineString',
+            )
+            await bankData.requestData(BackEndRequest.getbankLineData)
+            const { level1, level2, level3 } = DataPioneer.getDifBankData(
+                bankData.origin2geojson(),
+            )
+            !map.getSource('bank-level1-source') &&
+                map.addSource('bank-level1-source', {
+                    type: 'geojson',
+                    data: level1,
+                })
+            !map.getSource('bank-level2-source') &&
+                map.addSource('bank-level2-source', {
+                    type: 'geojson',
+                    data: level2,
+                })
+            !map.getSource('bank-level3-source') &&
+                map.addSource('bank-level3-source', {
+                    type: 'geojson',
+                    data: level3,
+                })
+        }
         await loadImage(map, '/geoStyle/warning3.png', 'warning3')
         !map.getLayer('三级预警岸段') &&
             map.addLayer({
@@ -405,7 +541,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '民主沙地标': (map) => {
+    '民主沙地标': async (map) => {
         !map.getSource('mzsPlaceLabelSource') &&
             map.addSource('mzsPlaceLabelSource', {
                 type: 'vector',
@@ -432,7 +568,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '民主沙区划线': (map) => {
+    '民主沙区划线': async (map) => {
         !map.getSource('mzsPlaceLineSource') &&
             map.addSource('mzsPlaceLineSource', {
                 type: 'vector',
@@ -458,7 +594,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '民主沙岸段线': (map) => {
+    '民主沙岸段线': async (map) => {
         !map.getSource('mzsBankLineSource') &&
             map.addSource('mzsBankLineSource', {
                 type: 'vector',
@@ -483,7 +619,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '民主沙岸段注记': (map) => {
+    '民主沙岸段注记': async (map) => {
         !map.getSource('mzsBankLabelSource') &&
             map.addSource('mzsBankLabelSource', {
                 type: 'vector',
@@ -509,7 +645,7 @@ const layerSrcMap = {
             })
 
     },
-    '守护工程断面': (map) => {
+    '守护工程断面': async (map) => {
         !map.getSource('mzsSectionLineSource') &&
             map.addSource('mzsSectionLineSource', {
                 type: 'vector',
@@ -535,7 +671,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '守护工程断面注记': (map) => {
+    '守护工程断面注记': async (map) => {
         !map.getSource('mzsSectionLineLabelSource') &&
             map.addSource('mzsSectionLineLabelSource', {
                 type: 'vector',
@@ -562,7 +698,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '稳定性分区': (map) => {
+    '稳定性分区': async (map) => {
         !map.getSource('mzsBankAreaStableSrc') &&
             map.addSource('mzsBankAreaStableSrc', {
                 type: 'vector',
@@ -585,7 +721,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '预警级别分区': (map) => {
+    '预警级别分区': async (map) => {
         !map.getSource('mzsBankAreaWarnSrc') &&
             map.addSource('mzsBankAreaWarnSrc', {
                 type: 'vector',
@@ -607,66 +743,192 @@ const layerSrcMap = {
                 },
             })
     },
-    'GNSS': (map, gnss) => {
-        !map.getSource('gnss-source') &&
-            map.addSource('gnss-source', {
-                type: 'geojson',
-                data: gnss,
-            })
+    'GNSS': async (map) => {
+        if (!map.getSource('gnss-source')) {
+            let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+            let monitorDevice = DataPioneer.generateGeoJson(
+                monitorInfo,
+                (element) => {
+                    return [element['longitude'], element['latitude']]
+                },
+                'Point',
+            )
+            // debugger
+            const { gnss, manometer, stress, incline } = DataPioneer.getDifMonitorData(monitorDevice)
+            !map.getSource('gnss-source') &&
+                map.addSource('gnss-source', {
+                    type: 'geojson',
+                    data: gnss,
+                })
+
+            !map.getSource('incline-source') &&
+                map.addSource('incline-source', {
+                    type: 'geojson',
+                    data: incline,
+                })
+
+            !map.getSource('manometer-source') &&
+                map.addSource('manometer-source', {
+                    type: 'geojson',
+                    data: manometer,
+                })
+
+            !map.getSource('stress-source') &&
+                map.addSource('stress-source', {
+                    type: 'geojson',
+                    data: stress,
+                })
+        }
+        await loadImage(map, '/geoStyle/gnss-dot.png', 'gnss-static')
+
         !map.getLayer('GNSS') &&
             map.addLayer({
                 id: 'GNSS',
                 type: 'symbol',
                 source: 'gnss-source',
                 layout: {
-                    'icon-image': 'pulsing-dot-gnss',
+                    'icon-image': 'gnss-static',
+                    'icon-size': 0.3,
                     'icon-allow-overlap': true,
-                    'visibility': 'none',
                 },
             })
     },
-    '测斜仪': (map, incline) => {
-        !map.getSource('incline-source') &&
-            map.addSource('incline-source', {
-                type: 'geojson',
-                data: incline,
-            })
+    '测斜仪': async (map) => {
+
+        if (!map.getSource('incline-source')) {
+            let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+            let monitorDevice = DataPioneer.generateGeoJson(
+                monitorInfo,
+                (element) => {
+                    return [element['longitude'], element['latitude']]
+                },
+                'Point',
+            )
+            const { gnss, manometer, stress, incline } = DataPioneer.getDifMonitorData(monitorDevice)
+            !map.getSource('gnss-source') &&
+                map.addSource('gnss-source', {
+                    type: 'geojson',
+                    data: gnss,
+                })
+
+            !map.getSource('incline-source') &&
+                map.addSource('incline-source', {
+                    type: 'geojson',
+                    data: incline,
+                })
+
+            !map.getSource('manometer-source') &&
+                map.addSource('manometer-source', {
+                    type: 'geojson',
+                    data: manometer,
+                })
+
+            !map.getSource('stress-source') &&
+                map.addSource('stress-source', {
+                    type: 'geojson',
+                    data: stress,
+                })
+        }
+        await loadImage(map, '/geoStyle/incline-rect.png', 'incline-static')
+
         !map.getLayer('测斜仪') &&
             map.addLayer({
                 id: '测斜仪',
                 type: 'symbol',
                 source: 'incline-source',
                 layout: {
-                    'icon-image': 'pulsing-rect-incline',
+                    'icon-image': 'incline-static',
+                    'icon-size': 0.3,
                     'icon-allow-overlap': true,
-                    'visibility': 'none',
                 },
             })
     },
-    '孔隙水压力计': (map, manometer) => {
-        !map.getSource('manometer-source') &&
-            map.addSource('manometer-source', {
-                type: 'geojson',
-                data: manometer,
-            })
+    '孔隙水压力计': async (map) => {
+        if (!map.getSource('manometer-source')) {
+            let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+            let monitorDevice = DataPioneer.generateGeoJson(
+                monitorInfo,
+                (element) => {
+                    return [element['longitude'], element['latitude']]
+                },
+                'Point',
+            )
+            const { gnss, manometer, stress, incline } = DataPioneer.getDifMonitorData(monitorDevice)
+            !map.getSource('gnss-source') &&
+                map.addSource('gnss-source', {
+                    type: 'geojson',
+                    data: gnss,
+                })
+
+            !map.getSource('incline-source') &&
+                map.addSource('incline-source', {
+                    type: 'geojson',
+                    data: incline,
+                })
+
+            !map.getSource('manometer-source') &&
+                map.addSource('manometer-source', {
+                    type: 'geojson',
+                    data: manometer,
+                })
+
+            !map.getSource('stress-source') &&
+                map.addSource('stress-source', {
+                    type: 'geojson',
+                    data: stress,
+                })
+        }
+        await loadImage(map, '/geoStyle/manometer-dia.png', 'manometer-static')
+
         !map.getLayer('孔隙水压力计') &&
             map.addLayer({
                 id: '孔隙水压力计',
                 type: 'symbol',
                 source: 'manometer-source',
                 layout: {
-                    'icon-image': 'pulsing-dia-manometer',
+                    'icon-image': 'manometer-static',
+                    'icon-size': 0.3,
                     'icon-allow-overlap': true,
-                    'visibility': 'none',
                 },
             })
     },
-    '应力桩': (map, stress) => {
-        !map.getSource('stress-source') &&
-            map.addSource('stress-source', {
-                type: 'geojson',
-                data: stress,
-            })
+    '应力桩': async (map, stress) => {
+        if (!map.getSource('stress-source')) {
+            let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+            let monitorDevice = DataPioneer.generateGeoJson(
+                monitorInfo,
+                (element) => {
+                    return [element['longitude'], element['latitude']]
+                },
+                'Point',
+            )
+            const { gnss, manometer, stress, incline } = DataPioneer.getDifMonitorData(monitorDevice)
+            !map.getSource('gnss-source') &&
+                map.addSource('gnss-source', {
+                    type: 'geojson',
+                    data: gnss,
+                })
+
+            !map.getSource('incline-source') &&
+                map.addSource('incline-source', {
+                    type: 'geojson',
+                    data: incline,
+                })
+
+            !map.getSource('manometer-source') &&
+                map.addSource('manometer-source', {
+                    type: 'geojson',
+                    data: manometer,
+                })
+
+            !map.getSource('stress-source') &&
+                map.addSource('stress-source', {
+                    type: 'geojson',
+                    data: stress,
+                })
+        }
+        await loadImage(map, '/geoStyle/stress-tri.png', 'stress-static')
+
         !map.getLayer('应力桩') &&
             map.addLayer({
                 id: '应力桩',
@@ -679,7 +941,7 @@ const layerSrcMap = {
                 },
             })
     },
-    '近岸流场': (map) => {
+    '近岸流场': async (map) => {
         if (map.getLayer('近岸流场')) useLayerStore().flowLayer.show()
         else {
             let flow = new SteadyFlowLayer()
@@ -687,7 +949,7 @@ const layerSrcMap = {
             useLayerStore().setFlowLayer(flow)
         }
     },
-    '三维地形': (map) => {
+    '三维地形': async (map) => {
         if (map.getLayer('近岸流场')) useLayerStore().terrainLayer.show()
         else {
             let terrainLayer = new TerrainLayer(14)
@@ -695,4 +957,9 @@ const layerSrcMap = {
             useLayerStore().setTerrainLayer(terrainLayer)
         }
     },
+}
+
+export {
+    layers,
+    layerAddFunctionMap
 }

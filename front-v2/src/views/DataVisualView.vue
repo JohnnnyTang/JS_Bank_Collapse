@@ -25,17 +25,12 @@ import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
 import { initMap, flytoLarge, flytoSmall, initScratchMap, addMarkerToMap } from '../utils/mapUtils';
 import { Scene } from '../components/dataVisual/Scene';
-import { useMapStore, useSceneStore } from '../store/mapStore'
+import { useMapStore, useSceneStore, useMapLayerStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
-// import layerControl from '../components/dataVisual/layerControl.vue';
-// import searchContainer from '../components/dataVisual/searchContainer.vue';
-// import BackEndRequest from '../api/backend';
-// import fullscreen from '../components/dataVisual/fullscreen.vue';
+
 import sceneRelate from '../components/dataVisual/scenesRelate/sceneRelate.vue';
 import totalController from '../components/dataVisual/common/totalController.vue'
 
-import TerrainLayer from '../utils/m_demLayer/terrainLayer';
-import SteadyFlowLayer from '../utils/m_demLayer/steadyFlowLayer';
 
 const mapContainerRef = ref();
 const mapStore = useMapStore()
@@ -43,30 +38,29 @@ const sceneStore = useSceneStore()
 const selectedScene = computed(() => sceneStore.selectedScene)
 let map = null;
 const selectedFeature = computed(() => sceneStore.selectedFeature)
+const mapLayerStore = useMapLayerStore()
 
+mapLayerStore.$subscribe((a, b) => {
+    console.log(a, b);
+})
 
 watch(selectedScene, async (newV, oldV) => {
     map = mapStore.getMap()
     oldV.allLayers.length && oldV.removeLayers(map)
     if (!newV.allLayers.length) {
-        await newV.initAllLayers(map)
+        await newV.initLayers(map)
     }
     else {
         newV.showLayers(map, [])
     }
 })
 
-const terrain = new TerrainLayer(14)
-const flow = new SteadyFlowLayer()
-
-
-
 onMounted(async () => {
-
     let mapInstance = await initScratchMap(mapContainerRef.value)
     // let mapInstance = initMap(mapContainerRef.value)
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
+    console.log('have map!');
     flytoLarge(map)
 
     const defaultScene = new Scene()

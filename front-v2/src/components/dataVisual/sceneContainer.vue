@@ -18,7 +18,7 @@
 import { onMounted, ref } from 'vue'
 import sceneCard from './sceneCard.vue'
 import { ElMessage } from "element-plus"
-import { Scene, getScnens } from './Scene.js'
+import { Scene } from './Scene.js'
 import { flytoFeature, flytoLarge, flytoSmall } from '../../utils/mapUtils'
 import { useMapStore, useSceneStore } from '../../store/mapStore';
 
@@ -37,7 +37,7 @@ const clickSceneHandler = (scene, index) => {
 
 
 
-const sceneCardInfo = getScnens()
+const sceneCardInfo = Scene.getScnens()
 console.log(sceneCardInfo);
 onMounted(async () => {
 

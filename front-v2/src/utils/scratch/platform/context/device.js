@@ -24,11 +24,8 @@ export class Device {
 
         const adapterFeatures = adapter.features;
         // Iterate through all the set values using values()
-        console.log("Features supported by the adapter");
         const valueIterator = adapterFeatures.values();
-        for (const value of valueIterator) {
-            console.log(value);
-        }
+
 
         deviceInstance.device = await adapter.requestDevice();
         deviceInstance.device.lost.then((info) => {
@@ -42,7 +39,6 @@ export class Device {
         });
         
         deviceInstance.isPrepared = true;
-        console.log(deviceInstance.device);
 
         return deviceInstance;
     }
@@ -86,12 +82,9 @@ async function StartDash() {
 
     const adapterFeatures = adapter.features
     // Iterate through all the set values using values()
-    console.log("Features supported by the adapter")
 
     const valueIterator = adapterFeatures.values()
-    for (const value of valueIterator) {
-        console.log(value)
-    }
+
     
     const instance = await adapter.requestDevice()
     instance.lost.then(async(info) => {
@@ -104,7 +97,6 @@ async function StartDash() {
         }
     })
     
-    console.log(instance)
     device.setDevice(instance)
     return device.device
 }

@@ -1,7 +1,6 @@
 import { ElMessage } from 'element-plus'
 import mapboxgl from 'mapbox-gl'
 import { ref } from 'vue'
-import BackEndRequest from '../../api/backend.js'
 import {
     loadImage,
     pulsing,
@@ -12,6 +11,8 @@ import {
 import { useSceneStore, useMapLayerStore, useLayerStore } from '../../store/mapStore.js'
 import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
 import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
+import { layers as ALL_LAYERS, layerAddFunctionMap as LAYER_FUNCTION_MAP } from './layerUtil.js'
+
 
 // BackEndRequest.getDataNodeData()
 
@@ -20,7 +21,6 @@ let flow = new SteadyFlowLayer()
 let refHeight = ref('')
 let sectionName = ref('')
 
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 // Data Prepare
 class DataPioneer {
@@ -194,26 +194,6 @@ class DataPioneer {
 
 }
 
-const generateGeoJson = (itemArr, getCoords, type) => {
-    const features = []
-    itemArr.forEach((element) => {
-        let coords = getCoords(element)
-        let feature = {
-            type: 'Feature',
-            properties: element,
-            geometry: {
-                coordinates: coords,
-                type: type,
-            },
-        }
-        features.push(feature)
-    })
-    const geojson = {
-        type: 'FeatureCollection',
-        features: features,
-    }
-    return geojson
-}
 
 
 let globalpopup = null
@@ -851,7 +831,6 @@ const initLayers = async (sceneInstance, map) => {
 
 
         case '全江概貌':
-            console.log('test');
             let layers = [
                 '地形瓦片',
                 '河段划分',
@@ -863,551 +842,20 @@ const initLayers = async (sceneInstance, map) => {
                 '在建通道',
                 '规划通道',
             ]
-            useMapLayerStore().layersShowing(layers)
 
-            !map.getSource('river-terrain-source') &&
-                map.addSource('river-terrain-source', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('地形瓦片') &&
-                map.addLayer({
-                    id: '地形瓦片',
-                    type: 'fill',
-                    source: 'river-terrain-source',
-                    'source-layer': 'default',
-                    paint: {
-                        'fill-color': [
-                            'match',
-                            ['get', 'height'],
-                            0,
-                            '#57a3ea',
-                            5,
-                            '#3c8ee9',
-                            10,
-                            '#2177e9',
-                            15,
-                            '#1361dc',
-                            20,
-                            '#0e4dc5',
-                            25,
-                            '#0a3bad',
-                            30,
-                            '#072c95',
-                            35,
-                            '#041e7c',
-                            40,
-                            '#021363',
-                            45,
-                            '#010a49',
-                            50,
-                            '#00042e',
-                            '#000000'
-                        ],
-                        // 'fill-color': '#3EFA13'
-                    },
-                })
-            !map.getSource('riverSectionLabelSource') &&
-                map.addSource('riverSectionLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverSection/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getSource('riverLabelSource') &&
-                map.addSource('riverLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverName/{x}/{y}/{z}',
-                    ],
-                })
-
-            !map.getLayer('河段划分') &&
-                map.addLayer({
-                    id: '河段划分',
-                    type: 'line',
-                    source: 'riverSectionLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                    },
-                    paint: {
-                        'line-opacity': 1,
-                        'line-color': 'rgba(231, 214, 86, 0.9)',
-                        'line-width': 4,
-                    },
-                })
-            !map.getLayer('河段注记') &&
-                map.addLayer({
-                    id: '河段注记',
-                    type: 'symbol',
-                    source: 'riverLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        // 'text-offset': [0, 1.25],
-                        'text-anchor': 'left',
-                    },
-                    paint: {
-                        'text-color': '#FC7C49',
-                    },
-                })
-            !map.getSource('riverLand') &&
-                map.addSource('riverLand', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverLand/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('沙岛') &&
-                map.addLayer({
-                    id: '沙岛',
-                    type: 'fill',
-                    source: 'riverLand',
-                    'source-layer': 'default',
-                    paint: {
-                        'fill-color': 'rgba(183, 214, 86, 0.7)',
-                    },
-                })
-
-            !map.getSource('river-terrain-source') &&
-                map.addSource('ptVector', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('全江注记') &&
-                map.addLayer({
-                    id: '全江注记',
-                    type: 'symbol',
-                    source: 'ptVector',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        'text-anchor': 'left',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'text-color': '#1FAEB3',
-                    },
-                })
-
-            !map.getSource('depthLineSource') &&
-                map.addSource('depthLineSource', {
-                    type: 'vector',
-                    tiles: [
-                        // tileServer+'/tile/vector/depthLine/1999/{x}/{y}/{z}',
-                        // tileServer+'/tile/vector/depthLine/2004/{x}/{y}/{z}',
-                        // tileServer+'/tile/vector/depthLine/2006/{x}/{y}/{z}',
-                        // tileServer+'/tile/vector/depthLine/2015/{x}/{y}/{z}',
-                        tileServer + '/tile/vector/depthLine/2017/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('深泓线') &&
-                map.addLayer({
-                    id: '深泓线',
-                    type: 'line',
-                    source: 'depthLineSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'line-opacity': 1,
-                        'line-color': 'rgba(12, 214, 211, 0.5)',
-                        'line-width': 4,
-                    },
-                })
-
-
-            let channel = new DataPioneer(
-                '过江通道',
-                (e) => e['llCoords'],
-                'LineString',
-            )
-            await channel.requestData(BackEndRequest.getChannelData)
-            const { built, building, planning } = DataPioneer.getDifChannelData(
-                channel.origin2geojson(),
-            )
-            !map.getSource('channel-built-source') &&
-                map.addSource('channel-built-source', {
-                    type: 'geojson',
-                    data: built,
-                })
-            !map.getSource('channel-building-source') &&
-                map.addSource('channel-building-source', {
-                    type: 'geojson',
-                    data: building,
-                })
-            !map.getSource('channel-planning-source') &&
-                map.addSource('channel-planning-source', {
-                    type: 'geojson',
-                    data: planning,
-                })
-
-            !map.getLayer('已建通道') &&
-                map.addLayer({
-                    id: '已建通道',
-                    type: 'line',
-                    source: 'channel-built-source',
-                    layout: { 'line-join': 'round', 'line-cap': 'round', 'visibility': 'none' },
-                    paint: {
-                        'line-color': 'rgb(121, 164, 35)',
-                        'line-opacity': 1,
-                        'line-width': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            7,
-                            5,
-                            22,
-                            20,
-                        ],
-                    },
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'line-round-limit': 2,
-                    },
-                })
-            !map.getLayer('在建通道') &&
-                map.addLayer({
-                    id: '在建通道',
-                    type: 'line',
-                    source: 'channel-building-source',
-                    layout: { 'line-join': 'round', 'line-cap': 'round' },
-                    paint: {
-                        'line-color': 'rgb(204, 102, 0)',
-                        'line-opacity': 1,
-                        'line-width': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            7,
-                            5,
-                            22,
-                            20,
-                        ],
-                    },
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'line-round-limit': 2,
-                    },
-                })
-            !map.getLayer('规划通道') &&
-                map.addLayer({
-                    id: '规划通道',
-                    type: 'line',
-                    source: 'channel-planning-source',
-                    layout: { 'line-join': 'round', 'line-cap': 'round', },
-                    paint: {
-                        'line-color': 'rgb(51, 204, 153)',
-                        'line-opacity': 1,
-                        'line-width': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            7,
-                            5,
-                            22,
-                            20,
-                        ],
-                    },
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'line-round-limit': 2,
-                    },
-                })
-
+            layers.forEach(async (id) => {
+                await LAYER_FUNCTION_MAP[id](map)
+            })
 
             sceneInstance.allLayers = layers
+            //sceneInstance.showLayers(map, layers)
             useMapLayerStore().layesrAdded(layers)
             useMapLayerStore().layersShowing(layers)
+
 
             break
 
         case '典型崩岸':
-            !map.getSource('river-terrain-source') &&
-                map.addSource('river-terrain-source', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('地形瓦片') &&
-                map.addLayer({
-                    id: '地形瓦片',
-                    type: 'fill',
-                    source: 'river-terrain-source',
-                    'source-layer': 'default',
-                    paint: {
-                        'fill-color': [
-                            'match',
-                            ['get', 'height'],
-                            0,
-                            '#57a3ea',
-                            5,
-                            '#3c8ee9',
-                            10,
-                            '#2177e9',
-                            15,
-                            '#1361dc',
-                            20,
-                            '#0e4dc5',
-                            25,
-                            '#0a3bad',
-                            30,
-                            '#072c95',
-                            35,
-                            '#041e7c',
-                            40,
-                            '#021363',
-                            45,
-                            '#010a49',
-                            50,
-                            '#00042e',
-                            '#000000'
-                        ],
-                        // 'fill-color': '#3EFA13'
-                    },
-                })
-            !map.getSource('riverSectionLabelSource') &&
-                map.addSource('riverSectionLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverSection/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getSource('riverLabelSource') &&
-                map.addSource('riverLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverName/{x}/{y}/{z}',
-                    ],
-                })
-
-            !map.getLayer('河段划分') &&
-                map.addLayer({
-                    id: '河段划分',
-                    type: 'line',
-                    source: 'riverSectionLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                    },
-                    paint: {
-                        'line-opacity': 1,
-                        'line-color': 'rgba(231, 214, 86, 0.9)',
-                        'line-width': 4,
-                    },
-                })
-            !map.getLayer('河段注记') &&
-                map.addLayer({
-                    id: '河段注记',
-                    type: 'symbol',
-                    source: 'riverLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        // 'text-offset': [0, 1.25],
-                        'text-anchor': 'left',
-                    },
-                    paint: {
-                        'text-color': '#FC7C49',
-                    },
-                })
-            !map.getSource('riverLand') &&
-                map.addSource('riverLand', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/riverLand/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('沙岛') &&
-                map.addLayer({
-                    id: '沙岛',
-                    type: 'fill',
-                    source: 'riverLand',
-                    'source-layer': 'default',
-                    paint: {
-                        'fill-color': 'rgba(183, 214, 86, 0.7)',
-                    },
-                })
-
-            !map.getSource('river-terrain-source') &&
-                map.addSource('ptVector', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('全江注记') &&
-                map.addLayer({
-                    id: '全江注记',
-                    type: 'symbol',
-                    source: 'ptVector',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        'text-anchor': 'left',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'text-color': '#1FAEB3',
-                    },
-                })
-
-            !map.getSource('depthLineSource') &&
-                map.addSource('depthLineSource', {
-                    type: 'vector',
-                    tiles: [
-                        // tileServer+'/tile/vector/depthLine/1999/{x}/{y}/{z}',
-                        // tileServer+'/tile/vector/depthLine/2004/{x}/{y}/{z}',
-                        // tileServer+'/tile/vector/depthLine/2006/{x}/{y}/{z}',
-                        // tileServer+'/tile/vector/depthLine/2015/{x}/{y}/{z}',
-                        tileServer + '/tile/vector/depthLine/2017/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getLayer('深泓线') &&
-                map.addLayer({
-                    id: '深泓线',
-                    type: 'line',
-                    source: 'depthLineSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'line-opacity': 1,
-                        'line-color': 'rgba(12, 214, 211, 0.5)',
-                        'line-width': 4,
-                    },
-                })
-
-            let bankData = new DataPioneer(
-                '典型崩岸',
-                (e) => e['coord'],
-                'LineString',
-            )
-            await bankData.requestData(BackEndRequest.getbankLineData)
-
-            const { level1, level2, level3 } = DataPioneer.getDifBankData(
-                bankData.origin2geojson(),
-            )
-            !map.getSource('bank-level1-source') &&
-                map.addSource('bank-level1-source', {
-                    type: 'geojson',
-                    data: level1,
-                })
-            !map.getSource('bank-level2-source') &&
-                map.addSource('bank-level2-source', {
-                    type: 'geojson',
-                    data: level2,
-                })
-            !map.getSource('bank-level3-source') &&
-                map.addSource('bank-level3-source', {
-                    type: 'geojson',
-                    data: level3,
-                })
-            await loadImage(map, './geoStyle/warning1.png', 'warning1')
-            !map.getLayer('一级预警岸段') &&
-                map.addLayer({
-                    id: '一级预警岸段',
-                    type: 'line',
-                    source: 'bank-level1-source',
-                    layout: { 'line-join': 'round', 'line-cap': 'round' },
-                    paint: {
-                        'line-color': 'rgb(121, 164, 35)',
-                        'line-opacity': 1,
-                        'line-width': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            7,
-                            5,
-                            22,
-                            20,
-                        ],
-                        'line-pattern': 'warning1',
-                    },
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'line-round-limit': 2,
-                    },
-                })
-
-            await loadImage(map, './geoStyle/warning2.png', 'warning2')
-            !map.getLayer('二级预警岸段') &&
-                map.addLayer({
-                    id: '二级预警岸段',
-                    type: 'line',
-                    source: 'bank-level2-source',
-                    layout: { 'line-join': 'round', 'line-cap': 'round' },
-                    paint: {
-                        'line-color': 'rgb(121, 164, 35)',
-                        'line-opacity': 1,
-                        'line-width': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            7,
-                            5,
-                            22,
-                            20,
-                        ],
-                        'line-pattern': 'warning2',
-                    },
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'line-round-limit': 2,
-                    },
-                })
-
-            await loadImage(map, './geoStyle/warning3.png', 'warning3')
-            !map.getLayer('三级预警岸段') &&
-                map.addLayer({
-                    id: '三级预警岸段',
-                    type: 'line',
-                    source: 'bank-level3-source',
-                    layout: { 'line-join': 'round', 'line-cap': 'round' },
-                    paint: {
-                        'line-color': 'rgb(121, 164, 35)',
-                        'line-opacity': 1,
-                        'line-width': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            7,
-                            5,
-                            22,
-                            20,
-                        ],
-                        'line-pattern': 'warning3',
-                    },
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'line-round-limit': 2,
-                    },
-                })
-
 
             let layers2 = [
                 '地形瓦片',
@@ -1420,222 +868,19 @@ const initLayers = async (sceneInstance, map) => {
                 '二级预警岸段',
                 '三级预警岸段',
             ]
+            layers2.forEach(async (id) => {
+                await LAYER_FUNCTION_MAP[id](map)
+            })
+
             sceneInstance.allLayers = layers2
+            //sceneInstance.showLayers(map, layers2)
             useMapLayerStore().layesrAdded(layers2)
             useMapLayerStore().layersShowing(layers2)
-
 
 
             break
 
         case '民主沙近岸':
-            !map.getSource('mzsPlaceLabelSource') &&
-                map.addSource('mzsPlaceLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getSource('mzsPlaceLineSource') &&
-                map.addSource('mzsPlaceLineSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
-                    ],
-                })
-
-
-            !map.getLayer('民主沙地标') &&
-                map.addLayer({
-                    id: '民主沙地标',
-                    type: 'symbol',
-                    source: 'mzsPlaceLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        // 'text-offset': [0, 1.25],
-                        'text-anchor': 'left',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'text-color': 'rgba(231, 214, 86, 0.9)',
-                    },
-                })
-
-            !map.getLayer('民主沙区划线') &&
-                map.addLayer({
-                    id: '民主沙区划线',
-                    type: 'line',
-                    source: 'mzsPlaceLineSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'line-opacity': 1,
-                        'line-color': 'rgba(26, 87, 138, 0.9)',
-                        'line-width': 3,
-                    },
-                })
-
-
-            !map.getSource('mzsBankLabelSource') &&
-                map.addSource('mzsBankLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getSource('mzsBankLineSource') &&
-                map.addSource('mzsBankLineSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}',
-                    ],
-                })
-
-            !map.getLayer('民主沙岸段线') &&
-                map.addLayer({
-                    id: '民主沙岸段线',
-                    type: 'symbol',
-                    source: 'mzsBankLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        // 'text-offset': [0, 1.25],
-                        'text-anchor': 'left',
-                    },
-                    paint: {
-                        'text-color': 'rgba(231, 214, 126, 0.9)',
-                    },
-                })
-            !map.getLayer('民主沙岸段注记') &&
-                map.addLayer({
-                    id: '民主沙岸段注记',
-                    type: 'symbol',
-                    source: 'mzsSectionLineLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        // 'text-offset': [0, 1.25],
-                        'text-anchor': 'left',
-                    },
-                    paint: {
-                        'text-color': 'rgba(121, 214, 126, 0.9)',
-                    },
-                })
-
-
-
-
-            !map.getSource('mzsSectionLineSource') &&
-                map.addSource('mzsSectionLineSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsSectionLine/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getSource('mzsSectionLineLabelSource') &&
-                map.addSource('mzsSectionLineLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
-                    ],
-                })
-
-            !map.getLayer('守护工程断面') &&
-                map.addLayer({
-                    id: '守护工程断面',
-                    type: 'line',
-                    source: 'mzsSectionLineSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                    },
-                    paint: {
-                        'line-opacity': 1,
-                        'line-color': '#7F02F3',
-                        'line-width': 7,
-                        'line-pattern': 'section'
-                    },
-                })
-            !map.getLayer('守护工程断面注记') &&
-                map.addLayer({
-                    id: '守护工程断面注记 ',
-                    type: 'symbol',
-                    source: 'mzsSectionLineLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        'text-offset': [0, 1.25],
-                        'text-anchor': 'left',
-                        'text-size': 20,
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'text-color': '#040052',
-                    },
-                })
-
-
-            !map.getSource('mzsBankAreaWarnSrc') &&
-                map.addSource('mzsBankAreaWarnSrc', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getSource('mzsBankAreaStableSrc') &&
-                map.addSource('mzsBankAreaStableSrc', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
-                    ],
-                })
-
-            !map.getLayer('稳定性分区') &&
-                map.addLayer({
-                    id: '稳定性分区',
-                    type: 'fill',
-                    source: 'mzsBankAreaStableSrc',
-                    'source-layer': 'default',
-                    layout: {
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'fill-color': 'rgba(233, 23, 86, 0.6)',
-                    },
-                })
-            !map.getLayer('预警级别分区') &&
-                map.addLayer({
-                    id: '预警级别分区',
-                    type: 'fill',
-                    source: 'mzsBankAreaWarnSrc',
-                    'source-layer': 'default',
-                    layout: {
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'fill-color': 'rgba(233, 233, 86, 0.6)',
-                    },
-                })
-
-            if (map.getLayer('近岸流场')) flow.show()
-            else map.addLayer(flow)
-            useLayerStore().setFlowLayer(flow)
-            if (map.getLayer('三维地形')) terrainLayer.show()
-            else map.addLayer(terrainLayer)
-            useLayerStore().setTerrainLayer(terrainLayer)
-
-            map.triggerRepaint()
-
 
             let layers3 = [
                 '民主沙地标',
@@ -1649,7 +894,11 @@ const initLayers = async (sceneInstance, map) => {
                 '近岸流场',
                 '三维地形'
             ]
+            layers3.forEach(async (id) => {
+                await LAYER_FUNCTION_MAP[id](map)
+            })
             sceneInstance.allLayers = layers3
+            //sceneInstance.showLayers(map, layers3)
 
             useMapLayerStore().layesrAdded(layers3)
             useMapLayerStore().layersShowing(layers3)
@@ -1659,160 +908,6 @@ const initLayers = async (sceneInstance, map) => {
             break
 
         case '民主沙预警监测':
-            !map.getSource('mzsPlaceLabelSource') &&
-                map.addSource('mzsPlaceLabelSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
-                    ],
-                })
-            !map.getSource('mzsPlaceLineSource') &&
-                map.addSource('mzsPlaceLineSource', {
-                    type: 'vector',
-                    tiles: [
-                        tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
-                    ],
-                })
-
-
-            !map.getLayer('民主沙地标') &&
-                map.addLayer({
-                    id: '民主沙地标',
-                    type: 'symbol',
-                    source: 'mzsPlaceLabelSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                        // 'text-offset': [0, 1.25],
-                        'text-anchor': 'left',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'text-color': 'rgba(231, 214, 86, 0.9)',
-                    },
-                })
-
-            !map.getLayer('民主沙区划线') &&
-                map.addLayer({
-                    id: '民主沙区划线',
-                    type: 'line',
-                    source: 'mzsPlaceLineSource',
-                    'source-layer': 'default',
-                    layout: {
-                        'line-cap': 'round',
-                        'line-join': 'round',
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'line-opacity': 1,
-                        'line-color': 'rgba(26, 87, 138, 0.9)',
-                        'line-width': 3,
-                    },
-                })
-
-            !map.getLayer('稳定性分区') &&
-                map.addLayer({
-                    id: '稳定性分区',
-                    type: 'fill',
-                    source: 'mzsBankAreaStableSrc',
-                    'source-layer': 'default',
-                    layout: {
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'fill-color': 'rgba(233, 23, 86, 0.6)',
-                    },
-                })
-            !map.getLayer('预警级别分区') &&
-                map.addLayer({
-                    id: '预警级别分区',
-                    type: 'fill',
-                    source: 'mzsBankAreaWarnSrc',
-                    'source-layer': 'default',
-                    layout: {
-                        'visibility': 'none',
-                    },
-                    paint: {
-                        'fill-color': 'rgba(233, 233, 86, 0.6)',
-                    },
-                })
-
-
-            let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
-            let monitorDevice = generateGeoJson(
-                monitorInfo,
-                (element) => {
-                    return [element['longitude'], element['latitude']]
-                },
-                'Point',
-            )
-            const { gnss, incline, stress, manometer } =
-                DataPioneer.getDifMonitorData(monitorDevice)
-            !map.getSource('gnss-source') &&
-                map.addSource('gnss-source', {
-                    type: 'geojson',
-                    data: gnss,
-                })
-            !map.getSource('incline-source') &&
-                map.addSource('incline-source', {
-                    type: 'geojson',
-                    data: incline,
-                })
-            !map.getSource('stress-source') &&
-                map.addSource('stress-source', {
-                    type: 'geojson',
-                    data: stress,
-                })
-            !map.getSource('manometer-source') &&
-                map.addSource('manometer-source', {
-                    type: 'geojson',
-                    data: manometer,
-                })
-            !map.getLayer('GNSS') &&
-                map.addLayer({
-                    id: 'GNSS',
-                    type: 'symbol',
-                    source: 'gnss-source',
-                    layout: {
-                        'icon-image': 'pulsing-dot-gnss',
-                        'icon-allow-overlap': true,
-                        'visibility': 'none',
-                    },
-                })
-            !map.getLayer('测斜仪') &&
-                map.addLayer({
-                    id: '测斜仪',
-                    type: 'symbol',
-                    source: 'incline-source',
-                    layout: {
-                        'icon-image': 'pulsing-rect-incline',
-                        'icon-allow-overlap': true,
-                        'visibility': 'none',
-                    },
-                })
-            !map.getLayer('孔隙水压力计') &&
-                map.addLayer({
-                    id: '孔隙水压力计',
-                    type: 'symbol',
-                    source: 'manometer-source',
-                    layout: {
-                        'icon-image': 'pulsing-dia-manometer',
-                        'icon-allow-overlap': true,
-                        'visibility': 'none',
-                    },
-                })
-            !map.getLayer('应力桩') &&
-                map.addLayer({
-                    id: '应力桩',
-                    type: 'symbol',
-                    source: 'stress-source',
-                    layout: {
-                        'icon-image': 'pulsing-tri-stress',
-                        'icon-allow-overlap': true,
-                        'visibility': 'none',
-                    },
-                })
 
             let layers4 = [
                 '民主沙地标',
@@ -1824,7 +919,11 @@ const initLayers = async (sceneInstance, map) => {
                 '孔隙水压力计',
                 '应力桩',
             ]
+            layers4.forEach(async (id) => {
+                await LAYER_FUNCTION_MAP[id](map)
+            })
             sceneInstance.allLayers = layers4
+            // sceneInstance.showLayers(map, layers4)
             useMapLayerStore().layesrAdded(layers4)
             useMapLayerStore().layersShowing(layers4)
 
@@ -1835,7 +934,6 @@ const initLayers = async (sceneInstance, map) => {
             ElMessage('wait developing...')
             break
     }
-
 
     const sceneStore = useSceneStore()
     sceneStore.setSelectedScene(sceneInstance)
@@ -1857,8 +955,7 @@ class Scene {
         this.allLayers = [] //only id
         this.markers = []
     }
-    async initAllLayers(map) {
-
+    async initLayers(map) {
         await initLayers(this, map)
     }
 
@@ -2074,124 +1171,36 @@ class Scene {
 
     }
 
+    static getScnens(){
+        let scene0 = new Scene()
+        scene0.title = '全江概貌'
+        scene0.desc = '展示全江概貌，助力有关规划决策.'
+        scene0.iconSrc = '/icons/gate.png'
+        scene0.type = '全江'
+        let scene1 = new Scene()
+        scene1.title = '典型崩岸'
+        scene1.desc = '展示典型崩岸,助力有关规划决策.'
+        scene1.type = '全江'
+        scene1.iconSrc = '/icons/collapse.png'
+    
+        let scene2 = new Scene()
+        scene2.title = '民主沙近岸'
+        scene2.desc = '展示民主沙近岸场景,助力有关规划决策.'
+        scene2.iconSrc = '/icons/terrain.png'
+        scene2.type = '民主沙'
+        let scene3 = new Scene()
+        scene3.title = '民主沙预警监测'
+        scene3.desc = '展示民主沙测点布设,助力有关规划决策.'
+        scene3.iconSrc = './icons/gate.png'
+        scene3.type = '民主沙'
+    
+        return [scene0, scene1, scene2, scene3]
+    }
 
 
-}
-const getBigRangeScenes = () => {
-    let bigRangeScenes = []
-    let scene3 = new Scene()
-    scene3.title = '过江通道'
-    scene3.desc = '展示三类过江通道,助力有关规划决策.'
-    scene3.iconSrc = './icons/gate.png'
-
-    let scene4 = new Scene()
-    scene4.title = '实时水情'
-    scene4.desc = '反映当前水域的水位、流速等信息，用于水资源管理和调度.'
-    scene4.iconSrc = './icons/water-drop.png'
-
-    let scene1 = new Scene()
-    scene1.title = '水利一张图'
-    scene1.desc = '展示关键水利工程信息。'
-    scene1.iconSrc = './icons/beach.png'
-
-    let scene2 = new Scene()
-    scene2.title = '河湖码头'
-    scene2.desc = '展示河湖码头信息，助力水资源管理和调度。'
-    scene2.iconSrc = './icons/pier.png'
-
-    let typiclaCollapse = new Scene()
-    typiclaCollapse.title = '预警岸段'
-    typiclaCollapse.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
-    typiclaCollapse.iconSrc = './icons/collapse.png'
-
-
-    let terrain = new Scene()
-    terrain.title = '全江地形'
-    terrain.desc = '呈现整个江河的地形高低变化，为水文分析提供基础数据.'
-    terrain.iconSrc = './icons/terrain.png'
-
-    let chongy = new Scene()
-    chongy.title = '平面冲淤'
-        ; (chongy.desc = '呈现整个江河岸段的冲淤情况'),
-            (chongy.iconSrc = './icons/shore.png')
-
-    bigRangeScenes.push(
-        typiclaCollapse,
-        scene3,
-        terrain,
-        scene1,
-        scene4,
-        scene2,
-        chongy,
-    )
-    return bigRangeScenes
-}
-const getSmallRangeScenes = () => {
-    let smallRangeScenes = []
-
-    // let aggregationScene = new Scene()
-    // aggregationScene.title = '岸段聚合场景'
-    // aggregationScene.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
-    // aggregationScene.iconSrc = './icons/collapse.png'
-
-    let flowFieldScene = new Scene()
-    flowFieldScene.title = '近岸流场'
-    flowFieldScene.desc = '近岸区域水流动态，助力监测管理。'
-    flowFieldScene.iconSrc = './icons/flow.png'
-
-    let terrScene = new Scene()
-    terrScene.title = '三维地形'
-    terrScene.desc = '立体地貌模拟，展现自然景观'
-    terrScene.iconSrc = './icons/terrain.png'
-
-    let watching = new Scene()
-    watching.title = '实时监测设备'
-    watching.desc = '监测数据可视化,监测设备管理'
-    watching.iconSrc = './icons/watching.png'
-
-    let duanMian = new Scene()
-    duanMian.title = '断面形态'
-    duanMian.desc = '截面轮廓，展示形状、结构或特征，'
-    duanMian.iconSrc = './icons/transversal.png'
-
-    smallRangeScenes.push(flowFieldScene, terrScene, watching, duanMian)
-
-    return smallRangeScenes
-}
-
-const getScnens = () => {
-    let scene0 = new Scene()
-    scene0.title = '全江概貌'
-    scene0.desc = '展示全江概貌，助力有关规划决策.'
-    scene0.iconSrc = '/icons/gate.png'
-    scene0.type = '全江'
-    let scene1 = new Scene()
-    scene1.title = '典型崩岸'
-    scene1.desc = '展示典型崩岸,助力有关规划决策.'
-    scene1.type = '全江'
-    scene1.iconSrc = '/icons/collapse.png'
-
-    let scene2 = new Scene()
-    scene2.title = '民主沙近岸'
-    scene2.desc = '展示民主沙近岸场景,助力有关规划决策.'
-    scene2.iconSrc = '/icons/terrain.png'
-    scene2.type = '民主沙'
-    let scene3 = new Scene()
-    scene3.title = '民主沙预警监测'
-    scene3.desc = '展示民主沙测点布设,助力有关规划决策.'
-    scene3.iconSrc = './icons/gate.png'
-    scene3.type = '民主沙'
-
-    return [scene0, scene1, scene2, scene3]
-}
-
-const myAddSource = (map, id, type) => {
 
 }
-
-
 
 export {
-    Scene, getBigRangeScenes, getSmallRangeScenes, initLayers, DataPioneer,
-    getScnens
+    Scene, initLayers, DataPioneer
 }
