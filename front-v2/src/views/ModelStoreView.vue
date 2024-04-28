@@ -61,36 +61,36 @@ div.model-arror  {
   z-index: 10;
 
   &.a1 {
-    top: 150px;
-    left: 760px;
+    top: 20vh;
+    left: 49.5vw;
   }
 
   &.a2 {
-    top: 650px;
-    left: 760px;
+    top: 76vh;
+    left: 49.5vw;
   }
 
   &.a3 {
-    top: 380px;
-    left: 350px;
+    top: 46.5vh;
+    left: 23vw;
   }
 
   &.a4 {
-    top: 380px;
-    left: 1130px;
+    top: 46.5vh;
+    left: 73vw;
   }
 }
 
 img {
-    width: 100px;
-    height: 100px;
+    width: 5vw;
+    height: 10vh;
     object-fit: contain;
     // transform: rotate(90deg);
 }
 
 img.line {
-    width: 100px;
-    height: 100px;
+    width: 5vw;
+    height: 10vh;
     object-fit: contain;
     transform: rotate(90deg);
 }
