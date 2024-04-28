@@ -49,7 +49,7 @@ onMounted(async () => {
 .scene-container {
     position: absolute;
     pointer-events: all;
-    background: linear-gradient(45deg, #C9E1F5, #E2FFEE);
+    background: rgb(228, 247, 243);
     height: 92vh;
     overflow: hidden;
     z-index: 3;

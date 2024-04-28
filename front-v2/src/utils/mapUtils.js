@@ -399,6 +399,10 @@ const showLayersFunction = (map, showLayers) => {
         if (map.getLayer(layer)) {
             if (layer === '近岸流场') {
                 useLayerStore().flowLayer.show()
+                let center = map.getCenter()
+                map.flyTo({
+                    center:center
+                })
             } else if (layer === '三维地形') {
                 useLayerStore().terrainLayer.show()
             } else {

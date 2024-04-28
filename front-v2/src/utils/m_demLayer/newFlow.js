@@ -32,7 +32,7 @@ export default class SteadyFlowLayer {
         this.progressRate = scr.f32()
         this.currentResourcePointer = 0
         this.particleNum = scr.u32(5000)
-        this.speedFactor = scr.f32(0.6)
+        this.speedFactor = scr.f32(1.0)
         this.timePointParser = timePointParser
         this.randomSeed = scr.f32(Math.random())
 

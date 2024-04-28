@@ -219,10 +219,20 @@ fn fMain(input: VertexOutput) -> @location(0) vec4f {
         0x00378d,
         0x001d75,
     );
+    let pallete = array<u32, 8>(
+        0x80c6ff,
+        0x64b7ff,
+        0x4aa8ff,
+        0x3397ff,
+        0x2786ff,
+        0x2b72ff,
+        0x3d5cff,
+        0x5142ff,
+    );
 
     let velocity = input.velocity;
     let alpha = getAlpha(abs(input.edgeParam));
-    let color = velocityColor(length(velocity) / frameUniform.maxSpeed, rampColors1);
+    let color = velocityColor(length(velocity) / frameUniform.maxSpeed, pallete);
     // return vec4f(color, 0.5);
     return vec4f(color, 0.8) * alpha;
 }
