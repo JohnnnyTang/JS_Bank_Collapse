@@ -324,7 +324,7 @@ const initLayers = async (sceneInstance, map) => {
                 '守护工程断面注记',
                 '稳定性分区',
                 '预警级别分区',
-                // '近岸流场',
+                '近岸流场',
                 '三维地形'
             ]
             showLayersFunction(map, layers3)
