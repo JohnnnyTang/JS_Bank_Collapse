@@ -21,7 +21,7 @@
                         <span class="custom-tree-node">
                             <span class="text">{{ node.label }}</span>
 
-                            <span class="eyes" :style="eyesIcon(node)"></span>
+                            <span class="eyes" :style="eyesComputed(node)"></span>
                         </span>
                     </template>
 
@@ -36,8 +36,8 @@ import { onMounted, ref, watch, computed } from 'vue';
 import { Decoration7 } from '@kjgl77/datav-vue3'
 import { ElTree } from 'element-plus';
 import { Scene } from '../Scene';
-import { useLayerStore, useMapLayerStore } from '../../../store/mapStore';
-
+import { useMapLayerStore, useMapStore } from '../../../store/mapStore';
+import { showLayersFunction, hideLayersFunction } from '../../../utils/mapUtils';
 
 const defaultProps = {
     children: 'children',
@@ -47,28 +47,23 @@ const filterText = ref('')
 const treeRef = ref()
 const selectedLayer = ref('')
 const data = ref([])
-const layerState = computed(() => useMapLayerStore().mapLayerState)
+const mapLayerStore = useMapLayerStore()
 
 
 watch(filterText, (val) => {
     treeRef.value.filter(val)
 })
-watch(layerState, (val) => {
-    console.log(val);
-})
 
 
-
-
-const eyesIcon = (node) => {
-    if (node.isLeaf) {
-        let showing = (useMapLayerStore().mapLayerState[node.data.label].showing)
-        return showing ? { background: `url('/view.png')` } : { background: `url('/hide.png')` }
+const eyesComputed = computed(() =>
+    (node) => {
+        if (node.isLeaf) {
+            let showing = (mapLayerStore.layerState[node.data.label].showing)
+            return showing ? { background: `url('/view.png')` } : { background: `url('/hide.png')` }
+        }
+        return {}
     }
-    return {}
-
-}
-
+)
 const filterNode = (value, data) => {
     if (!value) return true
     return data.label.includes(value)
@@ -76,18 +71,17 @@ const filterNode = (value, data) => {
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         selectedLayer.value = nodeProp.data.label
-        console.log('node! ', nodeProp);
-        console.log('tree Ref!', treeRef.value);
-        useMapLayerStore().layerShowing(nodeProp.data.label)
-
+        
+        let map = useMapStore().getMap()
+        mapLayerStore.layerState[nodeProp.data.label].showing = !mapLayerStore.layerState[nodeProp.data.label].showing
+        mapLayerStore.layerState[nodeProp.data.label].showing? showLayersFunction(map, [nodeProp.data.label]):hideLayersFunction(map, [nodeProp.data.label])
+        console.log(treeRef.value);
     }
 }
 
 onMounted(() => {
     let treeData = Scene.getLayerTreeData()
     data.value = treeData
-    console.log(layerState.value)
-
 })
 
 </script>
@@ -100,7 +94,7 @@ div.total-controller {
     z-index: 3;
     pointer-events: all;
 
-    width: 25vw;
+    width: 20vw;
     height: 50vh;
     background-color: rgb(226, 236, 255);
     border-radius: 1%;
@@ -108,14 +102,13 @@ div.total-controller {
 
     .title {
         position: relative;
-        width: 25vw;
+        width: 20vw;
         height: 5vh;
         display: flex;
         justify-content: center;
         align-items: center;
 
         .title-back {
-            // width: 8vw;
             padding-left: 1vw;
             padding-right: 1vw;
 
@@ -133,7 +126,7 @@ div.total-controller {
 
     .content {
         position: relative;
-        width: 25vw;
+        width: 20vw;
         height: 45vh;
         display: flex;
         flex-direction: column;
@@ -141,7 +134,7 @@ div.total-controller {
         align-items: center;
 
         .e-input {
-            width: 21vw;
+            width: 16vw;
             height: 3vh;
             display: flex;
             justify-content: center;
@@ -152,7 +145,7 @@ div.total-controller {
 
         .tree-container {
             position: relative;
-            width: 22vw;
+            width: 17vw;
             height: 33vh;
             padding-left: 1vw;
             padding-bottom: 1.5vh;
@@ -166,16 +159,16 @@ div.total-controller {
             }
 
             &::-webkit-scrollbar-track {
-                background-color: rgba(6, 181, 197, 0.219);
+                background-color: rgba(162, 168, 168, 0.219);
             }
 
             &::-webkit-scrollbar-thumb {
-                background-color: #15a1e294;
+                background-color: rgb(94, 164, 250);
                 border-radius: 5px;
             }
 
             &::-webkit-scrollbar-thumb:hover {
-                background-color: #3af0f781;
+                background-color: rgb(48, 136, 243);
             }
 
             .custom-tree-node {

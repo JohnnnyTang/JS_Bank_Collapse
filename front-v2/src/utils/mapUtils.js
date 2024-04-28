@@ -1,10 +1,9 @@
 import mapboxgl from 'mapbox-gl'
 import { createApp } from 'vue'
-import { useMapStore, useSceneStore } from '../store/mapStore'
+import { useMapStore, useSceneStore, useLayerStore } from '../store/mapStore'
 import * as scr from './scratch/scratch.js'
 import popUpContent from '../components/dataVisual/featureDetails/popUpContent.vue'
-import SteadyFlowLayer from './m_demLayer/steadyFlowLayer.js'
-import TerrainLayer from './m_demLayer/terrainLayer.js'
+import { layerAddFunctionMap } from '../components/dataVisual/layerUtil'
 
 const initMap = async (ref) => {
     return new mapboxgl.Map({
@@ -28,8 +27,8 @@ const initScratchMap = (ref) => {
                 container: ref.id, // container ID
                 accessToken:
                     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-                style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-                // style: getStyleJson(),
+                // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+                style: getStyleJson(),
                 center: [120.312, 31.917], // starting position [lng, lat]
                 maxZoom: 18,
                 zoom: 8,
@@ -73,17 +72,17 @@ const flytoLarge = (map) => {
         pitch: 48.0432167520608,
         bearing: 0,
         zoom: 8.28560629149188,
-        speed: 0.7,
+        speed: 1.0,
         essential: true,
     })
 }
 const flytoSmall = (map) => {
     map.flyTo({
-        center: [120.53070965313992, 32.042615280683805],
+        center: [120.54070965313992, 32.042615280683805],
         pitch: 61.99999999999988,
         bearing: 0,
         zoom: 13.245427972376211,
-        speed: 0.7,
+        speed: 1.0,
         essential: true,
     })
 }
@@ -102,10 +101,12 @@ const flytoFeature = (map, coord, zoom = 10) => {
 
 const loadImage = async (map, url, imageID) => {
     if (map.hasImage(imageID)) return
+    console.log('map.hasImag', imageID, map.hasImage(imageID));
     return new Promise((resolve, reject) => {
         map.loadImage(url, (err, img) => {
             if (err) throw err
-            map.addImage(imageID, img)
+            if (map.hasImage(imageID)) return
+            else map.addImage(imageID, img)
             resolve()
         })
     })
@@ -211,7 +212,7 @@ const getStyleJson = () => {
                 tiles: [
                     // 'http://127.0.0.1:9000/2020-10-planet-14.mbtiles/{z}/{x}/{y}.pbf'
                     // 'http://127.0.0.1:8989/api/v1/proxy/tiles/world/{z}/{x}/{y}.pbf',
-                    tileServer + '/tiles/world/{z}/{x}/{y}.pbf'
+                    tileServer + '/proxy/tiles/world/{z}/{x}/{y}.pbf'
                 ],
                 minzoom: 0,
                 maxzoom: 12,//local TILES max zoom::12
@@ -392,7 +393,39 @@ const getStyleJson = () => {
 }
 
 
+const showLayersFunction = (map, showLayers) => {
+    // new Promise?
+    showLayers.forEach(async layer => {
+        if (map.getLayer(layer)) {
+            if (layer === '近岸流场') {
+                useLayerStore().flowLayer.show()
+            } else if (layer === '三维地形') {
+                useLayerStore().terrainLayer.show()
+            } else {
+                map.setLayoutProperty(layer, 'visibility', 'visible')
+            }
 
+        }
+        else {
+            console.log('add layer', layer);
+            await layerAddFunctionMap[layer](map)
+        }
+    })
+}
+
+const hideLayersFunction = (map, hideLayers) => {
+    hideLayers.forEach(async layer => {
+        if (map.getLayer(layer)) {
+            if (layer === '近岸流场') {
+                useLayerStore().flowLayer.hide()
+            } else if (layer === '三维地形') {
+                useLayerStore().terrainLayer.hide()
+            } else {
+                map.setLayoutProperty(layer, 'visibility', 'none')
+            }
+        }
+    })
+}
 
 
 const size = 120
@@ -676,7 +709,9 @@ const pulsing = {
 }
 
 class ScratchMap extends mapboxgl.Map {
+
     constructor(options) {
+
         // Init mapbox map
         super(options)
 
@@ -686,11 +721,12 @@ class ScratchMap extends mapboxgl.Map {
         this.uMatrix = scr.mat4f()
         this.centerLow = scr.vec3f()
         this.centerHigh = scr.vec3f()
+        this.mvpInverse = scr.mat4f()
         this.mercatorCenter = scr.vec3f()
         this.zoom = scr.f32(this.getZoom())
         this.mercatorBounds = new scr.BoundingBox2D()
         this.cameraBounds = new scr.BoundingBox2D(...this.getBounds().toArray())
-
+        
         // Buffer-related resource (based on map status)
         this.dynamicUniformBuffer = scr.uniformBuffer({
             name: 'Uniform Buffer (Scratch map dynamic status)',
@@ -704,28 +740,23 @@ class ScratchMap extends mapboxgl.Map {
                         uMatrix: this.uMatrix,
                         centerLow: this.centerLow,
                         centerHigh: this.centerHigh,
-                    },
+                        mvpInverse: this.mvpInverse,
+                    }
                 }),
-            ],
+            ]
         })
 
         // Texture-related resource
-        this.screen = scr.screen({
-            canvas: options.GPUFrame,
-            alphaMode: 'premultiplied',
-        })
-        this.depthTexture = this.screen.createScreenDependentTexture(
-            'Texture (Map Common Depth)',
-            'depth32float',
-        )
+        this.screen = scr.screen({ canvas: options.GPUFrame, alphaMode: 'premultiplied'})
+        this.depthTexture = this.screen.createScreenDependentTexture('Texture (Map Common Depth)', 'depth32float')
 
         // Pass
         this.outputPass = scr.renderPass({
             name: 'Render Pass (Scratch map)',
-            colorAttachments: [{ colorResource: this.screen }],
-            depthStencilAttachment: { depthStencilResource: this.depthTexture },
+            colorAttachments: [ { colorResource: this.screen } ],
+            depthStencilAttachment: { depthStencilResource: this.depthTexture }
         })
-
+        
         // Make stages
         this.preProcessStageName = 'PreRendering'
         this.renderStageName = 'Rendering'
@@ -735,22 +766,22 @@ class ScratchMap extends mapboxgl.Map {
         })
         scr.director.addStage({
             name: this.renderStageName,
-            items: [this.outputPass],
+            items: [ this.outputPass ],
         })
 
         this.on('render', () => {
+
             this.update()
             scr.director.tick()
         })
     }
 
     update() {
-        this.mercatorCenter = new mapboxgl.MercatorCoordinate(
-            ...this.transform._computeCameraPosition().slice(0, 3),
-        )
-        this.zoom.n = this.getZoom()
 
-        const { far, near, matrix } = getMercatorMatrix(this.transform.clone())
+        this.mercatorCenter = new mapboxgl.MercatorCoordinate(...this.transform._computeCameraPosition().slice(0, 3))
+        this.zoom.n = this.getZoom()
+        
+        const { far, near, matrix} = getMercatorMatrix(this.transform.clone())
         const mercatorCenterX = encodeFloatToDouble(this.mercatorCenter.x)
         const mercatorCenterY = encodeFloatToDouble(this.mercatorCenter.y)
         const mercatorCenterZ = encodeFloatToDouble(this.mercatorCenter.z)
@@ -772,23 +803,48 @@ class ScratchMap extends mapboxgl.Map {
         this.far.n = far
         this.near.n = near
         this.uMatrix.data = matrix
-        this.uMatrix.translate(
-            scr.vec3f(
-                mercatorCenterX[0],
-                mercatorCenterY[0],
-                mercatorCenterZ[0],
-            ),
-        )
+        this.uMatrix.translate(scr.vec3f(mercatorCenterX[0], mercatorCenterY[0], mercatorCenterZ[0]))
+        this.mvpInverse.invert(this.uMatrix)
+
+        // if (frameCount++ === 1000) {
+        //     flowLayer.resetResource([
+        //         '/bin/examples/flow/uv_14.bin',
+        //         '/bin/examples/flow/uv_15.bin',
+        //         '/bin/examples/flow/uv_16.bin',
+        //         '/bin/examples/flow/uv_17.bin',
+        //         '/bin/examples/flow/uv_18.bin',
+        //         '/bin/examples/flow/uv_19.bin',
+        //         '/bin/examples/flow/uv_20.bin',
+        //         '/bin/examples/flow/uv_21.bin',
+        //         '/bin/examples/flow/uv_22.bin',
+        //         '/bin/examples/flow/uv_23.bin',
+        //         '/bin/examples/flow/uv_24.bin',
+        //         '/bin/examples/flow/uv_25.bin',
+        //         '/bin/examples/flow/uv_26.bin',
+        //     ])
+        // }
     }
 
     add2PreProcess(prePass) {
+        
         scr.director.addItem(this.preProcessStageName, prePass)
         return this
     }
 
     add2RenderPass(pipeline, binding) {
+
         this.outputPass.add(pipeline, binding)
         return this
+    }
+
+    remove(){
+        console.log(scr.director);
+        super.remove()
+        scr.director.stages = {}
+        scr.director.stageNum = 0
+        scr.director.bindings = []
+        console.log(scr.director);
+
     }
 }
 //#region scratch map helper
@@ -1032,5 +1088,7 @@ export {
     getCenterCoord,
     createPopUp,
     getStyleJson,
-    initLoadedMap
+    initLoadedMap,
+    showLayersFunction,
+    hideLayersFunction,
 }

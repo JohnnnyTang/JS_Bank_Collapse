@@ -255,7 +255,6 @@ const mapInit = async (map, vis) => {
             },
             'Point',
         )
-        // debugger
         const { gnss, incline, stress, manometer } =
             DataPioneer.getDifMonitorData(monitorDevice)
 
@@ -361,7 +360,7 @@ const mapInit = async (map, vis) => {
         // request per 20minutes 
 
         ///////DEBUG////////
-        window.addEventListener('keydown', (e) => {
+        window.addEventListener('keydown', async(e) => {
             if (e.key === '3') {
                 setWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
             }
@@ -381,10 +380,28 @@ const mapInit = async (map, vis) => {
                 removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
             }
 
-            if (e.key == '7') {
-                const popup = createWarningPopup({ a: 'a' })
-                popup.setLngLat([115, 35]).addTo(map)
+            if (e.key == 'Enter') {
+                const minute = 30
+                let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
 
+                let lastPos
+                allWarnData.forEach((item) => {
+                    let id = item.deviceId
+                    let type = 'GNSS'
+                    lastPos = setWarningDeviceStyle(map, type, id, item)
+                })
+
+
+                if (lastPos) {
+                    map.flyTo({
+                        center: lastPos,
+                        pitch: 61.99999999999988,
+                        bearing: 0,
+                        zoom: 15.845427972376211,
+                        speed: 0.5,
+                        essential: true,
+                    })
+                }
             }
 
         })
@@ -546,7 +563,8 @@ const open = (features, map) => {
     const items = features
     const selectedDevice = ref({})
     let selectedCode
-    const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+    // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪']
 
     const radioGroupVNode = h('div', [
         h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),
@@ -593,7 +611,6 @@ const open = (features, map) => {
                 type: 'info',
                 message: '加载设备详情',
             })
-            debugger
             let targetProperty
             for (let i = 0; i < items.length; i++) {
                 if (items[i].properties.code === selectedCode) {

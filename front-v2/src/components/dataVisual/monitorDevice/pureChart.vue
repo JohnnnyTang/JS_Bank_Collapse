@@ -1,7 +1,8 @@
 <template>
     <div class="pure-chart">
         <div class="buttons">
-            <div class="button" :class="{ active: selectedIndex === index }" v-for="(name, index) in dataAssitant.chartOptions.names" @click="showChart(index)">
+            <div class="button" :class="{ active: selectedIndex === index }"
+                v-for="(name, index) in dataAssitant.chartOptions.names" @click="showChart(index)">
                 {{ name }}
             </div>
         </div>
@@ -55,15 +56,18 @@ onMounted(async () => {
     myChart = echarts.init(chartDom);
     myChart.showLoading()
 
-    console.log('!!!',selectedFeature.value);
-    dataAssitant.value = new MonitorDataAssistant(selectedFeature.value)
     
-    await dataAssitant.value.getMonitoringdata()
-    dataAssitant.value.getProcessedDataObject()
-    dataAssitant.value.getChartOptions()
-    myChart.hideLoading()
+    if(selectedFeature.value)
+    {
+        dataAssitant.value = new MonitorDataAssistant(selectedFeature.value)
 
-    myChart.setOption(dataAssitant.value.chartOptions.options[0])
+        await dataAssitant.value.getMonitoringdata()
+        dataAssitant.value.getProcessedDataObject()
+        dataAssitant.value.getChartOptions()
+        myChart.hideLoading()
+
+        myChart.setOption(dataAssitant.value.chartOptions.options[0])
+    }
 
 
     //#region  for test
@@ -197,18 +201,19 @@ $Color5: rgb(6, 102, 192);
             color: $Color2;
             padding: 7px;
             margin-bottom: 1vh;
-          
-            
-            &:hover{
+
+
+            &:hover {
                 cursor: pointer;
             }
-            &:active{
+
+            &:active {
                 transform: scale(1.02);
             }
         }
 
-        .active{
-            background-color:  rgb(6, 142, 192);
+        .active {
+            background-color: rgb(6, 142, 192);
         }
     }
 

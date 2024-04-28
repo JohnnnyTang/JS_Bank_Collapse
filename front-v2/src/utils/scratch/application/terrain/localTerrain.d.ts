@@ -12,13 +12,13 @@ export class LocalTerrain {
 
     registerRenderableNode(options: MapOptions): void;
 
-    set minVisibleNodeLevel (min: number): void;
+    set minVisibleNodeLevel(min: number): void;
 
-    set maxVisibleNodeLevel (max: number): void;
+    set maxVisibleNodeLevel(max: number): void;
 
-    get minVisibleNodeLevel (): number
+    get minVisibleNodeLevel(): number
 
-    get maxVisibleNodeLevel (): number;
+    get maxVisibleNodeLevel(): number;
 
     get prePass(): RenderPass;
 
@@ -26,7 +26,7 @@ export class LocalTerrain {
 
     get binding(): Binding;
 
-    hide():void;
+    hide(): void;
 
-    show():void;
+    show(): void;
 }

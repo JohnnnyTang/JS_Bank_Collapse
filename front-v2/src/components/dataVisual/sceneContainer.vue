@@ -38,7 +38,6 @@ const clickSceneHandler = (scene, index) => {
 
 
 const sceneCardInfo = Scene.getScnens()
-console.log(sceneCardInfo);
 onMounted(async () => {
 
 
@@ -61,27 +60,27 @@ onMounted(async () => {
         font-size: calc(1vw + 1vh);
         font-weight: 800;
         text-align: center;
-        margin-right: 3vw;
+        margin-right: 0vw;
 
         color: #0663bb;
         text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 3px 2px 1px #CCCCCC, 2px 3px 1px #EEEEEE, 4px 3px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 5px 4px 1px #CCCCCC, 4px 5px 1px #EEEEEE, 6px 5px 1px #CCCCCC, 5px 6px 1px #EEEEEE, 7px 6px 1px #0f41e7;
 
     }
 
-    .switch-icon {
-        position: absolute;
-        top: 0.8vh;
-        right: 1vw;
-        height: 4vh;
-        width: 4vh;
-        background-image: url('/icons/switch.png');
-        background-size: contain;
-        animation: scaleAnim 1000ms infinite;
+    // .switch-icon {
+    //     position: absolute;
+    //     top: 0.8vh;
+    //     right: 1vw;
+    //     height: 4vh;
+    //     width: 4vh;
+    //     background-image: url('/icons/switch.png');
+    //     background-size: contain;
+    //     animation: scaleAnim 1000ms infinite;
 
-        &:hover {
-            cursor: pointer;
-        }
-    }
+    //     &:hover {
+    //         cursor: pointer;
+    //     }
+    // }
 
     @keyframes scaleAnim {
         0% {

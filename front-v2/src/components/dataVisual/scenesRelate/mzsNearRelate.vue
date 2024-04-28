@@ -2,7 +2,7 @@
     <div class="bankLineRelate-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">典型崩岸场景</div>
+            <div class="title">民主沙近岸场景</div>
         </div>
         <div class="card">
             <div class="content">
@@ -10,13 +10,9 @@
                     <div class="real-content">
 
                         <div class="desc-content">
-                            <div class="in-db-bank-container">
-                                <div class="in-db-bank">在库崩岸</div>
-                                <div class="in-db-bank-num">{{ Info.banklineNum }}</div>
-                            </div>
                             <div class="bank-desc">
                                 <div class="bank-desc-text">
-                                    预警岸段场景涵盖了的南京、扬中、镇扬、澄通、河口等各河段及河口段的典型崩岸信息以及基础地理信息。
+                                    民主沙近岸场景涵盖民主沙基础区划信息、重点岸段以及守护工程断面信息、沙岛南侧的预警分区信息以及近岸流场、三维地形的可视效果
                                 </div>
                             </div>
 
@@ -25,7 +21,11 @@
                                 <div class="last-update-text">{{ Info.updateTime }}</div>
                             </div>
                         </div>
+
+
                         <div class="chart" id="chart"></div>
+
+
                     </div>
                 </div>
             </div>
@@ -44,162 +44,43 @@ let myChart = null
 
 
 const chartProcess = (data) => {
-    let dataMapByRiver = {}
-    let dataMapByWarning = {}
-
-    for (let i = 0; i < data.length; i++) {
-        let item = data[i]
-        if (!dataMapByRiver[item["riverName"]]) {
-            dataMapByRiver[item["riverName"]] = []
-            dataMapByRiver[item["riverName"]].push(item)
-        } else {
-            dataMapByRiver[item["riverName"]].push(item)
-        }
-
-        if (!dataMapByWarning[item["warningLevel"]]) {
-            dataMapByWarning[item["warningLevel"]] = []
-            dataMapByWarning[item["warningLevel"]].push(item)
-        } else {
-            dataMapByWarning[item["warningLevel"]].push(item)
-        }
-    }
-
-    let warningByRiver = {
-        '一级预警': [],
-        '二级预警': [],
-        '三级预警': [],
-    }
-
-    const sum = (arr) => {
-        let total = 0
-        for (let i = 0; i < arr.length; i++) {
-            total += arr[i]
-        }
-        return total
-    }
-
-    for (let riverName in dataMapByRiver) {
-        let level1, level2, level3
-        level1 = level2 = level3 = 0
-        let oneRiverData = dataMapByRiver[riverName]
-        for (let i = 0; i < oneRiverData.length; i++) {
-            oneRiverData[i]["warningLevel"] === 1 && level1++;
-            oneRiverData[i]["warningLevel"] === 2 && level2++;
-            oneRiverData[i]["warningLevel"] === 3 && level3++;
-        }
-        warningByRiver['一级预警'].push(level1)
-        warningByRiver['二级预警'].push(level2)
-        warningByRiver['三级预警'].push(level3)
-    }
-
-    // 分河段 柱状按预警堆叠图
-    let series1 = []
-
-    for (let i = 0; i < Object.keys(warningByRiver).length; i++) {
-
-        let item = {
-            name: Object.keys(warningByRiver)[i],
-            type: 'bar',
-            stack: 'total',
-            label: {
-                show: true
-            },
-            emphasis: {
-                focus: 'series'
-            },
-            data: warningByRiver[Object.keys(warningByRiver)[i]]
-        }
-        series1.push(item)
-    }
 
     let option1 = {
-        color:
-            ['rgb(219,25,35)', 'rgb(240,122,56)', 'rgb(35,94,243)']
-        ,
+        title: {
+            left: 'center',
+            text: '重点岸段和断面数量'
+        },
+        grid:{
+          top:'45',
+          bottom:'30',
+          left:'25',  
+        },
         tooltip: {
             trigger: 'axis',
             axisPointer: {
-                // Use axis to trigger tooltip
-                type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+                type: 'shadow'
             }
         },
-        legend: {
-            top: '5%',
-            left: 'center'
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
         xAxis: {
-            type: 'value'
+            type: 'category',
+            data: ['守护工程断面', '重点岸段']
         },
         yAxis: {
-            type: 'category',
-            data: Object.keys(dataMapByRiver)
-        },
-        series: series1
-    };
-
-    let option2 = {
-        color:
-            ['rgb(219,25,35)', 'rgb(240,122,56)', 'rgb(35,94,243)']
-        ,
-        grid: {
-            top: 50
-        },
-        // tooltip: {
-        //     trigger: 'item'
-        // },
-        legend: {
-            top: '5%',
-            left: 'center'
+            type: 'value'
         },
         series: [
             {
-                name: 'Access From',
-                type: 'pie',
-                radius: ['40%', '70%'],
-                center: ['50%', '55%'],
-                avoidLabelOverlap: false,
-                itemStyle: {
-                    borderRadius: 10,
-                    borderColor: '#fff',
-                    borderWidth: 2
-                },
-                label: {
-                    normal: {
-                        formatter: '{b}:{c}',
-                        show: true,
-                        position: 'outside'
-                    },
-
-                },
-                emphasis: {
-                    label: {
-                        show: true,
-                        fontSize: 15,
-                        fontWeight: 'bold'
-                    }
-                },
-                labelLine: {
-                    show: false
-                },
-                data: [
-                    { value: sum(warningByRiver['一级预警']), name: '一级预警' },
-                    { value: sum(warningByRiver['二级预警']), name: '二级预警' },
-                    { value: sum(warningByRiver['三级预警']), name: '三级预警' },
-                ]
+                data: [10, 13],
+                type: 'bar'
             }
         ]
-    }
-    return [option1, option2]
+    };
+
+    return [option1]
 
 }
 let index = 0
-const update = async() => {
+const update = async () => {
 
     const data = (await BackEndRequest.getbankLineData()).data
     Info.value.banklineNum = data.length
@@ -208,16 +89,10 @@ const update = async() => {
 
     let optons = chartProcess(data)
 
-    if (index === 0) {
-        index = 1
-    }
-    else if (index === 1) {
-        index = 0
-    }
     var now = dayjs().format('YYYY-MM-DD HH:mm:ss')
     Info.value.updateTime = now;
     myChart.clear()
-    myChart.setOption(optons[index])
+    myChart.setOption(optons[0])
 }
 
 
@@ -228,15 +103,15 @@ onMounted(async () => {
     let chartdom = document.querySelector('#chart')
     myChart = echarts.init(chartdom);
 
-    setTimeout(() => {
-        update()
-    }, 0);
-    updateInterval= setInterval(() => {
-        update()
-    }, 6000);
+
+    update()
+
+    // updateInterval = setInterval(() => {
+    //     update()
+    // }, 6000);
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
     clearInterval(updateInterval)
 })
 
@@ -271,7 +146,7 @@ onUnmounted(()=>{
             width: 5vh;
             height: 5vh;
             margin-right: 1vw;
-            background-image: url('/icons/collapse.png');
+            background-image: url('/icons/terrain.png');
             background-size: contain;
             background-repeat: no-repeat
         }
@@ -329,40 +204,14 @@ onUnmounted(()=>{
                     justify-content: space-between;
 
                     .desc-content {
-                        width: 12vw;
+                        width: 15vw;
                         height: 27vh;
-
-                        .in-db-bank-container {
-                            width: 12vw;
-                            height: 6vh;
-                            background-color: #eaebec;
-                            display: flex;
-                            flex-direction: row;
-                            justify-content: space-evenly;
-
-                            .in-db-bank {
-                                line-height: 6vh;
-                                font-size: calc(0.9vh + 0.8vw);
-                                font-weight: 800;
-                                color: #4074b5;
-
-                            }
-
-                            .in-db-bank-num {
-                                line-height: 6vh;
-                                font-size: calc(1.0vh + 1.0vw);
-                                font-weight: 700;
-                                color: #4074b5;
-                                text-shadow: 2px 2px 0 #2fd0f8, 2px 2px 0 #d3d3d3;
-                                transform: rotate(1deg)
-                            }
-
-
-                        }
+                        scale: 1.1;
+                        transform: translateX(10%) translateY(5%);
 
                         .bank-desc {
-                            width: 11.5vw;
-                            height: 13vh;
+                            width: 12vw;
+                            height: 17vh;
                             background-color: #eff6ff;
                             color: #4074b5;
                             border-width: 2ps;
@@ -373,7 +222,6 @@ onUnmounted(()=>{
 
                             .bank-desc-text {
                                 padding: 10px;
-                                padding-top: 3px;
                                 font-size: calc(0.8vh + 0.5vw);
                                 font-weight: 600;
                                 text-indent: 1em;
@@ -409,7 +257,7 @@ onUnmounted(()=>{
                     }
 
                     .chart {
-                        width: 17.5vw;
+                        width: 13.5vw;
                         height: 27vh;
                         background-color: rgb(255, 255, 255);
                         border-radius: 10px;

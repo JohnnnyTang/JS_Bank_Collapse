@@ -41,6 +41,8 @@ struct DynamicUniformBlock {
 @group(0) @binding(1) var<uniform> staticUniform: StaticUniformBlock;
 @group(0) @binding(2) var<uniform> dynamicUniform: DynamicUniformBlock;
 
+@group(1) @binding(0) var border: texture_2d<f32>;
+
 const PI = 3.1415926535;
 
 fn translateRelativeToEye(high: vec3f, low: vec3f) -> vec3f {
@@ -58,24 +60,40 @@ fn calcWebMercatorCoord(coord: vec2f) -> vec2f {
     return vec2f(lon, lat);
 }
 
+fn calBorderUV(pos: vec4f) -> vec2f {
+    
+    let cs_pos = dynamicUniform.uMatrix * pos;
+    let ss_pos = cs_pos.xy/cs_pos.w;
+    var uv = (ss_pos + 1.0) / 2.0;
+    uv = vec2f(uv.x, 1.0-uv.y);
+    return uv;
+}
+
+
 @vertex
 fn vMain(input: VertexInput) -> VertexOutput {
 
     let x = (input.position.x - staticUniform.extent[0]) / (staticUniform.extent[2] - staticUniform.extent[0]);
     let y = (input.position.y - staticUniform.extent[1]) / (staticUniform.extent[3] - staticUniform.extent[1]);
 
+    let pos = vec4f(translateRelativeToEye(vec3f(input.position.xy, 0.0), vec3f(input.position.zw, 0.0)), 1.0);
+    let mapped_uv = calBorderUV(pos);
+
+
     var output: VertexOutput;
     output.position = dynamicUniform.uMatrix * vec4f(translateRelativeToEye(vec3f(input.position.xy, 0.0), vec3f(input.position.zw, 0.0)), 1.0);
     output.velocity = mix(input.vFrom, input.vTo, frameUniform.progressRate);
+    output.uv = mapped_uv;
     return output;
 }
 
 @fragment
 fn fMain(input: VertexOutput) -> @location(0) vec2f {
+    let dim = vec2f(textureDimensions(border,0).xy);
+    let color = textureLoad(border,vec2i(dim*input.uv),0);
+    if(color.x == 0.0){
+        return vec2f(0.0);
+    }
 
-    // if (input.velocity.x == 0.0 &&  input.velocity.y == 0.0) {
-    //     discard;
-    // }
-    return input.velocity;
-    // return vec2f(1.0);
+    return input.velocity;  
 }

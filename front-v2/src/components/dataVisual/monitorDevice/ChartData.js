@@ -64,7 +64,7 @@ const generateData_GNSS = (ogDataArray) => {
 }
 
 const generateData_Incline_new = (ogDataArray) => {
-
+    console.log(ogDataArray);
     let bottomMove = []
     let middleMove = []
     let topMove = []
@@ -553,7 +553,7 @@ const generateOptions_Incline_new = (processedData) => {
                 return Math.floor(value.min)
             },
             max: function (value) {
-                return Math.floor(value.max)
+                return Math.ceil(value.max)
             }
         },
         series: [
@@ -622,7 +622,7 @@ const generateOptions_Incline_new = (processedData) => {
                 return Math.floor(value.min)
             },
             max: function (value) {
-                return Math.floor(value.max)
+                return Math.ceil(value.max)
             }
         },
         series: [
@@ -794,7 +794,7 @@ const generateOptions_Stress = (processedData) => {
         title: {
             left: 'center',
             top: 5,
-            text: '测斜仪-受力',
+            text: '应力桩-应力折线',
             // subtext: '近五小时',
             // subtextStyle: {
             //     color: 'rgb(34,45,148)',
@@ -855,7 +855,7 @@ const generateOptions_Stress = (processedData) => {
         title: {
             left: 'center',
             top: 5,
-            text: '测斜仪-应力角度',
+            text: '应力桩-应力角度',
             // subtext: '近五小时',
             // subtextStyle: {
             //     color: 'rgb(34,45,148)',
@@ -916,7 +916,7 @@ const generateOptions_Stress = (processedData) => {
         title: {
             left: 'center',
             top: 5,
-            text: '测斜仪-最大主应变',
+            text: '应力桩-最大主应变',
             // subtext: '近五小时',
             // subtextStyle: {
             //     color: 'rgb(34,45,148)',
@@ -984,7 +984,7 @@ const generateOptions_Stress = (processedData) => {
 
     return {
         options: [optionPower, optionAngle, optionChange],
-        names: ['受力', '应力角度', '最大主应变']
+        names: ['受力折线', '应力角度', '最大主应变']
     }
 
 }

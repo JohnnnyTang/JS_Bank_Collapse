@@ -98,45 +98,45 @@ for (let i = 0; i < totalLayer.length; i++) {
     }
 }
 const useMapLayerStore = defineStore('mapLayerStore', () => {
-    const _mapLayerState = reactive(layerStates)
-    const mapLayerState = computed(() => _mapLayerState)
+ 
+    const layerState = ref(layerStates)
 
     function layerAdded(id) {
-        _mapLayerState[id].added = true
+        layerState.value[id].added = true
     }
     function layesrAdded(ids) {
         ids.forEach(id => {
-            _mapLayerState[id].added = true
+            layerState.value[id].added = true
         })
     }
     function layerShowing(id) {
-        _mapLayerState[id].showing = true
+        layerState.value[id].showing = true
     }
     function layersShowing(ids) {
         ids.forEach(id => {
-            _mapLayerState[id].showing = true
+            layerState.value[id].showing = true
         })
     }
 
 
     function layerRemove(id) {
-        _mapLayerState[id].added = false
+        layerState.value[id].added = false
     }
 
     function layersRemove(ids) {
         ids.forEach(id => {
-            _mapLayerState[id].added = false
+            layerState.value[id].added = false
         })
     }
     function layerHide(id) {
-        _mapLayerState[id].showing = false
+        layerState.value[id].showing = false
     }
     function layersHide(ids) {
         ids.forEach(id => {
-            _mapLayerState[id].showing = false
+            layerState.value[id].showing = false
         })
     }
-    return { mapLayerState, layerAdded, layesrAdded, layerRemove, layerHide, layerShowing, layersHide, layersShowing, layersRemove }
+    return { layerAdded, layesrAdded, layerRemove, layerHide, layerShowing, layersHide, layersShowing, layersRemove,layerState }
 })
 
 

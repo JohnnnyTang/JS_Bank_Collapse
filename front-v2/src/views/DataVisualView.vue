@@ -25,7 +25,7 @@ import "mapbox-gl/dist/mapbox-gl.css"
 import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
 import { initMap, flytoLarge, flytoSmall, initScratchMap, addMarkerToMap } from '../utils/mapUtils';
 import { Scene } from '../components/dataVisual/Scene';
-import { useMapStore, useSceneStore, useMapLayerStore } from '../store/mapStore'
+import { useLayerStore, useMapStore, useSceneStore } from '../store/mapStore'
 import sceneContainer from '../components/dataVisual/sceneContainer.vue';
 
 import sceneRelate from '../components/dataVisual/scenesRelate/sceneRelate.vue';
@@ -37,12 +37,8 @@ const mapStore = useMapStore()
 const sceneStore = useSceneStore()
 const selectedScene = computed(() => sceneStore.selectedScene)
 let map = null;
-const selectedFeature = computed(() => sceneStore.selectedFeature)
-const mapLayerStore = useMapLayerStore()
+// const selectedFeature = computed(() => sceneStore.selectedFeature)
 
-mapLayerStore.$subscribe((a, b) => {
-    console.log(a, b);
-})
 
 watch(selectedScene, async (newV, oldV) => {
     map = mapStore.getMap()
@@ -53,6 +49,11 @@ watch(selectedScene, async (newV, oldV) => {
     else {
         newV.showLayers(map, [])
     }
+    if (selectedScene.value.type === '全江') {
+        flytoLarge(map)
+    } else if (selectedScene.value.type === '民主沙') {
+        flytoSmall(map)
+    }
 })
 
 onMounted(async () => {
@@ -60,7 +61,6 @@ onMounted(async () => {
     // let mapInstance = initMap(mapContainerRef.value)
     mapStore.setMap(mapInstance)
     map = mapStore.getMap()
-    console.log('have map!');
     flytoLarge(map)
 
     const defaultScene = new Scene()
@@ -70,8 +70,14 @@ onMounted(async () => {
     //test 
     // addMarkerToMap(map, [119.9617548378, 32.04382454852],'testMarker','/icons/warning3.png')
 
+    window.addEventListener('keydown',(e)=>{
+        if(e.key==='1'){
+            console.log(useLayerStore().terrainLayer);
+        }
+    })
 
 })
+
 
 onUnmounted(() => {
 
@@ -155,5 +161,20 @@ div.data-visual-container {
 
 :deep(.el-tree) {
     background-color: rgba($color: #000000, $alpha: 0.0);
+}
+:deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip) {
+    display: none;
+}
+:deep(.mapboxgl-popup-tip) {
+    border: none;
+}
+:deep(.mapboxgl-popup-content){
+    background:none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+:deep(.el-overlay){
+    background-color: none;
 }
 </style>

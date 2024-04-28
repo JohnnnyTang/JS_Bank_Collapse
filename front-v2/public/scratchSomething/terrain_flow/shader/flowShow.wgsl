@@ -14,6 +14,8 @@ struct FrameUniformBlock {
     zoomLevel: f32,
     progressRate: f32,
     maxSpeed: f32,
+    lastMvp: mat4x4f,
+    lastMvpInverse: mat4x4f,
 };
 
 // Uniform bindings
@@ -134,6 +136,6 @@ fn fMain(fsInput: VertexOutput) -> @location(0) vec4f {
     }
 
     let color = velocityColor(length(velocity) / frameUniform.maxSpeed, rampColors0);
-    // return vec4f(velocity, 0.0, 0.2);
-    return vec4f(color, 0.9);
+    // return vec4f(velocity, 0.0, 1.0);
+    return vec4f(color, 0.5);
 }

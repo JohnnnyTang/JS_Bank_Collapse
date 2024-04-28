@@ -1,5 +1,6 @@
 
-import SteadyFlowLayer from "../../utils/m_demLayer/steadyFlowLayer"
+// import SteadyFlowLayer from "../../utils/m_demLayer/steadyFlowLayer"
+import SteadyFlowLayer from '../../utils/m_demLayer/newFlow'
 import TerrainLayer from "../../utils/m_demLayer/terrainLayer"
 import { useLayerStore } from "../../store/mapStore"
 import BackEndRequest from "../../api/backend"
@@ -169,7 +170,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'label'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     'text-anchor': 'left',
-                    'visibility': 'none',
+
                 },
                 paint: {
                     'text-color': '#1FAEB3',
@@ -198,7 +199,7 @@ const layerAddFunctionMap = {
                 layout: {
                     'line-cap': 'round',
                     'line-join': 'round',
-                    'visibility': 'none',
+
                 },
                 paint: {
                     'line-opacity': 1,
@@ -561,14 +562,15 @@ const layerAddFunctionMap = {
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     // 'text-offset': [0, 1.25],
                     'text-anchor': 'left',
-                    'visibility': 'none',
+
                 },
                 paint: {
-                    'text-color': 'rgba(231, 214, 86, 0.9)',
+                    'text-color': 'rgb(44,78,196)',
                 },
             })
     },
     '民主沙区划线': async (map) => {
+        console.log('add mzs 区划线');
         !map.getSource('mzsPlaceLineSource') &&
             map.addSource('mzsPlaceLineSource', {
                 type: 'vector',
@@ -576,6 +578,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
                 ],
             })
+        console.log('add mzs 区划线');
         !map.getLayer('民主沙区划线') &&
             map.addLayer({
                 id: '民主沙区划线',
@@ -585,7 +588,7 @@ const layerAddFunctionMap = {
                 layout: {
                     'line-cap': 'round',
                     'line-join': 'round',
-                    'visibility': 'none',
+
                 },
                 paint: {
                     'line-opacity': 1,
@@ -640,7 +643,7 @@ const layerAddFunctionMap = {
                     'text-anchor': 'left',
                 },
                 paint: {
-                    'text-color': 'rgba(121, 214, 126, 0.9)',
+                    'text-color': 'rgb(28,13,106)',
                 },
             })
 
@@ -653,6 +656,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/mzsSectionLine/{x}/{y}/{z}',
                 ],
             })
+        await loadImage(map, './geoStyle/warning2.png', 'warning2')
         !map.getLayer('守护工程断面') &&
             map.addLayer({
                 id: '守护工程断面',
@@ -667,7 +671,7 @@ const layerAddFunctionMap = {
                     'line-opacity': 1,
                     'line-color': '#7F02F3',
                     'line-width': 7,
-                    'line-pattern': 'section'
+                    'line-pattern': 'warning2'
                 },
             })
     },
@@ -691,7 +695,7 @@ const layerAddFunctionMap = {
                     'text-offset': [0, 1.25],
                     'text-anchor': 'left',
                     'text-size': 20,
-                    'visibility': 'none',
+
                 },
                 paint: {
                     'text-color': '#040052',
@@ -714,7 +718,7 @@ const layerAddFunctionMap = {
                 source: 'mzsBankAreaStableSrc',
                 'source-layer': 'default',
                 layout: {
-                    'visibility': 'none',
+
                 },
                 paint: {
                     'fill-color': 'rgba(233, 23, 86, 0.6)',
@@ -736,7 +740,7 @@ const layerAddFunctionMap = {
                 source: 'mzsBankAreaWarnSrc',
                 'source-layer': 'default',
                 layout: {
-                    'visibility': 'none',
+
                 },
                 paint: {
                     'fill-color': 'rgba(233, 233, 86, 0.6)',
@@ -935,25 +939,38 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 source: 'stress-source',
                 layout: {
-                    'icon-image': 'pulsing-tri-stress',
+                    'icon-image': 'stress-static',
                     'icon-allow-overlap': true,
-                    'visibility': 'none',
+                    'icon-size': 0.3,
                 },
             })
     },
     '近岸流场': async (map) => {
         if (map.getLayer('近岸流场')) useLayerStore().flowLayer.show()
         else {
-            let flow = new SteadyFlowLayer()
+            // let flow = new SteadyFlowLayer()
+            let flowSrc = []
+            for (let i = 0; i < 26; i++) {
+                flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+            }
+
+            let flow = new SteadyFlowLayer(
+                '近岸流场',
+                '/scratchSomething/terrain_flow/json/station.bin',
+                flowSrc,
+                (url) => url.match(/uv_(\d+)\.bin/)[1],
+            )
+
             map.addLayer(flow)
             useLayerStore().setFlowLayer(flow)
         }
     },
     '三维地形': async (map) => {
-        if (map.getLayer('近岸流场')) useLayerStore().terrainLayer.show()
+        if (map.getLayer('三维地形')) useLayerStore().terrainLayer.show()
         else {
             let terrainLayer = new TerrainLayer(14)
             map.addLayer(terrainLayer)
+            console.log('set terrain Layer!');
             useLayerStore().setTerrainLayer(terrainLayer)
         }
     },

@@ -26,7 +26,6 @@ export class Device {
         // Iterate through all the set values using values()
         const valueIterator = adapterFeatures.values();
 
-
         deviceInstance.device = await adapter.requestDevice();
         deviceInstance.device.lost.then((info) => {
             console.error("ERROR:: WebGPU device was lost: ${info.message}");
@@ -39,7 +38,6 @@ export class Device {
         });
         
         deviceInstance.isPrepared = true;
-
         return deviceInstance;
     }
 }
@@ -85,7 +83,6 @@ async function StartDash() {
 
     const valueIterator = adapterFeatures.values()
 
-    
     const instance = await adapter.requestDevice()
     instance.lost.then(async(info) => {
         console.error("ERROR:: WebGPU device was lost: ${info.message}")
@@ -96,7 +93,6 @@ async function StartDash() {
             await StartDash()
         }
     })
-    
     device.setDevice(instance)
     return device.device
 }
