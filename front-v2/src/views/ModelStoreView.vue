@@ -7,6 +7,10 @@
         />
         <BottomWaveVue/>
     </div>
+    <div class="nav-knowledge-button" @click="navToKnowLedge">
+        <div class="nav-knowledge-icon"></div>
+        <div class="nav-knowledge-text">知识平台</div>
+    </div>
     <div class="model-arror a1">
       <img src="/modelArror.png" alt="">
     </div>
@@ -25,6 +29,12 @@
 import ModelCardVue from '../components/modelStore/ModelCard.vue'
 import BottomWaveVue from '../components/modelStore/BottomWave.vue'
 import { infoItemList } from '../components/modelStore/modelInfoList.js'
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const navToKnowLedge = () => {
+  router.push('/knowledgeStore');
+}
 
 </script>
 
@@ -38,6 +48,51 @@ import { infoItemList } from '../components/modelStore/modelInfoList.js'
   }
   100% {
     background-position: 0% 0%;
+  }
+}
+div.nav-knowledge-button {
+  position: absolute;
+  right: 0;
+  top: 10vh;
+
+  width: 6vh;
+  height: 6vh;
+  background-color: rgb(53, 84, 98);
+  transition: all 0.4s cubic-bezier(0.68, -0.15, 0.265, 1.15);
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+
+  display: flex;
+  flex-flow: row nowrap;
+  overflow: hidden;
+  z-index: 10;
+
+  &:hover {
+      width: 16vh;
+      cursor: pointer;
+  }
+
+  div.nav-knowledge-icon {
+      width: 6vh;
+      height: 6vh;
+      flex-shrink: 0;
+
+      background-image: url('/knowledge.png');
+      background-size: 75%;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+  }
+
+  div.nav-knowledge-text {
+      width: 10vh;
+      height: 6vh;
+      line-height: 6vh;
+      text-align: center;
+
+      font-size: calc(0.9vw + 0.4vh);
+      font-weight: bold;
+      color: rgba(32, 75, 116, 0.4);
+      color: rgb(140, 255, 255);
   }
 }
 div.model-store-container {
