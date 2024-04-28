@@ -20,10 +20,22 @@
                 </div>
             </div>
             <div class="machine-info-container">
+                <div class="machine-img-container">
+                    <el-image
+                        class="machineInfoImage"
+                        :src="machineInfoImageUrl"
+                        :zoom-rate = "1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
+                        :initial-index="4"
+                        :preview-src-list="machineInfoImageUrlList"
+                        fit="cover"
+                    />
+                    <!-- <img src="/manometer_des.png" alt=""> -->
+                </div>
                 <div class="machine-text-container">
                     <div class="machine-text-content">
-                        这里是解算算法的内容#这里是解算算法的内容#这里是解算算法的内容
-                        #这里是解算算法的内容#这里是解算算法的内容#这里是解算算法的内容
+                        <!-- 孔隙水压力计渗透压结算算法内容 -->
                     </div>
                 </div>
             </div>
@@ -76,12 +88,15 @@
 <script setup>
 import DeviceRequest from './api.js';
 import { ref, onMounted } from 'vue'
+import { ElImage } from 'element-plus'
 
 const tableData = ref([]);
 const deviceNum = ref(0);
 const CalculateTime = ref(0);
 const latestTime = ref("");
 const loading = ref(true)
+const machineInfoImageUrl = "/manometer_des.png"
+const machineInfoImageUrlList = ["/manometer_des.png"]
 
 const props = defineProps({
     watpre: {
@@ -160,7 +175,7 @@ div.machine-card-container {
         border-radius: 10px;
         transition: transform 0.3s ease;
         &:hover {
-            transform: scale(1.02);
+            // transform: scale(1.02);
             background-color: rgba(255, 255, 255, 0.1);
             // transform: translate(0.1vw, -1vh) rotate(0.5deg);
         }
@@ -184,6 +199,12 @@ div.machine-card-container {
 
         &.second {
             flex-direction: column;
+            transition: transform 0.3s ease;
+            &:hover {
+                transform: scale(1.02);
+                background-color: rgba(255, 255, 255, 0.1);
+                // transform: translate(0.1vw, -1vh) rotate(0.5deg);
+            }
         }
 
         div.machine-show-container {
@@ -231,12 +252,26 @@ div.machine-card-container {
             width: 60%;
             height: 100%;
 
+            div.machine-img-container {
+                width: 80%;
+                height: 80%;
+                margin-top: 18px;
+                border: #eaecee solid 4px;
+                border-radius: 10px;
+
+                el-image.machineInfoImage {
+                    width: 100%;
+                    height: 100%;
+                    margin-bottom: 10px;
+                }
+            }
+
             div.machine-text-container {
                 display: flex;
                 justify-content: center; 
                 align-items: center;
                 width: 80%;
-                height: 80%;
+                // height: 80%;
                 // background-color: aqua;
 
                 div.machine-text-content {

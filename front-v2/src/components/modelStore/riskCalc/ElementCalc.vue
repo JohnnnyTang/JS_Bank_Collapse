@@ -719,7 +719,7 @@ div.model-item-content {
             box-shadow: -4px 8px 8px -4px rgb(0, 47, 117);
 
             div.place-holder {
-                height: 10%;
+                height: 12%;
                 width: 100%;
                 // background-color: black;
 
@@ -762,7 +762,7 @@ div.model-item-content {
 
             div.main-index-container {
                 @include flex-center-column();
-                height: 24%;
+                height: 22%;
                 width: 100%;
                 transition: transform 0.25s ease;
                 &:hover {
@@ -854,7 +854,7 @@ div.model-item-content {
                     div.index-shower {
                         @include flex-center-row();
                         width: 96%;
-                        height: 47%;
+                        height: 45%;
                         margin-top: 3px;
                         border-radius: 10px;
                         border: 2px solid rgba(190, 154, 210, 0.7);
@@ -1651,7 +1651,7 @@ div.model-item-content {
     background-color: rgba(227, 121, 16, 0.1);
     backdrop-filter: blur(8px);
     width: 97%;
-    height: 96%;
+    height: 90%;
 }
 
 
@@ -1673,6 +1673,7 @@ div.model-item-content {
 :deep(.dv-loading.loading-icon) {
     display: flex;
     margin-left:22%;
+    height: auto;
 }
 
 :deep(.el-input) {
