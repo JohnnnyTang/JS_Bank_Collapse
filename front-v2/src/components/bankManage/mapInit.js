@@ -18,8 +18,6 @@ const zoomRef = ref()
 const mapInit = async (map, vis) => {
 
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
-    console.log(tileServer);
-
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [
@@ -326,16 +324,14 @@ const mapInit = async (map, vis) => {
         let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
         map.on('click', deviceLayers, (e) => {
-            console.log(e.features);
             if (e.features.length > 1)
                 open(e.features, map)
             else if (e.features.length === 1) {
                 let p = e.features[0].properties
                 const property = e.features[0].properties
                 useSceneStore().setSelectedFeature(property)
-
                 propertyRef.value = property
-                console.log(propertyRef.value);
+                console.log('click feature', propertyRef.value);
                 const popUp = createPopUp(propertyRef, zoomRef)
                 popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
             }
@@ -360,7 +356,7 @@ const mapInit = async (map, vis) => {
         // request per 20minutes 
 
         ///////DEBUG////////
-        window.addEventListener('keydown', async(e) => {
+        window.addEventListener('keydown', async (e) => {
             if (e.key === '3') {
                 setWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
             }
@@ -606,7 +602,6 @@ const open = (features, map) => {
         }
     )
         .then(() => {
-            console.log(selectedCode)
             ElMessage({
                 type: 'info',
                 message: '加载设备详情',
@@ -617,7 +612,6 @@ const open = (features, map) => {
                     targetProperty = items[i].properties
                 }
             }
-            console.log(targetProperty);
 
             useSceneStore().setSelectedFeature(targetProperty)
             propertyRef.value = targetProperty

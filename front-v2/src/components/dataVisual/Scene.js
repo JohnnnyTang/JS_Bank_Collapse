@@ -638,7 +638,7 @@ class Scene {
         let scene3 = new Scene()
         scene3.title = '民主沙预警监测'
         scene3.desc = '展示民主沙测点布设,助力有关规划决策.'
-        scene3.iconSrc = '/measurement.png'
+        scene3.iconSrc = '/icons/watching.png'
         scene3.type = '民主沙'
 
         return [scene0, scene1, scene2, scene3]
@@ -660,6 +660,7 @@ const createMonitorPopup = (deviceProperty, zoom) => {
     return popUp
 }
 const open = (features, map) => {
+    console.log('trigger open');
     const items = features
     let selectedCode
     // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
@@ -697,7 +698,6 @@ const open = (features, map) => {
     ElMessageBox.confirm(
         '该区域有多台设备，请选择目标设备',
         {
-            distinguishCancelAndClose: true,
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             center: true,

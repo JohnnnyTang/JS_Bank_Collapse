@@ -570,7 +570,6 @@ const layerAddFunctionMap = {
             })
     },
     '民主沙区划线': async (map) => {
-        console.log('add mzs 区划线');
         !map.getSource('mzsPlaceLineSource') &&
             map.addSource('mzsPlaceLineSource', {
                 type: 'vector',
@@ -578,7 +577,6 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
                 ],
             })
-        console.log('add mzs 区划线');
         !map.getLayer('民主沙区划线') &&
             map.addLayer({
                 id: '民主沙区划线',
@@ -972,7 +970,6 @@ const layerAddFunctionMap = {
         else {
             let terrainLayer = new TerrainLayer(14)
             map.addLayer(terrainLayer)
-            console.log('set terrain Layer!');
             useLayerStore().setTerrainLayer(terrainLayer)
         }
     },

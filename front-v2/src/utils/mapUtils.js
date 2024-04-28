@@ -101,7 +101,6 @@ const flytoFeature = (map, coord, zoom = 10) => {
 
 const loadImage = async (map, url, imageID) => {
     if (map.hasImage(imageID)) return
-    console.log('map.hasImag', imageID, map.hasImage(imageID));
     return new Promise((resolve, reject) => {
         map.loadImage(url, (err, img) => {
             if (err) throw err
@@ -847,7 +846,6 @@ class ScratchMap extends mapboxgl.Map {
         scr.director.stages = {}
         scr.director.stageNum = 0
         scr.director.bindings = []
-        console.log(scr.director);
 
     }
 }

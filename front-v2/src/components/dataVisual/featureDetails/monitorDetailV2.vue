@@ -90,13 +90,7 @@ const DEVICEPICMAP = ['/gnssBase.png', '/changePress.png', '/waterPress.png', '/
 const clickbuttonHandler = () => {
     showChart.value = !showChart.value
     buttonTxt.value = showChart.value ? "设备概要" : "查看图表"
-
 }
-// const scaleStyle = computed(() => {
-//     let scale = props.zoom.value / 18
-//     console.log(scale);
-//     return `transform: scale(${scale})`
-// })
 
 onMounted(async () => {
     deviceInfo.value["status"] = '正常运行';

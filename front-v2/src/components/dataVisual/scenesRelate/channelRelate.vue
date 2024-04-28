@@ -199,7 +199,7 @@ onUnmounted(() => {
             width: 5vh;
             height: 5vh;
             margin-right: 1vw;
-            background-image: url('/icons/gate.png');
+            background-image: url('/river.png');
             background-size: contain;
             background-repeat: no-repeat
         }

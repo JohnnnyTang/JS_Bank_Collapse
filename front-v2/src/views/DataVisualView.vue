@@ -70,12 +70,11 @@ onMounted(async () => {
     //test 
     // addMarkerToMap(map, [119.9617548378, 32.04382454852],'testMarker','/icons/warning3.png')
 
-    window.addEventListener('keydown',(e)=>{
-        if(e.key==='1'){
+    window.addEventListener('keydown', (e) => {
+        if (e.key === '1') {
             console.log(useLayerStore().terrainLayer);
         }
     })
-
 })
 
 
@@ -162,19 +161,23 @@ div.data-visual-container {
 :deep(.el-tree) {
     background-color: rgba($color: #000000, $alpha: 0.0);
 }
+
 :deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip) {
     display: none;
 }
+
 :deep(.mapboxgl-popup-tip) {
     border: none;
 }
-:deep(.mapboxgl-popup-content){
-    background:none;
+
+:deep(.mapboxgl-popup-content) {
+    background: none;
     border: none;
     box-shadow: none;
     padding: 0;
 }
-:deep(.el-overlay){
+
+:deep(.el-overlay) {
     background-color: none;
 }
 </style>

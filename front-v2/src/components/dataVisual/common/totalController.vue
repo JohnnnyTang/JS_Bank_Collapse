@@ -75,7 +75,6 @@ const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
         let map = useMapStore().getMap()
         mapLayerStore.layerState[nodeProp.data.label].showing = !mapLayerStore.layerState[nodeProp.data.label].showing
         mapLayerStore.layerState[nodeProp.data.label].showing? showLayersFunction(map, [nodeProp.data.label]):hideLayersFunction(map, [nodeProp.data.label])
-        console.log(treeRef.value);
     }
 }
 
