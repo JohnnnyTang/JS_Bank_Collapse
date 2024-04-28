@@ -4,7 +4,7 @@
             :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
             class="stable-border-box"
         >
-            <div class="stable-status-header">断面稳定状态</div>
+            <div class="stable-status-header">监测设备预警信息</div>
             <div class="splitter-container">
                 <dv-decoration3
                     class="status-splitter"
@@ -24,21 +24,21 @@
                 />
             </div>
             <div class="section-selector">
-                <div class="section-selectior-label">选择断面</div>
+                <div class="section-selectior-label">选择设备</div>
                 <div class="section-selectior-item">
                     <el-select
-                        v-model="value"
-                        placeholder="全部断面"
+                        v-model="selectedDevice"
+                        placeholder="全部设备"
                         style="width: 10vw; height: 3.5vh"
                         @change="sectionSelectChange"
                     >
                         <el-option
-                            v-for="item in sectionList"
-                            :key="item.value"
+                            v-for="item in deviceList"
+                            :key="item.label"
                             :label="
-                                item.label == '全部断面状态比例'
+                                item.label == '全部设备'
                                     ? item.label
-                                    : item.label + '断面风险'
+                                    : item.label
                             "
                             :value="item.label"
                         >
@@ -118,7 +118,7 @@
                                 class="wave-container"
                                 :style="{
                                     height:
-                                        stableStatus[i - 1][m - 1] * 1.2 +
+                                        deviceStableData[i - 1][m - 1] * 1.2 +
                                         28 +
                                         '%',
                                 }"
@@ -180,7 +180,7 @@
                                     {{ statusTextMap[i - 1] }}
                                 </div>
                                 <div class="stable-status-value">
-                                    {{ stableStatus[i - 1][m - 1] + '%' }}
+                                    {{ deviceStableData[i - 1][m - 1] + '%' }}
                                 </div>
                             </div>
                         </div>
@@ -223,14 +223,14 @@ import { fade } from '../../utils/colorUtils'
 import { getHoursBackIn } from '../../utils/timeUtils'
 import {
     stableStatus,
-    sectionList,
-    stableStatusLineData,
-    sectionStableDataMap,
-    genChartSeries,
+    deviceList,
+    genDeviceWarnChart,
 } from './data'
+import axios from 'axios'
 
+const deviceStableData = ref(stableStatus)
 const sectionChartDom = ref()
-const value = ref('全部断面状态比例')
+const selectedDevice = ref('全部设备')
 const singleSectionShow = ref(false)
 const sectionClassColorMap = {
     警告: 'warning',
@@ -240,15 +240,40 @@ const sectionClassColorMap = {
     统计: 'all',
 }
 
-const sectionSelectChange = (val) => {
-    console.log(val)
-    if (val === '全部断面状态比例') singleSectionShow.value = false
-    else {
-        singleSectionShow.value = true
-    }
+const backendInstance = axios.create({
+    // baseURL: Vue.prototype.baseURL,
+    baseURL: '/api',
+})
+
+const deviceIdMap = {
+    'CL-01': 'MZS120.51749289_32.04059243_1',
+    'CL-02': 'MZS120.51977143_32.04001152_1',
+    'CL-03': 'MZS120.52557975_32.03825056_1',
+    'CL-04': 'MZS120.52660704_32.03676583_1',
+    'CL-05': 'MZS120.53334877_32.03227055_1',
+    'CL-06': 'MZS120.54599538_32.02837993_1',
+    'CL-07': 'MZS120.55327892_32.02707923_1',
+    'CL-08': 'MZS120.55649757_32.02592404_1',
+    'CL-09': 'MZS120.56334257_32.02298144_1',
+    'CL-10': 'MZS120.56944728_32.02070961_1',
 }
 
-const statusTextMap = ref(['较稳定', '稳定', '不稳定', '较不稳定'])
+let deviceDataMap = {
+    'CL-01': [[], []],
+    'CL-02': [[], []],
+    'CL-03': [[], []],
+    'CL-04': [[], []],
+    'CL-05': [[], []],
+    'CL-06': [[], []],
+    'CL-07': [[], []],
+    'CL-08': [[], []],
+    'CL-09': [[], []],
+    'CL-10': [[], []],
+}
+
+let stableStatusLineData = [[], [], [], []]
+
+const statusTextMap = ref(['正常', '关注', '警告', '危险'])
 // const statusColorMap = ref(['#0cb444', '#0212a1', '#e48b18', '#b11a06'])
 const statusColorMap = ref(['#13a500', '#003a92', '#be7200', '#a50101'])
 const lineStatusShow = ref(false)
@@ -317,7 +342,7 @@ const areaColorGradientMap = [
     ]),
 ]
 
-const hoursBackList = getHoursBackIn(24, 2)
+const hoursBackList = getHoursBackIn(23, 2)
 // console.log(getHoursBackIn(24, 2))
 
 const baseChartOption = {
@@ -402,23 +427,109 @@ function genChartOption(index) {
 
 let sectionChartOption = {}
 
-onMounted(() => {
+const updateCurrentDeviceStableData = async (minutes) => {
+    let curWarnCount = (
+        await backendInstance.get(`/data/deviceWarn/warn/count/min/${minutes}`)
+    ).data
+    console.log('warn total', curWarnCount)
+    deviceStableData.value[2][3] = curWarnCount * 10
+    let curDangerCount = (
+        await backendInstance.get(
+            `/data/deviceWarn/danger/count/min/${minutes}`,
+        )
+    ).data
+    console.log('danger total', curDangerCount)
+    deviceStableData.value[3][3] = curDangerCount * 10
+    deviceStableData.value[0][3] = (5 - curWarnCount - curDangerCount) * 10
+    deviceStableData.value[1][3] = 5 * 10
+}
+
+const updateDeviceStableTrend = async (num, minutes) => {
+    let trendData = [[], [], [], []]
+    for (let i = num - 1; i >= 0; i--) {
+        let curWarnCount = (
+            await backendInstance.get(
+                `/data/deviceWarn/count/warn/minute/beg/${minutes * i}/dur/${minutes}`,
+            )
+        ).data
+        trendData[2].push(curWarnCount * 10)
+        let curDangerCount = (
+            await backendInstance.get(
+                `/data/deviceWarn/count/danger/minute/beg/${minutes * i}/dur/${minutes}`,
+            )
+        ).data
+        trendData[3].push(curDangerCount * 10)
+        trendData[1].push(50)
+        trendData[0].push((5 - curWarnCount - curDangerCount) * 10)
+    }
+    return trendData
+}
+
+const updateDeviceSingleData = async (num, minutes, deviceId) => {
+    let warnReqList = []
+    let dangerReqList = []
+    for (let i = num - 1; i >= 0; i--) {
+        warnReqList.push(
+            backendInstance.get(
+                `/data/deviceWarn/count/warn/minute/beg/${minutes * i}/dur/${minutes}/device/${deviceIdMap[deviceId]}`,
+            ),
+        )
+        dangerReqList.push(
+            backendInstance.get(
+                `/data/deviceWarn/count/danger/minute/beg/${minutes * i}/dur/${minutes}/device/${deviceIdMap[deviceId]}`,
+            ),
+        )
+        // deviceDataMap[deviceId][0].push(curWarnCount)
+        // deviceDataMap[deviceId][1].push(curDangerCount)
+    }
+    let warnResList = (await axios.all(warnReqList)).map((val) => val.data)
+    let dangerResList = (await axios.all(dangerReqList)).map((val) => val.data)
+    deviceDataMap[deviceId][0] = warnResList
+    deviceDataMap[deviceId][1] = dangerResList
+}
+
+let sectionChart = null;
+
+const sectionSelectChange = (val) => {
+    console.log(val)
+    if (val === '全部设备统计') singleSectionShow.value = false
+    else {
+        console.log(deviceDataMap[val])
+        singleSectionShow.value = true
+        sectionChartOption = genDeviceWarnChart(
+            sectionChart,
+            ['#F0AB51', '#FF3636'],
+            deviceDataMap[val],
+            2,
+        )
+        // console.log(sectionChartOption)
+        sectionChart.setOption(sectionChartOption)
+    }
+}
+
+onMounted(async () => {
+    updateCurrentDeviceStableData(20)
+    stableStatusLineData = await updateDeviceStableTrend(12, 20)
     for (let i = 0; i < 4; i++) {
         // console.log(i)
         let aChart = echarts.init(statusLineDom.value[i])
         aChart.setOption(genChartOption(i))
     }
 
-    let sectionChart = echarts.init(sectionChartDom.value)
-    sectionChartOption = genChartSeries(
+    sectionChart = echarts.init(sectionChartDom.value)
+    for (let id in deviceIdMap) {
+        await updateDeviceSingleData(8, 60, id)
+    }
+    console.log(deviceDataMap)
+    sectionChartOption = genDeviceWarnChart(
         sectionChart,
-        ['#42EB77', '#00ACFF', '#F0AB51', '#FF3636'],
-        sectionStableDataMap['JC01'],
-        4
+        ['#F0AB51', '#FF3636'],
+        deviceDataMap['CL-10'],
+        2,
     )
+    // console.log(sectionChartOption)
     sectionChart.setOption(sectionChartOption)
 })
-
 </script>
 
 <style lang="scss" scoped>

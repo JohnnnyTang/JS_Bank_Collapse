@@ -176,12 +176,12 @@ onMounted(() => {
                 tileServer+'/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
             ],
         })
-        map.addSource('mzsBankAreaWSource', {
-            type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
-            ],
-        })
+        // map.addSource('mzsBankAreaWSource', {
+        //     type: 'vector',
+        //     tiles: [
+        //         tileServer+'/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+        //     ],
+        // })
         map.addSource('mzsBankAreaSSource', {
             type: 'vector',
             tiles: [
@@ -422,15 +422,15 @@ onMounted(() => {
                 'fill-color': 'rgba(233, 23, 86, 0.6)',
             },
         })
-        map.addLayer({
-            id: 'mzsSectionArea2',
-            type: 'fill',
-            source: 'mzsBankAreaWSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgba(233, 233, 86, 0.6)',
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsSectionArea2',
+        //     type: 'fill',
+        //     source: 'mzsBankAreaWSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': 'rgba(233, 233, 86, 0.6)',
+        //     },
+        // })
         map.addLayer({
             id: 'mzsBankLine',
             type: 'line',

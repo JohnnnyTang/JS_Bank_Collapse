@@ -36,12 +36,18 @@
 import * as echarts from 'echarts'
 import { ref, onMounted } from 'vue'
 import { BorderBox9 as DvBorderBox9 } from '@kjgl77/datav-vue3'
+import axios from 'axios'
 
 const riskTypeList = ref(['正常', '关注', '警告', '危险'])
 const chartDom = ref(null)
 const pieChartShow = ref(false)
 
-const dataset = {
+const backendInstance = axios.create({
+    // baseURL: Vue.prototype.baseURL,
+    baseURL: '/api',
+})
+
+let dataset = {
     dimensions: ['name', 'score'],
     source: [
         ['危险', 3],
@@ -49,6 +55,16 @@ const dataset = {
         ['关注', 5],
         ['正常', 16],
     ],
+}
+const updateCurrentDeviceStableData = async (minutes) => {
+    let curWarnCount = (await backendInstance.get(`/data/deviceWarn/warn/count/min/${minutes}`)).data
+    console.log("warn total", curWarnCount)
+    dataset.source[1][1] = curWarnCount
+    let curDangerCount = (await backendInstance.get(`/data/deviceWarn/danger/count/min/${minutes}`)).data
+    console.log("danger total", curDangerCount)
+    dataset.source[0][1] = curDangerCount
+    dataset.source[3][1] = (21 - curWarnCount - curDangerCount)
+    dataset.source[2][1] = 5
 }
 
 const pieOption = {
@@ -173,7 +189,8 @@ const barOption = {
 
 let option = barOption
 
-onMounted(() => {
+onMounted(async () => {
+    await updateCurrentDeviceStableData(20)
     const riskChart = echarts.init(chartDom.value)
     riskChart.setOption(option)
 

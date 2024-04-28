@@ -19,8 +19,22 @@ public interface IDeviceWarningRepo {
     DeviceWarning findNewestData();
 
     int getTotalCount();
+    int getTotalWarnCount();
+    int getTotalDangerCount();
 
     int getTotalCountOfDevice(String deviceId);
+
+    int getTotalWarnCountOfDevice(String deviceId);
+
+    int getTotalDangerCountOfDevice(String deviceId);
+
+    int getTotalCountByTime(Timestamp begTime, Timestamp endTime);
+    int getTotalWarnCountByTime(Timestamp begTime, Timestamp endTime);
+    int getTotalDangerCountByTime(Timestamp begTime, Timestamp endTime);
+
+    int getTotalCountByTimeOfDevice(Timestamp begTime, Timestamp endTime, String deviceId);
+    int getTotalWarnCountByTimeOfDevice(Timestamp begTime, Timestamp endTime, String deviceId);
+    int getTotalDangerCountByTimeOfDevice(Timestamp begTime, Timestamp endTime, String deviceId);
 
     void save(DeviceWarning deviceWarning);
 

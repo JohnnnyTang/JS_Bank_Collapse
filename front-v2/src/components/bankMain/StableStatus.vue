@@ -3,7 +3,7 @@
         <div class="stable-status-title">
             <div class="stable-status-icon"></div>
             <div class="status-title-text">
-                {{ '风险状态评估-' + stableStatusTitle }}
+                {{ '稳定状态评估-' + stableStatusTitle }}
             </div>
         </div>
         <div
@@ -164,13 +164,13 @@
 import * as echarts from 'echarts'
 import { fade } from '../../utils/colorUtils'
 import { onMounted, ref, onUnmounted } from 'vue'
-import { getHoursBackIn } from '../../utils/timeUtils'
+import { getHoursBackIn, getDatesBefore } from '../../utils/timeUtils'
 
 const stableStatus = ref([
-    [42, 38, 34, 29],
-    [30, 26, 39, 42],
-    [24, 24, 19, 21],
-    [4, 12, 9, 8],
+    [3, 0, 0,  0],
+    [8, 6, 0, 0],
+    [48, 48, 47, 36],
+    [42, 46, 53, 64],
 ])
 const stableStatusTitle = ref('当前状态')
 const statusTextMap = ref(['较稳定', '稳定', '不稳定', '较不稳定'])
@@ -209,10 +209,10 @@ function genStatusLinearBg(statusIndex, itemIndex) {
 }
 
 const stableStatusLineData = [
-    [39, 41, 47, 48, 40, 42, 45, 36, 42, 38, 34, 29],
-    [21, 24, 18, 18, 13, 16, 25, 25, 30, 26, 39, 42],
-    [23, 25, 6, 16, 36, 25, 21, 24, 24, 24, 19, 21],
-    [17, 10, 29, 18, 11, 17, 9, 15, 4, 12, 9, 8],
+    [8,  6,  5,  5,  3,  0,  0,  0],
+    [13, 13, 12, 10, 8,  6,  0,  0],
+    [52, 48, 48, 48, 48, 48, 47, 36],
+    [27, 33, 35, 37, 41, 46, 53, 64],
 ]
 
 function getR() {
@@ -272,7 +272,8 @@ const areaColorGradientMap = [
     ]),
 ]
 
-const hoursBackList = getHoursBackIn(24, 2)
+const hoursBackList = getDatesBefore(8, 30)
+console.log('dat', hoursBackList)
 // console.log(getHoursBackIn(24, 2))
 
 const baseChartOption = {
@@ -374,7 +375,7 @@ function iterateStatus(interval) {
 
     setTimeout(() => {
         lineStatusShow.value = true
-        stableStatusTitle.value = '近三月内评估'
+        stableStatusTitle.value = '近一年内评估'
     }, interval + 5000)
 
     setTimeout(() => {

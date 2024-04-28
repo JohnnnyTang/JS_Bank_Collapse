@@ -154,7 +154,54 @@ const sectionList = [
     },
 ]
 
-const stableStatusLineData = [
+const deviceList = [
+    {
+        value: '统计',
+        label: '全部设备统计',
+    },
+    {
+        value: '警告',
+        label: 'CL-01',
+    },
+    {
+        value: '警告',
+        label: 'CL-02',
+    },
+    {
+        value: '警告',
+        label: 'CL-03',
+    },
+    {
+        value: '预警',
+        label: 'CL-04',
+    },
+    {
+        value: '预警',
+        label: 'CL-05',
+    },
+    {
+        value: '预警',
+        label: 'CL-06',
+    },
+    {
+        value: '关注',
+        label: 'CL-07',
+    },
+    {
+        value: '关注',
+        label: 'CL-08',
+    },
+    {
+        value: '关注',
+        label: 'CL-09',
+    },
+    {
+        value: '关注',
+        label: 'CL-10',
+    }
+]
+
+let stableStatusLineData = [
     [39, 41, 47, 48, 40, 42, 45, 36, 42, 38, 34, 29],
     [21, 24, 18, 18, 13, 16, 25, 25, 30, 26, 39, 42],
     [23, 25, 6, 16, 36, 25, 21, 24, 24, 24, 19, 21],
@@ -162,7 +209,7 @@ const stableStatusLineData = [
 ]
 
 const hoursBackList = getHoursBackIn(24, 3)
-const daysBackList = getDatesBefore(6)
+const daysBackList = getDatesBefore(6, 15)
 
 function genRandomStableData(num) {
     let res = [[], [], [], []]
@@ -212,10 +259,10 @@ const sectionStableDataMap = {
 // }
 
 function genLinkElementsOfChart(chartIns, colors, dataList, seriesNum, grid) {
-    const gridLeft = chartIns.getWidth() * (+grid.left.split('%')[0]) / 100
-    const gridRight = chartIns.getWidth() * (+grid.right.split('%')[0]) / 100
-    const gridTop = chartIns.getHeight() * (+grid.top.split('%')[0]) / 100
-    const gridBottom = chartIns.getHeight() * (+grid.bottom.split('%')[0]) / 100
+    const gridLeft = (chartIns.getWidth() * +grid.left.split('%')[0]) / 100
+    const gridRight = (chartIns.getWidth() * +grid.right.split('%')[0]) / 100
+    const gridTop = (chartIns.getHeight() * +grid.top.split('%')[0]) / 100
+    const gridBottom = (chartIns.getHeight() * +grid.bottom.split('%')[0]) / 100
     console.log(gridLeft, gridRight, gridBottom, gridTop)
     const gridWidth = chartIns.getWidth() - gridLeft - gridRight
     // const gridWidth = chartIns.getWidth()
@@ -270,7 +317,7 @@ function genChartSeries(chartIns, colors, dataList, seriesNum) {
         bottom: '8%',
         // containLabel: true,
     }
-    
+
     const series = ['稳定', '较稳定', '较不稳定', '不稳定'].map((name, sid) => {
         console.log(name, dataList[sid])
         return {
@@ -287,8 +334,8 @@ function genChartSeries(chartIns, colors, dataList, seriesNum) {
             data: dataList[sid],
             emphasis: {
                 focus: 'series',
-                blurScope: 'coordinateSystem'
-            }
+                blurScope: 'coordinateSystem',
+            },
         }
     })
     let option = {
@@ -305,8 +352,8 @@ function genChartSeries(chartIns, colors, dataList, seriesNum) {
         yAxis: {
             type: 'value',
             axisLabel: {
-                show: false
-            }
+                show: false,
+            },
         },
         xAxis: {
             type: 'category',
@@ -315,17 +362,99 @@ function genChartSeries(chartIns, colors, dataList, seriesNum) {
                 fontSize: 16,
                 fontWeight: 'bold',
                 color: '#fff',
-            }, 
+            },
             axisLine: {
                 lineStyle: {
                     color: '#fff',
-                    width: 2
-                }
+                    width: 2,
+                },
             },
         },
         series,
         graphic: {
-            elements: genLinkElementsOfChart(chartIns, colors, dataList, seriesNum, grid),
+            elements: genLinkElementsOfChart(
+                chartIns,
+                colors,
+                dataList,
+                seriesNum,
+                grid,
+            ),
+        },
+    }
+    console.log(option)
+    return option
+}
+
+function genDeviceWarnChart(chartIns, colors, dataList, seriesNum) {
+    const grid = {
+        left: '1%',
+        right: '1%',
+        top: '8%',
+        bottom: '8%',
+        // containLabel: true,
+    }
+
+    const series = ['警告', '危险'].map((name, sid) => {
+        console.log(name, dataList[sid])
+        return {
+            name,
+            type: 'bar',
+            stack: 'total',
+            barWidth: '60%',
+            label: {
+                show: true,
+                formatter: (params) => params.value + '次',
+                fontFamily: 'Impact',
+                fontSize: 16,
+            },
+            data: dataList[sid],
+            emphasis: {
+                focus: 'series',
+                blurScope: 'coordinateSystem',
+            },
+        }
+    })
+    let option = {
+        color: colors,
+        legend: {
+            selectedMode: false,
+            textStyle: {
+                color: 'rgb(11, 20, 86)',
+                fontSize: 16,
+                fontWeight: 'bold',
+            },
+        },
+        grid,
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                show: false,
+            },
+        },
+        xAxis: {
+            type: 'category',
+            data: getHoursBackIn(7, 1),
+            axisLabel: {
+                fontSize: 16,
+                fontWeight: 'bold',
+                color: '#fff',
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#fff',
+                    width: 2,
+                },
+            },
+        },
+        series,
+        graphic: {
+            elements: genLinkElementsOfChart(
+                chartIns,
+                colors,
+                dataList,
+                seriesNum,
+                grid,
+            ),
         },
     }
     console.log(option)
@@ -339,4 +468,6 @@ export {
     stableStatusLineData,
     sectionStableDataMap,
     genChartSeries,
+    deviceList,
+    genDeviceWarnChart
 }

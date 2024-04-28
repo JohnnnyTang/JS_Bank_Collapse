@@ -18,8 +18,46 @@
         SELECT COUNT(*) FROM device_warning;
     </select>
 
+    <select id="getTotalWarnCount" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE warn_value BETWEEN 12 AND 20;
+    </select>
+
+    <select id="getTotalDangerCount" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE warn_value >= 20;
+    </select>
+
     <select id="getTotalCountOfDevice" resultType="integer">
         SELECT COUNT(*) FROM device_warning WHERE device_id = #{deviceId};
+    </select>
+
+    <select id="getTotalWarnCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (device_id = #{deviceId}) AND (warn_value BETWEEN 12 AND 20);
+    </select>
+
+    <select id="getTotalDangerCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (device_id = #{deviceId}) AND (warn_value >= 20);
+    </select>
+
+    <select id="getTotalCountByTime" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE warn_time BETWEEN #{begTime} AND #{endTime};
+    </select>
+
+    <select id="getTotalWarnCountByTime" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (warn_value BETWEEN 12 AND 20);
+    </select>
+
+    <select id="getTotalDangerCountByTime" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (warn_value >= 20);
+    </select>
+
+    <select id="getTotalCountByTimeOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (device_id = #{deviceId});
+    </select>
+    <select id="getTotalWarnCountByTimeOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (device_id = #{deviceId}) AND (warn_value BETWEEN 12 AND 20);
+    </select>
+    <select id="getTotalDangerCountByTimeOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (device_id = #{deviceId}) AND (warn_value >= 20);
     </select>
 
     <select id="findNewestData" resultMap="deviceWarningMap">
@@ -32,6 +70,12 @@
 
     <select id="findDataByTime" resultMap="deviceWarningMap">
         SELECT * FROM device_warning WHERE warn_time BETWEEN #{begTime} AND #{endTime} ORDER BY warn_time ASC;
+    </select>
+    <select id="findWarnDataByTime" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (warn_value BETWEEN 12 AND 20) ORDER BY warn_time ASC;
+    </select>
+    <select id="findDangerDataByTime" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (warn_value >= 20) ORDER BY warn_time ASC;
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="deviceWarningMap">

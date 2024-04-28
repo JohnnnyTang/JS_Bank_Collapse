@@ -115,12 +115,13 @@ const navList = ref([
         iconUrl: '/big-data.png',
     },
     {
-        name: '崩岸知识平台',
-        routerLink: '/knowledgeStore',
+        name: '实时设备监测',
+        routerLink: '/bankTwin',
         isActive: false,
         oneRow: true,
-        iconUrl: '/knowledge.png',
+        iconUrl: '/analysis.png',
     },
+
     {
         name: '江苏省长江崩岸',
         nameTwo: '监测预警应用系统',
@@ -129,28 +130,28 @@ const navList = ref([
         oneRow: false,
     },
     {
-        name: '崩岸模型平台',
+        name: '崩岸模型知识',
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,
         iconUrl: '/predictive.png',
     },
     {
-        name: '孪生岸坡平台',
-        routerLink: '/bankTwin',
+        name: '崩岸知识平台',
+        routerLink: '/knowledgeStore',
         isActive: false,
         oneRow: true,
-        iconUrl: '/connection.png',
+        iconUrl: '/knowledge.png',
     },
 ])
 
 const routerPathIndexMap = {
     '/dataVisual': 0,
-    '/knowledgeStore': 1,
+    '/knowledgeStore': 4,
     '/': 2,
     '/modelStore': 3,
-    '/bankTwin': 4,
-    '/bankManage': 4,
+    '/bankTwin': 1,
+    '/bankManage': 1,
 }
 
 let previousActive = 2
@@ -235,12 +236,12 @@ onMounted(() => {
             // console.log(newPath.split('/'), oldPath)
             let parentPath = newPath
             let splitPath = newPath.split('/')
-            if(splitPath.length >= 3) {
+            if (splitPath.length >= 3) {
                 parentPath = '/' + splitPath[1]
             }
             if (
-                (parentPath in routerPathIndexMap) &&
-                (routerPathIndexMap[parentPath] != previousActive)
+                parentPath in routerPathIndexMap &&
+                routerPathIndexMap[parentPath] != previousActive
             ) {
                 navList.value[previousActive].isActive = false
                 navList.value[routerPathIndexMap[parentPath]].isActive = true

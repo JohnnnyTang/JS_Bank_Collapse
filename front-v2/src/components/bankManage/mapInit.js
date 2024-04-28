@@ -56,12 +56,12 @@ const mapInit = async (map, vis) => {
             tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
         ],
     })
-    map.addSource('mzsBankAreaWSource', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
-        ],
-    })
+    // map.addSource('mzsBankAreaWSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+    //     ],
+    // })
     map.addSource('mzsBankAreaSSource', {
         type: 'vector',
         tiles: [
@@ -108,39 +108,39 @@ const mapInit = async (map, vis) => {
             'fill-color': [
                 'match',
                 ['get', 'stability'],
-                '稳定',
-                '#18b915',
                 '较稳定',
+                '#18b915',
+                '稳定',
                 '#06bef1',
-                '较不稳定',
-                '#df8105',
                 '不稳定',
+                '#df8105',
+                '较不稳定',
                 '#ee3603',
                 '#18b915',
             ],
         },
     })
-    map.addLayer({
-        id: 'mzsSectionArea2',
-        type: 'fill',
-        source: 'mzsBankAreaWSource',
-        'source-layer': 'default',
-        paint: {
-            'fill-color': [
-                'match',
-                ['get', 'warn'],
-                '正常',
-                '#18b915',
-                '关注',
-                'rgba(131, 14, 223, 0.5)',
-                '预警',
-                'rgba(221, 224, 23, 0.5)',
-                '警告',
-                'rgba(221, 24, 23, 0.5)',
-                '#18b915',
-            ],
-        },
-    })
+    // map.addLayer({
+    //     id: 'mzsSectionArea2',
+    //     type: 'fill',
+    //     source: 'mzsBankAreaWSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': [
+    //             'match',
+    //             ['get', 'warn'],
+    //             '正常',
+    //             '#18b915',
+    //             '关注',
+    //             'rgba(131, 14, 223, 0.5)',
+    //             '预警',
+    //             'rgba(221, 224, 23, 0.5)',
+    //             '警告',
+    //             'rgba(221, 24, 23, 0.5)',
+    //             '#18b915',
+    //         ],
+    //     },
+    // })
     map.addLayer({
         id: 'mzsBankLine',
         type: 'line',

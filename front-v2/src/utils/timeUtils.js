@@ -111,7 +111,7 @@ function getNDateBefore(n) {
     return dates
 }
 
-function getDatesBefore(n) {
+function getDatesBefore(n, days) {
     let dates = []
 
     // 获取当前日期
@@ -133,7 +133,7 @@ function getDatesBefore(n) {
         let currentMonth = currentDate.getMonth() + 1 // 月份从0开始，需要加1
         let currentDay = currentDate.getDate()
         // 计算15天前的日期
-        let fifteenDaysAgoDay = currentDay - 15
+        let fifteenDaysAgoDay = currentDay - days
         let fifteenDaysAgoMonth = currentMonth
         let fifteenDaysAgoYear = currentYear
 

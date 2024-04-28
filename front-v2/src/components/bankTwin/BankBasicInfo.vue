@@ -18,7 +18,7 @@
                 <div class="key-val-container">
                     <div class="key-text">监测长度</div>
                     <div class="icon" id="length-icon"></div>
-                    <div class="val-text">7公里</div>
+                    <div class="val-text">全长7.2公里</div>
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">布设监测设备</div>

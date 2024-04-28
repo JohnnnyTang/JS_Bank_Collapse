@@ -57,10 +57,6 @@ console.log('edge-props', refProps.value)
 // const path = computed(() => getBezierPath(props))
 
 onMounted(() => {
-    setTimeout(() => {
-        animated.value = false
-        console.log(refProps.value)
-    }, 3000)
 })
 </script>
 

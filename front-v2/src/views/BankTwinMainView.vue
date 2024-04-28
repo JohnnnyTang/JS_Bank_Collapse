@@ -2,7 +2,7 @@
     <div class="twin-main-container" ref="containerDom">
         <div class="nav-manage-button" @click="navToManage">
             <div class="nav-manage-icon"></div>
-            <div class="nav-manage-text">系统管理</div>
+            <div class="nav-manage-text">监测详情</div>
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
@@ -12,7 +12,7 @@
         <BankBasicInfoVue />
         <RealtimeStatusVue />
         <SectionRisk />
-        <SectionStable />
+        <DeviceWarn />
         <div class="map-container" id="map"></div>
     </div>
 </template>
@@ -27,7 +27,7 @@ import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
 import SectionRisk from '../components/bankTwin/SectionRisk.vue'
-import SectionStable from '../components/bankTwin/SectionStable.vue'
+import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 import { useMapStore } from '../store/mapStore'
 
