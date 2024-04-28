@@ -1,6 +1,7 @@
 <script setup>
 import { BaseEdge, getBezierPath } from '@vue-flow/core'
-import { computed } from 'vue'
+import { BezierEdge } from '@vue-flow/core';
+import { computed, onMounted, toRef, ref } from 'vue'
 
 const props = defineProps({
     id: {
@@ -48,10 +49,19 @@ const props = defineProps({
         required: false,
     },
 })
+const refProps = toRef(props)
+const animated = ref(true)
 
-console.log('edge-props', props)
+console.log('edge-props', refProps.value)
 
-const path = computed(() => getBezierPath(props))
+// const path = computed(() => getBezierPath(props))
+
+onMounted(() => {
+    setTimeout(() => {
+        animated.value = false
+        console.log(refProps.value)
+    }, 3000)
+})
 </script>
 
 <script>
@@ -61,19 +71,14 @@ export default {
 </script>
 
 <template>
-    <BaseEdge
-        :id="id"
-        :style="style"
-        :path="path[0]"
-        :marker-end="markerEnd"
-        :label="data.text"
-        :label-x="path[1]"
-        :label-y="path[2]"
-        :label-style="{ fill: 'white' }"
-        :label-show-bg="true"
-        :label-bg-style="{ fill: 'red' }"
-        :label-bg-padding="[2, 4]"
-        :label-bg-border-radius="2"
+    <BezierEdge
+        :source-x="refProps.sourceX"
+        :source-y="refProps.sourceY"
+        :target-x="refProps.targetX"
+        :target-y="refProps.targetY"
+        :id="refProps.id"
+        :style="refProps.style"
+        :marker-end="refProps.markerEnd"
         :animated="animated"
     />
 </template>

@@ -11,7 +11,7 @@
                 <template #node-flow="props">
                     <FlowNode :data="props.data" />
                 </template>
-                <!-- <template #edge-flow="customEdgeProps">
+                <template #edge-flow="customEdgeProps">
                     <FlowEdge
                         :id="customEdgeProps.id"
                         :source-x="customEdgeProps.sourceX"
@@ -25,7 +25,7 @@
                         :style="customEdgeProps.style"
                         :animated="customEdgeProps.animated"
                     />
-                </template> -->
+                </template>
             </VueFlow>
         </div>
     </div>
@@ -36,7 +36,7 @@ import { ref, onMounted } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import '@vue-flow/core/dist/style.css'
 import FlowNode from './FlowNode.vue'
-// import FlowEdge from './FlowEdge.vue'
+import FlowEdge from './FlowEdge.vue'
 import { ElNotification } from 'element-plus'
 import { useMultiIndexStore } from '@/store/multiIndexStore'
 
