@@ -12,7 +12,7 @@
                         <div class="desc-content">
                             <div class="in-db-bank-container">
                                 <div class="in-db-bank">在库通道</div>
-                                <div class="in-db-bank-num">{{ Info.channelNum }}</div>
+                                <div class="in-db-bank-num">{{ Info.channelNum + 1 }}</div>
                             </div>
                             <div class="bank-desc">
                                 <div class="bank-desc-text">

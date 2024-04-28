@@ -34,7 +34,6 @@ import { useMapStore } from '../store/mapStore'
 const containerDom = ref(null)
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
-
 let map = null
 
 const items = ref([

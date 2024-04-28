@@ -108,6 +108,10 @@ const routes = [
             }
         ]
     },
+    {
+        path: '/bankWarn',
+        component: () => import('../views/BankRiskWarnView.vue')
+    },
 ]
 // 3、创建一个路由的对象
 const router = createRouter({

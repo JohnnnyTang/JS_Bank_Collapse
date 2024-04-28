@@ -515,8 +515,9 @@ onMounted(async () => {
         let aChart = echarts.init(statusLineDom.value[i])
         aChart.setOption(genChartOption(i))
     }
-
-    sectionChart = echarts.init(sectionChartDom.value)
+    if(sectionChartDom.value) {
+        sectionChart = echarts.init(sectionChartDom.value)
+    }
     for (let id in deviceIdMap) {
         await updateDeviceSingleData(8, 60, id)
     }
