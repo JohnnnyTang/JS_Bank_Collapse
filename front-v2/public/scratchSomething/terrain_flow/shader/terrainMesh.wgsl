@@ -317,18 +317,6 @@ fn fMain(fsInput: VertexOutput) -> @location(0) vec4f {
     // return paletteColor;
 
 
-    let rampColors = array<u32, 10>(
-        0x69b9ff,
-        0x5ea4e6,
-        0x538fcd,
-        0x477bb5,
-        0x3b689d,
-        0x305685,
-        0x24446e,
-        0x183358,
-        0x0b2343,
-        0x01132f,
-    );
     let reverseColors = array<u32, 10>(
         0x000214,
         0x101527,
@@ -341,17 +329,14 @@ fn fMain(fsInput: VertexOutput) -> @location(0) vec4f {
         0x2c7dcd,
         0x268ee8,
     );
-
     let elevationLevel = fsInput.depth;
     let index = 10-(u32(floor(elevationLevel*9.0)));
     let color = vec3f(linearColor(fract(elevationLevel), reverseColors));
-    // let color = vec3f(directColor(fract(elevationLevel), reverseColors));
     var alpha:f32;
-    if(index == 0 || index == 1 || index == 2){
+    if(index <= 2){
         alpha = 0.0;
     }else{
         alpha = 1.0;
-        // alpha = 0.08 * f32(index)+0.7;
     }
-    return vec4f(color,alpha);
+    return vec4f(color, 1.0) * alpha;
 }

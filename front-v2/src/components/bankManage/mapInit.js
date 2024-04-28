@@ -331,9 +331,11 @@ const mapInit = async (map, vis) => {
                 const property = e.features[0].properties
                 useSceneStore().setSelectedFeature(property)
                 propertyRef.value = property
-                console.log('click feature', propertyRef.value);
+                console.log('click feature!', propertyRef.value);
                 const popUp = createPopUp(propertyRef, zoomRef)
                 popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+                console.log('singgle popUp added!');
+
             }
 
 
@@ -349,10 +351,10 @@ const mapInit = async (map, vis) => {
         })
 
 
-        warnInterval(map, 20)
-        setInterval(() => {
-            warnInterval(map, 60)
-        }, 60 * 1000 * 20);
+        // warnInterval(map, 20)
+        // setInterval(() => {
+        //     warnInterval(map, 60)
+        // }, 60 * 1000 * 20);
         // request per 20minutes 
 
         ///////DEBUG////////
@@ -453,10 +455,6 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
     )
     propertyRef.value = property
 
-    // chart
-    // const popUp = createPopUp(propertyRef)
-    // popUp.setLngLat([property.longitude, property.latitude]).addTo(map)
-
     // warning
     const popup = createWarningPopup({ warningInfo: warnData })
     popup.setLngLat([property.longitude, property.latitude]).addTo(map)
@@ -477,7 +475,11 @@ const createPopUp = (deviceProperty, zoom) => {
     const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
 
     const container = document.createElement('div')
+    container.id = 'monitorDetailV2-div'
     const componentInstance = ap.mount(container)
+    console.log('VueComponent Mounted');
+
+
 
     const domwithComp = container
     const popUp = new mapboxgl.Popup({
@@ -617,6 +619,9 @@ const open = (features, map) => {
             propertyRef.value = targetProperty
             const popUp = createPopUp(propertyRef, zoomRef)
             popUp.setOffset(0).setLngLat([targetProperty.longitude, targetProperty.latitude]).addTo(map)
+
+            console.log('messageBox -> popUp added!');
+            let dom = document.getElementById('popup')
 
         })
         .catch((action) => {

@@ -1,7 +1,5 @@
 import BackEndRequest from '../../../api/backend'
 import * as echarts from 'echarts'
-// import 'echarts-gl';
-import ecStat from 'echarts-stat';
 import dayjs from 'dayjs'
 
 ///////////toolset
@@ -32,29 +30,41 @@ const generateData_GNSS = (ogDataArray) => {
     let time_zMove_scater_data = []
     let gnss3d_data = []
     let gnss_3Df_data = []
+    let xMove_data = []
+    let yMove_data = []
+    let zMove_data = []
+
 
     let showCount = ogDataArray.length - 1
     showCount = Math.min(20, showCount)
+    let base = ogDataArray.length - showCount
 
-    let endTime = time(ogDataArray[0].measureTime);
-    let startTime = time(ogDataArray[showCount].measureTime);
+
+    // let endTime = time(ogDataArray[base].measureTime);
+    // let startTime = time(ogDataArray[base + showCount].measureTime);
     for (let i = 0; i < showCount; i++) {
+        let item = ogDataArray[base + i]
+        let thistime = time(item.measureTime)
+        // let deltaSeconds = timeDif(startTime, thistime)
 
-        let thistime = time(ogDataArray[i].measureTime)
-        let deltaSeconds = timeDif(startTime, thistime)
+        // time_xMove_scater_data.push([deltaSeconds, item.XMove])
+        // time_yMove_scater_data.push([deltaSeconds, item.YMove])
+        // time_zMove_scater_data.push([deltaSeconds, item.ZMove])
 
-        time_xMove_scater_data.push([deltaSeconds, ogDataArray[i].XMove])
-        time_yMove_scater_data.push([deltaSeconds, ogDataArray[i].YMove])
-        time_zMove_scater_data.push([deltaSeconds, ogDataArray[i].ZMove])
-
-        gnss3d_data.push([ogDataArray[i].measureTime, ogDataArray[i].threeD])
-        gnss_3Df_data.push([ogDataArray[i].measureTime, ogDataArray[i].threeDf])
+        xMove_data.push([item.measureTime, item.XMove])
+        yMove_data.push([item.measureTime, item.YMove])
+        zMove_data.push([item.measureTime, item.ZMove])
+        gnss3d_data.push([item.measureTime, item.threeD])
+        gnss_3Df_data.push([item.measureTime, item.threeDf])
     }
     return {
-        startTime,
-        endTime,
+        // startTime,
+        // endTime,
         gnss3d_data,
         gnss_3Df_data,
+        xMove_data,
+        yMove_data,
+        zMove_data,
         scatterData: {
             time_xMove_scater_data,
             time_yMove_scater_data,
@@ -64,7 +74,7 @@ const generateData_GNSS = (ogDataArray) => {
 }
 
 const generateData_Incline_new = (ogDataArray) => {
-    console.log(ogDataArray);
+
     let bottomMove = []
     let middleMove = []
     let topMove = []
@@ -96,23 +106,24 @@ const generateData_Incline_new = (ogDataArray) => {
 
 
 const generateData_Manometer_new = (ogDataArray) => {
+
     let showCount = ogDataArray.length - 1
     showCount = Math.min(20, showCount)
+    let base = ogDataArray.length - showCount
 
-    let timeArray = []
     let heightArray = []
     let temperatureArray = []
     let frequencyArray = []
 
-    ogDataArray.forEach((item) => {
-        timeArray.push(item['measureTime'])
+    let index = base
+    while (index < ogDataArray.length) {
+        let item = ogDataArray[index]
         heightArray.push([item['measureTime'], item['height']])
         temperatureArray.push([item['measureTime'], item['temperature']])
         frequencyArray.push([item['measureTime'], item['frequency']])
-    })
-
+        index++
+    }
     return {
-        timeArray,
         heightArray,
         temperatureArray,
         frequencyArray
@@ -122,7 +133,8 @@ const generateData_Manometer_new = (ogDataArray) => {
 
 const generateData_Stress = (ogDataArray) => {
 
-    let showCount = Math.min(ogDataArray.length, 20)
+    let showCount = Math.min(ogDataArray.length - 1, 20)
+    let base = ogDataArray.length - showCount
     let btPower = []
     let btAngle = []
     let btChange = []
@@ -153,7 +165,7 @@ const generateData_Stress = (ogDataArray) => {
     // }
 
     for (let i = 0; i < showCount; i++) {
-        let item = ogDataArray[i]
+        let item = ogDataArray[i + base]
         btPower.push([item.measureTime, item.bottomPower])
         midPower.push([item.measureTime, item.middlePower])
         topPower.push([item.measureTime, item.topPower])
@@ -186,10 +198,9 @@ const generateData_Stress = (ogDataArray) => {
 //////////chart options func
 const generateOptions_GNSS = (processedData) => {
 
-    // 3dcube
-    const regressionX = ecStat.regression("polynomial", processedData.scatterData.time_xMove_scater_data, 7)
-    const regressionY = ecStat.regression("polynomial", processedData.scatterData.time_yMove_scater_data, 7)
-    const regressionZ = ecStat.regression("polynomial", processedData.scatterData.time_zMove_scater_data, 7)
+    // const regressionX = ecStat.regression("polynomial", processedData.scatterData.time_xMove_scater_data, 7)
+    // const regressionY = ecStat.regression("polynomial", processedData.scatterData.time_yMove_scater_data, 7)
+    // const regressionZ = ecStat.regression("polynomial", processedData.scatterData.time_zMove_scater_data, 7)
 
     // scatter 
     let optionScatter = {
@@ -206,14 +217,15 @@ const generateOptions_GNSS = (processedData) => {
             borderWidth: 1
         },
         xAxis: {
-            type: 'value',
+            type: 'time',
             show: true,
             max: 'dataMax',
             min: 'dataMin',
             axisLabel: {
-                formatter: (value) => {
-                    return value2time(value, processedData.startTime)
-                }
+                // formatter: (value) => {
+                //     return value2time(value, processedData.startTime)
+                // }
+                show: true
             }
         },
         yAxis: {
@@ -225,10 +237,7 @@ const generateOptions_GNSS = (processedData) => {
             top: '40',
             width: 300,
             left: 'center',
-            itemGap: 5,
-            formatter: (name) => {
-                return `{b|${name}} `;
-            },
+            // itemGap: 5,
             textStyle: {
                 color: '#999999',
                 align: 'left',
@@ -248,64 +257,28 @@ const generateOptions_GNSS = (processedData) => {
         },
         series: [
             {
-                symbolSize: 10,
+                type: 'line',
                 name: 'XMove',
-                type: 'scatter',
-                data: processedData.scatterData.time_xMove_scater_data,
-                itemStyle: {
-                    color: '#FFEE58'
-                }
+                data: processedData.xMove_data,
+                smooth: true,
+                symbolSize: 5,
+                symbol: 'circle',
             },
             {
-                symbolSize: 10,
+                type: 'line',
                 name: 'YMove',
-                type: 'scatter',
-                data: processedData.scatterData.time_yMove_scater_data,
-                itemStyle: {
-                    color: '#9CCC65'
-                }
+                data: processedData.yMove_data,
+                smooth: true,
+                symbolSize: 5,
+                symbol: 'circle',
             },
             {
-                symbolSize: 10,
+                type: 'line',
                 name: 'ZMove',
-                type: 'scatter',
-                data: processedData.scatterData.time_zMove_scater_data,
-                itemStyle: {
-                    color: '#1976D2'
-                }
-            },
-            {
-                type: 'line',
-                // name: 'XMove回归',
-                data: regressionX.points,
+                data: processedData.zMove_data,
                 smooth: true,
                 symbolSize: 5,
-                itemStyle: {
-                    color: '#AAA041'
-                },
-                symbol: 'triangle',
-            },
-            {
-                type: 'line',
-                // name: 'YMove回归',
-                data: regressionY.points,
-                smooth: true,
-                symbolSize: 5,
-                itemStyle: {
-                    color: '#7AA04E'
-                },
-                symbol: 'triangle',
-            },
-            {
-                type: 'line',
-                // name: 'ZMove回归',
-                data: regressionZ.points,
-                smooth: true,
-                symbolSize: 5,
-                itemStyle: {
-                    color: '#0B437B'
-                },
-                symbol: 'triangle',
+                symbol: 'circle',
             },
         ]
 
@@ -338,78 +311,23 @@ const generateOptions_GNSS = (processedData) => {
             bottom: '3%',
             containLabel: true
         },
-        // visualMap: [
-        //     {
-        //         show: true,
-        //         itemGap: 0,
-        //         top: 'middle',
-        //         left: '0%',
-        //         itemSymbol: 'rect',
-        //         type: 'piecewise',
-        //         itemWidth: 15,
-        //         itemHeight: 15,
-        //         text: ['10.0', '0.0'],
-        //         textGap: 100,
-        //         realtime: false,
-        //         calculable: true,
-        //         seriesIndex: 0,
-        //         splitNumver: 6,
-        //         pieces: [
-        //             { gt: 9, lte: 10, label: "", color: "#ff1414" },
-        //             { gt: 8, lte: 9, label: "", color: "#fc4b00" },
-        //             { gt: 7, lte: 8, label: "", color: "#f46c00" },
-        //             { gt: 6, lte: 7, label: "", color: "#e78800" },
-        //             { gt: 5, lte: 6, label: "", color: "#d7a000" },
-        //             { gt: 4, lte: 5, label: "", color: "#c5b500" },
-        //             { gt: 3, lte: 4, label: "", color: "#b0c900" },
-        //             { gt: 2, lte: 3, label: "", color: "#93dc00" },
-        //             { gt: 1, lte: 2, label: "", color: "#6bee00" },
-        //             { gt: 0, lte: 1, label: "", color: "#0fff37" },
-        //             /////
-        //             // { gt: 0.9, lte: 1.0, label: "", color: "#03071e" },
-        //             // { gt: 0.8, lte: 0.9, label: "", color: "#370617" },
-        //             // { gt: 0.7, lte: 0.8, label: "", color: "#6a040f" },
-        //             // { gt: 0.6, lte: 0.7, label: "", color: "#9d0208" },
-        //             // { gt: 0.5, lte: 0.6, label: "", color: "#d00000" },
-        //             // { gt: 0.4, lte: 0.5, label: "", color: "#dc2f02" },
-        //             // { gt: 0.3, lte: 0.4, label: "", color: "#e85d04" },
-        //             // { gt: 0.2, lte: 0.3, label: "", color: "#f48c06" },
-        //             // { gt: 0.1, lte: 0.2, label: "", color: "#faa307" },
-        //             // { gt: 0, lte: 0.1, label: "", color: "#ffba08" },
-        //             // { gt: -0.1, lte: 0, label: "", color: "#ffba08" },
-        //             // { gt: -0.2, lte: -0.1, label: "", color: "#faa307" },
-        //             // { gt: -0.3, lte: -0.2, label: "", color: "#f48c06" },
-        //             // { gt: -0.4, lte: -0.3, label: "", color: "#e85d04" },
-        //             // { gt: -0.5, lte: -0.4, label: "", color: "#dc2f02" },
-        //             // { gt: -0.6, lte: -0.5, label: "", color: "#d00000" },
-        //             // { gt: -0.7, lte: -0.6, label: "", color: "#9d0208" },
-        //             // { gt: -0.8, lte: -0.7, label: "", color: "#6a040f" },
-        //             // { gt: -0.9, lte: -0.8, label: "", color: "#370617" },
-        //             // { gt: -10, lte: -1.0, label: "", color: "#03071e" }
-        //         ]
-        //     },
-        // ],
-        // markLine:{
-        //     data: [{ 
-        //         value:5.0,
-        //         lineStyle: {
-        //     }]
-        // },
         xAxis: {
             type: 'time',
             min: 'dataMin',
+            max: 'dataMax',
             axisLine: {
                 show: true
             },
             axisLabel: {
-                formatter: function (value, index) {
-                    // if (index === 0 || index === dataIndexArray.length - 1) {
-                    if (index % 2 === 0) {
-                        return echarts.format.formatTime('hh:ss', value);
-                    } else {
-                        return '';
-                    }
-                }
+                // formatter: function (value, index) {
+                //     // if (index === 0 || index === dataIndexArray.length - 1) {
+                //     if (index % 2 === 0) {
+                //         return echarts.format.formatTime('hh:ss', value);
+                //     } else {
+                //         return '';
+                //     }
+                // }
+                show: true,
             }
         },
         yAxis: {
@@ -458,22 +376,22 @@ const generateOptions_GNSS = (processedData) => {
             }
         },
         xAxis: {
+            type: 'time',
+            min: 'dataMin',
+            max: 'dataMax',
             axisLine: {
                 show: true
             },
-            axisTick: {
-                show: true
-            },
-            type: 'time',
             axisLabel: {
-                formatter: function (value, index) {
-                    // if (index === 0 || index === dataIndexArray.length - 1) {
-                    if (index % 2 === 0) {
-                        return echarts.format.formatTime('hh:ss', value);
-                    } else {
-                        return '';
-                    }
-                }
+                // formatter: function (value, index) {
+                //     // if (index === 0 || index === dataIndexArray.length - 1) {
+                //     if (index % 2 === 0) {
+                //         return echarts.format.formatTime('hh:ss', value);
+                //     } else {
+                //         return '';
+                //     }
+                // }
+                show: true,
             }
         },
         yAxis: {
@@ -814,15 +732,17 @@ const generateOptions_Stress = (processedData) => {
             }
         },
         xAxis: {
-            axisLine: {
-                show: true
-            },
-            axisTick: {
-                show: true
-            },
             type: 'time',
             min: 'dataMin',
-            max: 'dataMax'
+            max: 'dataMax',
+            axisLine: {
+                show: true,
+
+            },
+            axisLabel: {
+                show: true,
+                rotate: 30
+            }
         },
         yAxis: {
             type: 'value',
@@ -879,7 +799,11 @@ const generateOptions_Stress = (processedData) => {
                 show: true
             },
             axisTick: {
-                show: true
+                show: true,
+            },
+            axisLabel:{
+                show:true,
+                rotate: 30
             },
             type: 'time',
             min: 'dataMin',
@@ -942,7 +866,10 @@ const generateOptions_Stress = (processedData) => {
             axisTick: {
                 show: true
             },
-            interval: 3,
+            axisLabel:{
+                show:true,
+                rotate: 30
+            },
             type: 'time',
             min: 'dataMin',
             max: 'dataMax'

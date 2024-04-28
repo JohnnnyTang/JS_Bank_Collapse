@@ -1,5 +1,5 @@
 <template>
-    <div class="container" v-show="show" >
+    <div class="container" v-show="true">
         <div class="info-content-container">
             <div class="device-detail-container">
                 <div class="device-name-text">{{ DEVICETYPEMAP[(+deviceInfo.type) - 1] }}</div>
@@ -59,9 +59,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed, onBeforeMount } from 'vue';
 import pureChart from '../monitorDevice/pureChart.vue';
-import { useSceneStore } from '../../../store/mapStore';
 
 const props = defineProps({
     deviceInfo: Object,
@@ -79,7 +78,6 @@ const show = computed(() => {
 const imgSrcPrefix = 'http://localhost:5173//device/all/'
 
 
-// const deviceInfo = computed(() => useSceneStore().selectedFeature)
 const deviceInfo = props.deviceInfo
 const STATIONMAP = {
     'MZS': '民主沙'
@@ -92,15 +90,27 @@ const clickbuttonHandler = () => {
     buttonTxt.value = showChart.value ? "设备概要" : "查看图表"
 }
 
+onBeforeMount(()=>{
+    console.log('monitorDetailV2 onBeforeMount!!!');
+})
 onMounted(async () => {
+    console.log('monitorDetailV2 onMounted!!!');
     deviceInfo.value["status"] = '正常运行';
     deviceInfo.value["updating"] = false;
-
 })
+
 
 </script>
 
 <style lang="scss" scoped>
+
+.container{
+    position: relative;
+    display: block;
+    width: 25vw;
+    height: 34vh;
+}
+
 div.info-content-container {
     user-select: none;
     width: 25vw;

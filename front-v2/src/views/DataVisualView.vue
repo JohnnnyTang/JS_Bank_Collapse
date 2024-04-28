@@ -69,12 +69,6 @@ onMounted(async () => {
 
     //test 
     // addMarkerToMap(map, [119.9617548378, 32.04382454852],'testMarker','/icons/warning3.png')
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '1') {
-            console.log(useLayerStore().terrainLayer);
-        }
-    })
 })
 
 
@@ -123,7 +117,7 @@ div.data-visual-container {
     .mapboxgl-popup-content {
         padding: 0;
         background-color: transparent;
-        border: none
+        border: none;
     }
 
     .mapboxgl-popup-tip {
@@ -139,6 +133,7 @@ div.data-visual-container {
         // border-color: blue($color: #000000);
     }
 }
+
 
 #warning1-marker {
     background-image: url('https://docs.mapbox.com/mapbox-gl-js/assets/washington-monument.jpg');
