@@ -47,6 +47,7 @@ export const initialEdges = [
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
         style: { stroke: '#333', strokeWidth: 3 },
+        type: 'flow',
     },
     {
         id: 'e1-3',
@@ -55,6 +56,7 @@ export const initialEdges = [
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
         style: { stroke: '#333', strokeWidth: 3 },
+        type: 'flow',
     },
 
     {
@@ -64,6 +66,7 @@ export const initialEdges = [
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
         style: { stroke: '#333', strokeWidth: 3 },
+        type: 'flow',
     },
     {
         id: 'e3-4',
@@ -72,5 +75,6 @@ export const initialEdges = [
         animated: true,
         markerEnd: MarkerType.ArrowClosed,
         style: { stroke: '#333', strokeWidth: 3 },
+        type: 'flow',
     },
 ]

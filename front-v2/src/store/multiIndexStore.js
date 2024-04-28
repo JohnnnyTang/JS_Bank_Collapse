@@ -243,8 +243,7 @@ export const useMultiIndexStore = defineStore(
 
         function updateSectionStatus(newStatus) {
             flowNode.value[0].data.status = newStatus
-            console.log("update", flowEdge.value[2])
-            
+            // console.log("update", flowEdge.value[2])
             if (newStatus == 2) {
                 flowNode.value[1].data.status = 0
                 flowNode.value[2].data.status = 0
@@ -256,7 +255,6 @@ export const useMultiIndexStore = defineStore(
 
         function updateVelocityEvolveStatus(id, newStatus) {
             flowNode.value[id].data.status = newStatus
-            // console.log('update', flowEdge)
             if(newStatus== 2) {
                 flowEdge.value[+(id - 1)].animated = false
                 if(id == 1) {
@@ -275,6 +273,8 @@ export const useMultiIndexStore = defineStore(
                     ].join(',')
                     flowEdge.value[3].style.stroke = '#10b981'
                 }
+                console.log(flowEdge.value[+(id - 1)])
+                
             }
             if (
                 flowNode.value[1].data.status == 2 &&
@@ -289,8 +289,10 @@ export const useMultiIndexStore = defineStore(
             if (flowNode.value[3].data.status == 2) {
                 flowNode.value[3].data.result = [
                     resJson.value.risk[1],
-                    resJson.value.risk[2]
-                ].join(',')
+                    resJson.value.risk[2].toFixed(3)
+                ].join(': ')
+                flowEdge.value[2].animated = false
+                flowEdge.value[3].animated = false
             }
         }
 
