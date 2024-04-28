@@ -96,7 +96,7 @@ div.total-controller {
 
     width: 20vw;
     height: 50vh;
-    background-color: rgb(226, 236, 255);
+    background-color: rgb(240, 248, 246);
     border-radius: 1%;
     box-shadow: 0px 0px 10px 1px #b3b2b2ee;
 

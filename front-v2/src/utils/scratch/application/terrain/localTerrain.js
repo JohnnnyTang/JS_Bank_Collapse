@@ -136,6 +136,7 @@ export class LocalTerrain {
         this.demTexture = imageLoader.load('Texture (DEM)', '/scratchSomething/terrain_flow/image/dem.png')
         this.borderTexture = imageLoader.load('Texture (DEM Border)', '/scratchSomething/terrain_flow/image/border.png')
         this.paletteTexture = imageLoader.load('Texture (DEM Palette)', '/scratchSomething/terrain_flow/image/blueDemPalette.png')
+        
         this.lodMapTexture = texture({
             name: 'Texture (LOD Map)',
             resource: { size: () => this.lodMapSize.array }

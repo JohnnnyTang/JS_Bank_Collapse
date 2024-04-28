@@ -125,7 +125,7 @@ const removeLayerRelatedMarker = (className) => {
         top: 0;
         width: 6.5vh;
         height: 6.5vh;
-        background-color: rgb(255, 245, 245);
+        background-color: rgb(228, 247, 243);
         border-radius: 6vh;
         display: flex;
         align-items: center;

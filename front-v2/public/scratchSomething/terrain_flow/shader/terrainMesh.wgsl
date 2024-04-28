@@ -173,6 +173,40 @@ fn positionCS(coord: vec2f, z: f32) -> vec4f {
     return position_CS;
 }
 
+fn colorFromInt(color: u32) -> vec3f {
+    
+    let b = f32(color & 0xFF) / 255.0;
+    let g = f32((color >> 8) & 0xFF) / 255.0;
+    let r = f32((color >> 16) & 0xFF) / 255.0;
+
+    return vec3f(r, g, b);
+}
+
+
+fn linearColor(speed: f32, rampColors: array<u32, 10>) -> vec3f {
+    
+    let bottomIndex = floor(speed * 10.0);
+    let topIndex = ceil(speed * 10.0);
+    let interval = speed * 10.0 - bottomIndex;
+
+    let slowColor = colorFromInt(rampColors[u32(bottomIndex)]);
+    let fastColor = colorFromInt(rampColors[u32(topIndex)]);
+
+    return mix(slowColor, fastColor, interval);
+}
+
+fn directColor(speed: f32, rampColors: array<u32, 10>) -> vec3f {
+
+
+    let roundIndex = u32(round(speed * 10.0));
+    let color = colorFromInt(rampColors[roundIndex]);
+
+    return color;
+
+}
+
+
+
 @vertex
 fn vMain(vsInput: VertexInput) -> VertexOutput {
 
@@ -275,11 +309,49 @@ fn fMain(fsInput: VertexOutput) -> @location(0) vec4f {
 
 
 
-    let paletteLength = f32(textureDimensions(palette).x);
-    // let elevationLevel = (paletteLength * fsInput.depth*0.7) / paletteLength;
-    let elevationLevel = (ceil(paletteLength * fsInput.depth*0.7) / paletteLength);
+    // og v
+    // let paletteLength = f32(textureDimensions(palette).x);
+    // // let elevationLevel = (paletteLength * fsInput.depth*0.7) / paletteLength;
+    // let elevationLevel = fsInput.depth *0.7;
+    // let paletteColor = textureSample(palette, lSampler, vec2f(elevationLevel + 0.2, 0.5));
+    // return paletteColor;
 
-    //let elevationLevel = fract(paletteLength * fsInput.depth) / paletteLength;
-     let paletteColor = textureSample(palette, lSampler, vec2f(elevationLevel + 0.2, 0.5));
-    return paletteColor;
+
+    let rampColors = array<u32, 10>(
+        0x69b9ff,
+        0x5ea4e6,
+        0x538fcd,
+        0x477bb5,
+        0x3b689d,
+        0x305685,
+        0x24446e,
+        0x183358,
+        0x0b2343,
+        0x01132f,
+    );
+    let reverseColors = array<u32, 10>(
+        0x000214,
+        0x101527,
+        0x18223c,
+        0x1f2f52,
+        0x253d69,
+        0x2a4c81,
+        0x2d5c9a,
+        0x2e6cb3,
+        0x2c7dcd,
+        0x268ee8,
+    );
+
+    let elevationLevel = fsInput.depth;
+    let index = 10-(u32(floor(elevationLevel*9.0)));
+    let color = vec3f(linearColor(fract(elevationLevel), reverseColors));
+    // let color = vec3f(directColor(fract(elevationLevel), reverseColors));
+    var alpha:f32;
+    if(index == 0 || index == 1 || index == 2){
+        alpha = 0.0;
+    }else{
+        alpha = 1.0;
+        // alpha = 0.08 * f32(index)+0.7;
+    }
+    return vec4f(color,alpha);
 }

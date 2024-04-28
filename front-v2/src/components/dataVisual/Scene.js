@@ -324,7 +324,7 @@ const initLayers = async (sceneInstance, map) => {
                 '守护工程断面注记',
                 '稳定性分区',
                 '预警级别分区',
-                '近岸流场',
+                // '近岸流场',
                 '三维地形'
             ]
             showLayersFunction(map, layers3)
@@ -435,16 +435,6 @@ class Scene {
     removeLayers(map) {
 
         globalpopup && globalpopup.remove()
-
-        // this.allLayers.forEach((layerID) => {
-        //     if (layerID === '三维地形') {
-        //         useLayerStore().terrainLayer.hide()
-        //     } else if (layerID === '近岸流场') {
-        //         useLayerStore().flowLayer.hide()
-        //     } else map.getLayer(layerID) && map.removeLayer(layerID)
-
-        //     useMapLayerStore().layerRemove(layerID)
-        // })
         hideLayersFunction(map, this.allLayers)
         this.allLayers = []
 
