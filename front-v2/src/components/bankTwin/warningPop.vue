@@ -22,7 +22,7 @@
                     <div class="text">
                         <span
                             style="font-size: calc(0.5vh + 0.4vw); display: block; height: 40%; line-height:  calc(0.5vh + 0.4vw);">累计位移</span>
-                        <span style="color: red; height: 60%;">{{ info.dif+' m' }}</span>
+                        <span style="color: red; height: 60%;">{{ info.dif+' mm' }}</span>
                     </div>
                 </div>
 

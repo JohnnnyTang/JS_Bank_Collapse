@@ -1,11 +1,11 @@
 <template>
     <div class="scene-container">
 
-        <div class="scene-title"> {{ sceneContainerInfo.sceneTitle }} </div>
-        <div class="switch-icon" @click="switchHandler"></div>
+        <div class="scene-title"> 典型数据场景 </div>
         <div class="card-container">
-            <sceneCard v-for="(info, index) in  sceneContainerInfo.sceneCardInfo " :key="index" :title="info.title"
-                :desc="info.desc" :iconSrc="info.iconSrc" @click="clickSceneHandler(info, index)"
+            <sceneCard v-for="(info, index) in  sceneCardInfo " :key="index" :title="info.title"
+                :desc="info.desc" :iconSrc="info.iconSrc" 
+                @click="clickSceneHandler(info, index)"
                 :class="{ active: selectedIndex === index }">
             </sceneCard>
             <hr>
@@ -18,103 +18,26 @@
 import { onMounted, ref } from 'vue'
 import sceneCard from './sceneCard.vue'
 import { ElMessage } from "element-plus"
-import { Scene, getBigRangeScenes, getSmallRangeScenes } from './Scene.js'
-import { flytoLarge, flytoSmall } from '../../utils/mapUtils'
+import { Scene } from './Scene.js'
+import { flytoFeature, flytoLarge, flytoSmall } from '../../utils/mapUtils'
 import { useMapStore, useSceneStore } from '../../store/mapStore';
 
-const mapStore = useMapStore()
 const sceneStore = useSceneStore()
 const selectedIndex = ref(0)
-
-// const emit = defineEmits(['selectScene'])
 
 const clickSceneHandler = (scene, index) => {
     sceneStore.setSelectedScene(scene)
     selectedIndex.value = index;
-    // emit('selectScene', scene)
-}
-
-const switchHandler = () => {
-    //layer remove
-    selectedIndex.value = -1;
-    if (sceneContainerInfo.value.sceneTitle === '长江江苏段') {
-        useSceneStore().selectedScene.removeLayers(mapStore.getMap())
-        //console.log('map add mzs relative layer');
-        let map = mapStore.getMap()
-        if(!map.getSource("mzsPlaceLabelSource"))
-        map.addSource('mzsPlaceLabelSource', {
-            type: 'vector',
-            tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
-            ],
-        })
-        if(!map.getSource('mzsPlaceLineSource'))
-        map.addSource('mzsPlaceLineSource', {
-            type: 'vector',
-            tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
-            ],
-        })
-        map.addLayer({
-            id: 'mzsLine',
-            type: 'line',
-            source: 'mzsPlaceLineSource',
-            'source-layer': 'default',
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                'line-color': 'rgba(118,186,236, 0.7)',
-                'line-width': 3,
-            },
-        })
-        map.addLayer({
-            id: 'mzsLabel',
-            type: 'symbol',
-            source: 'mzsPlaceLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(76,109,206, 1.0)',
-            },
-        })
-        flytoSmall(mapStore.getMap())
-        sceneContainerInfo.value = sceneContainerInfo2
-        useSceneStore().setSelectedScene(new Scene());
-    }
-    else {
- 
-        let map = mapStore.getMap()
-        if (map.getLayer('mzsLine')) map.removeLayer('mzsLine')
-        if (map.getLayer('mzsLabel')) map.removeLayer('mzsLabel')
-        //console.log('map remove mzs relative layer');
-        flytoLarge(mapStore.getMap())
-        sceneContainerInfo.value = sceneContainerInfo1
-
-    }
+    // if(scene.type === '全江'){
+    //     flytoLarge(map)
+    // }else{
+    //     flytoSmall(map)
+    // }
 }
 
 
 
-const sceneCardInfo1 = getBigRangeScenes()
-const sceneCardInfo2 = getSmallRangeScenes()
-const sceneContainerInfo1 = {
-    sceneTitle: '长江江苏段',
-    sceneCardInfo: sceneCardInfo1
-}
-const sceneContainerInfo2 = {
-    sceneTitle: '民主沙示范段',
-    sceneCardInfo: sceneCardInfo2
-}
-const sceneContainerInfo = ref(sceneContainerInfo1)
-
+const sceneCardInfo = Scene.getScnens()
 onMounted(async () => {
 
 
@@ -137,27 +60,27 @@ onMounted(async () => {
         font-size: calc(1vw + 1vh);
         font-weight: 800;
         text-align: center;
-        margin-right: 3vw;
+        margin-right: 0vw;
 
         color: #0663bb;
         text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 3px 2px 1px #CCCCCC, 2px 3px 1px #EEEEEE, 4px 3px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 5px 4px 1px #CCCCCC, 4px 5px 1px #EEEEEE, 6px 5px 1px #CCCCCC, 5px 6px 1px #EEEEEE, 7px 6px 1px #0f41e7;
 
     }
 
-    .switch-icon {
-        position: absolute;
-        top: 0.8vh;
-        right: 1vw;
-        height: 4vh;
-        width: 4vh;
-        background-image: url('/icons/switch.png');
-        background-size: contain;
-        animation: scaleAnim 1000ms infinite;
+    // .switch-icon {
+    //     position: absolute;
+    //     top: 0.8vh;
+    //     right: 1vw;
+    //     height: 4vh;
+    //     width: 4vh;
+    //     background-image: url('/icons/switch.png');
+    //     background-size: contain;
+    //     animation: scaleAnim 1000ms infinite;
 
-        &:hover {
-            cursor: pointer;
-        }
-    }
+    //     &:hover {
+    //         cursor: pointer;
+    //     }
+    // }
 
     @keyframes scaleAnim {
         0% {
