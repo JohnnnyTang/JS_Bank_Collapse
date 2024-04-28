@@ -2,7 +2,7 @@
     <div class="bankLineRelate-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">过江通道信息</div>
+            <div class="title">全江概貌场景</div>
         </div>
         <div class="card">
             <div class="content">
@@ -16,7 +16,7 @@
                             </div>
                             <div class="bank-desc">
                                 <div class="bank-desc-text">
-                                    涵盖长江江苏段已建成、在建以及规划中的桥梁和隧道，为促进南北岸交通互联、助力过江通道的发展提供支持。
+                                    全江概貌场景涵盖长江江苏段已建成、在建以及规划中的三类过江通道以及全江基础地理信息。
                                 </div>
                             </div>
 
@@ -154,17 +154,17 @@ onMounted(async () => {
     let chartdom = document.querySelector('#chart')
     myChart = echarts.init(chartdom);
 
-    setTimeout(() => {
-        update()
-    }, 0);
+
+    update()
+
 
     updateInterval = setInterval(() => {
         update()
-    }, 5000);
+    }, 10 * 1000);
 
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
     clearInterval(updateInterval)
 })
 

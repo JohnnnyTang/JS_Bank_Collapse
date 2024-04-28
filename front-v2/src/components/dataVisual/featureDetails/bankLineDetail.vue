@@ -97,6 +97,7 @@ $Color5: rgb(6, 102, 192);
         font-family: "Trebuchet MS", Helvetica, sans-serif;
         text-shadow: 1px 1px 0 #bcbcbc, 1px 1px 0 #9c9c9c;
         font-weight: 600;
+        overflow: hidden
     }
 
     .main-container {

@@ -136,5 +136,5 @@ fn vMain(vsInput: VertexInput) -> VertexOutput {
 @fragment
 fn fMain(fsInput: VertexOutput) -> @location(0) vec4f {
 
-    return vec4f(fsInput.level / 500.0);
+    return vec4f(fsInput.level / 255.0);
 }
