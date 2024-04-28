@@ -44,6 +44,9 @@ public class ProcessUtil {
     //    static String pythonDir = "/home/zym/python/";
     static String pythonStr = "python";
 
+//    static String condaStr = "conda activate multiIndex &&";
+    static String condaStr = "conda activate bankModel &&";
+
 //    static String pythonStr = "python3";
 
     public static Process cmdShp2Pgsql(List<String> commands) throws IOException {
@@ -74,7 +77,7 @@ public class ProcessUtil {
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
-        commands.add("conda activate multiIndex &&");
+        commands.add(condaStr);
 
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
@@ -99,7 +102,7 @@ public class ProcessUtil {
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
-        commands.add("conda activate multiIndex &&");
+        commands.add(condaStr);
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
         commands.add((String) modelUsage.get("exePrefix"));

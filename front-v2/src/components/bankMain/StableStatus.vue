@@ -173,7 +173,7 @@ const stableStatus = ref([
     [4, 12, 9, 8],
 ])
 const stableStatusTitle = ref('当前状态')
-const statusTextMap = ref(['稳定', '较稳定', '较不稳定', '不稳定'])
+const statusTextMap = ref(['较稳定', '稳定', '不稳定', '较不稳定'])
 const statusColorMap = ref(['#0cb444', '#0212a1', '#e48b18', '#b11a06'])
 const beforeSmallCurrentStatus = ref(false)
 const statusDetailShow = ref(false)
@@ -374,7 +374,7 @@ function iterateStatus(interval) {
 
     setTimeout(() => {
         lineStatusShow.value = true
-        stableStatusTitle.value = '近一日内评估'
+        stableStatusTitle.value = '近三月内评估'
     }, interval + 5000)
 
     setTimeout(() => {

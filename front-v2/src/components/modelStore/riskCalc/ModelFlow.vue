@@ -2,10 +2,28 @@
     <div class="model-flow-container">
         <div class="model-flow-title">风险预警模型工作流</div>
         <div class="model-flow-content" ref="modelFlowDom">
-            <VueFlow :nodes="nodes" :edges="edges" @node-click="FlowNodeClick">
+            <VueFlow
+                :nodes="multiIndexStore.flowNode"
+                :edges="multiIndexStore.flowEdge"
+                @node-click="FlowNodeClick"
+                fit-view-on-init
+            >
                 <template #node-flow="props">
-                    <FlowNode
-                        :data="props.data"
+                    <FlowNode :data="props.data" />
+                </template>
+                <template #edge-flow="customEdgeProps">
+                    <FlowEdge
+                        :id="customEdgeProps.id"
+                        :source-x="customEdgeProps.sourceX"
+                        :source-y="customEdgeProps.sourceY"
+                        :target-x="customEdgeProps.targetX"
+                        :target-y="customEdgeProps.targetY"
+                        :source-position="customEdgeProps.sourcePosition"
+                        :target-position="customEdgeProps.targetPosition"
+                        :data="customEdgeProps.data"
+                        :marker-end="customEdgeProps.markerEnd"
+                        :style="customEdgeProps.style"
+                        :animated="customEdgeProps.animated"
                     />
                 </template>
             </VueFlow>
@@ -17,19 +35,28 @@
 import { ref, onMounted } from 'vue'
 import { VueFlow } from '@vue-flow/core'
 import '@vue-flow/core/dist/style.css'
-import { initialNodes, initialEdges } from './flowChartConfig.js'
 import FlowNode from './FlowNode.vue'
+import FlowEdge from './FlowEdge.vue'
+import { ElNotification } from 'element-plus'
+import { useMultiIndexStore } from '@/store/multiIndexStore'
 
-const nodes = ref(initialNodes)
-const edges = ref(initialEdges)
+const multiIndexStore = useMultiIndexStore()
 const modelFlowDom = ref()
 const emit = defineEmits(['changeModel'])
 
 const FlowNodeClick = (e) => {
+    if (e.node.data.status < 0) {
+        ElNotification({
+            title: '无法调用',
+            message: '请先完成前置步骤',
+            type: 'warning',
+            position: 'top-left',
+        })
+        return
+    }
     console.log('click node', e.node.label)
-    emit("changeModel", e.node.label)
+    emit('changeModel', e.node.label)
 }
-
 </script>
 
 <style lang="scss" scoped>

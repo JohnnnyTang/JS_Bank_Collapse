@@ -147,6 +147,7 @@ const isDisable = computed(() => {
 const isFinish = computed(() => indexValues.value[0].length !== 0)
 
 const submitForm = async () => {
+    multiIndexStore.updateVelocityEvolveStatus(2,1)
     if (Number(multiIndexStore.resJson.year) <= paramsForm.year) {
         ElMessage({
             message:
@@ -216,7 +217,7 @@ const submitForm = async () => {
                 )
                 rateChart.resize()
             }, 10)
-
+            multiIndexStore.updateVelocityEvolveStatus(2,2)
             ElMessage({
                 message: '演化分析指标计算成功',
                 type: 'success',
