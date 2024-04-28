@@ -130,28 +130,28 @@ const navList = ref([
         oneRow: false,
     },
     {
+        name: '崩岸风险预警',
+        routerLink: '/bankWarn',
+        isActive: false,
+        oneRow: true,
+        iconUrl: '/monitoring.png',
+    },
+    {
         name: '崩岸模型知识',
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,
         iconUrl: '/predictive.png',
     },
-    {
-        name: '崩岸知识平台',
-        routerLink: '/knowledgeStore',
-        isActive: false,
-        oneRow: true,
-        iconUrl: '/knowledge.png',
-    },
 ])
 
 const routerPathIndexMap = {
     '/dataVisual': 0,
-    '/knowledgeStore': 4,
-    '/': 2,
-    '/modelStore': 3,
+    '/bankWarn': 3,
+    '/modelStore': 4,
     '/bankTwin': 1,
     '/bankManage': 1,
+    '/': 2
 }
 
 let previousActive = 2
@@ -218,7 +218,7 @@ onMounted(() => {
     // titleWidthInPixel.value = titleDom;
     onResize(headerDom.value.clientWidth, headerDom.value.clientHeight)
     resizeObserver.observe(headerDom.value)
-    // console.log(navItemRefs.value);
+    console.log(navItemRefs.value);
     let curRoute = router.currentRoute.value.path
     console.log(curRoute)
     if (routerPathIndexMap[curRoute] != previousActive) {
@@ -236,6 +236,7 @@ onMounted(() => {
             // console.log(newPath.split('/'), oldPath)
             let parentPath = newPath
             let splitPath = newPath.split('/')
+            console.log('pp', parentPath, splitPath)
             if (splitPath.length >= 3) {
                 parentPath = '/' + splitPath[1]
             }

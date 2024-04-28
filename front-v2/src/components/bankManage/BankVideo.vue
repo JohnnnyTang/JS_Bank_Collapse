@@ -111,7 +111,7 @@ const defaultVal = [
         name: '民主沙中游监控S03',
         position: '32.02839471, 120.54611474',
         videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=at.2q8ej4p4114dtudb20awr9763vfz1f6o-5j403u7nkd-1ya7mgb-wv9z5z55f',
+            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=at.742vjiq01mtq2g3jbnkckwuq3ze19j4w-839um484hs-1qki2ev-lammqrxtd',
     },
 ]
 
@@ -132,7 +132,7 @@ const videoList = ref([
         name: '民主沙监控3',
         position: '32.0316674, 120.5402574',
         videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=at.2q8ej4p4114dtudb20awr9763vfz1f6o-5j403u7nkd-1ya7mgb-wv9z5z55f',
+            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=at.742vjiq01mtq2g3jbnkckwuq3ze19j4w-839um484hs-1qki2ev-lammqrxtd',
     },
 ])
 

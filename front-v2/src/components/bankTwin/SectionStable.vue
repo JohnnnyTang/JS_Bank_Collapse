@@ -220,14 +220,27 @@
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
 import { fade } from '../../utils/colorUtils'
-import { getHoursBackIn } from '../../utils/timeUtils'
+import { getDatesBefore } from '../../utils/timeUtils'
 import {
-    stableStatus,
     sectionList,
-    stableStatusLineData,
     sectionStableDataMap,
     genChartSeries,
 } from './data'
+
+
+const stableStatus = [
+    [3, 0, 0,  0],
+    [8, 6, 0, 0],
+    [48, 48, 47, 36],
+    [42, 46, 53, 64],
+]
+
+const stableStatusLineData = [
+    [8,  6,  5,  5,  3,  0,  0,  0],
+    [13, 13, 12, 10, 8,  6,  0,  0],
+    [52, 48, 48, 48, 48, 48, 47, 36],
+    [27, 33, 35, 37, 41, 46, 53, 64],
+]
 
 const sectionChartDom = ref()
 const value = ref('全部断面状态比例')
@@ -317,7 +330,7 @@ const areaColorGradientMap = [
     ]),
 ]
 
-const hoursBackList = getHoursBackIn(24, 2)
+const hoursBackList = getDatesBefore(8, 15)
 // console.log(getHoursBackIn(24, 2))
 
 const baseChartOption = {
