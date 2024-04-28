@@ -351,10 +351,10 @@ const mapInit = async (map, vis) => {
         })
 
 
-        // warnInterval(map, 20)
-        // setInterval(() => {
-        //     warnInterval(map, 60)
-        // }, 60 * 1000 * 20);
+        warnInterval(map, 20)
+        setInterval(() => {
+            warnInterval(map, 60)
+        }, 60 * 1000 * 20);
         // request per 20minutes 
 
         ///////DEBUG////////
