@@ -209,6 +209,7 @@
                     <div
                         class="section-chart-container"
                         ref="sectionChartDom"
+                        v-loading="chartLoading"
                     ></div>
                 </div>
             </div>
@@ -239,6 +240,7 @@ const sectionClassColorMap = {
     普通: 'normal',
     统计: 'all',
 }
+const chartLoading = ref(false)
 
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
@@ -490,12 +492,15 @@ const updateDeviceSingleData = async (num, minutes, deviceId) => {
 
 let sectionChart = null;
 
-const sectionSelectChange = (val) => {
+const sectionSelectChange = async (val) => {
     console.log(val)
     if (val === '全部设备统计') singleSectionShow.value = false
     else {
         console.log(deviceDataMap[val])
         singleSectionShow.value = true
+        chartLoading.value = true
+        await updateDeviceSingleData(8, 60, val)
+        chartLoading.value = false
         sectionChartOption = genDeviceWarnChart(
             sectionChart,
             ['#F0AB51', '#FF3636'],
@@ -518,18 +523,18 @@ onMounted(async () => {
     if(sectionChartDom.value) {
         sectionChart = echarts.init(sectionChartDom.value)
     }
-    for (let id in deviceIdMap) {
-        await updateDeviceSingleData(8, 60, id)
-    }
-    console.log(deviceDataMap)
-    sectionChartOption = genDeviceWarnChart(
-        sectionChart,
-        ['#F0AB51', '#FF3636'],
-        deviceDataMap['CL-10'],
-        2,
-    )
-    // console.log(sectionChartOption)
-    sectionChart.setOption(sectionChartOption)
+    // for (let id in deviceIdMap) {
+    //     await updateDeviceSingleData(8, 60, id)
+    // }
+    // console.log(deviceDataMap)
+    // sectionChartOption = genDeviceWarnChart(
+    //     sectionChart,
+    //     ['#F0AB51', '#FF3636'],
+    //     deviceDataMap['CL-10'],
+    //     2,
+    // )
+    // // console.log(sectionChartOption)
+    // sectionChart.setOption(sectionChartOption)
 })
 </script>
 

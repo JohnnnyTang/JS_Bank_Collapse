@@ -199,6 +199,21 @@ const mapInit = async (map, vis) => {
             'text-color': 'rgba(81, 154, 86, 0.9)',
         },
     })
+    map.addLayer({
+        id: 'mzsLabel',
+        type: 'symbol',
+        source: 'mzsPlaceLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'left',
+        },
+        paint: {
+            'text-color': 'rgba(31, 14, 126, 0.75)',
+        },
+    })
 
     if (vis) {
 

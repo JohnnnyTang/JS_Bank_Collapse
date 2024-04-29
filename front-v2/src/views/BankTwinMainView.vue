@@ -30,7 +30,7 @@ import SectionRisk from '../components/bankTwin/SectionRisk.vue'
 import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 import { useMapStore } from '../store/mapStore'
-
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -81,8 +81,31 @@ onMounted(() => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
         useMapStore().setMap(map)
+        map.addSource('ptVector', {
+            type: 'vector',
+            tiles: [
+                tileServer+'/tile/vector/placeLabel/{x}/{y}/{z}',
+            ],
+        })
         await mapInit(map, true)
-
+        map.addLayer({
+            id: '点1',
+            type: 'symbol',
+            source: 'ptVector',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+                'text-size': 20,
+            },
+            paint: {
+                'text-color': 'rgb(0, 42, 105)',
+            },
+        })
+        
         // map.on('click', (e) => {
         //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
 

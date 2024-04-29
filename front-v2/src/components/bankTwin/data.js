@@ -371,17 +371,17 @@ function genChartSeries(chartIns, colors, dataList, seriesNum) {
             },
         },
         series,
-        graphic: {
-            elements: genLinkElementsOfChart(
-                chartIns,
-                colors,
-                dataList,
-                seriesNum,
-                grid,
-            ),
-        },
+        // graphic: {
+        //     elements: genLinkElementsOfChart(
+        //         chartIns,
+        //         colors,
+        //         dataList,
+        //         seriesNum,
+        //         grid,
+        //     ),
+        // },
     }
-    console.log(option)
+    // console.log(option)
     return option
 }
 
