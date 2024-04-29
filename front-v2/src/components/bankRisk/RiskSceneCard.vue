@@ -1,5 +1,5 @@
 <template>
-    <div class="param-card-container">
+    <div class="param-card-container" :class="{'active': props.active}">
         <div class="top-section">
             <div class="border">
                 <div class="title-text">{{ props.name }}</div>
@@ -31,17 +31,28 @@
 </template>
 
 <script setup>
+import { defineEmits } from 'vue';
 
 const props = defineProps({
-  name: String,
-  year: String,
-  timeString: String,
+    name: String,
+    year: String,
+    timeString: String,
+    active: Boolean,
+    index: Number
 })
 
-const changeInfoPage = () => {}
+const emit = defineEmits(['changeScene'])
+
+const changeInfoPage = () => {
+    // console.log(props.index)
+    emit('changeScene', props.index)
+}
 </script>
 
 <style lang="scss" scoped>
+$rotate-border-width: 3px;
+$rotate-border-length: 12px;
+$rotate-border-color: #175fa3;
 $selector-height: 5vh;
 div.param-card-container {
     margin-top: 2vh;
@@ -56,6 +67,18 @@ div.param-card-container {
     &:hover {
         transform: scale(1.03, 1.03);
         transition: all 0.3s cubic-bezier(0.68, -0.25, 0.265, 1.15);
+    }
+
+    &.active {
+        // transform: scale(1.03, 1.03);
+        background: #175fa3;
+
+        div.top-section {
+            background: linear-gradient(45deg, #ddf7f7, #74faff);
+        }
+
+        border: 2px solid #00eeff;
+        animation: zoom-in-out 1s infinite linear;
     }
 
     div.top-section {
@@ -196,6 +219,34 @@ div.param-card-container {
                 }
             }
         }
+    }
+}
+@keyframes border-dance {
+    0% {
+        background-position:
+            0 0,
+            100% 100%,
+            0 100%,
+            100% 0;
+    }
+    100% {
+        background-position:
+            100% 0,
+            0 100%,
+            0 0,
+            100% 100%;
+    }
+}
+
+@keyframes zoom-in-out {
+    0% {
+        transform: scale(1, 1);
+    }
+    50% {
+        transform: scale(1.02, 1.02);
+    }
+    100% {
+        transform: scale(1, 1);
     }
 }
 </style>

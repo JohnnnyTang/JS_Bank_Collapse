@@ -108,14 +108,14 @@ const hoverBracketLeft = ref(0)
 
 const navList = ref([
     {
-        name: '崩岸专题信息',
+        name: '崩岸综合信息',
         routerLink: '/dataVisual',
         isActive: false,
         oneRow: true,
         iconUrl: '/big-data.png',
     },
     {
-        name: '实时设备监测',
+        name: '实时监测预警',
         routerLink: '/bankTwin',
         isActive: false,
         oneRow: true,
@@ -130,7 +130,7 @@ const navList = ref([
         oneRow: false,
     },
     {
-        name: '崩岸风险预警',
+        name: '崩岸风险评估',
         routerLink: '/bankWarn',
         isActive: false,
         oneRow: true,
