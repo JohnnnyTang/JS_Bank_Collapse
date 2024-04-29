@@ -244,6 +244,7 @@ div.model-card-container {
                 font-size: calc(0.6vh + 0.6vw);
                 text-align: left;
                 
+
                 &.second {
                     border: 0px;
                     text-align: center;

@@ -68,11 +68,11 @@ const routes = [
             },
             {
                 path: 'soilAnalysis',
-                component: () => import('../components/modelStore/views/SoilAnalysis2.vue'),
+                component: () => import('../components/modelStore/views/SoilAnalysis.vue'),
             },
             {
                 path: 'stabilityAnalysis',
-                component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
+                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
             },
             {
                 path: 'riskWarning',

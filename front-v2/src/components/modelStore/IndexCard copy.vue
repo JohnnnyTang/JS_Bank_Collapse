@@ -35,7 +35,7 @@ const main = ref(null);
 </script>
 
 <style lang="scss" scoped>
-div.card {
+div.part1-card {
     min-width: 23vw;
     height: 90%;
     margin: 15px;

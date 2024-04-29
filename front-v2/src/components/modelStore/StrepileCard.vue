@@ -106,7 +106,7 @@ onMounted(
                 top_angle: item.top_angle,
                 top_power: item.top_power,
                 top_change: item.top_change,
-                time: item.in_time
+                time: item.idGroup.measure_time
             })
         })
         loading.value = false

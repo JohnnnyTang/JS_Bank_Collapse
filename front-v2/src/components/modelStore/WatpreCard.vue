@@ -106,7 +106,7 @@ onMounted(
                 zx: item.zx,
                 wd: item.wd,
                 swgc: item.swgc,
-                time: item.in_time
+                time: item.idGroup.measure_time
             })
         })
         loading.value = false
