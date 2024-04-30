@@ -958,8 +958,8 @@ const layerAddFunctionMap = {
                 flowSrc,
                 (url) => url.match(/uv_(\d+)\.bin/)[1],
             )
-            flow.particleNum.n = 10000;
-            flow.speedFactor.n = 2.0;
+            flow.particleNum.n = 2800;
+            flow.speedFactor.n = 1.8;
 
             map.addLayer(flow)
             useLayerStore().setFlowLayer(flow)

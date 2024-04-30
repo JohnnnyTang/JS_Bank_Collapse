@@ -69,6 +69,7 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
     @Override
     @GetMapping("/hour/{hours}/device/{deviceCode}")
     public ResponseEntity<List<T>> getDataByHourOfDevice(@PathVariable int hours, @PathVariable String deviceCode) {
+        List<T> list = monitorDataService.getDataByHourOfDevice(dataNode, hours, deviceCode);
         return ResponseEntity.ok(monitorDataService.getDataByHourOfDevice(dataNode, hours, deviceCode));
     }
 

@@ -70,9 +70,9 @@ const carouselLoop = ref(false)
 const carouselDom = ref()
 
 const paramRowSelector = ref([
-    { name: '土体变形分析模型', id: 0, isActive: true },
-    { name: '岸坡稳定分析模型', id: 1, isActive: false },
-    { name: '崩岸风险预警模型', id: 2, isActive: false },
+    { name: '崩岸风险预警模型', id: 0, isActive: true },
+    { name: '土体变形分析模型', id: 1, isActive: false },
+    { name: '岸坡稳定分析模型', id: 2, isActive: false },
 ])
 
 const paramColumnSelector = ref([

@@ -82,21 +82,21 @@ const mapInit = async (map, vis) => {
             'line-width': 2,
         },
     })
-    map.addLayer({
-        id: 'mzsLabel',
-        type: 'symbol',
-        source: 'mzsPlaceLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'left',
-        },
-        paint: {
-            'text-color': 'rgba(31, 14, 126, 0.75)',
-        },
-    })
+    // map.addLayer({
+    //     id: 'mzsLabel',
+    //     type: 'symbol',
+    //     source: 'mzsPlaceLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'left',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(31, 14, 126, 0.75)',
+    //     },
+    // })
     map.addLayer({
         id: 'mzsSectionArea1',
         type: 'fill',
@@ -394,7 +394,7 @@ const mapInit = async (map, vis) => {
             }
 
             if (e.key == 'Enter') {
-                const minute = 30
+                const minute = 720
                 let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
 
                 let lastPos

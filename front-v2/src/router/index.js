@@ -105,6 +105,10 @@ const routes = [
             {
                 path: 'warn/:id', // 默认子页面
                 component: () => import('../components/bankManage/BankWarnTable.vue')
+            },
+            {
+                path: 'report/:id', // 默认子页面
+                component: () => import('../components/bankManage/BankWarnReport.vue')
             }
         ]
     },

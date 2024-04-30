@@ -1,6 +1,6 @@
 <template>
     <div class="stable-length-container">
-        <div class="stable-length-title">断面风险专题对比</div>
+        <div class="stable-length-title">岸段风险专题对比</div>
         <div class="stable-length-content" v-loading="lengthChartLoading">
             <div class="section-selectior-item">
                 <el-select

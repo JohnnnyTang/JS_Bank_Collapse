@@ -44,8 +44,8 @@ public class ProcessUtil {
     //    static String pythonDir = "/home/zym/python/";
     static String pythonStr = "python";
 
-//    static String condaStr = "conda activate multiIndex &&";
-    static String condaStr = "conda activate bankModel &&";
+    static String condaStr = "conda activate multiIndex &&";
+//    static String condaStr = "conda activate bankModel &&";
 
 //    static String pythonStr = "python3";
 

@@ -1,6 +1,5 @@
 package com.johnny.bank.jobs;
 
-import ch.qos.logback.core.util.TimeUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.johnny.bank.model.resource.dataResource.*;
@@ -9,6 +8,8 @@ import com.johnny.bank.utils.BeanUtil;
 import com.johnny.bank.utils.MailUtil;
 import com.johnny.bank.utils.SMSUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,7 +35,11 @@ public class GnssWarningJob implements Job {
 
     private static final List<String> mailList = List.of("249884523@qq.com", "1275441282@qq.com");
     private static final List<String> phoneList = List.of("18860847206", "13382058110");
+//    private static final List<String> phoneList = List.of("13382058110");
 //    private static final List<String> phoneList = List.of("18860847206");
+    ExpiringMap<String, Double> messageMap = ExpiringMap.builder()
+        .variableExpiration()
+        .build();
 
     public List<List<GnssData>> before() {
         MonitorInfoService monitorInfoService = BeanUtil.getBean(MonitorInfoService.class);
@@ -105,10 +111,10 @@ public class GnssWarningJob implements Job {
             warnStrBuilder.append("河岸变形较大，崩岸风险很高，请注意相关防汛安全！");
             String warnStr = warnStrBuilder.toString();
             log.info(warnStr);
-            for(String mailTo: mailList) {
-                mailUtil.sendSimpleMail(
-                        mailTo, "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", warnStr);
-            }
+//            for(String mailTo: mailList) {
+//                mailUtil.sendSimpleMail(
+//                        mailTo, "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", warnStr);
+//            }
         }
 
 
@@ -116,10 +122,7 @@ public class GnssWarningJob implements Job {
             MonitorInfo gnssInfo = monitorInfoService.getDataById(
                     monitorInfoService.getDataNode(), gnssData.getDeviceId()
             );
-            List<DeviceWarning> deviceWarningList = gnssWarningService.getDataByHourOfDevice(
-                    2, gnssInfo.getCode()
-            );
-            if(deviceWarningList.isEmpty()) {
+            if(!messageMap.containsKey(gnssInfo.getCode())) {
                 log.info("send message");
 //                String posStr = gnssInfo.getLongitude() + "," + gnssInfo.getLatitude();
 //                String messageStr = baseDangerStr +
@@ -145,20 +148,15 @@ public class GnssWarningJob implements Job {
                         throw new RuntimeException(e);
                     }
                 }
+                messageMap.put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 2, TimeUnit.HOURS);
+                log.info("message map: " + messageMap.toString());
             }
+            log.info("curMessage: " + messageMap.toString());
             DeviceWarning deviceWarning = DeviceWarning.builder()
                     .deviceId(gnssData.getDeviceId()).warnTime(gnssData.getMeasureTime())
                     .threeDiff(gnssData.getThreeD()).deviceCode(gnssInfo.getMachineId())
                     .build();
             gnssWarningService.save(deviceWarning);
-//            mailUtil.sendSimpleMail(
-//                    "fyzhang@nhri.cn", "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", resStr);
-//            mailUtil.sendSimpleMail(
-//                    "249884523@qq.com", "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", resStr
-//            );
-//            mailUtil.sendSimpleMail(
-//                    "1275441282@qq.com", "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", resStr
-//            );
         }
         try {
             log.info("watching gnss data...");

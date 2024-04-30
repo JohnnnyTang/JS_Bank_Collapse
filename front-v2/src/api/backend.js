@@ -63,7 +63,7 @@ export default class BackEndRequest {
             case '1': {
                 // return backendInstance.get(`/data/gnssData/id/${code}`)
                 // return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
-                return backendInstance.get(`/data/gnssData/hour/5/device/${code}`)
+                return backendInstance.get(`/data/gnssData/hour/12/device/${code}`)
             }
             case '2': {
                 // return backendInstance.get(`/data/stressData/id/${code}`)

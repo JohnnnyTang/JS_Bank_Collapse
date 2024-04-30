@@ -30,7 +30,7 @@
         <div class="stable-legend-container">
             <div class="stable-legend-item" v-for="i in 4" :key="i">
                 <div class="stable-legend-mark" :status-id="i"></div>
-                <div class="stable-legend-text">{{ statusList[i-1] }}</div>
+                <div class="stable-legend-text">{{ statusList[i - 1] }}</div>
             </div>
         </div>
         <SectionRiskVue />
@@ -104,6 +104,19 @@ const sectionPaint = {
             '#ee3603',
             '#18b915',
         ],
+        'fill-opacity': [
+            'match',
+            ['get', 'stability'],
+            '较稳定',
+            1,
+            '稳定',
+            1,
+            '不稳定',
+            1,
+            '较不稳定',
+            1,
+            1,
+        ],
     },
     2019: {
         'fill-color': [
@@ -119,8 +132,49 @@ const sectionPaint = {
             '#ee3603',
             '#18b915',
         ],
+        'fill-opacity': [
+            'match',
+            ['get', 'stability_2019'],
+            '较稳定',
+            1,
+            '稳定',
+            1,
+            '不稳定',
+            1,
+            '较不稳定',
+            1,
+            1,
+        ],
     },
 }
+
+let fillColorIndex = 0
+let fillOpacityIdnex = 0
+let fillColorList = [
+    '#ff6000',
+    '#ff5400',
+    '#ff4200',
+    '#ff3300',
+    '#ff2a00',
+    '#ff1d00',
+    '#ff1d00',
+    '#ff1400',
+    '#ff0c00',
+    '#ff0000',
+    '#ff0000',
+    '#ff0c00',
+    '#ff1400',
+    '#ff1d00',
+    '#ff1d00',
+    '#ff2a00',
+    '#ff3300',
+    '#ff4200',
+    '#ff5400',
+    '#ff6000',
+]
+let fillOpacity = [0.6, 0.7, 0.8, 0.8, 0.9, 0.9, 1.0, 0.9, 0.9, 0.8, 0.8, 0.7]
+let defaultInterval = null
+let otherInterval = null
 
 let lastActiveIndex = 0
 let firstTimeCalc = true
@@ -151,13 +205,51 @@ const changeScene = (val) => {
             setTimeout(() => {
                 sectionStableVue.value.changeData(1)
                 stableLoading.value = false
+                clearInterval(defaultInterval)
+                otherInterval = setInterval(() => {
+                    sectionPaint['2019']['fill-color'][9] =
+                        fillColorList[fillColorIndex]
+                    sectionPaint['2019']['fill-opacity'][9] =
+                        fillOpacity[fillOpacityIdnex]
+                    fillOpacityIdnex = (fillOpacity + 1) % 11
+                    fillColorIndex = (fillColorIndex + 1) % 20
+                    map.setPaintProperty(
+                        'mzsSectionArea1',
+                        'fill-color',
+                        sectionPaint['2019']['fill-color'],
+                    )
+                    map.setPaintProperty(
+                        'mzsSectionArea1',
+                        'fill-opacity',
+                        sectionPaint['2019']['fill-opacity'],
+                    )
+                }, 20)
             }, 1200)
         } else {
-            map.setPaintProperty(
-                'mzsSectionArea1',
-                'fill-color',
-                sectionPaint['default']['fill-color'],
-            )
+            // map.setPaintProperty(
+            //     'mzsSectionArea1',
+            //     'fill-color',
+            //     sectionPaint['default']['fill-color'],
+            // )
+            clearInterval(otherInterval)
+            defaultInterval = setInterval(() => {
+                sectionPaint.default['fill-color'][9] =
+                    fillColorList[fillColorIndex]
+                sectionPaint.default['fill-opacity'][9] =
+                    fillOpacity[fillOpacityIdnex]
+                fillOpacityIdnex = (fillOpacity + 1) % 11
+                fillColorIndex = (fillColorIndex + 1) % 20
+                map.setPaintProperty(
+                    'mzsSectionArea1',
+                    'fill-color',
+                    sectionPaint.default['fill-color'],
+                )
+                map.setPaintProperty(
+                    'mzsSectionArea1',
+                    'fill-opacity',
+                    sectionPaint.default['fill-opacity'],
+                )
+            }, 20)
             stableLoading.value = true
             setTimeout(() => {
                 sectionStableVue.value.changeData(0)
@@ -241,6 +333,24 @@ onMounted(() => {
                 },
                 'mzsBankLine',
             )
+            defaultInterval = setInterval(() => {
+                sectionPaint.default['fill-color'][9] =
+                    fillColorList[fillColorIndex]
+                sectionPaint.default['fill-opacity'][9] =
+                    fillOpacity[fillOpacityIdnex]
+                fillOpacityIdnex = (fillOpacity + 1) % 11
+                fillColorIndex = (fillColorIndex + 1) % 20
+                map.setPaintProperty(
+                    'mzsSectionArea1',
+                    'fill-color',
+                    sectionPaint.default['fill-color'],
+                )
+                map.setPaintProperty(
+                    'mzsSectionArea1',
+                    'fill-opacity',
+                    sectionPaint.default['fill-opacity'],
+                )
+            }, 20)
             stableLoading.value = false
         }, 1500)
 
@@ -459,7 +569,7 @@ div.risk-warn-container {
     div.stable-legend-container {
         position: absolute;
         top: 1vh;
-        right: 29vh;
+        right: 25vh;
 
         height: 10vh;
         width: 6vw;
@@ -492,10 +602,10 @@ div.risk-warn-container {
                     background-color: #1092ce;
                 }
                 &[status-id='3'] {
-                    background-color: rgb(223,129,5);
+                    background-color: rgb(223, 129, 5);
                 }
                 &[status-id='4'] {
-                    background-color: rgb(238,54,3);
+                    background-color: rgb(238, 54, 3);
                 }
             }
 

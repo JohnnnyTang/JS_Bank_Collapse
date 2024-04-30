@@ -68,7 +68,7 @@
                         <span>报表管理</span>
                     </template>
                     <el-menu-item index="4-1">日报</el-menu-item>
-                    <el-menu-item index="4-2">周报</el-menu-item>
+                    <el-menu-item index="report/week">周报</el-menu-item>
                     <el-menu-item index="4-3">月报</el-menu-item>
                 </el-sub-menu>
             </el-menu>
