@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class GnssWarningJob implements Job {
 
     private static final List<String> mailList = List.of("249884523@qq.com", "1275441282@qq.com");
-    private static final List<String> phoneList = List.of("18860847206", "13382058110");
+    private static final List<String> phoneList = List.of("18860847206", "13382058110", "13913859225");
 //    private static final List<String> phoneList = List.of("13382058110");
 //    private static final List<String> phoneList = List.of("18860847206");
     ExpiringMap<String, Double> messageMap = ExpiringMap.builder()
