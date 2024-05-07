@@ -183,15 +183,15 @@ onUnmounted(() => {
                 align-items: center;
                 overflow: hidden;
 
-                &::before {
-                    position: absolute;
-                    content: " ";
-                    display: block;
-                    width: 60vw;
-                    height: 14vh;
-                    background: rgb(104, 175, 235);
-                    animation: rotation_481 5000ms infinite linear;
-                }
+                // &::before {
+                //     position: absolute;
+                //     content: " ";
+                //     display: block;
+                //     width: 60vw;
+                //     height: 14vh;
+                //     background: rgb(104, 175, 235);
+                //     animation: rotation_481 5000ms infinite linear;
+                // }
 
                 .real-content {
                     position: absolute;

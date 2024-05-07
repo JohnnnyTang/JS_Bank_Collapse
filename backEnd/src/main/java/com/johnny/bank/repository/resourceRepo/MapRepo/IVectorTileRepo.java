@@ -3,7 +3,12 @@ package com.johnny.bank.repository.resourceRepo.MapRepo;
 import com.johnny.bank.model.common.ContourTileBox;
 import com.johnny.bank.model.common.DepthLineTileBox;
 import com.johnny.bank.model.common.TileBox;
+import org.apache.ibatis.annotations.MapKey;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Johnny Tang
@@ -17,4 +22,7 @@ public interface IVectorTileRepo {
     Object getContourVectorTile(ContourTileBox contourTileBox);
 
     Object getDepthLineVectorTile(DepthLineTileBox depthLineTileBox);
+
+    @MapKey("id")
+    List<Map<String, Object>> getLayerBasicInfo(@Param("tableName") String tableName, @Param("fieldList") List<String> fieldList);
 }

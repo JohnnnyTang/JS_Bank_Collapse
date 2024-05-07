@@ -4,7 +4,7 @@
             :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
             class="stable-border-box"
         >
-            <div class="stable-status-header">岸段风险评估</div>
+            <div class="stable-status-header">断面风险评估</div>
             <div class="splitter-container">
                 <dv-decoration3
                     class="status-splitter"

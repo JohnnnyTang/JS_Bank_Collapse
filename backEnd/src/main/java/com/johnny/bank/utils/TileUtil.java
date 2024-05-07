@@ -2,8 +2,6 @@ package com.johnny.bank.utils;
 
 import com.johnny.bank.model.common.TileBox;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +84,18 @@ public class TileUtil {
         tileBox.setName(tableName);
         tileBox.setProjection(4326);
         tileBox.setFieldList(fieldListMap.get(tableName));
+        return tileBox;
+    }
+
+    public static TileBox tile2boundingBox(int x, int y, int zoom, String tableName, List<String> fieldList) {
+        TileBox tileBox = new TileBox();
+        tileBox.setXMin(tile2lon(x, zoom));
+        tileBox.setXMax(tile2lon(x + 1, zoom));
+        tileBox.setYMin(tile2lat(y + 1, zoom));
+        tileBox.setYMax(tile2lat(y, zoom));
+        tileBox.setName(tableName);
+        tileBox.setProjection(4326);
+        tileBox.setFieldList(fieldList);
         return tileBox;
     }
 

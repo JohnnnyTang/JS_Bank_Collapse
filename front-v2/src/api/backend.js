@@ -35,6 +35,10 @@ export default class BackEndRequest {
         return backendInstance.get("/data/bankLine")
     }
 
+    static getBankLineSimpleData() {
+        return backendInstance.get("/data/bankLine/simple")
+    }
+
     static getHistoryInfo() {
         return backendInstance.get("/data/historyInfo")
     }

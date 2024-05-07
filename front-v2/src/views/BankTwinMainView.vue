@@ -6,7 +6,7 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.6vw + 0.4vh)" :items="items" :columns="2"></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -207,7 +207,7 @@ div.twin-main-container {
 }
 
 :deep(.iEdpB) {
-    font-size: calc(0.6vw + 0.4vh);
+    font-size: calc(0.4vw + 0.4vh);
 }
 
 :deep(.active.active .iEdpB) {

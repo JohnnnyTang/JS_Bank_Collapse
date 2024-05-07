@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Author: Johnny T
  * @Date: 2023/12/21
@@ -18,4 +20,7 @@ public interface IParamNodeRepo extends IBaseNodeRepo<ParamNode> {
     @Query("{'_id': ?0}")
     @Update("{'$set': {'params': ?1}}")
     void updateParamNodeParamById(String nodeId, JSONObject newParams);
+
+    List<ParamNode> findParamNodesByModelId(String modelId);
+    List<ParamNode> findParamNodesByModelIdAndCategory(String modelId, String category);
 }
