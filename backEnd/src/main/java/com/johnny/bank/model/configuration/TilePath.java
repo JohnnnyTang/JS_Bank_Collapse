@@ -16,4 +16,5 @@ import org.springframework.stereotype.Component;
 public class TilePath {
     private String mzsTilePath;
     private String worldTilePath;
+    private String nodeServicePath;
 }

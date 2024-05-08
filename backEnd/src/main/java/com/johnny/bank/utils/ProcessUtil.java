@@ -4,14 +4,10 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
 import com.johnny.bank.model.configuration.MultiIndexPath;
-import com.johnny.bank.model.configuration.TilePath;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -33,8 +29,6 @@ import java.util.Objects;
 @Component
 public class ProcessUtil {
 
-    @Autowired
-    private TilePath tilePath;
     //    static String pythonDir = "C:/nhri/monitor/pythonDir/";
 
     @Autowired
@@ -120,15 +114,11 @@ public class ProcessUtil {
         return processBuilder.start();
     }
 
-    public static Process buildMapTileServiceProcess(String worldTilePath) throws Exception {
+    public static Process buildMapTileServiceProcess(String worldTilePath, String nodeServicePath) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
         commands.add("node");
-        Resource resource = new ClassPathResource("node/index.js");
-        //获1.txt的取相对路径
-        String path = resource.getFile().getPath();
-        System.out.println(path);
-        commands.add(path);
+        commands.add(nodeServicePath);
         commands.add(worldTilePath);
         processBuilder.command(commands);
         System.out.println(processBuilder);

@@ -7,10 +7,10 @@
         />
         <BottomWaveVue/>
     </div>
-    <div class="nav-knowledge-button" @click="navToKnowLedge">
+    <!-- <div class="nav-knowledge-button" @click="navToKnowLedge">
         <div class="nav-knowledge-icon"></div>
         <div class="nav-knowledge-text">知识平台</div>
-    </div>
+    </div> -->
     <div class="model-arror a1">
       <img src="/modelArror.png" alt="">
     </div>
