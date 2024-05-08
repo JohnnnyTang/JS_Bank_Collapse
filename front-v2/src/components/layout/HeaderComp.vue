@@ -30,6 +30,31 @@
                     <br />
                     {{ navItem.nameTwo }}
                 </div>
+                <el-dropdown
+                    ref="eleDropDownDomRef"
+                    v-if="index == 4"
+                    trigger="click"
+                    popper-class="nav-popper"
+                >
+                    <div
+                        style="
+                            width: 10vw;
+                            height: 1px;
+                            background-color: transparent;
+                            position: relative;
+                        "
+                    ></div>
+                    <template #dropdown>
+                        <el-dropdown-menu>
+                            <el-dropdown-item @click="navToModelPage"
+                                >崩岸模型库</el-dropdown-item
+                            >
+                            <el-dropdown-item @click="navToKnowledgePage"
+                                >崩岸知识库</el-dropdown-item
+                            >
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
         </div>
         <div class="header-user-container">
@@ -106,6 +131,8 @@ const bracketHoverTitleWidth = ref(0)
 const bracketTitleHoverShow = ref(false)
 const hoverBracketLeft = ref(0)
 
+const eleDropDownDomRef = ref()
+
 const navList = ref([
     {
         name: '崩岸综合信息',
@@ -130,14 +157,14 @@ const navList = ref([
         oneRow: false,
     },
     {
-        name: '崩岸风险评估',
+        name: '崩岸风险信息',
         routerLink: '/bankWarn',
         isActive: false,
         oneRow: true,
         iconUrl: '/monitoring.png',
     },
     {
-        name: '崩岸模型知识',
+        name: '模型与知识库',
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,
@@ -149,9 +176,10 @@ const routerPathIndexMap = {
     '/dataVisual': 0,
     '/bankWarn': 3,
     '/modelStore': 4,
+    '/knowledgeStore': 4,
     '/bankTwin': 1,
     '/bankManage': 1,
-    '/': 2
+    '/': 2,
 }
 
 let previousActive = 2
@@ -168,7 +196,10 @@ const focusOnNavItem = (navIndex) => {
 }
 
 const emitNavClick = async (navIndex) => {
-    if (navIndex != previousActive) {
+    if (navIndex == 4) {
+        // console.log(1)
+        eleDropDownDomRef.value[0].handleOpen()
+    } else if (navIndex != previousActive) {
         router.push(navList.value[navIndex].routerLink)
         navList.value[previousActive].isActive = false
         navList.value[navIndex].isActive = true
@@ -195,6 +226,18 @@ const leaveNav = () => {
     bracketTitleHoverShow.value = false
 }
 
+const navToModelPage = () => {
+    eleDropDownDomRef.value[0].handleClose()
+    router.push('/modelStore')
+    focusOnNavItem(4)
+}
+
+const navToKnowledgePage = () => {
+    eleDropDownDomRef.value[0].handleClose()
+    router.push('/knowledgeStore')
+    focusOnNavItem(4)
+}
+
 const onResize = (refDomWidth, refDomHeight) => {
     titleWidthInPixel.value = (4 * refDomWidth) / 25
     decLineWidth.value = refDomHeight / 24
@@ -218,7 +261,7 @@ onMounted(() => {
     // titleWidthInPixel.value = titleDom;
     onResize(headerDom.value.clientWidth, headerDom.value.clientHeight)
     resizeObserver.observe(headerDom.value)
-    console.log(navItemRefs.value);
+    console.log(navItemRefs.value)
     let curRoute = router.currentRoute.value.path
     console.log(curRoute)
     if (routerPathIndexMap[curRoute] != previousActive) {
@@ -253,24 +296,6 @@ onMounted(() => {
             }
         },
     )
-    // watchEffect(() => {
-    //     router.getRoutes().map((item, index) => {
-    //         console.log(item.path, index)
-    //         // if (
-    //         //     item.path === router.currentRoute.value.path &&
-    //         //     index != previousActive
-    //         // ) {
-    //         //     // console.log(item.path)
-    //         //     // console.log(index, previousActive);
-    //         //     navList.value[previousActive].isActive = false
-    //         //     navList.value[index].isActive = true
-    //         //     previousActive = index
-    //         //     if (index != 2) {
-    //         //         focusOnNavItem(index)
-    //         //     }
-    //         // }
-    //     })
-    // })
 })
 onUnmounted(() => {
     resizeObserver.disconnect()

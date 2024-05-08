@@ -2,15 +2,13 @@
     <div class="bank-main-container" ref="containerDom">
         <div id="map" class="map-container"></div>
         <TickClockVue />
-        <div class="basemap-radio-container">
+        <!-- <div class="basemap-radio-container">
             <input type="radio" id="radio-1" name="tabs" checked />
             <label class="tab" for="radio-1">天地图</label>
             <input type="radio" id="radio-2" name="tabs" />
             <label class="tab" for="radio-2">OSM</label>
-            <!-- <input type="radio" id="radio-3" name="tabs" />
-            <label class="tab" for="radio-3">Completed</label> -->
             <span class="glider"></span>
-        </div>
+        </div> -->
         <BankTableVue />
         <WarnNoticeVue />
         <RealtimeRiskVue />

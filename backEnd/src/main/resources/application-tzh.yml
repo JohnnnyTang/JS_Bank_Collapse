@@ -53,7 +53,7 @@ video:
 
 multiIndex:
   dataPath: D:\2024-work\shore_collapse\model\modelData
-  resPath: D:\2024-work\shore_collapse\model\modelRes
+  resPath: D:\2024-work\shore_collapse\model\modelRes\
 
 sms:
   accessTokenLoc: D:\2024-work\AccessKey.json

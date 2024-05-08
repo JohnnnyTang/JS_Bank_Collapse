@@ -5,6 +5,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.johnny.bank.model.resource.dataResource.*;
 import com.johnny.bank.service.resource.data.impl.*;
 import com.johnny.bank.utils.BeanUtil;
+import com.johnny.bank.utils.GlobalMap;
 import com.johnny.bank.utils.MailUtil;
 import com.johnny.bank.utils.SMSUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +38,9 @@ public class GnssWarningJob implements Job {
     private static final List<String> phoneList = List.of("18860847206", "13382058110", "13913859225");
 //    private static final List<String> phoneList = List.of("13382058110");
 //    private static final List<String> phoneList = List.of("18860847206");
-    ExpiringMap<String, Double> messageMap = ExpiringMap.builder()
-        .variableExpiration()
-        .build();
+//    ExpiringMap<String, Double> messageMap = ExpiringMap.builder()
+//        .variableExpiration()
+//        .build();
 
     public List<List<GnssData>> before() {
         MonitorInfoService monitorInfoService = BeanUtil.getBean(MonitorInfoService.class);
@@ -117,12 +118,13 @@ public class GnssWarningJob implements Job {
 //            }
         }
 
+        GlobalMap globalMap = BeanUtil.getBean(GlobalMap.class);
 
         for(GnssData gnssData: warningGnssDataList.get(1)) {
             MonitorInfo gnssInfo = monitorInfoService.getDataById(
                     monitorInfoService.getDataNode(), gnssData.getDeviceId()
             );
-            if(!messageMap.containsKey(gnssInfo.getCode())) {
+            if(!globalMap.getWarMessageMap().containsKey(gnssInfo.getCode())) {
                 log.info("send message");
 //                String posStr = gnssInfo.getLongitude() + "," + gnssInfo.getLatitude();
 //                String messageStr = baseDangerStr +
@@ -134,24 +136,25 @@ public class GnssWarningJob implements Job {
                 paramsJson.put("time", sdf.format(gnssData.getMeasureTime()));
                 paramsJson.put("position", "(" + gnssInfo.getLongitude() + "," + gnssInfo.getLatitude() + ")");
                 paramsJson.put("device", gnssData.getDeviceCode());
-                for(String phoneNumber: phoneList) {
-                    SendSmsResponse smsResponse = null;
-                    try {
-                        smsResponse = smsUtil.sendSms(phoneNumber, paramsJson.toJSONString());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    log.info(smsResponse.getMessage());
-                    try {
-                        TimeUnit.SECONDS.sleep(5);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                messageMap.put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 2, TimeUnit.HOURS);
-                log.info("message map: " + messageMap.toString());
+//                for(String phoneNumber: phoneList) {
+//                    SendSmsResponse smsResponse = null;
+//                    try {
+//                        smsResponse = smsUtil.sendSms(phoneNumber, paramsJson.toJSONString());
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    log.info(smsResponse.getMessage());
+//                    try {
+//                        TimeUnit.SECONDS.sleep(5);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+                log.info(paramsJson.toString());
+                globalMap.getWarMessageMap().put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 2, TimeUnit.HOURS);
+//                log.info("message map: " + globalMap.getWarMessageMap().toString());
             }
-            log.info("curMessage: " + messageMap.toString());
+            log.info("curMessage: " + globalMap.getWarMessageMap().toString());
             DeviceWarning deviceWarning = DeviceWarning.builder()
                     .deviceId(gnssData.getDeviceId()).warnTime(gnssData.getMeasureTime())
                     .threeDiff(gnssData.getThreeD()).deviceCode(gnssInfo.getMachineId())

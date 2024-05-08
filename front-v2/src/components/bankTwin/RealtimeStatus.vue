@@ -59,7 +59,6 @@
                     <dv-border-box10
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
                     >
-                        <div class="device-chart-dom" ref="chartDomRef"></div>
                     </dv-border-box10>
                 </div>
             </div>
@@ -83,68 +82,8 @@ const deviceStatusDataList = ref([
     { name: '视频监控', count: 3, percent: '100%' },
 ])
 
-const chartDomRef = ref(null)
-
-const option = {
-    grid: {
-        left: '2%',
-        right: '2%',
-        top: '2%',
-        bottom: '3%',
-    },
-    visualMap: {
-        type: 'continuous',
-        min: 1,
-        max: 14,
-        inRange: {
-            color: ['rgb(206,238,254)', 'rgb(4,70,168)'],
-        },
-        right: "5%",
-        top: 'center',
-        itemWidth: "40%",
-        itemHeight: "200%",
-    },
-    series: {
-        type: 'sunburst',
-        data: deviceStatusData,
-        center: ["42%", "50%"],
-        radius: ['20%', '100%'],
-        itemStyle: {
-            borderRadius: 7,
-            borderWidth: 2,
-        },
-        label: {
-            // show: true,
-            rotate: 'tangential',
-            fontSize: 12,
-            color: '#fff',
-            textBorderColor: 'inherit',
-            textBorderWidth: 1,
-        },
-        levels: [
-            {},
-            {
-                label: {
-                    rotate: 'tangential',
-                    textBorderColor: 'inherit',
-                    textBorderWidth: 1,
-                    fontSize: 12,
-                    fontWeight: 'bold',
-                },
-            },
-            {
-                label: {
-                    rotate: 'tangential',
-                    fontSize: 16,
-                },
-            }
-        ],
-    },
-}
 
 onMounted(() => {
-    const deviceStatusChart = echarts.init(chartDomRef.value)
-    deviceStatusChart.setOption(option)
 })
 </script>
 

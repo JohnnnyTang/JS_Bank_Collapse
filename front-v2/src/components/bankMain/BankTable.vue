@@ -11,6 +11,7 @@
             :border="true"
             :row-class-name="rowClassName"
             ref="bankTableDomRef"
+            v-loading="tableLoading"
         >
             <el-table-column prop="bankName" label="名称" align="center" />
             <el-table-column prop="riverName" label="所处河段" align="center" />
@@ -24,11 +25,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { bankInfo } from './data'
+import { nextTick, onMounted, ref } from 'vue'
+// import { bankInfo } from './data'
+import BackEndRequest from '../../api/backend'
 
 const rowClassName = ref('even-state')
 const bankTableDomRef = ref(null)
+const tableLoading = ref(true)
+const bankInfo = ref([])
 
 // setTimeout(() => {
 //     rowClassName.value = 'odd-state'
@@ -37,18 +41,32 @@ const bankTableDomRef = ref(null)
 let curRowIndex = 0
 let scrollTopVal = 0
 
-onMounted(() => {
+onMounted(async () => {
+    bankInfo.value = (await BackEndRequest.getBankLineSimpleData()).data
+    tableLoading.value = false
+    // await nextTick()
     let tableRows = bankTableDomRef.value.$el.querySelectorAll(
         '.el-table__body tbody .el-table__row',
     )
-    let rowNumber = bankInfo.length
+    let rowNumber = bankInfo.value.length
     let scrollBar = bankTableDomRef.value.$el.querySelectorAll(
         '.el-scrollbar__wrap',
     )[0]
     // console.log(scrollBar)
 
     setInterval(() => {
-        if (tableRows[curRowIndex].offsetHeight != 0) {
+        // console.log(tableRows, scrollBar)
+        if (tableRows.length == 0) {
+            tableRows = bankTableDomRef.value.$el.querySelectorAll(
+                '.el-table__body tbody .el-table__row',
+            )
+            scrollBar = bankTableDomRef.value.$el.querySelectorAll(
+                '.el-scrollbar__wrap',
+            )[0]
+            console.log(tableRows, scrollBar)
+        } else if (tableRows[curRowIndex].offsetHeight != 0) {
+            console.log(111, curRowIndex, rowNumber)
+
             if (curRowIndex < rowNumber - 2) {
                 rowClassName.value =
                     rowClassName.value === 'even-state'
