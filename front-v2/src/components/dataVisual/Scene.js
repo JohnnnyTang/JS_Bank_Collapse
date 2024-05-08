@@ -625,8 +625,8 @@ class Scene {
         scene0.iconSrc = '/river.png'
         scene0.type = '全江'
         let scene1 = new Scene()
-        scene1.title = '典型崩岸'
-        scene1.desc = '展示典型崩岸,助力有关规划决策.'
+        scene1.title = '典型岸段'
+        scene1.desc = '展示典型岸段,助力有关规划决策.'
         scene1.type = '全江'
         scene1.iconSrc = '/icons/collapse.png'
 

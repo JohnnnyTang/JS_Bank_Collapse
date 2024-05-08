@@ -2,9 +2,9 @@
 
     <div class="p">
         <channelRelate v-if="selectedScene.title === '全江概貌'"></channelRelate>
-        <bankLineRelate v-if="selectedScene.title === '典型崩岸'"></bankLineRelate>
-        <monitorDeviceRelate v-if="selectedScene.title === '民主沙预警监测'"></monitorDeviceRelate>
-        <mzsNearRelate v-if="selectedScene.title === '民主沙近岸'"></mzsNearRelate>
+        <bankLineRelate v-else-if="selectedScene.title === '典型岸段'"></bankLineRelate>
+        <monitorDeviceRelate v-else-if="selectedScene.title === '民主沙预警监测'"></monitorDeviceRelate>
+        <mzsNearRelate v-else-if="selectedScene.title === '民主沙近岸'"></mzsNearRelate>
     </div>
 
 </template>
