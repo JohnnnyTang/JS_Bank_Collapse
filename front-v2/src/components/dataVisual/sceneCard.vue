@@ -17,8 +17,6 @@
 <script setup>
 import { onMounted } from 'vue'
 
-
-//涵盖了水库、堤坝、灌溉系统等重要水利工程.
 const props = defineProps({
   title: String,
   desc: String,
@@ -71,8 +69,6 @@ onMounted(async () => {
       box-shadow: -5px -5px 0 2px #175fa3;
     }
 
-
-
     .border {
       border-bottom-right-radius: 10px;
       height: 4vh;
@@ -92,7 +88,6 @@ onMounted(async () => {
         border-top-left-radius: 10px;
         box-shadow: -5px -5px 0 2px #175FA3;
       }
-
       .title-text {
         color: #ECF4FD;
         font-size: calc(0.8vw + 0.8vh);
@@ -108,15 +103,12 @@ onMounted(async () => {
       top: 0;
       right: 15%;
       transform: translateX(50%);
-
       width: 4vh;
       position: absolute;
       height: 4vh;
       //background-image: url('./icons/beach.png');
       background-size: contain;
     }
-
-
 
     .text {
       color: black;

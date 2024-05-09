@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Scene } from '../components/dataVisual/Scene'
-import SteadyFlowLayer from '../utils/m_demLayer/steadyFlowLayer'
-import TerrainLayer from '../utils/m_demLayer/terrainLayer'
+import { NewScene } from '../components/dataVisual/js/scene'
 
 const useMapStore = defineStore('mapStore', () => {
     const map = ref(null)
@@ -61,6 +60,16 @@ const useLayerStore = defineStore('layerStore', () => {
     }
 })
 
+
+
+
+const sMap = NewScene.getInitSceneMap()
+const useNewSceneStore = defineStore('newSceneStore', () => {
+    const sceneMap = ref(sMap)
+    const nowScene = ref()
+    return {sceneMap, nowScene}
+})
+
 const totalLayer = [
     '地形瓦片',
     '河段划分',
@@ -89,7 +98,6 @@ const totalLayer = [
     '近岸流场',
     '三维地形'
 ]
-
 const layerStates = {}
 for (let i = 0; i < totalLayer.length; i++) {
     layerStates[totalLayer[i]] = {
@@ -98,7 +106,7 @@ for (let i = 0; i < totalLayer.length; i++) {
     }
 }
 const useMapLayerStore = defineStore('mapLayerStore', () => {
- 
+
     const layerState = ref(layerStates)
 
     function layerAdded(id) {
@@ -136,8 +144,8 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
             layerState.value[id].showing = false
         })
     }
-    return { layerAdded, layesrAdded, layerRemove, layerHide, layerShowing, layersHide, layersShowing, layersRemove,layerState }
+    return { layerAdded, layesrAdded, layerRemove, layerHide, layerShowing, layersHide, layersShowing, layersRemove, layerState }
 })
 
 
-export { useMapStore, useSceneStore, useLayerStore, useMapLayerStore }
+export { useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore }

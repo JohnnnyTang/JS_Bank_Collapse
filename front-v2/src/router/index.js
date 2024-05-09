@@ -11,7 +11,7 @@ import {
 const routes = [
     {
         path: '/dataVisual',
-        component: () => import('../views/DataVisualView.vue'),
+        component: () => import('../views/DtVisualView.vue'),
     },
     {
         path: '/knowledgeStore',

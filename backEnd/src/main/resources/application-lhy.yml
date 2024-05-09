@@ -13,7 +13,7 @@ spring:
       idle-timeout: 0
     default:
       #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
-      url: jdbc:postgresql://localhost:5432/shore_0401?stringtype=unspecified
+      url: jdbc:postgresql://localhost:5432/shore?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: QWERBOOM123
@@ -30,5 +30,5 @@ springfox:
 
 tile:
   mzsTilePath:  E:/WATER/BankCollapse/backdata/rasterTIle/
-
   worldTilePath: E:/WATER/offline_map
+  nodeServicePath: E:/WATER/BankCollapse/JS_Bank_Collapse/backEnd/src/main/resources/node/index.js
