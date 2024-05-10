@@ -6,6 +6,7 @@
                     <span class="title-text">图层管理</span>
                 </div>
             </Decoration7>
+            <div class="miniIcon" @click="close"></div>
         </div>
         <hr>
         <div class="content">
@@ -48,6 +49,7 @@ const treeRef = ref()
 const selectedLayer = ref('')
 const data = ref([])
 const mapLayerStore = useMapLayerStore()
+const emit = defineEmits(['close'])
 
 
 watch(filterText, (val) => {
@@ -71,11 +73,14 @@ const filterNode = (value, data) => {
 const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     if (nodeProp.isLeaf) {
         selectedLayer.value = nodeProp.data.label
-        
+
         let map = useMapStore().getMap()
         mapLayerStore.layerState[nodeProp.data.label].showing = !mapLayerStore.layerState[nodeProp.data.label].showing
-        mapLayerStore.layerState[nodeProp.data.label].showing? showLayersFunction(map, [nodeProp.data.label]):hideLayersFunction(map, [nodeProp.data.label])
+        mapLayerStore.layerState[nodeProp.data.label].showing ? showLayersFunction(map, [nodeProp.data.label]) : hideLayersFunction(map, [nodeProp.data.label])
     }
+}
+const close = () => {
+    emit('close',1)
 }
 
 onMounted(() => {
@@ -96,7 +101,7 @@ div.total-controller {
 
     width: 20vw;
     height: 50vh;
-    background-color: rgb(240, 248, 246);
+    background-color: rgb(239, 247, 253);
     border-radius: 1%;
     box-shadow: 0px 0px 10px 1px #b3b2b2ee;
 
@@ -118,6 +123,18 @@ div.total-controller {
                 font-weight: 600;
                 line-height: 5vh;
                 color: rgb(75, 115, 181);
+            }
+        }
+        .miniIcon {
+            position: absolute;
+            right: 0.5vw;
+            width: 4vh;
+            height: 4vh;
+            background-image: url('/icons/minimize.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            &:hover{
+                cursor: pointer;
             }
         }
 

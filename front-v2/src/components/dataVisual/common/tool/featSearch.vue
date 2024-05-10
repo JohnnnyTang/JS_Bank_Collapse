@@ -3,9 +3,10 @@
         <div class="title">
             <Decoration7 style="width: 30vw; height: 5vh;" :color="['rgb(28,13,106)', 'rgb(88,146,255)']">
                 <div class="title-back">
-                    <span class="title-text">数据检索</span>
+                    <span class="title-text">要素查询</span>
                 </div>
             </Decoration7>
+            <div class="miniIcon" @click="close"></div>
         </div>
         <hr>
         <div class="content">
@@ -14,14 +15,14 @@
                 <el-input v-model="filterText" style="width: 10vw" placeholder="请输入关键词" />
             </div>
             <div class="tree-container">
-                <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data" :props="defaultProps"
-                    default-expand-all :filter-node-method="filterNode" @node-click="selectedNodeHandler">
+                <el-tree ref="treeRef" style="max-width: 600px" :data="data" :props="defaultProps"
+                    default-expand-all :filter-node-method="filterNode">
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <span class="text">{{ node.label }}</span>
-
-                            <span class="eyes" :style="eyesComputed(node)"></span>
+                            <el-button type="primary" plain v-if="node.isLeaf">查看详情</el-button>
+                            <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button>
                         </span>
                     </template>
 
@@ -39,6 +40,7 @@ import { Scene } from '../../Scene';
 import { useMapLayerStore, useMapStore } from '../../../../store/mapStore';
 import { showLayersFunction, hideLayersFunction } from '../../../../utils/mapUtils';
 
+// data
 const defaultProps = {
     children: 'children',
     label: 'label',
@@ -48,6 +50,8 @@ const treeRef = ref()
 const selectedLayer = ref('')
 const data = ref([])
 const mapLayerStore = useMapLayerStore()
+const emit = defineEmits(['close'])
+
 
 
 watch(filterText, (val) => {
@@ -55,29 +59,14 @@ watch(filterText, (val) => {
 })
 
 
-const eyesComputed = computed(() =>
-    (node) => {
-        if (node.isLeaf) {
-            let showing = (mapLayerStore.layerState[node.data.label].showing)
-            return showing ? { background: `url('/view.png')` } : { background: `url('/hide.png')` }
-        }
-        return {}
-    }
-)
 const filterNode = (value, data) => {
     if (!value) return true
     return data.label.includes(value)
 }
-const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
-    if (nodeProp.isLeaf) {
-        selectedLayer.value = nodeProp.data.label
-        
-        let map = useMapStore().getMap()
-        mapLayerStore.layerState[nodeProp.data.label].showing = !mapLayerStore.layerState[nodeProp.data.label].showing
-        mapLayerStore.layerState[nodeProp.data.label].showing? showLayersFunction(map, [nodeProp.data.label]):hideLayersFunction(map, [nodeProp.data.label])
-    }
+const close = () => {
+    console.log('1');
+    emit('close',0)
 }
-
 onMounted(() => {
     let treeData = Scene.getLayerTreeData()
     data.value = treeData
@@ -96,7 +85,7 @@ div.total-controller {
 
     width: 20vw;
     height: 50vh;
-    background-color: rgb(240, 248, 246);
+    background-color: rgb(239, 247, 253);
     border-radius: 1%;
     box-shadow: 0px 0px 10px 1px #b3b2b2ee;
 
@@ -118,6 +107,18 @@ div.total-controller {
                 font-weight: 600;
                 line-height: 5vh;
                 color: rgb(75, 115, 181);
+            }
+        }
+        .miniIcon {
+            position: absolute;
+            right: 0.5vw;
+            width: 4vh;
+            height: 4vh;
+            background-image: url('/icons/minimize.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            &:hover{
+                cursor: pointer;
             }
         }
 
@@ -209,9 +210,24 @@ div.total-controller {
     color: rgb(75, 115, 181);
 }
 
+
 hr {
-    margin: 0;
-    border-top-width: 2px;
-    border-color: rgb(75, 115, 181);
+    position: relative;
+    margin-top: 0.1vh;
+    margin-bottom: 0.1vh;
+    border: 0;
+    height: 0.4vh;
+    width: 90%;
+    background-image: linear-gradient(to right, rgb(65, 90, 255), rgb(14, 155, 219), rgb(65, 90, 255));
+}
+
+:deep(.el-button) {
+    transform: scale(0.8);
+    padding: 5px 5px;
+    height: 25px;
+
+    span {
+        font-size: calc(0.5vw + 0.5vh);
+    }
 }
 </style>

@@ -17,13 +17,13 @@
 
 
         <div class="search-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body' }">
-            <featSearch></featSearch>
+            <featSearch @close="closeHandler"></featSearch>
         </div>
         <div class="layer-pos" v-show="activeStatus[1]" v-draggable="{ bounds: 'body' }">
-            <layerCtrl></layerCtrl>
+            <layerCtrl @close="closeHandler"></layerCtrl>
         </div>
         <div class="legend-pos" v-show="activeStatus[2]" v-draggable="{ bounds: 'body' }">
-            <mapLegend></mapLegend>
+            <mapLegend @close="closeHandler"></mapLegend>
         </div>
     </div>
 </template>
@@ -31,6 +31,7 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
+
 import { onMounted, ref } from 'vue';
 import sideBar from '../components/dataVisual/common/sideBar.vue'
 import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
@@ -58,11 +59,12 @@ const styles = [
 
 // methods
 const toolClick = (i) => {
-
-    activeStatus.value[i] = !activeStatus.value[i]
     if (i == 3) { //zoom
         mapFlyToRiver(mapStore.getMap())
+        return;
     }
+    activeStatus.value[i] = !activeStatus.value[i]
+
 }
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -71,6 +73,10 @@ const mapFlyToRiver = (mapIns) => {
         [121.94881134428226, 32.68858659779259],],
         { pitch: 52.45, duration: 1500, },
     )
+}
+const closeHandler = (index) => {
+    console.log('hello');
+    activeStatus.value[index] = false
 }
 
 onMounted(async () => {
@@ -82,6 +88,7 @@ onMounted(async () => {
         showCompass: true,
         visualizePitch: true
     }), 'top-right')
+
     mapFlyToRiver(mapInstance)
 
     window.addEventListener('keydown', () => {
@@ -198,6 +205,7 @@ onMounted(async () => {
 
 }
 
+
 :deep(.mapboxgl-ctrl-group button) {
     width: 5vh;
     height: 5vh;
@@ -206,4 +214,5 @@ onMounted(async () => {
 :deep(.mapboxgl-ctrl button.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon) {
     background-image: url('/icons/compass.svg');
 }
+
 </style>
