@@ -41,6 +41,6 @@
                     ${field}
                 </foreach>
             from ${tableName}
-        )
+        ) as res
     </select>
 </mapper>
