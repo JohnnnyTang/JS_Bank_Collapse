@@ -148,6 +148,10 @@ onMounted(() => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
         })
+        map.addSource('dockAreaSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
+        })
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -178,6 +182,15 @@ onMounted(() => {
         //         'text-color': 'rgba(31, 14, 126, 0.75)',
         //     },
         // })
+        map.addLayer({
+            id: 'dockArea',
+            type: 'fill',
+            source: 'dockAreaSource',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': '#18b915',
+            },
+        })
         map.addLayer({
             id: 'mzsSectionArea1',
             type: 'fill',
@@ -318,8 +331,6 @@ div.risk-warn-container {
                     color: #2b61f7;
                     font-size: calc(0.4vw + 0.4vh);
                 }
-
-                
             }
         }
     }
