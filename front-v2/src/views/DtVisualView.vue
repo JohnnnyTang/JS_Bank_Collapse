@@ -120,7 +120,7 @@ onMounted(async () => {
     // })
     //#endregion
 
-        
+    addNewLayer(mapInstance)
 
 
 })
@@ -147,6 +147,344 @@ const tempFunction = async (mapInstance, layerName) => {
         properties = res.data
     }
     console.log(properties);
+}
+const addNewLayer = async (mapInstance) => {
+    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+
+    let map = mapInstance
+    ///////////////////////////////全江概貌
+    //////////// 1、行政区划
+    map.addSource('cityBoundary', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/cityBoundary/{x}/{y}/{z}',
+        ],
+    })
+    map.addLayer({
+        id: '江苏省省域',
+        type: 'fill',
+        source: 'cityBoundary',
+        'source-layer': 'default',
+        layout: {
+            // 'line-width': 10.0
+        },
+        paint: {
+            'fill-color': 'rgb(216,241,255)',
+            'fill-opacity': 1.0,
+            // 'fill-outline-color': 'rgba(0,0,47,0.8)'
+        },
+    })
+
+    // map.addLayer({
+    //     id: '市级行政区',
+    //     // type: 'fill',
+    //     type: 'line',
+    //     source: 'cityBoundary',
+    //     'source-layer': 'default',
+    //     layout: {
+
+    //     },
+    //     paint: {
+    //         'line-color': '#0A215C',
+    //         'line-width': 1.5,
+    //         'line-opacity': 0.5
+    //     },
+    // })
+
+    // let data = (await axios.get(`http://localhost:5173/api/tile/vector/cityBoundary/info`)).data
+    // let pointgeoJson = convertToGeoJSON(data)
+    // map.addSource('District-point', {
+    //     type: 'geojson',
+    //     data: pointgeoJson
+    // })
+    // map.addLayer({
+    //     id: '市级行政区-注记',
+    //     type: 'symbol',
+    //     source: 'District-point',
+    //     layout: {
+    //         'text-field': ['get', 'name'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         'text-anchor': 'center',
+    //         'text-offset': ['match', ['get', 'name'], '无锡市', [7, 0], '常州市', [5, 0], [0, 0]],
+    //     },
+    //     paint: {
+    //         'text-color': 'rgb(28,13,106)',
+    //     },
+    // })
+
+
+
+
+    //////////////2 河道分段
+    // map.addSource('riverSection', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverSection/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '河道分段',
+    //     type: 'line',
+    //     source: 'riverSection',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'line-cap': 'round',
+    //         'line-join': 'round',
+    //     },
+    //     paint: {
+    //         'line-opacity': 1,
+    //         'line-color': 'rgba(231, 214, 86, 0.9)',
+    //         'line-width': 4,
+    //     },
+    // })
+    // map.addSource('riverName', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverName/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '河段注记',
+    //     type: 'symbol',
+    //     source: 'riverName',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'left',
+    //     },
+    //     paint: {
+    //         'text-color': '#FC7C49',
+    //     },
+    // })
+
+    /////// 3、流域水系
+    // map.addSource('riverArea', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverArea/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '流域水系',
+    //     type: 'fill',
+    //     source: 'riverArea',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': 'rgb(27,116,193)',
+    //     },
+    // })
+    // {
+    // "code": "EBAA1H00000P",
+    // "level": 3,
+    // "name": "金湾河",
+    // "length": 13,
+    // "id": "110",
+    // "basin": "淮河流域",
+    // "water": "淮河水系",
+    // "center_y": 32.44801774692429,
+    // "center_x": 119.5220794131374
+    // }
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/riverArea/info`)).data);
+
+
+    ////// 4、湖泊河流
+    // map.addSource('lakeArea', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/lakeArea/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '湖泊河流',
+    //     type: 'fill',
+    //     source: 'lakeArea',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': 'rgb(74,102,172)',
+    //     },
+    // })
+    //  console.log((await axios.get(`http://localhost:5173/api/tile/vector/lakeArea/info`)).data);
+
+    ////// 5、水文站点
+    // map.addSource('hydroStationPoint', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/hydroStationPoint/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '水文站点',
+    //     type: 'circle',
+    //     source: 'hydroStationPoint',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'circle-color': 'rgb(79,188,215)',
+    //         'circle-blur': 0.5,
+    //         'circle-radius': 6,
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/hydroStationPoint/info`)).data);
+
+    ///////////////////////////////涉水工程
+    // 1、长江堤防
+    // map.addSource('embankmentLine', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/embankmentLine/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '长江堤防',
+    //     type: 'line',
+    //     source: 'embankmentLine',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'line-cap': 'round',
+    //         'line-join': 'round',
+    //     },
+    //     paint: {
+    //         'line-opacity': 1,
+    //         'line-color': '#D3ABF5',
+    //         'line-width': 1,
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/embankmentLine/info`)).data);
+
+    // 2、过江通道
+
+
+
+    // 3、沿江码头
+    // map.addSource('dockArea', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/dockArea/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '沿江码头',
+    //     type: 'fill',
+    //     source: 'dockArea',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': '#2B2E76',
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/dockArea/info`)).data);
+
+    // 4、大型枢纽
+
+
+
+    // 5、水库大坝
+
+
+    // 6、水闸工程  很小
+    // map.addSource('sluiceArea', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/sluiceArea/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '水闸工程',
+    //     type: 'fill',
+    //     source: 'sluiceArea',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': '#2B2E76',
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/sluiceArea/info`)).data);
+
+    // 7、泵站工程  很小
+    // map.addSource('pumpArea', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/pumpArea/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '泵站工程',
+    //     type: 'fill',
+    //     source: 'pumpArea',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': '#2B2E76',
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/pumpArea/info`)).data);
+
+    // 8、组合工程
+
+
+    ////////////////// 重点岸段
+    // 1、岸段名录
+
+    // 2、历史崩岸
+
+    // 3、近岸地形
+
+    // 4、近年冲淤
+
+    //// 重点岸段
+    // map.addSource('importantBank', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/importantBank/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '重点岸段',
+    //     type: 'line',
+    //     source: 'importantBank',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         // 'line-cap': 'round',
+    //         // 'line-join': 'round',
+    //     },
+    //     paint: {
+    //         // 'line-opacity': 1,
+    //         'line-color': '#FF0303',
+    //         'line-width': 10,
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/importantBank/info`)).data);
+
+
+}
+function convertToGeoJSON(data) {
+    const features = data.map(item => {
+        return {
+            type: 'Feature',
+            properties: {
+                name: item.name
+            },
+            geometry: {
+                type: 'Point',
+                coordinates: [item.center_x, item.center_y]
+            }
+        };
+    });
+
+    return {
+        type: 'FeatureCollection',
+        features: features
+    };
 }
 
 
