@@ -38,8 +38,8 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 const layerAddFunctionMap = {
     '地形瓦片': async (map) => {
-        !map.getSource('river-terrain-source') &&
-            map.addSource('river-terrain-source', {
+        !map.getSource('riverBg') &&
+            map.addSource('riverBg', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
@@ -49,7 +49,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '地形瓦片',
                 type: 'fill',
-                source: 'river-terrain-source',
+                source: 'riverBg',
                 'source-layer': 'default',
                 paint: {
                     'fill-color': [
@@ -84,8 +84,8 @@ const layerAddFunctionMap = {
             })
     },
     '河段划分': async (map) => {
-        !map.getSource('riverSectionLabelSource') &&
-            map.addSource('riverSectionLabelSource', {
+        !map.getSource('riverSection') &&
+            map.addSource('riverSection', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/riverSection/{x}/{y}/{z}',
@@ -95,7 +95,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '河段划分',
                 type: 'line',
-                source: 'riverSectionLabelSource',
+                source: 'riverSection',
                 'source-layer': 'default',
                 layout: {
                     'line-cap': 'round',
@@ -109,8 +109,8 @@ const layerAddFunctionMap = {
             })
     },
     '河段注记': async (map) => {
-        !map.getSource('riverLabelSource') &&
-            map.addSource('riverLabelSource', {
+        !map.getSource('riverName') &&
+            map.addSource('riverName', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/riverName/{x}/{y}/{z}',
@@ -120,7 +120,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '河段注记',
                 type: 'symbol',
-                source: 'riverLabelSource',
+                source: 'riverName',
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'label'],
@@ -153,8 +153,8 @@ const layerAddFunctionMap = {
             })
     },
     '全江注记': async (map) => {
-        !map.getSource('ptVector') &&
-            map.addSource('ptVector', {
+        !map.getSource('placeLabel') &&
+            map.addSource('placeLabel', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}',
@@ -164,7 +164,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '全江注记',
                 type: 'symbol',
-                source: 'ptVector',
+                source: 'placeLabel',
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'label'],
@@ -179,8 +179,8 @@ const layerAddFunctionMap = {
     },
     '深泓线': async (map) => {
 
-        !map.getSource('depthLineSource') &&
-            map.addSource('depthLineSource', {
+        !map.getSource('depthLine') &&
+            map.addSource('depthLine', {
                 type: 'vector',
                 tiles: [
                     // tileServer+'/tile/vector/depthLine/1999/{x}/{y}/{z}',
@@ -194,7 +194,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '深泓线',
                 type: 'line',
-                source: 'depthLineSource',
+                source: 'depthLine',
                 'source-layer': 'default',
                 layout: {
                     'line-cap': 'round',
@@ -543,8 +543,8 @@ const layerAddFunctionMap = {
             })
     },
     '民主沙地标': async (map) => {
-        !map.getSource('mzsPlaceLabelSource') &&
-            map.addSource('mzsPlaceLabelSource', {
+        !map.getSource('mzsPlaceLabel') &&
+            map.addSource('mzsPlaceLabel', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
@@ -555,7 +555,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '民主沙地标',
                 type: 'symbol',
-                source: 'mzsPlaceLabelSource',
+                source: 'mzsPlaceLabel',
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'label'],
@@ -570,8 +570,8 @@ const layerAddFunctionMap = {
             })
     },
     '民主沙区划线': async (map) => {
-        !map.getSource('mzsPlaceLineSource') &&
-            map.addSource('mzsPlaceLineSource', {
+        !map.getSource('mzsPlaceLine') &&
+            map.addSource('mzsPlaceLine', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
@@ -581,7 +581,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '民主沙区划线',
                 type: 'line',
-                source: 'mzsPlaceLineSource',
+                source: 'mzsPlaceLine',
                 'source-layer': 'default',
                 layout: {
                     'line-cap': 'round',
@@ -596,8 +596,8 @@ const layerAddFunctionMap = {
             })
     },
     '民主沙岸段线': async (map) => {
-        !map.getSource('mzsBankLineSource') &&
-            map.addSource('mzsBankLineSource', {
+        !map.getSource('mzsBankLine') &&
+            map.addSource('mzsBankLine', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}',
@@ -607,7 +607,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '民主沙岸段线',
                 type: 'symbol',
-                source: 'mzsBankLineSource',
+                source: 'mzsBankLine',
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'label'],
@@ -621,8 +621,8 @@ const layerAddFunctionMap = {
             })
     },
     '民主沙岸段注记': async (map) => {
-        !map.getSource('mzsBankLabelSource') &&
-            map.addSource('mzsBankLabelSource', {
+        !map.getSource('mzsBankLabel') &&
+            map.addSource('mzsBankLabel', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
@@ -632,7 +632,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '民主沙岸段注记',
                 type: 'symbol',
-                source: 'mzsBankLabelSource',
+                source: 'mzsBankLabel',
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'label'],
@@ -647,8 +647,8 @@ const layerAddFunctionMap = {
 
     },
     '守护工程断面': async (map) => {
-        !map.getSource('mzsSectionLineSource') &&
-            map.addSource('mzsSectionLineSource', {
+        !map.getSource('mzsSectionLine') &&
+            map.addSource('mzsSectionLine', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsSectionLine/{x}/{y}/{z}',
@@ -659,7 +659,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '守护工程断面',
                 type: 'line',
-                source: 'mzsSectionLineSource',
+                source: 'mzsSectionLine',
                 'source-layer': 'default',
                 layout: {
                     'line-cap': 'round',
@@ -674,8 +674,8 @@ const layerAddFunctionMap = {
             })
     },
     '守护工程断面注记': async (map) => {
-        !map.getSource('mzsSectionLineLabelSource') &&
-            map.addSource('mzsSectionLineLabelSource', {
+        !map.getSource('mzsSectionLineLabel') &&
+            map.addSource('mzsSectionLineLabel', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
@@ -685,7 +685,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '守护工程断面注记 ',
                 type: 'symbol',
-                source: 'mzsSectionLineLabelSource',
+                source: 'mzsSectionLineLabel',
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'label'],
@@ -701,8 +701,8 @@ const layerAddFunctionMap = {
             })
     },
     '稳定性分区': async (map) => {
-        !map.getSource('mzsBankAreaStableSrc') &&
-            map.addSource('mzsBankAreaStableSrc', {
+        !map.getSource('mzsBankAreaS') &&
+            map.addSource('mzsBankAreaS', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
@@ -713,7 +713,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '稳定性分区',
                 type: 'fill',
-                source: 'mzsBankAreaStableSrc',
+                source: 'mzsBankAreaS',
                 'source-layer': 'default',
                 layout: {
 
@@ -724,8 +724,8 @@ const layerAddFunctionMap = {
             })
     },
     '预警级别分区': async (map) => {
-        !map.getSource('mzsBankAreaWarnSrc') &&
-            map.addSource('mzsBankAreaWarnSrc', {
+        !map.getSource('mzsBankAreaW') &&
+            map.addSource('mzsBankAreaW', {
                 type: 'vector',
                 tiles: [
                     tileServer + '/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
@@ -735,7 +735,7 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '预警级别分区',
                 type: 'fill',
-                source: 'mzsBankAreaWarnSrc',
+                source: 'mzsBankAreaW',
                 'source-layer': 'default',
                 layout: {
 
@@ -944,9 +944,14 @@ const layerAddFunctionMap = {
             })
     },
     '近岸流场': async (map) => {
-        if (map.getLayer('近岸流场')) useLayerStore().flowLayer.show()
+        if (map.getLayer('近岸流场')) {
+            useLayerStore().flowLayer.show()
+            let center = map.getCenter()
+            map.flyTo({
+                center: center
+            })
+        }
         else {
-            // let flow = new SteadyFlowLayer()
             let flowSrc = []
             for (let i = 0; i < 26; i++) {
                 flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
@@ -975,7 +980,31 @@ const layerAddFunctionMap = {
     },
 }
 
+const layerAddFunction = async (map, layerID) => {
+    await layerAddFunctionMap[layerID](map)
+}
+
+const layerRemoveFunction = (map, layerID) => {
+    if (map.getLayer(layerID)) {
+        if (layerID === '近岸流场') {
+            useLayerStore().flowLayer.hide()
+        } else if (layerID === '三维地形') {
+            useLayerStore().terrainLayer.hide()
+        } else {
+            // 隐藏
+            map.setLayoutProperty(layerID, 'visibility', 'none')
+            // 删除
+            let layer = map.getLayer(layerID)
+            let sourceId = map.getSource(layer.source)
+            map.removeLayer(layerID)
+            map.removeSource(sourceId)
+        }
+    }
+}
+
 export {
     layers,
-    layerAddFunctionMap
+    layerAddFunctionMap,
+    layerRemoveFunction, // hide and remove
+    layerAddFunction,// add and show
 }

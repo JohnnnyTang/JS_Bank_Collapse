@@ -74,6 +74,9 @@ div.legend-container {
         justify-content: center;
         align-items: center;
 
+        &:hover {
+            cursor:move;
+        }
         .title-back {
             padding-left: 1vw;
             padding-right: 1vw;

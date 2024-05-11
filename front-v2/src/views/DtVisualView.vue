@@ -16,13 +16,13 @@
         </div>
 
 
-        <div class="search-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body' }">
+        <div class="search-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <featSearch @close="closeHandler"></featSearch>
         </div>
-        <div class="layer-pos" v-show="activeStatus[1]" v-draggable="{ bounds: 'body' }">
+        <div class="layer-pos" v-show="activeStatus[1]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <layerCtrl @close="closeHandler"></layerCtrl>
         </div>
-        <div class="legend-pos" v-show="activeStatus[2]" v-draggable="{ bounds: 'body' }">
+        <div class="legend-pos" v-show="activeStatus[2]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <mapLegend @close="closeHandler"></mapLegend>
         </div>
     </div>
@@ -39,15 +39,13 @@ import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
 import { initScratchMap } from '../utils/mapUtils';
 import { useMapStore } from '../store/mapStore';
-
-
-
-const mapContainer = ref()
-
-const mapStore = useMapStore()
+import { layerAddFunctionMap } from '../components/dataVisual/layerUtil';
+import axios from 'axios';
 
 
 // data
+const mapContainer = ref()
+const mapStore = useMapStore()
 const activeStatus = ref([false, false, false])
 const styles = [
     { backgroundImage: `url('/icons/searching.png')` },
@@ -64,7 +62,6 @@ const toolClick = (i) => {
         return;
     }
     activeStatus.value[i] = !activeStatus.value[i]
-
 }
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -88,16 +85,69 @@ onMounted(async () => {
         showCompass: true,
         visualizePitch: true
     }), 'top-right')
-
+    mapInstance.addControl(new mapboxgl.ScaleControl({ maxWidth: 150 }), 'bottom-left');
     mapFlyToRiver(mapInstance)
 
-    window.addEventListener('keydown', () => {
-        console.log(mapInstance.getBounds());
-    })
+    //#region test
+    // feature get test
+    // await layerAddFunctionMap['地形瓦片'](mapInstance)//mvt polygon
+    // await layerAddFunctionMap['沙岛'](mapInstance)//mvt polygon
+    // await layerAddFunctionMap['全江注记'](mapInstance)//mvt point
+    // await layerAddFunctionMap['民主沙区划线'](mapInstance)//mvt line
+    // await layerAddFunctionMap['GNSS'](mapInstance)//geojson point
+    // await layerAddFunctionMap['一级预警岸段'](mapInstance)//geojson line
+
+    /// feature get test
+    // window.addEventListener('keydown', async (e) => {
+    //     console.log(e.key);
+    //     switch (e.key) {
+    //         case '1':
+    //             await tempFunction(mapInstance, '地形瓦片')
+    //             break;
+    //         case '2':
+    //             await tempFunction(mapInstance, '全江注记')
+    //             break;
+    //         case '3':
+    //             await tempFunction(mapInstance, '民主沙区划线')
+    //             break; 
+    //         case '4':
+    //             await tempFunction(mapInstance, 'GNSS')
+    //             break;
+    //         case '5':
+    //             await tempFunction(mapInstance, '一级预警岸段')
+    //             break;
+    //     }
+    // })
+    //#endregion
+
+        
+
+
 })
 
 
+const tempFunction = async (mapInstance, layerName) => {
+    let properties = []
 
+    let layer = mapInstance.getLayer(layerName)
+    if (!layer) return properties
+
+    let sourceId = layer.source
+    let source = mapInstance.getSource(sourceId)
+    if (!source) return properties
+
+    if (source.type == 'geojson') {
+        let geofeatures = source['_data']['features']
+        for (let i = 0; i < geofeatures.length; i++) {
+            properties.push(geofeatures[i]['properties'])
+        }
+    }
+    else if (source.type == 'vector') {
+        const res = await axios.get(`http://localhost:5173/api/tile/vector/${sourceId}/info`)
+        properties = res.data
+    }
+    console.log(properties);
+}
 
 
 </script>
@@ -215,4 +265,8 @@ onMounted(async () => {
     background-image: url('/icons/compass.svg');
 }
 
+:deep(.mapboxgl-ctrl.mapboxgl-ctrl-scale) {
+    text-align: center;
+    font-size: calc(0.5vw + 0.5vh);
+}
 </style>

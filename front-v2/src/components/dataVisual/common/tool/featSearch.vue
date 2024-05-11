@@ -15,8 +15,8 @@
                 <el-input v-model="filterText" style="width: 10vw" placeholder="请输入关键词" />
             </div>
             <div class="tree-container">
-                <el-tree ref="treeRef" style="max-width: 600px" :data="data" :props="defaultProps"
-                    default-expand-all :filter-node-method="filterNode">
+                <el-tree ref="treeRef" style="max-width: 600px" :data="data" :props="defaultProps" default-expand-all
+                    :filter-node-method="filterNode">
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
@@ -65,7 +65,7 @@ const filterNode = (value, data) => {
 }
 const close = () => {
     console.log('1');
-    emit('close',0)
+    emit('close', 0)
 }
 onMounted(() => {
     let treeData = Scene.getLayerTreeData()
@@ -97,6 +97,10 @@ div.total-controller {
         justify-content: center;
         align-items: center;
 
+        &:hover {
+            cursor:move;
+        }
+
         .title-back {
             padding-left: 1vw;
             padding-right: 1vw;
@@ -109,6 +113,7 @@ div.total-controller {
                 color: rgb(75, 115, 181);
             }
         }
+
         .miniIcon {
             position: absolute;
             right: 0.5vw;
@@ -117,7 +122,8 @@ div.total-controller {
             background-image: url('/icons/minimize.png');
             background-size: contain;
             background-repeat: no-repeat;
-            &:hover{
+
+            &:hover {
                 cursor: pointer;
             }
         }
@@ -229,5 +235,4 @@ hr {
     span {
         font-size: calc(0.5vw + 0.5vh);
     }
-}
-</style>
+}</style>
