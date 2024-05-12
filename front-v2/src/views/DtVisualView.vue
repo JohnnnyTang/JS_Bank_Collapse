@@ -386,7 +386,27 @@ const addNewLayer = async (mapInstance) => {
 
 
 
-    // 5、水库大坝
+    // 5、水库工程
+    // map.addSource('reservoirArea', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/reservoirArea/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '水库大坝',
+    //     type: 'fill',
+    //     source: 'reservoirArea',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': '#2B2E76',
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/reservoirArea/info`)).data);
+
+    //要素高亮小测试
 
 
     // 6、水闸工程  很小
@@ -430,18 +450,104 @@ const addNewLayer = async (mapInstance) => {
     // console.log((await axios.get(`http://localhost:5173/api/tile/vector/pumpArea/info`)).data);
 
     // 8、组合工程
+    // map.addSource('fjsFixPolygon', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/fjsFixPolygon/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '组合工程-面',
+    //     type: 'fill',
+    //     source: 'fjsFixPolygon',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': '#2B2E76',
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/fjsFixPolygon/info`)).data);
+
 
 
     ////////////////// 重点岸段
     // 1、岸段名录
-
+    let bankTable = (await axios.get(`http://localhost:5173/api/tile/vector/importantBank/info`)).data
+    console.log('岸段名录', bankTable);
     // 2、历史崩岸
-
+    let bankHistory = (await axios.get(`http://localhost:5173/api/data/historyInfo/desc/sort`)).data
+    console.log('历史崩岸', bankHistory);
     // 3、近岸地形
+
+    // map.addSource('riverBg', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '全江地形',
+    //     type: 'fill',
+    //     source: 'riverBg',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': [
+    //             'match',
+    //             ['get', 'height'],
+    //             0,
+    //             '#57a3ea',
+    //             5,
+    //             '#3c8ee9',
+    //             10,
+    //             '#2177e9',
+    //             15,
+    //             '#1361dc',
+    //             20,
+    //             '#0e4dc5',
+    //             25,
+    //             '#0a3bad',
+    //             30,
+    //             '#072c95',
+    //             35,
+    //             '#041e7c',
+    //             40,
+    //             '#021363',
+    //             45,
+    //             '#010a49',
+    //             50,
+    //             '#00042e',
+    //             '#000000'
+    //         ],
+    //         // 'fill-color': '#3EFA13'
+    //     },
+    // })
+
+    map.addSource('mzs2022Before', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/mzs2022Before/{x}/{y}/{z}',
+        ],
+    })
+    map.addLayer({
+        id: '民主沙近岸地形',
+        type: 'fill',
+        source: 'mzs2022Before',
+        'source-layer': 'default',
+        layout: {
+        },
+        paint: {
+            'fill-color': '#2B2E76',
+        },
+    })
+    console.log((await axios.get(`http://localhost:5173/api/tile/vector/mzs2022Before/info`)).data);
+
+
+
 
     // 4、近年冲淤
 
-    //// 重点岸段
+    //// 重点岸段 - 原来的预警岸段
     // map.addSource('importantBank', {
     //     type: 'vector',
     //     tiles: [
@@ -486,7 +592,29 @@ function convertToGeoJSON(data) {
         features: features
     };
 }
+function featureHighlight(layer, nameField, name, map) {
+    map.on('click', ['水库工程'], (e) => {
+        console.log(e.features[0].properties);
+        let sp_name = e.features[0].properties['sp_name']
+        map.addLayer({
+            id: `水库工程-highlight-${sp_name}`,
+            type: 'fill',
+            source: 'reservoirArea',
+            'source-layer': 'default',
+            filter: ['==', ['get', 'sp_name'], sp_name],
+            layout: {
 
+            },
+            paint: {
+                'fill-color': 'rgb(254,254,60)',
+                // 'fill-outline-color': 'rgba(254,254,60,0.8)'
+            },
+        })
+        setTimeout(() => {
+            map.removeLayer(`水库工程-highlight-${sp_name}`)
+        }, 3000)
+    })
+}
 
 </script>
 
