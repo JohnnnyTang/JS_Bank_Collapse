@@ -15,9 +15,18 @@
         <result property="topMovePerDay" column="top_move_24h"/>
         <result property="middleMovePerDay" column="middle_move_24h"/>
         <result property="bottomMovePerDay" column="bottom_move_24h"/>
+        <result property="topMoveAvg" column="top_move_avg"/>
+        <result property="middleMoveAvg" column="middle_move_avg"/>
+        <result property="bottomMoveAvg" column="bottom_move_avg"/>
     </resultMap>
     <select id="findAll" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record;
+--         SELECT * FROM inclinometer_record;
+        select *,
+        round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+        round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+        round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        order by measure_time DESC;
     </select>
 
     <select id="getTotalCount" resultType="integer">
@@ -33,11 +42,25 @@
     </select>
 
     <select id="findByStationCode" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE station_id = #{stationCode};
+--         SELECT * FROM inclinometer_record WHERE station_id = #{stationCode};
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        WHERE station_id = #{stationCode}
+        order by measure_time DESC;
     </select>
 
     <select id="findByDeviceCode" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE machine_id_nnu = #{deviceCode};
+--         SELECT * FROM inclinometer_record WHERE machine_id_nnu = #{deviceCode};
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC;
     </select>
 
 <!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
@@ -45,27 +68,64 @@
 <!--    </select>-->
 
     <select id="findNewestData" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record ORDER BY measure_time DESC LIMIT 1;
+--         SELECT * FROM inclinometer_record ORDER BY measure_time DESC LIMIT 1;
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findNewestDataInStation" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+--         SELECT * FROM inclinometer_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        WHERE station_id = #{stationCode}
+        ORDER BY measure_time DESC LIMIT 1
     </select>
 
     <select id="findNewestDataOfDevice" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+--         SELECT * FROM inclinometer_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findDataByTime" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time ASC;
+--         SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time ASC;
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime};
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
+--         SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode};
     </select>
 
     <select id="findDataByTimeInStation" resultMap="inclinometerDataMap">
-        SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
+--         SELECT * FROM inclinometer_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
+        select *,
+               round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+               round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+               round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN 1 PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        from inclinometer_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode};
     </select>
 
     <select id="ifContinueUpdateOfDevice" resultType="boolean">

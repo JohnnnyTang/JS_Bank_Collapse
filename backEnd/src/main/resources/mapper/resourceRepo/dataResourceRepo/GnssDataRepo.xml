@@ -16,8 +16,8 @@
     </resultMap>
     <select id="findAll" resultMap="gnssDataMap">
         select *,
-               avg(threed) OVER(ORDER BY measure_time
-                   ROWS BETWEEN 59 PRECEDING AND CURRENT ROW )
+               round(avg(threed) OVER(ORDER BY measure_time
+                   ROWS BETWEEN 59 PRECEDING AND CURRENT ROW ), 2)
                    as avg
         from gnss_record
         order by measure_time DESC;
