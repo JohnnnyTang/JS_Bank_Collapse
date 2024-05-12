@@ -96,9 +96,10 @@ const treeNodeClickHandler = (node, data) => {
 onMounted(async () => {
     // sceneStore.SCENEMAP.value = scenes
     // sceneStore.LAYERGROUPMAP.value = layerGroups
-
+    console.log(dataSource.value[0]);
     setTimeout(() => {
         // wait for map init
+        dataSource.value[0].active = true
         let mapInstance = mapStore.getMap()
         let selectedSceneID = '全江概貌'
         sceneStore.SCENEMAP.value[selectedSceneID].setMap(mapInstance)

@@ -15,7 +15,7 @@
                 <div class="scene-area">
                     <div class="text">数据专题</div>
                     <div class="data-theme-tags">
-                        <el-check-tag v-for="(item, i) in Scenes" :key="i" @click="sceneTagClickHandler(i)"
+                        <el-check-tag v-for="(item, i) in Scenes" :key="i" @click="SceneTagClickHandler(i)"
                             :checked="sceneTagChecked[i]">{{ item }}</el-check-tag>
                     </div>
                 </div>
@@ -29,19 +29,20 @@
 
             <div class="e-input">
                 <span class="text">要素检索</span>
-                <el-input v-model="filterText" style="width: 10vw" placeholder="请输入关键词" />
+                <el-input v-model="filterText" style="width: 13vw" placeholder="请输入关键词" />
             </div>
             <div class="tree-container">
                 <div class="feature-desc">
-                    <div class="text">共有要素 {{ featureCount }}条</div>
+                    <div class="text">共有要素 {{ featureCount }} 条</div>
                 </div>
-                <el-tree ref="treeRef" style="max-width: 600px" :data="data" :props="defaultProps" default-expand-all
+                <el-tree ref="treeRef" style="max-width: 15.5vw" :data="data" :props="defaultProps" default-expand-all
                     :filter-node-method="filterNode">
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <span class="text">{{ node.label }}</span>
-                            <el-button type="primary" plain v-if="node.isLeaf">查看详情</el-button>
+                            <el-button type="primary" plain v-if="node.isLeaf"
+                                @click="detailClickHandler(node, data)">查看详情</el-button>
                             <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button>
                         </span>
                     </template>
@@ -63,11 +64,13 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { Decoration7 } from '@kjgl77/datav-vue3'
 import { ElTree } from 'element-plus';
-import { Scene } from '../../Scene';
 import { useMapStore, useNewSceneStore } from '../../../../store/mapStore';
 import axios from 'axios';
+import { sourceNameMap } from '../../js/tilefieldMAP'
+import { tree } from '../../js/SCENES'
 
 // data
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const defaultProps = {
     children: 'children',
     label: 'label',
@@ -79,70 +82,172 @@ const sceneStore = useNewSceneStore()
 const mapStore = useMapStore()
 const data = ref([])
 const emit = defineEmits(['close'])
-const Scenes = ['全江概貌', '涉水工程', '重点岸段']
+const Scenes = ref(['全江概貌', '涉水工程', '重点岸段'])
 const sceneTagChecked = ref([true, false, false])
-const LGroups = ['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点']
+const LGroups = ref(['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'])
 const LGroupsTagChecked = ref([true, false, false, false, false])
-const featureCount = ref(999)
+const featureCount = ref(0)
 
 watch(filterText, (val) => {
     treeRef.value.filter(val)
 })
-
 
 const filterNode = (value, data) => {
     if (!value) return true
     return data.label.includes(value)
 }
 const close = () => {
-    console.log('1');
     emit('close', 0)
 }
-const LGroupsTagClickHandler = async () => {
-    await updateTreeData()
+
+const SceneTagClickHandler = (i) => {
+    for (let i = 0; i < sceneTagChecked.value.length; i++) {
+        sceneTagChecked.value[i] = false
+    }
+    sceneTagChecked.value[i] = true
+    featureCount.value = 0
+    data.value = []
+    updateLgroupTags(Scenes.value[i])
+}
+const updateLgroupTags = (sceneName) => {
+    // LGroupsTagChecked.value = [true, false, false, false, false]
+    console.log(tree);
+    let newLayerGroupTags = []
+    for (let i = 0; i < tree.length; i++) {
+        if (tree[i].label === sceneName) {
+            let children = tree[i].children
+            for (let j = 0; j < children.length; j++) {
+                newLayerGroupTags.push(children[j].label)
+            }
+            break
+        }
+    }
+    let falseArray = new Array(newLayerGroupTags.length).fill(false)
+
+    LGroups.value = newLayerGroupTags
+    LGroupsTagChecked.value = falseArray
 }
 
-const updateTreeData = async () => {
-    // let checkedLayerGroup = []
-    // for (let i = 0; i < LGroupsTagChecked.value.length; i++) {
-    //     if (LGroupsTagChecked.value[i]) {
-    //         checkedLayerGroup.push(LGroups[i])
-    //     }
-    // }
-    // console.log(checkedLayerGroup);
-    let checkedLayerGroupID = '行政区划'
-    // let layers = sceneStore.LAYERGROUPMAP.value.layerIDs
-    // console.log(sceneStore.LAYERGROUPMAP.value[checkedLayerGroupID].layerIDs);
 
-    let layerid = '市级行政区'
+const LGroupsTagClickHandler = async (i) => {
+    LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
+    if (LGroupsTagChecked.value[i]) {
+        await appednTreeData()
+    } else {
+        deleteTreeData()
+    }
+}
+
+const appednTreeData = async () => {
+    let checkedLayerGroup = []
+    for (let i = 0; i < LGroupsTagChecked.value.length; i++) {
+        if (LGroupsTagChecked.value[i]) {
+            checkedLayerGroup.push(LGroups.value[i])
+        }
+    }
+    console.log(checkedLayerGroup);
+
+    let layers = []
+    for (let i = 0; i < checkedLayerGroup.length; i++) {
+        layers.push(...sceneStore.LAYERGROUPMAP.value[checkedLayerGroup[i]].layerIDs)
+    }
+
+    console.log(layers);
+
     let map = mapStore.getMap()
-    let res = await getLayerFeatureArray(map, layerid)
-    console.log(res);
+    for (let i = 0; i < layers.length; i++) {
+        // 特殊图层
+        if (layers[i].includes('注记') || layers[i].includes('省级行政区') ||
+            layers[i] === '过江通道-桥墩'
+        ) {
+            continue
+        }
 
-    let treeNode = {
-        label: layerid,
-        children: []
+        let layerid = layers[i]
+        let sourceid = map.getLayer(layerid).source
+        // 监测当前treeNode是否已经存在Node
+        const treeHasNode = (nodeName) => {
+            for (let i = 0; i < data.value.length; i++) {
+                if (data.value[i].label === nodeName) {
+                    return true
+                }
+            }
+            return false
+        }
+        if (treeHasNode(layerid)) continue
+
+        let res = await getLayerFeatureArray(map, layerid)
+
+        let treeNode = {
+            label: layerid,
+            children: []
+        }
+        for (let i = 0; i < res.length; i++) {
+            treeNode.children.push({
+                label: res[i][sourceNameMap[sourceid]],
+                property: res[i],
+            })
+        }
+        data.value.push(treeNode)
+        updateFeatureCount()
+        // featureCount.value = featureCount.value + res.length
     }
-    for(let i=0;i<res.length;i++){
-        treeNode.children.push({
-            label: res[i]['name'],
-        })
+
+
+
+}
+const deleteTreeData = async () => {
+    let noCcheckedLayerGroup = []
+    for (let i = 0; i < LGroupsTagChecked.value.length; i++) {
+        if (!LGroupsTagChecked.value[i]) {
+            noCcheckedLayerGroup.push(LGroups.value[i])
+        }
     }
-    featureCount.value =  res.length
+    let noLayers = []
+    for (let i = 0; i < noCcheckedLayerGroup.length; i++) {
+        noLayers.push(...sceneStore.LAYERGROUPMAP.value[noCcheckedLayerGroup[i]].layerIDs)
+    }
+    for (let i = 0; i < data.value.length; i++) {
+        let index = noLayers.indexOf(data.value[i].label)
+        index != -1 && data.value.splice(i, 1)
+    }
+    updateFeatureCount()
+}
 
-    data.value.push(treeNode)
+const detailClickHandler = (node, data) => {
+    let layerId = node.parent.data.label
+    let featureId = data.label
+    let property = data.property
 
 
+    // 要素高亮
+    featureHighLight(layerId, mapStore.getMap(), featureId, property)
+
+}
+
+const updateFeatureCount = () => {
+    let num = 0
+    for (let i = 0; i < data.value.length; i++) {
+        num = num + data.value[i].children.length
+    }
+    featureCount.value = num
 }
 
 
 onMounted(() => {
-    setTimeout(()=>{
-        updateTreeData()
-    },2000)
-})  
+    setTimeout(() => {
+        appednTreeData()
+    }, 2000)
+})
 
+//// tools 
 const getLayerFeatureArray = async (mapInstance, layerName) => {
+
+    // 特殊图层
+    if (layerName.includes('注记')) {
+        return []
+    }
+
     // 获取要素数组的函数
     let properties = []
 
@@ -160,11 +265,69 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
         }
     }
     else if (source.type == 'vector') {
-        const res = await axios.get(`http://localhost:5173/api/tile/vector/${sourceId}/info`)
+        const res = await axios.get(tileServer + `/tile/vector/${sourceId}/info`)
         properties = res.data
+        console.log(sourceId, properties);
+        // special
+        if (sourceId == 'riverSection') {
+            let n = []
+            for (let i = 0; i < properties.length; i++) {
+                if (properties[i].label != '') n.push(properties[i]);
+            }
+            properties = n
+            console.log(properties);
+        }
+
     }
-    // console.log(properties);
     return properties;
+}
+
+const featureHighLight = (featureLayerid, map, featureName, property) => {
+    let layerId = featureLayerid
+    let featureId = featureName
+    let featureLayer = map.getLayer(layerId)
+    let sourceid = featureLayer.source
+
+    let paintMap = {
+        'line': {
+            'line-color': '#FF5D06',
+            'line-width': 3,
+        },
+        'fill': {
+            'fill-color': '#FF5D06',
+            'fill-opacity': 0.8
+        },
+        'circle': {
+            'circle-color': '#FF5D06',
+            'circle-radius': 8,
+        },
+        'symbol': {
+
+        },
+        'fill-extrusion': {
+            'fill-extrusion-color': '#FF5D06',
+            'fill-extrusion-base': 200,
+            'fill-extrusion-height': 210,
+            'fill-extrusion-opacity': 1.0
+        }
+    }
+    map.addLayer({
+        id: `${layerId}-highlight-${featureId}`,//自定义
+        type: featureLayer.type,
+        source: featureLayer.source,
+        'source-layer': featureLayer.sourceLayer,
+        filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
+        layout: {
+
+        },
+        paint: paintMap[featureLayer.type],
+    })
+
+    map.jumpTo({ center: [property.center_x, property.center_y] });
+
+    setTimeout(() => {
+        map.removeLayer(`${layerId}-highlight-${featureId}`)
+    }, 3000)
 }
 
 </script>
@@ -239,36 +402,50 @@ div.total-controller {
             height: 10vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-evenly;
             align-items: center;
 
             .scene-area {
+                height: 3vh;
                 display: flex;
                 flex-direction: row;
             }
 
             .lg-area {
+                width: 19vw;
+                height: 4vh;
                 display: flex;
                 flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: flex-start;
+                flex-wrap: nowrap;
+                justify-content: space-around;
+                overflow-x: auto;
 
                 :deep(.el-check-tag.el-check-tag--primary) {
-                    width: 1.5vw;
-                    margin: 0.5vh;
+                    // width: 1.5vw;
+                    // height: 2.5vh;
+                    // margin: calc(0.1vw + 0.3vh);
+                    // padding: calc(0.3vw + 0.5vh);
+                    // margin: 0;
+                    padding: calc(0.1vw + 0.3vh);
+                    margin-left: 0.1vw;
+                    margin-right: 0.1vw;
+                    width: 2vw;
+                    height: 3vh;
+                    display: block;
+                    text-align: center;
                 }
             }
 
         }
 
         .e-input {
-            width: 16vw;
-            height: 3vh;
+            width: 18vw;
+            height: 4vh;
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             transform: translateY(-20%);
-            scale: 1.15;
+            scale: 1.0;
         }
 
         .tree-container {
@@ -276,10 +453,10 @@ div.total-controller {
             width: 17vw;
             height: 27.5vh;
             padding-left: 1vw;
-            padding-bottom: 1.5vh;
-            padding-top: 1.5vh;
-            box-shadow: rgb(255, 255, 255) 0px 0px 25px 3px inset;
-            border-radius: 5%;
+            padding-bottom: 1vh;
+            padding-top: 0.5vh;
+            box-shadow: rgb(201, 230, 255) 0px 0px 5px 3px inset;
+            border-radius: 1%;
             overflow-y: auto;
 
             .feature-desc {
@@ -287,45 +464,45 @@ div.total-controller {
                 text-align: left;
             }
 
-            &::-webkit-scrollbar {
-                width: 5px;
+            :deep(.el-tree) {
+                background-color: rgb(239, 247, 253);
+                height: 24vh;
+                overflow-y: auto;
+
+                &::-webkit-scrollbar {
+                    width: 5px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background-color: rgba(162, 168, 168, 0.219);
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background-color: rgb(94, 164, 250);
+                    border-radius: 5px;
+                }
+
+                &::-webkit-scrollbar-thumb:hover {
+                    background-color: rgb(48, 136, 243);
+                }
             }
 
-            &::-webkit-scrollbar-track {
-                background-color: rgba(162, 168, 168, 0.219);
-            }
 
-            &::-webkit-scrollbar-thumb {
-                background-color: rgb(94, 164, 250);
-                border-radius: 5px;
-            }
-
-            &::-webkit-scrollbar-thumb:hover {
-                background-color: rgb(48, 136, 243);
-            }
 
             .custom-tree-node {
                 flex: 1;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                font-size: 14px;
                 padding-right: 8px;
 
                 .text {
-                    font-size: calc(0.6vw + 0.7vh);
+                    font-size: calc(0.6vw + 0.4vh);
                     color: rgb(19, 70, 147);
-                    font-weight: 300;
+                    font-weight: 500;
+                    font-family: 'Microsoft YaHei';
                 }
 
-                .eyes {
-                    display: block;
-                    width: 2vh;
-                    height: 2vh;
-                    background-size: contain !important;
-                    transform: scale(0.8);
-                    // background:url('/data.png')
-                }
             }
 
         }
@@ -361,5 +538,9 @@ hr {
     span {
         font-size: calc(0.5vw + 0.5vh);
     }
+}
+
+:deep(.el-check-tag.el-check-tag--primary) {
+    user-select: none;
 }
 </style>

@@ -1,4 +1,4 @@
-export default {
+const sourceFieldMap = {
     "combineProjectPoint": {
         "original": "组合工程",
         "fieldMap": {
@@ -106,3 +106,23 @@ export default {
     }
 }
 
+const sourceNameMap = {
+    "cityBoundaryLine": "name",
+    "riverSection": "label",
+    "riverArea": "name",
+    "lakeArea": "name",
+    "hydroStationPoint": "sp_name",
+    "combineProjectPoint": "name",
+    "dockArea": "project_name",
+    "embankmentLine": "sp_name",
+    "pumpArea": "sp_name",
+    "reservoirArea": "sp_name",
+    "sluiceArea": "sp_name",
+    "riverPassageLine": 'name',
+    "riverPassagePolygon": 'name'
+}
+
+export {
+    sourceNameMap,
+    sourceFieldMap
+}

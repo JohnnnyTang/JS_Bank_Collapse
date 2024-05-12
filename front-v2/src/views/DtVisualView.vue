@@ -97,8 +97,6 @@ onMounted(async () => {
 
 
 
-
-
     //#region test
     // feature get test
     // await layerAddFunctionMap['地形瓦片'](mapInstance)//mvt polygon
@@ -174,7 +172,7 @@ const addNewLayer = async (mapInstance) => {
         ],
     })
     map.addLayer({
-        id: '江苏省省域',
+        id: '省级行政区',
         type: 'fill',
         source: 'cityBoundary',
         'source-layer': 'default',
@@ -386,7 +384,7 @@ const addNewLayer = async (mapInstance) => {
     //     ],
     // })
     // map.addLayer({
-    //     id: '过江通道-桥面',
+    //     id: '过江通道-桥',
     //     type: 'fill-extrusion',
     //     source: 'riverPassagePolygon',
     //     'source-layer': 'default',
@@ -633,26 +631,26 @@ function convertToGeoJSON(data) {
 }
 function featureHighlight(layer, nameField, name, map) {
     // 要素高亮函数
-    map.on('click', ['水库工程'], (e) => {
+    map.on('click', ['市级行政区'], (e) => {
         console.log(e.features[0].properties);
-        let sp_name = e.features[0].properties['sp_name']
-        map.addLayer({
-            id: `水库工程-highlight-${sp_name}`,
-            type: 'fill',
-            source: 'reservoirArea',
-            'source-layer': 'default',
-            filter: ['==', ['get', 'sp_name'], sp_name],
-            layout: {
+        // let sp_name = e.features[0].properties['sp_name']
+        // map.addLayer({
+        //     id: `水库工程-highlight-${sp_name}`,
+        //     type: 'fill',
+        //     source: 'reservoirArea',
+        //     'source-layer': 'default',
+        //     filter: ['==', ['get', 'sp_name'], sp_name],
+        //     layout: {
 
-            },
-            paint: {
-                'fill-color': 'rgb(254,254,60)',
-                // 'fill-outline-color': 'rgba(254,254,60,0.8)'
-            },
-        })
-        setTimeout(() => {
-            map.removeLayer(`水库工程-highlight-${sp_name}`)
-        }, 3000)
+        //     },
+        //     paint: {
+        //         'fill-color': 'rgb(254,254,60)',
+        //         // 'fill-outline-color': 'rgba(254,254,60,0.8)'
+        //     },
+        // })
+        // setTimeout(() => {
+        //     map.removeLayer(`水库工程-highlight-${sp_name}`)
+        // }, 3000)
     })
 }
 

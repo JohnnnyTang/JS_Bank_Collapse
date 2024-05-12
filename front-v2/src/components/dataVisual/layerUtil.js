@@ -983,7 +983,7 @@ const layerAddFunctionMap = {
 
     ///////////////全江概貌
     /////// 行政区划
-    '江苏省省域': async (map) => {
+    '省级行政区': async (map) => {
         !map.getSource('cityBoundary') &&
             map.addSource('cityBoundary', {
                 type: 'vector',
@@ -991,16 +991,16 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/cityBoundary/{x}/{y}/{z}',
                 ],
             })
-        !map.getLayer('江苏省省域') &&
+        !map.getLayer('省级行政区') &&
             map.addLayer({
-                id: '江苏省省域',
+                id: '省级行政区',
                 type: 'fill',
                 source: 'cityBoundary',
                 'source-layer': 'default',
                 layout: {
                 },
                 paint: {
-                    'fill-color': 'rgb(216,241,255)',
+                    'fill-color': 'rgb(201,241,247)',
                     'fill-opacity': 1.0,
                 },
             })
@@ -1255,7 +1255,7 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    '过江通道-桥面': async (map) => {
+    '过江通道-桥': async (map) => {
         !map.getSource('riverPassagePolygon') &&
             map.addSource('riverPassagePolygon', {
                 type: 'vector',
@@ -1263,9 +1263,9 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverPassagePolygon/{x}/{y}/{z}',
                 ],
             })
-        !map.getLayer('过江通道-桥面') &&
+        !map.getLayer('过江通道-桥') &&
             map.addLayer({
-                id: '过江通道-桥面',
+                id: '过江通道-桥',
                 type: 'fill-extrusion',
                 source: 'riverPassagePolygon',
                 'source-layer': 'default',
@@ -1274,8 +1274,8 @@ const layerAddFunctionMap = {
                 paint: {
                     'fill-extrusion-color': '#BBAD9F',
                     'fill-extrusion-base': 200,
-                    'fill-extrusion-height': 230,
-                    'fill-extrusion-opacity': 0.7
+                    'fill-extrusion-height': 210,
+                    'fill-extrusion-opacity': 1.0
                 },
             })
     },
@@ -1473,9 +1473,9 @@ const layerRemoveFunction = (map, layerID) => {
             map.setLayoutProperty(layerID, 'visibility', 'none')
             // 删除
             let layer = map.getLayer(layerID)
-            // let sourceId = map.getSource(layer.source)
+            let sourceId = layer.source
             map.removeLayer(layerID)
-            // map.removeSource(sourceId)
+            map.removeSource(sourceId)
         }
     }
 }
