@@ -142,7 +142,7 @@ onMounted(() => {
         })
         map.addSource('mzsBankAreaSSource', {
             type: 'vector',
-            tiles: [tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}'],
+            tiles: [tileServer + '/tile/vector/mzsBankAreaOne/{x}/{y}/{z}'],
         })
         map.addSource('mzsBankLineSource', {
             type: 'vector',

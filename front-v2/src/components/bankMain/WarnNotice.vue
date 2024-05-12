@@ -92,7 +92,7 @@ div.warn-notice-container {
     backdrop-filter: blur(5px);
 
     border: solid 3px #0064e7;
-    border-radius: 0.6rem;
+    border-radius: 0.2rem;
     overflow: hidden;
 
     div.warn-notice-title {
@@ -107,7 +107,7 @@ div.warn-notice-container {
         // border-style: solid;
         border-bottom: inset 2px #0064e7;
 
-        background-color: rgba(43, 106, 243, 0.6);
+        background-color: rgba(0, 61, 192, 1);
 
         div.warn-notice-icon {
             height: 4vh;
@@ -166,7 +166,7 @@ div.warn-notice-container {
             background-color: #e1efff;
             height: 2vh;
             color: #173eaa;
-            border-radius: 6px;
+            border-radius: 4px;
             border: 1px solid #1546cca2;
             text-shadow:
                 #c7e7fd 1px 1px,
@@ -251,7 +251,7 @@ div.warn-notice-container {
             // background-color: #bce1ff;
             color: #f3ffff;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 4px;
 
             box-shadow:
                 $shadowBlue 1px 1px,
