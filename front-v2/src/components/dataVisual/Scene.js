@@ -1,7 +1,5 @@
-import { ElMessage } from 'element-plus'
 import mapboxgl from 'mapbox-gl'
-import { ref } from 'vue'
-import BackEndRequest from '../../api/backend.js'
+import { ref, h, createApp } from 'vue'
 import {
     loadImage,
     pulsing,
@@ -9,17 +7,20 @@ import {
     getCenterCoord,
     createPopUp,
 } from '../../utils/mapUtils.js'
-import { useSceneStore } from '../../store/mapStore.js'
-import { useLayerStore, useDataStore } from '../../store/mapStore.js'
-import TerrainLayer from '../../utils/m_demLayer/terrainLayer.js'
-import SteadyFlowLayer from '../../utils/m_demLayer/steadyFlowLayer.js'
+import { useSceneStore, useMapLayerStore, useLayerStore } from '../../store/mapStore.js'
+import { layers as ALL_LAYERS } from './layerUtil.js'
+import { showLayersFunction, hideLayersFunction} from '../../utils/mapUtils.js'
+import BackEndRequest from '../../api/backend.js'
+import monitorDetailV2 from './featureDetails/monitorDetailV2.vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 // BackEndRequest.getDataNodeData()
 
-let terrainLayer = new TerrainLayer(14)
-let flow = new SteadyFlowLayer()
 let refHeight = ref('')
 let sectionName = ref('')
+const propertyRef = ref({})
+const zoomRef = ref()
+
 
 // Data Prepare
 class DataPioneer {
@@ -170,7 +171,7 @@ class DataPioneer {
             },
         }
     }
-    static generateGeoJson(itemArr, getCoords, type){
+    static generateGeoJson(itemArr, getCoords, type) {
         const features = []
         itemArr.forEach((element) => {
             let coords = getCoords(element)
@@ -190,140 +191,48 @@ class DataPioneer {
         }
         return geojson
     }
-    
+
 }
 
-const generateGeoJson = (itemArr, getCoords, type) => {
-    const features = []
-    itemArr.forEach((element) => {
-        let coords = getCoords(element)
-        let feature = {
-            type: 'Feature',
-            properties: element,
-            geometry: {
-                coordinates: coords,
-                type: type,
-            },
-        }
-        features.push(feature)
-    })
-    const geojson = {
-        type: 'FeatureCollection',
-        features: features,
-    }
-    return geojson
-}
 
 
 let globalpopup = null
 const initLayers = async (sceneInstance, map) => {
 
-    let { popUp, componentInstance } = createPopUp(refHeight,sectionName)
+    let { popUp, componentInstance } = createPopUp(refHeight, sectionName)
     globalpopup = popUp
+
     switch (sceneInstance.title) {
-        /////Large Scene
-        case '过江通道':
+
+        case '全江概貌':
+            let layers = [
+                '地形瓦片',
+                '河段划分',
+                '河段注记',
+                '沙岛',
+                '全江注记',
+                '深泓线',
+                '已建通道',
+                '在建通道',
+                '规划通道',
+            ]
+            showLayersFunction(map, layers)
+
+            let hideLayers = ALL_LAYERS.filter((item) => !layers.includes(item))
+            hideLayersFunction(map, hideLayers)
+            useMapLayerStore().layersHide(hideLayers)
+
+            sceneInstance.allLayers = layers
+            //sceneInstance.showLayers(map, layers)
+            useMapLayerStore().layesrAdded(layers)
+            useMapLayerStore().layersShowing(layers)
+
             let channel = new DataPioneer(
                 '过江通道',
                 (e) => e['llCoords'],
                 'LineString',
             )
             await channel.requestData(BackEndRequest.getChannelData)
-            const { built, building, planning } = DataPioneer.getDifChannelData(
-                channel.origin2geojson(),
-            )
-            map.addSource('channel-built-source', {
-                type: 'geojson',
-                data: built,
-            })
-            map.addSource('channel-building-source', {
-                type: 'geojson',
-                data: building,
-            })
-            map.addSource('channel-planning-source', {
-                type: 'geojson',
-                data: planning,
-            })
-            sceneInstance.layerSrc.push(
-                'channel-built-source',
-                'channel-building-source',
-                'channel-planning-source',
-            )
-
-            map.addLayer({
-                id: '已建通道',
-                type: 'line',
-                source: 'channel-built-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                paint: {
-                    'line-color': 'rgb(121, 164, 35)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-            map.addLayer({
-                id: '在建通道',
-                type: 'line',
-                source: 'channel-building-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                paint: {
-                    'line-color': 'rgb(204, 102, 0)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-            map.addLayer({
-                id: '规划通道',
-                type: 'line',
-                source: 'channel-planning-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                paint: {
-                    'line-color': 'rgb(51, 204, 153)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-            sceneInstance.allLayers.push('已建通道', '在建通道', '规划通道')
-
             channel.data.forEach((item) => {
                 let centerCoord = getCenterCoord(item['llCoords'])
                 if (item.type === '在建通道') {
@@ -348,123 +257,37 @@ const initLayers = async (sceneInstance, map) => {
             })
 
             break
-        case '预警岸段':
+
+        case '典型崩岸':
+
+            let layers2 = [
+                '地形瓦片',
+                '河段划分',
+                '河段注记',
+                '沙岛',
+                '全江注记',
+                '深泓线',
+                '一级预警岸段',
+                '二级预警岸段',
+                '三级预警岸段',
+            ]
+            showLayersFunction(map, layers2)
+
+            let hideLayers2 = ALL_LAYERS.filter((item) => !layers2.includes(item))
+            hideLayersFunction(map, hideLayers2)
+            useMapLayerStore().layersHide(hideLayers2)
+
+            sceneInstance.allLayers = layers2
+            //sceneInstance.showLayers(map, layers2)
+            useMapLayerStore().layesrAdded(layers2)
+            useMapLayerStore().layersShowing(layers2)
+
             let bankData = new DataPioneer(
                 '典型崩岸',
                 (e) => e['coord'],
                 'LineString',
             )
             await bankData.requestData(BackEndRequest.getbankLineData)
-
-            const { level1, level2, level3 } = DataPioneer.getDifBankData(
-                bankData.origin2geojson(),
-            )
-            map.addSource('bank-level1-source', {
-                type: 'geojson',
-                data: level1,
-            })
-            map.addSource('bank-level2-source', {
-                type: 'geojson',
-                data: level2,
-            })
-            map.addSource('bank-level3-source', {
-                type: 'geojson',
-                data: level3,
-            })
-            sceneInstance.layerSrc.push(
-                'bank-level1-source',
-                'bank-level2-source',
-                'bank-level3-source',
-            )
-
-            await loadImage(map, './geoStyle/warning1.png', 'warning1')
-            map.addLayer({
-                id: '一级预警岸段',
-                type: 'line',
-                source: 'bank-level1-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                paint: {
-                    'line-color': 'rgb(121, 164, 35)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                    'line-pattern': 'warning1',
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-
-            await loadImage(map, './geoStyle/warning2.png', 'warning2')
-            map.addLayer({
-                id: '二级预警岸段',
-                type: 'line',
-                source: 'bank-level2-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                paint: {
-                    'line-color': 'rgb(121, 164, 35)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                    'line-pattern': 'warning2',
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-
-            await loadImage(map, './geoStyle/warning3.png', 'warning3')
-            map.addLayer({
-                id: '三级预警岸段',
-                type: 'line',
-                source: 'bank-level3-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                paint: {
-                    'line-color': 'rgb(121, 164, 35)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                    'line-pattern': 'warning3',
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-            sceneInstance.allLayers.push(
-                '一级预警岸段',
-                '二级预警岸段',
-                '三级预警岸段',
-            )
-
-            // add marker here
-
             let count = 0
             bankData.data.forEach((item) => {
                 let centerCoord = getCenterCoord(item['coord'])
@@ -487,373 +310,102 @@ const initLayers = async (sceneInstance, map) => {
                 //     addMarkerToMap(map, centerCoord, item['id'], '/icons/warning1.png', popUp, item)
                 // }
             })
-            break
-
-        case '全江地形':
-            map.addSource('river-terrain-source', {
-                type: 'vector',
-                tiles: [
-                    'http://127.0.0.1:8989/api/v1/tile/vector/riverBg/{x}/{y}/{z}',
-                ],
-            })
-            map.addLayer({
-                id: '全江地形',
-                type: 'fill',
-                source: 'river-terrain-source',
-                'source-layer': 'default',
-                paint: {
-                    'fill-color': [
-                        'match',
-                        ['get', 'height'],
-                        0,
-                        '#3EFA13',
-                        5,
-                        '#51E212',
-                        10,
-                        '#65CA11',
-                        15,
-                        '#78B210',
-                        20,
-                        '#8B9A0F',
-                        25,
-                        '#9F820F',
-                        30,
-                        '#B26A0E',
-                        35,
-                        '#C5520D',
-                        40,
-                        '#C5520D',
-                        45,
-                        '#D83A0C',
-                        50,
-                        '#EC220B',
-                        '#000000'
-                    ],
-                    // 'fill-color': '#3EFA13'
-                },
-            })
-
-
-            map.addSource('riverSectionLabelSource', {
-                type: 'vector',
-                tiles: [
-                    'http://127.0.0.1:8989/api/v1/tile/vector/riverSection/{x}/{y}/{z}',
-                ],
-            })
-            map.addSource('riverLabelSource', {
-                type: 'vector',
-                tiles: [
-                    'http://127.0.0.1:8989/api/v1/tile/vector/riverName/{x}/{y}/{z}',
-                ],
-            })
-
-            map.addLayer({
-                id: '河段划分',
-                type: 'line',
-                source: 'riverSectionLabelSource',
-                'source-layer': 'default',
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                },
-                paint: {
-                    'line-opacity': 1,
-                    'line-color': 'rgba(231, 214, 86, 0.9)',
-                    'line-width': 4,
-                },
-            })
-            map.addLayer({
-                id: '河段描述',
-                type: 'symbol',
-                source: 'riverLabelSource',
-                'source-layer': 'default',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                    // 'text-offset': [0, 1.25],
-                    'text-anchor': 'left',
-                },
-                paint: {
-                    'text-color': '#FC7C49',
-                },
-            })
-            sceneInstance.allLayers.push(
-                '全江地形',
-                '河段描述',
-                '河段划分',
-            )
-            sceneInstance.layerSrc.push(
-                'river-terrain-source',
-                'riverSectionLabelSource',
-                'riverLabelSource',
-            )
-            // map.addSource('riverLand', {
-            //     type: 'vector',
-            //     tiles: [
-            //         'http://127.0.0.1:8989/api/v1/tile/vector/riverLand/{x}/{y}/{z}',
-            //     ],
-            // })
-            // map.addLayer({
-            //     id: 'land1',
-            //     type: 'fill',
-            //     source: 'riverLand',
-            //     'source-layer': 'default',
-            //     paint: {
-            //         'fill-color': '#000000',
-            //     },
-            // })
-
-            // const el = document.createElement('div')
-            // el.style.width = '35px'
-            // el.style.height = '35px'
-            // const marker = new mapboxgl.Marker({
-            //     element: el,
-            //     rotationAlignment: 'horizon',
-            // })
-            // map.on('click', '全江地形', (e) => {
-            //     map.getCanvas().style.cursor = 'pointer'
-            //     const feature = e.features[0];
-            //     el.textContent = feature["properties"]["height"]
-            //     marker
-            //         .setLngLat(e.lngLat)
-            //         .addTo(map);
-            // })
-            map.on('click', '全江地形', (e) => {
-                const height = e.features[0]['properties']['height']
-                refHeight.value = '-' + height + 'm';
-                // useDataStore().setTerrainHeight('-' + height + 'm')
-                const popupCoord = e.lngLat
-                popUp && popUp.remove()
-                popUp.setOffset(0).setLngLat(popupCoord).addTo(map)
-            })
-
-            map.on('mousemove', '全江地形', (e) => {
-                map.getCanvas().style.cursor = 'pointer'
-            })
-            map.on('mouseleave', '全江地形', (e) => {
-                map.getCanvas().style.cursor = ''
-            })
-
-            // sceneInstance.allLayers.push('全江地形')
 
             break
 
+        case '民主沙近岸':
 
-        // case '水利一张图':
-        //     break;
+            let layers3 = [
+                '民主沙地标',
+                '民主沙区划线',
+                '民主沙岸段线',
+                '民主沙岸段注记',
+                '守护工程断面',
+                '守护工程断面注记',
+                '稳定性分区',
+                '预警级别分区',
+                // '近岸流场',
+                '三维地形'
+            ]
+            showLayersFunction(map, layers3)
+
+            let hideLayers3 = ALL_LAYERS.filter((item) => !layers3.includes(item))
+            hideLayersFunction(map, hideLayers3)
+            useMapLayerStore().layersHide(hideLayers3)
 
 
-        /////small Scene
-        case '实时监测设备':
-            let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
-            let monitorDevice = generateGeoJson(
-                monitorInfo,
-                (element) => {
-                    return [element['longitude'], element['latitude']]
-                },
-                'Point',
-            )
-            // debugger
-            const { gnss, incline, stress, manometer } =
-                DataPioneer.getDifMonitorData(monitorDevice)
+            sceneInstance.allLayers = layers3
+            //sceneInstance.showLayers(map, layers3)
 
-            map.addSource('gnss-source', {
-                type: 'geojson',
-                data: gnss,
-            })
-            map.addSource('incline-source', {
-                type: 'geojson',
-                data: incline,
-            })
-            map.addSource('stress-source', {
-                type: 'geojson',
-                data: stress,
-            })
-            map.addSource('manometer-source', {
-                type: 'geojson',
-                data: manometer,
-            })
-            sceneInstance.layerSrc.push(
-                'gnss-source',
-                'incline-source',
-                'stress-source',
-                'manometer-source',
-            )
-            !map.hasImage('pulsing-dot-gnss') &&
-                map.addImage('pulsing-dot-gnss', pulsing.point, {
-                    pixelRatio: 1,
-                })
-            !map.hasImage('pulsing-rect-incline') &&
-                map.addImage('pulsing-rect-incline', pulsing.rectangle, {
-                    pixelRatio: 1,
-                })
-            !map.hasImage('pulsing-tri-stress') &&
-                map.addImage('pulsing-tri-stress', pulsing.diamond, {
-                    pixelRatio: 1,
-                })
-            !map.hasImage('pulsing-dia-manometer') &&
-                map.addImage('pulsing-dia-manometer', pulsing.triangle, {
-                    pixelRatio: 1,
-                })
-            map.addLayer({
-                id: 'GNSS',
-                type: 'symbol',
-                source: 'gnss-source',
-                layout: {
-                    'icon-image': 'pulsing-dot-gnss',
-                    'icon-allow-overlap': true,
-                },
-            })
-            map.addLayer({
-                id: '测斜仪',
-                type: 'symbol',
-                source: 'incline-source',
-                layout: {
-                    'icon-image': 'pulsing-rect-incline',
-                    'icon-allow-overlap': true,
-                },
-            })
-            map.addLayer({
-                id: '孔隙水压力计',
-                type: 'symbol',
-                source: 'manometer-source',
-                layout: {
-                    'icon-image': 'pulsing-dia-manometer',
-                    'icon-allow-overlap': true,
-                },
-            })
-            map.addLayer({
-                id: '应力桩',
-                type: 'symbol',
-                source: 'stress-source',
-                layout: {
-                    'icon-image': 'pulsing-tri-stress',
-                    'icon-allow-overlap': true,
-                },
-            })
+            useMapLayerStore().layesrAdded(layers3)
+            useMapLayerStore().layersShowing(layers3)
 
-            sceneInstance.allLayers.push(
+            break
+
+        case '民主沙预警监测':
+
+            let layers4 = [
+                '民主沙地标',
+                '民主沙区划线',
+                '稳定性分区',
+                '预警级别分区',
                 'GNSS',
                 '测斜仪',
                 '孔隙水压力计',
                 '应力桩',
-            )
+            ]
+            showLayersFunction(map, layers4)
 
+            let hideLayers4 = ALL_LAYERS.filter((item) => !layers4.includes(item))
+            hideLayersFunction(map, hideLayers4)
+            useMapLayerStore().layersHide(hideLayers4)
 
-            map.on('click', sceneInstance.allLayers, (e) => {
-                console.log(e.features[0].properties);
-                useSceneStore().setSelectedFeature(e.features[0].properties)
-                let popupCoord = e.lngLat
-                // flytoFeature(map, popupCoord, 15)
-                popUp && popUp.remove()
-                popUp.setLngLat(popupCoord).addTo(map);
+            sceneInstance.allLayers = layers4
+            // sceneInstance.showLayers(map, layers4)
+            useMapLayerStore().layesrAdded(layers4)
+            useMapLayerStore().layersShowing(layers4)
+
+            let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
+
+            map.on('click', deviceLayers, (e) => {
+                if (e.features.length > 1)
+                    open(e.features, map)
+                else if (e.features.length === 1) {
+                    let p = e.features[0].properties
+                    const property = e.features[0].properties
+                    useSceneStore().setSelectedFeature(property)
+
+                    propertyRef.value = property
+                    const popUp = createMonitorPopup(propertyRef, zoomRef)
+                    popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+                }
             })
-            map.on('mousemove', sceneInstance.allLayers, (e) => {
+
+            map.on('mousemove', deviceLayers, (e) => {
                 map.getCanvas().style.cursor = 'pointer'
             })
-            map.on('mouseleave', sceneInstance.allLayers, (e) => {
+            map.on('mouseleave', deviceLayers, (e) => {
                 map.getCanvas().style.cursor = ''
+            })
+            map.on('zoom', () => {
+                zoomRef.value = map.getZoom()
             })
 
             break
 
-        case '近岸流场':
-            if (map.getLayer('FlowLayer')) flow.show()
-            else map.addLayer(flow)
-            useLayerStore().setFlowLayer(flow)
-            sceneInstance.allLayers.push('FlowLayer')
-            map.triggerRepaint()
-            break;
-
-        case '三维地形':
-            if (map.getLayer('TerrainLayer')) terrainLayer.show()
-            else map.addLayer(terrainLayer)
-            useLayerStore().setTerrainLayer(terrainLayer)
-            sceneInstance.allLayers.push('TerrainLayer')
-            map.triggerRepaint()
-            break
-
-        case '断面形态':
-            await loadImage(map, './geoStyle/warning2.png', 'section')
-            map.addSource('mzsSectionLineSource', {
-                type: 'vector',
-                tiles: [
-                    'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
-                ],
-            })
-            map.addSource('mzsSectionLineLabelSource', {
-                type: 'vector',
-                tiles: [
-                    'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
-                ],
-            })
-
-            map.addLayer({
-                id: '守护工程断面',
-                type: 'line',
-                source: 'mzsSectionLineSource',
-                'source-layer': 'default',
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                },
-                paint: {
-                    'line-opacity': 1,
-                    'line-color': '#7F02F3',
-                    'line-width': 7,
-                    'line-pattern':'section'
-                },
-            })
-            map.addLayer({
-                id: '守护工程断面标注',
-                type: 'symbol',
-                source: 'mzsSectionLineLabelSource',
-                'source-layer': 'default',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                    'text-offset': [0, 1.25],
-                    'text-anchor': 'left',
-                    'text-size': 20,
-                },
-                paint: {
-                    'text-color': '#040052',
-                },
-            })
-            map.on('click','守护工程断面',(e)=>{
-
-                const secName = e.features[0]['properties']['label']
-                sectionName.value = secName
-                const popupCoord = e.lngLat
-                popUp && popUp.remove()
-                popUp.setOffset(0).setLngLat(popupCoord).addTo(map)
-            })
-            map.on('mousemove', '守护工程断面', (e) => {
-                map.getCanvas().style.cursor = 'pointer'
-            })
-            map.on('mouseleave', '守护工程断面', (e) => {
-                map.getCanvas().style.cursor = ''
-            })
-            sceneInstance.allLayers.push(
-                '守护工程断面',
-                '守护工程断面标注',
-            )
-            sceneInstance.layerSrc.push(
-                'mzsSectionLineSource',
-                'mzsSectionLineLabelSource',
-            )
-
-            break;
         default:
             console.log('wait developing...')
             ElMessage('wait developing...')
             break
     }
 
-
     const sceneStore = useSceneStore()
     sceneStore.setSelectedScene(sceneInstance)
 }
+
+
+
+
 
 // Scene
 class Scene {
@@ -862,65 +414,34 @@ class Scene {
         this.title = ''
         this.desc = ''
         this.iconSrc = ''
-        this.layerSrc = [] //only id
+        this.type = ''
         this.allLayers = [] //only id
         this.markers = []
     }
-    async initAllLayers(map) {
-        // question！！！
-        // prepare for layer source, add Layers and all visible
-        // if (map.loaded()) {
-        //     await initLayers(this, map)
-        // }
-        // else {
-        //     console.log(1112,map.loaded());
-        //     map.on('load', async () => {
-        //         console.log('11122');
-        //         await initLayers(this, map)
-        //     })
-        // }
+    async initLayers(map) {
         await initLayers(this, map)
     }
 
     showLayers(map, showArrays) {
-        // show layers based showArrys
-        // if (map.loaded()) {
 
         var invisibleLayers = this.allLayers.filter(
             (v) => !showArrays.includes(v),
         )
-        invisibleLayers.forEach((layerID) => {
-            map.setLayoutProperty(layerID, 'visibility', 'none')
-        })
+        hideLayersFunction(map, invisibleLayers)
 
-        showArrays.forEach((layerID) => {
-            map.setLayoutProperty(layerID, 'visibility', 'visible')
-        })
-        // }
-        // else {
-        //     ElMessage('map not loaded!')
-        // }
+        showLayersFunction(map, showArrays)
     }
 
     removeLayers(map) {
-        // when scene checkout
-        // if (map.loaded()) {
-        //remove layer , remove source
+
         globalpopup && globalpopup.remove()
-        this.allLayers.forEach((layerID) => {
-            if (layerID === 'TerrainLayer') {
-                terrainLayer.hide()
-            } else if (layerID === 'FlowLayer') {
-                flow.hide()
-            } else map.getLayer(layerID) && map.removeLayer(layerID)
-        })
+        hideLayersFunction(map, this.allLayers)
         this.allLayers = []
 
         // source 是否需要删除？
-        this.layerSrc.forEach((sourceID) => {
-            map.getSource(sourceID) && map.removeSource(sourceID)
-        })
-        this.layerSrc = []
+        // this.layerSrc.forEach((sourceID) => {
+        //     map.getSource(sourceID) && map.removeSource(sourceID)
+        // })
 
         //hide marker
         let markersDoms = document.getElementsByClassName(
@@ -929,100 +450,288 @@ class Scene {
         for (let i = markersDoms.length - 1; i >= 0; i--) {
             markersDoms[i].remove()
         }
-
-        // }
-        // else {
-        //     ElMessage('map not loaded!')
-        // }
     }
+
+
+    static getLayerTreeData() {
+        let layersCollection = [
+            {
+                label: '江苏段',
+                children: []
+            },
+            {
+                label: '民主沙段',
+                children: []
+            }
+        ]
+        let channel = {
+            label: '过江通道',
+            children: []
+        }
+
+        channel.children.push({
+            label: '已建通道',
+            children: [],
+        })
+        channel.children.push({
+            label: '在建通道',
+            children: [],
+        })
+        channel.children.push({
+            label: '规划通道',
+            children: [],
+        })
+        layersCollection[0].children.push(channel)
+
+        let bank = {
+            label: '典型岸段',
+            children: []
+        }
+
+        bank.children.push({
+            label: '一级预警岸段',
+            children: [],
+        })
+        bank.children.push({
+            label: '二级预警岸段',
+            children: [],
+        })
+        bank.children.push({
+            label: '三级预警岸段',
+            children: [],
+        })
+        layersCollection[0].children.push(bank)
+
+        layersCollection[0].children.push({
+            label: '地形瓦片',
+            children: [],
+        })
+
+        layersCollection[0].children.push({
+            label: '沙岛',
+            children: [],
+        })
+
+        layersCollection[0].children.push({
+            label: '全江注记',
+            children: [],
+        })
+
+        layersCollection[0].children.push({
+            label: '河段',
+            children: [
+                {
+                    label: '河段划分',
+                    children: [],
+                },
+                {
+                    label: '河段注记',
+                    children: [],
+                }
+            ],
+        })
+        layersCollection[0].children.push({
+            label: '深泓线',
+            children: [],
+        })
+        layersCollection[0].children.push({
+            label: '监测设备',
+            children: [
+                {
+                    label: 'GNSS',
+                    children: [],
+                },
+                {
+                    label: '测斜仪',
+                    children: [],
+                },
+                {
+                    label: '孔隙水压力计',
+                    children: [],
+                },
+                {
+                    label: '应力桩',
+                    children: [],
+                },
+            ],
+        })
+
+        ///////////mzs
+        layersCollection[1].children.push({
+            label: '民主沙区划',
+            children: [
+                {
+                    label: '民主沙地标',
+                    children: []
+                },
+                {
+                    label: '民主沙区划线',
+                    children: []
+                }
+            ]
+        })
+        layersCollection[1].children.push({
+            label: '断面与岸段',
+            children: [
+                {
+                    label: '守护工程断面',
+                    children: []
+                },
+                {
+                    label: '守护工程断面注记',
+                    children: []
+                },
+                {
+                    label: '民主沙岸段线',
+                    children: []
+                },
+                {
+                    label: '民主沙岸段注记',
+                    children: []
+                }
+            ]
+        })
+        layersCollection[1].children.push({
+            label: '预警分区',
+            children: [
+                {
+                    label: '稳定性分区',
+                    children: []
+                },
+                {
+                    label: '预警级别分区',
+                    children: []
+                }
+            ]
+        })
+        
+        layersCollection[1].children.push({
+            label: '近岸流场',
+            children: []
+        })
+        layersCollection[1].children.push({
+            label: '三维地形',
+            children: []
+        })
+        return layersCollection
+
+
+    }
+
+    static getScnens() {
+        let scene0 = new Scene()
+        scene0.title = '全江概貌'
+        scene0.desc = '展示全江概貌，助力有关规划决策.'
+        scene0.iconSrc = '/river.png'
+        scene0.type = '全江'
+        let scene1 = new Scene()
+        scene1.title = '典型崩岸'
+        scene1.desc = '展示典型崩岸,助力有关规划决策.'
+        scene1.type = '全江'
+        scene1.iconSrc = '/icons/collapse.png'
+
+        let scene2 = new Scene()
+        scene2.title = '民主沙近岸'
+        scene2.desc = '展示民主沙近岸场景,助力有关规划决策.'
+        scene2.iconSrc = '/icons/terrain.png'
+        scene2.type = '民主沙'
+        let scene3 = new Scene()
+        scene3.title = '民主沙预警监测'
+        scene3.desc = '展示民主沙测点布设,助力有关规划决策.'
+        scene3.iconSrc = '/icons/watching.png'
+        scene3.type = '民主沙'
+
+        return [scene0, scene1, scene2, scene3]
+    }
+
 }
-const getBigRangeScenes = () => {
-    let bigRangeScenes = []
-    let scene3 = new Scene()
-    scene3.title = '过江通道'
-    scene3.desc = '展示三类过江通道,助力有关规划决策.'
-    scene3.iconSrc = './icons/gate.png'
 
-    let scene4 = new Scene()
-    scene4.title = '实时水情'
-    scene4.desc = '反映当前水域的水位、流速等信息，用于水资源管理和调度.'
-    scene4.iconSrc = './icons/water-drop.png'
+const createMonitorPopup = (deviceProperty, zoom) => {
+    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
 
-    let scene1 = new Scene()
-    scene1.title = '水利一张图'
-    scene1.desc = '展示关键水利工程信息。'
-    scene1.iconSrc = './icons/beach.png'
+    const container = document.createElement('div')
+    const componentInstance = ap.mount(container)
 
-    let scene2 = new Scene()
-    scene2.title = '河湖码头'
-    scene2.desc = '展示河湖码头信息，助力水资源管理和调度。'
-    scene2.iconSrc = './icons/pier.png'
+    const domwithComp = container
+    const popUp = new mapboxgl.Popup({
+        maxWidth: '1000px',
+        offset: 25,
+    }).setDOMContent(domwithComp)
+    return popUp
+}
+const open = (features, map) => {
+    console.log('trigger open');
+    const items = features
+    let selectedCode
+    // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪']
 
-    let typiclaCollapse = new Scene()
-    typiclaCollapse.title = '预警岸段'
-    typiclaCollapse.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
-    typiclaCollapse.iconSrc = './icons/collapse.png'
+    const radioGroupVNode = h('div', [
+        h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),
+        items.map(item => {
+            return h(
+                'div',
+                {
+                    key: item.properties.machineId,
+                    style: { marginBottom: '10px' }
+                },
+                [
+                    h('label', {},
+                        [
+                            h('input', {
+                                type: 'radio',
+                                name: 'options',
+                                value: item.properties.code,
+                                onChange: event => {
+                                    // 在这里处理选项变化事件
+                                    selectedCode = event.target.value;
+                                }
+                            }),
+                            h('span', {}, DEVICETYPEMAP[Number(item.properties.type) - 1] + '--' + item.properties.code)
+                        ]
+                    )
+                ]
+            );
+        })
+    ]);
 
-
-    let terrain = new Scene()
-    terrain.title = '全江地形'
-    terrain.desc = '呈现整个江河的地形高低变化，为水文分析提供基础数据.'
-    terrain.iconSrc = './icons/terrain.png'
-
-    let chongy = new Scene()
-    chongy.title = '平面冲淤'
-        ; (chongy.desc = '呈现整个江河岸段的冲淤情况'),
-            (chongy.iconSrc = './icons/shore.png')
-
-    bigRangeScenes.push(
-        typiclaCollapse,
-        scene3,
-        terrain,
-        scene1,
-        scene4,
-        scene2,
-        chongy,
+    ElMessageBox.confirm(
+        '该区域有多台设备，请选择目标设备',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            center: true,
+            message: radioGroupVNode
+        }
     )
-    return bigRangeScenes
-}
-const getSmallRangeScenes = () => {
-    let smallRangeScenes = []
+        .then(() => {
+            ElMessage({
+                type: 'info',
+                message: '加载设备详情',
+            })
+            let targetProperty
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].properties.code === selectedCode) {
+                    targetProperty = items[i].properties
+                }
+            }
+            console.log(targetProperty);
 
-    // let aggregationScene = new Scene()
-    // aggregationScene.title = '岸段聚合场景'
-    // aggregationScene.desc = '描绘典型崩岸地貌，用于分析地质特征和防范措施.'
-    // aggregationScene.iconSrc = './icons/collapse.png'
+            useSceneStore().setSelectedFeature(targetProperty)
+            propertyRef.value = targetProperty
+            const popUp = createMonitorPopup(propertyRef, zoomRef)
+            popUp.setOffset(0).setLngLat([targetProperty.longitude, targetProperty.latitude]).addTo(map)
 
-    let flowFieldScene = new Scene()
-    flowFieldScene.title = '近岸流场'
-    flowFieldScene.desc = '近岸区域水流动态，助力监测管理。'
-    flowFieldScene.iconSrc = './icons/flow.png'
 
-    let terrScene = new Scene()
-    terrScene.title = '三维地形'
-    terrScene.desc = '立体地貌模拟，展现自然景观'
-    terrScene.iconSrc = './icons/terrain.png'
-
-    let watching = new Scene()
-    watching.title = '实时监测设备'
-    watching.desc = '监测数据可视化,监测设备管理'
-    watching.iconSrc = './icons/watching.png'
-
-    let duanMian = new Scene()
-    duanMian.title = '断面形态'
-    duanMian.desc = '截面轮廓，展示形状、结构或特征，'
-    duanMian.iconSrc = './icons/transversal.png'
-
-    smallRangeScenes.push(flowFieldScene, terrScene, watching, duanMian)
-
-    return smallRangeScenes
+        })
+        .catch((action) => {
+            ElMessage({
+                type: 'info',
+                message: '取消'
+            })
+        })
 }
 
-
-
-//   const htmlElement = generateHTMLAndCSS('rgb(163, 206, 245)', 'rgb(47, 94, 177)', 'rgb(47, 94, 211)', '10m');
-//   document.body.appendChild(htmlElement);
-
-
-
-export { Scene, getBigRangeScenes, getSmallRangeScenes, initLayers,DataPioneer }
+export {
+    Scene, initLayers, DataPioneer
+}

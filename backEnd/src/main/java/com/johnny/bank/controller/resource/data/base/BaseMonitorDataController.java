@@ -69,6 +69,7 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
     @Override
     @GetMapping("/hour/{hours}/device/{deviceCode}")
     public ResponseEntity<List<T>> getDataByHourOfDevice(@PathVariable int hours, @PathVariable String deviceCode) {
+        List<T> list = monitorDataService.getDataByHourOfDevice(dataNode, hours, deviceCode);
         return ResponseEntity.ok(monitorDataService.getDataByHourOfDevice(dataNode, hours, deviceCode));
     }
 
@@ -76,6 +77,24 @@ public class BaseMonitorDataController<T extends MonitorData> extends AbstractMo
     @GetMapping("/day/{days}/device/{deviceCode}")
     public ResponseEntity<List<T>> getDataByDayOfDevice(@PathVariable int days, @PathVariable String deviceCode) {
         return ResponseEntity.ok(monitorDataService.getDataByDayOfDevice(dataNode, days, deviceCode));
+    }
+
+    @Override
+    @GetMapping("/minute/beg/{minutesBefore}/dur/{minutesDur}/device/{deviceCode}")
+    public ResponseEntity<List<T>> getDataByMinBeforeBegOfDevice(@PathVariable int minutesBefore, @PathVariable int minutesDur, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.getDataByMinBeforeStartOfDevice(dataNode, minutesBefore, minutesDur, deviceCode));
+    }
+
+    @Override
+    @GetMapping("/hour/beg/{hoursBefore}/dur/{hoursDur}/device/{deviceCode}")
+    public ResponseEntity<List<T>> getDataByHourBeforeBegOfDevice(@PathVariable int hoursBefore, @PathVariable int hoursDur, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.getDataByHourBeforeStartOfDevice(dataNode, hoursBefore, hoursDur, deviceCode));
+    }
+
+    @Override
+    @GetMapping("/day/beg/{daysBefore}/dur/{daysDur}/device/{deviceCode}")
+    public ResponseEntity<List<T>> getDataByDayBeforeBegOfDevice(@PathVariable int daysBefore, @PathVariable int daysDur, @PathVariable String deviceCode) {
+        return ResponseEntity.ok(monitorDataService.getDataByDayBeforeStartOfDevice(dataNode, daysBefore, daysDur, deviceCode));
     }
 
     @Override

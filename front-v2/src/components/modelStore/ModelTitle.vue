@@ -47,6 +47,8 @@ div.model-title-container {
         background-image: url('/left-arrow.png');
         background-size: contain;
         transition: transform 0.25s ease;
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
         &:hover {
             cursor: pointer;
             transform: scale(1.1);

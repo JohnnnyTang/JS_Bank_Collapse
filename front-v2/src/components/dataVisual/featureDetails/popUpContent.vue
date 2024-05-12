@@ -1,11 +1,11 @@
 <template>
 
-    <bankLineDetail v-if="selectedScene.title === '预警岸段'"></bankLineDetail>
-    <channelDetail v-else-if="selectedScene.title === '过江通道'"></channelDetail>
-    <monitorDetail v-else-if="selectedScene.title === '实时监测设备'"></monitorDetail>
-    <terrainDetail v-else-if="selectedScene.title === '全江地形'" :height="props.height"></terrainDetail>
+    <bankLineDetail v-if="selectedScene.title === '典型崩岸'"></bankLineDetail>
+    <channelDetail v-else-if="selectedScene.title === '全江概貌'"></channelDetail>
+    <monitorDetail v-else-if="selectedScene.title === '民主沙预警监测'"></monitorDetail>
+    <!-- <terrainDetail v-else-if="selectedScene.title === '全江地形'" :height="props.height"></terrainDetail> -->
 
-    <sectionDetail v-else-if="selectedScene.title === '断面形态'" :sectionName="props.sectionName"></sectionDetail>
+    <!-- <sectionDetail v-else-if="selectedScene.title === '断面形态'" :sectionName="props.sectionName"></sectionDetail> -->
 
 </template>
 
@@ -17,7 +17,7 @@ import terrainDetail from './terrainDetail.vue';
 import sectionDetail from './sectionDetail.vue';
 
 import { onMounted, ref, computed, watch } from 'vue';
-import { useSceneStore,useDataStore } from '../../../store/mapStore';
+import { useSceneStore } from '../../../store/mapStore';
 
 const sceneStore = useSceneStore()
 const selectedScene = computed(() => sceneStore.selectedScene)

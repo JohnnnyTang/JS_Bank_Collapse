@@ -12,10 +12,27 @@ spring:
       maxLifeTime: 120000
       idle-timeout: 0
     default:
-      url: jdbc:postgresql://localhost:4321/shore?stringtype=unspecified
+      url: jdbc:postgresql://localhost:5432/bank_dev?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: 20000601
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1275441282@qq.com
+    password: ezuxlysqewrgfhhi
+    from: 1275441282@qq.com
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        debug: true #启动debug调试
+        smtp:
+          ssl:
+            enable: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory #SSL连接配置
+
 mybatis:
   mapper-locations: classpath:mapper/resourceRepo/*/*.xml
   configuration:
@@ -28,8 +45,17 @@ springfox:
 
 tile:
   mzsTilePath: D:/2024-work/shore_collapse/data/DEM/rasterTIle/
-
   worldTilePath: D:/2024-work/shore_collapse/data/mbtiles/data
+  nodeServicePath: D:\2024-work\shore_collapse\code\project\backEnd\src\main\resources\node\index.js
 
 video:
   yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4
+
+multiIndex:
+  dataPath: D:\2024-work\shore_collapse\model\modelData
+  resPath: D:\2024-work\shore_collapse\model\modelRes\
+
+sms:
+  accessTokenLoc: D:\2024-work\AccessKey.json
+  signName: 江苏长江崩岸监测预警系统
+  verifyTemplateCode: SMS_465975002

@@ -2,58 +2,68 @@ import BackEndRequest from '../../api/backend'
 import { DataPioneer } from '../dataVisual/Scene'
 import { pulsing, loadImage } from '../../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
-import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
-import { ref, createApp } from 'vue'
+// import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
+import monitorDetailV2 from '../dataVisual/featureDetails/monitorDetailV2.vue'
+import warningPop from '../bankTwin/warningPop.vue'
+import { ref, createApp, h } from 'vue'
+import axios from 'axios'
+import { useSceneStore } from '../../store/mapStore'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const propertyRef = ref({})
+const zoomRef = ref()
+
+
 
 const mapInit = async (map, vis) => {
+
+    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsPlaceLineSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankLabelSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsBankLineSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsSectionLineSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsSectionLine/{x}/{y}/{z}',
         ],
     })
     map.addSource('mzsSectionLineLabelSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
         ],
     })
-    map.addSource('mzsBankAreaWSource', {
-        type: 'vector',
-        tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
-        ],
-    })
+    // map.addSource('mzsBankAreaWSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+    //     ],
+    // })
     map.addSource('mzsBankAreaSSource', {
         type: 'vector',
         tiles: [
-            'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
+            tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
         ],
     })
 
@@ -72,39 +82,63 @@ const mapInit = async (map, vis) => {
             'line-width': 2,
         },
     })
-    map.addLayer({
-        id: 'mzsLabel',
-        type: 'symbol',
-        source: 'mzsPlaceLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'left',
-        },
-        paint: {
-            'text-color': 'rgba(31, 14, 126, 0.75)',
-        },
-    })
+    // map.addLayer({
+    //     id: 'mzsLabel',
+    //     type: 'symbol',
+    //     source: 'mzsPlaceLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'left',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(31, 14, 126, 0.75)',
+    //     },
+    // })
     map.addLayer({
         id: 'mzsSectionArea1',
         type: 'fill',
         source: 'mzsBankAreaSSource',
         'source-layer': 'default',
         paint: {
-            'fill-color': 'rgba(233, 23, 86, 0.6)',
+            'fill-color': [
+                'match',
+                ['get', 'stability'],
+                '较稳定',
+                '#18b915',
+                '稳定',
+                '#06bef1',
+                '不稳定',
+                '#df8105',
+                '较不稳定',
+                '#ee3603',
+                '#18b915',
+            ],
         },
     })
-    map.addLayer({
-        id: 'mzsSectionArea2',
-        type: 'fill',
-        source: 'mzsBankAreaWSource',
-        'source-layer': 'default',
-        paint: {
-            'fill-color': 'rgba(233, 233, 86, 0.6)',
-        },
-    })
+    // map.addLayer({
+    //     id: 'mzsSectionArea2',
+    //     type: 'fill',
+    //     source: 'mzsBankAreaWSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': [
+    //             'match',
+    //             ['get', 'warn'],
+    //             '正常',
+    //             '#18b915',
+    //             '关注',
+    //             'rgba(131, 14, 223, 0.5)',
+    //             '预警',
+    //             'rgba(221, 224, 23, 0.5)',
+    //             '警告',
+    //             'rgba(221, 24, 23, 0.5)',
+    //             '#18b915',
+    //         ],
+    //     },
+    // })
     map.addLayer({
         id: 'mzsBankLine',
         type: 'line',
@@ -165,8 +199,66 @@ const mapInit = async (map, vis) => {
             'text-color': 'rgba(81, 154, 86, 0.9)',
         },
     })
+    map.addLayer({
+        id: 'mzsLabel',
+        type: 'symbol',
+        source: 'mzsPlaceLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'left',
+        },
+        paint: {
+            'text-color': 'rgba(31, 14, 126, 0.75)',
+        },
+    })
 
     if (vis) {
+
+        const pulsingCVSMap = {
+            'GNSS': 'point',
+            '测斜仪': 'rectangle',
+            '孔隙水压力计': 'diamond',
+            '应力桩': 'triangle',
+        }
+        const pulsingMap = {
+            'GNSS': 'gnss-dot-pulsing',
+            '测斜仪': 'incline-dot-pulsing',
+            '孔隙水压力计': 'manometer-dot-pulsing',
+            '应力桩': 'stress-dot-pulsing',
+        }
+        map.addImage(
+            pulsingMap['GNSS'],
+            pulsing[pulsingCVSMap['GNSS']],
+            {
+                pixelRatio: 1,
+            },
+        )
+        map.addImage(
+            pulsingMap['测斜仪'],
+            pulsing[pulsingCVSMap['测斜仪']],
+            {
+                pixelRatio: 1,
+            },
+        )
+        map.addImage(
+            pulsingMap['孔隙水压力计'],
+            pulsing[pulsingCVSMap['孔隙水压力计']],
+            {
+                pixelRatio: 1,
+            },
+        )
+        map.addImage(
+            pulsingMap['应力桩'],
+            pulsing[pulsingCVSMap['应力桩']],
+            {
+                pixelRatio: 1,
+            },
+        )
+
+
         //////////////monitor device////////////
         let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
         let monitorDevice = DataPioneer.generateGeoJson(
@@ -176,7 +268,6 @@ const mapInit = async (map, vis) => {
             },
             'Point',
         )
-        // debugger
         const { gnss, incline, stress, manometer } =
             DataPioneer.getDifMonitorData(monitorDevice)
 
@@ -248,12 +339,21 @@ const mapInit = async (map, vis) => {
         let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
         map.on('click', deviceLayers, (e) => {
-            ///////test
-            let p = e.features[0].properties
-            const property = e.features[0].properties
-            propertyRef.value = property
-            const popUp = createPopUp(propertyRef)
-            popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+            if (e.features.length > 1)
+                open(e.features, map)
+            else if (e.features.length === 1) {
+                let p = e.features[0].properties
+                const property = e.features[0].properties
+                useSceneStore().setSelectedFeature(property)
+                propertyRef.value = property
+                console.log('click feature!', propertyRef.value);
+                const popUp = createPopUp(propertyRef, zoomRef)
+                popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+                console.log('singgle popUp added!');
+
+            }
+
+
         })
         map.on('mousemove', deviceLayers, (e) => {
             map.getCanvas().style.cursor = 'pointer'
@@ -261,14 +361,19 @@ const mapInit = async (map, vis) => {
         map.on('mouseleave', deviceLayers, (e) => {
             map.getCanvas().style.cursor = ''
         })
+        map.on('zoom', () => {
+            zoomRef.value = map.getZoom()
+        })
 
-        // setTimeout(() => {
-        //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-        //     // setWarningDeviceStyle(map,'孔隙水压力计',"MZS120.52566826_32.03799363_3")
-        // }, 2000)
+
+        warnInterval(map, 20)
+        setInterval(() => {
+            warnInterval(map, 60)
+        }, 60 * 1000 * 20);
+        // request per 20minutes 
 
         ///////DEBUG////////
-        window.addEventListener('keydown', (e) => {
+        window.addEventListener('keydown', async (e) => {
             if (e.key === '3') {
                 setWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
             }
@@ -278,21 +383,53 @@ const mapInit = async (map, vis) => {
             if (e.key === '2') {
                 setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
             }
-            if (e.key === '4'){
+            if (e.key === '4') {
                 removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
             }
-            if (e.key === '5'){
+            if (e.key === '5') {
                 removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
             }
-            if (e.key === '6'){
+            if (e.key === '6') {
                 removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
             }
- 
+
+            if (e.key == 'Enter') {
+                const minute = 720
+                let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
+
+                let lastPos
+                allWarnData.forEach((item) => {
+                    let id = item.deviceId
+                    let type = 'GNSS'
+                    lastPos = setWarningDeviceStyle(map, type, id, item)
+                })
+
+
+                if (lastPos) {
+                    map.flyTo({
+                        center: lastPos,
+                        pitch: 61.99999999999988,
+                        bearing: 0,
+                        zoom: 15.845427972376211,
+                        speed: 0.5,
+                        essential: true,
+                    })
+                }
+            }
+
         })
+
+        // setInterval(async()=>{
+        //     const data = (await BackEndRequest.getDangerousDevice()).data
+        //     warning(data,map)
+        // },5000)
+
+
     }
 }
 
-const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
+const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
+
     const pulsingCVSMap = {
         GNSS: 'point',
         测斜仪: 'rectangle',
@@ -305,22 +442,14 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
         孔隙水压力计: 'manometer-dot-pulsing',
         应力桩: 'stress-dot-pulsing',
     }
+
     const sourceMap = {
         GNSS: 'gnss-source',
         测斜仪: 'incline-source',
         孔隙水压力计: 'manometer-source',
         应力桩: 'stress-source',
     }
-
-    !map.hasImage(pulsingMap[deviceLayer]) &&
-        map.addImage(
-            pulsingMap[deviceLayer],
-            pulsing[pulsingCVSMap[deviceLayer]],
-            {
-                pixelRatio: 1,
-            },
-        )
-    !map.getLayer(`${deviceLayer}-${deviceCode}`) &&
+    if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
         map.addLayer({
             id: `${deviceLayer}-${deviceCode}`,
             type: 'symbol',
@@ -332,8 +461,7 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
             },
             filter: ['==', 'code', deviceCode],
         })
-
-
+    }
     let json = map.getSource(sourceMap[deviceLayer])['_data']
 
     let property = findProptyFromJson(
@@ -341,21 +469,16 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
         deviceCode
     )
     propertyRef.value = property
-    const popUp = createPopUp(propertyRef)
-    popUp.setLngLat([property.longitude, property.latitude]).addTo(map)
 
-    map.flyTo({
-        center: [property.longitude, property.latitude],
-        pitch: 61.99999999999988,
-        bearing: 0,
-        zoom: 15.845427972376211,
-        speed: 0.5,
-        essential: true,
-    })
+    // warning
+    const popup = createWarningPopup({ warningInfo: warnData })
+    popup.setLngLat([property.longitude, property.latitude]).addTo(map)
+
 
     map.on('render', () => {
         map.triggerRepaint()
     })
+    return [property.longitude, property.latitude]
 }
 
 const removeWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
@@ -363,8 +486,27 @@ const removeWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
         map.removeLayer(`${deviceLayer}-${deviceCode}`)
 }
 
-const createPopUp = (deviceProperty) => {
-    const ap = createApp(MultiChart, { selectedFeature: deviceProperty })
+const createPopUp = (deviceProperty, zoom) => {
+    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
+
+    const container = document.createElement('div')
+    container.id = 'monitorDetailV2-div'
+    const componentInstance = ap.mount(container)
+    console.log('VueComponent Mounted');
+
+
+
+    const domwithComp = container
+    const popUp = new mapboxgl.Popup({
+        maxWidth: '1000px',
+        offset: 25,
+    }).setDOMContent(domwithComp)
+    return popUp
+}
+
+
+const createWarningPopup = (info) => {
+    const ap = createApp(warningPop, { warningInfo: info })
 
     const container = document.createElement('div')
     const componentInstance = ap.mount(container)
@@ -374,10 +516,9 @@ const createPopUp = (deviceProperty) => {
         maxWidth: '1000px',
         offset: 25,
     }).setDOMContent(domwithComp)
-    // .setLngLat(popupCoord)
-    // .addTo(map); undefined;
     return popUp
 }
+
 
 const findProptyFromJson = (geoJson, code) => {
     const features = geoJson.features
@@ -390,5 +531,122 @@ const findProptyFromJson = (geoJson, code) => {
 
     return prop
 }
+
+
+const warnInterval = async (map, minute) => {
+    const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+    const DeviceIDs = {
+        'GNSS': [],
+        '测斜仪': [],
+        '水压力计': [],
+        '应力桩': [],
+    }
+    let deviceInfo = (await axios.get('/api/data/monitorInfo')).data
+    deviceInfo.forEach((item) => {
+        const type = Number(item["type"]) - 1
+        if (type != 4) {
+            DeviceIDs[DEVICETYPEMAP[type]].push(item["code"])
+        }
+    })
+
+    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
+
+    let lastPos
+    allWarnData.forEach((item) => {
+        let id = item.deviceId
+        let type = 'GNSS'
+        lastPos = setWarningDeviceStyle(map, type, id, item)
+    })
+
+
+    if (lastPos) {
+        map.flyTo({
+            center: lastPos,
+            pitch: 61.99999999999988,
+            bearing: 0,
+            zoom: 15.845427972376211,
+            speed: 0.5,
+            essential: true,
+        })
+    }
+}
+
+
+const open = (features, map) => {
+    const items = features
+    const selectedDevice = ref({})
+    let selectedCode
+    // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪']
+
+    const radioGroupVNode = h('div', [
+        h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),
+        items.map(item => {
+            return h(
+                'div',
+                {
+                    key: item.properties.machineId,
+                    style: { marginBottom: '10px' }
+                },
+                [
+                    h('label', {},
+                        [
+                            h('input', {
+                                type: 'radio',
+                                name: 'options',
+                                value: item.properties.code,
+                                onChange: event => {
+                                    // 在这里处理选项变化事件
+                                    selectedCode = event.target.value;
+                                }
+                            }),
+                            h('span', {}, DEVICETYPEMAP[Number(item.properties.type) - 1] + '--' + item.properties.code)
+                        ]
+                    )
+                ]
+            );
+        })
+    ]);
+
+    ElMessageBox.confirm(
+        '该区域有多台设备，请选择目标设备',
+        {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            center: true,
+            message: radioGroupVNode
+        }
+    )
+        .then(() => {
+            ElMessage({
+                type: 'info',
+                message: '加载设备详情',
+            })
+            let targetProperty
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].properties.code === selectedCode) {
+                    targetProperty = items[i].properties
+                }
+            }
+
+            useSceneStore().setSelectedFeature(targetProperty)
+            propertyRef.value = targetProperty
+            const popUp = createPopUp(propertyRef, zoomRef)
+            popUp.setOffset(0).setLngLat([targetProperty.longitude, targetProperty.latitude]).addTo(map)
+
+            console.log('messageBox -> popUp added!');
+            let dom = document.getElementById('popup')
+
+        })
+        .catch((action) => {
+            ElMessage({
+                type: 'info',
+                message: '取消'
+            })
+        })
+}
+
+
 
 export { mapInit }

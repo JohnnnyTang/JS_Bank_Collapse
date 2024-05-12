@@ -28,4 +28,19 @@
                 where year = #{year}
             ) as result
     </select>
+
+    <select id="getLayerBasicInfo" resultType="java.util.Map">
+        select
+            ST_X(centroid_geom) as center_x,ST_Y(centroid_geom) as center_Y,
+            <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+                ${field}
+            </foreach>
+        from (
+            select ST_Transform(ST_Centroid(geom), 4326) as centroid_geom,
+                <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+                    ${field}
+                </foreach>
+            from ${tableName}
+        ) as res
+    </select>
 </mapper>

@@ -126,7 +126,7 @@ const barOption = {
             label: {
                 show: true,
                 formatter: '{@score}个',
-                fontSize: 24,
+                fontSize: 16,
                 fontFamily: 'Impact',
                 // fontWeight: 'bold',
                 color: '#fff',
@@ -170,9 +170,9 @@ div.realtime-risk-container {
     background-color: rgba(54, 100, 226, 0.4);
     backdrop-filter: blur(5px);
 
-    border-radius: 0.6rem;
+    border-radius: 0.2rem;
     overflow: hidden;
-    border: solid 3px #d3fff9;
+    border: solid 3px #173eaa;
 
     div.realtime-risk-title {
         width: 20vw;
@@ -184,9 +184,9 @@ div.realtime-risk-container {
         column-gap: 0.4vw;
 
         // border-style: solid;
-        border-bottom: inset 2px #daf1ff;
+        border-bottom: inset 2px #173eaa;
 
-        background-color: rgba(215, 228, 255, 0.6);
+        background-color: rgba(193, 211, 255, 1);
 
         div.realtime-risk-icon {
             height: 4vh;
@@ -202,11 +202,11 @@ div.realtime-risk-container {
             text-align: center;
             font-size: calc(1vw + 0.3vh);
             font-weight: 600;
-            color: #173eaa;
+            color: #002ba0;
             text-shadow:
                 #e3f4ff 1px 1px,
-                #e3f4ff 2px 2px,
-                #e3f4ff 3px 3px;
+                #e3f4ff 2px 2px;
+                // #e3f4ff 3px 3px;
         }
     }
 

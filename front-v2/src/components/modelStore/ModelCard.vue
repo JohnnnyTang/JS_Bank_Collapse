@@ -6,17 +6,21 @@
                 :class="[infoItem.firstPage ? 'inactive' : 'active']"
                 @click="changeactive"
             >
-                <div class="image-wrapper">
-                    <div class="image-div">
-                        <img :src="infoItem.picsrc" alt="模型图标">
+                <div class="model-card-inwrapper">
+                    <div class="model-title-container">
+                        <div class="image-wrapper">
+                            <div class="image-div">
+                                <img :src="infoItem.picsrc" alt="模型图标">
+                            </div>
+                        </div>
+                        <div class="title-text-container">
+                            {{ infoItem.name }}
+                        </div>
                     </div>
-                </div>
-                <div class="model-title-container">
-                    {{ infoItem.name }}
-                </div>
-                <div class="model-content-container">
-                    <div class="model-content-text">
-                        {{ infoItem.description }}
+                    <div class="model-content-container">
+                        <div class="model-content-text">
+                            {{ infoItem.description }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -25,40 +29,44 @@
                 :class="[infoItem.firstPage ? 'active' : 'inactive']"
                 @click="changeactive"
             >
-                <div class="model-title-container second">
-                    {{ infoItem.name }}
-                </div>
-                <div class="model-content-container second">
-                    <div class="content-item-container">
-                        <div class="content-item-title">
-                            应用分类
-                        </div>
-                        <div class="content-item-text">
-                            {{ infoItem.application }}
+                <div class="model-card-inwrapper second">
+                    <div class="model-title-container second">
+                        <div class="title-text-container second">
+                            {{ infoItem.name }}
                         </div>
                     </div>
-                    <div class="content-item-container">
-                        <div class="content-item-title">
-                            使用场景
+                    <div class="model-content-container second">
+                        <div class="content-item-container">
+                            <div class="content-item-title">
+                                应用分类
+                            </div>
+                            <div class="content-item-text">
+                                {{ infoItem.application }}
+                            </div>
                         </div>
-                        <div class="content-item-text">
-                            {{ infoItem.usescene }}
+                        <div class="content-item-container">
+                            <div class="content-item-title">
+                                使用场景
+                            </div>
+                            <div class="content-item-text">
+                                {{ infoItem.usescene }}
+                            </div>
                         </div>
-                    </div>
-                    <div class="content-item-container">
-                        <div class="content-item-title">
-                            输入参数
+                        <div class="content-item-container">
+                            <div class="content-item-title">
+                                输入参数
+                            </div>
+                            <div class="content-item-text">
+                                {{ infoItem.input }}
+                            </div>
                         </div>
-                        <div class="content-item-text">
-                            {{ infoItem.input }}
-                        </div>
-                    </div>
-                    <div class="content-item-container">
-                        <div class="content-item-title">
-                            输出结果
-                        </div>
-                        <div class="content-item-text">
-                            {{ infoItem.output }}
+                        <div class="content-item-container">
+                            <div class="content-item-title">
+                                输出结果
+                            </div>
+                            <div class="content-item-text">
+                                {{ infoItem.output }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -107,8 +115,8 @@ const Detail = () => {
   
 <style lang="scss" scoped>
 div.model-card-container {
-    width: 28vw;
-    height: 78vh;
+    width: 50vw;
+    height: 50vh;
 
     div.model-card-wrapper {
         // width: 23vw;
@@ -117,26 +125,20 @@ div.model-card-container {
         // left: 2vw;
         // top: 0vh;
         display: flex; /* 使用 flex 布局使卡片横向排列 */
-        flex-wrap: nowrap; /* 不换行 */
+        align-items: space-between;
         justify-content: space-between; /* 在父容器内平均分布每个卡片 */
-        width: calc(18vw + 4vw); /* 计算容器宽度，包括卡片和间距 */
-        height: 80vh;
+        width: calc(45vw + 5vw); /* 计算容器宽度，包括卡片和间距 */
+        height: calc(39vh + 0.5vh);
         position: relative;
         left: 2vw;
         right: 2vw;
-        top: 3vh;
+        top: 4.8vh;
 
         div.model-card {
-            width: 18vw;
-            height: 70vh;
-            padding-left: 1vw;
-            padding-right: 1vw;
-            padding-bottom: 4vh;
+            width: 45vw;
+            height: 39vh;
             position: relative;
-            top: 1.5vh;
-
             background-color: aliceblue;
-
             border-radius: 10px;
             box-shadow: 0px 8px 40px -10px rgba(0, 0, 0, 0.8);
             display: flex;
@@ -144,7 +146,7 @@ div.model-card-container {
             justify-content: center;
             align-content: flex-start;
             transition: all 0.25s ease;
-            
+
             &.active {
                 opacity: 1;
                 z-index: 2;
@@ -161,7 +163,8 @@ div.model-card-container {
                 position: absolute;
                 opacity: 0.75;
                 top: 0;
-                right: 15px;
+                right: 4vw;
+                top: -1.25vh;
                 z-index: 1;
                 cursor: pointer;
 
@@ -174,120 +177,161 @@ div.model-card-container {
                    opacity: 1;
                 }
             }
-
-            div.image-wrapper {
-                -webkit-transition: all 0.25s ease;
-                -moz-transition: all 0.25s ease;
-                -o-transition: all 0.25s ease;
-                transition: all 0.25s ease;
-                // will-change: transform;
-                margin-top: 2vh;
-                height: 29vh;
-
-                div.image-div {
-                    width: calc(100% + 15%);
-                    -webkit-transform: translate(-10%, 0);
-                    -moz-transform: translate(-10%, 0);
-                    -o-transform: translate(-10%, 0);
-                    -ms-transform: translate(-10%, 0);
-                    transform: translate(-7%, 0);
-                    height: 28vh;
-                    -webkit-box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
-                    -moz-box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
-                    box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
-                    margin-bottom: 2vh;
-                    user-select: none;
-                    overflow: hidden;
-                    -webkit-transition: all 0.25s ease;
-                    -moz-transition: all 0.25s ease;
-                    -o-transition: all 0.25s ease;
-                    transition: all 0.25s ease;
-                    border: rgb(235, 232, 232) 3.5px solid;
-
-                    img {
-                        object-fit: cover;
-                        width: 100%;
-                        height: 100%;
-                        filter: contrast(1.1) hue-rotate(12deg) brightness(0.9)
-                            saturate(0.8);
-                        border-radius: 10px;
-                    }
-                }
-            }
-
-            div.model-title-container {
+            
+            div.model-card-inwrapper {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
                 width: 100%;
-                height: 6vh;
-                line-height: 5vh;
-                // background-color: aqua;
-
-                font-size: calc(1vh + 0.8vw);
-                font-weight: 600;
-                font-family: 'Microsoft YaHei';
-                text-align: center;
-                // border-top: 3px solid #9d5fd8;
 
                 &.second {
-                    margin-top: 30px;
-                    height: 5vh;
-                    font-size: calc(1.5vh + 0.8vw);
+                    flex-direction: column;
                 }
-            }
-
-            div.model-content-container {
-                width: 100%;
-                height: 30vh;
-                padding: 20px;
-                border: 3px dashed rgb(202, 148, 202);
-                border-radius: 15px;
-                line-height: 3vh;
-                font-size: calc(0.6vh + 0.6vw);
-                text-align: left;
                 
+                div.model-title-container {
+                    display: flex;
+                    flex-direction: column;
+                    width: 50%;
+                    height: 100%;
 
-                &.second {
-                    border: 0px;
-                    text-align: center;
-                }
-
-                div.content-item-container {
-                    height: 15vh;
-                    width: 100%;
-                    border-top: 3px dashed rgb(202, 148, 202);
-
-                    div.content-item-title {
-                        position: relative;
+                    &.second {
                         width: 100%;
-                        height: 3vh;
-                        line-height: 4vh;
-                        left: -6vw;
-                        margin-bottom: 10px;
-                        // background-color: aquamarine;
-                        // color: #0050b1;
-                        background: linear-gradient(
-                            to right,
-                            #c8beca 0%,
-                            #881096 100%
-                        );
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
+                        height: 15%;
+                    }
 
-                        font-size: calc(0.8vh + 0.6vw);
+                    div.image-wrapper {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        -webkit-transition: all 0.25s ease;
+                        -moz-transition: all 0.25s ease;
+                        -o-transition: all 0.25s ease;
+                        transition: all 0.25s ease;
+                        // will-change: transform;
+                        // margin-top: 2vh;
+                        height: 85%;
+
+                        div.image-div {
+                            width: 90%;
+                            height: 90%;
+                            margin-top: 4%;
+                            -webkit-box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
+                            -moz-box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
+                            box-shadow: 0px 20px 30px -15px rgba(0, 0, 0, 0.45);
+                            // margin-bottom: 2vh;
+                            user-select: none;
+                            overflow: hidden;
+                            -webkit-transition: all 0.25s ease;
+                            -moz-transition: all 0.25s ease;
+                            -o-transition: all 0.25s ease;
+                            transition: all 0.25s ease;
+                            border: rgb(235, 232, 232) 3.5px solid;
+
+                            img {
+                                object-fit: cover;
+                                width: 100%;
+                                height: 100%;
+                                filter: contrast(1.1) hue-rotate(12deg) brightness(0.9)
+                                    saturate(0.8);
+                                border-radius: 10px;
+                            }
+                        }
+                    }
+
+                    div.title-text-container {
+                        width: 100%;
+                        height: 20%;
+                        line-height: 5vh;
+
+                        font-size: calc(1.6vh + 1.0vw);
                         font-weight: 600;
                         font-family: 'Microsoft YaHei';
+                        text-align: center;
+                        // border-top: 3px solid #9d5fd8;
+
+                        &.second {
+                            height: 100%;
+                            width: 100%;
+                            font-size: calc(1.5vh + 0.8vw);
+                        }
+                    }
+                }
+
+                div.model-content-container {
+                    display: flex;
+                    justify-content: center;
+                    width: 48%;
+                    height: 90%;
+                    margin-right: 2%;
+                    border: 3px dashed rgb(202, 148, 202);
+                    border-radius: 15px;
+                    line-height: 3vh;
+                    text-align: left;
+                    
+                    &.second {
+                        width: 100%;
+                        border: 0px;
+                        text-align: center;
+                        margin-right: 0;
+                        flex-wrap: wrap;
+                        justify-content: space-between;
                     }
 
-                    div.content-item-text {
-                        width: 100%;
-                        height: 4vh;
-                        line-height: 3vh;
-                        // background-color: bisque;
-                        color: #5467e2;
-
-                        font-size: calc(0.5vh + 0.65vw);
-                        // font-weight: 600;
+                    div.model-content-text {
+                        width: 90%;
+                        height: 90%;
+                        margin-top: 5%;
+                        margin-left: 5.5%;
+                        font-size: calc(0.8vh + 0.7vw);
+                        font-weight: 400;
                         font-family: 'Microsoft YaHei';
-                        text-align: left;
+                        // color: #9518ae;
+                    }
+
+                    div.content-item-container {
+                        display: flex;
+                        flex-direction: column;
+                        height: 48%;
+                        width: calc(50% - 2%);
+                        border-top: 3px dashed rgb(202, 148, 202);
+
+                        div.content-item-title {
+                            position: relative;
+                            width: 100%;
+                            height: 20%;
+                            line-height: 4vh;
+                            left: -7.5vw;
+                            margin-bottom: 10px;
+                            // background-color: aquamarine;
+                            // color: #0050b1;
+                            background: linear-gradient(
+                                to right,
+                                #c8beca 0%,
+                                #881096 100%
+                            );
+                            -webkit-background-clip: text;
+                            -webkit-text-fill-color: transparent;
+
+                            font-size: calc(1.2vh + 0.6vw);
+                            font-weight: 600;
+                            font-family: 'Microsoft YaHei';
+                        }
+
+                        div.content-item-text {
+                            width: 90%;
+                            height: 90%;
+                            margin-left: 3%;
+                            line-height: 3vh;
+                            // background-color: bisque;
+                            color: #5467e2;
+
+                            font-size: calc(0.7vh + 0.65vw);
+                            // font-weight: 600;
+                            font-family: 'Microsoft YaHei';
+                            text-align: left;
+                        }
                     }
                 }
             }
@@ -299,8 +343,8 @@ div.model-card-container {
             height: 5vh;
             line-height: 5vh;
             // background-color: aquamarine;
-            bottom: 1.4vh;
-            right: 3vw;
+            bottom: -2vh;
+            right: 7vw;
             display: flex;
             flex-flow: row nowrap;
             justify-content: center;
@@ -315,7 +359,7 @@ div.model-card-container {
             transition: all 0.4s cubic-bezier(0.68, -0.45, 0.265, 1.45);
             &:hover {
                 cursor: pointer;
-                right: 1.8vw;
+                right: 5vw;
                 column-gap: 0;
                 transition: all 0.4s cubic-bezier(0.68, -0.45, 0.265, 1.45);
             }

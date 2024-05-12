@@ -36,4 +36,9 @@ public class BankImpDataController {
     public ResponseEntity<List<BankImpData>> GetAllData() {
         return ResponseEntity.ok(bankImpDataService.getAllData());
     }
+
+    @GetMapping("/simple")
+    public ResponseEntity<List<BankImpData>> GetSimpleData() {
+        return ResponseEntity.ok(bankImpDataService.getSimpleData());
+    }
 }

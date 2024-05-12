@@ -173,6 +173,40 @@ fn positionCS(coord: vec2f, z: f32) -> vec4f {
     return position_CS;
 }
 
+fn colorFromInt(color: u32) -> vec3f {
+    
+    let b = f32(color & 0xFF) / 255.0;
+    let g = f32((color >> 8) & 0xFF) / 255.0;
+    let r = f32((color >> 16) & 0xFF) / 255.0;
+
+    return vec3f(r, g, b);
+}
+
+
+fn linearColor(speed: f32, rampColors: array<u32, 10>) -> vec3f {
+    
+    let bottomIndex = floor(speed * 10.0);
+    let topIndex = ceil(speed * 10.0);
+    let interval = speed * 10.0 - bottomIndex;
+
+    let slowColor = colorFromInt(rampColors[u32(bottomIndex)]);
+    let fastColor = colorFromInt(rampColors[u32(topIndex)]);
+
+    return mix(slowColor, fastColor, interval);
+}
+
+fn directColor(speed: f32, rampColors: array<u32, 10>) -> vec3f {
+
+
+    let roundIndex = u32(round(speed * 10.0));
+    let color = colorFromInt(rampColors[roundIndex]);
+
+    return color;
+
+}
+
+
+
 @vertex
 fn vMain(vsInput: VertexInput) -> VertexOutput {
 
@@ -265,11 +299,44 @@ fn fMain(fsInput: VertexOutput) -> @location(0) vec4f {
     // let texcoords = fsInput.uv * dim;
     // let levelColor = textureLoad(lodMap, vec2i(texcoords.xy), 0).rgb;
 
-     let paletteLength = f32(textureDimensions(palette).x);
-     let elevationLevel = (paletteLength * fsInput.depth*0.6) / paletteLength;
-    //let elevationLevel = fract(paletteLength * fsInput.depth) / paletteLength;
-     let paletteColor = textureSample(palette, lSampler, vec2f(elevationLevel + 0.2, 0.5));
-    return paletteColor;
-    //return vec4f(1.0 - fsInput.depth) * 1.0;
+    // let paletteLength = f32(textureDimensions(palette).x);
+    // let elevationLevel = fract(paletteLength * fsInput.depth) / paletteLength;
+    // let paletteColor = textureSample(palette, lSampler, vec2f(elevationLevel + 0.2, 0.5));
+    
+    // return vec4f(paletteColor);
+    // return vec4f(1.0 - fsInput.depth) * 0.5;
     // return vec4f(vec3f(0.0, 0.5, 0.5) * fsInput.depth, 1.0);
+
+
+
+    // og v
+    // let paletteLength = f32(textureDimensions(palette).x);
+    // // let elevationLevel = (paletteLength * fsInput.depth*0.7) / paletteLength;
+    // let elevationLevel = fsInput.depth *0.7;
+    // let paletteColor = textureSample(palette, lSampler, vec2f(elevationLevel + 0.2, 0.5));
+    // return paletteColor;
+
+
+    let reverseColors = array<u32, 10>(
+        0x000214,
+        0x101527,
+        0x18223c,
+        0x1f2f52,
+        0x253d69,
+        0x2a4c81,
+        0x2d5c9a,
+        0x2e6cb3,
+        0x2c7dcd,
+        0x268ee8,
+    );
+    let elevationLevel = fsInput.depth;
+    let index = 10-(u32(floor(elevationLevel*9.0)));
+    let color = vec3f(linearColor(fract(elevationLevel), reverseColors));
+    var alpha:f32;
+    if(index <= 2){
+        alpha = 0.0;
+    }else{
+        alpha = 1.0;
+    }
+    return vec4f(color, 1.0) * alpha;
 }

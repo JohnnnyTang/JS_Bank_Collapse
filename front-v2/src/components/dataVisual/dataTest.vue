@@ -12,7 +12,6 @@ import { onMounted, ref } from 'vue';
 const mapref = ref()
 
 
-
 const createEmptyMap = () => {
     const blankMapStyle = {
         "version": 8,
@@ -34,6 +33,7 @@ const createEmptyMap = () => {
     })
     return map;
 }
+
 
 const createOfflineMap = () => {
     const geojson =

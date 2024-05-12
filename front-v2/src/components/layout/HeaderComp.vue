@@ -30,6 +30,36 @@
                     <br />
                     {{ navItem.nameTwo }}
                 </div>
+                <el-dropdown
+                    ref="eleDropDownDomRef"
+                    v-if="index == 4 || index == 1"
+                    trigger="click"
+                    popper-class="nav-popper"
+                >
+                    <div
+                        style="
+                            width: 10vw;
+                            height: 1px;
+                            background-color: transparent;
+                            position: relative;
+                        "
+                    ></div>
+                    <template #dropdown>
+                        <el-dropdown-menu v-if="index == 4">
+                            <el-dropdown-item @click="navToModelPage"
+                                >崩岸模型库</el-dropdown-item
+                            >
+                            <el-dropdown-item @click="navToKnowledgePage"
+                                >崩岸知识库</el-dropdown-item
+                            >
+                        </el-dropdown-menu>
+                        <el-dropdown-menu v-if="index == 1">
+                            <el-dropdown-item @click="navToWarnPage"
+                                >民主沙右缘示范段</el-dropdown-item
+                            >
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
         </div>
         <div class="header-user-container">
@@ -106,51 +136,55 @@ const bracketHoverTitleWidth = ref(0)
 const bracketTitleHoverShow = ref(false)
 const hoverBracketLeft = ref(0)
 
+const eleDropDownDomRef = ref()
+
 const navList = ref([
     {
-        name: '数据底板平台',
+        name: '崩岸综合信息',
         routerLink: '/dataVisual',
         isActive: false,
         oneRow: true,
         iconUrl: '/big-data.png',
     },
     {
-        name: '崩岸知识平台',
-        routerLink: '/knowledgeStore',
+        name: '实时监测预警',
+        routerLink: '/bankTwin',
         isActive: false,
         oneRow: true,
-        iconUrl: '/knowledge.png',
+        iconUrl: '/analysis.png',
     },
+
     {
-        name: '江苏省长江',
-        nameTwo: '崩岸监测预警应用系统',
+        name: '江苏省长江崩岸',
+        nameTwo: '监测预警应用系统',
         routerLink: '/',
         isActive: true,
         oneRow: false,
     },
     {
-        name: '崩岸模型平台',
+        name: '崩岸风险信息',
+        routerLink: '/bankWarn',
+        isActive: false,
+        oneRow: true,
+        iconUrl: '/monitoring.png',
+    },
+    {
+        name: '模型与知识库',
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,
         iconUrl: '/predictive.png',
     },
-    {
-        name: '孪生岸坡平台',
-        routerLink: '/bankTwin',
-        isActive: false,
-        oneRow: true,
-        iconUrl: '/connection.png',
-    },
 ])
 
 const routerPathIndexMap = {
     '/dataVisual': 0,
-    '/knowledgeStore': 1,
+    '/bankWarn': 3,
+    '/modelStore': 4,
+    '/knowledgeStore': 4,
+    '/bankTwin': 1,
+    '/bankManage': 1,
     '/': 2,
-    '/modelStore': 3,
-    '/bankTwin': 4,
-    '/bankManage': 4,
 }
 
 let previousActive = 2
@@ -167,7 +201,10 @@ const focusOnNavItem = (navIndex) => {
 }
 
 const emitNavClick = async (navIndex) => {
-    if (navIndex != previousActive) {
+    if (navIndex == 4 || navIndex == 1) {
+        // console.log(1)
+        eleDropDownDomRef.value[0].handleOpen()
+    } else if (navIndex != previousActive) {
         router.push(navList.value[navIndex].routerLink)
         navList.value[previousActive].isActive = false
         navList.value[navIndex].isActive = true
@@ -194,6 +231,24 @@ const leaveNav = () => {
     bracketTitleHoverShow.value = false
 }
 
+const navToModelPage = () => {
+    eleDropDownDomRef.value[0].handleClose()
+    router.push('/modelStore')
+    focusOnNavItem(4)
+}
+
+const navToKnowledgePage = () => {
+    eleDropDownDomRef.value[0].handleClose()
+    router.push('/knowledgeStore')
+    focusOnNavItem(4)
+}
+
+const navToWarnPage = () => {
+    eleDropDownDomRef.value[0].handleClose()
+    router.push('/bankTwin')
+    focusOnNavItem(1)
+}
+
 const onResize = (refDomWidth, refDomHeight) => {
     titleWidthInPixel.value = (4 * refDomWidth) / 25
     decLineWidth.value = refDomHeight / 24
@@ -217,7 +272,7 @@ onMounted(() => {
     // titleWidthInPixel.value = titleDom;
     onResize(headerDom.value.clientWidth, headerDom.value.clientHeight)
     resizeObserver.observe(headerDom.value)
-    // console.log(navItemRefs.value);
+    console.log(navItemRefs.value)
     let curRoute = router.currentRoute.value.path
     console.log(curRoute)
     if (routerPathIndexMap[curRoute] != previousActive) {
@@ -235,12 +290,13 @@ onMounted(() => {
             // console.log(newPath.split('/'), oldPath)
             let parentPath = newPath
             let splitPath = newPath.split('/')
-            if(splitPath.length >= 3) {
+            console.log('pp', parentPath, splitPath)
+            if (splitPath.length >= 3) {
                 parentPath = '/' + splitPath[1]
             }
             if (
-                (parentPath in routerPathIndexMap) &&
-                (routerPathIndexMap[parentPath] != previousActive)
+                parentPath in routerPathIndexMap &&
+                routerPathIndexMap[parentPath] != previousActive
             ) {
                 navList.value[previousActive].isActive = false
                 navList.value[routerPathIndexMap[parentPath]].isActive = true
@@ -251,24 +307,6 @@ onMounted(() => {
             }
         },
     )
-    // watchEffect(() => {
-    //     router.getRoutes().map((item, index) => {
-    //         console.log(item.path, index)
-    //         // if (
-    //         //     item.path === router.currentRoute.value.path &&
-    //         //     index != previousActive
-    //         // ) {
-    //         //     // console.log(item.path)
-    //         //     // console.log(index, previousActive);
-    //         //     navList.value[previousActive].isActive = false
-    //         //     navList.value[index].isActive = true
-    //         //     previousActive = index
-    //         //     if (index != 2) {
-    //         //         focusOnNavItem(index)
-    //         //     }
-    //         // }
-    //     })
-    // })
 })
 onUnmounted(() => {
     resizeObserver.disconnect()

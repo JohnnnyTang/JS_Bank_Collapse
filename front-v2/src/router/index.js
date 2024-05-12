@@ -48,6 +48,11 @@ const routes = [
     },
     {
         path: '/',
+        name: 'home',
+        component: () => import("../views/BankMainView.vue")
+    },
+    {
+        path: '/main',
         component: () => import("../views/BankMainView.vue")
     },
     {
@@ -68,11 +73,11 @@ const routes = [
             },
             {
                 path: 'soilAnalysis',
-                component: () => import('../components/modelStore/views/SoilAnalysis.vue'),
+                component: () => import('../components/modelStore/views/SoilAnalysis2.vue'),
             },
             {
                 path: 'stabilityAnalysis',
-                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
+                component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
             },
             {
                 path: 'riskWarning',
@@ -96,8 +101,16 @@ const routes = [
             {
                 path: 'monitor/:id', // 默认子页面
                 component: () => import('../components/bankManage/BankMonitorInfo.vue')
+            },
+            {
+                path: 'warn/:id', // 默认子页面
+                component: () => import('../components/bankManage/BankWarnTable.vue')
             }
         ]
+    },
+    {
+        path: '/bankWarn',
+        component: () => import('../views/BankRiskWarnView.vue')
     },
 ]
 // 3、创建一个路由的对象

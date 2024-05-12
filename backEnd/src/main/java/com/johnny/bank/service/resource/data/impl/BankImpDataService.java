@@ -31,4 +31,8 @@ public class BankImpDataService implements IBankImpDataService {
     public List<BankImpData> getAllData() {
         return IBankImpDataRepo.findAll();
     }
+
+    public List<BankImpData> getSimpleData() {
+        return IBankImpDataRepo.findBankSimpleData();
+    }
 }

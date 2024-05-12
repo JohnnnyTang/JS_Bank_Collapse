@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
  * @Author: Johnny Tang
  * @Date: 2024/4/12
@@ -33,7 +31,9 @@ public class MapTileServiceThread extends Thread{
     @Override
     public void run() {
         try {
-            cmdProcess = ProcessUtil.buildMapTileServiceProcess(tilePath.getWorldTilePath());
+            cmdProcess = ProcessUtil.buildMapTileServiceProcess(
+                    tilePath.getWorldTilePath(), tilePath.getNodeServicePath()
+            );
             ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(cmdProcess.getInputStream());
             if(cmdOutput.getStatusCode() == 0) {
                 System.out.println("tile service start wrong");

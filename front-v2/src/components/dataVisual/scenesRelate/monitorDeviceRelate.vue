@@ -2,7 +2,7 @@
     <div class="monitorDevice-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">实时监测设备信息</div>
+            <div class="title">民主沙预警监测场景</div>
         </div>
         <div class="card">
             <div class="content">
@@ -32,7 +32,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="chart" class="chart">
+                            <div id="chart" class="chart" ref="chartDom">
 
                             </div>
 
@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import BackEndRequest from '../../../api/backend';
 import * as echarts from 'echarts'
 import dayjs from 'dayjs';
@@ -58,6 +58,7 @@ var DEVICECOUNT = [0, 0, 0, 0]
 const deviceInfos = ref([])
 const DeviceSum = ref(0)
 let myChart = null
+const chartDom = ref()
 
 const countingStar = (arr) => {
     DEVICECOUNT = [0, 0, 0, 0]
@@ -78,11 +79,10 @@ const countingStar = (arr) => {
         // }
     }
     // console.log('sum of DEVICECOUNT', DEVICECOUNT[0]+DEVICECOUNT[1]+DEVICECOUNT[2]+DEVICECOUNT[3]);
-    DeviceSum.value = DEVICECOUNT[0]+DEVICECOUNT[1]+DEVICECOUNT[2]+DEVICECOUNT[3]
+    DeviceSum.value = DEVICECOUNT[0] + DEVICECOUNT[1] + DEVICECOUNT[2] + DEVICECOUNT[3]
 }
 
 const chartOption = () => {
-    console.log('1');
     let option = {
         tooltip: {
             trigger: 'item'
@@ -96,7 +96,7 @@ const chartOption = () => {
                 name: '已接入设备',
                 type: 'pie',
                 radius: ['20%', '70%'],
-                center:['50%','55%'],
+                center: ['50%', '55%'],
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 10,
@@ -125,7 +125,6 @@ const chartOption = () => {
 
 const updateInfo = async () => {
     const data = (await BackEndRequest.getMonitorInfo()).data
-    console.log(data);
     countingStar(data)
     deviceInfos.value = data
     var now = dayjs().format('YYYY-MM-DD HH:mm:ss')
@@ -141,18 +140,21 @@ const updateInfo = async () => {
 let updateInterval = null
 onMounted(async () => {
     // console.log("123123");
-    myChart = echarts.init(document.getElementById('chart'))
+    nextTick(async() => {
 
-    setTimeout(async() => {
+        myChart = echarts.init(chartDom.value)
         await updateInfo();
-    }, 0);
-    updateInterval= setInterval(async () => {
-        await updateInfo();
-    }, 10 * 1000);
+        myChart.hideLoading()
+
+        updateInterval = setInterval(async () => {
+            await updateInfo();
+        }, 10 * 1000);
+    })
+
 
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
     clearInterval(updateInterval)
 })
 
@@ -221,15 +223,15 @@ onUnmounted(()=>{
                 align-items: center;
                 overflow: hidden;
 
-                &::before {
-                    position: absolute;
-                    content: " ";
-                    display: block;
-                    width: 60vw;
-                    height: 14vh;
-                    background: rgb(104, 175, 235);
-                    animation: rotation_481 5000ms infinite linear;
-                }
+                // &::before {
+                //     position: absolute;
+                //     content: " ";
+                //     display: block;
+                //     width: 60vw;
+                //     height: 14vh;
+                //     background: rgb(104, 175, 235);
+                //     animation: rotation_481 5000ms infinite linear;
+                // }
 
                 .real-content {
                     position: absolute;

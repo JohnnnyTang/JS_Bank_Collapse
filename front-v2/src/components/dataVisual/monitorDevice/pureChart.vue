@@ -1,12 +1,15 @@
 <template>
     <div class="pure-chart">
         <div class="buttons">
-            <div class="button" :class="{ active: selectedIndex === index }" v-for="(name, index) in dataAssitant.chartOptions.names" @click="showChart(index)">
+            <div class="button" :class="{ active: selectedIndex === index }"
+                v-for="(name, index) in dataAssitant.chartOptions.names" @click="showChart(index)">
                 {{ name }}
             </div>
         </div>
 
-        <div class="chart" id="chart"></div>
+        <!-- <div class="chart" id="chart"></div> -->
+        <div class="chart" ref="chartRef"></div>
+
     </div>
 </template>
 
@@ -20,6 +23,7 @@ import { useSceneStore } from '../../../store/mapStore';
 
 const selectedFeature = computed(() => useSceneStore().selectedFeature)
 const selectedIndex = ref(0)
+const chartRef = ref()
 
 let myChart
 let chartDom
@@ -35,126 +39,37 @@ const showChart = (index) => {
     }
 }
 
-watch(selectedFeature, async (newV, oldV) => {
-    selectedIndex.value = 0;
-    myChart && myChart.clear()
-    if (newV) {
-        dataAssitant.value = new MonitorDataAssistant(newV)
-        await dataAssitant.value.getMonitoringdata()
-        dataAssitant.value.getProcessedDataObject()
-        dataAssitant.value.getChartOptions()
-        myChart.setOption(dataAssitant.value.chartOptions.options[0])
-    }
-
-
-})
+// watch(selectedFeature, async (newV, oldV) => {
+//     selectedIndex.value = 0;
+//     myChart && myChart.clear()
+//     if (newV) {
+//         dataAssitant.value = new MonitorDataAssistant(newV)
+//         await dataAssitant.value.getMonitoringdata()
+//         dataAssitant.value.getProcessedDataObject()
+//         dataAssitant.value.getChartOptions()
+//         myChart.setOption(dataAssitant.value.chartOptions.options[0])
+//     }
+// })
 
 
 
 
 onMounted(async () => {
-    chartDom = document.getElementById('chart');
-    myChart = echarts.init(chartDom);
-
-    console.log('!!!',selectedFeature.value);
-    dataAssitant.value = new MonitorDataAssistant(selectedFeature.value)
-    
-    await dataAssitant.value.getMonitoringdata()
-    dataAssitant.value.getProcessedDataObject()
-    dataAssitant.value.getChartOptions()
-
-    myChart.setOption(dataAssitant.value.chartOptions.options[0])
+    // chartDom = document.getElementById('chart');
+    myChart = echarts.init(chartRef.value);
+    myChart.showLoading()
 
 
-    //#region  for test
-    //////////for gnss
-    // let gnssMonitorInfo = (await BackEndRequest.getSpecMonitorInfo("1")).data
-    // let oneGnss = new MonitorDataAssistant(gnssMonitorInfo[0])
-    // await oneGnss.getMonitoringdata()
-    // oneGnss.getProcessedDataObject()
-    // options.value = oneGnss.getChartOptions().options
-    // console.log(oneGnss);
+    if (selectedFeature.value) {
+        dataAssitant.value = new MonitorDataAssistant(selectedFeature.value)
 
-    /////////for inclinometer 
-    // let inclinometerInfo = (await BackEndRequest.getSpecMonitorInfo("2")).data
-    // let oneInclinometer = new MonitorDataAssistant(inclinometerInfo[0])
-    // await oneInclinometer.getMonitoringdata()
-    // oneInclinometer.getProcessedDataObject()
-    // options.value = oneInclinometer.getChartOptions().options
-    // console.log(oneInclinometer);
+        await dataAssitant.value.getMonitoringdata()
+        dataAssitant.value.getProcessedDataObject()
+        dataAssitant.value.getChartOptions()
+        myChart.hideLoading()
 
-
-
-    ///////for manometer
-    // let manometerInfo = (await BackEndRequest.getSpecMonitorInfo("3")).data
-    // let oneManometer = new MonitorDataAssistant(manometerInfo[0])
-    // await oneManometer.getMonitoringdata()
-    // oneManometer.getProcessedDataObject()
-    // options.value = oneManometer.getChartOptions().options
-    // console.log(oneManometer);
-
-
-
-
-
-    /////////for stress
-    // let stressInfo = (await BackEndRequest.getSpecMonitorInfo("4")).data
-    // let oneStress = new MonitorDataAssistant(stressInfo[0])
-    // await oneStress.getMonitoringdata()
-    // oneStress.getProcessedDataObject()
-    // options.value = oneStress.getChartOptions().options 
-    // console.log(oneStress);
-
-
-
-    // function run(i) {
-    //     console.log(i);
-    //     myChart&&myChart.setOption({
-    //         series: [
-    //             {
-    //                 type: 'bar',
-    //                 name: oneManometer.processedData.depth_value_time[i],
-    //                 data: oneManometer.processedData.pressureArrBytime[i],
-    //             }
-    //         ]
-    //     });
-    // }
-    // let count = 1;
-    // setInterval(function () {
-    //     run(count);
-    //     count = (count + 1) % 8
-    // }, 3000);
-
-    // window.addEventListener("keydown", (e) => {
-    //     if (e.key == '1') {
-    //         myChart.clear()
-    //         let count = 1
-    //         myChart.setOption(oneStress.chartOptions.options[0])
-
-    //         setInterval(function () {
-    //             let gaugeData = MonitorDataAssistant.getOnegaugeData(oneStress.processedData.horizontalAngle[count], oneStress.processedData.legendData)
-    //             myChart.setOption({
-    //                 series: [
-    //                     {
-    //                         data: gaugeData
-    //                     }
-    //                 ]
-    //             });
-    //             count = (count + 1) % 10
-    //         }, 2000);
-    //     }
-    //     if (e.key == '2') {
-    //         myChart.clear()
-    //         myChart.setOption(oneStress.chartOptions.options[0])
-    //     }
-    //     if (e.key == '3') {
-    //         myChart.clear()
-    //         myChart.setOption(oneStress.chartOptions.options[1])
-    //     }
-    // })
-
-    //#endregion
-
+        myChart.setOption(dataAssitant.value.chartOptions.options[0])
+    }
     window.onresize = function () {
         myChart.resize();
     }
@@ -197,18 +112,19 @@ $Color5: rgb(6, 102, 192);
             color: $Color2;
             padding: 7px;
             margin-bottom: 1vh;
-          
-            
-            &:hover{
+
+
+            &:hover {
                 cursor: pointer;
             }
-            &:active{
+
+            &:active {
                 transform: scale(1.02);
             }
         }
 
-        .active{
-            background-color:  rgb(6, 142, 192);
+        .active {
+            background-color: rgb(6, 142, 192);
         }
     }
 

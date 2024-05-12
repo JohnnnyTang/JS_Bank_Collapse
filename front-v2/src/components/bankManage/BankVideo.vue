@@ -10,6 +10,15 @@
                         class="video-box"
                     >
                         <div class="video-content">
+                            <!-- <video
+                                width="100%"
+                                height="100%"
+                                :id="item.name"
+                                controls
+                                preload="auto"
+                                class="video-js vjs-default-skin"
+                            ><source :src="item.videoUrl" /></video> -->
+                            <!-- <videoPlay :src="item.videoUrl" autoPlay :type="m3u8"/> -->
                             <iframe
                                 :src="item.videoUrl"
                                 width="100%"
@@ -81,27 +90,27 @@
 import { onMounted, ref } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
-import axios from 'axios';
-
+import axios from 'axios'
+// import 'viplayer/dist/index.css'
+// import { videoPlay } from 'viplayer'
+// const token = 'at.2q8ej4p4114dtudb20awr9763vfz1f6o-5j403u7nkd-1ya7mgb-wv9z5z55f'
+const token = 'at.742vjiq01mtq2g3jbnkckwuq3ze19j4w-839um484hs-1qki2ev-lammqrxtd'
 
 const defaultVal = [
     {
         name: '民主沙上游监控S01',
         position: '32.04023206, 120.51992163',
-        videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=${token}`,
     },
     {
         name: '民主沙中游监控S02',
         position: '32.03683063, 120.52666202',
-        videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=${token}`,
     },
     {
         name: '民主沙中游监控S03',
         position: '32.02839471, 120.54611474',
-        videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=${token}`,
     },
 ]
 
@@ -110,19 +119,19 @@ const videoList = ref([
         name: '民主沙监控1',
         position: '32.0432963, 120.5122242',
         videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
+        `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=${token}`,
     },
     {
         name: '民主沙监控2',
         position: '32.0381061, 120.5263473',
         videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
+        `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=${token}`,
     },
     {
         name: '民主沙监控3',
         position: '32.0316674, 120.5402574',
         videoUrl:
-            'https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=at.bc097qtkcvb25p1b8uxru4421oiqj868-4n7i72pcx4-1pb7rqg-tcssqtxnv',
+        `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=${token}`,
     },
 ])
 

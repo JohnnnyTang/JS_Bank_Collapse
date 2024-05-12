@@ -22,8 +22,7 @@
             <div class="machine-info-container">
                 <div class="machine-text-container">
                     <div class="machine-text-content">
-                        这里是解算算法的内容#这里是解算算法的内容#这里是解算算法的内容
-                        #这里是解算算法的内容#这里是解算算法的内容#这里是解算算法的内容
+                        固定式测斜仪位移测量解算算法内容
                     </div>
                 </div>
             </div>

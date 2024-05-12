@@ -4,7 +4,7 @@
             :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
             class="stable-border-box"
         >
-            <div class="stable-status-header">断面稳定状态</div>
+            <div class="stable-status-header">断面风险评估</div>
             <div class="splitter-container">
                 <dv-decoration3
                     class="status-splitter"
@@ -220,14 +220,33 @@
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
 import { fade } from '../../utils/colorUtils'
-import { getHoursBackIn } from '../../utils/timeUtils'
-import {
-    stableStatus,
-    sectionList,
-    stableStatusLineData,
-    sectionStableDataMap,
-    genChartSeries,
-} from './data'
+import { getDatesBefore } from '../../utils/timeUtils'
+import { sectionList, sectionStableDataMap, genChartSeries } from './data'
+
+const stableStatus = ref([
+    [3, 0, 0, 0],
+    [8, 6, 0, 0],
+    [48, 48, 47, 36],
+    [42, 46, 53, 64],
+])
+
+const changeData = (index) => {
+    if (index == 1) {
+        stableStatus.value[2][3] = 47
+        stableStatus.value[3][3] = 53
+    }
+    else {
+        stableStatus.value[2][3] = 36
+        stableStatus.value[3][3] = 64
+    }
+}
+defineExpose({ changeData })
+const stableStatusLineData = [
+    [8, 6, 5, 5, 3, 0, 0, 0],
+    [13, 13, 12, 10, 8, 6, 0, 0],
+    [52, 48, 48, 48, 48, 48, 47, 36],
+    [27, 33, 35, 37, 41, 46, 53, 64],
+]
 
 const sectionChartDom = ref()
 const value = ref('全部断面状态比例')
@@ -248,7 +267,7 @@ const sectionSelectChange = (val) => {
     }
 }
 
-const statusTextMap = ref(['稳定', '较稳定', '较不稳定', '不稳定'])
+const statusTextMap = ref(['较稳定', '稳定', '不稳定', '较不稳定'])
 // const statusColorMap = ref(['#0cb444', '#0212a1', '#e48b18', '#b11a06'])
 const statusColorMap = ref(['#13a500', '#003a92', '#be7200', '#a50101'])
 const lineStatusShow = ref(false)
@@ -317,7 +336,7 @@ const areaColorGradientMap = [
     ]),
 ]
 
-const hoursBackList = getHoursBackIn(24, 2)
+const hoursBackList = getDatesBefore(8, 15)
 // console.log(getHoursBackIn(24, 2))
 
 const baseChartOption = {
@@ -414,15 +433,14 @@ onMounted(() => {
         sectionChart,
         ['#42EB77', '#00ACFF', '#F0AB51', '#FF3636'],
         sectionStableDataMap['JC01'],
-        4
+        4,
     )
     sectionChart.setOption(sectionChartOption)
 })
-
 </script>
 
 <style lang="scss" scoped>
-$shadowWhite: #b3b3b3;
+$shadowWhite: #accad8;
 $shadowGreen: #00ca22;
 $shadowBlue: #005ae0;
 $shadowOrange: #c54f00;
@@ -456,10 +474,10 @@ div.stable-status-container {
         text-align: center;
         letter-spacing: 0.3rem;
 
-        color: #0400fd;
+        color: rgb(23, 95, 163);
         text-shadow:
-            #eef3ff 1px 1px,
-            #eef3ff 2px 2px,
+            #c7dcec 1px 1px,
+            #c7dcec 2px 2px,
             #6493ff 3px 3px;
     }
 

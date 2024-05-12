@@ -2,7 +2,7 @@
     <div class="bankLineRelate-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">崩岸预警信息</div>
+            <div class="title">典型崩岸场景</div>
         </div>
         <div class="card">
             <div class="content">
@@ -16,7 +16,7 @@
                             </div>
                             <div class="bank-desc">
                                 <div class="bank-desc-text">
-                                    长江江苏段预警岸段场景涵盖了的南京、扬中、镇扬、扬中、澄通等各河段及河口段的众多崩岸信息。
+                                    预警岸段场景涵盖了的南京、扬中、镇扬、澄通、河口等各河段及河口段的典型崩岸信息以及基础地理信息。
                                 </div>
                             </div>
 
@@ -25,11 +25,7 @@
                                 <div class="last-update-text">{{ Info.updateTime }}</div>
                             </div>
                         </div>
-
-
                         <div class="chart" id="chart"></div>
-
-
                     </div>
                 </div>
             </div>
@@ -254,7 +250,6 @@ onUnmounted(()=>{
     position: absolute;
     right: 1vw;
     top: 1vh;
-    height: 20vh;
     z-index: 5;
     width: 30vw;
     height: 35vh;
@@ -313,15 +308,15 @@ onUnmounted(()=>{
                 align-items: center;
                 overflow: hidden;
 
-                &::before {
-                    position: absolute;
-                    content: " ";
-                    display: block;
-                    width: 60vw;
-                    height: 14vh;
-                    background: rgb(104, 175, 235);
-                    animation: rotation_481 5000ms infinite linear;
-                }
+                // &::before {
+                //     position: absolute;
+                //     content: " ";
+                //     display: block;
+                //     width: 60vw;
+                //     height: 14vh;
+                //     background: rgb(104, 175, 235);
+                //     animation: rotation_481 5000ms infinite linear;
+                // }
 
                 .real-content {
                     position: absolute;
@@ -378,6 +373,7 @@ onUnmounted(()=>{
 
                             .bank-desc-text {
                                 padding: 10px;
+                                padding-top: 3px;
                                 font-size: calc(0.8vh + 0.5vw);
                                 font-weight: 600;
                                 text-indent: 1em;

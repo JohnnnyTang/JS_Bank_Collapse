@@ -89,9 +89,9 @@ const optionsMap = reactive({
         '顶端角度',
         '中部角度',
         '底端角度',
-        '顶端变化',
-        '中部变化',
-        '底端变化',
+        '顶端最大应变',
+        '中部最大应变',
+        '底端最大应变',
         '顶端应力',
         '中部应力',
         '底端应力',
@@ -108,6 +108,7 @@ const optionsMap = reactive({
 
 const deviceSelection = ref(defaultActiveMap.value[curDevice.value])
 
+console.log('props', props.initDevice)
 const chartSelection = ref(optionsMap[props.initDevice][0])
 
 const deviceNameMap = {
@@ -135,9 +136,9 @@ const deviceNameMap = {
         顶端角度: 'topAngle',
         中部角度: 'middleAngle',
         底端角度: 'bottomAngle',
-        顶端变化: 'topChange',
-        中部变化: 'middleChange',
-        底端变化: 'bottomChange',
+        顶端最大应变: 'topChange',
+        中部最大应变: 'middleChange',
+        底端最大应变: 'bottomChange',
         顶端应力: 'topPower',
         中部应力: 'middlePower',
         底端应力: 'bottomPower',
@@ -234,39 +235,39 @@ const deviceIdMap = {
 
 const deviceTableKeyListMap = ref({
     gnss: [
-        { name: 'XMove', label: 'X位移' },
-        { name: 'YMove', label: 'Y位移' },
-        { name: 'ZMove', label: 'Z位移' },
-        { name: 'threeD', label: '三维累积位移' },
-        { name: 'threeDf', label: '五小时相对变化' },
-        { name: 'inTime', label: '时间' },
+        { name: 'XMove', label: 'X位移(mm)' },
+        { name: 'YMove', label: 'Y位移(mm)' },
+        { name: 'ZMove', label: 'Z位移(mm)' },
+        { name: 'threeD', label: '三维累积位移(mm)' },
+        { name: 'threeDf', label: '五小时相对变化(mm)' },
+        { name: 'measureTime', label: '时间' },
     ],
     inclinometer: [
-        { name: 'topMove', label: '顶端移动' },
-        { name: 'middleMove', label: '中部移动' },
-        { name: 'bottomMove', label: '底端角度' },
-        { name: 'topMovePerDay', label: '顶端日累计移动' },
-        { name: 'middleMovePerDay', label: '中部日累计移动' },
-        { name: 'bottomMovePerDay', label: '底端日累计移动' },
-        { name: 'inTime', label: '时间' },
+        { name: 'topMove', label: '顶端移动(mm)' },
+        { name: 'middleMove', label: '中部移动(mm)' },
+        { name: 'bottomMove', label: '底端移动(mm)' },
+        { name: 'topMovePerDay', label: '顶端日累计移动(mm)' },
+        { name: 'middleMovePerDay', label: '中部日累计移动(mm)' },
+        { name: 'bottomMovePerDay', label: '底端日累计移动(mm)' },
+        { name: 'measureTime', label: '时间' },
     ],
     manometer: [
         { name: 'frequency', label: '频率' },
-        { name: 'temperature', label: '温度' },
+        { name: 'temperature', label: '温度(℃)' },
         { name: 'height', label: '水位高度' },
-        { name: 'inTime', label: '时间' },
+        { name: 'measureTime', label: '时间' },
     ],
     stress: [
-        { name: 'topAngle', label: '顶端角度' },
-        { name: 'middleAngle', label: '中部角度' },
-        { name: 'bottomAngle', label: '底端角度' },
-        { name: 'topChange', label: '顶端变化' },
-        { name: 'middleChange', label: '中部变化' },
-        { name: 'bottomChange', label: '底端变化' },
-        { name: 'topPower', label: '顶端应力' },
-        { name: 'middlePower', label: '中部应力' },
-        { name: 'bottomPower', label: '底端应力' },
-        { name: 'inTime', label: '时间' },
+        { name: 'topAngle', label: '顶端角度(°)' },
+        { name: 'middleAngle', label: '中部角度(°)' },
+        { name: 'bottomAngle', label: '底端角度(°)' },
+        { name: 'topChange', label: '顶端最大应变' },
+        { name: 'middleChange', label: '中部最大应变' },
+        { name: 'bottomChange', label: '底端最大应变' },
+        { name: 'topPower', label: '顶端应力(mpa)' },
+        { name: 'middlePower', label: '中部应力(mpa)' },
+        { name: 'bottomPower', label: '底端应力(mpa)' },
+        { name: 'measureTime', label: '时间' },
     ],
 })
 
@@ -799,7 +800,7 @@ const manoHeightVisMap = {
 
 function buildSeries(dataList, deviceType) {
     const timeList = dataList.map(function (item) {
-        return item['inTime'].replace(' ', '\n')
+        return item['measureTime'].replace(' ', '\n')
     })
     switch (deviceType) {
         case 'gnss':
@@ -1746,8 +1747,12 @@ const selectDevice = async (index, indexPath) => {
 }
 
 onBeforeRouteUpdate((to, from) => {
-    // console.log(to, from)
+    console.log('device route',to, from)
     // console.log(to)
+    if(to.params.id == 'video') {
+        console.log('to')
+        return
+    }
     curDevice.value = to.params.id
     deviceSelection.value = defaultActiveMap.value[curDevice.value]
     chartSelection.value = optionsMap[curDevice.value][0]

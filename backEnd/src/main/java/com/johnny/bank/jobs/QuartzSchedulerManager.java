@@ -25,7 +25,7 @@ public class QuartzSchedulerManager {
     // 开始执行定时器
     public void startJob() throws SchedulerException {
 //        startTestJob(scheduler);
-        startTestRunningJob(scheduler);
+        startGnssWarningJob(scheduler);
         scheduler.start();
     }
 
@@ -108,6 +108,19 @@ public class QuartzSchedulerManager {
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/55 * * * ?");
         // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("testJob", "tesGroup")
+                .withSchedule(cronScheduleBuilder).build();
+        scheduler.scheduleJob(jobDetail, cronTrigger);
+    }
+
+    private void startGnssWarningJob(Scheduler scheduler) throws SchedulerException {
+        // 通过JobBuilder构建JobDetail实例，JobDetail规定其job只能是实现Job接口的实例
+        JobDetail jobDetail = JobBuilder.newJob(GnssWarningJob.class)
+                .withIdentity("gnssWarning", "group1")
+                .build();
+        // 基于表达式构建触发器
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/50 * * * ?");
+        // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("gnssWarningTrigger", "tesGroup")
                 .withSchedule(cronScheduleBuilder).build();
         scheduler.scheduleJob(jobDetail, cronTrigger);
     }

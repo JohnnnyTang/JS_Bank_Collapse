@@ -1,6 +1,6 @@
 <template>
     <div class="device-info-container">
-        <dv-border-box8
+        <dv-border-box12
             :dur="5"
             :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']"
         >
@@ -59,92 +59,29 @@
                     <dv-border-box10
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
                     >
-                        <div class="device-chart-dom" ref="chartDomRef"></div>
                     </dv-border-box10>
                 </div>
             </div>
-        </dv-border-box8>
+        </dv-border-box12>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3'
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
-import { deviceStatusData } from './data'
 import * as echarts from 'echarts'
 
 const deviceStatusDataList = ref([
-    { name: 'GNSS', count: 13, percent: '100%' },
+    { name: '位移测量站', count: 13, percent: '100%' },
     { name: '测斜仪', count: 9, percent: '100%' },
     { name: '孔隙水压力计', count: 9, percent: '100%' },
     { name: '应力桩', count: 7, percent: '100%' },
     { name: '视频监控', count: 3, percent: '100%' },
 ])
 
-const chartDomRef = ref(null)
-
-const option = {
-    grid: {
-        left: '2%',
-        right: '2%',
-        top: '2%',
-        bottom: '3%',
-    },
-    visualMap: {
-        type: 'continuous',
-        min: 1,
-        max: 14,
-        inRange: {
-            color: ['rgb(206,238,254)', 'rgb(4,70,168)'],
-        },
-        right: "5%",
-        top: 'center',
-        itemWidth: "40%",
-        itemHeight: "200%",
-    },
-    series: {
-        type: 'sunburst',
-        data: deviceStatusData,
-        center: ["42%", "50%"],
-        radius: ['20%', '100%'],
-        itemStyle: {
-            borderRadius: 7,
-            borderWidth: 2,
-        },
-        label: {
-            // show: true,
-            rotate: 'tangential',
-            fontSize: 12,
-            color: '#fff',
-            textBorderColor: 'inherit',
-            textBorderWidth: 1,
-        },
-        levels: [
-            {},
-            {
-                label: {
-                    rotate: 'tangential',
-                    textBorderColor: 'inherit',
-                    textBorderWidth: 1,
-                    fontSize: 12,
-                    fontWeight: 'bold',
-                },
-            },
-            {
-                label: {
-                    rotate: 'tangential',
-                    fontSize: 16,
-                },
-            }
-        ],
-    },
-}
 
 onMounted(() => {
-    const deviceStatusChart = echarts.init(chartDomRef.value)
-    deviceStatusChart.setOption(option)
 })
 </script>
 
@@ -155,7 +92,7 @@ div.device-info-container {
 
     position: absolute;
     left: 1vw;
-    top: 33vh;
+    top: 25vh;
     width: 20vw;
     height: 56vh;
 
@@ -317,6 +254,7 @@ div.device-info-container {
     // border-radius: 12px;
 }
 
+
 :deep(.dv-border-svg-container use) {
     stroke-width: 4;
 }
@@ -326,8 +264,9 @@ div.device-info-container {
     backdrop-filter: blur(8px);
 }
 
-:deep(.dv-border-box-10) {
-    background-color: rgba(255, 255, 255, 0.63);
+:deep(.dv-border-box-12) {
+    background-color: rgba(156, 195, 255, 0.4);
     backdrop-filter: blur(8px);
+    border-radius: 6px;
 }
 </style>

@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 //@EnableConfigurationProperties(DataSourceConfig.class)
 @MapperScan("com.johnny.bank.repository.resourceRepo")
 public class BankApplication {
-
     public static void main(String[] args) {
 //        System.out.println(Arrays.toString(",asd,".split(",")));
 //        System.out.println(System.getProperty("user.dir"));

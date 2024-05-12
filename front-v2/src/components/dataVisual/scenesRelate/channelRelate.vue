@@ -2,7 +2,7 @@
     <div class="bankLineRelate-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">过江通道信息</div>
+            <div class="title">全江概貌场景</div>
         </div>
         <div class="card">
             <div class="content">
@@ -12,11 +12,11 @@
                         <div class="desc-content">
                             <div class="in-db-bank-container">
                                 <div class="in-db-bank">在库通道</div>
-                                <div class="in-db-bank-num">{{ Info.channelNum }}</div>
+                                <div class="in-db-bank-num">{{ Info.channelNum + 1 }}</div>
                             </div>
                             <div class="bank-desc">
                                 <div class="bank-desc-text">
-                                    涵盖长江江苏段已建成、在建以及规划中的桥梁和隧道，为促进南北岸交通互联、助力过江通道的发展提供支持。
+                                    全江概貌场景涵盖长江江苏段已建成、在建以及规划中的三类过江通道以及全江基础地理信息。
                                 </div>
                             </div>
 
@@ -154,17 +154,17 @@ onMounted(async () => {
     let chartdom = document.querySelector('#chart')
     myChart = echarts.init(chartdom);
 
-    setTimeout(() => {
-        update()
-    }, 0);
+
+    update()
+
 
     updateInterval = setInterval(() => {
         update()
-    }, 5000);
+    }, 10 * 1000);
 
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
     clearInterval(updateInterval)
 })
 
@@ -199,7 +199,7 @@ onUnmounted(()=>{
             width: 5vh;
             height: 5vh;
             margin-right: 1vw;
-            background-image: url('/icons/gate.png');
+            background-image: url('/river.png');
             background-size: contain;
             background-repeat: no-repeat
         }
@@ -236,15 +236,15 @@ onUnmounted(()=>{
                 align-items: center;
                 overflow: hidden;
 
-                &::before {
-                    position: absolute;
-                    content: " ";
-                    display: block;
-                    width: 60vw;
-                    height: 14vh;
-                    background: rgb(104, 175, 235);
-                    animation: rotation_481 5000ms infinite linear;
-                }
+                // &::before {
+                //     position: absolute;
+                //     content: " ";
+                //     display: block;
+                //     width: 60vw;
+                //     height: 14vh;
+                //     background: rgb(104, 175, 235);
+                //     animation: rotation_481 5000ms infinite linear;
+                // }
 
                 .real-content {
                     position: absolute;

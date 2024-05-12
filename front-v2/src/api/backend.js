@@ -35,6 +35,10 @@ export default class BackEndRequest {
         return backendInstance.get("/data/bankLine")
     }
 
+    static getBankLineSimpleData() {
+        return backendInstance.get("/data/bankLine/simple")
+    }
+
     static getHistoryInfo() {
         return backendInstance.get("/data/historyInfo")
     }
@@ -43,9 +47,9 @@ export default class BackEndRequest {
         return backendInstance.get("/data/monitorInfo")
     }
 
-    static getSpecMonitorInfo(type){
+    static getSpecMonitorInfo(type) {
         //设备概述信息！！！！
-        switch(type){
+        switch (type) {
             case '1':
                 return backendInstance.get("/data/monitorInfo/type/1")
             case '2':
@@ -54,7 +58,7 @@ export default class BackEndRequest {
                 return backendInstance.get("/data/monitorInfo/type/3");
             case '4':
                 return backendInstance.get("/data/monitorInfo/type/4");
-        }   
+        }
     }
 
     static getMonitorDetailByType_Code(code, type) {
@@ -62,28 +66,32 @@ export default class BackEndRequest {
         switch (type) {
             case '1': {
                 // return backendInstance.get(`/data/gnssData/id/${code}`)
-                return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
+                // return backendInstance.get(`/data/gnssData/day/1/device/${code}`)
+                return backendInstance.get(`/data/gnssData/hour/12/device/${code}`)
             }
             case '2': {
                 // return backendInstance.get(`/data/stressData/id/${code}`)
-
+                // return new Promise((resolve) => { resolve({ data: [] }) })
+                return backendInstance.get(`/data/stressData/minute/30/device/${code}`)
             }
             case '3': {
                 // return backendInstance.get(`/data/manometerData/id/${code}`)
-                return backendInstance.get(`/data/manometerData/day/1/device/${code}`)
+                // return backendInstance.get(`/data/manometerData/day/1/device/${code}`)
+                return backendInstance.get(`/data/manometerData/hour/5/device/${code}`)
             }
             case '4': {
-                return backendInstance.get(`/data/inclinometerData/day/1/device/${code}`)
+                // return backendInstance.get(`/data/inclinometerData/day/1/device/${code}`)
+                return backendInstance.get(`/data/inclinometerData/hour/5/device/${code}`)
             }
         }
     }
 
 
-    static getMonitorInfoByType_Code(code,type){
+    static getMonitorInfoByType_Code(code, type) {
         //desc
         switch (type) {
             case '1': {
-                return new Promise((resolve)=>{resolve({data:{pointNum:0}})})
+                return new Promise((resolve) => { resolve({ data: { pointNum: 0 } }) })
                 // return backendInstance.get(`/data/gnssInfo/id/${code}`)
             }
             case '2': {
@@ -97,6 +105,30 @@ export default class BackEndRequest {
             }
         }
     }
+
+
+    static getMonitorWarningInfomation() {
+
+        return new Promise((resolve) => {
+            resolve({
+                data: [
+                    {
+                        deviceCode: 'MZS120.55327892_32.02707923_1',
+                        warningValue: '16.64m',
+                        time:'123'
+                    },
+                    {
+                        deviceCode: 'MZS120.55649757_32.02592404_1',
+                        warningValue: '13.42m',
+                        time:'123'
+                    }
+                ]
+            })
+        })
+
+    }
+
+
 
 }
 

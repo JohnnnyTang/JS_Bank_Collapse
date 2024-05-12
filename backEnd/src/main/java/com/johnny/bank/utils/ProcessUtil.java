@@ -3,20 +3,18 @@ package com.johnny.bank.utils;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
-import com.johnny.bank.model.configuration.TilePath;
+import com.johnny.bank.model.configuration.MultiIndexPath;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @projectName: backEnd
@@ -31,13 +29,17 @@ import java.util.List;
 @Component
 public class ProcessUtil {
 
-    @Autowired
-    private TilePath tilePath;
     //    static String pythonDir = "C:/nhri/monitor/pythonDir/";
+
+    @Autowired
+    private MultiIndexPath multiIndexPath;
 
     static String outsideModelDir = "D:/zhuomian/水科院/python/";
     //    static String pythonDir = "/home/zym/python/";
     static String pythonStr = "python";
+
+//    static String condaStr = "conda activate multiIndex &&";
+    static String condaStr = "conda activate bankModel &&";
 
 //    static String pythonStr = "python3";
 
@@ -63,15 +65,60 @@ public class ProcessUtil {
         return processBuilder.start();
     }
 
-    public static Process buildMapTileServiceProcess(String worldTilePath) throws Exception {
+    // 岸坡因子计算
+    public static Process buildSectionTaskNodeProcess(
+            TaskNode taskNode, String multiIndexDataPath, String multiIndexResPath
+    ) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        commands.add(condaStr);
+
+        ModelNode modelNode = taskNode.getModelNode();
+        JSONObject modelUsage = modelNode.getUsage();
+        commands.add((String) modelUsage.get("exePrefix"));
+        commands.add(taskNode.getModelNode().getProgram());
+        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
+        JSONObject paramObject = taskNode.getParamNode().getParams();
+        for(String paramKey: paramKeys) {
+            commands.add(paramObject.get(paramKey).toString());
+        }
+        commands.add(multiIndexDataPath);
+        commands.add(multiIndexResPath);
+        String pyCmdStr = String.join(" ", commands);
+        System.out.printf(pyCmdStr);
+        processBuilder.command("cmd.exe", "/c", pyCmdStr);
+        return processBuilder.start();
+    }
+
+    // 其他因子计算
+    public static Process buildOtherIndexTaskNodeProcess(
+            TaskNode taskNode, String fullJsonPath
+    ) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        commands.add(condaStr);
+        ModelNode modelNode = taskNode.getModelNode();
+        JSONObject modelUsage = modelNode.getUsage();
+        commands.add((String) modelUsage.get("exePrefix"));
+        commands.add(taskNode.getModelNode().getProgram());
+        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
+        JSONObject paramObject = taskNode.getParamNode().getParams();
+        commands.add(fullJsonPath);
+        for(String paramKey: paramKeys) {
+            if(Objects.equals(paramKey, "jsonId")) continue;
+            commands.add(paramObject.get(paramKey).toString());
+        }
+        String cmdStr = String.join(" ", commands);
+        log.info(cmdStr);
+        processBuilder.command("cmd", "/c", cmdStr);
+        return processBuilder.start();
+    }
+
+    public static Process buildMapTileServiceProcess(String worldTilePath, String nodeServicePath) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
         commands.add("node");
-        Resource resource = new ClassPathResource("node/index.js");
-        //获1.txt的取相对路径
-        String path = resource.getFile().getPath();
-        System.out.println(path);
-        commands.add(path);
+        commands.add(nodeServicePath);
         commands.add(worldTilePath);
         processBuilder.command(commands);
         System.out.println(processBuilder);

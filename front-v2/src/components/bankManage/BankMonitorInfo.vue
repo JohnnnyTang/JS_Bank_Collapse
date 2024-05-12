@@ -18,12 +18,14 @@ const initDevice = ref("gnss")
 onBeforeRouteUpdate((to, from) => {
     // console.log('111', to, from)
     curPage.value = to.params.id
+    if(to.params.id == 'video') return
+    else initDevice.value = to.params.id
 })
 
 onMounted(() => {
     // console.log(route.params)
     curPage.value = route.params.id
-    initDevice.value = curPage.value
+    // initDevice.value = curPage.value
 })
 </script>
 

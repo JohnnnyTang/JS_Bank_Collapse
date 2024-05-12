@@ -105,7 +105,7 @@ import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue';
 import SetParameter from '../stability-sub/SetParameter.vue';
 import UploadModel from '../stability-sub/UploadModel.vue';
 import { ElMessage } from 'element-plus';
-import SteadyFlowLayer from '../../../utils/m_demLayer/steadyFlowLayer';
+import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
 
 
 const showHyCondition = ref(false)
@@ -129,7 +129,7 @@ const title1 = ref('模型配置')
 const showAnalysis = ref(false)
 const checky1 = ref(true)
 const checky2 = ref(false)
-const backHandle = ()=>{
+const backHandle = () => {
     checky1.value = true;
     checky2.value = false;
     showAnalysis.value = false
@@ -265,7 +265,19 @@ const defaultProps = {
 ////////////layer///////////////
 const checkedlayers = ref([])
 const layers = ref([])
-const flow = new SteadyFlowLayer();
+let globalMap = undefined
+
+
+let flowSrc = []
+for (let i = 0; i < 26; i++) {
+    flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+}
+let flow = new SteadyFlowLayer(
+    '近岸流场',
+    '/scratchSomething/terrain_flow/json/station.bin',
+    flowSrc,
+    (url) => url.match(/uv_(\d+)\.bin/)[1],
+)
 
 watch(checkedlayers, (value) => {
     console.log(value);
@@ -276,7 +288,19 @@ watch(checkedlayers, (value) => {
 const handleCheckedlayersChange = (value) => {
 
     if (value.includes('flowLayer')) {
+         console.log('1',globalMap);
         flow.show();
+        if (globalMap) {
+            globalMap.flyTo({
+                center: [120.54070965313992, 32.042615280683805],
+                pitch: 31.99999999999988,
+                bearing: 0,
+                zoom: 10.245427972376211,
+                speed: 1.0,
+                essential: true,
+            })
+        }
+
     } else {
         flow.hide();
     }
@@ -286,6 +310,7 @@ const handleCheckedlayersChange = (value) => {
 onMounted(async () => {
 
     const map = await initScratchMap(mapContainerRef.value)
+    globalMap = map
     map.addLayer(flow)
     flow.hide()
 })
@@ -300,6 +325,7 @@ div.all {
     width: 100vw;
     height: 92vh;
     position: relative;
+    overflow: hidden
 }
 
 div.model-content-container {
@@ -716,7 +742,7 @@ div.model-content-container {
 
     .background {
         // background-color: radial-gradient(circle, rgb(16, 2, 84) 0%, rgb(16, 31, 128) 40%, rgb(13, 80, 147) 80%, rgb(0, 134, 255) 100%);
-        background-color: rgb(22,36,127);
+        background-color: rgb(22, 36, 127);
         position: fixed;
         top: 0;
         height: 8.2vh;

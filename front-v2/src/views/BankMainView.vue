@@ -2,15 +2,13 @@
     <div class="bank-main-container" ref="containerDom">
         <div id="map" class="map-container"></div>
         <TickClockVue />
-        <div class="basemap-radio-container">
+        <!-- <div class="basemap-radio-container">
             <input type="radio" id="radio-1" name="tabs" checked />
             <label class="tab" for="radio-1">天地图</label>
             <input type="radio" id="radio-2" name="tabs" />
             <label class="tab" for="radio-2">OSM</label>
-            <!-- <input type="radio" id="radio-3" name="tabs" />
-            <label class="tab" for="radio-3">Completed</label> -->
             <span class="glider"></span>
-        </div>
+        </div> -->
         <BankTableVue />
         <WarnNoticeVue />
         <RealtimeRiskVue />
@@ -34,6 +32,7 @@ mapboxgl.accessToken =
 
 const containerDom = ref(null)
 let map = null
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -58,7 +57,7 @@ onMounted(() => {
     map = new mapboxgl.Map({
         container: 'map', // container ID
         // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-        style:getStyleJson(),
+        style: getStyleJson(),
         center: [120.312, 31.917], // starting position [lng, lat]
         zoom: 3, // starting zoom
         bounds: [
@@ -73,13 +72,13 @@ onMounted(() => {
         map.addSource('mapVector', {
             type: 'vector',
             tiles: [
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2021/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2023/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2020/before/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2020/after/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/contour/2021/after/{x}/{y}/{z}',
-                'http://127.0.0.1:8989/api/v1/tile/vector/contour/2022/after/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2021/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2022/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2023/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2020/before/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2020/after/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/contour/2021/after/{x}/{y}/{z}',
+                tileServer+'/tile/vector/contour/2022/after/{x}/{y}/{z}',
             ],
         })
         // map.addSource('worldBase', {
@@ -100,91 +99,91 @@ onMounted(() => {
         map.addSource('depthLineSource', {
             type: 'vector',
             tiles: [
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/1999/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2004/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2006/{x}/{y}/{z}',
-                // 'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2015/{x}/{y}/{z}',
-                'http://127.0.0.1:8989/api/v1/tile/vector/depthLine/2017/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/1999/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/2004/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/2006/{x}/{y}/{z}',
+                // tileServer+'/tile/vector/depthLine/2015/{x}/{y}/{z}',
+                tileServer+'/tile/vector/depthLine/2017/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverSectionLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverSection/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverSection/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverBg', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverBg/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverBg/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverLand', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverLand/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverLand/{x}/{y}/{z}',
             ],
         })
         map.addSource('ptVector', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/placeLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/placeLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/riverName/{x}/{y}/{z}',
+                tileServer+'/tile/vector/riverName/{x}/{y}/{z}',
             ],
         })
 
         map.addSource('mzsPlaceLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsPlaceLineSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
             ],
         })
 
         map.addSource('mzsBankLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsBankLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsBankLineSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankLine/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsBankLine/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsSectionLineSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsSectionLine/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsSectionLineLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
             ],
         })
-        map.addSource('mzsBankAreaWSource', {
-            type: 'vector',
-            tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
-            ],
-        })
+        // map.addSource('mzsBankAreaWSource', {
+        //     type: 'vector',
+        //     tiles: [
+        //         tileServer+'/tile/vector/mzsBankAreaW/{x}/{y}/{z}',
+        //     ],
+        // })
         map.addSource('mzsBankAreaSSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
             ],
         })
         map.addLayer({
@@ -202,14 +201,41 @@ onMounted(() => {
                 'line-width': 4,
             },
         })
-        
+
         map.addLayer({
             id: 'fill1',
             type: 'fill',
             source: 'riverBg',
             'source-layer': 'default',
             paint: {
-                'fill-color': 'rgba(13, 22, 189, 0.5)',
+                'fill-color': [
+                    'match',
+                    ['get', 'height'],
+                    0,
+                    '#00e4ff',
+                    5,
+                    '#06bef1',
+                    10,
+                    '#0a9fe6',
+                    15,
+                    '#0e82db',
+                    20,
+                    '#1261cf',
+                    25,
+                    '#1548c6',
+                    30,
+                    '#1f3fcd',
+                    35,
+                    '#2f31d7',
+                    40,
+                    '#4021e3',
+                    45,
+                    '#5310f0',
+                    50,
+                    '#6500fc',
+                    '#000000',
+                ],
+                // 'fill-color': '#3EFA13'
             },
         })
         map.addLayer({
@@ -218,7 +244,7 @@ onMounted(() => {
             source: 'riverLand',
             'source-layer': 'default',
             paint: {
-                'fill-color': 'rgba(23, 214, 86, 0.5)',
+                'fill-color': 'rgba(183, 214, 86, 0.7)',
             },
         })
         // warning here!!
@@ -239,21 +265,6 @@ onMounted(() => {
             },
         })
         map.addLayer({
-            id: 'riverLabel',
-            type: 'symbol',
-            source: 'riverLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(13, 22, 189, 0.8)',
-            },
-        })
-        map.addLayer({
             id: 'riverSectionLabel',
             type: 'line',
             source: 'riverSectionLabelSource',
@@ -266,6 +277,21 @@ onMounted(() => {
                 'line-opacity': 1,
                 'line-color': 'rgba(231, 214, 86, 0.9)',
                 'line-width': 4,
+            },
+        })
+        map.addLayer({
+            id: 'riverLabel',
+            type: 'symbol',
+            source: 'riverLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+            },
+            paint: {
+                'text-color': 'rgba(13, 22, 189, 0.8)',
             },
         })
         map.addSource('mapRaster', {
@@ -394,15 +420,15 @@ onMounted(() => {
                 'fill-color': 'rgba(233, 23, 86, 0.6)',
             },
         })
-        map.addLayer({
-            id: 'mzsSectionArea2',
-            type: 'fill',
-            source: 'mzsBankAreaWSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgba(233, 233, 86, 0.6)',
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsSectionArea2',
+        //     type: 'fill',
+        //     source: 'mzsBankAreaWSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': 'rgba(233, 233, 86, 0.6)',
+        //     },
+        // })
         map.addLayer({
             id: 'mzsBankLine',
             type: 'line',
@@ -475,8 +501,6 @@ onMounted(() => {
             console.log(features)
         })
         resizeObserver.observe(containerDom.value)
-
-
     })
 })
 

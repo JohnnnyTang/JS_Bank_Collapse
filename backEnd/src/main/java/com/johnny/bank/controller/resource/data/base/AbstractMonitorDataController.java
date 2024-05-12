@@ -22,6 +22,10 @@ public abstract class AbstractMonitorDataController<T extends MonitorData> {
     public abstract ResponseEntity<List<T>> getDataByHourOfDevice(int hours, String deviceCode);
     public abstract ResponseEntity<List<T>> getDataByDayOfDevice(int days, String deviceCode);
 
+    public abstract ResponseEntity<List<T>> getDataByMinBeforeBegOfDevice(int minutesBefore, int minutesDur, String deviceCode);
+    public abstract ResponseEntity<List<T>> getDataByHourBeforeBegOfDevice(int hoursBefore, int hoursDur, String deviceCode);
+    public abstract ResponseEntity<List<T>> getDataByDayBeforeBegOfDevice(int daysBefore, int daysDur, String deviceCode);
+
     public abstract ResponseEntity<List<T>> getDataByTimeInStation(Timestamp begTime, Timestamp endTime, String stationCode);
     public abstract ResponseEntity<List<T>> getDataByMinInStation(int minutes, String stationCode);
     public abstract ResponseEntity<List<T>> getDataByHourInStation(int hours, String stationCode);
