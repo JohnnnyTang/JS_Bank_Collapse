@@ -9,12 +9,32 @@
             <div class="miniIcon" @click="close"></div>
         </div>
         <hr>
+
         <div class="content">
+            <div class="data-theme">
+                <div class="scene-area">
+                    <div class="text">数据专题</div>
+                    <div class="data-theme-tags">
+                        <el-check-tag v-for="(item, i) in Scenes" :key="i" @click="sceneTagClickHandler(i)"
+                            :checked="sceneTagChecked[i]">{{ item }}</el-check-tag>
+                    </div>
+                </div>
+                <div class="lg-area sub-data-theme-tags">
+                    <el-check-tag :checked="LGroupsTagChecked[i]" type="primary" @change="LGroupsTagClickHandler(i)"
+                        v-for="(item, i) in LGroups">
+                        {{ item }}
+                    </el-check-tag>
+                </div>
+            </div>
+
             <div class="e-input">
                 <span class="text">要素检索</span>
                 <el-input v-model="filterText" style="width: 10vw" placeholder="请输入关键词" />
             </div>
             <div class="tree-container">
+                <div class="feature-desc">
+                    <div class="text">共有要素 {{ featureCount }}条</div>
+                </div>
                 <el-tree ref="treeRef" style="max-width: 600px" :data="data" :props="defaultProps" default-expand-all
                     :filter-node-method="filterNode">
 
@@ -25,10 +45,17 @@
                             <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button>
                         </span>
                     </template>
-
                 </el-tree>
             </div>
+
+
+
+
         </div>
+
+
+
+
     </div>
 </template>
 
@@ -37,8 +64,8 @@ import { onMounted, ref, watch, computed } from 'vue';
 import { Decoration7 } from '@kjgl77/datav-vue3'
 import { ElTree } from 'element-plus';
 import { Scene } from '../../Scene';
-import { useMapLayerStore, useMapStore } from '../../../../store/mapStore';
-import { showLayersFunction, hideLayersFunction } from '../../../../utils/mapUtils';
+import { useMapStore, useNewSceneStore } from '../../../../store/mapStore';
+import axios from 'axios';
 
 // data
 const defaultProps = {
@@ -48,11 +75,15 @@ const defaultProps = {
 const filterText = ref('')
 const treeRef = ref()
 const selectedLayer = ref('')
+const sceneStore = useNewSceneStore()
+const mapStore = useMapStore()
 const data = ref([])
-const mapLayerStore = useMapLayerStore()
 const emit = defineEmits(['close'])
-
-
+const Scenes = ['全江概貌', '涉水工程', '重点岸段']
+const sceneTagChecked = ref([true, false, false])
+const LGroups = ['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点']
+const LGroupsTagChecked = ref([true, false, false, false, false])
+const featureCount = ref(999)
 
 watch(filterText, (val) => {
     treeRef.value.filter(val)
@@ -67,18 +98,80 @@ const close = () => {
     console.log('1');
     emit('close', 0)
 }
+const LGroupsTagClickHandler = async () => {
+    await updateTreeData()
+}
+
+const updateTreeData = async () => {
+    // let checkedLayerGroup = []
+    // for (let i = 0; i < LGroupsTagChecked.value.length; i++) {
+    //     if (LGroupsTagChecked.value[i]) {
+    //         checkedLayerGroup.push(LGroups[i])
+    //     }
+    // }
+    // console.log(checkedLayerGroup);
+    let checkedLayerGroupID = '行政区划'
+    // let layers = sceneStore.LAYERGROUPMAP.value.layerIDs
+    // console.log(sceneStore.LAYERGROUPMAP.value[checkedLayerGroupID].layerIDs);
+
+    let layerid = '市级行政区'
+    let map = mapStore.getMap()
+    let res = await getLayerFeatureArray(map, layerid)
+    console.log(res);
+
+    let treeNode = {
+        label: layerid,
+        children: []
+    }
+    for(let i=0;i<res.length;i++){
+        treeNode.children.push({
+            label: res[i]['name'],
+        })
+    }
+    featureCount.value =  res.length
+
+    data.value.push(treeNode)
+
+
+}
+
+
 onMounted(() => {
-    let treeData = Scene.getLayerTreeData()
-    data.value = treeData
-})
+    setTimeout(()=>{
+        updateTreeData()
+    },2000)
+})  
+
+const getLayerFeatureArray = async (mapInstance, layerName) => {
+    // 获取要素数组的函数
+    let properties = []
+
+    let layer = mapInstance.getLayer(layerName)
+    if (!layer) return properties
+
+    let sourceId = layer.source
+    let source = mapInstance.getSource(sourceId)
+    if (!source) return properties
+
+    if (source.type == 'geojson') {
+        let geofeatures = source['_data']['features']
+        for (let i = 0; i < geofeatures.length; i++) {
+            properties.push(geofeatures[i]['properties'])
+        }
+    }
+    else if (source.type == 'vector') {
+        const res = await axios.get(`http://localhost:5173/api/tile/vector/${sourceId}/info`)
+        properties = res.data
+    }
+    // console.log(properties);
+    return properties;
+}
 
 </script>
 
 <style lang="scss" scoped>
 div.total-controller {
-    // position: absolute;
-    // right: 1vw;
-    // top: 40vh;
+
     position: relative;
     z-index: 3;
     pointer-events: all;
@@ -98,7 +191,7 @@ div.total-controller {
         align-items: center;
 
         &:hover {
-            cursor:move;
+            cursor: move;
         }
 
         .title-back {
@@ -137,8 +230,36 @@ div.total-controller {
         height: 45vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
+
+
+        .data-theme {
+            width: 19vw;
+            height: 10vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .scene-area {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .lg-area {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+
+                :deep(.el-check-tag.el-check-tag--primary) {
+                    width: 1.5vw;
+                    margin: 0.5vh;
+                }
+            }
+
+        }
 
         .e-input {
             width: 16vw;
@@ -146,20 +267,25 @@ div.total-controller {
             display: flex;
             justify-content: center;
             align-items: center;
-            transform: translateY(-50%);
+            transform: translateY(-20%);
             scale: 1.15;
         }
 
         .tree-container {
             position: relative;
             width: 17vw;
-            height: 33vh;
+            height: 27.5vh;
             padding-left: 1vw;
             padding-bottom: 1.5vh;
             padding-top: 1.5vh;
             box-shadow: rgb(255, 255, 255) 0px 0px 25px 3px inset;
             border-radius: 5%;
             overflow-y: auto;
+
+            .feature-desc {
+                height: 3vh;
+                text-align: left;
+            }
 
             &::-webkit-scrollbar {
                 width: 5px;
@@ -235,4 +361,5 @@ hr {
     span {
         font-size: calc(0.5vw + 0.5vh);
     }
-}</style>
+}
+</style>

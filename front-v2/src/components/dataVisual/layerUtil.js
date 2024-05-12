@@ -5,6 +5,7 @@ import TerrainLayer from "../../utils/m_demLayer/terrainLayer"
 import { useLayerStore } from "../../store/mapStore"
 import BackEndRequest from "../../api/backend"
 import { DataPioneer } from "./Scene"
+import axios from 'axios'
 import { loadImage } from "../../utils/mapUtils"
 const layers = [
     '地形瓦片',
@@ -978,6 +979,483 @@ const layerAddFunctionMap = {
             useLayerStore().setTerrainLayer(terrainLayer)
         }
     },
+
+
+    ///////////////全江概貌
+    /////// 行政区划
+    '江苏省省域': async (map) => {
+        !map.getSource('cityBoundary') &&
+            map.addSource('cityBoundary', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/cityBoundary/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('江苏省省域') &&
+            map.addLayer({
+                id: '江苏省省域',
+                type: 'fill',
+                source: 'cityBoundary',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': 'rgb(216,241,255)',
+                    'fill-opacity': 1.0,
+                },
+            })
+    },
+    '市级行政区': async (map) => {
+        !map.getSource('cityBoundaryLine') &&
+            map.addSource('cityBoundaryLine', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}',
+                ],
+            })
+
+        !map.getLayer('市级行政区') &&
+            map.addLayer({
+                id: '市级行政区',
+                type: 'line',
+                source: 'cityBoundaryLine',
+                'source-layer': 'default',
+                layout: {
+
+                },
+                paint: {
+                    'line-color': '#0A215C',
+                    'line-width': 1.5,
+                    'line-opacity': 0.5
+                },
+            })
+    },
+    '市级行政区-注记': async (map) => {
+        if (!map.getSource('District-point')) {
+            let data = (await axios.get(`http://localhost:5173/api/tile/vector/cityBoundary/info`)).data
+            let pointgeoJson = convertToGeoJSON(data)
+
+            map.addSource('District-point', {
+                type: 'geojson',
+                data: pointgeoJson
+            })
+        }
+        !map.getLayer('市级行政区-注记') &&
+            map.addLayer({
+                id: '市级行政区-注记',
+                type: 'symbol',
+                source: 'District-point',
+                layout: {
+                    'text-field': ['get', 'name'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    'text-anchor': 'center',
+                    'text-offset': ['match', ['get', 'name'], '无锡市', [2, 0], '常州市', [1, 0], [0, 0]],
+                },
+                paint: {
+                    'text-color': 'rgb(28,13,106)',
+                },
+            })
+    },
+    /////// 河道分段
+    '河道分段': async (map) => {
+        !map.getSource('riverSection') &&
+            map.addSource('riverSection', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverSection/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('河道分段') &&
+            map.addLayer({
+                id: '河道分段',
+                type: 'line',
+                source: 'riverSection',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': 'rgba(231, 214, 86, 0.9)',
+                    'line-width': 4,
+                },
+            })
+    },
+    '河道分段-注记': async (map) => {
+        !map.getSource('riverName') &&
+            map.addSource('riverName', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverName/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('河道分段-注记') &&
+            map.addLayer({
+                id: '河道分段-注记',
+                type: 'symbol',
+                source: 'riverName',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                },
+                paint: {
+                    'text-color': '#FC7C49',
+                },
+            })
+    },
+
+    ////// 流域水系
+    '流域水系': async (map) => {
+        !map.getSource('riverArea') &&
+            map.addSource('riverArea', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverArea/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('流域水系') &&
+            map.addLayer({
+                id: '流域水系',
+                type: 'fill',
+                source: 'riverArea',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': 'rgb(27,116,193)',
+                },
+            })
+    },
+    ////// 湖泊河流
+    '湖泊河流': async (map) => {
+        !map.getSource('lakeArea') &&
+            map.addSource('lakeArea', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/lakeArea/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('湖泊河流') &&
+            map.addLayer({
+                id: '湖泊河流',
+                type: 'fill',
+                source: 'lakeArea',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': 'rgb(74,102,172)',
+                },
+            })
+    },
+    ////// 水文站点
+    '水文站点': async (map) => {
+        !map.getSource('hydroStationPoint') &&
+            map.addSource('hydroStationPoint', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/hydroStationPoint/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('水文站点') &&
+            map.addLayer({
+                id: '水文站点',
+                type: 'circle',
+                source: 'hydroStationPoint',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'circle-color': 'rgb(79,188,215)',
+                    'circle-blur': 0.5,
+                    'circle-radius': 6,
+                },
+            })
+    },
+
+
+    ////////////// 涉水工程
+    ////////长江提防
+    '长江堤防': async (map) => {
+        !map.getSource('embankmentLine') &&
+            map.addSource('embankmentLine', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/embankmentLine/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('长江堤防') &&
+            map.addLayer({
+                id: '长江堤防',
+                type: 'line',
+                source: 'embankmentLine',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': '#D3ABF5',
+                    'line-width': 1,
+                },
+            })
+    },
+    ////////过江通道
+    '过江通道-线': async (map) => {
+        !map.getSource('riverPassageLine') &&
+            map.addSource('riverPassageLine', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('过江通道-线') &&
+            map.addLayer({
+                id: '过江通道-线',
+                type: 'line',
+                source: 'riverPassageLine',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': '#FFD8B0',
+                    'line-width': 2.0,
+                },
+            })
+    },
+    '过江通道-桥墩': async (map) => {
+        !map.getSource('riverPassagePier') &&
+            map.addSource('riverPassagePier', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverPassagePier/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('过江通道-桥墩') &&
+            map.addLayer({
+                id: '过江通道-桥墩',
+                type: 'fill-extrusion',
+                source: 'riverPassagePier',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-extrusion-color': '#E0D2C4',
+                    'fill-extrusion-base': 0,
+                    'fill-extrusion-height': 200,
+                    'fill-extrusion-opacity': 0.5
+                },
+            })
+    },
+    '过江通道-桥面': async (map) => {
+        !map.getSource('riverPassagePolygon') &&
+            map.addSource('riverPassagePolygon', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverPassagePolygon/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('过江通道-桥面') &&
+            map.addLayer({
+                id: '过江通道-桥面',
+                type: 'fill-extrusion',
+                source: 'riverPassagePolygon',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-extrusion-color': '#BBAD9F',
+                    'fill-extrusion-base': 200,
+                    'fill-extrusion-height': 230,
+                    'fill-extrusion-opacity': 0.7
+                },
+            })
+    },
+    ///////沿江码头
+    '沿江码头': async (map) => {
+        !map.getSource('dockArea') &&
+            map.addSource('dockArea', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/dockArea/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('沿江码头') &&
+            map.addLayer({
+                id: '沿江码头',
+                type: 'fill',
+                source: 'dockArea',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': '#2B2E76',
+                },
+            })
+    },
+    ///////大型枢纽 
+    '大型枢纽': async (map) => {
+        // null
+    },
+    '水库大坝': async (map) => {
+        !map.getSource('reservoirArea') &&
+            map.addSource('reservoirArea', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/reservoirArea/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('水库大坝') &&
+            map.addLayer({
+                id: '水库大坝',
+                type: 'fill',
+                source: 'reservoirArea',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': '#2B2E76',
+                },
+            })
+    },
+    '水闸工程': async (map) => {
+        !map.getSource('sluiceArea') &&
+            map.addSource('sluiceArea', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/sluiceArea/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('水闸工程') &&
+            map.addLayer({
+                id: '水闸工程',
+                type: 'fill',
+                source: 'sluiceArea',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': '#2B2E76',
+                },
+            })
+    },
+    '泵站工程': async (map) => {
+        !map.getSource('pumpArea') &&
+            map.addSource('pumpArea', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/pumpArea/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('泵站工程') &&
+            map.addLayer({
+                id: '泵站工程',
+                type: 'fill',
+                source: 'pumpArea',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': '#2B2E76',
+                },
+            })
+    },
+    '组合工程': async (map) => {
+        !map.getSource('combineProjectPoint') &&
+            map.addSource('combineProjectPoint', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/combineProjectPoint/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('组合工程') &&
+            map.addLayer({
+                id: '组合工程',
+                type: 'circle',
+                source: 'combineProjectPoint',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'circle-color': 'rgb(79,188,215)',
+                    'circle-blur': 0.5,
+                    'circle-radius': 6,
+                },
+            })
+    },
+
+    ///////////// 重点岸段
+    /// 岸段名录
+    '岸段名录': async (map) => {
+
+    },
+    /// 历史崩岸
+    '历史崩岸': async (map) => {
+
+    },
+    /// 近岸地形
+    '近岸地形': async (map) => {
+        !map.getSource('riverBg') &&
+            map.addSource('riverBg', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('近岸地形') &&
+            map.addLayer({
+                id: '近岸地形',
+                type: 'fill',
+                source: 'riverBg',
+                'source-layer': 'default',
+                paint: {
+                    'fill-color': [
+                        'match',
+                        ['get', 'height'],
+                        0,
+                        '#57a3ea',
+                        5,
+                        '#3c8ee9',
+                        10,
+                        '#2177e9',
+                        15,
+                        '#1361dc',
+                        20,
+                        '#0e4dc5',
+                        25,
+                        '#0a3bad',
+                        30,
+                        '#072c95',
+                        35,
+                        '#041e7c',
+                        40,
+                        '#021363',
+                        45,
+                        '#010a49',
+                        50,
+                        '#00042e',
+                        '#000000'
+                    ],
+                    // 'fill-color': '#3EFA13'
+                },
+            })
+    },
+    /// 近年冲淤
+    '近年冲淤': async (map) => {
+
+    }
+
+
+
+
 }
 
 const layerAddFunction = async (map, layerID) => {
@@ -995,11 +1473,30 @@ const layerRemoveFunction = (map, layerID) => {
             map.setLayoutProperty(layerID, 'visibility', 'none')
             // 删除
             let layer = map.getLayer(layerID)
-            let sourceId = map.getSource(layer.source)
+            // let sourceId = map.getSource(layer.source)
             map.removeLayer(layerID)
-            map.removeSource(sourceId)
+            // map.removeSource(sourceId)
         }
     }
+}
+function convertToGeoJSON(data) {
+    const features = data.map(item => {
+        return {
+            type: 'Feature',
+            properties: {
+                name: item.name
+            },
+            geometry: {
+                type: 'Point',
+                coordinates: [item.center_x, item.center_y]
+            }
+        };
+    });
+
+    return {
+        type: 'FeatureCollection',
+        features: features
+    };
 }
 
 export {

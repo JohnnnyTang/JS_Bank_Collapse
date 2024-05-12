@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { Scene } from '../components/dataVisual/Scene'
-import { NewScene } from '../components/dataVisual/js/scene'
 
 const useMapStore = defineStore('mapStore', () => {
     const map = ref(null)
@@ -62,12 +61,10 @@ const useLayerStore = defineStore('layerStore', () => {
 
 
 
-
-const sMap = NewScene.getInitSceneMap()
 const useNewSceneStore = defineStore('newSceneStore', () => {
-    const sceneMap = ref(sMap)
-    const nowScene = ref()
-    return {sceneMap, nowScene}
+    const SCENEMAP = ref({})
+    const LAYERGROUPMAP = ref({})
+    return { SCENEMAP, LAYERGROUPMAP }
 })
 
 const totalLayer = [

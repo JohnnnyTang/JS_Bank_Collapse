@@ -3,7 +3,7 @@
         <div class="sideBar-container">
             <dv-decoration-11 style="width:75%;height: 7vh;">
                 <div class="title-text">
-                    综合信息专题
+                    综合数据专题
                 </div>
             </dv-decoration-11>
             <hr class="hr_gradient">
@@ -12,13 +12,10 @@
                 <el-tree style="max-width: 600px" :data="dataSource" node-key="id" default-expand-all
                     :expand-on-click-node="false">
                     <template #default="{ node, data }">
-                        <span class="custom-tree-node" @click="look(node, data)">
+                        <span class="custom-tree-node" @click="treeNodeClickHandler(node, data)">
                             <sceneContainer v-if="node.level == 1" :title="data.label"></sceneContainer>
-                            <subSceneContainer v-else-if="node.level == 2" 
-                            :title="data.label" 
-                            :icon-src="data.icon"
-                            :class="{ active: data.active }"
-                            >
+                            <subSceneContainer v-else-if="node.level == 2" :title="data.label" :icon-src="data.icon"
+                                :class="{ active: data.active }">
                             </subSceneContainer>
                         </span>
                     </template>
@@ -34,53 +31,87 @@ import { BorderBox9 as DvBorderBox9, Decoration11 as DvDecoration11 } from '@kjg
 import { onMounted, ref } from 'vue';
 import subSceneContainer from '../common/subSceneContainer.vue';
 import sceneContainer from '../common/sceneContainer.vue'
-import { NewScene } from '../js/scene.js'
+import { tree, scenes, layerGroups } from '../js/SCENES'
+import { useMapStore, useNewSceneStore } from '../../../store/mapStore';
 
-const dataSource = ref(NewScene.getSceneTree())
-// const dataSource = ref([
-//     {
-//         label: 'Level one 1',
-//         children: [
-//             {
-//                 label: 'Level two 1-1',
-//             },
-//         ],
-//     },
-//     {
-//         label: 'Level one 2',
-//         children: [
-//             {
-//                 label: 'Level two 2-1',
-//             },
-//             {
-//                 label: 'Level two 2-2',
-//             },
-//         ],
-//     },
-//     {
-//         label: 'Level one 3',
-//         children: [
-//             {
-//                 label: 'Level two 3-1',
-//             },
-//             {
-//                 label: 'Level two 3-2',
-//             },
-//         ],
-//     },
-// ])
+const dataSource = ref(tree)
+const mapStore = useMapStore()
+const sceneStore = useNewSceneStore()
+const sceneDict = {
+    '全江概貌': 0,
+    '涉水工程': 1,
+    '重点岸段': 2,
+}
 
 
+const treeNodeClickHandler = (node, data) => {
+    // console.log(node);
 
-
-const look = (node, data) => {
-    console.log(node, data);
-    if(data.active){
+    if (data.active) {
         data.active = false
+        //移除
+        let map = mapStore.getMap()
+        if (node.level == 2) { // layerGroup 级别
+            let selectedLayerGroupID = data.label
+            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
+            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].hideLayer()
+            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = false
+
+        } else if (node.level == 1) {
+            let selectedSceneID = data.label
+            sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
+            sceneStore.SCENEMAP.value[selectedSceneID].hideScene()
+            sceneStore.SCENEMAP.value[selectedSceneID].active = false
+            for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+                dataSource.value[sceneDict[selectedSceneID]].children[i].active = false
+            }
+        }
         return
     }
-    data.active = true
+    else {
+        data.active = true
+        // 添加
+        let map = mapStore.getMap()
+        if (node.level == 2) { // layerGroup 级别
+            let selectedLayerGroupID = data.label
+            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
+            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
+            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
+
+        } else if (node.level == 1) {
+            let selectedSceneID = data.label
+            sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
+            sceneStore.SCENEMAP.value[selectedSceneID].showScene()
+            sceneStore.SCENEMAP.value[selectedSceneID].active = true
+            for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+                dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
+            }
+        }
+    }
+
+
+
 }
+
+onMounted(async () => {
+    // sceneStore.SCENEMAP.value = scenes
+    // sceneStore.LAYERGROUPMAP.value = layerGroups
+
+    setTimeout(() => {
+        // wait for map init
+        let mapInstance = mapStore.getMap()
+        let selectedSceneID = '全江概貌'
+        sceneStore.SCENEMAP.value[selectedSceneID].setMap(mapInstance)
+        sceneStore.SCENEMAP.value[selectedSceneID].showScene()
+        sceneStore.SCENEMAP.value[selectedSceneID].active = true
+        for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+            dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
+        }
+    }, 2000)
+
+
+})
+
 
 </script>
 

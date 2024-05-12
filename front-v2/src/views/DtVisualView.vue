@@ -38,14 +38,15 @@ import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
 import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
 import { initScratchMap } from '../utils/mapUtils';
-import { useMapStore } from '../store/mapStore';
-import { layerAddFunctionMap } from '../components/dataVisual/layerUtil';
+import { useMapStore, useNewSceneStore } from '../store/mapStore';
+import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
 import axios from 'axios';
 
 
 // data
 const mapContainer = ref()
 const mapStore = useMapStore()
+const sceneStore = useNewSceneStore()
 const activeStatus = ref([false, false, false])
 const styles = [
     { backgroundImage: `url('/icons/searching.png')` },
@@ -53,6 +54,7 @@ const styles = [
     { backgroundImage: `url('/icons/legend.png')` },
     { backgroundImage: `url('/icons/full.png')` },
 ]
+
 
 
 // methods
@@ -88,6 +90,15 @@ onMounted(async () => {
     mapInstance.addControl(new mapboxgl.ScaleControl({ maxWidth: 150 }), 'bottom-left');
     mapFlyToRiver(mapInstance)
 
+    sceneStore.SCENEMAP.value = scenes
+    sceneStore.LAYERGROUPMAP.value = layerGroups
+
+    activeStatus.value[0] = true
+
+
+
+
+
     //#region test
     // feature get test
     // await layerAddFunctionMap['地形瓦片'](mapInstance)//mvt polygon
@@ -120,13 +131,14 @@ onMounted(async () => {
     // })
     //#endregion
 
-    addNewLayer(mapInstance)
+    // addNewLayer(mapInstance)
 
 
 })
 
-
+//////////// DEBUG FUNCTIONS
 const tempFunction = async (mapInstance, layerName) => {
+    // 获取要素数组的函数
     let properties = []
 
     let layer = mapInstance.getLayer(layerName)
@@ -149,6 +161,7 @@ const tempFunction = async (mapInstance, layerName) => {
     console.log(properties);
 }
 const addNewLayer = async (mapInstance) => {
+    // 测试瓦片图层
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
     let map = mapInstance
@@ -175,89 +188,51 @@ const addNewLayer = async (mapInstance) => {
         },
     })
 
-    // map.addLayer({
-    //     id: '市级行政区',
-    //     // type: 'fill',
-    //     type: 'line',
-    //     source: 'cityBoundary',
-    //     'source-layer': 'default',
-    //     layout: {
-
-    //     },
-    //     paint: {
-    //         'line-color': '#0A215C',
-    //         'line-width': 1.5,
-    //         'line-opacity': 0.5
-    //     },
-    // })
-
-    // let data = (await axios.get(`http://localhost:5173/api/tile/vector/cityBoundary/info`)).data
-    // let pointgeoJson = convertToGeoJSON(data)
-    // map.addSource('District-point', {
-    //     type: 'geojson',
-    //     data: pointgeoJson
-    // })
-    // map.addLayer({
-    //     id: '市级行政区-注记',
-    //     type: 'symbol',
-    //     source: 'District-point',
-    //     layout: {
-    //         'text-field': ['get', 'name'],
-    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-    //         'text-anchor': 'center',
-    //         'text-offset': ['match', ['get', 'name'], '无锡市', [7, 0], '常州市', [5, 0], [0, 0]],
-    //     },
-    //     paint: {
-    //         'text-color': 'rgb(28,13,106)',
-    //     },
-    // })
-
-
 
 
     //////////////2 河道分段
-    // map.addSource('riverSection', {
-    //     type: 'vector',
-    //     tiles: [
-    //         tileServer + '/tile/vector/riverSection/{x}/{y}/{z}',
-    //     ],
-    // })
-    // map.addLayer({
-    //     id: '河道分段',
-    //     type: 'line',
-    //     source: 'riverSection',
-    //     'source-layer': 'default',
-    //     layout: {
-    //         'line-cap': 'round',
-    //         'line-join': 'round',
-    //     },
-    //     paint: {
-    //         'line-opacity': 1,
-    //         'line-color': 'rgba(231, 214, 86, 0.9)',
-    //         'line-width': 4,
-    //     },
-    // })
-    // map.addSource('riverName', {
-    //     type: 'vector',
-    //     tiles: [
-    //         tileServer + '/tile/vector/riverName/{x}/{y}/{z}',
-    //     ],
-    // })
-    // map.addLayer({
-    //     id: '河段注记',
-    //     type: 'symbol',
-    //     source: 'riverName',
-    //     'source-layer': 'default',
-    //     layout: {
-    //         'text-field': ['get', 'label'],
-    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-    //         // 'text-offset': [0, 1.25],
-    //         'text-anchor': 'left',
-    //     },
-    //     paint: {
-    //         'text-color': '#FC7C49',
-    //     },
-    // })
+    map.addSource('riverSection', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/riverSection/{x}/{y}/{z}',
+        ],
+    })
+    map.addLayer({
+        id: '河道分段',
+        type: 'line',
+        source: 'riverSection',
+        'source-layer': 'default',
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+        },
+        paint: {
+            'line-opacity': 1,
+            'line-color': 'rgba(231, 214, 86, 0.9)',
+            'line-width': 4,
+        },
+    })
+    map.addSource('riverName', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/riverName/{x}/{y}/{z}',
+        ],
+    })
+    map.addLayer({
+        id: '河段注记',
+        type: 'symbol',
+        source: 'riverName',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'left',
+        },
+        paint: {
+            'text-color': '#FC7C49',
+        },
+    })
 
     /////// 3、流域水系
     // map.addSource('riverArea', {
@@ -358,8 +333,72 @@ const addNewLayer = async (mapInstance) => {
     // })
     // console.log((await axios.get(`http://localhost:5173/api/tile/vector/embankmentLine/info`)).data);
 
-    // 2、过江通道
+    // 2、过江通道 /data/bankLine
+    // console.log((await axios.get(`http://localhost:5173/api/data/channel`)).data);
 
+    // map.addSource('riverPassageLine', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '过江通道-线',
+    //     type: 'line',
+    //     source: 'riverPassageLine',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'line-cap': 'round',
+    //         'line-join': 'round',
+    //     },
+    //     paint: {
+    //         'line-opacity': 1,
+    //         'line-color': '#FFD8B0',
+    //         'line-width': 2.0,
+    //     },
+    // })
+
+    // map.addSource('riverPassagePier', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverPassagePier/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '过江通道-桥墩',
+    //     type: 'fill-extrusion',
+    //     source: 'riverPassagePier',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-extrusion-color': '#E0D2C4',
+    //         'fill-extrusion-base': 0,
+    //         'fill-extrusion-height': 200,
+    //         'fill-extrusion-opacity': 0.5
+    //     },
+    // })
+
+    // map.addSource('riverPassagePolygon', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverPassagePolygon/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '过江通道-桥面',
+    //     type: 'fill-extrusion',
+    //     source: 'riverPassagePolygon',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-extrusion-color': '#BBAD9F',
+    //         'fill-extrusion-base': 200,
+    //         'fill-extrusion-height': 230,
+    //         'fill-extrusion-opacity': 0.7
+    //     },
+    // })
 
 
     // 3、沿江码头
@@ -473,11 +512,11 @@ const addNewLayer = async (mapInstance) => {
 
     ////////////////// 重点岸段
     // 1、岸段名录
-    let bankTable = (await axios.get(`http://localhost:5173/api/tile/vector/importantBank/info`)).data
-    console.log('岸段名录', bankTable);
+    // let bankTable = (await axios.get(`http://localhost:5173/api/tile/vector/importantBank/info`)).data
+    // console.log('岸段名录', bankTable);
     // 2、历史崩岸
-    let bankHistory = (await axios.get(`http://localhost:5173/api/data/historyInfo/desc/sort`)).data
-    console.log('历史崩岸', bankHistory);
+    // let bankHistory = (await axios.get(`http://localhost:5173/api/data/historyInfo/desc/sort`)).data
+    // console.log('历史崩岸', bankHistory);
     // 3、近岸地形
 
     // map.addSource('riverBg', {
@@ -523,24 +562,24 @@ const addNewLayer = async (mapInstance) => {
     //     },
     // })
 
-    map.addSource('mzs2022Before', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzs2022Before/{x}/{y}/{z}',
-        ],
-    })
-    map.addLayer({
-        id: '民主沙近岸地形',
-        type: 'fill',
-        source: 'mzs2022Before',
-        'source-layer': 'default',
-        layout: {
-        },
-        paint: {
-            'fill-color': '#2B2E76',
-        },
-    })
-    console.log((await axios.get(`http://localhost:5173/api/tile/vector/mzs2022Before/info`)).data);
+    // map.addSource('mzs2022Before', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzs2022Before/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '民主沙近岸地形',
+    //     type: 'fill',
+    //     source: 'mzs2022Before',
+    //     'source-layer': 'default',
+    //     layout: {
+    //     },
+    //     paint: {
+    //         'fill-color': '#2B2E76',
+    //     },
+    // })
+    // console.log((await axios.get(`http://localhost:5173/api/tile/vector/mzs2022Before/info`)).data);
 
 
 
@@ -593,6 +632,7 @@ function convertToGeoJSON(data) {
     };
 }
 function featureHighlight(layer, nameField, name, map) {
+    // 要素高亮函数
     map.on('click', ['水库工程'], (e) => {
         console.log(e.features[0].properties);
         let sp_name = e.features[0].properties['sp_name']
