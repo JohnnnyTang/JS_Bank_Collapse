@@ -34,7 +34,7 @@
                     ref="eleDropDownDomRef"
                     v-if="index == 4 || index == 1"
                     trigger="click"
-                    popper-class="nav-popper"
+                    :popper-class="['nav-popper', {'center': (index == 4)}]"
                 >
                     <div
                         style="
@@ -54,9 +54,42 @@
                             >
                         </el-dropdown-menu>
                         <el-dropdown-menu v-if="index == 1">
-                            <el-dropdown-item @click="navToWarnPage"
-                                >民主沙右缘示范段</el-dropdown-item
-                            >
+                            <el-dropdown-item @click="navToWarnPage">
+                                <span
+                                    style="float: left"
+                                    class="left"
+                                    >民主沙右缘</span
+                                >
+                                <span
+                                    style="float: right"
+                                    class="right level-one"
+                                    >一级预警岸段</span
+                                >
+                            </el-dropdown-item>
+                            <el-dropdown-item @click="navToWarnPage" disabled>
+                                <span
+                                    style="float: left"
+                                    class="left"
+                                    >太平洲左缘</span
+                                >
+                                <span
+                                    style="float: right"
+                                    class="right level-one"
+                                    >一级预警岸段</span
+                                >
+                            </el-dropdown-item>
+                            <el-dropdown-item @click="navToWarnPage" disabled>
+                                <span
+                                    style="float: left"
+                                    class="left"
+                                    >丰乐桥</span
+                                >
+                                <span
+                                    style="float: right"
+                                    class="right level-two"
+                                    >二级预警岸段</span
+                                >
+                            </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
@@ -201,10 +234,13 @@ const focusOnNavItem = (navIndex) => {
 }
 
 const emitNavClick = async (navIndex) => {
-    if (navIndex == 4 || navIndex == 1) {
+    if (navIndex == 4) {
         // console.log(1)
+        eleDropDownDomRef.value[1].handleOpen()
+    } else if(navIndex == 1) {
         eleDropDownDomRef.value[0].handleOpen()
-    } else if (navIndex != previousActive) {
+    }
+    else if (navIndex != previousActive) {
         router.push(navList.value[navIndex].routerLink)
         navList.value[previousActive].isActive = false
         navList.value[navIndex].isActive = true
