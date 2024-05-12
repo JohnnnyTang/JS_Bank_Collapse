@@ -186,7 +186,7 @@ div.realtime-risk-container {
         // border-style: solid;
         border-bottom: inset 2px #173eaa;
 
-        background-color: rgba(193, 211, 255, 1);
+        background-color: rgba(0, 61, 192, 1);
 
         div.realtime-risk-icon {
             height: 4vh;
@@ -202,11 +202,11 @@ div.realtime-risk-container {
             text-align: center;
             font-size: calc(1vw + 0.3vh);
             font-weight: 600;
-            color: #002ba0;
+            color: #e3f4ff;
             text-shadow:
-                #e3f4ff 1px 1px,
-                #e3f4ff 2px 2px;
-                // #e3f4ff 3px 3px;
+                #173eaa 1px 1px,
+                #173eaa 2px 2px,
+                #173eaa 3px 3px;
         }
     }
 

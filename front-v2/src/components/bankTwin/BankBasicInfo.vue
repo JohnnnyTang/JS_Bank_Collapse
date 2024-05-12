@@ -41,7 +41,7 @@ div.basic-info-container {
     z-index: 3;
     left: 1vw;
     top: 3vh;
-    width: 20vw;
+    width: 24vw;
     height: 20vh;
 
     // background-color: aliceblue;
@@ -110,13 +110,13 @@ div.basic-info-container {
                 width: fit-content;
                 line-height: 5vh;
                 background-color: transparent;
-                font-size: calc(0.7vw + 0.4vh);
+                font-size: calc(0.7vw + 0.6vh);
                 color: #0043fd;
             }
 
             div.val-text {
                 line-height: 5vh;
-                font-size: calc(0.7vw + 0.4vh);
+                font-size: calc(0.7vw + 0.5vh);
                 font-weight: bold;
                 color: #1d00be;
                 // text-align: center;

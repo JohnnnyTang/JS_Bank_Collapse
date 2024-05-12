@@ -34,7 +34,7 @@
                     ref="eleDropDownDomRef"
                     v-if="index == 4 || index == 1"
                     trigger="click"
-                    :popper-class="['nav-popper', {'center': (index == 4)}]"
+                    :popper-class="(index == 4)?'nav-popper center':'nav-popper'"
                 >
                     <div
                         style="

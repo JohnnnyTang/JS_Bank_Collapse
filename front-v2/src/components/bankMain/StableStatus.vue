@@ -449,7 +449,7 @@ div.stable-status-conatainer {
         border-bottom: inset 2px #2761e0;
 
         // background-color: rgb(175, 255, 248);
-        background-color: rgb(194, 213, 255);
+        background-color: rgba(0, 61, 192, 1);
 
         div.stable-status-icon {
             height: 4vh;
@@ -465,11 +465,11 @@ div.stable-status-conatainer {
             text-align: center;
             font-size: calc(1vw + 0.3vh);
             font-weight: 600;
-            color: #002486;
+            color: #e3f4ff;
             text-shadow:
-                #e3f4ff 1px 1px,
-                #e3f4ff 2px 2px,
-                #e3f4ff 3px 3px;
+                #173eaa 1px 1px,
+                #173eaa 2px 2px,
+                #173eaa 3px 3px;
         }
     }
 
