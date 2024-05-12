@@ -100,7 +100,7 @@
                 >
                     <path
                         d="M21 8H11V5a1 1 0 0 0-1.707-.707l-7 7a1 1 0 0 0 0 1.414l7 7A1 1 0 0 0 11 19v-3h10a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1z"
-                        style="fill: #fff"
+                        style="fill: rgb(175, 255, 248)"
                         preserveAspectRatio="none"
                         shape-rendering="auto"
                     />
@@ -117,7 +117,7 @@
                 >
                     <path
                         d="M21 8H11V5a1 1 0 0 0-1.707-.707l-7 7a1 1 0 0 0 0 1.414l7 7A1 1 0 0 0 11 19v-3h10a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1z"
-                        style="fill: #fff"
+                        style="fill: rgb(175, 255, 248)"
                         preserveAspectRatio="none"
                         shape-rendering="auto"
                     />
@@ -134,7 +134,7 @@
                 >
                     <path
                         d="M21 8H11V5a1 1 0 0 0-1.707-.707l-7 7a1 1 0 0 0 0 1.414l7 7A1 1 0 0 0 11 19v-3h10a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1z"
-                        style="fill: #fff"
+                        style="fill: rgb(175, 255, 248)"
                         preserveAspectRatio="none"
                         shape-rendering="auto"
                     />
@@ -424,7 +424,7 @@ div.stable-status-conatainer {
     right: 1vw;
     width: 20vw;
     height: 36vh;
-    border-radius: 0.6rem;
+    border-radius: 0.2rem;
     overflow: hidden;
 
     background-color: rgba(54, 100, 226, 0.4);
@@ -434,7 +434,7 @@ div.stable-status-conatainer {
     flex-flow: row wrap;
     justify-content: space-around;
 
-    border: solid 3px #d3fff9;
+    border: solid 3px #2761e0;
 
     div.stable-status-title {
         width: 20vw;
@@ -446,9 +446,10 @@ div.stable-status-conatainer {
         column-gap: 0.4vw;
 
         // border-style: solid;
-        border-bottom: inset 2px #daf1ff;
+        border-bottom: inset 2px #2761e0;
 
-        background-color: rgba(215, 228, 255, 0.6);
+        // background-color: rgb(175, 255, 248);
+        background-color: rgb(194, 213, 255);
 
         div.stable-status-icon {
             height: 4vh;
@@ -464,7 +465,7 @@ div.stable-status-conatainer {
             text-align: center;
             font-size: calc(1vw + 0.3vh);
             font-weight: 600;
-            color: #173eaa;
+            color: #002486;
             text-shadow:
                 #e3f4ff 1px 1px,
                 #e3f4ff 2px 2px,
@@ -476,11 +477,12 @@ div.stable-status-conatainer {
         width: 9.6vw;
         height: 14vh;
 
-        border-radius: 1rem;
+        border-radius: 0.4rem;
 
         background-color: rgba(234, 241, 255, 0.8);
 
         transition: all 2s ease-in-out;
+        border: 2px solid #3d5bdf;
 
         &[id='status-item-1'] {
             div.status-small-item {
@@ -536,7 +538,8 @@ div.stable-status-conatainer {
             width: 4.5vw;
             line-height: 6.5vh;
             height: 6.7vh;
-            border-radius: 1rem;
+            border-radius: 0.2rem;
+            box-shadow: 0 0 0 1px rgb(5, 25, 206);
 
             background-color: #0cb444;
             // display: inline-block;

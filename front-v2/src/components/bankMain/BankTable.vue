@@ -97,11 +97,11 @@ div.bank-table-container {
     width: 20vw;
     height: 44vh;
 
-    background-color: rgba(54, 100, 226, 0.4);
+    background-color: rgba(0, 61, 192, 1);
     backdrop-filter: blur(5px);
 
     border: solid 3px #0064e7;
-    border-radius: 0.6rem;
+    border-radius: 0.2rem;
     overflow: hidden;
 
     div.bank-table-title {
@@ -116,7 +116,7 @@ div.bank-table-container {
         // border-style: solid;
         border-bottom: inset 2px #0064e7;
 
-        background-color: rgba(43, 106, 243, 0.6);
+        background-color: rgba(0, 61, 192, 1);
 
         div.bank-table-icon {
             height: 4vh;
@@ -193,7 +193,7 @@ div.bank-table-container {
 
     &.odd-state {
         color: rgba(230, 243, 255, 0.9);
-        background: hsl(214, 97%, 57%);
+        background: rgb(45, 87, 177);
         font-weight: 600;
     }
 }
@@ -205,7 +205,7 @@ div.bank-table-container {
 :deep(.el-table tbody tr:nth-child(2n + 1)) {
     &.even-state {
         color: rgba(230, 243, 255, 0.9);
-        background: hsl(214, 97%, 57%);
+        background: rgb(45, 87, 177);
         font-weight: 600;
     }
 
