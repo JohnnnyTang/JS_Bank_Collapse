@@ -29,4 +29,7 @@ public class StressPileData extends MonitorData {
     private Double topChange;
     private Double middleChange;
     private Double bottomChange;
+    private Double topChangeAvg;
+    private Double middleChangeAvg;
+    private Double bottomChangeAvg;
 }

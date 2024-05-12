@@ -27,3 +27,7 @@ springfox:
     swagger-ui:
       enabled: true
 
+tile:
+  worldTilePath: E:/Data/2020-10-planet-14
+  nodeServicePath: E:/Data/node/index.js
+
