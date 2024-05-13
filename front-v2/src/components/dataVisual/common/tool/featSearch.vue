@@ -35,7 +35,7 @@
                 <div class="feature-desc">
                     <div class="text">共有要素 {{ featureCount }} 条</div>
                 </div>
-                <el-tree ref="treeRef" style="max-width: 15.5vw" :data="data" :props="defaultProps" default-expand-all
+                <el-tree ref="treeRef" style="max-width: 16.2vw" :data="data" :props="defaultProps" default-expand-all
                     :filter-node-method="filterNode">
 
                     <template #default="{ node, data }">
@@ -55,7 +55,7 @@
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
 import { Decoration7 } from '@kjgl77/datav-vue3'
-import { ElTree } from 'element-plus';
+import { ElTree, ElMessage } from 'element-plus';
 import { useMapStore, useNewSceneStore } from '../../../../store/mapStore';
 import axios from 'axios';
 import { sourceNameMap, sourceZoomMap, sourceColumnMap } from '../../js/tilefieldMAP'
@@ -134,7 +134,7 @@ const updateLgroupTags = (sceneName) => {
 
 
 const LGroupsTagClickHandler = async (i) => {
-    setTimeout(async() => {
+    setTimeout(async () => {
         LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
         if (LGroupsTagChecked.value[i]) {
             await appednTreeData()
@@ -142,7 +142,7 @@ const LGroupsTagClickHandler = async (i) => {
             deleteTreeData()
         }
         updateFeatureCount()
-    },500)
+    }, 500)
 }
 
 const appednTreeData = async () => {
@@ -173,6 +173,11 @@ const appednTreeData = async () => {
         let layerid = layers[i]
         if (!map.getLayer(layerid)) {
             console.log('图层不存在', layerid);
+            ElMessage({
+                message: '图层尚未加载，请先加载相应专题数据',
+                type: 'warning',
+            })
+
             continue
         }
         console.log('图层存在', layerid);

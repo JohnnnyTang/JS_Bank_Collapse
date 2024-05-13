@@ -272,9 +272,10 @@ const legendMap = {
         },
         {
             style: {
-                'height': '30%',
-                'width':'20%',
-                'background-color': '#529b2e',
+                'height': '80%',
+                'width':'50%',
+                'transform': 'translateX(22%)',
+                'background-image': `url('/icons/zuhegongcheng.png')`,
             },
             text: '组合工程'
         },
