@@ -139,7 +139,7 @@ div.twin-main-container {
         right: 0;
         top: 2vh;
 
-        width: 6vh;
+        width: 16vh;
         height: 6vh;
         background-color: rgb(0, 42, 105);
         transition: all 0.4s cubic-bezier(0.68, -0.15, 0.265, 1.15);
@@ -152,7 +152,6 @@ div.twin-main-container {
         z-index: 3;
 
         &:hover {
-            width: 16vh;
             cursor: pointer;
         }
 
@@ -192,7 +191,7 @@ div.twin-main-container {
     div.visual-tab-container {
         position: absolute;
         top: 2vh;
-        right: 18vh;
+        right: 19vh;
 
         width: 10vw;
         height: 6vh;

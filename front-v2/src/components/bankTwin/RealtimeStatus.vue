@@ -1,6 +1,6 @@
 <template>
     <div class="device-info-container">
-        <dv-border-box8
+        <dv-border-box12
             :dur="5"
             :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']"
         >
@@ -54,7 +54,37 @@
                         </div>
                     </dv-border-box12>
                 </div>
-
+                <div class="section-selectior-item">
+                    <el-select
+                        v-model="selectedDevice"
+                        placeholder="全部设备"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="deviceSelectChange"
+                    >
+                        <el-option
+                            v-for="item in deviceList"
+                            :key="item.label"
+                            :label="
+                                item.label == '全部设备'
+                                    ? item.label
+                                    : item.label
+                            "
+                            :value="item.label"
+                        >
+                            <span
+                                style="float: left"
+                                class="section-name-text"
+                                >{{ item.label }}</span
+                            >
+                            <span
+                                style="float: right"
+                                class="section-class-text"
+                                :id="sectionClassColorMap[item.value]"
+                                >{{ item.value }}</span
+                            >
+                        </el-option>
+                    </el-select>
+                </div>
                 <div class="device-chart-container">
                     <dv-border-box10
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
@@ -62,44 +92,106 @@
                     </dv-border-box10>
                 </div>
             </div>
-        </dv-border-box8>
+        </dv-border-box12>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3'
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
-import { deviceStatusData } from './data'
 import * as echarts from 'echarts'
 
 const deviceStatusDataList = ref([
-    { name: 'GNSS', count: 13, percent: '100%' },
+    { name: '位移测量站', count: 13, percent: '100%' },
     { name: '测斜仪', count: 9, percent: '100%' },
     { name: '孔隙水压力计', count: 9, percent: '100%' },
     { name: '应力桩', count: 7, percent: '100%' },
     { name: '视频监控', count: 3, percent: '100%' },
 ])
 
+const selectedDevice = ref('全部设备')
 
-onMounted(() => {
+const sectionClassColorMap = ref({
+    警告: 'warning',
+    预警: 'pre-warning',
+    关注: 'attention',
+    普通: 'normal',
+    统计: 'all',
 })
+
+const deviceList = ref([
+    {
+        value: '统计',
+        label: '全部设备统计',
+    },
+    {
+        value: '关注',
+        label: 'CL-01',
+    },
+    {
+        value: '关注',
+        label: 'CL-02',
+    },
+    {
+        value: '关注',
+        label: 'CL-03',
+    },
+    {
+        value: '关注',
+        label: 'CL-04',
+    },
+    {
+        value: '预警',
+        label: 'CL-05',
+    },
+    {
+        value: '预警',
+        label: 'CL-06',
+    },
+    {
+        value: '警告',
+        label: 'CL-07',
+    },
+    {
+        value: '警告',
+        label: 'CL-08',
+    },
+    {
+        value: '警告',
+        label: 'CL-09',
+    },
+    {
+        value: '警告',
+        label: 'CL-10',
+    },
+])
+
+const deviceSelectChange = () => {}
+
+onMounted(() => {})
 </script>
 
 <style lang="scss" scoped>
+$shadowWhite: #b3b3b3;
+$shadowGreen: #00ca22;
+$shadowBlue: #005ae0;
+$shadowOrange: #c54f00;
+$shadowRed: #cf0000;
+
+
 div.device-info-container {
     z-index: 3;
     box-shadow: 4px 8px 8px -4px rgb(0, 86, 199);
 
     position: absolute;
     left: 1vw;
-    top: 33vh;
-    width: 20vw;
-    height: 56vh;
+    top: 25vh;
+    width: 24vw;
+    height: 66vh;
 
     div.device-info-content {
-        width: 19vw;
+        width: 23vw;
         margin-left: 0.5vw;
         margin-right: 0.5vw;
         height: 55vh;
@@ -232,10 +324,56 @@ div.device-info-container {
             // background-color: #2622fd;
         }
 
+        div.section-selectior-item {
+            width: 10vw;
+            height: 3.3vh;
+
+            line-height: 3.3vh;
+            text-align: center;
+
+            // background-color: #eef3ff;
+            :deep(.el-select) {
+                height: 3.3vh;
+                box-shadow:
+                    rgba(0, 132, 255, 0.8) 1px 1px,
+                    rgba(0, 119, 255, 0.7) 2px 2px,
+                    rgba(0, 119, 255, 0.6) 3px 4px;
+                border-radius: 6px;
+            }
+
+            :deep(.el-select__wrapper) {
+                height: 3.3vh;
+                line-height: 3.3vh;
+                border-radius: 6px;
+                font-family: 'Microsoft YaHei';
+                font-weight: bold;
+                font-size: calc(0.5vw + 0.6vh);
+                background-color: #e6f7ff;
+            }
+
+            :deep(.el-select__placeholder) {
+                color: #738ab6;
+            }
+
+            :deep(.el-icon) {
+                width: 0.5vw;
+                height: 0.5vw;
+
+                svg {
+                    width: 0.5vw;
+                    height: 0.5vw;
+
+                    path {
+                        fill: #001cb8;
+                    }
+                }
+            }
+        }
+
         div.device-chart-container {
             width: 95%;
             margin-left: 2.5%;
-            height: 23vh;
+            height: 24vh;
             margin-top: 1vh;
             border-radius: 10px;
             overflow: hidden;
@@ -265,8 +403,33 @@ div.device-info-container {
     backdrop-filter: blur(8px);
 }
 
-:deep(.dv-border-box-10) {
-    background-color: rgba(255, 255, 255, 0.63);
+:deep(.dv-border-box-12) {
+    background-color: rgba(156, 195, 255, 0.4);
     backdrop-filter: blur(8px);
+    border-radius: 6px;
+}
+
+:deep(.section-name-text) {
+    font-weight: bold;
+    font-size: calc(0.4vw + 0.4vh);
+}
+
+:deep(.section-class-text) {
+    font-size: calc(0.4vw + 0.4vh);
+    &[id='warning'] {
+        color: $shadowRed;
+    }
+    &[id='pre-warning'] {
+        color: $shadowOrange;
+    }
+    &[id='attention'] {
+        color: $shadowBlue;
+    }
+    &[id='normal'] {
+        color: $shadowGreen;
+    }
+    &[id='all'] {
+        color: #3d00ad;
+    }
 }
 </style>

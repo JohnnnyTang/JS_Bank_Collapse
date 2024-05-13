@@ -27,7 +27,7 @@ body,
 }
 .nav-popper {
     .el-scrollbar__wrap {
-        width: 7vw;
+        width: 14vw;
         text-align: center;
         position: relative;
         z-index: 9999;
@@ -42,11 +42,39 @@ body,
         li {
             // width: 10vw;
             text-align: center;
-            line-height: 2.6vh;
-            justify-content: center;
-            font-size: calc(0.4vw + 0.6vh);
+            line-height: 4vh;
+            justify-content: space-between;
+            font-size: calc(0.6vw + 0.6vh);
+            font-weight: bold;
             color: aliceblue;
             border-bottom: 1px solid white;
+
+            span.right {
+                font-size: calc(0.4vw + 0.6vh);
+            }
+
+            &.is-disabled {
+                background-color: rgb(87, 103, 128);
+                color: rgb(196, 203, 209);
+                filter: grayscale(0.5);
+            }
+
+            span.level-one {
+                color: rgb(255, 98, 98);
+            }
+
+            span.level-two {
+                color: rgb(230, 247, 137);
+            }
+        }
+    }
+    &.center {
+        .el-scrollbar__wrap {
+            width: 12vw;
+        }
+        li {
+            justify-content: center;
+            font-size: calc(0.8vw + 0.6vh);
         }
     }
 }

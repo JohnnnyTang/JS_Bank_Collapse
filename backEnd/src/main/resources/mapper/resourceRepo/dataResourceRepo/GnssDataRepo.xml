@@ -12,9 +12,15 @@
         <result property="xMove" column="x_move"/>
         <result property="yMove" column="y_move"/>
         <result property="zMove" column="z_move"/>
+        <result property="movingAvg" column="avg"/>
     </resultMap>
     <select id="findAll" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record;
+        select *,
+               round(avg(threed) OVER(ORDER BY measure_time
+                   ROWS BETWEEN 59 PRECEDING AND CURRENT ROW ), 2)
+                   as avg
+        from gnss_record
+        order by measure_time DESC;
     </select>
 
     <select id="getTotalCount" resultType="integer">
@@ -30,11 +36,23 @@
     </select>
 
     <select id="findByStationCode" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE station_id = #{stationCode};
+        select *,
+               round(avg(threed) OVER(ORDER BY measure_time
+                   ROWS BETWEEN 59 PRECEDING AND CURRENT ROW ), 2)
+                   as avg
+        from gnss_record
+        WHERE station_id = #{stationCode}
+        order by measure_time DESC;
     </select>
 
     <select id="findByDeviceCode" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE machine_id_nnu = #{deviceCode};
+        select *,
+               round(avg(threed) OVER(ORDER BY measure_time
+                   ROWS BETWEEN 59 PRECEDING AND CURRENT ROW ), 2)
+                   as avg
+        from gnss_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC;
     </select>
 
 <!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
@@ -42,27 +60,59 @@
 <!--    </select>-->
 
     <select id="findNewestData" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record ORDER BY measure_time DESC LIMIT 1;
+        select *,
+               round(avg(threed) OVER(ORDER BY measure_time
+                   ROWS BETWEEN 59 PRECEDING AND CURRENT ROW ), 2)
+                   as avg
+        from gnss_record
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findNewestDataInStation" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+        select *,
+               round(avg(threed) OVER(ORDER BY measure_time
+                   ROWS BETWEEN 59 PRECEDING AND CURRENT ROW ), 2)
+                   as avg
+        from gnss_record
+        WHERE station_id = #{stationCode}
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findNewestDataOfDevice" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+        select *,round(avg(threed) OVER(
+            ORDER BY measure_time
+            ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
+            ), 2) as avg
+        from gnss_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findDataByTime" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time ASC;
+        select *,round(avg(threed) OVER(
+            ORDER BY measure_time
+            ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
+            ), 2) as avg
+        from gnss_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime};
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
+        select *,round(avg(threed) OVER(
+            ORDER BY measure_time
+            ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
+            ), 2) as avg
+        from gnss_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode};
     </select>
 
     <select id="findDataByTimeInStation" resultMap="gnssDataMap">
-        SELECT * FROM gnss_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
+        select *,round(avg(threed) OVER(
+            ORDER BY measure_time
+            ROWS BETWEEN 59 PRECEDING AND CURRENT ROW
+            ), 2) as avg
+        from gnss_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode};
     </select>
 
     <select id="ifContinueUpdateOfDevice" resultType="boolean">

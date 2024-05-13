@@ -16,7 +16,7 @@ spring:
       url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
-      password: 123
+      password: 123456
 mybatis:
   mapper-locations: classpath:mapper/resourceRepo/*/*.xml
   configuration:
@@ -26,4 +26,8 @@ springfox:
   documentation:
     swagger-ui:
       enabled: true
+
+tile:
+  worldTilePath: E:/Data/2020-10-planet-14
+  nodeServicePath: E:/Data/node/index.js
 

@@ -18,9 +18,16 @@
         <result property="topChange" column="top_change"/>
         <result property="middleChange" column="middle_change"/>
         <result property="bottomChange" column="bottom_change"/>
+        <result property="topChangeAvg" column="top_change_avg"/>
+        <result property="middleChangeAvg" column="middle_change_avg"/>
+        <result property="bottomChangeAvg" column="bottom_change_avg"/>
     </resultMap>
     <select id="findAll" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record;
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record;
     </select>
 
     <select id="getTotalCount" resultType="integer">
@@ -36,11 +43,25 @@
     </select>
 
     <select id="findByStationCode" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE station_id = #{stationCode};
+--         SELECT * FROM stresspile_record WHERE station_id = #{stationCode};
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE station_id = #{stationCode}
+        order by measure_time DESC;
     </select>
 
     <select id="findByDeviceCode" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode};
+--         SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode};
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC;
     </select>
 
 <!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
@@ -48,27 +69,65 @@
 <!--    </select>-->
 
     <select id="findNewestData" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record ORDER BY measure_time DESC LIMIT 1;
+--         SELECT * FROM stresspile_record ORDER BY measure_time DESC LIMIT 1;
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findNewestDataInStation" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+--         SELECT * FROM stresspile_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE station_id = #{stationCode}
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findNewestDataOfDevice" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+--         SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC LIMIT 1;
     </select>
 
     <select id="findDataByTime" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+--         SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime};
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
+--         SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode};
     </select>
 
     <select id="findDataByTimeInStation" resultMap="stressPileDataMap">
-        SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
+--         SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode};
     </select>
 
     <select id="ifContinueUpdateOfDevice" resultType="boolean">

@@ -11,21 +11,19 @@
                     />
                 </div>
                 <div class="key-val-container">
-                    <div class="icon" id="warning-icon"></div>
-                    <div class="key-text">预警级别</div>
+                    <div class="key-text">预警级别：</div>
                     <div class="val-text">Ⅰ级</div>
                 </div>
                 <div class="key-val-container">
-                    <div class="key-text">监测长度</div>
-                    <div class="icon" id="length-icon"></div>
-                    <div class="val-text">全长7.2公里</div>
+                    <div class="key-text">监测长度：</div>
+                    <div class="val-text">全长7公里</div>
                 </div>
                 <div class="key-val-container">
-                    <div class="key-text">布设监测设备</div>
-                    <div class="val-text">38台</div>
+                    <div class="key-text">布设监测设备：</div>
+                    <div class="val-text">41台</div>
                 </div>
                 <div class="key-val-container">
-                    <div class="key-text">持续监测时间</div>
+                    <div class="key-text">持续监测时间：</div>
                     <div class="val-text">12天</div>
                 </div>
             </div>
@@ -43,8 +41,8 @@ div.basic-info-container {
     z-index: 3;
     left: 1vw;
     top: 3vh;
-    width: 20vw;
-    height: 28vh;
+    width: 24vw;
+    height: 20vh;
 
     // background-color: aliceblue;
 
@@ -82,17 +80,18 @@ div.basic-info-container {
 
         div.key-val-container {
             margin-top: 0.4vh;
-            width: 40%;
-            height: 9vh;
+            width: 48%;
+            height: 5vh;
             display: flex;
             flex-flow: row wrap;
             // background-color: #0446a8;
             text-align: center;
-            border-bottom: 3px solid rgb(0, 32, 175);
+            border-bottom: 2px solid rgb(0, 32, 175);
+
 
             div.icon {
                 width: 20%;
-                height: 4.5vh;
+                height: 3vh;
                 background-size: contain;
                 background-repeat: no-repeat;
                 background-position: 50% 50%;
@@ -109,19 +108,15 @@ div.basic-info-container {
 
             div.key-text {
                 width: fit-content;
-                flex-grow: 1;
-                height: 4.5vh;
-                line-height: 4.5vh;
+                line-height: 5vh;
                 background-color: transparent;
-                font-size: calc(0.8vw + 0.6vh);
+                font-size: calc(0.7vw + 0.6vh);
                 color: #0043fd;
             }
 
             div.val-text {
-                width: 100%;
-                height: 4.5vh;
-                line-height: 4.5vh;
-                font-size: calc(0.8vw + 0.6vh);
+                line-height: 5vh;
+                font-size: calc(0.7vw + 0.5vh);
                 font-weight: bold;
                 color: #1d00be;
                 // text-align: center;
@@ -129,12 +124,14 @@ div.basic-info-container {
 
             &:nth-child(2n + 1) {
                 text-align: left;
-                padding-left: 6%;
+                
+                // padding-left: 6%;
                 // border-right: 2px solid rgb(0, 32, 175);
             }
             &:nth-child(2n) {
                 text-align: right;
-                padding-right: 6%;
+                justify-content: flex-end;
+                // padding-right: 6%;
                 // border-left: 2px solid rgb(0, 32, 175);
             }
         }

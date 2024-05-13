@@ -32,9 +32,9 @@
                 </div>
                 <el-dropdown
                     ref="eleDropDownDomRef"
-                    v-if="index == 4"
+                    v-if="index == 4 || index == 1"
                     trigger="click"
-                    popper-class="nav-popper"
+                    :popper-class="(index == 4)?'nav-popper center':'nav-popper'"
                 >
                     <div
                         style="
@@ -45,13 +45,51 @@
                         "
                     ></div>
                     <template #dropdown>
-                        <el-dropdown-menu>
+                        <el-dropdown-menu v-if="index == 4">
                             <el-dropdown-item @click="navToModelPage"
                                 >崩岸模型库</el-dropdown-item
                             >
                             <el-dropdown-item @click="navToKnowledgePage"
                                 >崩岸知识库</el-dropdown-item
                             >
+                        </el-dropdown-menu>
+                        <el-dropdown-menu v-if="index == 1">
+                            <el-dropdown-item @click="navToWarnPage">
+                                <span
+                                    style="float: left"
+                                    class="left"
+                                    >民主沙右缘</span
+                                >
+                                <span
+                                    style="float: right"
+                                    class="right level-one"
+                                    >一级预警岸段</span
+                                >
+                            </el-dropdown-item>
+                            <el-dropdown-item @click="navToWarnPage" disabled>
+                                <span
+                                    style="float: left"
+                                    class="left"
+                                    >太平洲左缘</span
+                                >
+                                <span
+                                    style="float: right"
+                                    class="right level-one"
+                                    >一级预警岸段</span
+                                >
+                            </el-dropdown-item>
+                            <el-dropdown-item @click="navToWarnPage" disabled>
+                                <span
+                                    style="float: left"
+                                    class="left"
+                                    >丰乐桥</span
+                                >
+                                <span
+                                    style="float: right"
+                                    class="right level-two"
+                                    >二级预警岸段</span
+                                >
+                            </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
@@ -198,8 +236,11 @@ const focusOnNavItem = (navIndex) => {
 const emitNavClick = async (navIndex) => {
     if (navIndex == 4) {
         // console.log(1)
+        eleDropDownDomRef.value[1].handleOpen()
+    } else if(navIndex == 1) {
         eleDropDownDomRef.value[0].handleOpen()
-    } else if (navIndex != previousActive) {
+    }
+    else if (navIndex != previousActive) {
         router.push(navList.value[navIndex].routerLink)
         navList.value[previousActive].isActive = false
         navList.value[navIndex].isActive = true
@@ -236,6 +277,12 @@ const navToKnowledgePage = () => {
     eleDropDownDomRef.value[0].handleClose()
     router.push('/knowledgeStore')
     focusOnNavItem(4)
+}
+
+const navToWarnPage = () => {
+    eleDropDownDomRef.value[0].handleClose()
+    router.push('/bankTwin')
+    focusOnNavItem(1)
 }
 
 const onResize = (refDomWidth, refDomHeight) => {

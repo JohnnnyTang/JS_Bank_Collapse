@@ -105,7 +105,7 @@ onMounted(
                 x_move: item.x_move,
                 y_move: item.y_move,
                 z_move: item.z_move,
-                time: item.in_time
+                time: item.idGroup.measure_time
             })
         })
         loading.value = false

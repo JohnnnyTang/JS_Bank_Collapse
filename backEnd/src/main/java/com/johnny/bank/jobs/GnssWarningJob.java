@@ -1,25 +1,25 @@
 package com.johnny.bank.jobs;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
-import com.johnny.bank.model.resource.dataResource.*;
-import com.johnny.bank.service.resource.data.impl.*;
+import com.johnny.bank.model.resource.dataResource.DeviceWarning;
+import com.johnny.bank.model.resource.dataResource.GnssData;
+import com.johnny.bank.model.resource.dataResource.MonitorInfo;
+import com.johnny.bank.service.resource.data.impl.DeviceWarningService;
+import com.johnny.bank.service.resource.data.impl.GnssDataService;
+import com.johnny.bank.service.resource.data.impl.MonitorInfoService;
 import com.johnny.bank.utils.BeanUtil;
 import com.johnny.bank.utils.GlobalMap;
 import com.johnny.bank.utils.MailUtil;
 import com.johnny.bank.utils.SMSUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpirationPolicy;
-import net.jodah.expiringmap.ExpiringMap;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,6 +105,7 @@ public class GnssWarningJob implements Job {
                     .deviceId(gnssData.getDeviceId()).warnTime(gnssData.getMeasureTime())
                     .deviceCode(gnssInfo.getMachineId()).threeDiff(gnssData.getThreeD())
                     .build();
+            log.info("gnss warn: " + deviceWarning);
             gnssWarningService.save(deviceWarning);
         }
         if(i > 0) {
@@ -159,6 +160,7 @@ public class GnssWarningJob implements Job {
                     .deviceId(gnssData.getDeviceId()).warnTime(gnssData.getMeasureTime())
                     .threeDiff(gnssData.getThreeD()).deviceCode(gnssInfo.getMachineId())
                     .build();
+            log.info("gnss warn: " + deviceWarning);
             gnssWarningService.save(deviceWarning);
         }
         try {

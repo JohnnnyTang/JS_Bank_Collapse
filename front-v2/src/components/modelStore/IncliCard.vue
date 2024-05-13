@@ -108,7 +108,7 @@ onMounted(
                 top_move_24h: item.top_move_24h,
                 middle_move_24h: item.middle_move_24h,
                 bottom_move_24h: item.bottom_move_24h,
-                time: item.in_time
+                time: item.idGroup.measure_time
             })
         })
         loading.value = false
