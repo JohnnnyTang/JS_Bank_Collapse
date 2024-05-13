@@ -82,6 +82,13 @@ const defaultActiveMap = ref({
     inclinometer: 'CX-01',
 })
 
+const deviceTypeErrorMap = {
+    gnss: 5,
+    inclinometer: 3,
+    manometer: 0.2,
+    stress: 40,
+}
+
 const optionsMap = reactive({
     gnss: ['X位移', 'Y位移', 'Z位移', '三维累积位移', '五小时相对变化'],
     manometer: ['频率', '温度', '水位高度'],
@@ -499,61 +506,7 @@ const chartOption = {
             type: 'slider',
         },
     ],
-    visualMap: {
-        top: '4%',
-        right: '8%',
-        itemHeight: '20',
-        itemWidth: '28',
-        pieces: [
-            {
-                gt: -18,
-                lte: -10,
-                color: '#FD0100',
-            },
-            {
-                gt: -10,
-                lte: -5,
-                color: '#FC7D02',
-            },
-            {
-                gt: -5,
-                lte: -3,
-                color: '#FBDB0F',
-            },
-            {
-                gt: -3,
-                lte: 3,
-                color: '#93CE07',
-            },
-            {
-                gt: 3,
-                lte: 5,
-                color: '#FBDB0F',
-            },
-            {
-                gt: 5,
-                lte: 10,
-                color: '#FC7D02',
-            },
-            {
-                gt: 10,
-                lte: 18,
-                color: '#FD0100',
-            },
-        ],
-        outOfRange: {
-            color: '#999',
-        },
-        formatter: '{value}~{value2}',
-        orient: 'horizontal',
-        align: 'left',
-        // textGap: 20,
-        itemGap: 30,
-        textStyle: {
-            fontFamily: 'Times',
-            fontWeight: 'bold',
-        },
-    },
+    visualMap: {},
     series: [
         {
             name: 'SplitLine',
@@ -568,100 +521,72 @@ const chartOption = {
                     width: 2,
                     opacity: 0.75,
                 },
-                data: [
-                    {
-                        yAxis: 3,
-                        lineStyle: {
-                            color: '#93CE07',
-                        },
-                    },
-                    {
-                        yAxis: -3,
-                        lineStyle: {
-                            color: '#93CE07',
-                        },
-                    },
-                    {
-                        yAxis: 5,
-                        lineStyle: {
-                            color: '#FBDB0F',
-                        },
-                    },
-                    {
-                        yAxis: -5,
-                        lineStyle: {
-                            color: '#FBDB0F',
-                        },
-                    },
-                    {
-                        yAxis: 10,
-                        lineStyle: {
-                            color: '#FC7D02',
-                        },
-                    },
-                    {
-                        yAxis: -10,
-                        lineStyle: {
-                            color: '#FC7D02',
-                        },
-                    },
-                    {
-                        yAxis: 18,
-                        lineStyle: {
-                            color: '#FD0100',
-                        },
-                    },
-                    {
-                        yAxis: -18,
-                        lineStyle: {
-                            color: '#FD0100',
-                        },
-                    },
-                ],
+                data: [],
             },
         },
     ],
 }
 
+const markLineSeries = {
+    name: 'SplitLine',
+    type: 'line',
+    // data: data.map(function (item) {
+    //   return item[1];
+    // }),
+    markLine: {
+        silent: true,
+        lineStyle: {
+            // color: '#333',
+            width: 2,
+            opacity: 0.75,
+        },
+        data: [],
+    },
+}
+
+const gnss3dYAxis = {
+    min: 0,
+    max: 60,
+}
+
+const gnss3dfYAxis = {
+    min: 0,
+    max: 30,
+}
+
+const gnssYAxis = {
+    min: -30,
+    max: 30,
+}
+
 const gnssVisMap = {
     top: '4%',
-    right: '8%',
+    right: '2%',
     itemHeight: '20',
     itemWidth: '28',
+    seriesIndex: 1,
     pieces: [
         {
-            gt: -18,
-            lte: -10,
+            lte: -50,
             color: '#FD0100',
         },
         {
-            gt: -10,
-            lte: -5,
-            color: '#FC7D02',
+            lte: -35,
+            gt: -50,
+            color: '#FF8E00',
         },
         {
-            gt: -5,
-            lte: -3,
-            color: '#FBDB0F',
+            gt: -35,
+            lte: 35,
+            color: '#45BF55',
         },
         {
-            gt: -3,
-            lte: 3,
-            color: '#93CE07',
+            gt: 35,
+            lte: 50,
+            color: '#FF8E00',
         },
         {
-            gt: 3,
-            lte: 5,
-            color: '#FBDB0F',
-        },
-        {
-            gt: 5,
-            lte: 10,
-            color: '#FC7D02',
-        },
-        {
-            gt: 10,
-            lte: 18,
+            gt: 50,
             color: '#FD0100',
         },
     ],
@@ -672,7 +597,7 @@ const gnssVisMap = {
     orient: 'horizontal',
     align: 'left',
     // textGap: 20,
-    itemGap: 30,
+    itemGap: 20,
     textStyle: {
         fontFamily: 'Times',
         fontWeight: 'bold',
@@ -802,445 +727,306 @@ function buildSeries(dataList, deviceType) {
     const timeList = dataList.map(function (item) {
         return item['measureTime'].replace(' ', '\n')
     })
+    let data = []
     switch (deviceType) {
         case 'gnss':
+            data = [[], [], [], [], [], [], [], []]
+            dataList.map(function (item) {
+                data[0].push(item['XMove'])
+                data[1].push(item['YMove'])
+                data[2].push(item['ZMove'])
+                data[3].push(item['threeD'])
+                data[4].push(item['threeDf'])
+                data[5].push(item['movingAvg'])
+                data[6].push(item['movingAvg'] - deviceTypeErrorMap.gnss)
+                data[7].push(deviceTypeErrorMap.gnss * 2)
+            })
+            // console.log(data[6], data[7])
             return {
                 time: timeList,
                 series: {
                     x_move: {
-                        series: {
-                            name: 'x_move',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['XMove']
-                            }),
-                        },
-                        visMap: gnssVisMap,
-                        markLineData: [
+                        series: [
                             {
-                                yAxis: 3,
+                                name: 'x_move',
+                                type: 'line',
+                                data: data[0],
                                 lineStyle: {
-                                    color: '#93CE07',
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
                                 },
-                            },
-                            {
-                                yAxis: -3,
-                                lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: 5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: -5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: 10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: -10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: 18,
-                                lineStyle: {
-                                    color: '#FD0100',
-                                },
-                            },
-                            {
-                                yAxis: -18,
-                                lineStyle: {
-                                    color: '#FD0100',
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
                                 },
                             },
                         ],
+                        yAxis: gnssYAxis,
+                        visMap: gnssVisMap,
+                        markLineData: [],
                     },
                     y_move: {
-                        series: {
-                            name: 'y_move',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['YMove']
-                            }),
-                        },
-                        visMap: gnssVisMap,
-                        markLineData: [
+                        series: [
                             {
-                                yAxis: 3,
+                                name: 'y_move',
+                                type: 'line',
+                                data: data[1],
                                 lineStyle: {
-                                    color: '#93CE07',
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
                                 },
-                            },
-                            {
-                                yAxis: -3,
-                                lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: 5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: -5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: 10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: -10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: 18,
-                                lineStyle: {
-                                    color: '#FD0100',
-                                },
-                            },
-                            {
-                                yAxis: -18,
-                                lineStyle: {
-                                    color: '#FD0100',
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
                                 },
                             },
                         ],
+                        yAxis: gnssYAxis,
+                        visMap: gnssVisMap,
+                        markLineData: [],
                     },
                     z_move: {
-                        series: {
-                            name: 'z_move',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['ZMove']
-                            }),
-                        },
-                        visMap: gnssVisMap,
-                        markLineData: [
+                        series: [
                             {
-                                yAxis: 3,
+                                name: 'z_move',
+                                type: 'line',
+                                data: data[2],
                                 lineStyle: {
-                                    color: '#93CE07',
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
                                 },
-                            },
-                            {
-                                yAxis: -3,
-                                lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: 5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: -5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: 10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: -10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: 18,
-                                lineStyle: {
-                                    color: '#FD0100',
-                                },
-                            },
-                            {
-                                yAxis: -18,
-                                lineStyle: {
-                                    color: '#FD0100',
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
                                 },
                             },
                         ],
+                        yAxis: gnssYAxis,
+                        visMap: gnssVisMap,
+                        markLineData: [],
                     },
                     threeD: {
-                        series: {
-                            name: 'threeD',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['threeD']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'threeD',
+                                type: 'scatter',
+                                data: data[3],
+                                symbolSize: 7,
+                                itemStyle: {
+                                    color: 'rgb(133,133,133)',
+                                    opacity: 0.4,
+                                },
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
+                                },
+                            },
+                            {
+                                name: '位移滑动平均',
+                                type: 'line',
+                                data: data[5],
+                                lineStyle: {
+                                    opacity: 1,
+                                    width: 4,
+                                },
+                            },
+                            {
+                                name: '累积位移滑动误差区间下限',
+                                type: 'line',
+                                stack: 'error',
+                                lineStyle: {
+                                    color: '#38D0F2',
+                                    opacity: 0.4,
+                                },
+                                itemStyle: {
+                                    color: '#38D0F2',
+                                    borderColor: '#38D0F2',
+                                    opacity: 0.4,
+                                },
+                                symbol: 'none',
+                                tooltip: {
+                                    formatter: '累积位移滑动误差区间±5mm',
+                                },
+                                data: data[6],
+                            },
+                            {
+                                name: '累积位移误差区间',
+                                type: 'line',
+                                stack: 'error',
+                                areaStyle: {
+                                    color: '#A7C5C5',
+                                    opacity: 0.2,
+                                },
+                                lineStyle: {
+                                    color: '#38D0F2',
+                                    opacity: 0.4,
+                                },
+                                symbol: 'none',
+                                data: data[7],
+                            },
+                        ],
+                        yAxis: gnss3dYAxis,
                         visMap: gnssVisMap,
                         markLineData: [
                             {
-                                yAxis: 3,
+                                yAxis: 35,
                                 lineStyle: {
-                                    color: '#93CE07',
+                                    color: '#FF8E00',
+                                    width: 3,
                                 },
                             },
                             {
-                                yAxis: -3,
-                                lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: 5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: -5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: 10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: -10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: 18,
+                                yAxis: 50,
                                 lineStyle: {
                                     color: '#FD0100',
-                                },
-                            },
-                            {
-                                yAxis: -18,
-                                lineStyle: {
-                                    color: '#FD0100',
+                                    width: 3,
                                 },
                             },
                         ],
                     },
+
                     threeDF: {
-                        series: {
-                            name: 'threeDF',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['threeDf']
-                            }),
-                        },
-                        visMap: gnssVisMap,
-                        markLineData: [
+                        series: [
                             {
-                                yAxis: 3,
+                                name: 'threeDF',
+                                type: 'line',
+                                data: data[4],
                                 lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: -3,
-                                lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: 5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: -5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: 10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: -10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: 18,
-                                lineStyle: {
-                                    color: '#FD0100',
-                                },
-                            },
-                            {
-                                yAxis: -18,
-                                lineStyle: {
-                                    color: '#FD0100',
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
                                 },
                             },
                         ],
+                        yAxis: gnss3dfYAxis,
+                        visMap: gnssVisMap,
+                        markLineData: [],
                     },
                 },
             }
         case 'inclinometer':
+            data = [[], [], [], [], [], [], [], [], []]
+            dataList.map(function (item) {
+                data[0].push(item['topMove'])
+                data[1].push(item['middleMove'])
+                data[2].push(item['bottomMove'])
+                data[3].push(item['topMovePerDay'])
+                data[4].push(item['middleMovePerDay'])
+                data[5].push(item['bottomMovePerDay'])
+                data[6].push(item['bottomMoveAvg'])
+                data[7].push(
+                    item['bottomMoveAvg'] - deviceTypeErrorMap.inclinometer,
+                )
+                data[8].push(item['bottomMoveAvg'] + deviceTypeErrorMap.inclinometer)
+            })
             return {
                 time: timeList,
                 series: {
                     topMove: {
-                        series: {
-                            name: 'topMove',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['topMove']
-                            }),
-                        },
-                        visMap: gnssVisMap,
-                        markLineData: [
+                        series: [
                             {
-                                yAxis: 3,
+                                name: 'topMove',
+                                type: 'line',
+                                data: data[0],
                                 lineStyle: {
-                                    color: '#93CE07',
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
                                 },
-                            },
-                            {
-                                yAxis: -3,
-                                lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: 5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: -5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: 10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: -10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: 18,
-                                lineStyle: {
-                                    color: '#FD0100',
-                                },
-                            },
-                            {
-                                yAxis: -18,
-                                lineStyle: {
-                                    color: '#FD0100',
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
                                 },
                             },
                         ],
+                        visMap: {show: false},
+                        markLineData: [],
                     },
                     middleMove: {
-                        series: {
-                            name: 'middleMove',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['middleMove']
-                            }),
-                        },
-                        visMap: gnssVisMap,
-                        markLineData: [
+                        series: [
                             {
-                                yAxis: 3,
+                                name: 'middleMove',
+                                type: 'line',
+                                data: data[1],
                                 lineStyle: {
-                                    color: '#93CE07',
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
                                 },
-                            },
-                            {
-                                yAxis: -3,
-                                lineStyle: {
-                                    color: '#93CE07',
-                                },
-                            },
-                            {
-                                yAxis: 5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: -5,
-                                lineStyle: {
-                                    color: '#FBDB0F',
-                                },
-                            },
-                            {
-                                yAxis: 10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: -10,
-                                lineStyle: {
-                                    color: '#FC7D02',
-                                },
-                            },
-                            {
-                                yAxis: 18,
-                                lineStyle: {
-                                    color: '#FD0100',
-                                },
-                            },
-                            {
-                                yAxis: -18,
-                                lineStyle: {
-                                    color: '#FD0100',
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
                                 },
                             },
                         ],
+                        visMap: {show: false},
+                        markLineData: [],
                     },
                     bottomMove: {
-                        series: {
-                            name: 'bottomMove',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['bottomMove']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'bottomMove',
+                                type: 'scatter',
+                                data: data[2],
+                                symbolSize: 7,
+                                itemStyle: {
+                                    color: 'rgb(133,133,133)',
+                                    opacity: 0.6,
+                                },
+                            },
+                            {
+                                name: '下层内部位移滑动平均',
+                                type: 'line',
+                                data: data[6],
+                                lineStyle: {
+                                    opacity: 1,
+                                    width: 4,
+                                    color: '#45BF55',
+                                },
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
+                                },
+                            },
+                            {
+                                name: '下层内部位移滑动平均误差区间下限',
+                                type: 'line',
+                                // stack: 'error',
+                                lineStyle: {
+                                    color: '#38D0F2',
+                                    opacity: 0.4,
+                                },
+                                areaStyle: {
+                                    color: '#A7C5C5',
+                                    opacity: 0.2,
+                                },
+                                itemStyle: {
+                                    color: '#38D0F2',
+                                    borderColor: '#38D0F2',
+                                    opacity: 0.4,
+                                },
+                                symbol: 'none',
+                                data: data[7],
+                            },
+                            {
+                                name: '下层内部位移滑动平均误差区间上限',
+                                type: 'line',
+                                // stack: 'error',
+                                areaStyle: {
+                                    color: '#A7C5C5',
+                                    opacity: 0.2,
+                                },
+                                lineStyle: {
+                                    color: '#38D0F2',
+                                    opacity: 0.4,
+                                },
+                                symbol: 'none',
+                                data: data[8],
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [
                             {
@@ -1294,13 +1080,22 @@ function buildSeries(dataList, deviceType) {
                         ],
                     },
                     topMovePerDay: {
-                        series: {
-                            name: 'topMovePerDay',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['topMovePerDay']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'topMovePerDay',
+                                type: 'line',
+                                data: data[3],
+                                lineStyle: {
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
+                                },
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
+                                },
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [
                             {
@@ -1354,13 +1149,22 @@ function buildSeries(dataList, deviceType) {
                         ],
                     },
                     middleMovePerDay: {
-                        series: {
-                            name: 'middleMovePerDay',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['middleMovePerDay']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'middleMovePerDay',
+                                type: 'line',
+                                data: data[4],
+                                lineStyle: {
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
+                                },
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
+                                },
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [
                             {
@@ -1414,13 +1218,22 @@ function buildSeries(dataList, deviceType) {
                         ],
                     },
                     bottomMovePerDay: {
-                        series: {
-                            name: 'bottomMovePerDay',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['bottomMovePerDay']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'bottomMovePerDay',
+                                type: 'line',
+                                data: data[5],
+                                lineStyle: {
+                                    color: '#45BF55',
+                                    opacity: 1,
+                                    width: 4,
+                                },
+                                itemStyle: {
+                                    color: '#45BF55',
+                                    opacity: 0.4,
+                                },
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [
                             {
@@ -1480,13 +1293,15 @@ function buildSeries(dataList, deviceType) {
                 time: timeList,
                 series: {
                     frequency: {
-                        series: {
-                            name: 'frequency',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['frequency']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'frequency',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['frequency']
+                                }),
+                            },
+                        ],
                         visMap: manoFreqVisMap,
                         markLineData: [
                             {
@@ -1516,13 +1331,15 @@ function buildSeries(dataList, deviceType) {
                         ],
                     },
                     temperature: {
-                        series: {
-                            name: 'temperature',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['temperature']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'temperature',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['temperature']
+                                }),
+                            },
+                        ],
                         visMap: manoTempVisMap,
                         markLineData: [
                             {
@@ -1552,13 +1369,15 @@ function buildSeries(dataList, deviceType) {
                         ],
                     },
                     height: {
-                        series: {
-                            name: 'height',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['height']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'height',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['height']
+                                }),
+                            },
+                        ],
                         visMap: manoHeightVisMap,
                         markLineData: [
                             {
@@ -1594,101 +1413,119 @@ function buildSeries(dataList, deviceType) {
                 time: timeList,
                 series: {
                     topAngle: {
-                        series: {
-                            name: 'topAngle',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['topAngle']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'topAngle',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['topAngle']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     middleAngle: {
-                        series: {
-                            name: 'middleAngle',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['middleAngle']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'middleAngle',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['middleAngle']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     bottomAngle: {
-                        series: {
-                            name: 'bottomAngle',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['bottomAngle']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'bottomAngle',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['bottomAngle']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     topChange: {
-                        series: {
-                            name: 'topChange',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['topChange']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'topChange',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['topChange']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     middleChange: {
-                        series: {
-                            name: 'middleChange',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['middleChange']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'middleChange',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['middleChange']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     bottomChange: {
-                        series: {
-                            name: 'bottomChange',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['bottomChange']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'bottomChange',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['bottomChange']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     topPower: {
-                        series: {
-                            name: 'topPower',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['topPower']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'topPower',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['topPower']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     middlePower: {
-                        series: {
-                            name: 'middlePower',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['middlePower']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'middlePower',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['middlePower']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
                     bottomPower: {
-                        series: {
-                            name: 'bottomPower',
-                            type: 'line',
-                            data: dataList.map(function (item) {
-                                return item['bottomPower']
-                            }),
-                        },
+                        series: [
+                            {
+                                name: 'bottomPower',
+                                type: 'line',
+                                data: dataList.map(function (item) {
+                                    return item['bottomPower']
+                                }),
+                            },
+                        ],
                         visMap: gnssVisMap,
                         markLineData: [],
                     },
@@ -1703,7 +1540,7 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
     if (deviceDataManageMap.value[deviceType][deviceName].data.length == 0) {
         deviceDataManageMap.value[deviceType][deviceName].data = (
             await backendInstance.get(
-                `/data/${deviceType}Data/day/1/device/${deviceIdMap[deviceType][deviceName]}`,
+                `/data/${deviceType}Data/day/3/device/${deviceIdMap[deviceType][deviceName]}`,
             )
         ).data
         deviceDataManageMap.value[deviceType][deviceName].chartData =
@@ -1713,19 +1550,21 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
             )
     }
     deviceSelection.value = deviceName
+    myChart.clear()
     // console.log(deviceNameMap[curDevice.value][chartSelection.value])
 
     // current series
-    chartOption.series[1] =
+    chartOption.series =
         deviceDataManageMap.value[deviceType][deviceName].chartData.series[
             deviceNameMap[deviceType][dataName]
         ].series
 
     // current markLine
-    chartOption.series[0].markLine.data =
+    markLineSeries.markLine.data =
         deviceDataManageMap.value[deviceType][deviceName].chartData.series[
             deviceNameMap[deviceType][dataName]
         ].markLineData
+    chartOption.series.push(markLineSeries)
 
     // current visualMap
     chartOption.visualMap =
@@ -1734,6 +1573,11 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
         ].visMap
     chartOption.xAxis.data =
         deviceDataManageMap.value[deviceType][deviceName].chartData.time
+
+    chartOption.yAxis = deviceDataManageMap.value[deviceType][deviceName]
+        .chartData.series[deviceNameMap[deviceType][dataName]].yAxis || {
+        scale: true,
+    }
 
     myChart.setOption(chartOption)
 }
@@ -1747,9 +1591,9 @@ const selectDevice = async (index, indexPath) => {
 }
 
 onBeforeRouteUpdate((to, from) => {
-    console.log('device route',to, from)
+    console.log('device route', to, from)
     // console.log(to)
-    if(to.params.id == 'video') {
+    if (to.params.id == 'video') {
         console.log('to')
         return
     }
@@ -1765,11 +1609,11 @@ onBeforeRouteUpdate((to, from) => {
 
 onMounted(async () => {
     console.log(
-        `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+        `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
     )
     const deviceData = (
         await backendInstance.get(
-            `/data/${curDevice.value}Data/day/1/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+            `/data/${curDevice.value}Data/day/3/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
         )
     ).data
     deviceDataManageMap.value[curDevice.value][
@@ -1784,28 +1628,36 @@ onMounted(async () => {
         curDevice.value,
     )
     // console.log(deviceDataManageMap.value[curDevice.value][defaultActiveMap.value[curDevice.value]].chartData.series)
-    chartOption.series.push(
+    chartOption.series =
         deviceDataManageMap.value[curDevice.value][
             defaultActiveMap.value[curDevice.value]
-        ].chartData.series[deviceNameMap[curDevice.value][chartSelection.value]]
-            .series,
-    )
+        ].chartData.series[
+            deviceNameMap[curDevice.value][chartSelection.value]
+        ].series
+
     chartOption.visualMap =
         deviceDataManageMap.value[curDevice.value][
             defaultActiveMap.value[curDevice.value]
         ].chartData.series[
             deviceNameMap[curDevice.value][chartSelection.value]
         ].visMap
-    chartOption.series[0].markLine.data =
+    markLineSeries.markLine.data =
         deviceDataManageMap.value[curDevice.value][
             defaultActiveMap.value[curDevice.value]
         ].chartData.series[
             deviceNameMap[curDevice.value][chartSelection.value]
         ].markLineData
+    chartOption.series.push(markLineSeries)
     chartOption.xAxis.data =
         deviceDataManageMap.value[curDevice.value][
             defaultActiveMap.value[curDevice.value]
         ].chartData.time
+    chartOption.yAxis = deviceDataManageMap.value[curDevice.value][
+        defaultActiveMap.value[curDevice.value]
+    ].chartData.series[deviceNameMap[curDevice.value][chartSelection.value]]
+        .yAxis || {
+        scale: true,
+    }
     console.log('init', chartOption)
     myChart = echarts.init(chartDom.value)
 

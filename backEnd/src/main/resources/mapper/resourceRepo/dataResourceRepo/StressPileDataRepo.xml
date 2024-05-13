@@ -43,7 +43,6 @@
     </select>
 
     <select id="findByStationCode" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record WHERE station_id = #{stationCode};
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
@@ -54,7 +53,6 @@
     </select>
 
     <select id="findByDeviceCode" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode};
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
@@ -69,7 +67,6 @@
 <!--    </select>-->
 
     <select id="findNewestData" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record ORDER BY measure_time DESC LIMIT 1;
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
@@ -79,7 +76,6 @@
     </select>
 
     <select id="findNewestDataInStation" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record WHERE station_id = #{stationCode} ORDER BY measure_time DESC LIMIT 1;
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
@@ -90,7 +86,6 @@
     </select>
 
     <select id="findNewestDataOfDevice" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record WHERE machine_id_nnu = #{deviceCode} ORDER BY measure_time DESC LIMIT 1;
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
@@ -101,7 +96,6 @@
     </select>
 
     <select id="findDataByTime" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} ORDER BY measure_time DESC;
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
@@ -111,7 +105,6 @@
     </select>
 
     <select id="findDataByTimeOfDevice" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode} ORDER BY measure_time ASC;
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
@@ -121,7 +114,6 @@
     </select>
 
     <select id="findDataByTimeInStation" resultMap="stressPileDataMap">
---         SELECT * FROM stresspile_record WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode} ORDER BY measure_time ASC;
         SELECT *,
                round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
                round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,

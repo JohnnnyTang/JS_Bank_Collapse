@@ -91,7 +91,7 @@ export default class BackEndRequest {
         //desc
         switch (type) {
             case '1': {
-                return new Promise((resolve) => { resolve({ data: { pointNum: 0 } }) })
+                return new Promise((sresolve) => { resolve({ data: { pointNum: 0 } }) })
                 // return backendInstance.get(`/data/gnssInfo/id/${code}`)
             }
             case '2': {
@@ -125,10 +125,24 @@ export default class BackEndRequest {
                 ]
             })
         })
-
     }
 
+    static getMonitorDataByTypeIdWithTime(typeStr, id, timeUnit, timeCount) {
+        return backendInstance.get(`/data/${typeStr}Data/${timeUnit}/${timeCount}/device/${id}`)
+    }
 
+    static getAllTypeMonitorNewestData() {
+        return axios.all([
+            backendInstance.get('/data/gnssData/newest'),
+            backendInstance.get('/data/stressData/newest'),
+            backendInstance.get('/data/manometerData/newest'),
+            backendInstance.get('/data/inclinometerData/newest'),
+        ])
+    }
+
+    static getVideoDeviceInfo() {
+        return backendInstance.get('/data/monitorInfo/type/6')
+    }
 
 }
 

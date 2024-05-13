@@ -3,16 +3,42 @@
         <div class="nav-manage-button" @click="navToManage">
             <div class="nav-manage-icon"></div>
             <div class="nav-manage-text">监测详情</div>
+            <div class="nav-arrow-icon"></div>
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"></e-tab>
+                <e-tab
+                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
+                    :items="items"
+                    :columns="2"
+                ></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
         <RealtimeStatusVue />
-        <SectionRisk />
-        <DeviceWarn />
+        <div class="realtime-video-container">
+            <div class="realtime-video-title">实时视频监控</div>
+            <div
+                class="video-box"
+                v-for="(item, index) in videoList"
+                :key="index"
+            >
+                <div class="video-content">
+                    <iframe
+                        :src="item.videoUrl + token"
+                        width="100%"
+                        height="100%"
+                        :id="item.name"
+                        allowfullscreen
+                    >
+                    </iframe>
+                </div>
+                <div class="video-title">{{ item.name }}</div>
+            </div>
+        </div>
+        <!-- <SectionRisk />
+        <DeviceWarn /> -->
+
         <div class="map-container" id="map"></div>
     </div>
 </template>
@@ -26,30 +52,56 @@ import { ETab } from 'e-datav-vue3'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
-import SectionRisk from '../components/bankTwin/SectionRisk.vue'
-import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
+// import SectionRisk from '../components/bankTwin/SectionRisk.vue'
+// import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 import { useMapStore } from '../store/mapStore'
+import axios from 'axios'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 let map = null
 
+const token = ref(
+    'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
+)
+
 const items = ref([
     { label: '二维视图', value: 'tab1' },
     { label: '三维视图', value: 'tab2' },
+])
+
+const videoList = ref([
+    {
+        name: '民主沙上游围堤监控',
+        position: '32.0432963, 120.5122242',
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+    },
+    {
+        name: '民主沙靖江市江滩办事处外堤监控',
+        position: '32.0381061, 120.5263473',
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+    },
+    {
+        name: '民主沙海事码头监控',
+        position: '32.0316674, 120.5402574',
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
+    },
 ])
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
-            [120.46987922676836, 32.03201616423072],
-            [120.61089640208264, 32.052171362618625],
+            [120.46957922676836, 32.01001616423072],
+            [120.61109640208264, 32.074171362618625],
         ],
         {
-            pitch: 52.45,
+            pitch: 32.45,
             duration: 1500,
             // zoom: 8,
         },
@@ -64,7 +116,7 @@ const navToManage = () => {
     router.push('/bankManage')
 }
 
-onMounted(() => {
+onMounted(async () => {
     map = new mapboxgl.Map({
         container: 'map', // container ID
         accessToken:
@@ -83,9 +135,7 @@ onMounted(() => {
         useMapStore().setMap(map)
         map.addSource('ptVector', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/placeLabel/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
         })
         await mapInit(map, true)
         map.addLayer({
@@ -105,7 +155,7 @@ onMounted(() => {
                 'text-color': 'rgb(0, 42, 105)',
             },
         })
-        
+
         // map.on('click', (e) => {
         //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
 
@@ -113,6 +163,15 @@ onMounted(() => {
 
         // resizeObserver.observe(containerDom.value)
     })
+
+    // const videoAccessKey = (await axios.post(
+    //     'https://open.ys7.com/api/lapp/token/get?appKey=d228a2fab09d4c879b4449c356bbd90d&appSecret=0c46042ef59aed43c4eddbb80d637369',
+    // )).data
+    // console.log('res', videoAccessKey)
+    // if (videoAccessKey.data.accessToken) {
+    //     console.log('get key')
+    //     token.value = videoAccessKey.data.accessToken
+    // }
 })
 
 onUnmounted(() => {
@@ -131,6 +190,7 @@ div.twin-main-container {
     height: 92vh;
     top: 8vh;
     left: 0;
+    overflow: hidden;
 
     background-color: rgb(100, 154, 202);
 
@@ -139,12 +199,12 @@ div.twin-main-container {
         right: 0;
         top: 2vh;
 
-        width: 16vh;
+        width: 10vw;
         height: 6vh;
         background-color: rgb(0, 42, 105);
         transition: all 0.4s cubic-bezier(0.68, -0.15, 0.265, 1.15);
-        border-top-left-radius: 16px;
-        border-bottom-left-radius: 16px;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
 
         display: flex;
         flex-flow: row nowrap;
@@ -153,29 +213,44 @@ div.twin-main-container {
 
         &:hover {
             cursor: pointer;
+            div.nav-arrow-icon {
+                width: 2.4vw;
+            }
         }
 
         div.nav-manage-icon {
-            width: 6vh;
+            width: 2.6vw;
             height: 6vh;
             flex-shrink: 0;
 
-            background-image: url('/settings.png');
-            background-size: 75%;
+            background-image: url('/dashboard.png');
+            background-size: 100%;
             background-position: 50% 50%;
             background-repeat: no-repeat;
         }
 
         div.nav-manage-text {
-            width: 10vh;
+            width: 5vw;
             height: 6vh;
             line-height: 6vh;
             text-align: center;
 
-            font-size: calc(0.9vw + 0.4vh);
+            font-size: calc(0.75vw + 0.4vh);
             font-weight: bold;
             color: rgba(32, 75, 116, 0.4);
             color: rgb(140, 255, 255);
+        }
+
+        div.nav-arrow-icon {
+            width: 2vw;
+            height: 6vh;
+            flex-shrink: 0;
+
+            background-image: url('/right-arrow.png');
+            background-size: 100%;
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+            transition: all 0.2s cubic-bezier(0.68, -0.15, 0.265, 1.15);
         }
     }
 
@@ -191,7 +266,7 @@ div.twin-main-container {
     div.visual-tab-container {
         position: absolute;
         top: 2vh;
-        right: 19vh;
+        right: 15vw;
 
         width: 10vw;
         height: 6vh;
@@ -202,6 +277,68 @@ div.twin-main-container {
         background-color: rgb(0, 56, 141);
         box-shadow: 4px 8px 8px -4px rgba(0, 11, 34, 0.9);
         // background-color: antiquewhite;
+    }
+
+    div.realtime-video-container {
+        position: absolute;
+        right: 1vw;
+        top: 9vh;
+
+        height: 82vh;
+        width: 24vw;
+
+        z-index: 4;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: space-between;
+
+        backdrop-filter: blur(12px);
+        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
+        background-color: rgba(156, 195, 255, 0.4);
+        border-radius: 4px;
+        border: 2px solid rgb(28, 105, 247);
+
+        div.realtime-video-title {
+            height: 4vh;
+            line-height: 4vh;
+            text-align: center;
+
+            font-size: calc(0.8vw + 0.8vh);
+            font-weight: bold;
+            color: #0400fd;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+            letter-spacing: 0.4rem;
+
+            border-bottom: 2px solid #0400fd;
+        }
+
+        div.video-box {
+            width: 23vw;
+            margin-left: 0.5vw;
+            height: 25vh;
+
+            background-color: rgba(3, 63, 173, 1);
+
+            div.video-content {
+                height: 22vh;
+                width: 23vw;
+
+                background-color: rgb(34, 75, 165);
+            }
+
+            div.video-title {
+                line-height: 3vh;
+                height: 3vh;
+                text-align: center;
+
+                font-weight: bold;
+                font-size: calc(0.6vw + 0.6vh);
+                color: #eef3ff;
+            }
+        }
     }
 }
 
@@ -214,27 +351,25 @@ div.twin-main-container {
     font-weight: bold;
 }
 
-
-
 :deep(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip) {
     display: none;
 }
 :deep(.mapboxgl-popup-tip) {
     border: none;
 }
-:deep(.mapboxgl-popup-content){
-    background:none;
+:deep(.mapboxgl-popup-content) {
+    background: none;
     border: none;
     box-shadow: none;
     padding: 0;
 }
-:deep(.mapboxgl-popup-close-button){
+:deep(.mapboxgl-popup-close-button) {
     right: 5px;
     top: 5px;
     border: none;
 }
 
-:deep(.el-overlay){
+:deep(.el-overlay) {
     background-color: none;
 }
 </style>

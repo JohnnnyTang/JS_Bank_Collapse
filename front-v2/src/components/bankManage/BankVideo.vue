@@ -20,7 +20,7 @@
                             ><source :src="item.videoUrl" /></video> -->
                             <!-- <videoPlay :src="item.videoUrl" autoPlay :type="m3u8"/> -->
                             <iframe
-                                :src="item.videoUrl"
+                                :src="item.videoUrl + token"
                                 width="100%"
                                 height="100%"
                                 :id="item.name"
@@ -64,7 +64,11 @@
                         </div>
                         <div class="video-val" v-else>{{ item.position }}</div>
                     </div>
-                    <div class="change-button-container">
+                    <div class="video-key-val">
+                        <div class="video-key">设备编号：</div>
+                        <div class="video-val">{{ item.code }}</div>
+                    </div>
+                    <!-- <div class="change-button-container">
                         <div
                             class="change-button"
                             @click="modifyData"
@@ -79,8 +83,9 @@
                         >
                             取消
                         </div>
-                    </div>
+                    </div> -->
                 </div>
+                <div class="map-container" id="map"></div>
             </dv-border-box10>
         </div>
     </div>
@@ -91,47 +96,59 @@ import { onMounted, ref } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
 import axios from 'axios'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
+import BackEndRequest from '../../api/backend'
+import { loadImage } from '../../utils/mapUtils'
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 // import 'viplayer/dist/index.css'
 // import { videoPlay } from 'viplayer'
 // const token = 'at.2q8ej4p4114dtudb20awr9763vfz1f6o-5j403u7nkd-1ya7mgb-wv9z5z55f'
-const token = 'at.742vjiq01mtq2g3jbnkckwuq3ze19j4w-839um484hs-1qki2ev-lammqrxtd'
-
+const token = ref(
+    'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
+)
 const defaultVal = [
     {
-        name: '民主沙上游监控S01',
+        name: '民主沙上游围堤监控',
+        code: 'FB5033036',
         position: '32.04023206, 120.51992163',
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=${token}`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
     },
     {
-        name: '民主沙中游监控S02',
+        name: '民主沙靖江市江滩办事处外堤监控',
+        code: 'FB5033037',
         position: '32.03683063, 120.52666202',
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=${token}`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
     },
     {
-        name: '民主沙中游监控S03',
+        name: '民主沙海事码头监控',
         position: '32.02839471, 120.54611474',
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=${token}`,
+        code: 'FB5033035',
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
     },
 ]
 
 const videoList = ref([
     {
-        name: '民主沙监控1',
+        name: '民主沙上游围堤监控',
+        code: 'FB5033036',
         position: '32.0432963, 120.5122242',
-        videoUrl:
-        `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=${token}`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
     },
     {
-        name: '民主沙监控2',
+        name: '民主沙靖江市江滩办事处外堤监控',
+        code: 'FB5033037',
         position: '32.0381061, 120.5263473',
-        videoUrl:
-        `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=${token}`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
     },
     {
-        name: '民主沙监控3',
+        name: '民主沙海事码头监控',
+        code: 'FB5033035',
         position: '32.0316674, 120.5402574',
-        videoUrl:
-        `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=${token}`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
     },
 ])
 
@@ -148,6 +165,161 @@ const cancelClick = () => {
     videoList.value = defaultVal
     changeStatus.value = false
 }
+
+const mapFlyToRiver = (mapIns) => {
+    if (!mapIns) return
+    mapIns.fitBounds(
+        [
+            [120.48957922676836, 32.03001616423072],
+            [120.59109640208264, 32.054171362618625],
+        ],
+        {
+            pitch: 32.45,
+            duration: 1500,
+            // zoom: 8,
+        },
+    )
+}
+
+const makeVideoDeviceGeojson = (vidInfoList) => {
+    return {
+        type: 'FeatureCollection',
+        features: vidInfoList.map((item) => {
+            return {
+                type: 'Feature',
+                properties: item,
+                geometry: {
+                    coordinates: [item.longitude, item.latitude],
+                    type: 'Point',
+                },
+            }
+        }),
+    }
+}
+
+let map
+
+onMounted(() => {
+    map = new mapboxgl.Map({
+        container: 'map', // container ID
+        accessToken:
+            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+        style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+        center: [120.542, 32.036], // starting position [lng, lat]
+        zoom: 8, // starting zoom
+        bounds: [
+            [114.36611654985586, 30.55501729652339],
+            [124.5709218840081, 35.31358005439914],
+        ],
+    })
+
+    map.on('load', async () => {
+        mapFlyToRiver(map)
+
+        map.addSource('mzsPlaceLabelSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
+        })
+        map.addSource('mzsPlaceLineSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
+        })
+        map.addSource('mzsBankLineSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
+        })
+        map.addSource('mzsBankAreaSSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}'],
+        })
+        map.addLayer({
+            id: 'mzsLine',
+            type: 'line',
+            source: 'mzsPlaceLineSource',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(26, 87, 138, 0.6)',
+                'line-width': 1,
+            },
+        })
+
+        map.addLayer({
+            id: 'mzsSectionArea1',
+            type: 'fill',
+            source: 'mzsBankAreaSSource',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': [
+                    'match',
+                    ['get', 'stability'],
+                    '较稳定',
+                    '#18b915',
+                    '稳定',
+                    '#06bef1',
+                    '不稳定',
+                    '#df8105',
+                    '较不稳定',
+                    '#ee3603',
+                    '#18b915',
+                ],
+            },
+        })
+        map.addLayer({
+            id: 'mzsBankLine',
+            type: 'line',
+            source: 'mzsBankLineSource',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(31, 14, 223, 0.75)',
+                'line-width': 4,
+            },
+        })
+        await loadImage(map, '/geoStyle/video_monitor.png', 'vid-device-icon')
+        const videoDeviceInfoList = (await BackEndRequest.getVideoDeviceInfo())
+            .data
+        const vidGeojson = makeVideoDeviceGeojson(videoDeviceInfoList)
+        map.addSource('vid-source', {
+            type: 'geojson',
+            data: vidGeojson,
+        })
+        map.addLayer({
+            id: 'vid-icon',
+            type: 'symbol',
+            source: 'vid-source',
+            layout: {
+                'icon-image': 'vid-device-icon',
+                'icon-size': 0.14,
+                'icon-allow-overlap': true,
+            },
+        })
+        map.addLayer({
+            id: 'vid-label',
+            type: 'symbol',
+            source: 'vid-source',
+            layout: {
+                'text-field': ['get', 'machineId'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-offset': [-0.5, 1.25],
+                'text-anchor': 'top',
+                'text-allow-overlap': true,
+            },
+            paint: {
+                'text-color': 'rgba(81, 34, 186, 1)',
+            },
+        })
+        // console.log('vid', vidGeojson)
+    })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -403,6 +575,15 @@ div.bank-video-container {
                     }
                 }
             }
+        }
+
+        div.map-container {
+            margin-left: 0.5vw;
+            margin-top: 1vh;
+            width: 25vw;
+            height: 36vh;
+
+            background-color: #1649b8;
         }
     }
 }

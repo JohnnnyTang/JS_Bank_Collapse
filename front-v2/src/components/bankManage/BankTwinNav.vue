@@ -2,7 +2,7 @@
     <div class="vertical-menu-container">
         <div class="placement-container upper" @click="returnPage">
             <div class="back-icon"></div>
-            <div class="back-text">返回平台</div>
+            <div class="back-text">返回实时监测</div>
         </div>
         <el-scrollbar>
             <el-menu
@@ -202,7 +202,7 @@ div.vertical-menu-container {
 
                 color: #032a96;
                 font-weight: bold;
-                font-size: calc(0.8vw + 0.6vh);
+                font-size: calc(0.8vw + 0.4vh);
 
                 border-top-right-radius: 8px;
                 border-bottom-right-radius: 8px;
