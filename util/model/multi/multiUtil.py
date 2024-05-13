@@ -43,6 +43,116 @@ def imagexy2geo(dataset: gdal.Dataset, row: float, column: float):
     return (x, y)
 
 
+def isSectionInArea(
+    dataset: gdal.Dataset, x1: float, y1: float, x2: float, y2: float
+) -> bool:
+    tag = True
+    max_col = dataset.RasterXSize
+    max_row = dataset.RasterYSize
+
+    row1 = geo2imagexy(dataset, x1, y1)[0]
+    col1 = geo2imagexy(dataset, x1, y1)[1]
+    row2 = geo2imagexy(dataset, x2, y2)[0]
+    col2 = geo2imagexy(dataset, x2, y2)[1]
+    if row1 < 0 or col1 < 0 or row2 < 0 or col2 < 0:
+        tag = False
+    if row1 >= max_row or col1 >= max_col or row2 >= max_row or col2 >= max_col:
+        tag = False
+
+    if tag:
+        k = (row2 - row1) / (col2 - col1)
+        b = row1 - k * col1
+        if abs(row2 - row1) <= abs(col2 - col1):
+            if col1 <= col2:
+                for i in range(col1, col2 + 1):
+                    temp_row = round(k * i + b)
+
+                    if (
+                        temp_row >= 0
+                        and temp_row < max_row
+                        and i >= 0
+                        and i < max_col
+                    ):
+                        band: gdal.Band = dataset.GetRasterBand(1)
+                        array = band.ReadAsArray(i, temp_row, 1, 1)
+                        if array:
+                            value: float = float(array[0, 0])
+                            if value < -233:
+                                tag = False
+                        else:
+                            tag = False
+                    if k >= 0 and (i >= max_col or temp_row >= max_row):
+                        break
+                    if k < 0 and (i > max_col or temp_row < 0):
+                        break
+            else:
+                for i in range(col1, col2 - 1, -1):
+                    temp_row = round(k * i + b)
+                    if (
+                        temp_row >= 0
+                        and temp_row < max_row
+                        and i >= 0
+                        and i < max_col
+                    ):
+                        band: gdal.Band = dataset.GetRasterBand(1)
+                        array = band.ReadAsArray(i, temp_row, 1, 1)
+                        if array:
+                            value: float = float(array[0, 0])
+                            if value < -233:
+                                tag = False
+                        else:
+                            tag = False
+                    if k >= 0 and (i < 0 or temp_row < 0):
+                        break
+                    if k < 0 and (i < 0 or temp_row >= max_row):
+                        break
+        else:
+            if row1 <= row2:
+                for i in range(row1, row2 + 1):
+                    temp_col = round((i - b) / k)
+                    if (
+                        temp_col >= 0
+                        and temp_col < max_col
+                        and i >= 0
+                        and i < max_row
+                    ):
+                        band: gdal.Band = dataset.GetRasterBand(1)
+                        array = band.ReadAsArray(temp_col, i, 1, 1)
+                        if array:
+                            value: float = float(array[0, 0])
+                            if value < -233:
+                                tag = False
+                        else:
+                            tag = False
+                    if k >= 0 and (i >= max_row or temp_col >= max_col):
+                        break
+                    if k < 0 and (i > max_row or temp_col < 0):
+                        break
+            else:
+                for i in range(row1, row2 - 1, -1):
+                    temp_col = round((i - b) / k)
+                    if (
+                        temp_col >= 0
+                        and temp_col < max_col
+                        and i >= 0
+                        and i < max_row
+                    ):
+                        band: gdal.Band = dataset.GetRasterBand(1)
+                        array = band.ReadAsArray(temp_col, i, 1, 1)
+                        if array:
+                            value: float = float(array[0, 0])
+                            if value < -233:
+                                tag = False
+                        else:
+                            tag = False
+                    if k > 0 and (i < 0 or temp_col < 0):
+                        break
+                    if k < 0 and (i < 0 or temp_col >= max_col):
+                        break
+
+    return tag
+
+
 def getSectionPointList(
     dataset: gdal.Dataset, x1: float, y1: float, x2: float, y2: float
 ) -> list[tuple[float, float, float]]:
@@ -351,7 +461,7 @@ def computeSaIndex(
 
 # 6. Ln
 def computeLnIndex(
-    ZNow: list[float], yearNow: int, ZBefore: list[float], yearBefore: int
+    ZNow: list[float], currentDate: str, ZBefore: list[float], beforeDate: str
 ) -> tuple[tuple[int, int, int, int], str, float]:
     totalNum: int = min(len(ZNow), len(ZBefore))
     LnList: list = []
@@ -360,28 +470,36 @@ def computeLnIndex(
         tLn = ZNow[i] - ZBefore[i]
         if tLn < 0:
             LnList.append(tLn)
-
     if len(LnList) == 0:
         return ((1, 0, 0, 0), "较低风险", 0)
-    Ln = abs(min(LnList) / (yearNow - yearBefore))
+
+    [currentYear, currentMonth, currentDay] = currentDate.split("-")
+    [beforeYear, beforeMonth, beforeDay] = beforeDate.split("-")
+    month = (
+        (int(currentYear) - int(beforeYear)) * 12
+        + int(currentMonth)
+        - int(beforeMonth)
+        + ((int(currentDay) - int(beforeDay)) / 30)
+    )
+    Ln = abs(min(LnList) / (month))
 
     matrix: tuple[int, int, int, int] = (0, 0, 0, 0)
     message: str = ""
 
-    if Ln < 2.0:
+    if Ln < 2.0 / 12:
         matrix = (1, 0, 0, 0)
         message = "较低风险"
-    elif Ln < 5.0:
+    elif Ln < 5.0 / 12:
         matrix = (0, 1, 0, 0)
         message = "低风险"
-    elif Ln < 8.0:
+    elif Ln < 8.0 / 12:
         matrix = (0, 0, 1, 0)
         message = "高风险"
     else:
         matrix = (0, 0, 0, 1)
         message = "较高风险"
 
-    return (matrix, message, Ln)
+    return (matrix, message, LnList)  # type: ignore
 
 
 def getRiskMatrix(
