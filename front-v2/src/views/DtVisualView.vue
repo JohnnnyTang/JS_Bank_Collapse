@@ -25,6 +25,11 @@
         <div class="legend-pos" v-show="activeStatus[2]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <mapLegend @close="closeHandler"></mapLegend>
         </div>
+
+        <div class="featDetail" v-draggable="{ bounds: 'body' }">
+            <featDetail></featDetail>
+        </div>
+
     </div>
 </template>
 
@@ -37,6 +42,7 @@ import sideBar from '../components/dataVisual/common/sideBar.vue'
 import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
 import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
+import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
 import { initScratchMap } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
@@ -754,6 +760,13 @@ function featureHighlight(layer, nameField, name, map) {
         position: absolute;
         z-index: 2;
         right: 1vw;
+        top: 10vh;
+    }
+
+    div.featDetail{
+        position: absolute;
+        z-index: 2;
+        left: 20vw;
         top: 10vh;
     }
 

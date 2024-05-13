@@ -48,15 +48,7 @@
                     </template>
                 </el-tree>
             </div>
-
-
-
-
         </div>
-
-
-
-
     </div>
 </template>
 
@@ -91,6 +83,16 @@ const featureCount = ref(0)
 watch(filterText, (val) => {
     treeRef.value.filter(val)
 })
+watch(() => sceneStore.latestScene, (newV, oldV) => {
+    let sceneIndex = Scenes.value.indexOf(oldV)
+    console.log(sceneIndex, oldV);
+    sceneIndex != -1 && (sceneTagChecked.value[sceneIndex] = false)
+    sceneIndex = Scenes.value.indexOf(newV)
+    console.log(sceneIndex, newV);
+    sceneIndex != -1 && (sceneTagChecked.value[sceneIndex] = true)
+    updateLgroupTags(newV)
+})
+
 
 const filterNode = (value, data) => {
     if (!value) return true
@@ -107,6 +109,7 @@ const SceneTagClickHandler = (i) => {
     sceneTagChecked.value[i] = true
     featureCount.value = 0
     data.value = []
+    updateFeatureCount()
     updateLgroupTags(Scenes.value[i])
 }
 const updateLgroupTags = (sceneName) => {
@@ -126,6 +129,9 @@ const updateLgroupTags = (sceneName) => {
 
     LGroups.value = newLayerGroupTags
     LGroupsTagChecked.value = falseArray
+    data.value = []
+    updateFeatureCount()
+    LGroupsTagClickHandler(0)
 }
 
 
@@ -136,6 +142,7 @@ const LGroupsTagClickHandler = async (i) => {
     } else {
         deleteTreeData()
     }
+    updateFeatureCount()
 }
 
 const appednTreeData = async () => {
@@ -145,14 +152,14 @@ const appednTreeData = async () => {
             checkedLayerGroup.push(LGroups.value[i])
         }
     }
-    console.log(checkedLayerGroup);
+    // console.log(checkedLayerGroup);
 
     let layers = []
     for (let i = 0; i < checkedLayerGroup.length; i++) {
         layers.push(...sceneStore.LAYERGROUPMAP.value[checkedLayerGroup[i]].layerIDs)
     }
 
-    console.log(layers);
+    // console.log(layers);
 
     let map = mapStore.getMap()
     for (let i = 0; i < layers.length; i++) {
@@ -164,6 +171,11 @@ const appednTreeData = async () => {
         }
 
         let layerid = layers[i]
+        if(!map.getLayer(layerid)){
+            console.log('图层不存在', layerid);
+            continue
+        }
+        console.log('图层存在', layerid);
         let sourceid = map.getLayer(layerid).source
         // 监测当前treeNode是否已经存在Node
         const treeHasNode = (nodeName) => {
@@ -203,13 +215,23 @@ const deleteTreeData = async () => {
             noCcheckedLayerGroup.push(LGroups.value[i])
         }
     }
+    console.log(noCcheckedLayerGroup);
     let noLayers = []
     for (let i = 0; i < noCcheckedLayerGroup.length; i++) {
         noLayers.push(...sceneStore.LAYERGROUPMAP.value[noCcheckedLayerGroup[i]].layerIDs)
     }
-    for (let i = 0; i < data.value.length; i++) {
-        let index = noLayers.indexOf(data.value[i].label)
-        index != -1 && data.value.splice(i, 1)
+    console.log(noLayers);
+    for (let i = 0; i < noLayers.length; i++) {
+
+        let index = -1
+        for (let j = 0; j < data.value.length; j++) {
+            if (data.value[j].label === noLayers[i]) {
+                index = j
+                break
+            }
+        }
+
+        index != -1 && data.value.splice(index, 1)
     }
     updateFeatureCount()
 }
@@ -219,7 +241,7 @@ const detailClickHandler = (node, data) => {
     let featureId = data.label
     let property = data.property
 
-
+    console.log(data.property)
     // 要素高亮
     featureHighLight(layerId, mapStore.getMap(), featureId, property)
 

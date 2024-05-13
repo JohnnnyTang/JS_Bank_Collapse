@@ -3,7 +3,7 @@
         <div class="top-section" :class="$attrs.class">
             <div class="title">
                 <div class="title-text">
-                    {{props.title}}
+                    {{ props.title }}
                 </div>
             </div>
         </div>
@@ -23,7 +23,7 @@ const props = defineProps({
     width: 13vw;
     height: 4vh;
     border-radius: 5px;
-    background: rgb(20,115,196);
+    background: rgb(20, 115, 196);
     padding: 4px;
     overflow: hidden;
     box-shadow: #cbeafd 10px 7px 20px 0px;
@@ -52,14 +52,14 @@ const props = defineProps({
             height: 4vh;
 
             .title-text {
-                color:  rgb(234, 244, 252);
+                color: rgb(234, 244, 252);
                 font-size: calc(0.8vw + 0.8vh);
                 font-style: normal;
                 font-weight: 700;
                 margin-left: 1vw;
                 line-height: 4vh;
                 font-family: 'Microsoft YaHei';
-                
+
             }
         }
 
@@ -82,7 +82,13 @@ const props = defineProps({
     }
 
     .top-section.active {
-        background: linear-gradient(45deg, #C9E1F5, #5af4ff);
+        background: linear-gradient(45deg, rgb(255, 255, 255), #C9E1F5);
+
+        .title {
+            .title-text {
+                color: rgb(27, 116, 193);
+            }
+        }
 
     }
 }

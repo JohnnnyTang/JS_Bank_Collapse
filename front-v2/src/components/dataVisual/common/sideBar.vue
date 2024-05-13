@@ -9,11 +9,12 @@
             <hr class="hr_gradient">
 
             <div class="scenes-tree-container">
-                <el-tree style="max-width: 600px" :data="dataSource" node-key="id" default-expand-all
-                    :expand-on-click-node="false">
+                <el-tree style="max-width: 600px" :data="dataSource" :expand-on-click-node="true" node-key="label"
+                    :default-expanded-keys="expandKey">
                     <template #default="{ node, data }">
                         <span class="custom-tree-node" @click="treeNodeClickHandler(node, data)">
-                            <sceneContainer v-if="node.level == 1" :title="data.label"></sceneContainer>
+                            <sceneContainer v-if="node.level == 1" :title="data.label" :class="{ active: data.active }">
+                            </sceneContainer>
                             <subSceneContainer v-else-if="node.level == 2" :title="data.label" :icon-src="data.icon"
                                 :class="{ active: data.active }">
                             </subSceneContainer>
@@ -28,7 +29,7 @@
 
 <script setup>
 import { BorderBox9 as DvBorderBox9, Decoration11 as DvDecoration11 } from '@kjgl77/datav-vue3'
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import subSceneContainer from '../common/subSceneContainer.vue';
 import sceneContainer from '../common/sceneContainer.vue'
 import { tree, scenes, layerGroups } from '../js/SCENES'
@@ -42,7 +43,7 @@ const sceneDict = {
     '涉水工程': 1,
     '重点岸段': 2,
 }
-
+const expandKey = ['全江概貌']
 
 const treeNodeClickHandler = (node, data) => {
     // console.log(node);
@@ -77,6 +78,9 @@ const treeNodeClickHandler = (node, data) => {
             sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
             sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
             sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
+            sceneStore.latestLayerGroup = selectedLayerGroupID
+
+            // sceneStore.latestLayerGroup.value = data.label
 
         } else if (node.level == 1) {
             let selectedSceneID = data.label
@@ -86,6 +90,7 @@ const treeNodeClickHandler = (node, data) => {
             for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
                 dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
             }
+            sceneStore.latestScene = selectedSceneID
         }
     }
 
@@ -102,6 +107,7 @@ onMounted(async () => {
         dataSource.value[0].active = true
         let mapInstance = mapStore.getMap()
         let selectedSceneID = '全江概貌'
+        sceneStore.latestScene = selectedSceneID
         sceneStore.SCENEMAP.value[selectedSceneID].setMap(mapInstance)
         sceneStore.SCENEMAP.value[selectedSceneID].showScene()
         sceneStore.SCENEMAP.value[selectedSceneID].active = true

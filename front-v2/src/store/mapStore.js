@@ -64,7 +64,9 @@ const useLayerStore = defineStore('layerStore', () => {
 const useNewSceneStore = defineStore('newSceneStore', () => {
     const SCENEMAP = ref({})
     const LAYERGROUPMAP = ref({})
-    return { SCENEMAP, LAYERGROUPMAP }
+    const latestScene = ref('')
+    const latestLayerGroup = ref('')
+    return { SCENEMAP, LAYERGROUPMAP, latestScene, latestLayerGroup }
 })
 
 const totalLayer = [
