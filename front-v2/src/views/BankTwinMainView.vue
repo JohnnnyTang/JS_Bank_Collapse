@@ -164,16 +164,6 @@ const navToManage = () => {
     router.push('/bankManage')
 }
 const updateWarnInfoDesc = () => {
-    /*
-    {
-        "deviceCode": "DVI3010425438293",
-        "deviceId": "MZS120.55327892_32.02707923_1",
-        "id": "16e97f22-75e3-41e4-ab56-ff72315df113",
-        "threeDiff": 26.299943,
-        "warnTime": "2024-05-13 21:40:32"
-    }
-     */
-
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
@@ -192,11 +182,8 @@ const updateWarnInfoDesc = () => {
     warningList.value = WARN_TEXT
 
     const marqueeBlockWidth = marqueeBlockDom.value.offsetWidth
-    animateTime.value = `${marqueeBlockWidth / 2}s`
+    animateTime.value = `${marqueeBlockWidth}s`
 }
-// watch(() => warnInfoStore.warnInfo, (newV,oldV) => {
-//     console.log(newV,oldV);
-// })
 
 onMounted(async () => {
     map = new mapboxgl.Map({

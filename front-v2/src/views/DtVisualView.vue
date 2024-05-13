@@ -38,7 +38,7 @@
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
 
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, ref, watch, onUnmounted } from 'vue';
 import sideBar from '../components/dataVisual/common/sideBar.vue'
 import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
 import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
@@ -196,6 +196,11 @@ const tempFunction = async (mapInstance, layerName) => {
     console.log(properties);
 }
 
+onUnmounted(() => {
+    console.log('onUnmounted')
+    map && map.remove()
+    console.log('map.remove')
+})
 
 </script>
 
