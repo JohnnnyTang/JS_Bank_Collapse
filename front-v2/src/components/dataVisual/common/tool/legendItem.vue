@@ -39,7 +39,7 @@ const props = defineProps({
             // image..
             // background-color...
             width: 100%;
-            height: 50%;
+            height: 30%;
             background-size: contain;
             background-repeat: no-repeat;
         }

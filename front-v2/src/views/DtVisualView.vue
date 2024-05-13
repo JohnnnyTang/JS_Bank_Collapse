@@ -23,7 +23,7 @@
             <layerCtrl @close="closeHandler"></layerCtrl>
         </div>
         <div class="legend-pos" v-show="activeStatus[2]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
-            <mapLegend @close="closeHandler" :legendList="legendList" :test="test"></mapLegend>
+            <mapLegend @close="closeHandler" :test="t" :legendList="legendList"></mapLegend>
         </div>
 
         <div class="featDetail" v-draggable="{ bounds: 'body' }" v-show="showDetail">
@@ -64,41 +64,51 @@ const styles = [
 ]
 const featureInfo = ref({})
 const showDetail = ref(false)
-const legendList = reactive([{
-    style: {
-        'background-color': 'rgb(215,132,50)',
-    },
-    text: '过江通道-桥'
-},
-{
-    style: {
-        'background-color': 'rgb(200,199,195)',
-    },
-    text: '过江通道-隧道/通道'
-},])
-const test = reactive('123')
+const legendList = ref([])
+const t = ref('123')
 
 watch(() => sceneStore.latestScene, (val) => {
     if (val == '重点岸段') {
         activeStatus.value[2] = true
-        // 展示过江通道图例
-        // legendList.value= [
-        //     {
-        //         style: {
-        //             'background-color': 'rgb(215,132,50)',
-        //         },
-        //         text: '过江通道-桥'
-        //     },
-        //     {
-        //         style: {
-        //             'background-color': 'rgb(200,199,195)',
-        //         },
-        //         text: '过江通道-隧道/通道'
-        //     },
-        // ]
-        test.value = '456'
+        legendList.value = [
+            {
+                style: {
+                    'background-color': '#FF7F6B',
+                },
+                text: '一级预警岸段'
+            },
+            {
+                style: {
+                    'background-color': '#6BA9FF',
+                },
+                text: '二级预警岸段'
+            },
+            {
+                style: {
+                    'background-color': '#B2EA9D',
+                },
+                text: '三级预警岸段'
+            },
+        ]
+
     } else if (val == '涉水工程') {
         activeStatus.value[2] = true
+        // 展示过江通道图例
+        legendList.value = [
+            {
+                style: {
+                    'background-color': 'rgb(215,132,50)',
+                },
+                text: '过江通道-桥'
+            },
+            {
+                style: {
+                    'background-color': '#6BA9FF',
+                },
+                text: '过江通道-隧道/通道'
+            },
+        ]
+        t.value = '456'
     }
 })
 

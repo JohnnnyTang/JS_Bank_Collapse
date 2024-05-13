@@ -34,14 +34,6 @@ watch(props, (newV, oldV) => {
     console.log(newV, oldV)
 })
 
-onMounted(() => {
-    console.log(props);
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'q') {
-            console.log(props);
-        }
-    })
-})
 
 const close = () => {
     emit('close', 2)

@@ -1202,7 +1202,7 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'line-opacity': 1,
-                    'line-color': '#FFD8B0',
+                    'line-color': '#6BA9FF',
                     'line-width': 2.0,
                 },
             })
