@@ -1,5 +1,5 @@
 <template>
-    <div class="container" v-show="true">
+    <div class="container">
         <div class="info-content-container">
             <div class="device-detail-container">
                 <div class="device-name-text">{{ DEVICETYPEMAP[(+deviceInfo.type) - 1] }}</div>
@@ -12,7 +12,7 @@
                         <div class="device-bank-text">{{ STATIONMAP[deviceInfo.stationCode] }}</div>
                     </div>
                 </div>
-                <div class="device-button-container" v-show="buttonShow">
+                <div class="device-button-container">
                     <div class="device-status-button" @click="clickbuttonHandler">
                         {{ buttonTxt }}</div>
                 </div>
@@ -50,69 +50,67 @@
             </div>
 
             <div class="chart" v-if="showChart">
-                <pureChart></pureChart>
+                <pureChart :feature-info="deviceInfo"></pureChart>
             </div>
+            <!-- <div class="buttons">
+                <el-check-tag :checked="checked[0]" @click="deviceClick(0)">测斜仪</el-check-tag>
+                <el-check-tag :checked="checked[1]" @change="deviceClick(1)">孔隙水压力计</el-check-tag>
+            </div> -->
+
         </div>
     </div>
-
-
 </template>
 
 <script setup>
-import { onMounted, ref, computed, onBeforeMount } from 'vue';
-import pureChart from '../monitorDevice/pureChart.vue';
+import { onMounted, ref } from 'vue';
+import pureChart from '../monitorDevice/pureChartV2.vue';
 
 const props = defineProps({
-    deviceInfo: Object,
-    zoom: Object
+    deviceInfo_CX: Object,
+    deviceInfo_KXS: Object,
 })
 
-
+const checked = ref([true, false])
 const showChart = ref(false)
-const buttonShow = ref(false)
 const buttonTxt = ref("查看图表")
-const show = computed(() => {
-    if (props.zoom.value > 10)
-        return true
-    return false
-})
+
 const imgSrcPrefix = 'http://localhost:5173//device/all/'
 
 
-const deviceInfo = props.deviceInfo
+const deviceInfo = props.deviceInfo_CX
 const STATIONMAP = {
     'MZS': '民主沙'
 }
-const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪','','摄像头']
+const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
 const DEVICEPICMAP = ['/gnssBase.png', '/changePress.png', '/waterPress.png', '/inclino.png']
 
 const clickbuttonHandler = () => {
     showChart.value = !showChart.value
     buttonTxt.value = showChart.value ? "设备概要" : "查看图表"
 }
+const deviceClick = (i) => {
+    if(i == 0){
+        checked.value[0] = true
+        checked.value[1] = false
+        deviceInfo.value = props.deviceInfo_CX
+    }else{
+        checked.value[0] = false
+        checked.value[1] = true
+        deviceInfo.value = props.deviceInfo_KXS
+    }
+}
 
-onBeforeMount(()=>{
-    console.log('monitorDetailV2 onBeforeMount!!!');
-})
 onMounted(async () => {
     console.log('monitorDetailV2 onMounted!!!');
     deviceInfo.value["status"] = '正常运行';
     deviceInfo.value["updating"] = false;
-
-    if(deviceInfo.value.type === '6'){
-        buttonShow.value = false
-    }else{
-        buttonShow.value = true
-    }
-
 })
 
 
 </script>
 
 <style lang="scss" scoped>
-
-.container{
+.container {
     position: relative;
     display: block;
     width: 25vw;

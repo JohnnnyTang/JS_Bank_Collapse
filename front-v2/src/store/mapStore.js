@@ -146,5 +146,10 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
     return { layerAdded, layesrAdded, layerRemove, layerHide, layerShowing, layersHide, layersShowing, layersRemove, layerState }
 })
 
+const useWarnInfoStore = defineStore('WarnInfoStore', () => {
+    const warnInfo = ref([])
 
-export { useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore }
+    return { warnInfo }
+})
+
+export { useWarnInfoStore, useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore }

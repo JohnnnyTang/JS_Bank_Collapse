@@ -6,8 +6,6 @@
                 {{ name }}
             </div>
         </div>
-
-        <!-- <div class="chart" id="chart"></div> -->
         <div class="chart" ref="chartRef"></div>
 
     </div>
@@ -17,9 +15,12 @@
 import { onMounted, ref, computed, watch } from 'vue';
 import * as echarts from 'echarts'
 import { MonitorDataAssistant } from './ChartData'
-import { useSceneStore } from '../../../store/mapStore';
 
-const selectedFeature = computed(() => useSceneStore().selectedFeature)
+
+const props = defineProps({
+    featureInfo: Object
+})
+const selectedFeature = computed(() => props.featureInfo)
 const selectedIndex = ref(0)
 const chartRef = ref()
 
@@ -37,17 +38,17 @@ const showChart = (index) => {
     }
 }
 
-// watch(selectedFeature, async (newV, oldV) => {
-//     selectedIndex.value = 0;
-//     myChart && myChart.clear()
-//     if (newV) {
-//         dataAssitant.value = new MonitorDataAssistant(newV)
-//         await dataAssitant.value.getMonitoringdata()
-//         dataAssitant.value.getProcessedDataObject()
-//         dataAssitant.value.getChartOptions()
-//         myChart.setOption(dataAssitant.value.chartOptions.options[0])
-//     }
-// })
+watch(selectedFeature, async (newV, oldV) => {
+    selectedIndex.value = 0;
+    myChart && myChart.clear()
+    if (newV) {
+        dataAssitant.value = new MonitorDataAssistant(newV)
+        await dataAssitant.value.getMonitoringdata()
+        dataAssitant.value.getProcessedDataObject()
+        dataAssitant.value.getChartOptions()
+        myChart.setOption(dataAssitant.value.chartOptions.options[0])
+    }
+})
 
 
 

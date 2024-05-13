@@ -782,7 +782,7 @@ const layerAddFunctionMap = {
                     data: stress,
                 })
         }
-        await loadImage(map, '/geoStyle/gnss-dot.png', 'gnss-static')
+        await loadImage(map, '/icons/GNSS.png', 'gnss-static')
 
         !map.getLayer('GNSS') &&
             map.addLayer({
@@ -881,7 +881,7 @@ const layerAddFunctionMap = {
                     data: stress,
                 })
         }
-        await loadImage(map, '/geoStyle/manometer-dia.png', 'manometer-static')
+        await loadImage(map, '/icons/孔隙水压力计.png', 'manometer-static')
 
         !map.getLayer('孔隙水压力计') &&
             map.addLayer({
@@ -930,7 +930,7 @@ const layerAddFunctionMap = {
                     data: stress,
                 })
         }
-        await loadImage(map, '/geoStyle/stress-tri.png', 'stress-static')
+        await loadImage(map, '/icons/应力桩.png', 'stress-static')
 
         !map.getLayer('应力桩') &&
             map.addLayer({
