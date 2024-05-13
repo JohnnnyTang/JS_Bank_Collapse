@@ -239,24 +239,24 @@ const tree = [
                 icon: '/icons/岸段名录.png'
 
             },
-            {
-                label: '历史崩岸',
-                icon: '/icons/历史崩岸.png'
+            // {
+            //     label: '历史崩岸',
+            //     icon: '/icons/历史崩岸.png'
 
-            },
+            // },
             {
                 label: '近岸地形',
                 icon: '/icons/近岸地形.png'
 
             },
-            {
-                label: '近年冲淤',
-                icon: '/icons/近年冲淤.png'
-
-            },
+            // {
+            //     label: '近年冲淤',
+            //     icon: '/icons/近年冲淤.png'
+            // },
         ]
     }
 ]
+
 
 
 
@@ -265,5 +265,5 @@ export {
     layerGroups,
     initLayerScenes,
     initLayerGroups,
-    tree
+    tree,
 }

@@ -27,7 +27,6 @@ const emit = defineEmits(['close'])
 
 const props = defineProps({
     legendList: Array,
-    test: Object
 })
 
 watch(props, (newV, oldV) => {
@@ -112,10 +111,31 @@ div.legend-container {
         height: 24vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         background-color: rgb(254, 254, 254);
         transform: scale(0.95);
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-color: rgba(6, 181, 197, 0.219);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #15a1e294;
+            border-radius: 5px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background-color: #3af0f781;
+        }
+
     }
 
-}</style>
+}
+</style>

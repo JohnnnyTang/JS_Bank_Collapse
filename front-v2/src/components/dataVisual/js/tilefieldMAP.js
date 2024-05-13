@@ -201,9 +201,127 @@ const sourceColumnMap = {
     "bank-level3-source": 1
 }
 
+const legendMap = {
+    '全江概貌': [
+        {
+            style: {
+                'height': '10%',
+                'background-color': 'rgb(27,116,193)',
+            },
+            text: '流域水系'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width':'50%',
+                // 'transform': 'translateX(50%)',
+                'background-color': 'rgb(76,103,169)',
+            },
+            text: '湖泊河流'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width':'50%',
+                'background-image': `url('/icons/shuiwenzhandian.png')`,
+                'transform': 'translateX(20%)',
+            },
+            text: '水文站点'
+        },
+    ],
+    '涉水工程': [
+        {
+            style: {
+                'height': '10%',
+                'background-color': '#D3ABF5',
+            },
+            text: '堤防工程'
+        },
+        //45,47,116
+        {
+            style: {
+                'height': '80%',
+                'width':'50%',
+                'background-color': 'rgb(45,47,116)',
+            },
+            text: '码头工程'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width':'50%',
+                'background-color': '#337ecc',
+            },
+            text: '水库工程'
+        },
+        {
+            style: {
+                'height': '30%',
+                'width':'20%',
+                'background-color': 'rgb(45,47,116)',
+            },
+            text: '水闸工程'
+        },
+        {
+            style: {
+                'height': '30%',
+                'width':'20%',
+                'background-color': 'rgb(45,47,116)',
+            },
+            text: '泵站工程'
+        },
+        {
+            style: {
+                'height': '30%',
+                'width':'20%',
+                'background-color': '#529b2e',
+            },
+            text: '组合工程'
+        },
+        {
+            style: {
+                'height': '15%',
+                'background-color': 'rgb(215,132,50)',
+            },
+            text: '过江大桥'
+        },
+        {
+            style: {
+                'height': '15%',
+                'background-color': '#E6A23C',
+            },
+            text: '过江隧道/通道'
+        },
+    ],
+    '重点岸段': [
+        {
+            style: {
+                'background-color': '#FF7F6B',
+            },
+            text: '一级预警岸段'
+        },
+        {
+            style: {
+                'background-color': '#6BA9FF',
+            },
+            text: '二级预警岸段'
+        },
+        {
+            style: {
+                'background-color': '#B2EA9D',
+            },
+            text: '三级预警岸段'
+        },
+    ]
+}
+
+
+
+
 export {
     sourceNameMap,
     sourceFieldMap,
     sourceZoomMap,
-    sourceColumnMap
+    sourceColumnMap,
+    legendMap
 }

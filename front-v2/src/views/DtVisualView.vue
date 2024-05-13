@@ -23,7 +23,7 @@
             <layerCtrl @close="closeHandler"></layerCtrl>
         </div>
         <div class="legend-pos" v-show="activeStatus[2]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
-            <mapLegend @close="closeHandler" :test="t" :legendList="legendList"></mapLegend>
+            <mapLegend @close="closeHandler" :legendList="legendList"></mapLegend>
         </div>
 
         <div class="featDetail" v-draggable="{ bounds: 'body' }" v-show="showDetail">
@@ -47,7 +47,7 @@ import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
 import { initScratchMap } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
-import { sourceFieldMap } from '../components/dataVisual/js/tilefieldMAP';
+import { sourceFieldMap, legendMap } from '../components/dataVisual/js/tilefieldMAP';
 import axios from 'axios';
 
 
@@ -70,45 +70,16 @@ const t = ref('123')
 watch(() => sceneStore.latestScene, (val) => {
     if (val == '重点岸段') {
         activeStatus.value[2] = true
-        legendList.value = [
-            {
-                style: {
-                    'background-color': '#FF7F6B',
-                },
-                text: '一级预警岸段'
-            },
-            {
-                style: {
-                    'background-color': '#6BA9FF',
-                },
-                text: '二级预警岸段'
-            },
-            {
-                style: {
-                    'background-color': '#B2EA9D',
-                },
-                text: '三级预警岸段'
-            },
-        ]
+        legendList.value = legendMap['重点岸段']
 
     } else if (val == '涉水工程') {
         activeStatus.value[2] = true
         // 展示过江通道图例
-        legendList.value = [
-            {
-                style: {
-                    'background-color': 'rgb(215,132,50)',
-                },
-                text: '过江通道-桥'
-            },
-            {
-                style: {
-                    'background-color': '#6BA9FF',
-                },
-                text: '过江通道-隧道/通道'
-            },
-        ]
-        t.value = '456'
+        legendList.value = legendMap['涉水工程']
+    }
+    else if (val == '全江概貌') {
+        activeStatus.value[2] = true
+        legendList.value = legendMap['全江概貌']
     }
 })
 

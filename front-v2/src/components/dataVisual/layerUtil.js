@@ -1155,7 +1155,7 @@ const layerAddFunctionMap = {
 
 
     ////////////// 涉水工程
-    ////////长江提防
+    ////////长江堤防
     '长江堤防': async (map) => {
         !map.getSource('embankmentLine') &&
             map.addSource('embankmentLine', {
@@ -1202,7 +1202,7 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'line-opacity': 1,
-                    'line-color': '#6BA9FF',
+                    'line-color': '#E6A23C',
                     'line-width': 2.0,
                 },
             })
@@ -1295,7 +1295,7 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-color': '#2B2E76',
+                    'fill-color': '#337ecc',
                 },
             })
     },
@@ -1358,7 +1358,7 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'circle-color': 'rgb(79,188,215)',
+                    'circle-color': '#529b2e',
                     'circle-blur': 0.5,
                     'circle-radius': 6,
                 },
