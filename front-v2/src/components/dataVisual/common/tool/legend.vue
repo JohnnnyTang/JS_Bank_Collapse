@@ -10,7 +10,8 @@
         </div>
         <hr>
         <div class="content">
-            <legendItem v-for="(legendItem, i) in legendList" :key="i" :style="legendItem.style" :text="legendItem.text">
+            <legendItem v-for="(legendItem, i) in props.legendList" :key="i" :style="legendItem.style"
+                :text="legendItem.text">
             </legendItem>
         </div>
     </div>
@@ -19,31 +20,28 @@
 <script setup>
 import { Decoration7 } from '@kjgl77/datav-vue3'
 import legendItem from './legendItem.vue'
+import { onMounted, watch } from 'vue';
 
 const emit = defineEmits(['close'])
-const legendList = [
-    {
-        style: {
-            'background-color': 'rgb(75, 115, 181)',
-        },
-        text: 'test1'
-    },
-    {
-        style: {
-            'background-color': 'rgb(75, 0, 181)',
-        },
-        text: 'test2'
-    },
-    {
-        style: {
-            'height':'100%',
-            'background-image': `url('/geoStyle/gnss-dot.png')`,
-            'transform': 'translateX(40%)',
-        },
-        text: 'test3'
-    }
-]
 
+
+const props = defineProps({
+    legendList: Array,
+    test: Object
+})
+
+watch(props, (newV, oldV) => {
+    console.log(newV, oldV)
+})
+
+onMounted(() => {
+    console.log(props);
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'q') {
+            console.log(props);
+        }
+    })
+})
 
 const close = () => {
     emit('close', 2)
@@ -75,8 +73,9 @@ div.legend-container {
         align-items: center;
 
         &:hover {
-            cursor:move;
+            cursor: move;
         }
+
         .title-back {
             padding-left: 1vw;
             padding-right: 1vw;
@@ -89,6 +88,7 @@ div.legend-container {
                 color: rgb(75, 115, 181);
             }
         }
+
         .miniIcon {
             position: absolute;
             right: 0.5vw;
@@ -97,7 +97,8 @@ div.legend-container {
             background-image: url('/icons/minimize.png');
             background-size: contain;
             background-repeat: no-repeat;
-            &:hover{
+
+            &:hover {
                 cursor: pointer;
             }
         }
@@ -110,7 +111,7 @@ div.legend-container {
         border: 0;
         height: 0.4vh;
         width: 90%;
-        background-image: linear-gradient(to right, rgb(65, 90, 255), rgb(14, 155, 219),  rgb(65, 90, 255));
+        background-image: linear-gradient(to right, rgb(65, 90, 255), rgb(14, 155, 219), rgb(65, 90, 255));
     }
 
     .content {
@@ -125,5 +126,4 @@ div.legend-container {
         transform: scale(0.95);
     }
 
-}
-</style>
+}</style>

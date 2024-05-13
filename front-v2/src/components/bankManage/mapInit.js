@@ -425,9 +425,6 @@ const mapInit = async (map, vis) => {
 
             }
         })
-        map.jumpTo({
-            center: [120.51037306, 32.04268722],
-        })
         map.on('mousemove', deviceLayers, (e) => {
             map.getCanvas().style.cursor = 'pointer'
         })
@@ -468,7 +465,7 @@ const mapInit = async (map, vis) => {
             }
 
             if (e.key == 'Enter') {
-                const minute = 100
+                const minute = 720
                 let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
 
                 let lastPos
@@ -664,7 +661,7 @@ const open = (features, map) => {
     const selectedDevice = ref({})
     let selectedCode
     // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
-    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪']
+    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪','','摄像头']
 
     const radioGroupVNode = h('div', [
         h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),

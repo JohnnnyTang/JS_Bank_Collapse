@@ -400,7 +400,7 @@ const layerAddFunctionMap = {
                     data: level3,
                 })
         }
-        await loadImage(map, '/geoStyle/warning1.png', 'warning1')
+        // await loadImage(map, '/geoStyle/warning1.png', 'warning1')
 
         !map.getLayer('一级预警岸段') &&
             map.addLayer({
@@ -409,18 +409,10 @@ const layerAddFunctionMap = {
                 source: 'bank-level1-source',
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: {
-                    'line-color': 'rgb(121, 164, 35)',
+                    'line-color': '#FF7F6B',
                     'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                    'line-pattern': 'warning1',
+                    'line-width': 3,
+                    // 'line-pattern': 'warning1',
                 },
                 layout: {
                     'line-cap': 'round',
@@ -459,7 +451,7 @@ const layerAddFunctionMap = {
                 })
         }
 
-        await loadImage(map, '/geoStyle/warning2.png', 'warning2')
+        // await loadImage(map, '/geoStyle/warning2.png', 'warning2')
         !map.getLayer('二级预警岸段') &&
             map.addLayer({
                 id: '二级预警岸段',
@@ -467,18 +459,10 @@ const layerAddFunctionMap = {
                 source: 'bank-level2-source',
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: {
-                    'line-color': 'rgb(121, 164, 35)',
+                    'line-color': '#6BA9FF',
                     'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                    'line-pattern': 'warning2',
+                    'line-width': 3,
+                    // 'line-pattern': 'warning2',
                 },
                 layout: {
                     'line-cap': 'round',
@@ -515,7 +499,7 @@ const layerAddFunctionMap = {
                     data: level3,
                 })
         }
-        await loadImage(map, '/geoStyle/warning3.png', 'warning3')
+        // await loadImage(map, '/geoStyle/warning3.png', 'warning3')
         !map.getLayer('三级预警岸段') &&
             map.addLayer({
                 id: '三级预警岸段',
@@ -523,18 +507,10 @@ const layerAddFunctionMap = {
                 source: 'bank-level3-source',
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: {
-                    'line-color': 'rgb(121, 164, 35)',
+                    'line-color': '#B2EA9D',
                     'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                    'line-pattern': 'warning3',
+                    'line-width': 3,
+                    // 'line-pattern': 'warning3',
                 },
                 layout: {
                     'line-cap': 'round',
@@ -1206,7 +1182,7 @@ const layerAddFunctionMap = {
             })
     },
     ////////过江通道
-    '过江通道-线': async (map) => {
+    '过江通道-隧道/通道': async (map) => {
         !map.getSource('riverPassageLine') &&
             map.addSource('riverPassageLine', {
                 type: 'vector',
@@ -1214,9 +1190,9 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
                 ],
             })
-        !map.getLayer('过江通道-线') &&
+        !map.getLayer('过江通道-隧道/通道') &&
             map.addLayer({
-                id: '过江通道-线',
+                id: '过江通道-隧道/通道',
                 type: 'line',
                 source: 'riverPassageLine',
                 'source-layer': 'default',
@@ -1248,10 +1224,10 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-extrusion-color': '#E0D2C4',
+                    'fill-extrusion-color': '#E7AE6D',
                     'fill-extrusion-base': 0,
                     'fill-extrusion-height': 200,
-                    'fill-extrusion-opacity': 0.5
+                    'fill-extrusion-opacity': 1.0
                 },
             })
     },
@@ -1272,7 +1248,7 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-extrusion-color': '#BBAD9F',
+                    'fill-extrusion-color': '#FF9925',
                     'fill-extrusion-base': 200,
                     'fill-extrusion-height': 210,
                     'fill-extrusion-opacity': 1.0
@@ -1301,10 +1277,7 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    ///////大型枢纽 
-    '大型枢纽': async (map) => {
-        // null
-    },
+
     '水库大坝': async (map) => {
         !map.getSource('reservoirArea') &&
             map.addSource('reservoirArea', {
@@ -1395,6 +1368,32 @@ const layerAddFunctionMap = {
     ///////////// 重点岸段
     /// 岸段名录
     '岸段名录': async (map) => {
+        console.log('add 岸段名录');
+        // no geo
+        // !map.getSource('importantBank') &&
+        //     map.addSource('importantBank', {
+        //         type: 'vector',
+        //         tiles: [
+        //             tileServer + '/tile/vector/importantBank/{x}/{y}/{z}',
+        //         ],
+        //     })
+        // !map.getLayer('岸段名录') &&
+        //     map.addLayer({
+        //         id: '岸段名录',
+        //         type: 'line',
+        //         source: 'importantBank',
+        //         'source-layer': 'default',
+        //         layout: {
+        //             'line-cap': 'round',
+        //             'line-join': 'round',
+        //         },
+        //         paint: {
+        //             'line-opacity': 1,
+        //             'line-color': '#FFD8B0',
+        //             'line-width': 2.0,
+        //         },
+        //     })
+
 
     },
     /// 历史崩岸
@@ -1403,6 +1402,8 @@ const layerAddFunctionMap = {
     },
     /// 近岸地形
     '近岸地形': async (map) => {
+        console.log('add 近岸地形');
+
         !map.getSource('riverBg') &&
             map.addSource('riverBg', {
                 type: 'vector',

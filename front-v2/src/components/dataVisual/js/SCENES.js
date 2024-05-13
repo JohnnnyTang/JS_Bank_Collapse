@@ -51,7 +51,7 @@ class LayerScene {
 
     setMap(mapInstance) {
         this.map = mapInstance
-        for(let i = 0; i < this.LayerGroups.length; i++){
+        for (let i = 0; i < this.LayerGroups.length; i++) {
             this.LayerGroups[i].setMap(this.map)
         }
     }
@@ -86,21 +86,20 @@ const layerGroupMap = {
     '湖泊河流': ['湖泊河流'],
     '水文站点': ['水文站点'],
     '长江堤防': ['长江堤防'],
-    '过江通道': ['过江通道-线', '过江通道-桥墩', '过江通道-桥'],
+    '过江通道': ['过江通道-隧道/通道', '过江通道-桥墩', '过江通道-桥'],
     '沿江码头': ['沿江码头'],
-    '大型枢纽': [],
     '水库大坝': ['水库大坝'],
     '水闸工程': ['水闸工程'],
     '泵站工程': ['泵站工程'],
     '组合工程': ['组合工程'],
-    '岸段名录': [],
+    '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段'],
     '历史崩岸': [],
     '近岸地形': ['近岸地形'],
     '近年冲淤': [],
 }
 const layerSceneMap = {
     '全江概貌': ['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'],
-    '涉水工程': ['长江堤防', '过江通道', '沿江码头', '大型枢纽', '水库大坝', '水闸工程', '泵站工程', '组合工程'],
+    '涉水工程': ['长江堤防', '过江通道', '沿江码头', '水库大坝', '水闸工程', '泵站工程', '组合工程'],
     '重点岸段': ['岸段名录', '历史崩岸', '近岸地形', '近年冲淤'],
 }
 
@@ -112,14 +111,13 @@ const initLayerGroups = () => {
         '湖泊河流': ['湖泊河流'],
         '水文站点': ['水文站点'],
         '长江堤防': ['长江堤防'],
-        '过江通道': ['过江通道-线', '过江通道-桥墩', '过江通道-桥'],
+        '过江通道': ['过江通道-桥墩', '过江通道-桥', '过江通道-隧道/通道',],
         '沿江码头': ['沿江码头'],
-        '大型枢纽': [],
         '水库大坝': ['水库大坝'],
         '水闸工程': ['水闸工程'],
         '泵站工程': ['泵站工程'],
         '组合工程': ['组合工程'],
-        '岸段名录': [],
+        '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段'],
         '历史崩岸': [],
         '近岸地形': ['近岸地形'],
         '近年冲淤': [],
@@ -137,8 +135,8 @@ let layerGroupInstanceMap = initLayerGroups()
 const initLayerScenes = () => {
     const dict = {
         '全江概貌': ['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'],
-        '涉水工程': ['长江堤防', '过江通道', '沿江码头', '大型枢纽', '水库大坝', '水闸工程', '泵站工程', '组合工程'],
-        '重点岸段': ['岸段名录', '历史崩岸', '近岸地形', '近年冲淤'],
+        '涉水工程': ['长江堤防', '过江通道', '沿江码头', '水库大坝', '水闸工程', '泵站工程', '组合工程'],
+        '重点岸段': ['近岸地形', '历史崩岸', '岸段名录', '近年冲淤'],
     }
     let map = new Map()
     for (let key in dict) {
@@ -152,16 +150,16 @@ const initLayerScenes = () => {
     return map
 }
 
-const mapToObject = (mapObj)=>{
+const mapToObject = (mapObj) => {
     const obj = {}
-    mapObj.forEach((value,key)=>{
+    mapObj.forEach((value, key) => {
         obj[key] = value
     })
     return obj
 }
 
 
-const scenes = mapToObject(initLayerScenes()) 
+const scenes = mapToObject(initLayerScenes())
 const layerGroups = mapToObject(initLayerGroups())
 const tree = [
     {
@@ -209,11 +207,6 @@ const tree = [
             {
                 label: '沿江码头',
                 icon: '/icons/沿江码头.png'
-
-            },
-            {
-                label: '大型枢纽',
-                icon: '/icons/大型枢纽.png'
 
             },
             {

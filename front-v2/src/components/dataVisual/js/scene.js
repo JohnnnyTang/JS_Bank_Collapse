@@ -100,11 +100,6 @@ class NewScene {
 
                     },
                     {
-                        label: '大型枢纽',
-                        icon: '/icons/大型枢纽.png'
-
-                    },
-                    {
                         label: '水库大坝',
                         icon: '/icons/水库大坝.png'
 

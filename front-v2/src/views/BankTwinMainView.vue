@@ -103,19 +103,19 @@ const videoList = ref([
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙海事码头监控',
         position: '32.0316674, 120.5402574',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        //  videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
+         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
     },
 ])
 const warningList = ref([])
@@ -182,9 +182,9 @@ const updateWarnInfoDesc = () => {
 
         // 报警设备信息
         let deviceId = warnInfo[i].deviceId
-        let deviceName = DEVICETYPEMAP[deviceId.slice(-1)]
+        let deviceName = DEVICETYPEMAP[deviceId.slice(-1) - 1]
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒');
-        let threeDiff = warnInfo[i].threeDiff
+        let threeDiff = warnInfo[i].threeDiff.toFixed(3)
 
         let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}米！`
         WARN_TEXT.push(warnString)
@@ -192,7 +192,7 @@ const updateWarnInfoDesc = () => {
     warningList.value = WARN_TEXT
 
     const marqueeBlockWidth = marqueeBlockDom.value.offsetWidth
-    animateTime.value = `${marqueeBlockWidth / 5}s`
+    animateTime.value = `${marqueeBlockWidth / 2}s`
 }
 // watch(() => warnInfoStore.warnInfo, (newV,oldV) => {
 //     console.log(newV,oldV);
@@ -254,13 +254,6 @@ onMounted(async () => {
     //     console.log('get key')
     //     token.value = videoAccessKey.data.accessToken
     // }
-    animateTime.value = '0s'
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key == 's') {
-            animateTime.value = '5s'
-        }
-    })
 })
 
 onUnmounted(() => {

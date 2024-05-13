@@ -1,31 +1,17 @@
 <template>
     <div class="main">
-        <!-- <featDetail></featDetail> -->
+        <featDetail></featDetail>
     </div>
 </template>
 
 <script setup>
-// import featDetail from './common/tool/featDetail.vue';
+import featDetail from './common/tool/featDetail.vue';
 import { onMounted, watch } from 'vue';
-import { useWarnInfoStore } from '../../store/mapStore'
-const warnInfoStore = useWarnInfoStore()
+import axios from 'axios';
 
-watch(() => warnInfoStore.warnInfo, (newV, oldV) => {
-    console.log(newV, oldV);
-})
-
-onMounted(() => {
-    window.addEventListener('keydown', (e) => {
-        if (e.key == '1') {
-            warnInfoStore.warnInfo = [123, 123]
-        }
-        if (e.key == '2') {
-            warnInfoStore.warnInfo = [123, 123, 12312]
-        }
-        if (e.key == '3') {
-            warnInfoStore.warnInfo = []
-        }
-    })
+onMounted(async () => {
+    let data = (await axios.get(`http://localhost:5173/api/tile/vector/embankmentLine/info`)).data
+    console.log(data)
 })
 
 </script>

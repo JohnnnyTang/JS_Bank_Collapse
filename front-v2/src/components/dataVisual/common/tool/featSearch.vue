@@ -58,7 +58,7 @@ import { Decoration7 } from '@kjgl77/datav-vue3'
 import { ElTree } from 'element-plus';
 import { useMapStore, useNewSceneStore } from '../../../../store/mapStore';
 import axios from 'axios';
-import { sourceNameMap } from '../../js/tilefieldMAP'
+import { sourceNameMap, sourceZoomMap, sourceColumnMap } from '../../js/tilefieldMAP'
 import { tree } from '../../js/SCENES'
 
 // data
@@ -73,7 +73,7 @@ const selectedLayer = ref('')
 const sceneStore = useNewSceneStore()
 const mapStore = useMapStore()
 const data = ref([])
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'featureInfo'])
 const Scenes = ref(['全江概貌', '涉水工程', '重点岸段'])
 const sceneTagChecked = ref([true, false, false])
 const LGroups = ref(['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'])
@@ -85,10 +85,8 @@ watch(filterText, (val) => {
 })
 watch(() => sceneStore.latestScene, (newV, oldV) => {
     let sceneIndex = Scenes.value.indexOf(oldV)
-    console.log(sceneIndex, oldV);
     sceneIndex != -1 && (sceneTagChecked.value[sceneIndex] = false)
     sceneIndex = Scenes.value.indexOf(newV)
-    console.log(sceneIndex, newV);
     sceneIndex != -1 && (sceneTagChecked.value[sceneIndex] = true)
     updateLgroupTags(newV)
 })
@@ -136,13 +134,15 @@ const updateLgroupTags = (sceneName) => {
 
 
 const LGroupsTagClickHandler = async (i) => {
-    LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
-    if (LGroupsTagChecked.value[i]) {
-        await appednTreeData()
-    } else {
-        deleteTreeData()
-    }
-    updateFeatureCount()
+    setTimeout(async() => {
+        LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
+        if (LGroupsTagChecked.value[i]) {
+            await appednTreeData()
+        } else {
+            deleteTreeData()
+        }
+        updateFeatureCount()
+    },500)
 }
 
 const appednTreeData = async () => {
@@ -171,7 +171,7 @@ const appednTreeData = async () => {
         }
 
         let layerid = layers[i]
-        if(!map.getLayer(layerid)){
+        if (!map.getLayer(layerid)) {
             console.log('图层不存在', layerid);
             continue
         }
@@ -242,6 +242,7 @@ const detailClickHandler = (node, data) => {
     let property = data.property
 
     console.log(data.property)
+
     // 要素高亮
     featureHighLight(layerId, mapStore.getMap(), featureId, property)
 
@@ -310,10 +311,16 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
     let featureLayer = map.getLayer(layerId)
     let sourceid = featureLayer.source
 
+    emit('featureInfo', {
+        ogData: property,
+        sourceId: sourceid,
+        column: sourceColumnMap[sourceid]
+    })
+
     let paintMap = {
         'line': {
             'line-color': '#FF5D06',
-            'line-width': 3,
+            'line-width': 5,
         },
         'fill': {
             'fill-color': '#FF5D06',
@@ -333,23 +340,64 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
             'fill-extrusion-opacity': 1.0
         }
     }
-    map.addLayer({
-        id: `${layerId}-highlight-${featureId}`,//自定义
-        type: featureLayer.type,
-        source: featureLayer.source,
-        'source-layer': featureLayer.sourceLayer,
-        filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
-        layout: {
+    if (sourceid.includes('bank-level')) {
+        map.addLayer({
+            id: `${layerId}-highlight-${featureId}`,//自定义
+            type: featureLayer.type,
+            source: featureLayer.source,
+            filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
+            layout: {
 
-        },
-        paint: paintMap[featureLayer.type],
-    })
+            },
+            paint: paintMap[featureLayer.type],
+        })
+    } else {
+        map.addLayer({
+            id: `${layerId}-highlight-${featureId}`,//自定义
+            type: featureLayer.type,
+            source: featureLayer.source,
+            'source-layer': featureLayer.sourceLayer,
+            filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
+            layout: {
 
-    map.jumpTo({ center: [property.center_x, property.center_y] });
+            },
+            paint: paintMap[featureLayer.type],
+        })
+    }
+
+
+    let lng = property.center_x
+    let lat = property.center_y
+    if (sourceid.includes('bank-level')) {
+        let center = getCenterCoord(property.coord)
+        lng = center[0]
+        lat = center[1]
+    }
+    map.jumpTo({
+        center: [lng, lat],
+        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10
+    });
 
     setTimeout(() => {
-        map.removeLayer(`${layerId}-highlight-${featureId}`)
+        if (map.getLayer(`${layerId}-highlight-${featureId}`))
+            map.removeLayer(`${layerId}-highlight-${featureId}`)
     }, 3000)
+}
+
+const getCenterCoord = (coordsArray) => {
+    if (coordsArray.length % 2) {
+        return coordsArray[Math.floor(coordsArray.length / 2)]
+    } else {
+        let long =
+            (coordsArray[coordsArray.length / 2][0] +
+                coordsArray[coordsArray.length / 2 - 1][0]) /
+            2
+        let lat =
+            (coordsArray[coordsArray.length / 2][1] +
+                coordsArray[coordsArray.length / 2 - 1][1]) /
+            2
+        return [long, lat]
+    }
 }
 
 </script>

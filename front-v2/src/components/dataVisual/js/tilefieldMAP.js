@@ -103,6 +103,36 @@ const sourceFieldMap = {
             "level": "工程等别",
             "volume": "过闸流量"
         }
+    },
+    "bank-level1-source": {
+        "original": "重点岸段",
+        "fieldMap": {
+            "bankName": "名称",
+            "cityName": "所属城市",
+            "riverName": "所属河段",
+            "warningLevel": "预警等级",
+            "description": '简介',
+        }
+    },
+    "bank-level2-source": {
+        "original": "重点岸段",
+        "fieldMap": {
+            "bankName": "名称",
+            "cityName": "所属城市",
+            "riverName": "所属河段",
+            "warningLevel": "预警等级",
+            "description": '简介',
+        }
+    },
+    "bank-level3-source": {
+        "original": "重点岸段",
+        "fieldMap": {
+            "bankName": "名称",
+            "cityName": "所属城市",
+            "riverName": "所属河段",
+            "warningLevel": "预警等级",
+            "description": '简介',
+        }
     }
 }
 
@@ -119,10 +149,61 @@ const sourceNameMap = {
     "reservoirArea": "sp_name",
     "sluiceArea": "sp_name",
     "riverPassageLine": 'name',
-    "riverPassagePolygon": 'name'
+    "riverPassagePolygon": 'name',
+    "bank-level1-source": 'bankName',
+    "bank-level2-source": 'bankName',
+    "bank-level3-source": 'bankName',
+}
+
+const sourceZoomMap = {
+    "cityBoundaryLine": 8.5,
+    "riverSection": 9,
+    "riverArea": 11.5,
+    "lakeArea": 12,
+    "hydroStationPoint": 11,
+    "combineProjectPoint": 13,
+    "dockArea": 13.5,
+    "embankmentLine": 13,
+    "pumpArea": 15.5,
+    "reservoirArea": 14,
+    "sluiceArea": 15,
+    "riverPassageLine": 13,
+    "riverPassagePolygon": 13
+}
+
+// {
+//     "bankName": "七坝",
+//     "cityName": "南京市",
+//     "createTime": "2024-01-25 22:05:12",
+//     "description": "位于南京市浦口区桥林街道，板桥汽渡至骚狗山之间，全长约8.3公里，平均水深在-5米以下，属一级岸线，具有较好的发展空间和不可多得的资源优势",
+//     "id": "65b1fa18591ce236a211196c",
+//     "memo": "",
+//     "monitoringLength": 11.7,
+//     "number": 4,
+//     "riverName": "南京河段",
+//     "state": "active",
+//     "updateTime": "2024-01-25 22:05:12",
+//     "warningLevel": 1
+// }
+
+const sourceColumnMap = {
+    "riverArea": 2,
+    "lakeArea": 2,
+    "hydroStationPoint": 3,
+    "combineProjectPoint": 10,
+    "dockArea": 2,
+    "embankmentLine": 2,
+    "pumpArea": 2,
+    "reservoirArea": 2,
+    "sluiceArea": 2,
+    "bank-level1-source": 2,
+    "bank-level2-source": 1,
+    "bank-level3-source": 1
 }
 
 export {
     sourceNameMap,
-    sourceFieldMap
+    sourceFieldMap,
+    sourceZoomMap,
+    sourceColumnMap
 }
