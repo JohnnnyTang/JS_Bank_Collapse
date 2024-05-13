@@ -143,7 +143,7 @@ div.basic-info-container {
     backdrop-filter: blur(12px);
     box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
     background-color: rgba(156, 195, 255, 0.4);
-    border-radius: 8px;
+    border-radius: 4px;
     border: 2px solid rgb(28, 105, 247);
 }
 

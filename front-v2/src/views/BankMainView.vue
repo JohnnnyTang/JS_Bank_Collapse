@@ -162,12 +162,12 @@ onMounted(() => {
                 tileServer+'/tile/vector/mzsBankLine/{x}/{y}/{z}',
             ],
         })
-        map.addSource('mzsSectionLineSource', {
-            type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsSectionLine/{x}/{y}/{z}',
-            ],
-        })
+        // map.addSource('mzsSectionLineSource', {
+        //     type: 'vector',
+        //     tiles: [
+        //         tileServer+'/tile/vector/mzsSectionLine/{x}/{y}/{z}',
+        //     ],
+        // })
         map.addSource('mzsSectionLineLabelSource', {
             type: 'vector',
             tiles: [
@@ -444,21 +444,21 @@ onMounted(() => {
                 'line-width': 4,
             },
         })
-        map.addLayer({
-            id: 'mzsSectionLine',
-            type: 'line',
-            source: 'mzsSectionLineSource',
-            'source-layer': 'default',
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                'line-color': 'rgba(11, 214, 223, 0.9)',
-                'line-width': 4,
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsSectionLine',
+        //     type: 'line',
+        //     source: 'mzsSectionLineSource',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'line-cap': 'round',
+        //         'line-join': 'round',
+        //     },
+        //     paint: {
+        //         'line-opacity': 1,
+        //         'line-color': 'rgba(11, 214, 223, 0.9)',
+        //         'line-width': 4,
+        //     },
+        // })
         map.addLayer({
             id: 'mzsBankLabel',
             type: 'symbol',

@@ -99,7 +99,7 @@ const defaultVal = [
     },
     {
         key: '管理单位联系方式',
-        val: '13382058110',
+        val: 'xxxxxxxxxxx',
         type: ['half', 'right'],
     },
 ]
@@ -124,7 +124,7 @@ const mzsInfo = ref([
     },
     {
         key: '管理单位联系方式',
-        val: '13382058110',
+        val: 'xxxxxxxxxxx',
         type: ['half', 'right'],
     },
 ])
