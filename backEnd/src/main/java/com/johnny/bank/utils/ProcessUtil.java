@@ -39,7 +39,7 @@ public class ProcessUtil {
     static String pythonStr = "python";
 
 //    static String condaStr = "conda activate multiIndex &&";
-    static String condaStr = "conda activate bankModel &&";
+    static String condaStr = "conda activate Env1 &&";
 
 //    static String pythonStr = "python3";
 

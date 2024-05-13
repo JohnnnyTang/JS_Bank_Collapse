@@ -59,6 +59,55 @@
                 </div>
             </div>
         </div>
+        <div class="riskInfo-container">
+            <div class="riskInfo-title">
+                <dv-border-box2
+                :color="['rgb(63, 36, 214)', '#0c60af']"
+                >
+                    断面信息展示
+                </dv-border-box2>
+            </div>
+            <div class="riskInfo-item profileFlowSpeed">
+                <div class="item-title">
+                    断面流速：
+                </div>
+                <div 
+                    ref="flowGraphRef"
+                    class="flowspeed graph"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                ></div>
+            </div>
+            <div class="riskInfo-item profileShape">
+                <div class="item-title">
+                    断面形态对比：
+                </div>
+                <div class="profile-selector-container">
+                    <el-select
+                        v-model="profileValue"
+                        placeholder="选择断面"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="profileSelectChange"
+                        popper-class="profile-popper"
+                    >
+                        <el-option
+                            v-for="item in profileList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
+                            <span class="profile-name-text">
+                                {{ item.label }}
+                            </span>
+                        </el-option>    
+                    </el-select>
+                </div>
+                <div
+                    ref="shapeGraphRef"
+                    class="shape graph"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                ></div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -68,6 +117,10 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 import router from '../router/index'
+import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
+import { drawShapeGraph, drawFlowGraph } from '../components/bankRiskWarn/util.js'
+import tempData from '../components/bankRiskWarn/tempData.json'
+import * as echarts from 'echarts'
 
 let map = null
 
@@ -115,6 +168,78 @@ const placeList = ref([{ value: 'mzs', label: '民主沙右缘示范段' }])
 const sceneSelectChange = () => {}
 
 const onAddOption = () => {}
+
+const onAddProfileOption = () => {}
+
+const onAddProfile = () => {}
+
+
+const profileValue = ref(1)
+const profileList = ref([
+    {
+        value: 1,
+        label: '断面1',
+    },
+    {
+        value: 2,
+        label: '断面2',
+    },
+    {
+        value: 3,
+        label: '断面3',
+    },
+    {
+        value: 4,
+        label: '断面4',
+    },
+    {
+        value: 5,
+        label: '断面5',
+    },
+    {
+        value: 6,
+        label: '断面6',
+    },
+    {
+        value: 7,
+        label: '断面7',
+    },
+    {
+        value: 8,
+        label: '断面8',
+    },
+    {
+        value: 9,
+        label: '断面9',
+    },
+    {
+        value: 10,
+        label: '断面10',
+    },
+    {
+        value: 11,
+        label: '断面11',
+    },
+    {
+        value: 12,
+        label: '断面12',
+    }
+])
+const profileSelectChange = (inputValue) => {
+    profileValue.value = inputValue
+    drawShapeGraph(
+        shapeChart,
+        tempData[inputValue-1].section.map((value) => value[2]),
+        tempData[inputValue-1].beforeSection.map((value) => value[2]),
+        tempData[inputValue-1].SA[2],
+    )
+}
+
+let shapeChart = null
+let flowChart = null
+const shapeGraphRef = ref(null)
+const flowGraphRef = ref(null)
+const speed = [2,3,5,1,2,3,5,1,6,9,11,4]
 
 onMounted(() => {
     map = new mapboxgl.Map({
@@ -233,6 +358,19 @@ onMounted(() => {
 
         // })
     })
+
+    shapeChart = echarts.init(shapeGraphRef.value)
+    drawShapeGraph(
+        shapeChart,
+        tempData[profileValue.value-1].section.map((value) => value[2]),
+        tempData[profileValue.value-1].beforeSection.map((value) => value[2]),
+        tempData[profileValue.value-1].SA[2],
+    )
+    flowChart = echarts.init(flowGraphRef.value)
+    drawFlowGraph(
+        flowChart,
+        speed
+    )
 })
 </script>
 
@@ -330,6 +468,142 @@ div.risk-warn-container {
                 :deep(.el-select__tags-text) {
                     color: #2b61f7;
                     font-size: calc(0.4vw + 0.4vh);
+                }
+            }
+        }
+    }
+    div.riskInfo-container {
+        position: absolute;
+        top: 20vh;
+        left: 1vw;
+        height: 70vh;
+        width: 24vw;
+        border-radius: 8px;
+        border: #167aec 1px solid;
+        background-color: rgba(179, 201, 228, 0.6);
+        backdrop-filter: blur(5px);
+
+        div.riskInfo-title {
+            height: 4.5vh;
+            width: 10vw;
+            margin-left: 6.5vw;
+            margin-top: 0.6vh;
+            line-height: 4.5vh;
+            border-radius: 6px;
+            // background-color: rgba(235, 240, 247, 0.4);
+            text-align: center;
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+            font-size: calc(0.8vw + 0.8vh);
+            color: #0c60af;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+
+            :deep(.dv-border-box-2) {
+                width: 10vw;
+                height: 5vh;
+            }
+        }
+        div.riskInfo-item {
+            position: absolute;
+            width: 23vw;
+            left: 0.5vw;
+            border-radius: 6px;
+            border:#3b85e7 2px solid;
+
+            &.profileFlowSpeed {
+                top: 6.1vh;
+                height: 22vh;
+                // background-color: #b6b9eb;
+            }
+            
+            &.profileShape {
+                top: 29vh;
+                height: 40vh;
+                // background-color: #c9cad4;
+            }
+            
+            div.item-title {
+                position: absolute;
+                top: 0.5vh;
+                left: 0.5vw;
+                font-size: calc(0.8vh + 0.6vw);
+                font-weight: 600;
+                font-family: 'Microsoft YaHei';
+                // color: #a231e4;
+                // text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
+            }
+
+            div.profile-selector-container {
+                position: absolute;
+                width: 10vw;
+                height: 4vh;
+                left: 13vw;
+                // background-color: #d1d2db;
+
+                :deep(.el-select) {
+                    left: 4vw;
+                    top: 0.4vh;
+                    width: 5vw !important;
+                    height: 3vh !important;
+                    box-shadow:
+                        rgba(0, 132, 255, 0.8) 1px 1px,
+                        rgba(0, 119, 255, 0.7) 1px 1px,
+                        rgba(0, 119, 255, 0.6) 2px 2px;
+                    border-radius: 6px;
+                }
+
+                :deep(.el-select__wrapper) {
+                    height: 3vh;
+                    line-height: 3vh;
+                    border-radius: 6px;
+                    font-family: 'Microsoft YaHei';
+                    font-weight: bold;
+                    font-size: calc(0.4vw + 0.5vh);
+                    background-color: rgba(230, 253, 255, 0.7);
+                }
+
+                :deep(.el-select__placeholder) {
+                    color: #1c68cc;
+                }
+
+                :deep(.el-icon) {
+                    width: 0.8vw;
+                    height: 0.8vw;
+
+                    svg {
+                        width: 0.8vw;
+                        height: 0.8vw;
+
+                        path {
+                            fill: #00098a;
+                        }
+                    }
+                }
+                :deep(.el-select__tags-text) {
+                    color: #2b61f7;
+                    font-size: calc(0.4vw + 0.4vh);
+                }
+            }
+
+            div.graph {
+                position: absolute;
+                width: 22vw;
+                left: 0.5vw;
+                top: 4vh;
+
+                &.shape {
+                    height: 35vh;
+                    backdrop-filter: blur(5px);
+                    // background-color: rgba(220, 250, 248, 0.4);
+                }
+                
+                &.flowspeed {
+                    height: 17vh;
+                    backdrop-filter: blur(5px);
+                    // background-color: #00098a;
                 }
             }
         }
