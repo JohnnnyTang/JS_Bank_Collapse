@@ -27,7 +27,12 @@ springfox:
     swagger-ui:
       enabled: true
 
+multiIndex:
+  dataPath: E:\Data\bankProjectData\modelData
+  resPath: E:\Data\bankProjectData\modelRes\
+
 tile:
-  worldTilePath: E:/Data/2020-10-planet-14
-  nodeServicePath: E:/Data/node/index.js
+  mzsTilePath: D:/2024-work/shore_collapse/data/DEM/rasterTIle/
+  worldTilePath: E:/Data/bankProjectData/2020-10-planet-14
+  nodeServicePath: E:/Data/bankProjectData/node/2020-10-planet-14/index.js
 
