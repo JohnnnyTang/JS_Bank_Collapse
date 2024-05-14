@@ -197,7 +197,7 @@ const handleClick = (index) => {
             modelStore.modelProgress = 0
             modelStore.modelStatus = 'pending'
             const id = setInterval(() => {
-                modelStore.modelProgress += Math.random() * 100 * 3 / 3600 / 24
+                modelStore.modelProgress += Math.random() * 100 / 3600 / 0.5 / 24 * 3
                 if (modelStore.modelProgress >= 100) {
                     modelStore.modelStatus = 'success'
                     ElMessage({

@@ -35,7 +35,7 @@ import { useStabilityStore } from '../../../store/stabilityStore';
 
 const modelStore = useStabilityStore()
 const progress = computed(() => {
-    return Number(modelStore.modelProgress.toFixed(2))
+    return Number(modelStore.modelProgress.toFixed(3))
 })
 const time = computed(() => {
     const temp = (Date.now() - modelStore.modelStartTime) / 1000 / modelStore.modelProgress * (100 - modelStore.modelProgress)
