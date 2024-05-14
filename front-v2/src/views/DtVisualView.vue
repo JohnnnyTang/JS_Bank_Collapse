@@ -8,7 +8,7 @@
             <canvas id="GPUFrame"></canvas>
         </div>
         <div class="tools-container">
-            <div class="icon-container" v-for="i in 4">
+            <div class="icon-container" v-for="i in 4" :key="i">
                 <div class="icon" :style="styles[i - 1]" @click="toolClick(i - 1)"
                     :class="{ 'active': activeStatus[i - 1] }">
                 </div>
@@ -197,9 +197,7 @@ const tempFunction = async (mapInstance, layerName) => {
 }
 
 onUnmounted(() => {
-    // console.log('onUnmounted')
-    // map && map.remove()
-    // console.log('map.remove')
+    mapStore.destroyMap()
 })
 
 </script>

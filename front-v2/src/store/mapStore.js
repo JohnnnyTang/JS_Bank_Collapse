@@ -12,7 +12,11 @@ const useMapStore = defineStore('mapStore', () => {
         return map.value
     }
 
-    return { setMap, getMap }
+    function destroyMap() {
+        map.value = null
+    }
+
+    return { setMap, getMap, destroyMap }
 })
 
 const useSceneStore = defineStore('sceneStore', () => {

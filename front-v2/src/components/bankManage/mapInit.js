@@ -436,8 +436,8 @@ const mapInit = async (map, vis) => {
         })
 
         setTimeout(() => {
-            warnInterval(map, 20)
-        }, 1000)
+            warnInterval(map, 60)
+        }, 500)
         setInterval(() => {
             warnInterval(map, 60)
         }, 60 * 1000 * 20);
@@ -445,24 +445,24 @@ const mapInit = async (map, vis) => {
 
         ///////DEBUG////////
         window.addEventListener('keydown', async (e) => {
-            if (e.key === '3') {
-                setWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
-            }
-            if (e.key === '1') {
-                setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-            }
-            if (e.key === '2') {
-                setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
-            }
-            if (e.key === '4') {
-                removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
-            }
-            if (e.key === '5') {
-                removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-            }
-            if (e.key === '6') {
-                removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
-            }
+            // if (e.key === '3') {
+            //     setWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
+            // }
+            // if (e.key === '1') {
+            //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+            // }
+            // if (e.key === '2') {
+            //     setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
+            // }
+            // if (e.key === '4') {
+            //     removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
+            // }
+            // if (e.key === '5') {
+            //     removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
+            // }
+            // if (e.key === '6') {
+            //     removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
+            // }
 
             if (e.key == 'Enter') {
                 const minute = 720
@@ -661,7 +661,7 @@ const open = (features, map) => {
     const selectedDevice = ref({})
     let selectedCode
     // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
-    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪','','摄像头']
+    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪', '', '摄像头']
 
     const radioGroupVNode = h('div', [
         h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),

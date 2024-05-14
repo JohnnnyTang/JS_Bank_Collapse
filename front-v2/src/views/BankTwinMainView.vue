@@ -22,17 +22,10 @@
 
         <div class="marquee-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <div
-                    class="marquee-block"
-                    ref="marqueeBlockDom"
-                    :style="{ animationDuration: animateTime }"
-                >
-                    <div
-                        class="no-warn-block"
-                        v-if="warningList.length == 0"
-                        style="font-size: calc(0.5vw + 0.7vh); color: #e7f2ff"
-                    >
-                        {{ `当前无报警信息` }}
+                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
+                    <div class="no-warn-block" v-if="warningList.length == 0"
+                        style="font-size: calc(0.5vw + 0.7vh); color:#e7f2ff;">
+                        {{ `近一小时内无报警信息` }}
                     </div>
                     <div
                         v-else
@@ -263,12 +256,14 @@ const updateWarnInfoDesc = () => {
         let deviceName = DEVICETYPEMAP[deviceId.slice(-1) - 1]
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒')
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
-        
-        let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}米！`
+
+        let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}mm
+        ！`
         WARN_TEXT.push(warnString)
     }
     warnKeyValList.value[2].val = unique(deviceNameList).join(',')
     warnKeyValList.value[5].val = '是'
+    
     warningList.value = WARN_TEXT
     warnActive.value = true
 
