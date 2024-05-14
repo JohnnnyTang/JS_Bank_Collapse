@@ -176,7 +176,8 @@ const updateWarnInfoDesc = () => {
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒');
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
 
-        let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}米！`
+        let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}mm
+        ！`
         WARN_TEXT.push(warnString)
     }
     warningList.value = WARN_TEXT
