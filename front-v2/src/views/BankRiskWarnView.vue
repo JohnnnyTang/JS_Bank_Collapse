@@ -48,6 +48,13 @@
                     断面流速：
                 </div>
                 <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                <div class="graph-container flow">
+                    <div 
+                        ref="flowGraphRef"
+                        class="flowspeed graph"
+                        element-loading-background="rgba(214, 235, 255,0.8)"
+                    ></div>
+                </div>
             </div>
             <div class="riskInfo-item profileShape">
                 <div class="item-title">
@@ -64,8 +71,16 @@
                     </el-select>
                 </div>
                 <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                <div class="graph-container shape">
+                    <div
+                        ref="shapeGraphRef"
+                        class="shape graph"
+                        element-loading-background="rgba(214, 235, 255,0.8)"
+                    ></div>
+                </div>
             </div>
         </div>
+        <riskResultVue/>
     </div>
 </template>
 
@@ -76,6 +91,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
+import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 import { drawShapeGraph, drawFlowGraph } from '../components/bankRiskWarn/util.js'
 import tempData from '../components/bankRiskWarn/tempData.json'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
@@ -141,51 +157,51 @@ const profileValue = ref(1)
 const profileList = ref([
     {
         value: 1,
-        label: '断面1',
+        label: '断面 JC01',
     },
     {
         value: 2,
-        label: '断面2',
+        label: '断面 JC02',
     },
     {
         value: 3,
-        label: '断面3',
+        label: '断面 JC03',
     },
     {
         value: 4,
-        label: '断面4',
+        label: '断面 JC04',
     },
     {
         value: 5,
-        label: '断面5',
+        label: '断面 JC05',
     },
     {
         value: 6,
-        label: '断面6',
+        label: '断面 JC06',
     },
     {
         value: 7,
-        label: '断面7',
+        label: '断面 JC07',
     },
     {
         value: 8,
-        label: '断面8',
+        label: '断面 JC08',
     },
     {
         value: 9,
-        label: '断面9',
+        label: '断面 JC09',
     },
     {
         value: 10,
-        label: '断面10',
+        label: '断面 JC10',
     },
     {
         value: 11,
-        label: '断面11',
+        label: '断面 JC11',
     },
     {
         value: 12,
-        label: '断面12',
+        label: '断面 JC12',
     }
 ])
 const profileSelectChange = (inputValue) => {
@@ -584,7 +600,7 @@ div.risk-warn-container {
         border-radius: 8px;
         border: #167aec 1px solid;
         background-color: rgba(179, 201, 228, 0.6);
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(10px);
         z-index: 2;
 
         div.riskInfo-title {
@@ -651,7 +667,7 @@ div.risk-warn-container {
                 :deep(.el-select) {
                     left: 4vw;
                     top: 0.4vh;
-                    width: 5vw !important;
+                    width: 5.5vw !important;
                     height: 3vh !important;
                     box-shadow:
                         rgba(0, 132, 255, 0.8) 1px 1px,
@@ -694,11 +710,11 @@ div.risk-warn-container {
                 }
             }
 
-            div.graph {
+            div.graph-container {
                 position: absolute;
                 width: 22vw;
-                left: 0.5vw;
                 top: 4vh;
+                left: 0.5vw;
 
                 &.shape {
                     height: 35vh;
@@ -706,10 +722,26 @@ div.risk-warn-container {
                     // background-color: rgba(220, 250, 248, 0.4);
                 }
 
-                &.flowspeed {
+                &.flow {
                     height: 17vh;
                     backdrop-filter: blur(5px);
                     // background-color: #00098a;
+                }
+
+                div.graph {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    
+                    &.shape {
+                        // height: 35vh;
+                        // background-color: rgba(220, 250, 248, 0.4);
+                    }
+                    
+                    &.flowspeed {
+                        // height: 17vh;
+                        // background-color: #00098a;
+                    }
                 }
             }
         }
