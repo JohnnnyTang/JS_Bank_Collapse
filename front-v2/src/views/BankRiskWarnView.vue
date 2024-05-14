@@ -3,10 +3,6 @@
         <div class="map-container" id="map" ref="mapContainer"></div>
         <canvas id="GPUFrame"></canvas>
 
-        <div class="time-shower-container">
-            <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
-        </div>
-
         <div class="selector-container">
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div>
@@ -81,11 +77,36 @@
             </div>
         </div>
         <riskResultVue/>
+
+        <div class="flow-relative-container">
+            <div class="flow-relative-title">
+                <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
+                    流场信息
+                </dv-border-box2>
+            </div>
+
+            <div class="flow-relative-content">
+                <div class="flow-control-block">
+                    <label class="switch">
+                        <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
+                        <span class="slider"></span>
+                    </label>
+                    <div class="text-block">
+                        <div class="text">流场展示</div>
+                    </div>
+                </div>
+
+                <div class="time-shower-block">
+                    <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, reactive, watch } from 'vue'
+import { onMounted, ref, reactive, watch, onUnmounted } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -97,11 +118,25 @@ import tempData from '../components/bankRiskWarn/tempData.json'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initScratchMap } from '../utils/mapUtils';
 import SteadyFlowLayer from '../utils/m_demLayer/newFlow';
+import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
+import { ElMessage } from 'element-plus';
 
 let map = null
 const mapContainer = ref()
-const timeStep = ref(5)
+const timeStep = ref(0)
+const showFlow = ref(false)
+let flowSrc = []
+for (let i = 0; i < 26; i++) {
+    flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+}
+
+let flow = reactive(new SteadyFlowLayer(
+    '近岸流场',
+    '/scratchSomething/terrain_flow/json/station.bin',
+    flowSrc,
+    (url) => url.match(/uv_(\d+)\.bin/)[1],
+))
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -112,9 +147,26 @@ const mapFlyToRiver = (mapIns) => {
         ],
         {
             duration: 1500,
-            zoom: 13,
+            zoom: 11.5,
         },
     )
+}
+const mapJumpToRiver = (mapIns) => {
+    if (!mapIns) return
+    mapIns.jumpTo({
+        center: [120.529, 32.032],
+        zoom: 11.5,
+    })
+    // mapIns.fitBounds(
+    //     [
+    //         [120.46987922676836, 32.03201616423072],
+    //         [120.61089640208264, 32.052171362618625],
+    //     ],
+    //     {
+    //         duration: 500,
+    //         zoom: 11.5,
+    //     },
+    // )
 }
 
 const sceneValue = ref('mzs2024')
@@ -152,6 +204,29 @@ const onAddProfileOption = () => { }
 
 const onAddProfile = () => { }
 
+const flowControlHandler = () => {
+    showFlow.value = !showFlow.value
+    // console.log(showFlow.value);
+    if (showFlow.value) {
+        let map = useMapStore().getMap()
+        if (map) {
+            flow.show()
+            mapFlyToRiver(map)
+        }
+        else {
+            ElMessage({
+                'type': 'warning',
+                'message': '地图尚未加载，请等待'
+            })
+        }
+    } else flow.hide()
+
+}
+
+watch(() => flow.currentResourcePointer, (v) => {
+    // console.log(flow.currentResourcePointer)
+    timeStep.value = flow.currentResourcePointer
+})
 
 const profileValue = ref(1)
 const profileList = ref([
@@ -340,9 +415,9 @@ onMounted(() => {
     // })
 
     initScratchMap(mapContainer.value).then((map) => {
-        mapFlyToRiver(map)
+        mapJumpToRiver(map)
+        // mapFlyToRiver(map)
         // console.log('map loaded!!!')
-        mapFlyToRiver(map)
         map.addSource('mzsPlaceLabelSource', {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
@@ -439,25 +514,12 @@ onMounted(() => {
                 'line-width': 4,
             },
         })
-        let flowSrc = []
-        for (let i = 0; i < 26; i++) {
-            flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-        }
-
-        let flow = reactive(new SteadyFlowLayer(
-            '近岸流场',
-            '/scratchSomething/terrain_flow/json/station.bin',
-            flowSrc,
-            (url) => url.match(/uv_(\d+)\.bin/)[1],
-        ))
+        useMapStore().setMap(map)
+        console.log('set map!');
         flow.particleNum.n = 2800;
         flow.speedFactor.n = 1.0;
-        watch(() => flow.currentResourcePointer, (v) => {
-            // console.log(flow.currentResourcePointer)
-            timeStep.value = flow.currentResourcePointer
-        })
         map.addLayer(flow)
-
+        flow.hide()
     })
 
     shapeChart = echarts.init(shapeGraphRef.value)
@@ -472,6 +534,10 @@ onMounted(() => {
         flowChart,
         speed
     )
+})
+
+onUnmounted(() => {
+    useMapStore().destroyMap()
 })
 </script>
 
@@ -500,10 +566,129 @@ div.risk-warn-container {
         pointer-events: none;
     }
 
-    div.time-shower-container{
+    div.flow-relative-container {
         position: absolute;
-        bottom: 4vh;
-        right: 2vw;
+        top: 70vh;
+        right: 1vw;
+        height: 20vh;
+        width: 15vw;
+        border-radius: 8px;
+        border: #167aec 1px solid;
+        background-color: rgba(179, 201, 228, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 2;
+
+        div.flow-relative-title {
+            height: 4.5vh;
+            width: 15vw;
+            margin-top: 0.6vh;
+            line-height: 4.5vh;
+            border-radius: 6px;
+            // background-color: rgba(235, 240, 247, 0.4);
+            text-align: center;
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+            font-size: calc(0.8vw + 0.8vh);
+            color: #0c60af;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+            display: flex;
+            justify-content: center;
+
+            :deep(.dv-border-box-2) {
+                width: 8vw;
+                height: 5vh;
+            }
+        }
+
+        div.flow-relative-content {
+            margin-top: 1vh;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+
+            div.flow-control-block {
+                position: relative;
+                height: 13vh;
+                width: 6vw;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+
+                .switch {
+                    font-size: 20px;
+                    position: relative;
+                    display: inline-block;
+                    width: 2em;
+                    height: 3.5em;
+
+                    input {
+                        display: none;
+                    }
+
+                    /* The slider */
+                    .slider {
+                        position: absolute;
+                        cursor: pointer;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: rgb(165, 219, 253);
+                        transition: 0.4s;
+                        border-radius: 10px;
+
+                        &:before {
+                            position: absolute;
+                            content: "";
+                            height: 1.4em;
+                            width: 1.4em;
+                            border-radius: 5px;
+                            left: 0.3em;
+                            bottom: 0.3em;
+                            background-color: white;
+                            transition: 0.4s;
+                        }
+                    }
+
+                    input:checked {
+                        +.slider {
+                            background-color: rgb(73, 90, 250);
+                        }
+
+                        +.slider:before {
+                            transform: translateY(-1.5em);
+                        }
+                    }
+                }
+
+                .text-block {
+                    font-size: 20px;
+                    width: 3em;
+                    height: 5em;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    .text {
+                        writing-mode: vertical-lr;
+                        color: rgb(0, 80, 166);
+                        color-scheme: light;
+                        font-family: 'Microsoft YaHei';
+                        font-weight: 700;
+                        user-select: none;
+                    }
+                }
+            }
+
+            div.time-shower-block {
+                position: relative;
+            }
+        }
+
     }
 
     div.selector-container {

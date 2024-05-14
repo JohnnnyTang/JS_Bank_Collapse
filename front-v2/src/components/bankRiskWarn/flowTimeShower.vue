@@ -85,14 +85,14 @@ onMounted(() => {
 }
 
 :deep(.el-progress-circle__track) {
-    stroke: rgb(167, 230, 240);
+    stroke: rgb(133, 205, 253);
     /* stroke-width: 4.8; */
     fill: rgba(19, 47, 97, 0.945);
     /* fill: rgb(170,221,167) */
 }
 
 :deep(.el-progress-circle__path) {
-    stroke: rgb(104, 198, 253);
+    stroke: rgb(66, 88, 255);
     /* stroke-width: 4.8; */
 }
 </style>

@@ -30,7 +30,7 @@
                 <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
                     <div class="no-warn-block" v-if="warningList.length == 0"
                         style="font-size: calc(0.5vw + 0.7vh); color:#e7f2ff;">
-                        {{ `当前无报警信息` }}
+                        {{ `近一小时内无报警信息` }}
                     </div>
                     <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
                         <div
