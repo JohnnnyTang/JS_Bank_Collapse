@@ -149,7 +149,7 @@ body,
 
 .profile-popper {
     .el-scrollbar__wrap {
-        width: 5vw;
+        width: 5.5vw;
         text-align: center;
         position: relative;
         z-index: 9999;

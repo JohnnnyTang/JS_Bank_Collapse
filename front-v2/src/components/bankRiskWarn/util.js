@@ -5,7 +5,7 @@
  */
 export const drawFlowGraph = (echarts, speed) => {
     const option = {
-        backgroundColor: "rgba(220, 250, 248, 0.4)",
+        backgroundColor: "rgba(220, 250, 248, 0.3)",
         tooltip: {
             trigger: 'axis',
             axisPointer: {
@@ -31,12 +31,22 @@ export const drawFlowGraph = (echarts, speed) => {
         xAxis: [
             {
               type: 'category',
-              data: speed.map((_, index) => `断面${index + 1}`)
+              data: speed.map((_, index) => `断面${index + 1}`),
+              axisLine:{
+                lineStyle:{
+                    color:'black'
+                }
+              }
             }
         ],
         yAxis: [
             {
-              type: 'value'
+              type: 'value',
+              axisLine:{
+                lineStyle:{
+                    color:'black'
+                }
+              }
             }
         ],
         series: [
@@ -100,7 +110,7 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
     })()
 
     const option = {
-        backgroundColor: "rgba(220, 250, 248, 0.4)",
+        backgroundColor: "rgba(220, 250, 248, 0.3)",
         tooltip: {
             trigger: 'axis',
             axisPointer: {
@@ -142,6 +152,11 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                 //  axisLabel:{
                 //     show:false
                 //  }
+                axisLine:{
+                    lineStyle:{
+                        color:'black'
+                    }
+                  }
             },
             {
                 gridIndex: 1,
@@ -151,6 +166,9 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                 axisLine: {
                     show: true,
                     onZero: false,
+                    lineStyle:{
+                        color:'black'
+                    }
                 },
             },
         ],
@@ -163,6 +181,11 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                 scale: true,
                 max: Math.round(max + 1),
                 min: Math.round(min - 1),
+                axisLine:{
+                    lineStyle:{
+                        color:'black'
+                    }
+                  }
             },
             {
                 type: 'value',
@@ -172,6 +195,9 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                 gridIndex: 1,
                 axisLine: {
                     show: false,
+                    lineStyle:{
+                        color:'black'
+                    }
                 },
                 scale: true,
             },
