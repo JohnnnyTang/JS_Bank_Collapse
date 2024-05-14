@@ -1,0 +1,15 @@
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <rect fill="#4C261D" stroke="#000" stroke-dasharray="5,2,2,2" x="337" y="0" width="2" height="0" id="svg_6"/>
+  <path fill="#ff7f00" stroke="#000" stroke-dasharray="5,2,2,2" opacity="undefined" d="m268,23l27,0l0,428l-27,0l0,-428z" id="svg_8"/>
+  <path stroke="#4C261D" style="vector-effect: non-scaling-stroke;" id="svg_4" d="m57.42174,-35.51999l0.745,1.30375l-0.745,-1.30375z" stroke-dasharray="5,5" fill="#ff7f00"/>
+  <rect stroke="#ff7f00" id="svg_16" height="10.14493" width="105.50725" y="-0.14493" x="-1.5942" fill="#ff7f00"/>
+  <rect stroke="#ff7f00" id="svg_17" height="9.27536" width="105.50725" y="90" x="1.01449" fill="#ff7f00"/>
+  <rect transform="rotate(90 5.21739 48.2609)" stroke="#ff7f00" id="svg_18" height="12.46377" width="105.50725" y="42.02898" x="-47.53623" fill="#ff7f00"/>
+  <rect transform="rotate(90 95.6521 49.4203)" stroke="#ff7f00" id="svg_19" height="9.56522" width="105.50725" y="44.63766" x="42.89851" fill="#ff7f00"/>
+  <rect transform="rotate(45 50.6522 49.9275)" stroke="#ff7f00" id="svg_20" height="10.14493" width="115.55021" y="44.85507" x="-7.12293" fill="#ff7f00"/>
+  <rect transform="rotate(135 51.5217 50.2174)" stroke="#ff7f00" id="svg_21" height="10.14493" width="115.55021" y="45.14493" x="-6.25337" fill="#ff7f00"/>
+ </g>
+
+</svg>

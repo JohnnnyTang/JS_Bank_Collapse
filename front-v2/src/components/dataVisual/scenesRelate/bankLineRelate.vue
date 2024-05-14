@@ -2,7 +2,7 @@
     <div class="bankLineRelate-contaniner">
         <div class="titlebox">
             <div class="icon"></div>
-            <div class="title">典型崩岸场景</div>
+            <div class="title">典型岸段场景</div>
         </div>
         <div class="card">
             <div class="content">
@@ -11,12 +11,12 @@
 
                         <div class="desc-content">
                             <div class="in-db-bank-container">
-                                <div class="in-db-bank">在库崩岸</div>
+                                <div class="in-db-bank">在库岸段</div>
                                 <div class="in-db-bank-num">{{ Info.banklineNum }}</div>
                             </div>
                             <div class="bank-desc">
                                 <div class="bank-desc-text">
-                                    预警岸段场景涵盖了的南京、扬中、镇扬、澄通、河口等各河段及河口段的典型崩岸信息以及基础地理信息。
+                                    典型岸段场景涵盖了的南京、扬中、镇扬、澄通、河口等各河段及河口段的典型岸段信息以及基础地理信息。
                                 </div>
                             </div>
 

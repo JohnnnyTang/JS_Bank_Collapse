@@ -12,7 +12,7 @@
                         <div class="device-bank-text">{{ STATIONMAP[deviceInfo.stationCode] }}</div>
                     </div>
                 </div>
-                <div class="device-button-container">
+                <div class="device-button-container" v-show="buttonShow">
                     <div class="device-status-button" @click="clickbuttonHandler">
                         {{ buttonTxt }}</div>
                 </div>
@@ -69,6 +69,7 @@ const props = defineProps({
 
 
 const showChart = ref(false)
+const buttonShow = ref(false)
 const buttonTxt = ref("查看图表")
 const show = computed(() => {
     if (props.zoom.value > 10)
@@ -82,7 +83,7 @@ const deviceInfo = props.deviceInfo
 const STATIONMAP = {
     'MZS': '民主沙'
 }
-const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
+const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪','','摄像头']
 const DEVICEPICMAP = ['/gnssBase.png', '/changePress.png', '/waterPress.png', '/inclino.png']
 
 const clickbuttonHandler = () => {
@@ -97,6 +98,13 @@ onMounted(async () => {
     console.log('monitorDetailV2 onMounted!!!');
     deviceInfo.value["status"] = '正常运行';
     deviceInfo.value["updating"] = false;
+
+    if(deviceInfo.value.type === '6'){
+        buttonShow.value = false
+    }else{
+        buttonShow.value = true
+    }
+
 })
 
 
@@ -109,6 +117,7 @@ onMounted(async () => {
     display: block;
     width: 25vw;
     height: 34vh;
+    transform: scale(0.8) translateY(20%);
 }
 
 div.info-content-container {

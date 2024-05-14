@@ -298,7 +298,6 @@ const generateOptions_GNSS = (processedData) => {
         title: {
             left: 'center',
             text: 'GNSS-三维累计位移曲线',
-            subtext: '近五小时',
             subtextStyle: {
                 color: 'rgb(34,45,148)',
                 fontSize: 12,
@@ -357,7 +356,6 @@ const generateOptions_GNSS = (processedData) => {
             left: 'center',
             top: 5,
             text: 'GNSS-三维相对位移曲线',
-            subtext: '近五小时',
             subtextStyle: {
                 color: 'rgb(34,45,148)',
                 fontSize: 12,
@@ -426,7 +424,6 @@ const generateOptions_Incline_new = (processedData) => {
             left: 'center',
             top: 5,
             text: '测斜仪-偏移曲线',
-            subtext: '近五小时',
             subtextStyle: {
                 color: 'rgb(34,45,148)',
                 fontSize: 12,
@@ -495,7 +492,6 @@ const generateOptions_Incline_new = (processedData) => {
             left: 'center',
             top: 5,
             text: '测斜仪-相对偏移曲线',
-            subtext: '近五小时',
             subtextStyle: {
                 color: 'rgb(34,45,148)',
                 fontSize: 12,
@@ -575,7 +571,6 @@ const generateOptions_Manometer_new = (processedData) => {
             text: "水位折线",
             left: 'center',
             top: 5,
-            subtext: '近五小时',
             subtextStyle: {
                 color: 'rgb(34,45,148)',
                 fontSize: 12,
@@ -624,7 +619,6 @@ const generateOptions_Manometer_new = (processedData) => {
             text: "测温折线",
             left: 'center',
             top: 5,
-            subtext: '近五小时',
             subtextStyle: {
                 color: 'rgb(34,45,148)',
                 fontSize: 12,
@@ -664,7 +658,6 @@ const generateOptions_Manometer_new = (processedData) => {
             text: "频率折线",
             left: 'center',
             top: 5,
-            subtext: '近五小时',
             subtextStyle: {
                 color: 'rgb(34,45,148)',
                 fontSize: 12,
@@ -713,11 +706,6 @@ const generateOptions_Stress = (processedData) => {
             left: 'center',
             top: 5,
             text: '应力桩-应力折线',
-            // subtext: '近五小时',
-            // subtextStyle: {
-            //     color: 'rgb(34,45,148)',
-            //     fontSize: 12,
-            // }
         },
         grid: {
             left: '3%',
@@ -776,11 +764,6 @@ const generateOptions_Stress = (processedData) => {
             left: 'center',
             top: 5,
             text: '应力桩-应力角度',
-            // subtext: '近五小时',
-            // subtextStyle: {
-            //     color: 'rgb(34,45,148)',
-            //     fontSize: 12,
-            // }
         },
         grid: {
             left: '3%',
@@ -841,11 +824,6 @@ const generateOptions_Stress = (processedData) => {
             left: 'center',
             top: 5,
             text: '应力桩-最大主应变',
-            // subtext: '近五小时',
-            // subtextStyle: {
-            //     color: 'rgb(34,45,148)',
-            //     fontSize: 12,
-            // }
         },
         grid: {
             left: '3%',

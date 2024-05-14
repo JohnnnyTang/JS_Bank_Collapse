@@ -1,31 +1,18 @@
 <template>
-
     <div class="main">
-        <totalController></totalController>
-        <div class="map" ref="mapDom"></div>
+        <featDetail></featDetail>
     </div>
-
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch, createApp } from 'vue';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css'
+import featDetail from './common/tool/featDetail.vue';
+import { onMounted, watch } from 'vue';
 import axios from 'axios';
-import totalController from './common/totalController.vue';
-// import { initLoadedMap } from '../../utils/mapUtils';
-
-
-
-const mapDom = ref()
 
 onMounted(async () => {
-    // const map = await initLoadedMap(mapDom)
-    // console.log(layerTree);
-
+    let data = (await axios.get(`http://localhost:5173/api/tile/vector/embankmentLine/info`)).data
+    console.log(data)
 })
-
-
 
 </script>
 
@@ -36,27 +23,13 @@ onMounted(async () => {
     height: 92vh;
 
 
+    div.featDetail {
+        position: absolute;
+        z-index: 2;
+        left: 20vw;
+        top: 10vh;
+    }
 
 
 }
-
-:deep(.el-tree-node__label){
-    font-size: calc(0.6vw + 0.7vh);
-}
-:deep(.el-tree-node__content){
-    padding: 0.5vh;
-}
-:deep(.el-tree){
-    background-color: rgba($color: #000000, $alpha: 0.0);
-}
-
-
-
-.map {
-    position: absolute;
-    width: 100vw;
-    height: 92vh;
-}
-
-
 </style>

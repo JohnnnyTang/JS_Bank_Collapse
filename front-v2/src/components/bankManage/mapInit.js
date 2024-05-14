@@ -4,11 +4,17 @@ import { pulsing, loadImage } from '../../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
 // import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
 import monitorDetailV2 from '../dataVisual/featureDetails/monitorDetailV2.vue'
-import warningPop from '../bankTwin/warningPop.vue'
+// import monitorDetailV22 from '../dataVisual/featureDetails/monitorDetailV22.vue'
+// import warningPop from '../bankTwin/warningPop.vue'
+import warningPopup from '../bankTwin/warningPopup.vue'
+import { useWarnInfoStore } from '../../store/mapStore'
+
 import { ref, createApp, h } from 'vue'
 import axios from 'axios'
 import { useSceneStore } from '../../store/mapStore'
 import { ElMessageBox, ElMessage } from 'element-plus'
+// import ElementPlus from "element-plus";
+
 
 const propertyRef = ref({})
 const zoomRef = ref()
@@ -236,27 +242,27 @@ const mapInit = async (map, vis) => {
                 pixelRatio: 1,
             },
         )
-        map.addImage(
-            pulsingMap['测斜仪'],
-            pulsing[pulsingCVSMap['测斜仪']],
-            {
-                pixelRatio: 1,
-            },
-        )
-        map.addImage(
-            pulsingMap['孔隙水压力计'],
-            pulsing[pulsingCVSMap['孔隙水压力计']],
-            {
-                pixelRatio: 1,
-            },
-        )
-        map.addImage(
-            pulsingMap['应力桩'],
-            pulsing[pulsingCVSMap['应力桩']],
-            {
-                pixelRatio: 1,
-            },
-        )
+        // map.addImage(
+        //     pulsingMap['测斜仪'],
+        //     pulsing[pulsingCVSMap['测斜仪']],
+        //     {
+        //         pixelRatio: 1,
+        //     },
+        // )
+        // map.addImage(
+        //     pulsingMap['孔隙水压力计'],
+        //     pulsing[pulsingCVSMap['孔隙水压力计']],
+        //     {
+        //         pixelRatio: 1,
+        //     },
+        // )
+        // map.addImage(
+        //     pulsingMap['应力桩'],
+        //     pulsing[pulsingCVSMap['应力桩']],
+        //     {
+        //         pixelRatio: 1,
+        //     },
+        // )
 
 
         //////////////monitor device////////////
@@ -268,8 +274,17 @@ const mapInit = async (map, vis) => {
             },
             'Point',
         )
-        const { gnss, incline, stress, manometer } =
+        const { gnss, incline, stress, manometer, camera } =
             DataPioneer.getDifMonitorData(monitorDevice)
+        console.log(camera, incline);
+        // // cluster
+        // map.addSource('monitor-source', {
+        //     type: 'geojson',
+        //     data: monitorDevice,
+        //     cluster: true,
+        //     clusterMaxZoom: 14,
+        //     clusterRadius: 50,
+        // })
 
         map.addSource('gnss-source', {
             type: 'geojson',
@@ -287,13 +302,58 @@ const mapInit = async (map, vis) => {
             type: 'geojson',
             data: manometer,
         })
+        map.addSource('camera-source', {
+            type: 'geojson',
+            data: camera,
+        })
 
         // image source
 
-        await loadImage(map, '/geoStyle/gnss-dot.png', 'gnss-static')
-        await loadImage(map, '/geoStyle/incline-rect.png', 'incline-static')
-        await loadImage(map, '/geoStyle/manometer-dia.png', 'manometer-static')
-        await loadImage(map, '/geoStyle/stress-tri.png', 'stress-static')
+        await loadImage(map, '/icons/GNSS.png', 'gnss-static')
+        await loadImage(map, '/icons/测斜仪.png', 'incline-static')
+        await loadImage(map, '/icons/孔隙水压力计.png', 'manometer-static')
+        await loadImage(map, '/icons/应力桩.png', 'stress-static')
+        await loadImage(map, '/icons/视频监控.png', 'camera-static')
+
+
+        // map.addLayer({
+        //     id: '聚合点',
+        //     type: 'circle',
+        //     source: 'monitor-source',
+        //     filter: ['has', 'point_count'],
+        //     paint: {
+        //         'circle-color': [
+        //             'step',
+        //             ['get', 'point_count'],
+        //             '#51bbd6',
+        //             10,
+        //             '#f1f075',
+        //             30,
+        //             '#f28cb1'
+        //         ],
+        //         'circle-radius': [
+        //             'step',
+        //             ['get', 'point_count'],
+        //             20,
+        //             10,
+        //             30,
+        //             30,
+        //             40
+        //         ]
+        //     }
+        // });
+        // map.addLayer({
+        //     id: 'cluster-count',
+        //     type: 'symbol',
+        //     source: 'monitor-source',
+        //     filter: ['has', 'point_count'],
+        //     layout: {
+        //         'text-field': ['get', 'point_count_abbreviated'],
+        //         'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+        //         'text-size': 12
+        //     }
+        // });
+
 
         map.addLayer({
             id: 'GNSS',
@@ -301,7 +361,7 @@ const mapInit = async (map, vis) => {
             source: 'gnss-source',
             layout: {
                 'icon-image': 'gnss-static',
-                'icon-size': 0.3,
+                'icon-size': 0.2,
                 'icon-allow-overlap': true,
             },
         })
@@ -311,7 +371,7 @@ const mapInit = async (map, vis) => {
             source: 'incline-source',
             layout: {
                 'icon-image': 'incline-static',
-                'icon-size': 0.3,
+                'icon-size': 0.2,
                 'icon-allow-overlap': true,
             },
         })
@@ -321,7 +381,7 @@ const mapInit = async (map, vis) => {
             source: 'manometer-source',
             layout: {
                 'icon-image': 'manometer-static',
-                'icon-size': 0.3,
+                'icon-size': 0.2,
                 'icon-allow-overlap': true,
             },
         })
@@ -331,16 +391,28 @@ const mapInit = async (map, vis) => {
             source: 'stress-source',
             layout: {
                 'icon-image': 'stress-static',
-                'icon-size': 0.3,
+                'icon-size': 0.2,
+                'icon-allow-overlap': true,
+            },
+        })
+        map.addLayer({
+            id: '监控摄像头',
+            type: 'symbol',
+            source: 'camera-source',
+            layout: {
+                'icon-image': 'camera-static',
+                'icon-size': 0.2,
                 'icon-allow-overlap': true,
             },
         })
 
-        let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
+        let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩', '监控摄像头']
 
         map.on('click', deviceLayers, (e) => {
-            if (e.features.length > 1)
+            if (e.features.length > 1) {
+                console.log('click features!', e.features);
                 open(e.features, map)
+            }
             else if (e.features.length === 1) {
                 let p = e.features[0].properties
                 const property = e.features[0].properties
@@ -352,8 +424,6 @@ const mapInit = async (map, vis) => {
                 console.log('singgle popUp added!');
 
             }
-
-
         })
         map.on('mousemove', deviceLayers, (e) => {
             map.getCanvas().style.cursor = 'pointer'
@@ -365,8 +435,9 @@ const mapInit = async (map, vis) => {
             zoomRef.value = map.getZoom()
         })
 
-
-        warnInterval(map, 20)
+        setTimeout(() => {
+            warnInterval(map, 20)
+        }, 1000)
         setInterval(() => {
             warnInterval(map, 60)
         }, 60 * 1000 * 20);
@@ -403,18 +474,26 @@ const mapInit = async (map, vis) => {
                     let type = 'GNSS'
                     lastPos = setWarningDeviceStyle(map, type, id, item)
                 })
+                useWarnInfoStore().warnInfo = allWarnData
 
+                // if (lastPos) {
+                //     map.flyTo({
+                //         center: lastPos,
+                //         pitch: 61.99999999999988,
+                //         bearing: 0,
+                //         zoom: 15.845427972376211,
+                //         speed: 0.5,
+                //         essential: true,
+                //     })
+                // }
 
-                if (lastPos) {
-                    map.flyTo({
-                        center: lastPos,
-                        pitch: 61.99999999999988,
-                        bearing: 0,
-                        zoom: 15.845427972376211,
-                        speed: 0.5,
-                        essential: true,
-                    })
-                }
+                // setTimeout(() => {
+                //     allWarnData.forEach((item) => {
+                //         let id = item.deviceId
+                //         let type = 'GNSS'
+                //         removeWarningDeviceStyle(map, type, id)
+                //     })
+                // }, 2000)
             }
 
         })
@@ -506,7 +585,8 @@ const createPopUp = (deviceProperty, zoom) => {
 
 
 const createWarningPopup = (info) => {
-    const ap = createApp(warningPop, { warningInfo: info })
+    // const ap = createApp(warningPop, { warningInfo: info })
+    const ap = createApp(warningPopup)
 
     const container = document.createElement('div')
     const componentInstance = ap.mount(container)
@@ -544,7 +624,9 @@ const warnInterval = async (map, minute) => {
     let deviceInfo = (await axios.get('/api/data/monitorInfo')).data
     deviceInfo.forEach((item) => {
         const type = Number(item["type"]) - 1
-        if (type != 4) {
+
+        if (type != 4 && type != 5) {
+            // camera -- 5
             DeviceIDs[DEVICETYPEMAP[type]].push(item["code"])
         }
     })
@@ -557,18 +639,20 @@ const warnInterval = async (map, minute) => {
         let type = 'GNSS'
         lastPos = setWarningDeviceStyle(map, type, id, item)
     })
+    useWarnInfoStore().warnInfo = allWarnData
+    console.log('first-warnInterval!', allWarnData);
 
 
-    if (lastPos) {
-        map.flyTo({
-            center: lastPos,
-            pitch: 61.99999999999988,
-            bearing: 0,
-            zoom: 15.845427972376211,
-            speed: 0.5,
-            essential: true,
-        })
-    }
+    // if (lastPos) {
+    //     map.flyTo({
+    //         center: lastPos,
+    //         pitch: 61.99999999999988,
+    //         bearing: 0,
+    //         zoom: 15.845427972376211,
+    //         speed: 0.5,
+    //         essential: true,
+    //     })
+    // }
 }
 
 
@@ -577,7 +661,7 @@ const open = (features, map) => {
     const selectedDevice = ref({})
     let selectedCode
     // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
-    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪']
+    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪','','摄像头']
 
     const radioGroupVNode = h('div', [
         h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),
@@ -635,7 +719,6 @@ const open = (features, map) => {
             const popUp = createPopUp(propertyRef, zoomRef)
             popUp.setOffset(0).setLngLat([targetProperty.longitude, targetProperty.latitude]).addTo(map)
 
-            console.log('messageBox -> popUp added!');
             let dom = document.getElementById('popup')
 
         })
