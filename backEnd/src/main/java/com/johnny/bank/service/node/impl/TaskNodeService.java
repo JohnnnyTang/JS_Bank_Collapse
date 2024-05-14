@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,7 +140,9 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 .paramNode(paramNode).modelNode(modelNode).dataNode(null).status("0")
                 .result(resObj).ifAuto(false).name("multiWhole-fixedSection"+sectionLineInfo.getId())
                 .category("multiIndexWholeTaskItem").path(",taskNode,multiIndexWholeTaskGroup,").auth("all").build();
-        return null;
+        String taskId = save(taskNode);
+        new MultiIndexWholeTaskThread(taskNode, sectionLineInfo).start();
+        return taskId;
     }
 
     @Autowired
@@ -224,7 +227,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 updateNodeStatusById(taskNode.getId(), "1");
                 String fullJsonResPath = multiIndexPath.getResPath() + taskNode.getId() + ".json";
                 Process process = ProcessUtil.buildSectionTaskNodeProcess(
-                        taskNode, multiIndexPath.getDataPath(), fullJsonResPath
+                        taskNode, multiIndexPath.getDataPath(), fullJsonResPath, multiIndexPath.getCondaEnv()
                 );
                 ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
                 log.info(cmdOutput.toString());
@@ -275,7 +278,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 ).getPath();
 
                 Process process = ProcessUtil.buildOtherIndexTaskNodeProcess(
-                        taskNode, fullJsonPath
+                        taskNode, fullJsonPath, multiIndexPath.getCondaEnv()
                 );
                 ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
                 log.info(cmdOutput.toString());
@@ -320,7 +323,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
                         multiIndexPath.getResPath() + "fixedSection-" +
                         sectionLineInfo.getName() + ".json";
                 Process process = ProcessUtil.buildSectionTaskNodeProcess(
-                        taskNode, multiIndexPath.getDataPath(), fullJsonResPath
+                        taskNode, multiIndexPath.getWholeDataPath(), fullJsonResPath, multiIndexPath.getCondaEnv()
                 );
                 ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
                 log.info(cmdOutput.toString());
@@ -337,7 +340,9 @@ public class TaskNodeService extends NodeService<TaskNode> {
                     if (resJson.exists()) {
                         updateNodeStatusResultById(taskNode.getId(), "2", result);
                         GeoJsonData geoJsonData = GeoJsonData.geojsonBuilder()
-                                .id(taskNode.getId()).path(fullJsonResPath).type("geojson").name("multiRes")
+                                .id(taskNode.getId()).path(fullJsonResPath).type("geojson")
+                                .name("multiWholeRes-" + sectionLineInfo.getName())
+                                .createTime(new Timestamp(System.currentTimeMillis()))
                                 .build();
                         geoJsonDataRepo.insertData(geoJsonData);
                     }

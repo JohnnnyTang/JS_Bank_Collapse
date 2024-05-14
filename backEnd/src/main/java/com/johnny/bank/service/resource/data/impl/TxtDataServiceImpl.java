@@ -4,19 +4,15 @@ import com.alibaba.fastjson2.JSONException;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.aop.DynamicNodeData;
 import com.johnny.bank.model.node.DataNode;
-import com.johnny.bank.model.resource.dataResource.GeoJsonData;
-import com.johnny.bank.model.resource.dataResource.ShpData;
 import com.johnny.bank.model.resource.dataResource.TxtData;
 import com.johnny.bank.model.resource.dataResource.base.GeoData;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
-import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IShpDataRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.ITxtDataRepo;
 import com.johnny.bank.service.resource.data.ITxtDataService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -86,10 +82,8 @@ public class TxtDataServiceImpl implements ITxtDataService {
         } catch (JSONException | NumberFormatException | NullPointerException e ) {
             return (TxtData) GeoData.builder().build();
         }
-        String createTime = (String) jsonObject.getOrDefault("createtime",null);
-        String updateTime = (String) jsonObject.getOrDefault("updatetime",null);
-        txtData.setCreateTime(createTime);
-        txtData.setUpdateTime(updateTime);
+        txtData.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        txtData.setUpdateTime(null);
 
         return txtData;
     }

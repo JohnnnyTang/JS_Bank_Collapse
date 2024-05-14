@@ -197,9 +197,9 @@ const tempFunction = async (mapInstance, layerName) => {
 }
 
 onUnmounted(() => {
-    console.log('onUnmounted')
-    map && map.remove()
-    console.log('map.remove')
+    // console.log('onUnmounted')
+    // map && map.remove()
+    // console.log('map.remove')
 })
 
 </script>

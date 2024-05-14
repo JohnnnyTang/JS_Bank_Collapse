@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.aop.DynamicNodeData;
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.RasterData;
-import com.johnny.bank.model.resource.dataResource.ShpData;
 import com.johnny.bank.model.resource.dataResource.base.GeoData;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IRasterDataRepo;
@@ -13,6 +12,7 @@ import com.johnny.bank.service.resource.data.IRasterDataService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -82,10 +82,8 @@ public class RasterDataServiceImpl implements IRasterDataService {
         } catch (JSONException | NumberFormatException | NullPointerException e ) {
             return (RasterData) GeoData.builder().build();
         }
-        String createTime = (String) jsonObject.getOrDefault("createtime",null);
-        String updateTime = (String) jsonObject.getOrDefault("updatetime",null);
-        rasterData.setCreateTime(createTime);
-        rasterData.setUpdateTime(updateTime);
+        rasterData.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        rasterData.setUpdateTime(null);
 
         return rasterData;
     }

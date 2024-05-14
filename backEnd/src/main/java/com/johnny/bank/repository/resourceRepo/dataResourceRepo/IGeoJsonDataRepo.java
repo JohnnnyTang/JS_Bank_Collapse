@@ -11,6 +11,10 @@ public interface IGeoJsonDataRepo extends IGeoDataRepo {
 
     GeoJsonData findById(String id);
 
+    List<GeoJsonData> findByName(String name);
+
+    GeoJsonData findByNameNewest(String name);
+
     List<GeoJsonData> findByIdList(List<String> ids);
 
     void insertData(GeoJsonData geoJsonData);

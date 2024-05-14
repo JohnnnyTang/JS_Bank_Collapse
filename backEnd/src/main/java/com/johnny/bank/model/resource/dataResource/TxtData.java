@@ -2,10 +2,9 @@ package com.johnny.bank.model.resource.dataResource;
 
 import com.johnny.bank.model.resource.dataResource.base.GeoData;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
 
 /**
  * @projectName: backEnd
@@ -22,7 +21,7 @@ public class TxtData extends GeoData {
     @Builder(builderMethodName = "txtBuilder")
     public TxtData(@NotNull String id, @NotNull String name,
                    @NotNull String type, @NotNull String path,
-                   String createTime, String updateTime) {
+                   Timestamp createTime, Timestamp updateTime) {
         super(id, name, type, path, createTime, updateTime);
     }
 }

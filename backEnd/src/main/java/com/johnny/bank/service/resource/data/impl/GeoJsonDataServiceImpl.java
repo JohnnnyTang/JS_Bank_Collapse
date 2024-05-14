@@ -2,23 +2,19 @@ package com.johnny.bank.service.resource.data.impl;
 
 import com.alibaba.fastjson2.JSONException;
 import com.alibaba.fastjson2.JSONObject;
-import com.johnny.bank.aop.DynamicNodeData;
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.GeoJsonData;
-import com.johnny.bank.model.resource.dataResource.RasterData;
 import com.johnny.bank.model.resource.dataResource.base.GeoData;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IGeoJsonDataRepo;
 import com.johnny.bank.service.resource.data.IGeoJsonDataService;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -76,6 +72,11 @@ public class GeoJsonDataServiceImpl implements IGeoJsonDataService {
         return geojsonDataRepo.findByIdList(ids);
     }
 
+    @Override
+    public GeoJsonData findNewestByName(DataNode dataNode, String dataName) {
+        return geojsonDataRepo.findByNameNewest(dataName);
+    }
+
     private GeoJsonData dataProcess(JSONObject jsonObject) {
         GeoJsonData geoJsonData;
         try {
@@ -87,10 +88,8 @@ public class GeoJsonDataServiceImpl implements IGeoJsonDataService {
         } catch (JSONException | NumberFormatException | NullPointerException e ) {
             return (GeoJsonData) GeoData.builder().build();
         }
-        String createTime = (String) jsonObject.getOrDefault("createtime",null);
-        String updateTime = (String) jsonObject.getOrDefault("updatetime",null);
-        geoJsonData.setCreateTime(createTime);
-        geoJsonData.setUpdateTime(updateTime);
+        geoJsonData.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        geoJsonData.setUpdateTime(null);
 
         return geoJsonData;
     }

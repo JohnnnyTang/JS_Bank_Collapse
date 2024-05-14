@@ -3,8 +3,6 @@ package com.johnny.bank.controller.resource.data;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.controller.resource.data.base.GeoDataController;
 import com.johnny.bank.model.resource.dataResource.GeoJsonData;
-import com.johnny.bank.model.resource.dataResource.RasterData;
-import com.johnny.bank.model.resource.dataResource.ShpData;
 import com.johnny.bank.service.resource.data.IGeoJsonDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -110,6 +108,14 @@ public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService
     @GetMapping("/jsonStr/id/{id}")
     public String getGeoJsonById(@PathVariable String id) throws IOException {
         GeoJsonData geoJsonData = igeoDataService.findById(dataNode, id);
+        String filePath = geoJsonData.getPath();
+        //        JSONObject jsonObject = new JSONObject(Integer.parseInt(geoJsonString));
+        return igeoDataService.readGeoJsonFile(filePath);
+    }
+
+    @GetMapping("/jsonStr/name/{name}/newest")
+    public String getNewestGeoJsonByName(@PathVariable String name) throws IOException {
+        GeoJsonData geoJsonData = igeoDataService.findNewestByName(dataNode, name);
         String filePath = geoJsonData.getPath();
         //        JSONObject jsonObject = new JSONObject(Integer.parseInt(geoJsonString));
         return igeoDataService.readGeoJsonFile(filePath);

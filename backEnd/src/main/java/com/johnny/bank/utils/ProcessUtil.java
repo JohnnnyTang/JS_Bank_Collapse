@@ -3,7 +3,6 @@ package com.johnny.bank.utils;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
-import com.johnny.bank.model.configuration.MultiIndexPath;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +34,7 @@ public class ProcessUtil {
     static String pythonStr = "python";
 
 //    static String condaStr = "conda activate multiIndex &&";
-    static String condaStr = "conda activate" + " bankModel &&";
+    static String condaStr = "conda activate ";
 
 //    static String pythonStr = "python3";
 
@@ -63,11 +62,11 @@ public class ProcessUtil {
 
     // 岸坡因子计算
     public static Process buildSectionTaskNodeProcess(
-            TaskNode taskNode, String multiIndexDataPath, String multiIndexResPath
+            TaskNode taskNode, String multiIndexDataPath, String multiIndexResPath, String condaEnv
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
-        commands.add(condaStr);
+        commands.add(condaStr + condaEnv + " &&");
 
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
@@ -88,11 +87,11 @@ public class ProcessUtil {
 
     // 其他因子计算
     public static Process buildOtherIndexTaskNodeProcess(
-            TaskNode taskNode, String fullJsonPath
+            TaskNode taskNode, String fullJsonPath, String condaEnv
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
-        commands.add(condaStr);
+        commands.add(condaStr + condaEnv + " &&");
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
         commands.add((String) modelUsage.get("exePrefix"));
@@ -107,30 +106,6 @@ public class ProcessUtil {
         String cmdStr = String.join(" ", commands);
         log.info(cmdStr);
         processBuilder.command("cmd", "/c", cmdStr);
-        return processBuilder.start();
-    }
-
-    public static Process buildMultiWholeTaskNodeProcess(
-            TaskNode taskNode, MultiIndexPath multiIndexPath, String multiIndexResPath
-    ) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        List<String> commands = new ArrayList<>();
-        commands.add("conda activate " + multiIndexPath.getCondaEnv() + " &&");
-
-        ModelNode modelNode = taskNode.getModelNode();
-        JSONObject modelUsage = modelNode.getUsage();
-        commands.add((String) modelUsage.get("exePrefix"));
-        commands.add(taskNode.getModelNode().getProgram());
-        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
-        JSONObject paramObject = taskNode.getParamNode().getParams();
-        for(String paramKey: paramKeys) {
-            commands.add(paramObject.get(paramKey).toString());
-        }
-        commands.add(multiIndexPath.getDataPath());
-        commands.add(multiIndexResPath);
-        String pyCmdStr = String.join(" ", commands);
-        System.out.printf(pyCmdStr);
-        processBuilder.command("cmd.exe", "/c", pyCmdStr);
         return processBuilder.start();
     }
 

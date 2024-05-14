@@ -63,9 +63,9 @@ onMounted(async () => {
             scrollBar = bankTableDomRef.value.$el.querySelectorAll(
                 '.el-scrollbar__wrap',
             )[0]
-            console.log(tableRows, scrollBar)
+            // console.log(tableRows, scrollBar)
         } else if (tableRows[curRowIndex].offsetHeight != 0) {
-            console.log(111, curRowIndex, rowNumber)
+            // console.log(111, curRowIndex, rowNumber)
 
             if (curRowIndex < rowNumber - 2) {
                 rowClassName.value =

@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.aop.DynamicNodeData;
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.ShpData;
-import com.johnny.bank.model.resource.dataResource.base.GeoData;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IShpDataRepo;
 import com.johnny.bank.service.resource.data.IShpDataService;
@@ -18,12 +17,12 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * @projectName: backEnd
@@ -92,10 +91,8 @@ public class ShpDataServiceImpl implements IShpDataService {
         } catch (JSONException | NumberFormatException | NullPointerException e ) {
             return (ShpData) ShpData.builder().build();
         }
-        String createTime = (String) jsonObject.getOrDefault("createtime",null);
-        String updateTime = (String) jsonObject.getOrDefault("updatetime",null);
-        shpData.setCreateTime(createTime);
-        shpData.setUpdateTime(updateTime);
+        shpData.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        shpData.setUpdateTime(null);
 
         return shpData;
     }
