@@ -8,10 +8,12 @@ import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.node.TaskNode;
 import com.johnny.bank.model.resource.dataResource.GeoJsonData;
+import com.johnny.bank.model.resource.dataResource.SectionLineInfo;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepo;
 import com.johnny.bank.repository.nodeRepo.IModelNodeRepo;
 import com.johnny.bank.repository.nodeRepo.IParamNodeRepo;
 import com.johnny.bank.repository.nodeRepo.ITaskNodeRepo;
+import com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IGeoJsonDataRepo;
 import com.johnny.bank.utils.ProcessUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,8 @@ public class TaskNodeService extends NodeService<TaskNode> {
     private IParamNodeRepo paramNodeRepo;
     private MultiIndexPath multiIndexPath;
     private IGeoJsonDataRepo geoJsonDataRepo;
+    private IVectorTileRepo vectorTileRepo;
+
 
     @Autowired
 //    @Qualifier("BaseNodeRepo")
@@ -117,6 +121,27 @@ public class TaskNodeService extends NodeService<TaskNode> {
         return nodeId;
     }
 
+    public String createAndStartSectionDefaultMultiIndexTask(Integer sectionId) throws Exception {
+        SectionLineInfo sectionLineInfo = vectorTileRepo.selectSectionLineInfoById(sectionId);
+        ParamNode paramNode = paramNodeRepo.findParamNodeById("6642da4b010453003d568646");
+        paramNode.setId(null);
+        paramNode.getParams().put("x1", sectionLineInfo.getStX());
+        paramNode.getParams().put("y1", sectionLineInfo.getStY());
+        paramNode.getParams().put("x2", sectionLineInfo.getEndX());
+        paramNode.getParams().put("y2", sectionLineInfo.getEndY());
+        paramNode.setName(paramNode.getName() + '-' + System.currentTimeMillis());
+        paramNode = paramNodeRepo.save(paramNode);
+        ModelNode modelNode = ModelNode.modelNodeBuilder().id("6642d247010453003d568641").build();
+        JSONObject resObj = new JSONObject();
+        resObj.put("resultString", "");
+        resObj.put("resJsonId", "");
+        TaskNode taskNode = TaskNode.taskNodeBuilder()
+                .paramNode(paramNode).modelNode(modelNode).dataNode(null).status("0")
+                .result(resObj).ifAuto(false).name("multiWhole-fixedSection"+sectionLineInfo.getId())
+                .category("multiIndexWholeTaskItem").path(",taskNode,multiIndexWholeTaskGroup,").auth("all").build();
+        return null;
+    }
+
     @Autowired
     public void setDataNodeRepo(IDataNodeRepo dataNodeRepo) {
         this.dataNodeRepo = dataNodeRepo;
@@ -141,6 +166,12 @@ public class TaskNodeService extends NodeService<TaskNode> {
     @Autowired
     public void setGeoJsonDataRepo(IGeoJsonDataRepo geoJsonDataRepo) {
         this.geoJsonDataRepo = geoJsonDataRepo;
+    }
+
+    @Qualifier("VectorTileRepo")
+    @Autowired
+    public void setVectorTileRepo(IVectorTileRepo iVectorTileRepo) {
+        this.vectorTileRepo = iVectorTileRepo;
     }
 
     public class CmdOutputTaskThread extends Thread {
@@ -261,6 +292,58 @@ public class TaskNodeService extends NodeService<TaskNode> {
                     result.put("resJsonId", taskNode.getParamNode().getParams().get("jsonId"));
                     updateNodeStatusResultById(taskNode.getId(), "2", result);
 //                    taskNode.getResult().put("resultString", cmdOutput.getOutputString());
+                }
+                else {
+                    updateNodeStatusById(taskNode.getId(), "-1");
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            log.info("running custom Thread");
+        }
+    }
+
+    public class MultiIndexWholeTaskThread extends Thread {
+        TaskNode taskNode;
+        SectionLineInfo sectionLineInfo;
+
+        public MultiIndexWholeTaskThread(TaskNode taskNode, SectionLineInfo sectionLineInfo) {
+            this.taskNode = taskNode;
+            this.sectionLineInfo = sectionLineInfo;
+        }
+
+        @Override
+        public void run() {
+            try {
+                updateNodeStatusById(taskNode.getId(), "1");
+                String fullJsonResPath =
+                        multiIndexPath.getResPath() + "fixedSection-" +
+                        sectionLineInfo.getName() + ".json";
+                Process process = ProcessUtil.buildSectionTaskNodeProcess(
+                        taskNode, multiIndexPath.getDataPath(), fullJsonResPath
+                );
+                ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(process.getInputStream());
+                log.info(cmdOutput.toString());
+                if(cmdOutput.getStatusCode() == 0) {
+                    updateNodeStatusById(taskNode.getId(), "-1");
+                }
+                int code = process.waitFor();
+                process.destroy();
+                if(code == 0) {
+                    JSONObject result = new JSONObject();
+                    result.put("resultString", cmdOutput.getOutputString());
+                    result.put("resJsonId", taskNode.getId());
+                    File resJson = new File(fullJsonResPath);
+                    if (resJson.exists()) {
+                        updateNodeStatusResultById(taskNode.getId(), "2", result);
+                        GeoJsonData geoJsonData = GeoJsonData.geojsonBuilder()
+                                .id(taskNode.getId()).path(fullJsonResPath).type("geojson").name("multiRes")
+                                .build();
+                        geoJsonDataRepo.insertData(geoJsonData);
+                    }
+                    else {
+                        updateNodeStatusResultById(taskNode.getId(), "-2", result);
+                    }
                 }
                 else {
                     updateNodeStatusById(taskNode.getId(), "-1");

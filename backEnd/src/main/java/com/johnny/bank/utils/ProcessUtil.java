@@ -7,7 +7,6 @@ import com.johnny.bank.model.configuration.MultiIndexPath;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -31,15 +30,12 @@ public class ProcessUtil {
 
     //    static String pythonDir = "C:/nhri/monitor/pythonDir/";
 
-    @Autowired
-    private MultiIndexPath multiIndexPath;
-
     static String outsideModelDir = "D:/zhuomian/水科院/python/";
     //    static String pythonDir = "/home/zym/python/";
     static String pythonStr = "python";
 
 //    static String condaStr = "conda activate multiIndex &&";
-    static String condaStr = "conda activate bankModel &&";
+    static String condaStr = "conda activate" + " bankModel &&";
 
 //    static String pythonStr = "python3";
 
@@ -111,6 +107,30 @@ public class ProcessUtil {
         String cmdStr = String.join(" ", commands);
         log.info(cmdStr);
         processBuilder.command("cmd", "/c", cmdStr);
+        return processBuilder.start();
+    }
+
+    public static Process buildMultiWholeTaskNodeProcess(
+            TaskNode taskNode, MultiIndexPath multiIndexPath, String multiIndexResPath
+    ) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        commands.add("conda activate " + multiIndexPath.getCondaEnv() + " &&");
+
+        ModelNode modelNode = taskNode.getModelNode();
+        JSONObject modelUsage = modelNode.getUsage();
+        commands.add((String) modelUsage.get("exePrefix"));
+        commands.add(taskNode.getModelNode().getProgram());
+        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
+        JSONObject paramObject = taskNode.getParamNode().getParams();
+        for(String paramKey: paramKeys) {
+            commands.add(paramObject.get(paramKey).toString());
+        }
+        commands.add(multiIndexPath.getDataPath());
+        commands.add(multiIndexResPath);
+        String pyCmdStr = String.join(" ", commands);
+        System.out.printf(pyCmdStr);
+        processBuilder.command("cmd.exe", "/c", pyCmdStr);
         return processBuilder.start();
     }
 

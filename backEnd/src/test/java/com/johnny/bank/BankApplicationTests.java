@@ -2,13 +2,12 @@ package com.johnny.bank;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNode;
+import com.johnny.bank.model.resource.dataResource.SectionLineInfo;
 import com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo;
 import com.johnny.bank.service.node.impl.DataNodeService;
 import com.johnny.bank.service.resource.data.impl.StationInfoService;
 import com.johnny.bank.utils.MailUtil;
 import com.johnny.bank.utils.SMSUtil;
-import org.aspectj.weaver.ast.Var;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,6 +67,12 @@ class BankApplicationTests {
 //    @Test
     void testDynamicMapper() {
         List<Map<String, Object>> res = vectorTileRepo.getLayerBasicInfo("depth_line", List.of("year"));
+        System.out.println(res);
+    }
+
+//    @Test
+    void testSectionInfo() {
+        SectionLineInfo res = vectorTileRepo.selectSectionLineInfoById(1);
         System.out.println(res);
     }
 

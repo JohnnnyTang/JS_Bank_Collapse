@@ -21,6 +21,8 @@ public interface IParamNodeRepo extends IBaseNodeRepo<ParamNode> {
     @Update("{'$set': {'params': ?1}}")
     void updateParamNodeParamById(String nodeId, JSONObject newParams);
 
+
+    ParamNode findParamNodeById(String id);
     List<ParamNode> findParamNodesByModelId(String modelId);
     List<ParamNode> findParamNodesByModelIdAndCategory(String modelId, String category);
 }

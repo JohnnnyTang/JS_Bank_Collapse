@@ -19,4 +19,6 @@ import org.springframework.stereotype.Component;
 public class MultiIndexPath {
     private String dataPath;
     private String resPath;
+    private String wholeDataPath;
+    private String condaEnv;
 }

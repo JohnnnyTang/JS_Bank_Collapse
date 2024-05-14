@@ -43,4 +43,23 @@
             from ${tableName}
         ) as res
     </select>
+
+    <select id="selectSectionLineInfo" resultType="com.johnny.bank.model.resource.dataResource.SectionLineInfo">
+        select id, ST_X(stend.stp) as st_x, ST_Y(stend.stp) as st_x, ST_X(stend.endp) as end_x, ST_Y(stend.endp) as end_x, name, label
+        from (
+            select ST_StartPoint(geom) as stp, ST_EndPoint(geom) as endp, name, label, id
+            from public.mzs_bank_line
+        ) as stend
+    </select>
+
+    <select id="selectSectionLineInfoById" resultType="com.johnny.bank.model.resource.dataResource.SectionLineInfo" parameterType="integer">
+        select id, ST_X(stend.stp) as st_x, ST_Y(stend.stp) as st_y, ST_X(stend.endp) as end_x, ST_Y(stend.endp) as end_y, name, label
+        from (
+             select ST_StartPoint(geom) as stp, ST_EndPoint(geom) as endp, name, label, id
+             from public.mzs_bank_line
+             where id=#{id}
+        ) as stend
+    </select>
+
+
 </mapper>

@@ -241,15 +241,15 @@ const deviceIdMap = {
 const deviceTypeTimeMap = {
     '位移基准/测量站': {
         timeUnit: 'day',
-        timeCount: 2,
+        timeCount: 1,
     },
     测斜仪: {
         timeUnit: 'day',
-        timeCount: 4,
+        timeCount: 2,
     },
     孔隙水压力计: {
         timeUnit: 'day',
-        timeCount: 4,
+        timeCount: 2,
     },
     应力桩: {
         timeUnit: 'hour',
