@@ -114,10 +114,13 @@ public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService
     }
 
     @GetMapping("/jsonStr/name/{name}/newest")
-    public String getNewestGeoJsonByName(@PathVariable String name) throws IOException {
+    public ResponseEntity<String> getNewestGeoJsonByName(@PathVariable String name) throws IOException {
         GeoJsonData geoJsonData = igeoDataService.findNewestByName(dataNode, name);
+        if(geoJsonData == null) {
+            return ResponseEntity.ok(null);
+        }
         String filePath = geoJsonData.getPath();
         //        JSONObject jsonObject = new JSONObject(Integer.parseInt(geoJsonString));
-        return igeoDataService.readGeoJsonFile(filePath);
+        return ResponseEntity.ok(igeoDataService.readGeoJsonFile(filePath));
     }
 }
