@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,13 +27,13 @@ public class VectorTileService implements IVectorTileService {
 
     private final IVectorTileRepo IVectorTileRepo;
     private final ITileSourceRepo tileSourceRepo;
-    private final Map<String, String> tableNameMap = new HashMap<>(Map.of(
-            "placeLabel", "place_label_pt", "riverBg", "river_bg_vec",
-            "riverLand", "river_land", "riverSection", "river_section_label",
-            "riverName", "river_name_label", "mzsPlaceLabel", "mzs_place_label",
-            "mzsPlaceLine", "mzs_place_line", "mzsBankLabel", "mzs_bank_label",
-            "mzsSectionLine", "mzs_section_line", "mzsBankLine", "mzs_bank_line"
-    ));
+//    private final Map<String, String> tableNameMap = new HashMap<>(Map.of(
+//            "placeLabel", "place_label_pt", "riverBg", "river_bg_vec",
+//            "riverLand", "river_land", "riverSection", "river_section_label",
+//            "riverName", "river_name_label", "mzsPlaceLabel", "mzs_place_label",
+//            "mzsPlaceLine", "mzs_place_line", "mzsBankLabel", "mzs_bank_label",
+//            "mzsSectionLine", "mzs_section_line", "mzsBankLine", "mzs_bank_line"
+//    ));
 
     @Autowired
     public VectorTileService(
@@ -42,11 +41,11 @@ public class VectorTileService implements IVectorTileService {
             @Qualifier("TileSourceRepo") ITileSourceRepo tileSourceRepo) {
         this.tileSourceRepo = tileSourceRepo;
         this.IVectorTileRepo = IVectorTileRepo;
-        tableNameMap.put("mzsSectionLineLabel", "mzs_section_line_label");
-        tableNameMap.put("mzsBankAreaW", "mzs_bank_area_w");
-        tableNameMap.put("mzsBankAreaS", "mzs_bank_area_s");
-        tableNameMap.put("mzsOverWaterBound", "mzs_overwater_bound");
-        tableNameMap.put("mzsUnderWaterBound", "mzs_underwater_bound");
+//        tableNameMap.put("mzsSectionLineLabel", "mzs_section_line_label");
+//        tableNameMap.put("mzsBankAreaW", "mzs_bank_area_w");
+//        tableNameMap.put("mzsBankAreaS", "mzs_bank_area_s");
+//        tableNameMap.put("mzsOverWaterBound", "mzs_overwater_bound");
+//        tableNameMap.put("mzsUnderWaterBound", "mzs_underwater_bound");
     }
 
     @Override
@@ -60,6 +59,18 @@ public class VectorTileService implements IVectorTileService {
                 vectorTileSource.getTableName(), vectorTileSource.getFieldList()
         );
         return (byte[]) IVectorTileRepo.getVectorTile(tileBox);
+    }
+
+    public byte[] getVectorCenterPtTiles(String visualId, int x, int y, int z) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(visualId);
+        if(vectorTileSource == null) return null;
+//        if(!tableNameMap.containsKey(visualId)) return null;
+
+        TileBox tileBox = TileUtil.tile2boundingBox(
+                x, y, z,
+                vectorTileSource.getTableName(), vectorTileSource.getFieldList()
+        );
+        return (byte[]) IVectorTileRepo.getVectorCenterPtTile(tileBox);
     }
 
     @Override

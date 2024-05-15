@@ -295,6 +295,10 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
         })
+        map.addSource('test', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+        })
         await mapInit(map, true)
         map.addLayer({
             id: '点1',
@@ -308,6 +312,23 @@ onMounted(async () => {
                 // 'text-offset': [0, 1.25],
                 'text-anchor': 'left',
                 'text-size': 20,
+            },
+            paint: {
+                'text-color': 'rgb(0, 42, 105)',
+            },
+        })
+        map.addLayer({
+            id: '点2',
+            type: 'symbol',
+            source: 'test',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'top',
+                'text-size': 12,
             },
             paint: {
                 'text-color': 'rgb(0, 42, 105)',
