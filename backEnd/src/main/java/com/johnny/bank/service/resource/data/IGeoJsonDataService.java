@@ -14,6 +14,8 @@ public interface IGeoJsonDataService extends IGeoDataService<GeoJsonData> {
 
     List<GeoJsonData> findByIdList(DataNode dataNode, List<String> ids);
 
+    GeoJsonData findNewestByName(DataNode dataNode, String dataName);
+
     void deleteById(DataNode dataNode, String id);
 
     String readGeoJsonFile(String filepath) throws IOException;

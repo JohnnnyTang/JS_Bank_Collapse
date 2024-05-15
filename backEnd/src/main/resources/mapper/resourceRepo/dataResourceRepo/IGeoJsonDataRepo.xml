@@ -40,4 +40,11 @@
         </foreach>
     </select>
 
+    <select id="findByName" resultMap="geojsonMap">
+        SELECT * FROM geojsondata WHERE name = #{name};
+    </select>
+
+    <select id="findByNameNewest" resultType="com.johnny.bank.model.resource.dataResource.GeoJsonData">
+        SELECT * FROM geojsondata WHERE name = #{name} order by createtime DESC limit 1;
+    </select>
 </mapper>

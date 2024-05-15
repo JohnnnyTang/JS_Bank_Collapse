@@ -3,11 +3,9 @@ package com.johnny.bank.utils;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
-import com.johnny.bank.model.configuration.MultiIndexPath;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -31,15 +29,12 @@ public class ProcessUtil {
 
     //    static String pythonDir = "C:/nhri/monitor/pythonDir/";
 
-    @Autowired
-    private MultiIndexPath multiIndexPath;
-
     static String outsideModelDir = "D:/zhuomian/水科院/python/";
     //    static String pythonDir = "/home/zym/python/";
     static String pythonStr = "python";
 
 //    static String condaStr = "conda activate multiIndex &&";
-    static String condaStr = "conda activate Env1 &&";
+    static String condaStr = "conda activate ";
 
 //    static String pythonStr = "python3";
 
@@ -67,11 +62,11 @@ public class ProcessUtil {
 
     // 岸坡因子计算
     public static Process buildSectionTaskNodeProcess(
-            TaskNode taskNode, String multiIndexDataPath, String multiIndexResPath
+            TaskNode taskNode, String multiIndexDataPath, String multiIndexResPath, String condaEnv
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
-        commands.add(condaStr);
+        commands.add(condaStr + condaEnv + " &&");
 
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
@@ -92,11 +87,11 @@ public class ProcessUtil {
 
     // 其他因子计算
     public static Process buildOtherIndexTaskNodeProcess(
-            TaskNode taskNode, String fullJsonPath
+            TaskNode taskNode, String fullJsonPath, String condaEnv
     ) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
-        commands.add(condaStr);
+        commands.add(condaStr + condaEnv + " &&");
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
         commands.add((String) modelUsage.get("exePrefix"));

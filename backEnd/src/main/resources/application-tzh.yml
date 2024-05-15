@@ -52,7 +52,9 @@ video:
   yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4
 
 multiIndex:
+  condaEnv: bankModel
   dataPath: D:\2024-work\shore_collapse\model\modelData
+  wholeDataPath: D:\2024-work\shore_collapse\model\dataWhole
   resPath: D:\2024-work\shore_collapse\model\modelRes\
 
 sms:

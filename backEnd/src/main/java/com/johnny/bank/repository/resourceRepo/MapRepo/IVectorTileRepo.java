@@ -3,6 +3,7 @@ package com.johnny.bank.repository.resourceRepo.MapRepo;
 import com.johnny.bank.model.common.ContourTileBox;
 import com.johnny.bank.model.common.DepthLineTileBox;
 import com.johnny.bank.model.common.TileBox;
+import com.johnny.bank.model.resource.dataResource.SectionLineInfo;
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -25,4 +26,8 @@ public interface IVectorTileRepo {
 
     @MapKey("id")
     List<Map<String, Object>> getLayerBasicInfo(@Param("tableName") String tableName, @Param("fieldList") List<String> fieldList);
+
+    List<SectionLineInfo> selectSectionLineInfo();
+
+    SectionLineInfo selectSectionLineInfoById(Integer id);
 }

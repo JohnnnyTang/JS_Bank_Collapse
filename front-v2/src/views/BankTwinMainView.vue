@@ -7,21 +7,16 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"></e-tab>
+                <e-tab
+                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
+                    :items="items"
+                    :columns="2"
+                ></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
         <RealtimeStatusVue />
-        <div class="realtime-video-container">
-            <div class="realtime-video-title">实时视频监控</div>
-            <div class="video-box" v-for="(item, index) in videoList" :key="index">
-                <div class="video-content">
-                    <iframe :src="item.videoUrl + token" width="100%" height="100%" :id="item.name" allowfullscreen>
-                    </iframe>
-                </div>
-                <div class="video-title">{{ item.name }}</div>
-            </div>
-        </div>
+        <RealtimeVideoVue :active="!warnActive" />
         <!-- <SectionRisk />
         <DeviceWarn /> -->
 
@@ -32,12 +27,29 @@
                         style="font-size: calc(0.5vw + 0.7vh); color:#e7f2ff;">
                         {{ `近一小时内无报警信息` }}
                     </div>
-                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
+                    <div
+                        v-else
+                        class="warn-block"
+                        v-for="(warningString, index) in warningList"
+                        :key="index"
+                    >
                         <div
-                            style=" background-size: contain; background-image: url('/icons/warning.png');  width: 3vh; height: 3vh;">
+                            style="
+                                background-size: contain;
+                                background-image: url('/icons/warning.png');
+                                width: 3vh;
+                                height: 3vh;
+                            "
+                        ></div>
+                        <div
+                            style="
+                                font-size: calc(0.5vw + 0.7vh);
+                                color: #e7f2ff;
+                                margin-left: 0.5vw;
+                            "
+                        >
+                            {{ warningString }}
                         </div>
-                        <div style=" font-size: calc(0.5vw + 0.7vh); color:#e7f2ff; margin-left: 0.5vw;">
-                            {{ warningString }}</div>
                     </div>
                 </div>
             </DvBorderBox12>
@@ -46,19 +58,59 @@
         <div class="monitor-legend-container">
             <div class="monitor-legend-title">监测设备图例</div>
             <div class="monitor-legend-block">
-                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
-                    <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
+                <div
+                    v-for="(item, index) in legendList"
+                    :key="index"
+                    class="monitor-legend-item"
+                >
+                    <div
+                        class="icon-block"
+                        :style="{ backgroundImage: `url(${item.icon})` }"
+                    ></div>
                     <div class="text-block">
                         <span>{{ item.text1 }}</span>
-                        <span style="font-weight: bold;">{{ item.strong }}</span>
+                        <span style="font-weight: bold">{{ item.strong }}</span>
                         <span>{{ item.text2 }}</span>
-                        <br>
-                        <span style="text-align: center; width: 100%; display: block; 
-                            text-shadow: #eef3ff 1px 1px, #eef3ff 1px 1px,">
-                            {{ item.device }}</span>
+                        <br />
+                        <span
+                            style="
+                                text-align: center;
+                                width: 100%;
+                                display: block;
+                                text-shadow:
+                                    #eef3ff 1px 1px,
+                                    #eef3ff 1px 1px;
+                            "
+                        >
+                            {{ item.device }}</span
+                        >
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div
+            class="warn-detail-container"
+            :class="warnActive ? 'active' : 'in-active'"
+        >
+            <div class="warn-detail-title">预警信息详情</div>
+            <div class="warn-detail-content">
+                <div
+                    class="key-val-container"
+                    v-for="(item, index) in warnKeyValList"
+                    :key="index"
+                >
+                    <div class="key-text">{{ item.key + '：' }}</div>
+                    <div class="val-text">{{ item.val }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="warn-history-container"
+            :class="warnActive ? 'active' : 'in-active'"
+        >
+            <div class="warn-detail-title">历史预警信息</div>
         </div>
 
         <div class="map-container" id="map"></div>
@@ -71,9 +123,13 @@ import { onMounted, ref, onUnmounted, watch } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
-import { BorderBox12 as DvBorderBox12, BorderBox7 as DvBorderBox7 } from '@kjgl77/datav-vue3'
+import {
+    BorderBox12 as DvBorderBox12,
+    BorderBox7 as DvBorderBox7,
+} from '@kjgl77/datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
+import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 // import SectionRisk from '../components/bankTwin/SectionRisk.vue'
 // import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
 import { mapInit } from '../components/bankManage/mapInit'
@@ -84,6 +140,7 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 const animateTime = ref('0s')
 const marqueeBlockDom = ref()
+const warnActive = ref(false)
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -98,44 +155,59 @@ const items = ref([
     { label: '三维视图', value: 'tab2' },
 ])
 
-const videoList = ref([
-    {
-        name: '民主沙上游围堤监控',
-        position: '32.0432963, 120.5122242',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
-    },
-    {
-        name: '民主沙靖江市江滩办事处外堤监控',
-        position: '32.0381061, 120.5263473',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
-    },
-    {
-        name: '民主沙海事码头监控',
-        position: '32.0316674, 120.5402574',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
-    },
-])
 const warningList = ref([])
 const legendList = [
     {
-        icon: '/icons/GNSS.png', text1: '土体', strong: '表面位移', text2: '监测', device: 'GNSS'
+        icon: '/icons/GNSS.png',
+        text1: '土体',
+        strong: '表面位移',
+        text2: '监测',
+        device: 'GNSS',
     },
     {
-        icon: '/icons/测斜仪.png', text1: '土体', strong: '内部位移', text2: '监测', device: '测斜仪'
+        icon: '/icons/测斜仪.png',
+        text1: '土体',
+        strong: '内部位移',
+        text2: '监测',
+        device: '测斜仪',
     },
     {
-        icon: '/icons/孔隙水压力计.png', text1: '土体', strong: '潜水位', text2: '监测', device: '孔隙水压力计'
+        icon: '/icons/孔隙水压力计.png',
+        text1: '土体',
+        strong: '潜水位',
+        text2: '监测',
+        device: '孔隙水压力计',
     },
     {
-        icon: '/icons/应力桩.png', text1: '土体', strong: '应力应变', text2: '监测', device: '应力桩'
+        icon: '/icons/应力桩.png',
+        text1: '土体',
+        strong: '应力应变',
+        text2: '监测',
+        device: '应力桩',
     },
 ]
 
+const gnssIdMap = {
+    'MZS120.51749289_32.04059243_1': 'CL-01',
+    'MZS120.51977143_32.04001152_1': 'CL-02',
+    'MZS120.52557975_32.03825056_1': 'CL-03',
+    'MZS120.52660704_32.03676583_1': 'CL-04',
+    'MZS120.53334877_32.03227055_1': 'CL-05',
+    'MZS120.54599538_32.02837993_1': 'CL-06',
+    'MZS120.55327892_32.02707923_1': 'CL-07',
+    'MZS120.55649757_32.02592404_1': 'CL-08',
+    'MZS120.56334257_32.02298144_1': 'CL-09',
+    'MZS120.56944728_32.02070961_1': 'CL-10',
+}
 
-
+const warnKeyValList = ref([
+    { key: '危险区域', val: '暂无' },
+    { key: '出险时间', val: '暂无' },
+    { key: '设备信息', val: '暂无' },
+    { key: '管理单位', val: '暂无' },
+    { key: '联系方式', val: '暂无' },
+    { key: '是否发送通知', val: '暂无' },
+])
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -156,9 +228,16 @@ const mapFlyToRiver = (mapIns) => {
 //     mapFlyToRiver(map)
 // })
 
-watch(() => warnInfoStore.warnInfo, (newV, oldV) => {
-    updateWarnInfoDesc()
-})
+watch(
+    () => warnInfoStore.warnInfo,
+    (newV, oldV) => {
+        updateWarnInfoDesc()
+    },
+)
+
+function unique (arr) {
+  return Array.from(new Set(arr))
+}
 
 const navToManage = () => {
     router.push('/bankManage')
@@ -167,26 +246,35 @@ const updateWarnInfoDesc = () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
+    console.log('1231', warnInfo)
+    let deviceNameList = []
 
     for (let i = 0; i < warnInfo.length; i++) {
-
         // 报警设备信息
         let deviceId = warnInfo[i].deviceId
+        deviceNameList.push(gnssIdMap[warnInfo[i].deviceId])
         let deviceName = DEVICETYPEMAP[deviceId.slice(-1) - 1]
-        let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒');
+        let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒')
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
 
         let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}mm
         ！`
         WARN_TEXT.push(warnString)
     }
+    warnKeyValList.value[2].val = unique(deviceNameList).join(',')
+    warnKeyValList.value[5].val = '是'
+    
     warningList.value = WARN_TEXT
+    warnActive.value = true
 
     const marqueeBlockWidth = marqueeBlockDom.value.offsetWidth
     animateTime.value = `${marqueeBlockWidth}s`
 }
 
 onMounted(async () => {
+    setTimeout(() => {
+        warnActive.value = true
+    }, 3000)
     map = new mapboxgl.Map({
         container: 'map', // container ID
         accessToken:
@@ -412,7 +500,6 @@ div.twin-main-container {
         }
     }
 
-
     div.marquee-container {
         position: absolute;
         left: 28vw;
@@ -461,11 +548,8 @@ div.twin-main-container {
                     align-items: center;
                     width: fit-content;
                 }
-
-
             }
         }
-
     }
 
     div.monitor-legend-container {
@@ -505,7 +589,6 @@ div.twin-main-container {
             padding-right: 0.5vw;
         }
 
-
         div.monitor-legend-block {
             position: relative;
             width: 46vw;
@@ -524,7 +607,9 @@ div.twin-main-container {
                 width: 10vw;
                 height: 6vh;
                 border: #0400fd 1px solid;
-                box-shadow: inset 5px 5px 5px #478bf2bc, inset -5px -5px 5px #478bf2bc;
+                box-shadow:
+                    inset 5px 5px 5px #478bf2bc,
+                    inset -5px -5px 5px #478bf2bc;
                 // box-shadow: inset 5px 5px 5px #0400fd, inset -5px -5px 5px #0400fd;
 
                 border-radius: 5%;
@@ -546,10 +631,151 @@ div.twin-main-container {
                 }
             }
         }
-
     }
 
+    div.warn-detail-container {
+        position: absolute;
+        right: 1vw;
+        top: 10vh;
+        height: 45vh;
+        width: 24vw;
 
+        backdrop-filter: blur(12px);
+        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
+        background-color: rgba(156, 195, 255, 0.8);
+        border-radius: 4px;
+        border: 2px solid rgb(28, 105, 247);
+        z-index: 3;
+        border-radius: 4px;
+        overflow: hidden;
+
+        div.warn-detail-title {
+            height: 4vh;
+            line-height: 4vh;
+            width: 100%;
+            background-color: transparent;
+            text-align: center;
+            font-size: calc(0.8vw + 0.8vh);
+            font-weight: bold;
+            color: #0400fd;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+            letter-spacing: 0.4rem;
+            border-bottom: 2px solid #0400fd;
+        }
+
+        div.warn-detail-content {
+            height: 40vh;
+            width: 23vw;
+            margin-left: 0.5vw;
+            // margin-top: 0.5vh;
+
+            // background-color: #6493ff;
+
+            display: flex;
+            flex-flow: row wrap;
+            align-content: flex-start;
+            justify-content: center;
+
+            div.key-val-container {
+                margin-top: 0.6vh;
+                width: 90%;
+                height: 6vh;
+                display: flex;
+                flex-flow: row wrap;
+                justify-content: space-between;
+                // background-color: #0446a8;
+                text-align: center;
+                border-bottom: 2px solid rgb(0, 32, 175);
+
+                &:first-child {
+                    margin-top: 0;
+                }
+
+                div.icon {
+                    width: 20%;
+                    height: 3vh;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: 50% 50%;
+                    background-color: transparent;
+
+                    &#warning-icon {
+                        background-image: url('/warning.png');
+                    }
+
+                    &#length-icon {
+                        background-image: url('/distance.png');
+                    }
+                }
+
+                div.key-text {
+                    width: width;
+                    line-height: 6vh;
+                    background-color: transparent;
+                    font-size: calc(0.7vw + 0.6vh);
+                    color: #0043fd;
+                }
+
+                div.val-text {
+                    line-height: 6vh;
+                    font-size: calc(0.7vw + 0.5vh);
+                    font-weight: bold;
+                    color: #1d00be;
+                    // text-align: center;
+                }
+
+                // &:nth-child(2n + 1) {
+                //     text-align: left;
+
+                //     // padding-left: 6%;
+                //     // border-right: 2px solid rgb(0, 32, 175);
+                // }
+                // &:nth-child(2n) {
+                //     text-align: right;
+                //     justify-content: flex-end;
+                //     // padding-right: 6%;
+                //     // border-left: 2px solid rgb(0, 32, 175);
+                // }
+            }
+        }
+    }
+
+    div.warn-history-container {
+        position: absolute;
+        right: 1vw;
+        bottom: 1vh;
+        height: 34vh;
+        width: 24vw;
+
+        backdrop-filter: blur(16px);
+        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
+        background-color: rgba(156, 195, 255, 0.4);
+        border-radius: 4px;
+        border: 2px solid rgb(28, 105, 247);
+        z-index: 3;
+        border-radius: 4px;
+        overflow: hidden;
+
+        div.warn-detail-title {
+            height: 4vh;
+            line-height: 4vh;
+            width: 100%;
+            background-color: transparent;
+            text-align: center;
+            font-size: calc(0.8vw + 0.8vh);
+            font-weight: bold;
+            color: #0400fd;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+            letter-spacing: 0.4rem;
+            border-bottom: 2px solid #0400fd;
+        }
+    }
 
     /* 根据需要调整动画的持续时间 */
 }

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import nonapi.io.github.classgraph.json.Id;
 
+import java.sql.Timestamp;
+
 /**
  * @projectName: backEnd
  * @package: com.johnny.bank.model.resource.dataResource
@@ -28,6 +30,6 @@ public class GeoData {
     String type; // 数据类型
     @NotNull
     String path; // 数据路径
-    String createTime;
-    String updateTime;
+    Timestamp createTime;
+    Timestamp updateTime;
 }

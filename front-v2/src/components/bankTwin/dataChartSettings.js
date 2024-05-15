@@ -144,10 +144,18 @@ const genGnssOptionOfDevice = (deviceDataList, halfError) => {
     gnssOption.xAxis.data = []
     let gnssDataInterval = [[], [], [], []]
     deviceDataList.map(function (item) {
-        gnssOption.xAxis.data.push(item['measureTime'].replace(' ', '\n'))
-        gnssDataInterval[0].push(+item['threeD'].toFixed(2))
-        gnssDataInterval[1].push(item['movingAvg'])
-        gnssDataInterval[2].push(+(item['movingAvg'] - halfError).toFixed(2))
+        gnssOption.xAxis.data.push(
+            item['measureTime'] ? item['measureTime'].replace(' ', '\n') : null,
+        )
+        gnssDataInterval[0].push(
+            item['threeD'] ? +item['threeD'].toFixed(2) : null,
+        )
+        gnssDataInterval[1].push(item['movingAvg'] ? item['movingAvg'] : null)
+        gnssDataInterval[2].push(
+            item['movingAvg']
+                ? +(item['movingAvg'] - halfError).toFixed(2)
+                : null,
+        )
         gnssDataInterval[3].push(halfError * 2)
     })
     gnssOption.series[1] = {
@@ -221,13 +229,13 @@ let stressOption = {
         right: '1%',
         width: '60%',
         data: [
-            {name: '下层主应变'},
-            {name: '中层主应变'},
-            {name: '上层主应变'},
-            {name: '下层主应变滑动平均'},
-            {name: '中层主应变滑动平均'},
-            {name: '上层主应变滑动平均'},
-        ]
+            { name: '下层主应变' },
+            { name: '中层主应变' },
+            { name: '上层主应变' },
+            { name: '下层主应变滑动平均' },
+            { name: '中层主应变滑动平均' },
+            { name: '上层主应变滑动平均' },
+        ],
     },
     xAxis: {
         // data: data.map(function (item) {
@@ -263,14 +271,30 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
     stressOption.xAxis.data = []
     let dataInterval = [[], [], [], [], [], [], [], []]
     deviceDataList.map(function (item) {
-        stressOption.xAxis.data.push(item['measureTime'].replace(' ', '\n'))
-        dataInterval[0].push(+item['bottomChange'].toFixed(2))
-        dataInterval[1].push(+item['middleChange'].toFixed(2))
-        dataInterval[2].push(+item['topChange'].toFixed(2))
-        dataInterval[3].push(item['bottomChangeAvg'])
-        dataInterval[4].push(item['middleChangeAvg'])
-        dataInterval[5].push(item['topChangeAvg'])
-        dataInterval[6].push(+(item['topChangeAvg'] - halfError).toFixed(2))
+        stressOption.xAxis.data.push(
+            item['measureTime'] ? item['measureTime'].replace(' ', '\n') : null,
+        )
+        dataInterval[0].push(
+            item['bottomChange'] ? +item['bottomChange'].toFixed(2) : null,
+        )
+        dataInterval[1].push(
+            item['middleChange'] ? +item['middleChange'].toFixed(2) : null,
+        )
+        dataInterval[2].push(
+            item['topChange'] ? +item['topChange'].toFixed(2) : null,
+        )
+        dataInterval[3].push(
+            item['bottomChangeAvg'] ? item['bottomChangeAvg'] : null,
+        )
+        dataInterval[4].push(
+            item['middleChangeAvg'] ? item['middleChangeAvg'] : null,
+        )
+        dataInterval[5].push(item['topChangeAvg'] ? item['topChangeAvg'] : null)
+        dataInterval[6].push(
+            item['topChangeAvg']
+                ? +(item['topChangeAvg'] - halfError).toFixed(2)
+                : null,
+        )
         dataInterval[7].push(halfError * 2)
     })
     stressOption.series[0] = {
@@ -310,7 +334,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         lineStyle: {
             opacity: 1,
             width: 4,
-            color: '#FFA378'
+            color: '#FFA378',
         },
         itemStyle: {
             color: '#FFA378',
@@ -324,7 +348,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         lineStyle: {
             opacity: 1,
             width: 4,
-            color: '#05AFF2'
+            color: '#05AFF2',
         },
         itemStyle: {
             color: '#05AFF2',
@@ -338,7 +362,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         lineStyle: {
             opacity: 1,
             width: 4,
-            color: '#45BF55'
+            color: '#45BF55',
         },
         itemStyle: {
             color: '#45BF55',
@@ -394,11 +418,11 @@ let incinometerOption = {
         right: '1%',
         width: '60%',
         data: [
-            {name: '下层内部位移'},
-            {name: '中层内部位移'},
-            {name: '上层内部位移'},
-            {name: '下层内部位移滑动平均'},
-        ]
+            { name: '下层内部位移' },
+            { name: '中层内部位移' },
+            { name: '上层内部位移' },
+            { name: '下层内部位移滑动平均' },
+        ],
     },
     xAxis: {
         // data: data.map(function (item) {
@@ -435,13 +459,15 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
     let dataInterval = [[], [], [], [], [], []]
     let noArea = false
     deviceDataList.map(function (item) {
-        incinometerOption.xAxis.data.push(item['measureTime'].replace(' ', '\n'))
+        incinometerOption.xAxis.data.push(
+            item['measureTime'].replace(' ', '\n'),
+        )
         dataInterval[0].push(+item['bottomMove'].toFixed(2))
         dataInterval[1].push(+item['middleMove'].toFixed(2))
         dataInterval[2].push(+item['topMove'].toFixed(2))
         dataInterval[3].push(item['bottomMoveAvg'])
         dataInterval[4].push(+(item['bottomMoveAvg'] - halfError).toFixed(2))
-        if(Math.abs(item['bottomMoveAvg']) > halfError) {
+        if (Math.abs(item['bottomMoveAvg']) > halfError) {
             noArea = true
         }
         dataInterval[5].push(+(item['bottomMoveAvg'] + halfError).toFixed(2))
@@ -484,7 +510,7 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         lineStyle: {
             opacity: 1,
             width: 4,
-            color: '#45BF55'
+            color: '#45BF55',
         },
         itemStyle: {
             color: '#45BF55',
@@ -501,7 +527,7 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         },
         areaStyle: {
             color: '#A7C5C5',
-            opacity: 0.2
+            opacity: 0.2,
         },
         itemStyle: {
             color: '#38D0F2',
@@ -517,7 +543,7 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         // stack: 'error',
         areaStyle: {
             color: '#A7C5C5',
-            opacity: 0.2
+            opacity: 0.2,
         },
         lineStyle: {
             color: '#38D0F2',
@@ -544,10 +570,10 @@ let manometerOption = {
         right: '1%',
         width: '60%',
         data: [
-            {name: '潜水位土体孔隙水压力'},
-            {name: '潜水位土体孔隙水压力误差上限'},
-            {name: '潜水位土体孔隙水压力误差下限'},
-        ]
+            { name: '潜水位土体孔隙水压力' },
+            { name: '潜水位土体孔隙水压力误差上限' },
+            { name: '潜水位土体孔隙水压力误差下限' },
+        ],
     },
     xAxis: {
         // data: data.map(function (item) {
@@ -587,7 +613,7 @@ const genManometerOptionOfDevice = (deviceDataList, halfError) => {
         manometerOption.xAxis.data.push(item['measureTime'].replace(' ', '\n'))
         dataInterval[0].push(+item['height'].toFixed(2))
         dataInterval[1].push(+(item['height'] + halfError).toFixed(2))
-        if(Math.abs(item['height']) > halfError) {
+        if (Math.abs(item['height']) > halfError) {
             noArea = true
         }
         dataInterval[2].push(+(item['height'] - halfError).toFixed(2))
@@ -600,7 +626,7 @@ const genManometerOptionOfDevice = (deviceDataList, halfError) => {
         lineStyle: {
             opacity: 1,
             width: 4,
-            color: '#45BF55'
+            color: '#45BF55',
         },
         itemStyle: {
             color: '#45BF55',
@@ -645,4 +671,9 @@ const genManometerOptionOfDevice = (deviceDataList, halfError) => {
     return manometerOption
 }
 
-export { genGnssOptionOfDevice, genStressOptionOfDevice, genIncinometerOptionOfDevice, genManometerOptionOfDevice }
+export {
+    genGnssOptionOfDevice,
+    genStressOptionOfDevice,
+    genIncinometerOptionOfDevice,
+    genManometerOptionOfDevice,
+}

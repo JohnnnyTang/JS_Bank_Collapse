@@ -1,13 +1,11 @@
 package com.johnny.bank.controller.node;
 
 import com.johnny.bank.controller.node.base.BaseNodeController;
-import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.node.TaskNode;
 import com.johnny.bank.service.node.impl.TaskNodeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -21,6 +19,12 @@ public class TaskNodeController extends BaseNodeController<TaskNode> {
     @PostMapping("start")
     public ResponseEntity<String> startCmdOutTask(@RequestBody TaskNode taskNode) throws Exception {
         String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartNewTask(taskNode);
+        return ResponseEntity.ok(taskNodeId);
+    }
+
+    @PostMapping("start/multi/default/section/{id}")
+    public ResponseEntity<String> startCmdOutTask(@PathVariable Integer id) throws Exception {
+        String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(id);
         return ResponseEntity.ok(taskNodeId);
     }
 

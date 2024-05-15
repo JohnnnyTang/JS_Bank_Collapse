@@ -2,10 +2,9 @@ package com.johnny.bank.model.resource.dataResource;
 
 import com.johnny.bank.model.resource.dataResource.base.GeoData;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
 
 /**
  * @projectName: backEnd
@@ -20,8 +19,8 @@ import lombok.NoArgsConstructor;
 public class RasterData extends GeoData {
     @Builder(builderMethodName = "rasterBuilder")
     public RasterData(@NotNull String id, @NotNull String name,
-                   @NotNull String type, @NotNull String path,
-                   String createTime, String updateTime) {
+                      @NotNull String type, @NotNull String path,
+                      Timestamp createTime, Timestamp updateTime) {
         super(id, name, type, path, createTime, updateTime);
     }
 }
