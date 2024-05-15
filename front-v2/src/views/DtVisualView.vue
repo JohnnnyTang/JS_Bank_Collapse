@@ -96,7 +96,7 @@ const mapFlyToRiver = (mapIns) => {
     mapIns.fitBounds(
         [[118.75395171066617, 31.191536515956685],
         [121.94881134428226, 32.68858659779259],],
-        { pitch: 52.45, duration: 1500, },
+        { pitch: 0, duration: 1500, },
     )
 }
 const closeHandler = (index) => {

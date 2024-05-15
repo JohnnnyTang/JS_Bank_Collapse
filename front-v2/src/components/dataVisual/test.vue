@@ -2,6 +2,29 @@
     <div class="main">
         <div class="map" ref="mapDom" id="map">
         </div>
+        <!-- <div class="color-band">
+            <div class="color-section">
+                <div class="color-text">0m</div>
+            </div>
+            <div class="color-section">
+                <div class="color-text">10</div>
+            </div>
+            <div class="color-section">
+                <div class="color-text">13.5</div>
+            </div>
+            <div class="color-section">
+                <div class="color-text">15</div>
+            </div>
+            <div class="color-section">
+                <div class="color-text">20</div>
+            </div>
+            <div class="color-section">
+                <div class="color-text">30</div>
+            </div>
+            <div class="color-section">
+                <div class="color-text">60</div>
+            </div>
+        </div> -->
     </div>
 </template>
 
@@ -13,65 +36,449 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const mapDom = ref()
-const geojson = {
-    "type": "FeatureCollection",
-    "name": "point",
-    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-    "features": [
-        { "type": "Feature", "properties": { "label": "在建围堤" }, "geometry": { "type": "Point", "coordinates": [120.498666444291274, 32.049985245363033] } },
-        { "type": "Feature", "properties": { "label": "通信" }, "geometry": { "type": "Point", "coordinates": [120.537936534373657, 32.043194991802885] } },
-        { "type": "Feature", "properties": { "label": "牲" }, "geometry": { "type": "Point", "coordinates": [120.529661105709394, 32.045504501552998] } },
-        { "type": "Feature", "properties": { "label": "油" }, "geometry": { "type": "Point", "coordinates": [120.531043188529353, 32.046411147911222] } },
-        { "type": "Feature", "properties": { "label": "江心沙养殖场" }, "geometry": { "type": "Point", "coordinates": [120.531280722916648, 32.044484179965011] } },
-        { "type": "Feature", "properties": { "label": "江心洲重要湿地" }, "geometry": { "type": "Point", "coordinates": [120.513997001291273, 32.050901634735254] } },
-        { "type": "Feature", "properties": { "label": "抽" }, "geometry": { "type": "Point", "coordinates": [120.521983576048214, 32.044691050836185] } },
-        { "type": "Feature", "properties": { "label": "苗" }, "geometry": { "type": "Point", "coordinates": [120.525999268288103, 32.045176890656563] } },
-        { "type": "Feature", "properties": { "label": "苗" }, "geometry": { "type": "Point", "coordinates": [120.522662183364602, 32.043381662080698] } },
-        { "type": "Feature", "properties": { "label": "苗" }, "geometry": { "type": "Point", "coordinates": [120.52256663570391, 32.045082766347853] } },
-        { "type": "Feature", "properties": { "label": "南1(黄)" }, "geometry": { "type": "Point", "coordinates": [120.508643292642518, 32.042304064286789] } },
-        { "type": "Feature", "properties": { "label": "在建围堤" }, "geometry": { "type": "Point", "coordinates": [120.51161633291396, 32.053574416550582] } },
-        { "type": "Feature", "properties": { "label": "在建围堤" }, "geometry": { "type": "Point", "coordinates": [120.50797944268966, 32.049733979950545] } },
-        { "type": "Feature", "properties": { "label": "在建围堤" }, "geometry": { "type": "Point", "coordinates": [120.509035392576536, 32.045158077638085] } },
-        { "type": "Feature", "properties": { "label": "潜堤" }, "geometry": { "type": "Point", "coordinates": [120.50287743831727, 32.043218063514281] } },
-        { "type": "Feature", "properties": { "label": "吹填区" }, "geometry": { "type": "Point", "coordinates": [120.511255850880858, 32.048521530695844] } },
-        { "type": "Feature", "properties": { "label": "在建围堤" }, "geometry": { "type": "Point", "coordinates": [120.504027722147512, 32.054663363805844] } },
-        { "type": "Feature", "properties": { "label": "在建围堤" }, "geometry": { "type": "Point", "coordinates": [120.501248778702546, 32.044508878309522] } },
-        { "type": "Feature", "properties": { "label": "吹填区" }, "geometry": { "type": "Point", "coordinates": [120.502943154245727, 32.049620961677] } },
-        { "type": "Feature", "properties": { "label": "江滩办事处" }, "geometry": { "type": "Point", "coordinates": [120.525223501758049, 32.040733018179566] } },
-        { "type": "Feature", "properties": { "label": "通信" }, "geometry": { "type": "Point", "coordinates": [120.5531101511326, 32.029094449353146] } },
-        { "type": "Feature", "properties": { "label": "抽" }, "geometry": { "type": "Point", "coordinates": [120.552969454547465, 32.029619820841951] } },
-        { "type": "Feature", "properties": { "label": "靖江市人民政府" }, "geometry": { "type": "Point", "coordinates": [120.524922894314713, 32.040941963403704] } },
-        { "type": "Feature", "properties": { "label": "苗" }, "geometry": { "type": "Point", "coordinates": [120.5256615905096, 32.040484412634882] } },
-        { "type": "Feature", "properties": { "label": "人渡" }, "geometry": { "type": "Point", "coordinates": [120.5621358294608, 32.040791455129011] } }
-    ]
-}
-
 
 onMounted(async () => {
 
+
     const map = await initMap(mapDom.value)
-    !map.getSource('sluiceArea') &&
-        map.addSource('sluiceArea', {
+
+    !map.getSource('riverBg') &&
+        map.addSource('riverBg', {
             type: 'vector',
             tiles: [
-                tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}',
+                tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
             ],
         })
-    !map.getLayer('水闸工程') &&
+    !map.getLayer('近岸地形') &&
         map.addLayer({
-            id: '水闸工程',
-            type: 'circle',
-            source: 'sluiceArea',
+            id: '近岸地形',
+            type: 'fill',
+            source: 'riverBg',
             'source-layer': 'default',
-            layout: {
-            },
             paint: {
-                'circle-color': '#529b2e',
-                'circle-radius': 6,
+                'fill-color': [
+                    'interpolate',
+                    ['linear'],
+                    ['get', 'height'],
+                    0, '#0099FF',    // 草绿色
+                    2, '#78B766',   // R120 G183 B102
+                    5, '#27C731',   // 春绿色
+                    8, '#99CC33',   // 火星绿
+                    10, '#CCCC33',  // 香蕉黄
+                    11, '#D9D97A',  // R230 G230 B128
+                    13, '#FFFF99',  // 粉笔色
+                    13.5, '#FFFFFF',
+                    15, '#99FFFF',  // 冰蓝色
+                    16, '#0000FF',  // 天蓝色
+                    20, '#6699FF',  // 淡蓝色
+                    30, '#0096FF',
+                    60, '#0057DF',
+                    Infinity, '#000000'
+                ],
             },
         })
 
+    !map.getSource('riverLand') &&
+        map.addSource('riverLand', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/riverLand/{x}/{y}/{z}',
+            ],
+        })
+    !map.getLayer('沙岛') &&
+        map.addLayer({
+            id: '沙岛',
+            type: 'fill',
+            source: 'riverLand',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': '#CC8800',
+            },
+        })
 
+    map.on('click',['沙岛'],(e)=>{
+        console.log(e.features[0]);
+    })
+
+    // !map.getSource('importantBank') &&
+    //     map.addSource('importantBank', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/importantBank/{x}/{y}/{z}',
+    //         ],
+    //     })
+
+    // map.addLayer({
+    //     id: '岸段-注记',
+    //     type: 'symbol',
+    //     source: 'importantBank',
+    //     minzoom: 11,
+    //     maxzoom: 18,
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'bank_name'],
+    //         'symbol-placement': 'line',
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         'text-anchor': 'top',
+    //     },
+    //     paint: {
+    //         'text-color': '#232323',
+    //     },
+    // })
+
+
+    // !map.getLayer('一级预警岸段') &&
+    //     map.addLayer({
+    //         id: '一级预警岸段',
+    //         type: 'line',
+    //         source: 'importantBank',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         filter: ["==", "warning_level", 1],
+    //         paint: {
+    //             'line-color': '#B11717',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.5],
+    //                 10, ["literal", 3.0],
+    //                 13, ["literal", 7.0]
+    //             ],
+    //         },
+    //     })
+    // !map.getLayer('二级预警岸段') &&
+    //     map.addLayer({
+    //         id: '二级预警岸段',
+    //         type: 'line',
+    //         source: 'importantBank',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             // 'line-cap': 'round',
+    //             // 'line-join': 'round',
+    //         },
+    //         filter: ["==", "warning_level", 2],
+    //         paint: {
+    //             // 'line-opacity': 1,
+    //             'line-color': '#B14D17',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.5],
+    //                 10, ["literal", 3.0],
+    //                 13, ["literal", 7.0]
+    //             ],
+
+    //         },
+    //     })
+    // !map.getLayer('三级预警岸段') &&
+    //     map.addLayer({
+    //         id: '三级预警岸段',
+    //         type: 'line',
+    //         source: 'importantBank',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             // 'line-cap': 'round',
+    //             // 'line-join': 'round',
+    //         },
+    //         filter: ["==", "warning_level", 3],
+    //         paint: {
+    //             // 'line-opacity': 1,
+    //             'line-color': '#B18A17',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.5],
+    //                 10, ["literal", 3.0],
+    //                 13, ["literal", 7.0]
+    //             ],
+    //         },
+    //     })
+
+
+    // !map.getSource('riverBankLine') &&
+    //     map.addSource('riverBankLine', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverBankLine/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('江堤港堤') &&
+    //     map.addLayer({
+    //         id: '江堤港堤',
+    //         type: 'line',
+    //         source: 'riverBankLine',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'line-cap': 'round',
+    //             'line-join': 'round',
+    //         },
+    //         paint: {
+    //             'line-opacity': 1,
+    //             'line-color': '#958E54',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.5],
+    //                 10, ["literal", 1.0],
+    //                 13, ["literal", 3.0]
+    //             ],
+    //         },
+    //     })
+
+
+
+    // !map.getSource('portEmbankmentPoint') &&
+    //     map.addSource('portEmbankmentPoint', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/portEmbankmentPoint/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('里程桩') &&
+    //     map.addLayer({
+    //         id: '里程桩',
+    //         type: 'circle',
+    //         source: 'portEmbankmentPoint',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'circle-color': '#504C28',
+    //             'circle-blur': 0.5,
+    //             'circle-radius': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.5],
+    //                 10, ["literal", 2],
+    //                 13, ["literal", 4]
+    //             ],
+    //         },
+    //     })
+
+
+
+    // !map.getSource('combineProjectPoint') &&
+    //     map.addSource('combineProjectPoint', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/combineProjectPoint/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // loadImage(map, '/legend/枢纽.png', '枢纽')
+    // !map.getLayer('枢纽工程') &&
+    //     map.addLayer({
+    //         id: '枢纽工程',
+    //         type: 'symbol',
+    //         source: 'combineProjectPoint',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'icon-image': '枢纽',
+    //             'icon-size': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0],
+    //                 11, ["literal", 0.4],
+    //                 14, ["literal", 0.6]
+    //             ],
+    //         },
+    //         paint: {
+    //         },
+    //     })
+
+    // !map.getSource('riverPassageLine') &&
+    //     map.addSource('riverPassageLine', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('过江通道-隧道/通道') &&
+    //     map.addLayer({
+    //         id: '过江通道-隧道/通道',
+    //         type: 'line',
+    //         source: 'riverPassageLine',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'line-cap': 'round',
+    //             'line-join': 'round',
+    //         },
+    //         paint: {
+    //             'line-opacity': 1,
+    //             'line-color': '#FF8400',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.5],
+    //                 10, ["literal", 3.0],
+    //                 13, ["literal", 7.0]
+    //             ],
+    //         },
+    //     })
+
+    // !map.getSource('riverPassageLine') &&
+    //     map.addSource('riverPassageLine', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('过江通道-隧道/通道-注记') &&
+    //     map.addLayer({
+    //         id: '过江通道-隧道/通道-注记',
+    //         type: 'symbol',
+    //         source: 'riverPassageLine',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'text-field': ['get', 'name'],
+    //             'symbol-placement': 'line',
+    //             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //             // 'text-offset': [0, 1.25],
+    //             'text-anchor': 'center',
+    //         },
+    //         paint: {
+    //             'text-color': '#653400',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.5],
+    //                 10, ["literal", 3.0],
+    //                 13, ["literal", 7.0]
+    //             ],
+    //         },
+    //     })
+
+
+    // !map.getSource('riverPassagePier') &&
+    //     map.addSource('riverPassagePier', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverPassagePier/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('过江通道-桥墩') &&
+    //     map.addLayer({
+    //         id: '过江通道-桥墩',
+    //         type: 'fill-extrusion',
+    //         source: 'riverPassagePier',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'fill-extrusion-color': '#E7AE6D',
+    //             'fill-extrusion-base': 0,
+    //             'fill-extrusion-height': 200,
+    //             'fill-extrusion-opacity': 1.0
+    //         },
+    //     })
+
+    // !map.getSource('riverPassagePolygon') &&
+    //     map.addSource('riverPassagePolygon', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverPassagePolygon/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('过江通道-桥') &&
+    //     map.addLayer({
+    //         id: '过江通道-桥',
+    //         type: 'fill-extrusion',
+    //         source: 'riverPassagePolygon',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'fill-extrusion-color': '#FF9925',
+    //             'fill-extrusion-base': 200,
+    //             'fill-extrusion-height': 210,
+    //             'fill-extrusion-opacity': 1.0
+    //         },
+    //     })
+
+    // !map.getLayer('过江通道-桥-注记') &&
+    //     map.addLayer({
+    //         id: '过江通道-桥-注记',
+    //         type: 'symbol',
+    //         source: 'riverPassagePolygon',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'text-field': ['get', 'name'],
+    //             'symbol-placement': 'line',
+    //             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //             // 'text-offset': [0, 1.25],
+    //             'text-anchor': 'top',
+    //             'text-offset': [0, 0]
+    //         },
+    //         paint: {
+    //             'text-color': '#653400',
+    //         },
+    //     })
+
+    // !map.getSource('sluiceArea') &&
+    //     map.addSource('sluiceArea', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // loadImage(map, '/legend/水闸.png', '水闸')
+    // !map.getLayer('水闸工程') &&
+    //     map.addLayer({
+    //         id: '水闸工程',
+    //         type: 'symbol',
+    //         source: 'sluiceArea',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'icon-image': '水闸',
+    //             'icon-size': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 10.9, ["literal", 0],
+    //                 11, ["literal", 0.25],
+    //                 14, ["literal", 0.5]
+    //             ],
+    //         },
+    //         paint: {
+    //         },
+    //     })
+
+    // !map.getSource('pumpArea') &&
+    //     map.addSource('pumpArea', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // loadImage(map, '/legend/泵站.png', '泵站')
+    // !map.getLayer('泵站工程') &&
+    //     map.addLayer({
+    //         id: '泵站工程',
+    //         type: 'symbol',
+    //         source: 'pumpArea',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'icon-image': '泵站',
+    //             'icon-size': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 8, ["literal", 0],
+    //                 11, ["literal", 0.25],
+    //                 14, ["literal", 0.5]
+    //             ],
+    //         },
+    //         paint: {
+    //         },
+    //     })
 
 
     // !map.getSource('embankmentLine') &&
@@ -281,6 +688,47 @@ onMounted(async () => {
         height: 100%;
     }
 
+    .color-band {
+        width: 200px;
+        height: 50px;
+        /* 色带的高度，可根据需要调整 */
+        display: flex;
+    }
+
+    .color-section {
+        height: 100%;
+        flex: 1;
+        /* 使每个色块平均分配宽度 */
+    }
+
+    /* 为每个颜色段添加相应的背景颜色 */
+    .color-section:nth-child(1) {
+        background-color: #008000;
+    }
+
+    .color-section:nth-child(2) {
+        background-color: #e3cf01;
+    }
+
+    .color-section:nth-child(3) {
+        background-color: #ffffff;
+    }
+
+    .color-section:nth-child(4) {
+        background-color: #a9e9ff;
+    }
+
+    .color-section:nth-child(5) {
+        background-color: #ade2e6;
+    }
+
+    .color-section:nth-child(6) {
+        background-color: #009bff;
+    }
+
+    .color-section:nth-child(7) {
+        background-color: #0064ff;
+    }
 
 }
 </style>
