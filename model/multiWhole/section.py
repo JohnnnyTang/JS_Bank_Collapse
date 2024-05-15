@@ -30,6 +30,7 @@ def main(
 
     vertex0 = None
     vertex1 = None
+    print(currentSectionPoints)
     if currentSectionPoints[0][2] > currentSectionPoints[-1][2]:
         vertex0 = (x1, y1)
         vertex1 = (x2, y2)
@@ -73,3 +74,4 @@ if __name__ == "__main__":
         # -999
         # 13414573 3769008 13414748 3768302 20230901 minzhusha D:\project\JS_Bank_Collapse\util\model\multi\data D:\project\JS_Bank_Collapse\util\model\multi\test\result.json
         main(x1, y1, x2, y2, date, scene, dataFolderPath, dstPath)
+# python D:\1study\Work\2024_1_10_bank\JS_Bank_Collapse\model\multiWhole\all.py 13413987.075052204 3769198.7731254 13413960.628213946 3768963.462827877 2023-09-01 2023-03-01 flood minzhusha 0.5 0.5 0.16 0.48 0.36 0.28 0.36 0.36 E:\Data\bankProjectData\dataWhole E:\Data\bankProjectData\modelRes\fixedSection-JC01.json-end

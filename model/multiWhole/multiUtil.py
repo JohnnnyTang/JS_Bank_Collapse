@@ -162,6 +162,11 @@ def getSectionPointList(
     col1 = geo2imagexy(dataset, x1, y1)[1]
     row2 = geo2imagexy(dataset, x2, y2)[0]
     col2 = geo2imagexy(dataset, x2, y2)[1]
+    print(row1)
+    print(row2)
+    print(col1)
+    print(col2)
+
     result: list[tuple[float, float, float]] = []
     k = (row2 - row1) / (col2 - col1)
     b = row1 - k * col1

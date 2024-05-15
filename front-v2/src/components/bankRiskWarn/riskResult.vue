@@ -9,11 +9,11 @@
             style="position: absolute; height: 9vh; width: 20vw; left: 5.3vw;"
         />
         
-        <dv-border-box8
+        <!-- <dv-border-box8
             class="low"
             :dur="3"
             :color="['rgba(1, 1, 1, 0)', 'rgb(0, 176, 240)']"
-        ></dv-border-box8>
+        ></dv-border-box8> -->
         <div class="risk-item-container low">
             <div class="risk-item-title-container low">
                 <div class="risk-item-title">
@@ -36,11 +36,11 @@
             </div>
         </div>
 
-        <dv-border-box8
+        <!-- <dv-border-box8
             class="middle"
             :dur="3"
             :color="['rgba(1, 1, 1, 0)', 'rgb(237, 125, 49)']"
-        ></dv-border-box8>
+        ></dv-border-box8> -->
         <div class="risk-item-container middle">
             <div class="risk-item-title-container middle">
                 <div class="risk-item-title">
@@ -63,11 +63,11 @@
             </div>
         </div>
 
-        <dv-border-box8
+        <!-- <dv-border-box8
             class="high"
             :dur="3"
             :color="['rgba(1, 1, 1, 0)', 'rgba(255, 0, 0, 0.5)']"
-        ></dv-border-box8>
+        ></dv-border-box8> -->
         <div class="risk-item-container high">
             <div class="risk-item-title-container high">
                 <div class="risk-item-title">
@@ -278,25 +278,25 @@ onMounted(() => {
                 }
             }
         }
-        :deep(.dv-border-box-8) {
-            position: fixed;
-            top: 5vh;
-            width: 9.3vw;
-            height: 24vh;
-            z-index: 10;
+        // :deep(.dv-border-box-8) {
+        //     position: fixed;
+        //     top: 5vh;
+        //     width: 9.3vw;
+        //     height: 24vh;
+        //     z-index: 10;
 
-            &.low {
-                left: 0.6vw;
-            }
+        //     &.low {
+        //         left: 0.6vw;
+        //     }
 
-            &.middle {
-                left: 10.4vw;
-            }
+        //     &.middle {
+        //         left: 10.4vw;
+        //     }
 
-            &.high {
-                left: 20.2vw;
-            }
-        }
+        //     &.high {
+        //         left: 20.2vw;
+        //     }
+        // }
     }
     
 </style>
