@@ -367,10 +367,17 @@ public class TaskNodeService extends NodeService<TaskNode> {
                     result.put("resJsonId", taskNode.getId());
                     File resJson = new File(fullJsonResPath);
                     if (resJson.exists()) {
+                        String geoJsonName = "multiWholeRes-" + sectionLineInfo.getName();
+                        if(begTime != null) {
+                            geoJsonName += ("_beg" + begTime);
+                        }
+                        if(endTime != null) {
+                            geoJsonName += ("_end" + endTime);
+                        }
                         updateNodeStatusResultById(taskNode.getId(), "2", result);
                         GeoJsonData geoJsonData = GeoJsonData.geojsonBuilder()
                                 .id(taskNode.getId()).path(fullJsonResPath).type("geojson")
-                                .name("multiWholeRes-" + sectionLineInfo.getName())
+                                .name(geoJsonName)
                                 .createTime(new Timestamp(System.currentTimeMillis()))
                                 .build();
                         geoJsonDataRepo.insertData(geoJsonData);
