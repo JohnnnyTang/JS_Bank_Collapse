@@ -162,11 +162,6 @@ def getSectionPointList(
     col1 = geo2imagexy(dataset, x1, y1)[1]
     row2 = geo2imagexy(dataset, x2, y2)[0]
     col2 = geo2imagexy(dataset, x2, y2)[1]
-    print(row1)
-    print(row2)
-    print(col1)
-    print(col2)
-
     result: list[tuple[float, float, float]] = []
     k = (row2 - row1) / (col2 - col1)
     b = row1 - k * col1
@@ -433,8 +428,9 @@ def computeSaIndex(
     for i in range(0, totalNum, 10):
         selectedLSet.append(i)
         selectedZSet.append(Z[i])
-    selectedLSet.append(totalNum - 1)
-    selectedZSet.append(Z[totalNum - 1])
+    if selectedLSet[-1] != totalNum - 1:
+        selectedLSet.append(totalNum - 1)
+        selectedZSet.append(Z[totalNum - 1])
 
     Sa: list = [0.0 for i in range(len(selectedZSet) - 1)]
 

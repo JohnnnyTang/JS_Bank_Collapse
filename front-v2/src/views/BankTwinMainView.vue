@@ -329,6 +329,7 @@ onMounted(async () => {
                 'text-color': 'rgb(0, 42, 105)',
             },
         })
+        
         map.addLayer({
             id: '点2',
             type: 'symbol',
