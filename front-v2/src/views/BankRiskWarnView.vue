@@ -114,7 +114,6 @@ import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 import { drawShapeGraph, drawFlowGraph } from '../components/bankRiskWarn/util.js'
-import tempData from '../components/bankRiskWarn/tempData.json'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initScratchMap } from '../utils/mapUtils';
@@ -132,7 +131,6 @@ let flowSrc = []
 for (let i = 0; i < 26; i++) {
     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
 }
-
 let flow = reactive(new SteadyFlowLayer(
     '近岸流场',
     '/scratchSomething/terrain_flow/json/station.bin',
