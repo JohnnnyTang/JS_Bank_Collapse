@@ -72,10 +72,10 @@ watch(() => sceneStore.latestScene, (val) => {
         activeStatus.value[2] = true
         legendList.value = legendMap['重点岸段']
 
-    } else if (val == '涉水工程') {
+    } else if (val == '工程情况') {
         activeStatus.value[2] = true
         // 展示过江通道图例
-        legendList.value = legendMap['涉水工程']
+        legendList.value = legendMap['工程情况']
     }
     else if (val == '全江概貌') {
         activeStatus.value[2] = true

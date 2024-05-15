@@ -40,7 +40,7 @@ const mapStore = useMapStore()
 const sceneStore = useNewSceneStore()
 const sceneDict = {
     '全江概貌': 0,
-    '涉水工程': 1,
+    '工程情况': 1,
     '重点岸段': 2,
 }
 const expandKey = ['全江概貌']

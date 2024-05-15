@@ -83,7 +83,7 @@ class NewScene {
                 ]
             },
             {
-                label: '涉水工程',
+                label: '工程情况',
                 children: [
                     {
                         label: '长江堤防',
@@ -115,8 +115,8 @@ class NewScene {
 
                     },
                     {
-                        label: '组合工程',
-                        icon: '/icons/组合工程.png'
+                        label: '枢纽工程',
+                        icon: '/icons/枢纽工程.png'
 
                     },
                 ]

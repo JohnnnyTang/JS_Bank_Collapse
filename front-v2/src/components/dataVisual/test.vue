@@ -50,33 +50,133 @@ const geojson = {
 onMounted(async () => {
 
     const map = await initMap(mapDom.value)
-    await loadImage(map, '/legend/水文站.png', '水文站')
-    map.addSource('hydroStationPoint', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/hydroStationPoint/{x}/{y}/{z}',
-        ],
-    })
-    map.addLayer({
-        id: '水文站点',
-        type: 'symbol',
-        source: 'hydroStationPoint',
-        'source-layer': 'default',
-        layout: {
-            'icon-image': '水文站',
-            "icon-size": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                7, ["literal", 0.0],
-                10, ["literal", 0.3],
-                13, ["literal", 0.5]
+    !map.getSource('sluiceArea') &&
+        map.addSource('sluiceArea', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}',
             ],
-            "icon-offset": [0, 5],
-            'icon-allow-overlap': true,
-            'icon-keep-upright': true
-        },
-    })
+        })
+    !map.getLayer('水闸工程') &&
+        map.addLayer({
+            id: '水闸工程',
+            type: 'circle',
+            source: 'sluiceArea',
+            'source-layer': 'default',
+            layout: {
+            },
+            paint: {
+                'circle-color': '#529b2e',
+                'circle-radius': 6,
+            },
+        })
+
+
+
+
+    // !map.getSource('embankmentLine') &&
+    //     map.addSource('embankmentLine', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/embankmentLine/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // await loadImage(map, '/legend/堤防.png', '堤防')
+
+    // !map.getLayer('长江堤防') &&
+    //     map.addLayer({
+    //         id: '长江堤防',
+    //         type: 'line',
+    //         source: 'embankmentLine',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'line-pattern': '堤防',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.0],
+    //                 10, ["literal", 2],
+    //                 13, ["literal", 5]
+    //             ],
+    //         },
+    //     })
+
+
+
+
+
+    // !map.getSource('riverArea') &&
+    //     map.addSource('riverArea', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // await loadImage(map, '/legend/河流.png', '河流')
+    // !map.getLayer('流域水系') &&
+    //     map.addLayer({
+    //         id: '流域水系',
+    //         type: 'fill',
+    //         source: 'riverArea',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'fill-pattern':'河流',
+    //         },
+    //     })
+
+    // !map.getSource('lakeArea') &&
+    //     map.addSource('lakeArea', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/lakeArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // await loadImage(map, '/legend/湖泊.png', '湖泊')
+    // !map.getLayer('湖泊河流') &&
+    //     map.addLayer({
+    //         id: '湖泊河流',
+    //         type: 'fill',
+    //         source: 'lakeArea',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'fill-pattern':'湖泊'
+    //         },
+    //     })
+
+    // await loadImage(map, '/legend/水文站.png', '水文站')
+    // map.addSource('hydroStationPoint', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/hydroStationPoint/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addLayer({
+    //     id: '水文站点',
+    //     type: 'symbol',
+    //     source: 'hydroStationPoint',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'icon-image': '水文站',
+    //         "icon-size": [
+    //             "interpolate",
+    //             ["linear"],
+    //             ["zoom"],
+    //             7, ["literal", 0.0],
+    //             10, ["literal", 0.3],
+    //             13, ["literal", 0.5]
+    //         ],
+    //         'icon-anchor':'center',
+    //         'icon-allow-overlap': true,
+    //         'icon-keep-upright': true
+    //     },
+    // })
 
 
     // map.addSource('importantBank', {
@@ -86,7 +186,7 @@ onMounted(async () => {
     //     ],
     // })
     // map.addLayer({
-    //     id: '重点岸段',
+    //     id: '一级预警岸段',
     //     type: 'line',
     //     source: 'importantBank',
     //     'source-layer': 'default',
@@ -94,6 +194,7 @@ onMounted(async () => {
     //         // 'line-cap': 'round',
     //         // 'line-join': 'round',
     //     },
+    //     filter: ["==", "warning_level", 1],
     //     paint: {
     //         // 'line-opacity': 1,
     //         'line-color': '#FF00B0',
@@ -103,11 +204,57 @@ onMounted(async () => {
     //             ["zoom"],
     //             7, ["literal", 0.5],
     //             10, ["literal", 1.0],
-    //             13, ["literal", 2.0]
+    //             13, ["literal", 5.0]
     //         ],
     //     },
     // })
+    // map.addLayer({
+    //     id: '二级预警岸段',
+    //     type: 'line',
+    //     source: 'importantBank',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         // 'line-cap': 'round',
+    //         // 'line-join': 'round',
+    //     },
+    //     filter: ["==", "warning_level", 2],
+    //     paint: {
+    //         // 'line-opacity': 1,
+    //         'line-color': '#00FFB0',
+    //         'line-width': [
+    //             "interpolate",
+    //             ["linear"],
+    //             ["zoom"],
+    //             7, ["literal", 0.5],
+    //             10, ["literal", 1.0],
+    //             13, ["literal", 5.0]
+    //         ],
 
+    //     },
+    // })
+    // map.addLayer({
+    //     id: '三级预警岸段',
+    //     type: 'line',
+    //     source: 'importantBank',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         // 'line-cap': 'round',
+    //         // 'line-join': 'round',
+    //     },
+    //     filter: ["==", "warning_level", 3],
+    //     paint: {
+    //         // 'line-opacity': 1,
+    //         'line-color': '#0000FF',
+    //         'line-width': [
+    //             "interpolate",
+    //             ["linear"],
+    //             ["zoom"],
+    //             7, ["literal", 0.5],
+    //             10, ["literal", 1.0],
+    //             13, ["literal", 5.0]
+    //         ],
+    //     },
+    // })
 })
 
 

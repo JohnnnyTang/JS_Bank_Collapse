@@ -41,9 +41,9 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <span class="text">{{ node.label }}</span>
-                            <el-button type="primary" plain v-if="node.isLeaf"
+                            <el-button type="primary" plain v-if="node.isLeaf && node.label != '江堤港堤' && node.label != '里程桩'"
                                 @click="detailClickHandler(node, data)">查看详情</el-button>
-                            <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button>
+                            <!-- <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button> -->
                         </span>
                     </template>
                 </el-tree>
@@ -74,7 +74,7 @@ const sceneStore = useNewSceneStore()
 const mapStore = useMapStore()
 const data = ref([])
 const emit = defineEmits(['close', 'featureInfo'])
-const Scenes = ref(['全江概貌', '涉水工程', '重点岸段'])
+const Scenes = ref(['全江概貌', '工程情况', '重点岸段'])
 const sceneTagChecked = ref([true, false, false])
 const LGroups = ref(['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'])
 const LGroupsTagChecked = ref([true, false, false, false, false])
@@ -136,12 +136,35 @@ const updateLgroupTags = (sceneName) => {
 const LGroupsTagClickHandler = async (i) => {
     setTimeout(async () => {
         LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
-        if (LGroupsTagChecked.value[i]) {
-            await appednTreeData()
+        // console.log(LGroups[i]);
+        if (LGroups.value[i] === '江堤港堤') {
+            let featArray1 = await getLayerFeatureArray(mapStore.getMap(), '江堤港堤')
+            let featArray2 = await getLayerFeatureArray(mapStore.getMap(), '里程桩')
+            console.log('special!', featArray1, featArray2);
+            if (LGroupsTagChecked.value[i]) {
+                let treeNode1 = {
+                    label: '江堤港堤', children: []
+                }
+                let treeNode2 = {
+                    label: '里程桩', children: []
+                }
+                data.value.push(treeNode1, treeNode2)
+            } else {
+                deleteTreeData()
+            }
+            // updateFeatureCount()
+            featureCount.value = (featArray1.length + featArray2.length)
+
         } else {
-            deleteTreeData()
+            if (LGroupsTagChecked.value[i]) {
+                await appednTreeData()
+            } else {
+                deleteTreeData()
+            }
+            updateFeatureCount()
+
         }
-        updateFeatureCount()
+
     }, 500)
 }
 
@@ -159,7 +182,7 @@ const appednTreeData = async () => {
         layers.push(...sceneStore.LAYERGROUPMAP.value[checkedLayerGroup[i]].layerIDs)
     }
 
-    // console.log(layers);
+    console.log(layers);
 
     let map = mapStore.getMap()
     for (let i = 0; i < layers.length; i++) {
@@ -194,7 +217,7 @@ const appednTreeData = async () => {
         if (treeHasNode(layerid)) continue
 
         let res = await getLayerFeatureArray(map, layerid)
-
+        console.log(res);
         let treeNode = {
             label: layerid,
             children: []
@@ -272,7 +295,7 @@ onMounted(() => {
 const getLayerFeatureArray = async (mapInstance, layerName) => {
 
     // 特殊图层
-    if (layerName.includes('注记')) {
+    if (layerName.includes('注记') || layerName.includes('地形')) {
         return []
     }
 
@@ -296,6 +319,9 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
         const res = await axios.get(tileServer + `/tile/vector/${sourceId}/info`)
         properties = res.data
         console.log(sourceId, properties);
+
+        // 此处要注意，有的图层未经分类，有的图层经过分类，需要筛选一波
+        // 缓一下，整理一下，整体加一波filter的逻辑，先写个if吧
         // special
         if (sourceId == 'riverSection') {
             let n = []
@@ -303,7 +329,19 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
                 if (properties[i].label != '') n.push(properties[i]);
             }
             properties = n
-            console.log(properties);
+            // console.log(properties);
+        }
+        else if (sourceId == 'importantBank') {
+            let warningLevelMap = {
+                '一级预警岸段': 1,
+                '二级预警岸段': 2,
+                '三级预警岸段': 3,
+            }
+            let n = []
+            for (let i = 0; i < properties.length; i++) {
+                if (warningLevelMap[layerName] === properties[i].warning_level) n.push(properties[i]);
+            }
+            properties = n
         }
 
     }

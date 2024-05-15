@@ -1,6 +1,6 @@
 const sourceFieldMap = {
     "combineProjectPoint": {
-        "original": "组合工程",
+        "original": "枢纽工程",
         "fieldMap": {
             "id": "编号",
             "name": "名称"
@@ -104,36 +104,17 @@ const sourceFieldMap = {
             "volume": "过闸流量"
         }
     },
-    "bank-level1-source": {
+    "importantBank": {
         "original": "重点岸段",
         "fieldMap": {
-            "bankName": "名称",
-            "cityName": "所属城市",
-            "riverName": "所属河段",
-            "warningLevel": "预警等级",
+            "bank_name": "名称",
+            "city_name": "所属城市",
+            "river_name": "所属河段",
+            "monitoring_length": '岸段长度',
+            "warning_level": "预警等级",
             "description": '简介',
         }
     },
-    "bank-level2-source": {
-        "original": "重点岸段",
-        "fieldMap": {
-            "bankName": "名称",
-            "cityName": "所属城市",
-            "riverName": "所属河段",
-            "warningLevel": "预警等级",
-            "description": '简介',
-        }
-    },
-    "bank-level3-source": {
-        "original": "重点岸段",
-        "fieldMap": {
-            "bankName": "名称",
-            "cityName": "所属城市",
-            "riverName": "所属河段",
-            "warningLevel": "预警等级",
-            "description": '简介',
-        }
-    }
 }
 
 const sourceNameMap = {
@@ -150,9 +131,7 @@ const sourceNameMap = {
     "sluiceArea": "sp_name",
     "riverPassageLine": 'name',
     "riverPassagePolygon": 'name',
-    "bank-level1-source": 'bankName',
-    "bank-level2-source": 'bankName',
-    "bank-level3-source": 'bankName',
+    "importantBank": 'bank_name',
 }
 
 const sourceZoomMap = {
@@ -171,21 +150,6 @@ const sourceZoomMap = {
     "riverPassagePolygon": 13
 }
 
-// {
-//     "bankName": "七坝",
-//     "cityName": "南京市",
-//     "createTime": "2024-01-25 22:05:12",
-//     "description": "位于南京市浦口区桥林街道，板桥汽渡至骚狗山之间，全长约8.3公里，平均水深在-5米以下，属一级岸线，具有较好的发展空间和不可多得的资源优势",
-//     "id": "65b1fa18591ce236a211196c",
-//     "memo": "",
-//     "monitoringLength": 11.7,
-//     "number": 4,
-//     "riverName": "南京河段",
-//     "state": "active",
-//     "updateTime": "2024-01-25 22:05:12",
-//     "warningLevel": 1
-// }
-
 const sourceColumnMap = {
     "riverArea": 2,
     "lakeArea": 2,
@@ -196,9 +160,7 @@ const sourceColumnMap = {
     "pumpArea": 2,
     "reservoirArea": 2,
     "sluiceArea": 2,
-    "bank-level1-source": 2,
-    "bank-level2-source": 1,
-    "bank-level3-source": 1
+    "importantBank": 4,
 }
 
 const legendMap = {
@@ -213,7 +175,7 @@ const legendMap = {
         {
             style: {
                 'height': '80%',
-                'width':'50%',
+                'width': '50%',
                 // 'transform': 'translateX(50%)',
                 'background-color': 'rgb(76,103,169)',
             },
@@ -222,14 +184,14 @@ const legendMap = {
         {
             style: {
                 'height': '80%',
-                'width':'50%',
+                'width': '50%',
                 'background-image': `url('/icons/shuiwenzhandian.png')`,
                 'transform': 'translateX(20%)',
             },
             text: '水文站点'
         },
     ],
-    '涉水工程': [
+    '工程情况': [
         {
             style: {
                 'height': '10%',
@@ -241,7 +203,7 @@ const legendMap = {
         {
             style: {
                 'height': '80%',
-                'width':'50%',
+                'width': '50%',
                 'background-color': 'rgb(45,47,116)',
             },
             text: '码头工程'
@@ -249,7 +211,7 @@ const legendMap = {
         {
             style: {
                 'height': '80%',
-                'width':'50%',
+                'width': '50%',
                 'background-color': '#337ecc',
             },
             text: '水库工程'
@@ -257,7 +219,7 @@ const legendMap = {
         {
             style: {
                 'height': '30%',
-                'width':'20%',
+                'width': '20%',
                 'background-color': 'rgb(45,47,116)',
             },
             text: '水闸工程'
@@ -265,7 +227,7 @@ const legendMap = {
         {
             style: {
                 'height': '30%',
-                'width':'20%',
+                'width': '20%',
                 'background-color': 'rgb(45,47,116)',
             },
             text: '泵站工程'
@@ -273,11 +235,11 @@ const legendMap = {
         {
             style: {
                 'height': '80%',
-                'width':'50%',
+                'width': '50%',
                 'transform': 'translateX(22%)',
                 'background-image': `url('/icons/zuhegongcheng.png')`,
             },
-            text: '组合工程'
+            text: '枢纽工程'
         },
         {
             style: {
@@ -297,19 +259,19 @@ const legendMap = {
     '重点岸段': [
         {
             style: {
-                'background-color': '#FF7F6B',
+                'background-color': '#FF00B0',
             },
             text: '一级预警岸段'
         },
         {
             style: {
-                'background-color': '#6BA9FF',
+                'background-color': '#00FFB0',
             },
             text: '二级预警岸段'
         },
         {
             style: {
-                'background-color': '#B2EA9D',
+                'background-color': '#0000FF',
             },
             text: '三级预警岸段'
         },
