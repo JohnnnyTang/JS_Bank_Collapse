@@ -21,4 +21,5 @@ public class VectorTileSource {
     String tableName;
     List<String> fieldList;
     int activeStatus;
+    String memo;
 }

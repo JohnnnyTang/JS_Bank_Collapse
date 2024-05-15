@@ -15,4 +15,6 @@ public class GlobalMap {
     ExpiringMap<String, Double> warMessageMap = ExpiringMap.builder()
             .variableExpiration()
             .build();
+
+
 }

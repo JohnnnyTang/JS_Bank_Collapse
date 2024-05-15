@@ -6,12 +6,14 @@
         <result property="tableName" column="table_name"/>
         <result property="fieldList" column="field_list" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
         <result property="activeStatus" column="active_status"/>
+        <result property="memo" column="memo"/>
     </resultMap>
     <parameterMap id="vectorSourceParameterMap" type="com.johnny.bank.model.resource.dataResource.VectorTileSource">
         <parameter property="tileName"/>
         <parameter property="tableName"/>
         <parameter property="fieldList" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
         <parameter property="activeStatus" />
+        <parameter property="memo" />
     </parameterMap>
     <select id="getAllTileSource" resultMap="vectorSourceMap">
         select * from vector_tile;
@@ -21,7 +23,7 @@
         where tile_name = #{tileName}
     </select>
     <insert id="insertTileSource" parameterType="com.johnny.bank.model.resource.dataResource.VectorTileSource">
-        INSERT INTO vector_tile (tile_name, table_name, field_list, active_status)
-        VALUES (#{tileName}, #{tableName}, #{fieldList,typeHandler=com.johnny.bank.config.StringListArrayTypeHandler}, #{activeStatus});
+        INSERT INTO vector_tile (tile_name, table_name, field_list, active_status, memo)
+        VALUES (#{tileName}, #{tableName}, #{fieldList,typeHandler=com.johnny.bank.config.StringListArrayTypeHandler}, #{activeStatus}, #{memo});
     </insert>
 </mapper>
