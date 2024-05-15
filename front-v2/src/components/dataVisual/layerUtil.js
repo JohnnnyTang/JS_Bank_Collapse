@@ -1,6 +1,5 @@
 
-// import SteadyFlowLayer from "../../utils/m_demLayer/steadyFlowLayer"
-import SteadyFlowLayer from '../../utils/m_demLayer/newFlow'
+import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
 import TerrainLayer from "../../utils/m_demLayer/terrainLayer"
 import { useLayerStore } from "../../store/mapStore"
 import BackEndRequest from "../../api/backend"
@@ -939,6 +938,7 @@ const layerAddFunctionMap = {
                 '/scratchSomething/terrain_flow/json/station.bin',
                 flowSrc,
                 (url) => url.match(/uv_(\d+)\.bin/)[1],
+                '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
             )
             flow.particleNum.n = 2800;
             flow.speedFactor.n = 1.8;
@@ -1137,18 +1137,34 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/hydroStationPoint/{x}/{y}/{z}',
                 ],
             })
+
+        await loadImage(map, '/legend/水文站.png', '水文站')
+
         !map.getLayer('水文站点') &&
             map.addLayer({
                 id: '水文站点',
-                type: 'circle',
+                // type: 'circle',
+                type: 'symbol',
                 source: 'hydroStationPoint',
                 'source-layer': 'default',
                 layout: {
+                    'icon-image': '水文站',
+                    "icon-size": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        7, ["literal", 0.0],
+                        10, ["literal", 0.3],
+                        13, ["literal", 0.5]
+                    ],
+                    'icon-anchor': 'center',
+                    'icon-allow-overlap': true,
+                    'icon-keep-upright': true
                 },
                 paint: {
-                    'circle-color': 'rgb(79,188,215)',
-                    'circle-blur': 0.5,
-                    'circle-radius': 6,
+                    // 'circle-color': 'rgb(79,188,215)',
+                    // 'circle-blur': 0.5,
+                    // 'circle-radius': 6,
                 },
             })
     },

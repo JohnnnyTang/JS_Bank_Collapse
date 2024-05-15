@@ -105,7 +105,7 @@ import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue';
 import SetParameter from '../stability-sub/SetParameter.vue';
 import UploadModel from '../stability-sub/UploadModel.vue';
 import { ElMessage } from 'element-plus';
-import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
+import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow_mask'
 
 
 const showHyCondition = ref(false)
@@ -277,6 +277,7 @@ let flow = new SteadyFlowLayer(
     '/scratchSomething/terrain_flow/json/station.bin',
     flowSrc,
     (url) => url.match(/uv_(\d+)\.bin/)[1],
+    '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
 )
 
 watch(checkedlayers, (value) => {

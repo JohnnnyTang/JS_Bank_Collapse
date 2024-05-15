@@ -101,7 +101,7 @@ import { drawShapeGraph, drawFlowGraph } from '../components/bankRiskWarn/util.j
 import tempData from '../components/bankRiskWarn/tempData.json'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initScratchMap } from '../utils/mapUtils';
-import SteadyFlowLayer from '../utils/m_demLayer/newFlow';
+import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask';
 import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus';
@@ -120,6 +120,7 @@ let flow = reactive(new SteadyFlowLayer(
     '/scratchSomething/terrain_flow/json/station.bin',
     flowSrc,
     (url) => url.match(/uv_(\d+)\.bin/)[1],
+    '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
 ))
 
 const mapFlyToRiver = (mapIns) => {
