@@ -4,7 +4,7 @@
 
         <div class="model-content-container" v-show="!showAnalysis">
             <div class="model-item-container">
-                <div class="model-choice">
+                <!-- <div class="model-choice">
                     <div class="basemap-radio-container">
                         <input type="radio" id="radio-1" name="tabs" :checked="checky1" @click="radio1Click()" />
                         <label class="tab" for="radio-1">近岸动力分析</label>
@@ -13,7 +13,7 @@
                         <span class="glider"></span>
                     </div>
                     <div :class="styleObj" class="title-icon" ref="iconref" @click="iconClick()"></div>
-                </div>
+                </div> -->
                 <div class="main-page" v-if="!showDetail">
                     <div class="user-react">
                         <div class="title">
@@ -25,7 +25,6 @@
                                 @click="handleClick(index)">
                                 <div>{{ item }}</div>
                             </div>
-
                         </div>
                     </div>
                     <div class="data-panel">
@@ -34,10 +33,25 @@
                             <div class="title-text">数据面板</div>
                         </div>
                         <div class="dp-content">
-                            <el-tree style="max-width: 600px" :data="data" :props="defaultProps"
-                                @node-click="handleNodeClick" default-expand-all />
+                            <el-tree style="max-width: 600px; max-height: 260px; overflow: auto;" :data="data"
+                                :props="defaultProps" @node-contextmenu="handleNodeClick" node-key="nodeID">
+                                <template #default="{ node, data }">
+                                    <div class="custom-tree-node" style="width:100%">
+                                        <el-dropdown @command="handleNodeCommand" trigger="contextmenu"
+                                            placement="bottom-end" style="width:100%">
+                                            <div class="el-dropdown-link" style="width:100%">
+                                                {{ node.label }}
+                                            </div>
+                                            <template #dropdown v-if="data.nodeID">
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item command="add">添加至图层</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
+                                    </div>
+                                </template>
+                            </el-tree>
                         </div>
-
                     </div>
                     <div class="layer-panel">
                         <div class="title">
@@ -45,14 +59,12 @@
                             <div class="title-text">图层面板</div>
                         </div>
                         <div class="lp-content">
-
                             <div class="checkBox">
                                 <el-checkbox-group v-model="checkedlayers" @change="handleCheckedlayersChange">
                                     <el-checkbox v-for="city in layers" :key="city" :label="city" :value="city">{{ city
                                         }}</el-checkbox>
                                 </el-checkbox-group>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -60,7 +72,6 @@
                 <div v-if="showDetail" class="detail-page">
                     <ModelInfoVue :modelInfo="modelInfo" />
                 </div>
-
             </div>
             <div class="main">
                 <div class="map-container">
@@ -71,11 +82,9 @@
                 <HydrologicalCondition v-if="showHyCondition" v-on:close="showHyCondition = !showHyCondition"
                     v-on:condition="conditionHandler">
                 </HydrologicalCondition>
-                <UploadModel v-if="showUploadModel" v-on:close="showUploadModel = !showUploadModel"
-                    v-on:files="fileHandler">
-                </UploadModel>
                 <SetParameter v-if="showStParams" v-on:close="showStParams = !showStParams" v-on:params="paramsHandler">
                 </SetParameter>
+                <ModelStatus v-if="showModelStatus" v-on:close="showModelStatus = !showModelStatus"></ModelStatus>
             </div>
         </div>
 
@@ -84,38 +93,35 @@
             <div class="back" @click="backHandle"></div>
             <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
                 src="http://172.21.212.165:8050/#/analysis/73c29959-16f0-4478-8526-0927d1aff6f7">
-
             </iframe>
         </div>
-
     </div>
-
-
-
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue';
-import "mapbox-gl/dist/mapbox-gl.css"
+import { onMounted, reactive, ref, watch } from 'vue'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { initScratchMap } from '../../../utils/mapUtils.js'
 import { infoItemList } from '../modelInfoList.js'
-import ModelInfoVue from '../ModelInfo.vue';
-import ModelTitleVue from '../ModelTitle.vue';
-import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue';
-import SetParameter from '../stability-sub/SetParameter.vue';
-import UploadModel from '../stability-sub/UploadModel.vue';
-import { ElMessage } from 'element-plus';
+import ModelInfoVue from '../ModelInfo.vue'
+import ModelTitleVue from '../ModelTitle.vue'
+import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue'
+import SetParameter from '../stability-sub/SetParameter.vue'
+import ModelStatus from '../stability-sub/ModelStatus.vue'
+import { ElMessage } from 'element-plus'
 import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
-
+import { useStabilityStore } from '../../../store/stabilityStore.js'
 
 const showHyCondition = ref(false)
 const showStParams = ref(false)
-const showUploadModel = ref(false)
-const buttons = ref(['水文条件选择',
-    '模型文件上传',
+const showModelStatus = ref(false)
+const buttons = ref([
+    '水文条件选择',
     '模型参数设置',
-    '模型计算'])
-
+    '模型计算',
+    '模型运行状态',
+])
+const selectedNode = ref(null)
 
 const modelInfo = {
     application: infoItemList[2].application,
@@ -130,8 +136,8 @@ const showAnalysis = ref(false)
 const checky1 = ref(true)
 const checky2 = ref(false)
 const backHandle = () => {
-    checky1.value = true;
-    checky2.value = false;
+    checky1.value = true
+    checky2.value = false
     showAnalysis.value = false
 }
 
@@ -144,31 +150,34 @@ const radio2Click = () => {
     showAnalysis.value = true
     checky2.value = true
     checky1.value = false
-
 }
 
-const mapContainerRef = ref();
+const mapContainerRef = ref()
 const iconref = ref()
 const showDetail = ref(false)
 const styleObj = ref({
-    'detailIcon': true, 'returnIcon': false
+    detailIcon: true,
+    returnIcon: false,
 })
 const iconClick = () => {
     styleObj.value = {
-        'detailIcon': !styleObj.value.detailIcon, 'returnIcon': !styleObj.value.returnIcon
+        detailIcon: !styleObj.value.detailIcon,
+        returnIcon: !styleObj.value.returnIcon,
     }
     showDetail.value = !showDetail.value
 }
 
 //////////model//////////////
-let condition = null;
+const modelStore = useStabilityStore()
+modelStore.modelStatus = 'undefined'
+let condition = null
 const conditionHandler = (value) => {
     ElMessage({
         type: 'success',
         offset: 100,
-        message: "水文条件：" + value
+        message: '水文条件：' + value,
     })
-    condition = value;
+    condition = value
 }
 
 const handleClick = (index) => {
@@ -177,31 +186,31 @@ const handleClick = (index) => {
             showHyCondition.value = true
             break
         case 1:
-            showUploadModel.value = true
-            break
-        case 2:
             showStParams.value = true
             break
-        case 3:
+        case 2:
             ElMessage({
-                message: "模型计算中",
-                offset: 100
+                message: '模型计算中',
+                offset: 100,
             })
-            setTimeout(() => {
-                ElMessage({
-                    type: "success",
-                    offset: 100,
-                    message: "模型计算完成"
-                })
-                data[1].children = [
-                    {
-                        'label': 'uvet流场数据',
-                        'children': []
-                    }
-                ]
-                layers.value.push('flowLayer')
-
-            }, 2000)
+            modelStore.modelStartTime = Date.now()
+            modelStore.modelProgress = 0
+            modelStore.modelStatus = 'pending'
+            const id = setInterval(() => {
+                modelStore.modelProgress += Math.random() * 100 / 3600 / 0.5 / 24 * 3
+                if (modelStore.modelProgress >= 100) {
+                    modelStore.modelStatus = 'success'
+                    ElMessage({
+                        type: 'success',
+                        offset: 100,
+                        message: '模型计算完成',
+                    })
+                    clearInterval(id)
+                }
+            }, 3000)
+            break
+        case 3:
+            showModelStatus.value = true
             break
     }
 }
@@ -209,52 +218,171 @@ const handleClick = (index) => {
 const paramsHandler = (value) => {
     ElMessage({
         type: 'success',
-        message: "模型参数设置成功",
-        offset: 100
-    })
-    console.log(value);
-}
-
-
-
-const fileHandler = (value) => {
-    let inputFileNode = []
-    value.forEach(element => {
-        inputFileNode.push({
-            label: element,
-            children: []
-        })
-    });
-    data[0].children.push(...inputFileNode)
-    ElMessage({
-        type: "success",
+        message: '模型参数设置成功',
         offset: 100,
-        message: `上传${inputFileNode.length}条模型文件`,
     })
+    console.log(value)
 }
 
+// const fileHandler = (value) => {
+//     let inputFileNode = []
+//     value.forEach((element) => {
+//         inputFileNode.push({
+//             label: element,
+//             children: [],
+//         })
+//     })
+//     data[0].children.push(...inputFileNode)
+//     ElMessage({
+//         type: 'success',
+//         offset: 100,
+//         message: `上传${inputFileNode.length}条模型文件`,
+//     })
+// }
 
 ////////////tree///////////////
-const handleNodeClick = (data) => {
-    console.log(data)
+const handleNodeClick = (_, treeNode) => {
+    if (treeNode.nodeID) {
+        selectedNode.value = treeNode.nodeID
+    } else {
+        selectedNode.value = null
+    }
+}
+const handleNodeCommand = (command) => {
+    if (selectedNode.value && command === 'add') {
+        layers.value.push(selectedNode.value)
+    }
+
 }
 const data = reactive([
     {
-        label: '输入数据',
+        label: '旱季',
         children: [
             {
-                label: 'fort.14',
-                children: []
+                label: '输入数据',
+                children: [
+                    {
+                        label: 'fort.13',
+                        nodeID: 'dry-13'
+                    },
+                    {
+                        label: 'fort.14',
+                        nodeID: 'dry-14'
+                    },
+                    {
+                        label: 'fort.15',
+                        nodeID: 'dry-15'
+                    },
+                    {
+                        label: 'fort.16',
+                        nodeID: 'dry-16'
+                    },
+                    {
+                        label: 'fort.19',
+                        nodeID: 'dry-19'
+                    },
+                    {
+                        label: 'fort.20',
+                        nodeID: 'dry-20'
+                    },
+                ],
             },
             {
-                label: 'fort.15',
-                children: []
+                label: '输出数据',
+                children: [
+                    {
+                        label: "flow",
+                        nodeID: 'dry-flow'
+                    }
+                ],
             },
         ],
     },
     {
-        label: '输出数据',
-        children: [],
+        label: '洪季',
+        children: [
+            {
+                label: '输入数据',
+                children: [
+                    {
+                        label: 'fort.13',
+                        nodeID: 'flood-13'
+                    },
+                    {
+                        label: 'fort.14',
+                        nodeID: 'flood-14'
+                    },
+                    {
+                        label: 'fort.15',
+                        nodeID: 'flood-15'
+                    },
+                    {
+                        label: 'fort.16',
+                        nodeID: 'flood-16'
+                    },
+                    {
+                        label: 'fort.19',
+                        nodeID: 'flood-19'
+                    },
+                    {
+                        label: 'fort.20',
+                        nodeID: 'flood-20'
+                    },
+                ],
+            },
+            {
+                label: '输出数据',
+                children: [
+                    {
+                        label: "flow",
+                        nodeID: 'flood-flow'
+                    }
+                ],
+            },
+        ],
+    },
+    {
+        label: '20年一遇',
+        children: [
+            {
+                label: '输入数据',
+                children: [
+                    {
+                        label: 'fort.13',
+                        nodeID: '20-13'
+                    },
+                    {
+                        label: 'fort.14',
+                        nodeID: '20-14'
+                    },
+                    {
+                        label: 'fort.15',
+                        nodeID: '20-15'
+                    },
+                    {
+                        label: 'fort.16',
+                        nodeID: '20-16'
+                    },
+                    {
+                        label: 'fort.19',
+                        nodeID: '20-19'
+                    },
+                    {
+                        label: 'fort.20',
+                        nodeID: '20-20'
+                    },
+                ],
+            },
+            {
+                label: '输出数据',
+                children: [
+                    {
+                        label: "flow",
+                        nodeID: '20-flow'
+                    }
+                ],
+            },
+        ],
     },
 ])
 const defaultProps = {
@@ -266,7 +394,6 @@ const defaultProps = {
 const checkedlayers = ref([])
 const layers = ref([])
 let globalMap = undefined
-
 
 let flowSrc = []
 for (let i = 0; i < 26; i++) {
@@ -280,16 +407,13 @@ let flow = new SteadyFlowLayer(
 )
 
 watch(checkedlayers, (value) => {
-    console.log(value);
-
+    console.log(value)
 })
 
-
 const handleCheckedlayersChange = (value) => {
-
     if (value.includes('flowLayer')) {
-         console.log('1',globalMap);
-        flow.show();
+        console.log('1', globalMap)
+        flow.show()
         if (globalMap) {
             globalMap.flyTo({
                 center: [120.54070965313992, 32.042615280683805],
@@ -300,24 +424,17 @@ const handleCheckedlayersChange = (value) => {
                 essential: true,
             })
         }
-
     } else {
-        flow.hide();
+        flow.hide()
     }
 }
 
-
 onMounted(async () => {
-
     const map = await initScratchMap(mapContainerRef.value)
     globalMap = map
     map.addLayer(flow)
     flow.hide()
 })
-
-
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -325,7 +442,7 @@ div.all {
     width: 100vw;
     height: 92vh;
     position: relative;
-    overflow: hidden
+    overflow: hidden;
 }
 
 div.model-content-container {
@@ -358,11 +475,12 @@ div.model-content-container {
                 background-size: contain;
             }
 
-
             .el-popper.is-customized {
                 z-index: 3;
                 padding: 6px 12px;
-                background: linear-gradient(90deg, rgb(179, 255, 171), rgb(204, 229, 129));
+                background: linear-gradient(90deg,
+                        rgb(179, 255, 171),
+                        rgb(204, 229, 129));
             }
 
             .el-popper.is-customized .el-popper__arrow::before {
@@ -483,7 +601,6 @@ div.model-content-container {
                 //     }
                 // }
             }
-
         }
 
         div.main-page {
@@ -505,7 +622,9 @@ div.model-content-container {
             div.title {
                 height: 5vh;
                 width: 100%;
-                background: linear-gradient(90deg, rgb(187, 239, 248), rgb(29, 128, 214));
+                background: linear-gradient(90deg,
+                        rgb(187, 239, 248),
+                        rgb(29, 128, 214));
                 display: flex;
                 flex-direction: row;
                 justify-content: center;
@@ -513,10 +632,17 @@ div.model-content-container {
 
                 .title-text {
                     color: white;
-                    text-shadow: 5px 5px 0 #4074b5, 2px -2px 0 #4074b5, -2px 2px 0 #4074b5, -2px -2px 0 #4074b5, 2px 0px 0 #4074b5, 0px 2px 0 #4074b5, -2px 0px 0 #4074b5, 0px -2px 0 #4074b5;
+                    text-shadow:
+                        5px 5px 0 #4074b5,
+                        2px -2px 0 #4074b5,
+                        -2px 2px 0 #4074b5,
+                        -2px -2px 0 #4074b5,
+                        2px 0px 0 #4074b5,
+                        0px 2px 0 #4074b5,
+                        -2px 0px 0 #4074b5,
+                        0px -2px 0 #4074b5;
                 }
             }
-
 
             div.user-react {
                 height: 15vh;
@@ -524,7 +650,6 @@ div.model-content-container {
                 background-color: aliceblue;
 
                 .title {
-
                     .uricon {
                         background-image: url('/data.png');
                     }
@@ -546,7 +671,7 @@ div.model-content-container {
 
                     .button {
                         background-color: #4c97fa;
-                        padding: .3vh;
+                        padding: 0.3vh;
                         border-radius: 0.5vh;
                         border-color: white;
                         border-width: 0.5vh;
@@ -556,7 +681,7 @@ div.model-content-container {
                         font-size: calc(0.8vw + 0.5vh);
                         font-weight: 600;
                         margin-left: 1vw;
-                        margin: .7vh;
+                        margin: 0.7vh;
                         text-align: center;
 
                         &:hover {
@@ -564,7 +689,7 @@ div.model-content-container {
                             background-color: #0642b1;
                             transform: scale(1.01);
                             box-shadow: #00183d 0px 0px 5px 0px;
-                            transition: .2s ease-in;
+                            transition: 0.2s ease-in;
                         }
                     }
                 }
@@ -575,7 +700,6 @@ div.model-content-container {
                 width: 100%;
 
                 .title {
-
                     .dpicon {
                         background-image: url('/data-collection2.png');
                     }
@@ -587,7 +711,6 @@ div.model-content-container {
                         line-height: 5vh;
                     }
                 }
-
 
                 .dp-content {
                     height: 30vh;
@@ -619,7 +742,6 @@ div.model-content-container {
                 width: 100%;
 
                 .title {
-
                     .lpicon {
                         background-image: url('/icons/layers.png');
                     }
@@ -634,7 +756,6 @@ div.model-content-container {
 
                 .lp-content {
                     height: 25vh;
-
 
                     .checkBox {
                         height: 20vh;
@@ -676,7 +797,6 @@ div.model-content-container {
                                 :deep().el-checkbox__label {
                                     text-shadow: 1px 1px 0 #dfdada;
                                     color: #00183d;
-
                                 }
                             }
                         }
@@ -694,9 +814,7 @@ div.model-content-container {
 
             // transform: translateY(-1%);
         }
-
     }
-
 
     div.map-container {
         position: relative;
@@ -709,8 +827,6 @@ div.model-content-container {
             height: 100%;
             z-index: 1;
             background-color: hsl(194, 69%, 91%);
-            ;
-
         }
 
         #GPUFrame {
@@ -721,8 +837,6 @@ div.model-content-container {
             pointer-events: none;
         }
     }
-
-
 }
 
 .model-title-container {
@@ -765,7 +879,6 @@ div.model-content-container {
             transform: scale(1.03);
             transition: 500ms;
         }
-
     }
 
     iframe {
@@ -777,10 +890,9 @@ div.model-content-container {
 .conditions,
 .uploadModel,
 .stParams {
-    animation: fadenum .3s ease-in-out;
+    animation: fadenum 0.3s ease-in-out;
     box-shadow: rgb(184, 209, 255) 0px 5px 15px;
     border-radius: 1vh;
-
 }
 
 @keyframes fadenum {

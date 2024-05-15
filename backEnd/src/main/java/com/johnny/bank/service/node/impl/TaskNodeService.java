@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * @Author: Johnny Tang
@@ -122,7 +123,11 @@ public class TaskNodeService extends NodeService<TaskNode> {
         return nodeId;
     }
 
-    public String createAndStartSectionDefaultMultiIndexTask(Integer sectionId) throws Exception {
+    public String createAndStartSectionDefaultMultiIndexTask(
+            Integer sectionId, String beforeTime, String afterTime
+    ) throws Exception {
+        // TODO: validate time format
+        String datePattern = "\\d{4}-\\d{2}-\\d{2}";
         SectionLineInfo sectionLineInfo = vectorTileRepo.selectSectionLineInfoById(sectionId);
         ParamNode paramNode = paramNodeRepo.findParamNodeById("6642da4b010453003d568646");
 //        ParamNode paramNode = paramNodeRepo.findParamNodeById("662d1deaca8e246ea1290189");
@@ -131,7 +136,18 @@ public class TaskNodeService extends NodeService<TaskNode> {
         paramNode.getParams().put("y1", sectionLineInfo.getStY());
         paramNode.getParams().put("x2", sectionLineInfo.getEndX());
         paramNode.getParams().put("y2", sectionLineInfo.getEndY());
-        paramNode.setName(paramNode.getName() + '-' + System.currentTimeMillis());
+        String paramName = paramNode.getName() + '-' + System.currentTimeMillis();
+        if(beforeTime != null && Pattern.matches(datePattern, beforeTime)) {
+            log.info("date pattern valid");
+            paramNode.getParams().put("beforeDate", beforeTime);
+            paramName += ("_beg" + beforeTime);
+        }
+        if(afterTime != null && Pattern.matches(datePattern, afterTime)) {
+            log.info("date pattern valid");
+            paramNode.getParams().put("currentDate", afterTime);
+            paramName += ("_end" + afterTime);
+        }
+        paramNode.setName(paramName);
         paramNode = paramNodeRepo.save(paramNode);
         ModelNode modelNode = ModelNode.modelNodeBuilder().id("6642d247010453003d568641").build();
         JSONObject resObj = new JSONObject();
@@ -142,7 +158,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 .result(resObj).ifAuto(false).name("multiWhole-fixedSection"+sectionLineInfo.getId())
                 .category("multiIndexWholeTaskItem").path(",taskNode,multiIndexWholeTaskGroup,").auth("all").build();
         String taskId = save(taskNode);
-        new MultiIndexWholeTaskThread(taskNode, sectionLineInfo).start();
+        new MultiIndexWholeTaskThread(taskNode, sectionLineInfo, beforeTime, afterTime).start();
         return taskId;
     }
 
@@ -310,10 +326,16 @@ public class TaskNodeService extends NodeService<TaskNode> {
     public class MultiIndexWholeTaskThread extends Thread {
         TaskNode taskNode;
         SectionLineInfo sectionLineInfo;
+        String begTime;
+        String endTime;
 
-        public MultiIndexWholeTaskThread(TaskNode taskNode, SectionLineInfo sectionLineInfo) {
+        public MultiIndexWholeTaskThread(
+                TaskNode taskNode, SectionLineInfo sectionLineInfo, String beforeTime, String afterTime
+        ) {
             this.taskNode = taskNode;
             this.sectionLineInfo = sectionLineInfo;
+            this.begTime = beforeTime;
+            this.endTime = afterTime;
         }
 
         @Override
@@ -322,7 +344,14 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 updateNodeStatusById(taskNode.getId(), "1");
                 String fullJsonResPath =
                         multiIndexPath.getResPath() + "fixedSection-" +
-                        sectionLineInfo.getName() + ".json";
+                        sectionLineInfo.getName();
+                if(begTime != null) {
+                    fullJsonResPath += ("_beg" + begTime);
+                }
+                if(endTime != null) {
+                    fullJsonResPath += ("_end" + endTime);
+                }
+                fullJsonResPath += ".json";
                 Process process = ProcessUtil.buildSectionTaskNodeProcess(
                         taskNode, multiIndexPath.getWholeDataPath(), fullJsonResPath, multiIndexPath.getCondaEnv()
                 );
