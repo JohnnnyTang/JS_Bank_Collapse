@@ -22,9 +22,16 @@
 
         <div class="marquee-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
-                    <div class="no-warn-block" v-if="warningList.length == 0"
-                        style="font-size: calc(0.5vw + 0.7vh); color:#e7f2ff;">
+                <div
+                    class="marquee-block"
+                    ref="marqueeBlockDom"
+                    :style="{ animationDuration: animateTime }"
+                >
+                    <div
+                        class="no-warn-block"
+                        v-if="warningList.length == 0"
+                        style="font-size: calc(0.5vw + 0.7vh); color: #e7f2ff"
+                    >
                         {{ `近一小时内无报警信息` }}
                     </div>
                     <div
@@ -101,7 +108,9 @@
                     :key="index"
                 >
                     <div class="key-text">{{ item.key + '：' }}</div>
-                    <div class="val-text">{{ item.val }}</div>
+                    <el-scrollbar>
+                        <div class="val-text">{{ item.val }}</div>
+                    </el-scrollbar>
                 </div>
             </div>
         </div>
@@ -235,8 +244,8 @@ watch(
     },
 )
 
-function unique (arr) {
-  return Array.from(new Set(arr))
+function unique(arr) {
+    return Array.from(new Set(arr))
 }
 
 const navToManage = () => {
@@ -248,11 +257,13 @@ const updateWarnInfoDesc = () => {
     let WARN_TEXT = []
     console.log('1231', warnInfo)
     let deviceNameList = []
+    let warnTimeList = []
 
     for (let i = 0; i < warnInfo.length; i++) {
         // 报警设备信息
         let deviceId = warnInfo[i].deviceId
         deviceNameList.push(gnssIdMap[warnInfo[i].deviceId])
+        warnTimeList.push(warnInfo[i].warnTime.split(' ')[1])
         let deviceName = DEVICETYPEMAP[deviceId.slice(-1) - 1]
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒')
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
@@ -262,8 +273,9 @@ const updateWarnInfoDesc = () => {
         WARN_TEXT.push(warnString)
     }
     warnKeyValList.value[2].val = unique(deviceNameList).join(',')
+    warnKeyValList.value[1].val = unique(warnTimeList).join(',')
     warnKeyValList.value[5].val = '是'
-    
+
     warningList.value = WARN_TEXT
     warnActive.value = true
 
@@ -317,6 +329,7 @@ onMounted(async () => {
                 'text-color': 'rgb(0, 42, 105)',
             },
         })
+        
         map.addLayer({
             id: '点2',
             type: 'symbol',
@@ -740,11 +753,15 @@ div.twin-main-container {
                     color: #0043fd;
                 }
 
+
                 div.val-text {
                     line-height: 6vh;
                     font-size: calc(0.7vw + 0.5vh);
                     font-weight: bold;
                     color: #1d00be;
+                    // max-width: 70%;
+                    width: 12vw;
+                    text-align: right
                     // text-align: center;
                 }
 

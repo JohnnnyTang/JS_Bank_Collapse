@@ -114,13 +114,14 @@ import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 import { drawShapeGraph, drawFlowGraph } from '../components/bankRiskWarn/util.js'
-import tempData from '../components/bankRiskWarn/tempData.json'
+import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initScratchMap } from '../utils/mapUtils';
 import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask';
 import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus';
+import axios from 'axios';
 
 let map = null
 const mapContainer = ref()
@@ -130,7 +131,6 @@ let flowSrc = []
 for (let i = 0; i < 26; i++) {
     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
 }
-
 let flow = reactive(new SteadyFlowLayer(
     '近岸流场',
     '/scratchSomething/terrain_flow/json/station.bin',
@@ -229,7 +229,8 @@ watch(() => flow.currentResourcePointer, (v) => {
     timeStep.value = flow.currentResourcePointer
 })
 
-const profileValue = ref(1)
+let profileData = []
+const profileValue = ref(2)
 const profileList = ref([
     {
         value: 1,
@@ -277,16 +278,17 @@ const profileList = ref([
     },
     {
         value: 12,
-        label: '断面 JC12',
+        label: '断面 JC12'
     }
 ])
+
 const profileSelectChange = (inputValue) => {
     profileValue.value = inputValue
     drawShapeGraph(
         shapeChart,
-        tempData[inputValue - 1].section.map((value) => value[2]),
-        tempData[inputValue - 1].beforeSection.map((value) => value[2]),
-        tempData[inputValue - 1].SA[2],
+        profileData[inputValue - 1].section.map((value) => value[2]),
+        profileData[inputValue - 1].beforeSection.map((value) => value[2]),
+        profileData[inputValue - 1].SA[2],
     )
 }
 
@@ -296,7 +298,7 @@ const shapeGraphRef = ref(null)
 const flowGraphRef = ref(null)
 const speed = [2, 3, 5, 1, 2, 3, 5, 1, 6, 9, 11, 4]
 
-onMounted(() => {
+onMounted(async () => {
     // map = new mapboxgl.Map({
     //     container: 'map', // container ID
     //     accessToken:
@@ -523,12 +525,33 @@ onMounted(() => {
         flow.hide()
     })
 
+    const getProfileData = async() => {
+        const promises = [];
+        const result = [];
+        for (let i = 0; i < 12; i++) {
+            promises.push(bankRiskWarn.getProfileData(i+1));
+        }
+        const allResponses = await Promise.all(promises);
+        
+        // 确保每个响应都有 data 属性
+        allResponses.forEach(response => {
+            if (response && response.data) {
+                result.push(response.data);
+            } else {
+                console.error('响应数据不包含 "data" 属性或响应未定义。', response);
+            }
+        });
+        return result
+    };
+    profileData = await getProfileData()
+    console.log(profileData)
+    
     shapeChart = echarts.init(shapeGraphRef.value)
     drawShapeGraph(
         shapeChart,
-        tempData[profileValue.value - 1].section.map((value) => value[2]),
-        tempData[profileValue.value - 1].beforeSection.map((value) => value[2]),
-        tempData[profileValue.value - 1].SA[2],
+        profileData[profileValue.value - 1].section.map((value) => value[2]),
+        profileData[profileValue.value - 1].beforeSection.map((value) => value[2]),
+        profileData[profileValue.value - 1].SA[2],
     )
     flowChart = echarts.init(flowGraphRef.value)
     drawFlowGraph(

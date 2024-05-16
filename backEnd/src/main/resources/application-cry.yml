@@ -28,7 +28,9 @@ springfox:
       enabled: true
 
 multiIndex:
+  condaEnv: Env1
   dataPath: E:\Data\bankProjectData\modelData
+  wholeDataPath: E:\Data\bankProjectData\dataWhole
   resPath: E:\Data\bankProjectData\modelRes\
 
 tile:

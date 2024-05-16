@@ -130,6 +130,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
         String datePattern = "\\d{4}-\\d{2}-\\d{2}";
         SectionLineInfo sectionLineInfo = vectorTileRepo.selectSectionLineInfoById(sectionId);
         ParamNode paramNode = paramNodeRepo.findParamNodeById("6642da4b010453003d568646");
+//        ParamNode paramNode = paramNodeRepo.findParamNodeById("662d1deaca8e246ea1290189");
         paramNode.setId(null);
         paramNode.getParams().put("x1", sectionLineInfo.getStX());
         paramNode.getParams().put("y1", sectionLineInfo.getStY());
@@ -367,10 +368,17 @@ public class TaskNodeService extends NodeService<TaskNode> {
                     result.put("resJsonId", taskNode.getId());
                     File resJson = new File(fullJsonResPath);
                     if (resJson.exists()) {
+                        String geoJsonName = "multiWholeRes-" + sectionLineInfo.getName();
+                        if(begTime != null) {
+                            geoJsonName += ("_beg" + begTime);
+                        }
+                        if(endTime != null) {
+                            geoJsonName += ("_end" + endTime);
+                        }
                         updateNodeStatusResultById(taskNode.getId(), "2", result);
                         GeoJsonData geoJsonData = GeoJsonData.geojsonBuilder()
                                 .id(taskNode.getId()).path(fullJsonResPath).type("geojson")
-                                .name("multiWholeRes-" + sectionLineInfo.getName())
+                                .name(geoJsonName)
                                 .createTime(new Timestamp(System.currentTimeMillis()))
                                 .build();
                         geoJsonDataRepo.insertData(geoJsonData);

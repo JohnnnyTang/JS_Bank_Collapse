@@ -28,6 +28,25 @@ def main(
         currentDataset, float(x1), float(y1), float(x2), float(y2)
     )
 
+    # no intersection entirely
+    if not isAllInArea:
+        content = {
+            "date": date,
+            "vertex": ((x1, y1), (x2, y2)),
+            "scene": scene,
+            "section": currentSectionPoints,
+            "PQ": [[1, 0, 0, 0], "较低风险", 0],
+            "KY": [[1, 0, 0, 0], "较低风险", 0],
+            "ZD": [[1, 0, 0, 0], "较低风险", 0],
+            "ZB": [[1, 0, 0, 0], "较低风险", 0],
+            "SA": [[1, 0, 0, 0], "较低风险", 0],
+            "LN": [[1, 0, 0, 0], "较低风险", 0],
+            "risk": [[1, 0, 0, 0], "较低风险", 0],
+        }
+        with open(dstPath, "w", encoding="utf8") as f:
+            json.dump(content, f, ensure_ascii=False)
+        return False
+
     vertex0 = None
     vertex1 = None
     if currentSectionPoints[0][2] > currentSectionPoints[-1][2]:
@@ -49,6 +68,8 @@ def main(
     }
     with open(dstPath, "w", encoding="utf8") as f:
         json.dump(content, f)
+
+    return True
 
 
 if __name__ == "__main__":

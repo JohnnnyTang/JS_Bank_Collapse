@@ -70,6 +70,12 @@ def main(jsonPath: str, date: str, condition: str):
     content["PQ"] = PQIndex
     content["KY"] = KYIndex
     content["ZD"] = ZDIndex
+    content["deepestPoint"] = [
+        deepestPointInfo[2],
+        deepestPointInfo[1],
+        vel,
+        level,
+    ]
     with open(jsonPath, "w", encoding="utf8") as f:
         json.dump(content, f, ensure_ascii=False)
 
