@@ -568,13 +568,6 @@ div.total-controller {
                 overflow-y: auto;
                 overflow-x: auto;
 
-                .el-tree-node>.el-tree-node__children {
-                    overflow-y: auto;
-                    overflow-x: auto;
-
-
-                }
-
                 &::-webkit-scrollbar {
                     width: 5px;
                 }
@@ -591,6 +584,8 @@ div.total-controller {
                 &::-webkit-scrollbar-thumb:hover {
                     background-color: rgb(48, 136, 243);
                 }
+
+
 
             }
 

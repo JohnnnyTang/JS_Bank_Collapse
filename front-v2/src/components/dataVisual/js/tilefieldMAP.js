@@ -147,7 +147,8 @@ const sourceZoomMap = {
     "reservoirArea": 14,
     "sluiceArea": 15,
     "riverPassageLine": 13,
-    "riverPassagePolygon": 13
+    "riverPassagePolygon": 13,
+    'importantBank': 12
 }
 
 const sourceColumnMap = {
