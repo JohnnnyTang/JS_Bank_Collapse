@@ -164,71 +164,73 @@ const sourceColumnMap = {
 }
 
 const legendMap = {
+    // 按点线面
     '全江概貌': [
         {
             style: {
-                'height': '10%',
-                'background-color': 'rgb(27,116,193)',
-            },
-            text: '流域水系'
-        },
-        {
-            style: {
                 'height': '80%',
                 'width': '50%',
-                // 'transform': 'translateX(50%)',
-                'background-color': 'rgb(76,103,169)',
-            },
-            text: '湖泊河流'
-        },
-        {
-            style: {
-                'height': '80%',
-                'width': '50%',
-                'background-image': `url('/icons/shuiwenzhandian.png')`,
-                'transform': 'translateX(20%)',
+                'background-image': `url('/legend/水文站.png')`,
+                'transform': 'translateX(25%)',
             },
             text: '水文站点'
         },
+        {
+            style: {
+                'height': '80%',
+                'width': '50%',
+                'background-color': 'rgb(206,239,249)',
+                'border-color': 'rgb(79,105,146)',
+                'border-width': '1px',
+                'border-style': 'solid',
+            },
+            text: '行政区划'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width': '50%',
+                'background-image': `url('/legend/河流.png')`,
+                'background-size': 'cover',
+            },
+            text: '国普河流'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width': '50%',
+                'background-image': `url('/legend/湖泊.png')`,
+                'background-size': 'cover',
+            },
+            text: '国普湖泊'
+        },
+
     ],
     '工程情况': [
         {
             style: {
-                'height': '10%',
-                'background-color': '#D3ABF5',
-            },
-            text: '堤防工程'
-        },
-        //45,47,116
-        {
-            style: {
-                'height': '80%',
-                'width': '50%',
-                'background-color': 'rgb(45,47,116)',
-            },
-            text: '码头工程'
-        },
-        {
-            style: {
-                'height': '80%',
-                'width': '50%',
-                'background-color': '#337ecc',
-            },
-            text: '水库工程'
-        },
-        {
-            style: {
                 'height': '30%',
-                'width': '20%',
-                'background-color': 'rgb(45,47,116)',
+                'width': '10%',
+                'border-radius': '50%',
+                'background-color': '#504C28',
+            },
+            text: '江堤里程桩'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width': '50%',
+                'background-image': `url('/legend/水闸.png')`,
+                'transform': 'translateX(25%)',
             },
             text: '水闸工程'
         },
         {
             style: {
-                'height': '30%',
-                'width': '20%',
-                'background-color': 'rgb(45,47,116)',
+                'height': '80%',
+                'width': '50%',
+                'background-image': `url('/legend/泵站.png')`,
+                'transform': 'translateX(25%)',
             },
             text: '泵站工程'
         },
@@ -236,47 +238,111 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'transform': 'translateX(22%)',
-                'background-image': `url('/icons/zuhegongcheng.png')`,
+                'background-image': `url('/legend/枢纽.png')`,
+                'transform': 'translateX(25%)',
             },
             text: '枢纽工程'
         },
         {
             style: {
                 'height': '15%',
-                'background-color': 'rgb(215,132,50)',
+                'width': '50%',
+                'background-color': '#958E54',
+            },
+            text: '江堤港堤'
+        },
+        {
+            style: {
+                'height': '15%',
+                'width': '50%',
+                'background-color': '#E6A23C',
+            },
+            text: '过江隧道/通道'
+        },
+        {
+            style: {
+                'height': '100%',
+                'width': '100%',
+                'background-image': `url('/legend/堤防.png')`,
+                'background-size': 'cover',
+                'transform': 'scale(0.5)',
+            },
+            text: '堤防工程'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width': '50%',
+                'background-image': `url('/legend/过江大桥.png')`,
+                'background-size': 'cover',
             },
             text: '过江大桥'
         },
         {
             style: {
-                'height': '15%',
-                'background-color': '#E6A23C',
+                'height': '80%',
+                'width': '50%',
+                'background-image': `url('/legend/码头.png')`,
+                'background-size': 'cover',
             },
-            text: '过江隧道/通道'
+            text: '码头工程'
+        },
+        {
+            style: {
+                'height': '80%',
+                'width': '50%',
+                'background-image': `url('/legend/水库.png')`,
+                'background-size': 'cover',
+            },
+            text: '水库工程'
         },
     ],
     '重点岸段': [
         {
             style: {
+                'height': '15%',
+                'width': '50%',
                 'background-color': '#FF00B0',
             },
             text: '一级预警岸段'
         },
         {
             style: {
+                'height': '15%',
+                'width': '50%',
                 'background-color': '#00FFB0',
             },
             text: '二级预警岸段'
         },
         {
             style: {
+                'height': '15%',
+                'width': '50%',
                 'background-color': '#0000FF',
             },
             text: '三级预警岸段'
         },
+        {
+            style: {
+                'height': '80%',
+                'width': '50%',
+                'background-color': '#C4632E',
+            },
+            text: '沙洲/江心洲'
+        },
+        {
+            style: {
+                'margin-top': '22vh',
+                'margin-left': '1vw',
+                'height': '800%',
+                'width': '75%',
+                'background-image': `url(/legend/地形.png)`,
+            },
+            text: '水下地形'
+        }
     ]
 }
+
 
 
 

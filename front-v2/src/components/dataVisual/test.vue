@@ -1,30 +1,12 @@
 <template>
     <div class="main">
-        <div class="map" ref="mapDom" id="map">
-        </div>
-        <!-- <div class="color-band">
-            <div class="color-section">
-                <div class="color-text">0m</div>
-            </div>
-            <div class="color-section">
-                <div class="color-text">10</div>
-            </div>
-            <div class="color-section">
-                <div class="color-text">13.5</div>
-            </div>
-            <div class="color-section">
-                <div class="color-text">15</div>
-            </div>
-            <div class="color-section">
-                <div class="color-text">20</div>
-            </div>
-            <div class="color-section">
-                <div class="color-text">30</div>
-            </div>
-            <div class="color-section">
-                <div class="color-text">60</div>
-            </div>
+        <!-- <div class="map" ref="mapDom" id="map">
         </div> -->
+        <canvas id="colorLegend" width="50" height="210"></canvas>
+        <!-- <div id="legend"></div> -->
+        <div class="value">
+            <div class="value-item" v-for="item in values">{{ item }}</div>
+        </div>
     </div>
 </template>
 
@@ -36,69 +18,224 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const mapDom = ref()
+const values = [0, -2, -5, -8, -10, -11, -13, -13.5, -15, -16, -20, -30, -60];
 
 onMounted(async () => {
 
+    const canvas = document.getElementById('colorLegend');
+    const ctx = canvas.getContext('2d');
+    const colors = ['rgb(0,153,51)', '#78B766', '#27C731', '#99CC33', '#CCCC33', '#D9D97A', '#FFFF99', '#FFFFFF', '#99FFFF', '#0000FF', '#6699FF', '#0096FF', '#0057DF'];
+    const fontSize = 10;
+    const textBaseline = 'middle';
 
-    const map = await initMap(mapDom.value)
+    // Calculate the height of each color section
+    const sectionHeight = canvas.height / values.length;
 
-    !map.getSource('riverBg') &&
-        map.addSource('riverBg', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
-            ],
-        })
-    !map.getLayer('近岸地形') &&
-        map.addLayer({
-            id: '近岸地形',
-            type: 'fill',
-            source: 'riverBg',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': [
-                    'interpolate',
-                    ['linear'],
-                    ['get', 'height'],
-                    0, '#0099FF',    // 草绿色
-                    2, '#78B766',   // R120 G183 B102
-                    5, '#27C731',   // 春绿色
-                    8, '#99CC33',   // 火星绿
-                    10, '#CCCC33',  // 香蕉黄
-                    11, '#D9D97A',  // R230 G230 B128
-                    13, '#FFFF99',  // 粉笔色
-                    13.5, '#FFFFFF',
-                    15, '#99FFFF',  // 冰蓝色
-                    16, '#0000FF',  // 天蓝色
-                    20, '#6699FF',  // 淡蓝色
-                    30, '#0096FF',
-                    60, '#0057DF',
-                    Infinity, '#000000'
-                ],
-            },
-        })
+    values.forEach((val, index) => {
+        // Draw the color sections
+        ctx.fillStyle = colors[index];
+        ctx.fillRect(0, sectionHeight * index, canvas.width, sectionHeight);
 
-    !map.getSource('riverLand') &&
-        map.addSource('riverLand', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/riverLand/{x}/{y}/{z}',
-            ],
-        })
-    !map.getLayer('沙岛') &&
-        map.addLayer({
-            id: '沙岛',
-            type: 'fill',
-            source: 'riverLand',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': '#CC8800',
-            },
-        })
+        // Draw the value labels to the right of the color sections
 
-    map.on('click',['沙岛'],(e)=>{
-        console.log(e.features[0]);
-    })
+    });
+
+    // Optionally, add a border to the color sections
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(canvas.width - 1, 0);
+    ctx.lineTo(canvas.width - 1, canvas.height);
+    ctx.stroke();
+
+    // Draw the right border of the last section
+    ctx.fillRect(canvas.width - 1, sectionHeight * (values.length - 1), 1, sectionHeight);
+    // const map = await initMap(mapDom.value)
+
+    // !map.getSource('riverPassagePier') &&
+    //     map.addSource('riverPassagePier', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverPassagePier/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('过江通道-桥墩') &&
+    //     map.addLayer({
+    //         id: '过江通道-桥墩',
+    //         type: 'fill-extrusion',
+    //         source: 'riverPassagePier',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'fill-extrusion-color': '#E7AE6D',
+    //             'fill-extrusion-base': 0,
+    //             'fill-extrusion-height': 200,
+    //             'fill-extrusion-opacity': 1.0
+    //         },
+    //     })
+    // !map.getSource('riverPassagePolygon') &&
+    //     map.addSource('riverPassagePolygon', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverPassagePolygon/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('过江通道-桥') &&
+    //     map.addLayer({
+    //         id: '过江通道-桥',
+    //         type: 'fill-extrusion',
+    //         source: 'riverPassagePolygon',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'fill-extrusion-color': '#FF9925',
+    //             'fill-extrusion-base': 200,
+    //             'fill-extrusion-height': 210,
+    //             'fill-extrusion-opacity': 1.0
+    //         },
+    //     })
+
+    // !map.getSource('embankmentLine') &&
+    //     map.addSource('embankmentLine', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/embankmentLine/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // await loadImage(map, '/legend/堤防.png', '堤防')
+
+    // !map.getLayer('长江堤防') &&
+    //     map.addLayer({
+    //         id: '长江堤防',
+    //         type: 'line',
+    //         source: 'embankmentLine',
+    //         'source-layer': 'default',
+    //         layout: {
+    //         },
+    //         paint: {
+    //             'line-pattern': '堤防',
+    //             'line-width': [
+    //                 "interpolate",
+    //                 ["linear"],
+    //                 ["zoom"],
+    //                 7, ["literal", 0.0],
+    //                 10, ["literal", 2],
+    //                 13, ["literal", 5]
+    //             ],
+    //         },
+    //     })
+    // !map.getSource('embankmentLine') &&
+    //     map.addSource('embankmentLine', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/embankmentLine/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // map.addLayer({
+    //     id: '长江堤防-注记',
+    //     type: 'symbol',
+    //     source: 'embankmentLine',
+    //     minzoom: 11,
+    //     maxzoom: 18,
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'sp_name'],
+    //         'symbol-placement': 'line',
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         'text-anchor': 'top',
+    //     },
+    //     paint: {
+    //         'text-color': '#232323',
+    //     },
+    // })
+    // map.on('click',['长江堤防'],(e)=>{
+    //     console.log(e.features[0]);
+    // })
+
+    // !map.getSource('riverBg') &&
+    //     map.addSource('riverBg', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverBg/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('近岸地形') &&
+    //     map.addLayer({
+    //         id: '近岸地形',
+    //         type: 'fill',
+    //         source: 'riverBg',
+    //         'source-layer': 'default',
+    //         paint: {
+    //             'fill-color': [
+    //                 'interpolate',
+    //                 ['linear'],
+    //                 ['get', 'height'],
+    //                 0, '#0099FF',    // 草绿色
+    //                 2, '#78B766',   // R120 G183 B102
+    //                 5, '#27C731',   // 春绿色
+    //                 8, '#99CC33',   // 火星绿
+    //                 10, '#CCCC33',  // 香蕉黄
+    //                 11, '#D9D97A',  // R230 G230 B128
+    //                 13, '#FFFF99',  // 粉笔色
+    //                 13.5, '#FFFFFF',
+    //                 15, '#99FFFF',  // 冰蓝色
+    //                 16, '#0000FF',  // 天蓝色
+    //                 20, '#6699FF',  // 淡蓝色
+    //                 30, '#0096FF',
+    //                 60, '#0057DF',
+    //                 Infinity, '#000000'
+    //             ],
+    //         },
+    //     })
+
+    // !map.getSource('riverLand') &&
+    //     map.addSource('riverLand', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/riverLand/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('沙洲') &&
+    //     map.addLayer({
+    //         id: '沙洲',
+    //         type: 'fill',
+    //         source: 'riverLand',
+    //         'source-layer': 'default',
+    //         paint: {
+    //             'fill-color': 'rgb(209,244,249)',
+    //         },
+    //     })
+
+    // !map.getSource('placeLabel') &&
+    //     map.addSource('placeLabel', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getLayer('全江注记') &&
+    //     map.addLayer({
+    //         id: '全江注记',
+    //         type: 'symbol',
+    //         source: 'placeLabel',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'text-field': ['get', 'label'],
+    //             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //             'text-anchor': 'left',
+
+    //         },
+    //         paint: {
+    //             'text-color': 'rgb(19,95,173)',
+    //         },
+    //     })
+
+    // map.on('click', ['沙洲'], (e) => {
+    //     console.log(e.features[0]);
+    // })
 
     // !map.getSource('importantBank') &&
     //     map.addSource('importantBank', {
@@ -688,47 +825,25 @@ onMounted(async () => {
         height: 100%;
     }
 
-    .color-band {
-        width: 200px;
-        height: 50px;
-        /* 色带的高度，可根据需要调整 */
-        display: flex;
+    canvas#colorLegend {
+        position: absolute;
+        left: 5vw;
+        // border: 1px solid rgb(248, 248, 248);
+        border: none;
+        top: 10px;
     }
 
-    .color-section {
-        height: 100%;
-        flex: 1;
-        /* 使每个色块平均分配宽度 */
-    }
+    .value {
+        position: absolute;
+        left: 8vw;
+        top: 10px;
+        font-size: 12px;
+        color: #000000;
+        z-index: 1;
 
-    /* 为每个颜色段添加相应的背景颜色 */
-    .color-section:nth-child(1) {
-        background-color: #008000;
+        .value-item {
+            margin-bottom: 0.2px;
+        }
     }
-
-    .color-section:nth-child(2) {
-        background-color: #e3cf01;
-    }
-
-    .color-section:nth-child(3) {
-        background-color: #ffffff;
-    }
-
-    .color-section:nth-child(4) {
-        background-color: #a9e9ff;
-    }
-
-    .color-section:nth-child(5) {
-        background-color: #ade2e6;
-    }
-
-    .color-section:nth-child(6) {
-        background-color: #009bff;
-    }
-
-    .color-section:nth-child(7) {
-        background-color: #0064ff;
-    }
-
 }
 </style>

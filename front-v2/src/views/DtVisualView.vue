@@ -137,7 +137,7 @@ onMounted(async () => {
     //#region test
     // feature get test
     // await layerAddFunctionMap['地形瓦片'](mapInstance)//mvt polygon
-    // await layerAddFunctionMap['沙岛'](mapInstance)//mvt polygon
+    // await layerAddFunctionMap['沙洲'](mapInstance)//mvt polygon
     // await layerAddFunctionMap['全江注记'](mapInstance)//mvt point
     // await layerAddFunctionMap['民主沙区划线'](mapInstance)//mvt line
     // await layerAddFunctionMap['GNSS'](mapInstance)//geojson point

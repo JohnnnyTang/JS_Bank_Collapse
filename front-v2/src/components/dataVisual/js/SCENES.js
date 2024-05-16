@@ -1,5 +1,7 @@
 import { layerAddFunction, layerRemoveFunction } from "../layerUtil"
+import { useMapLayerStore } from "../../../store/mapStore"
 
+const mapLayerStore = useMapLayerStore()
 class LayerGroup {
     constructor(title, layerIDs, map = undefined) {
         this.map = map
@@ -19,6 +21,7 @@ class LayerGroup {
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
                 await layerAddFunction(this.map, this.layerIDs[i])
+                mapLayerStore.layerState[this.layerIDs[i]].showing = true
             }
             this.active = true
         } else {
@@ -30,6 +33,7 @@ class LayerGroup {
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
                 layerRemoveFunction(this.map, this.layerIDs[i])
+                mapLayerStore.layerState[this.layerIDs[i]].showing = false
             }
             this.active = false
         } else {
@@ -86,7 +90,7 @@ const initLayerGroups = () => {
         '流域水系': ['流域水系'],
         '湖泊河流': ['湖泊河流'],
         '水文站点': ['水文站点'],
-        '长江堤防': ['长江堤防'],
+        '长江堤防': ['长江堤防', '长江堤防-注记'],
         '过江通道': ['过江通道-桥墩', '过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
         '沿江码头': ['沿江码头'],
         '水库大坝': ['水库大坝'],
@@ -96,7 +100,7 @@ const initLayerGroups = () => {
         '江堤港堤': ['江堤港堤', '里程桩'],
         '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记'],
         '历史崩岸': [],
-        '近岸地形': ['近岸地形'],
+        '近岸地形': ['近岸地形', '沙洲', '全江注记'],
         '近年冲淤': [],
     }
     let map = new Map()
@@ -237,8 +241,144 @@ const tree = [
     }
 ]
 
+const totalLayer = [
+    '省级行政区',
+    '市级行政区',
+    '市级行政区-注记',
+    '河道分段',
+    '河道分段-注记',
+    '流域水系',
+    '湖泊河流',
+    '水文站点',
+    '长江堤防',
+    '长江堤防-注记',
+    '过江通道-桥墩',
+    '过江通道-桥',
+    '过江通道-隧道/通道',
+    '过江通道-隧道/通道-注记',
+    '过江通道-桥-注记',
+    '沿江码头',
+    '水库大坝',
+    '水闸工程',
+    '泵站工程',
+    '枢纽工程',
+    '江堤港堤',
+    '里程桩',
+    '一级预警岸段',
+    '二级预警岸段',
+    '三级预警岸段',
+    '岸段-注记',
+    '历史崩岸',
+    '近岸地形',
+    '沙洲',
+    '全江注记'
+];
 
-
+const layerTree = [
+    {
+        label: '全江概貌',
+        children: [
+            {
+                label: '行政区划',
+                children: [
+                    { label: '省级行政区' },
+                    { label: '市级行政区' },
+                    { label: '市级行政区-注记' }
+                ]
+            },
+            {
+                label: '河道分段',
+                children: [
+                    { label: '河道分段' },
+                    { label: '河道分段-注记' }
+                ]
+            },
+            {
+                label: '流域水系',
+                children: [{ label: '流域水系' }]
+            },
+            {
+                label: '湖泊河流',
+                children: [{ label: '湖泊河流' }]
+            },
+            {
+                label: '水文站点',
+                children: [{ label: '水文站点' }]
+            }
+        ]
+    },
+    {
+        label: '工程情况',
+        children: [
+            {
+                label: '长江堤防',
+                children: [
+                    { label: '长江堤防' },
+                    { label: '长江堤防-注记' }
+                ]
+            },
+            {
+                label: '过江通道',
+                children: [
+                    { label: '过江通道-桥墩' },
+                    { label: '过江通道-桥' },
+                    { label: '过江通道-隧道/通道' },
+                    { label: '过江通道-隧道/通道-注记' },
+                    { label: '过江通道-桥-注记' }
+                ]
+            },
+            {
+                label: '沿江码头',
+                children: [{ label: '沿江码头' }]
+            },
+            {
+                label: '水库大坝',
+                children: [{ label: '水库大坝' }]
+            },
+            {
+                label: '水闸工程',
+                children: [{ label: '水闸工程' }]
+            },
+            {
+                label: '泵站工程',
+                children: [{ label: '泵站工程' }]
+            },
+            {
+                label: '枢纽工程',
+                children: [{ label: '枢纽工程' }]
+            },
+            {
+                label: '江堤港堤',
+                children: [
+                    { label: '江堤港堤' },
+                    { label: '里程桩' }
+                ]
+            }
+        ]
+    },
+    {
+        label: '重点岸段',
+        children: [
+            {
+                label: '岸段名录',
+                children: [
+                    { label: '一级预警岸段' },
+                    { label: '二级预警岸段' },
+                    { label: '三级预警岸段' },
+                    { label: '岸段-注记' }
+                ]
+            },
+            {
+                label: '近岸地形',
+                children: [
+                    { label: '近岸地形' },
+                    { label: '沙洲' },
+                    { label: '全江注记' }
+                ]
+            },
+        ]
+    }
+];
 
 export {
     scenes,
@@ -246,4 +386,6 @@ export {
     initLayerScenes,
     initLayerGroups,
     tree,
+    layerTree,
+    totalLayer
 }

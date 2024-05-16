@@ -10,7 +10,7 @@ const layers = [
     '地形瓦片',
     '河段划分',
     '河段注记',
-    '沙岛',
+    '沙洲',
     '全江注记',
     '深泓线',
     '已建通道',
@@ -134,7 +134,7 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    '沙岛': async (map) => {
+    '沙洲': async (map) => {
         !map.getSource('riverLand') &&
             map.addSource('riverLand', {
                 type: 'vector',
@@ -142,14 +142,14 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverLand/{x}/{y}/{z}',
                 ],
             })
-        !map.getLayer('沙岛') &&
+        !map.getLayer('沙洲') &&
             map.addLayer({
-                id: '沙岛',
+                id: '沙洲',
                 type: 'fill',
                 source: 'riverLand',
                 'source-layer': 'default',
                 paint: {
-                    'fill-color': 'rgba(183, 214, 86, 0.7)',
+                    'fill-color': '#C4632E',
                 },
             })
     },
@@ -174,7 +174,7 @@ const layerAddFunctionMap = {
 
                 },
                 paint: {
-                    'text-color': '#1FAEB3',
+                    'text-color': 'rgb(19,95,173)',
                 },
             })
     },
@@ -1060,6 +1060,33 @@ const layerAddFunctionMap = {
                     ],
                 },
             })
+    },
+    '长江堤防-注记': async (map) => {
+
+        !map.getSource('embankmentLine') &&
+            map.addSource('embankmentLine', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/embankmentLine/{x}/{y}/{z}',
+                ],
+            })
+        map.addLayer({
+            id: '长江堤防-注记',
+            type: 'symbol',
+            source: 'embankmentLine',
+            minzoom: 11,
+            maxzoom: 18,
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'sp_name'],
+                'symbol-placement': 'line',
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-anchor': 'top',
+            },
+            paint: {
+                'text-color': 'rgb(78,103,167)',
+            },
+        })
 
     },
     ////////过江通道
@@ -1206,6 +1233,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/dockArea/{x}/{y}/{z}',
                 ],
             })
+        await loadImage(map, '/legend/码头.png', '码头')
         !map.getLayer('沿江码头') &&
             map.addLayer({
                 id: '沿江码头',
@@ -1215,7 +1243,7 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-color': '#2B2E76',
+                    'fill-pattern': '码头',
                 },
             })
     },
@@ -1228,6 +1256,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/reservoirArea/{x}/{y}/{z}',
                 ],
             })
+        await loadImage(map, '/legend/水库.png', '水库')
         !map.getLayer('水库大坝') &&
             map.addLayer({
                 id: '水库大坝',
@@ -1237,7 +1266,7 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-color': '#337ecc',
+                    'fill-pattern': '水库',
                 },
             })
     },
@@ -1256,15 +1285,16 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 source: 'sluiceArea',
                 'source-layer': 'default',
+                minzoom: 8,
                 layout: {
                     'icon-image': '水闸',
                     'icon-size': [
-                        "interpolate",
-                        ["linear"],
-                        ["zoom"],
-                        7, ["literal", 0],
-                        11, ["literal", 0.25],
-                        14, ["literal", 0.5]
+                        'step',
+                        ['zoom'],
+                        ['literal', 0],
+                        7, ['literal', 0],
+                        9.5, ['literal', 0.5],
+                        14, ['literal', 1.0]
                     ],
                 },
                 paint: {
@@ -1289,12 +1319,12 @@ const layerAddFunctionMap = {
                 layout: {
                     'icon-image': '泵站',
                     'icon-size': [
-                        "interpolate",
-                        ["linear"],
-                        ["zoom"],
-                        7, ["literal", 0],
-                        11, ["literal", 0.25],
-                        14, ["literal", 0.5]
+                        'step',
+                        ['zoom'],
+                        ['literal', 0],
+                        7, ['literal', 0],
+                        9.5, ['literal', 0.5],
+                        14, ['literal', 1.0]
                     ],
                 },
                 paint: {
@@ -1549,14 +1579,20 @@ const layerAddFunctionMap = {
                         'interpolate',
                         ['linear'],
                         ['get', 'height'],
-                        0, '#00ff00', // 草绿色
-                        10, '#78b766', // 香蕉黄
-                        13.5, '#27c731',
-                        15, '#a9e9ff', // 冰蓝色
-                        20, '#ade2e6', // 淡蓝色
-                        30, '#009bff',
-                        60, '#0064ff',
-                        Infinity, '#000000' // 默认颜色，如果height属性的值非常大
+                        0, 'rgb(0,153,51)',    // 草绿色
+                        2, '#78B766',   // R120 G183 B102
+                        5, '#27C731',   // 春绿色
+                        8, '#99CC33',   // 火星绿
+                        10, '#CCCC33',  // 香蕉黄
+                        11, '#D9D97A',  // R230 G230 B128
+                        13, '#FFFF99',  // 粉笔色
+                        13.5, '#FFFFFF',
+                        15, '#99FFFF',  // 冰蓝色
+                        16, '#0000FF',  // 天蓝色
+                        20, '#6699FF',  // 淡蓝色
+                        30, '#0096FF',
+                        60, '#0057DF',
+                        Infinity, '#000000'
                     ],
                 },
             })
@@ -1586,9 +1622,9 @@ const layerRemoveFunction = (map, layerID) => {
             map.setLayoutProperty(layerID, 'visibility', 'none')
             // 删除
             let layer = map.getLayer(layerID)
-            let sourceId = layer.source
+            // let sourceId = layer.source
             map.removeLayer(layerID)
-            map.removeSource(sourceId)
+            // map.removeSource(sourceId)
         }
     }
 }

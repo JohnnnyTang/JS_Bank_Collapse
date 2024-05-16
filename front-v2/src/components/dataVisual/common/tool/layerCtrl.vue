@@ -36,7 +36,8 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { Decoration7 } from '@kjgl77/datav-vue3'
 import { ElTree } from 'element-plus';
-import { Scene } from '../../Scene';
+// import { Scene } from '../../Scene';
+import { layerTree } from '../../js/SCENES';
 import { useMapLayerStore, useMapStore } from '../../../../store/mapStore';
 import { showLayersFunction, hideLayersFunction } from '../../../../utils/mapUtils';
 
@@ -80,12 +81,11 @@ const selectedNodeHandler = (nodeObj, nodeProp, Node, event) => {
     }
 }
 const close = () => {
-    emit('close',1)
+    emit('close', 1)
 }
 
 onMounted(() => {
-    let treeData = Scene.getLayerTreeData()
-    data.value = treeData
+    data.value = layerTree
 })
 
 </script>
@@ -99,23 +99,24 @@ div.total-controller {
     z-index: 3;
     pointer-events: all;
 
-    width: 20vw;
-    height: 50vh;
+    width: 16vw;
+    height: 41vh;
     background-color: rgb(239, 247, 253);
     border-radius: 1%;
     box-shadow: 0px 0px 10px 1px #b3b2b2ee;
 
     .title {
         position: relative;
-        width: 20vw;
+        width: 16vw;
         height: 5vh;
         display: flex;
         justify-content: center;
         align-items: center;
 
         &:hover {
-            cursor:move;
+            cursor: move;
         }
+
         .title-back {
             padding-left: 1vw;
             padding-right: 1vw;
@@ -128,6 +129,7 @@ div.total-controller {
                 color: rgb(75, 115, 181);
             }
         }
+
         .miniIcon {
             position: absolute;
             right: 0.5vw;
@@ -136,7 +138,8 @@ div.total-controller {
             background-image: url('/icons/minimize.png');
             background-size: contain;
             background-repeat: no-repeat;
-            &:hover{
+
+            &:hover {
                 cursor: pointer;
             }
         }
@@ -146,30 +149,33 @@ div.total-controller {
 
     .content {
         position: relative;
-        width: 20vw;
-        height: 45vh;
+        width: 16vw;
+        height: 35vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
 
         .e-input {
-            width: 16vw;
-            height: 3vh;
+            width: 13vw;
+            height: 5vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            transform: translateY(-50%);
-            scale: 1.15;
+            // transform: translateY(-50%);
+            scale: 1.0;
+            .text{
+                width: 5vw;
+            }
         }
 
         .tree-container {
             position: relative;
-            width: 17vw;
-            height: 33vh;
-            padding-left: 1vw;
+            width: 14.5vw;
+            height: 30vh;
+            padding-left: 0.5vw;
             padding-bottom: 1.5vh;
-            padding-top: 1.5vh;
+            padding-top: 0.5vh;
             box-shadow: rgb(255, 255, 255) 0px 0px 25px 3px inset;
             border-radius: 5%;
             overflow-y: auto;
@@ -200,9 +206,10 @@ div.total-controller {
                 padding-right: 8px;
 
                 .text {
-                    font-size: calc(0.6vw + 0.7vh);
+                    font-size: calc(0.6vw + 0.4vh);
                     color: rgb(19, 70, 147);
-                    font-weight: 300;
+                    font-weight: 500;
+                    font-family: 'Microsoft YaHei';
                 }
 
                 .eyes {
@@ -224,7 +231,7 @@ div.total-controller {
 .text {
     font-family: 'Microsoft YaHei', Helvetica, sans-serif;
     font-size: calc(0.5vw + 0.7vh);
-    padding-right: 1vw;
+    // padding-right: 0.5vw;
     font-weight: 600;
     color: rgb(75, 115, 181);
 }
@@ -233,5 +240,4 @@ hr {
     margin: 0;
     border-top-width: 2px;
     border-color: rgb(75, 115, 181);
-}
-</style>
+}</style>

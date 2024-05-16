@@ -216,7 +216,7 @@ const initLayers = async (sceneInstance, map) => {
                 '地形瓦片',
                 '河段划分',
                 '河段注记',
-                '沙岛',
+                '沙洲',
                 '全江注记',
                 '深泓线',
                 '已建通道',
@@ -271,7 +271,7 @@ const initLayers = async (sceneInstance, map) => {
                 '地形瓦片',
                 '河段划分',
                 '河段注记',
-                '沙岛',
+                '沙洲',
                 '全江注记',
                 '深泓线',
                 '一级预警岸段',
@@ -515,7 +515,7 @@ class Scene {
         })
 
         layersCollection[0].children.push({
-            label: '沙岛',
+            label: '沙洲',
             children: [],
         })
 
