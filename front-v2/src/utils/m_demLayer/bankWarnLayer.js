@@ -16,9 +16,7 @@ export default class BankWarnLayer {
 
     }
     async onAdd(map, gl) {
-        console.log('onAdd');
         const data = (await axios.get(this.jsonUrl)).data
-        console.log(data);
 
         this.map = map
         this.vertexData = []
@@ -59,12 +57,7 @@ export default class BankWarnLayer {
         // ]
         // this.vertexCount = 3
 
-        console.log(this.vertexData);
-        console.log(this.warnValues);
-        console.log(this.vertexCount);
-
         this.layerTexture = this.map.screen.createScreenDependentTexture('--warnLayerTexture--')
-        console.log(this.layerTexture);
         this.vertexBuffer4coord = scr.vertexBuffer({
             name: `--vertexBuffer4coord--`,
             resource: {
@@ -132,7 +125,6 @@ export default class BankWarnLayer {
 
 
     async render(gl, matrix) {
-        console.log('render!');
         if (!this.prepared) return
     }
 
