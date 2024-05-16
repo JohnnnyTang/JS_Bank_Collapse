@@ -8,7 +8,9 @@
             :color="['#0446a8','rgb(134, 245, 230)']"
             style="position: absolute; height: 9vh; width: 20vw; left: 5.3vw;"
         />
-        
+        <div class="risk-result-title2">
+            固定断面崩岸风险程度计算结果为：
+        </div>
         <!-- <dv-border-box8
             class="low"
             :dur="3"
@@ -22,7 +24,7 @@
             </div>
             <div class="risk-item-content">
                 <div
-                    v-for="item in riskResult"
+                    v-for="item in profileList"
                     :key="item.value"
                     class="risk-item-name"
                 >
@@ -32,6 +34,9 @@
                     >
                         {{ item.name }}
                     </span>
+                </div>
+                <div class="risk-item-null" v-show="JudgeRiskExist('low')">
+                    无断面处于低风险！
                 </div>
             </div>
         </div>
@@ -49,7 +54,7 @@
             </div>
             <div class="risk-item-content">
                 <div
-                    v-for="item in riskResult"
+                    v-for="item in profileList"
                     :key="item.value"
                     class="risk-item-name"
                 >
@@ -59,6 +64,9 @@
                     >
                         {{ item.name }}
                     </span>
+                </div>
+                <div class="risk-item-null" v-show="JudgeRiskExist('middle')">
+                    无断面处于中风险！
                 </div>
             </div>
         </div>
@@ -76,7 +84,7 @@
             </div>
             <div class="risk-item-content">
                 <div
-                    v-for="item in riskResult"
+                    v-for="item in profileList"
                     :key="item.value"
                     class="risk-item-name"
                 >
@@ -87,6 +95,9 @@
                         {{ item.name }}
                     </span>
                 </div>
+                <div class="risk-item-null" v-show="JudgeRiskExist('high')">
+                    无断面处于高风险！
+                </div>
             </div>
         </div>
     </div>
@@ -95,71 +106,24 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { BorderBox8 as DvBorderBox8 } from '@kjgl77/datav-vue3'
-const riskResult = ref([
-    {
-        value: 1,
-        name: 'JC01: 头部围堤',
-        risk: 'low'
-    },
-    {
-        value: 2,
-        name: 'JC02: 南顺堤',
-        risk: 'low'
-    },
-    {
-        value: 3,
-        name: 'JC03: 南顺堤尾部',
-        risk: 'middle'
-    },
-    {
-        value: 4,
-        name: 'JC04: 江滩办事处',
-        risk: 'middle'
-    },
-    {
-        value: 5,
-        name: 'JC05: 小港池',
-        risk: 'low'
-    },
-    {
-        value: 6,
-        name: 'JC06: 张靖皋桥位上游',
-        risk: 'low'
-    },
-    {
-        value: 7,
-        name: 'JC07: 张靖皋桥位下游',
-        risk: 'middle'
-    },
-    {
-        value: 8,
-        name: 'JC08: 海事码头',
-        risk: 'high'
-    },
-    {
-        value: 9,
-        name: 'JC09: 海事码头下游',
-        risk: 'middle'
-    },
-    {
-        value: 10,
-        name: 'JC10: 雷达站',
-        risk: 'high'
-    },
-    {
-        value: 11,
-        name: 'JC11: 民主沙尾部主路',
-        risk: 'middle'
-    },
-    {
-        value: 12,
-        name: 'JC12: 民主沙尾',
-        risk: 'high'
+const props = defineProps({
+    profileList: {
+        type: Object,
     }
-])
+})
+const profileList = ref(props.profileList)
 onMounted(() => {
     
 })
+
+const JudgeRiskExist = (risk) => {
+    if (profileList.value.some(item => item.risk === risk)) {
+        return false
+    } else {
+        return true
+    }
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -168,7 +132,7 @@ onMounted(() => {
         left: 69vw;
         top: 2vh;
         width: 30vw;
-        height: 30vh;
+        height: 33.5vh;
         border: 2px solid rgb(169, 197, 226);
         border-radius: 6px;
         background-color: rgba(164, 212, 255, 0.8);
@@ -190,9 +154,24 @@ onMounted(() => {
                 #6493ff 3px 3px;
         }
 
+        div.risk-result-title2 {
+            position: absolute;
+            top: 5vh;
+            left: 7vw;
+            width: 225vw;
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+            font-size: calc(0.8vw + 0.5vh);
+            color: #3e4449;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 1px 1px,
+                #6493ff 1px 1px;
+        }
+
         div.risk-item-container {
             position: absolute;
-            top: 5.3vh;
+            top: 8.6vh;
             width: 9vw;
             height: 23.5vh;
             border-radius: 6px;
@@ -247,10 +226,25 @@ onMounted(() => {
 
             div.risk-item-content {
                 position: absolute;
-                top:4vh;
-                left:0.3vw;
+                overflow: auto;
+                top: 4vh;
+                left: 0.3vw;
                 width: 8.4vw;
                 height: 19.3vh;
+                
+                &::-webkit-scrollbar {
+                        width: 3px;
+                }
+                &::-webkit-scrollbar-track {
+                    background-color: rgba(175, 180, 180, 0.219);
+                }
+                &::-webkit-scrollbar-thumb {
+                    background-color: #e6eaec94;
+                    border-radius: 5px;
+                }
+                &::-webkit-scrollbar-thumb:hover {
+                    background-color: #2b303081;
+                }
 
                 div.risk-item-name {
                     display: flex;
@@ -276,8 +270,18 @@ onMounted(() => {
                         }
                     }
                 }
+
+                div.risk-item-null {
+                    position: absolute;
+                    top: 1vh;
+                    left: 0.26vw;
+                    font-size: calc(0.7vw + 0.4vh);
+                    font-weight: 600;
+                    line-height: 3vh;
+                }
             }
         }
+
         // :deep(.dv-border-box-8) {
         //     position: fixed;
         //     top: 5vh;

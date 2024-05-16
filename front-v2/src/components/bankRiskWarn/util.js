@@ -1,9 +1,9 @@
 /**
  *
  * @param {any} echarts
- * @param {number[]} speed
+ * @param {number[]} erosion
  */
-export const drawFlowGraph = (echarts, speed) => {
+export const drawFlowspeedGraph = (echarts, erosion) => {
     const option = {
         backgroundColor: "rgba(220, 250, 248, 0.3)",
         tooltip: {
@@ -31,7 +31,7 @@ export const drawFlowGraph = (echarts, speed) => {
         xAxis: [
             {
               type: 'category',
-              data: speed.map((_, index) => `断面${index + 1}`),
+              data: erosion.map((_, index) => `断面${index + 1}`),
               axisLine:{
                 lineStyle:{
                     color:'black'
@@ -53,7 +53,7 @@ export const drawFlowGraph = (echarts, speed) => {
             {
               name: '流速',
               type: 'line',
-              data: speed
+              data: erosion
             }
         ],
     }
@@ -200,6 +200,8 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                     }
                 },
                 scale: true,
+                max: 0.5,
+                min: -0.5,
             },
         ],
         series: [
@@ -248,6 +250,72 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                     },
                 },
             },
+        ],
+    }
+    echarts.setOption(option)
+}
+
+/**
+ *
+ * @param {any} echarts
+ * @param {number[]} erosion
+ */
+export const drawErosionGraph = (echarts, erosion) => {
+    const option = {
+        backgroundColor: "rgba(220, 250, 248, 0.3)",
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985',
+                },
+            },
+        },
+        grid: [
+            {
+                top: '12%',
+                height: '75%',
+                width: '80%',
+                show: true,
+            }
+        ],
+        legend: {
+            data: ['流速'],
+            right: '10%',
+            top: '4%',
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: erosion.map((_, index) => index * 5),
+                position: 'bottom',
+                //  axisLabel:{
+                //     show:false
+                //  }
+                axisLine:{
+                    lineStyle:{
+                        color:'black'
+                    }
+                  }
+            },
+        ],
+        yAxis: [
+            {
+              type: 'value',
+              axisLine:{
+                lineStyle:{
+                    color:'black'
+                }
+              }
+            }
+        ],
+        series: [
+            {
+              name: '流速',
+              type: 'line',
+              data: erosion
+            }
         ],
     }
     echarts.setOption(option)

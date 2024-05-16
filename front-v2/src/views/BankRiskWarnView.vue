@@ -39,16 +39,6 @@
                     断面信息展示
                 </dv-border-box2>
             </div>
-            <div class="riskInfo-item profileFlowSpeed">
-                <div class="item-title">
-                    断面流速：
-                </div>
-                <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
-                <div class="graph-container flow">
-                    <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)">
-                    </div>
-                </div>
-            </div>
             <div class="riskInfo-item profileShape">
                 <div class="item-title">
                     断面形态对比：
@@ -65,11 +55,32 @@
                 </div>
                 <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 <div class="graph-container shape">
-                    <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                    <div
+                        ref="shapeGraphRef"
+                        class="shape graph"
+                        v-loading="shapeChartLoad"
+                        element-loading-background="rgba(255, 255, 255, 0.4)"
+                    ></div>
+                </div>
+            </div>
+            <div class="riskInfo-item profileErosion">
+                <div class="item-title">
+                    近岸冲淤：
+                </div>
+                <div ref="flowGraphRef" class="erosion graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                <div class="graph-container erosion">
+                    <div 
+                        ref="erosionGraphRef"
+                        class="erosion graph"
+                        v-loading="erosionChartLoad"
+                        element-loading-background="rgba(255, 255, 255, 0.4)"
+                    ></div>
                 </div>
             </div>
         </div>
-        <riskResultVue />
+        <riskResultVue 
+            :profileList="profileList"
+        />
 
         <div class="flow-relative-container">
             <div class="flow-relative-title">
@@ -106,7 +117,7 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
-import { drawShapeGraph, drawFlowGraph } from '../components/bankRiskWarn/util.js'
+import { drawShapeGraph, drawErosionGraph } from '../components/bankRiskWarn/util.js'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initScratchMap } from '../utils/mapUtils';
@@ -116,6 +127,7 @@ import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus';
 import axios from 'axios';
+import { filterFields } from 'element-plus/es/components/form/src/utils';
 
 let map = null
 const mapContainer = ref()
@@ -218,10 +230,14 @@ const flowControlHandler = () => {
 
 }
 
-watch(() => flow.currentResourcePointer, (v) => {
+watch(
+    () => flow.currentResourcePointer, (v) => {
     // console.log(flow.currentResourcePointer)
-    timeStep.value = flow.currentResourcePointer
-})
+        timeStep.value = flow.currentResourcePointer
+    }
+
+
+)
 
 let profileData = []
 const profileValue = ref(2)
@@ -229,69 +245,131 @@ const profileList = ref([
     {
         value: 1,
         label: '断面 JC01',
+        name: 'JC01: 头部围堤',
+        filter: ['==', 'name', 'JC01'],
+        risk: null,
     },
     {
         value: 2,
         label: '断面 JC02',
+        name: 'JC02: 南顺堤',
+        filter: ['==', 'name', 'JC02'],
+        risk: null,
     },
     {
         value: 3,
         label: '断面 JC03',
+        name: 'JC03: 南顺堤尾部',
+        filter: ['==', 'name', 'JC03'],
+        risk: null,
     },
     {
         value: 4,
         label: '断面 JC04',
+        name: 'JC04: 江滩办事处',
+        filter: ['==', 'name', 'JC04'],
+        risk: null,
     },
     {
         value: 5,
         label: '断面 JC05',
+        name: 'JC05: 小港池',
+        filter: ['==', 'name', 'JC05'],
+        risk: null,
     },
     {
         value: 6,
         label: '断面 JC06',
+        name: 'JC06: 张靖皋桥位上游',
+        filter: ['==', 'name', 'JC06'],
+        risk: null,
     },
     {
         value: 7,
         label: '断面 JC07',
+        name: 'JC07: 张靖皋桥位下游',
+        filter: ['==', 'name', 'JC07'],
+        risk: null,
     },
     {
         value: 8,
         label: '断面 JC08',
+        name: 'JC08: 海事码头',
+        filter: ['==', 'name', 'JC08'],
+        risk: null,
     },
     {
         value: 9,
         label: '断面 JC09',
+        name: 'JC09: 海事码头下游',
+        filter: ['==', 'name', 'JC09'],
+        risk: null,
     },
     {
         value: 10,
         label: '断面 JC10',
+        name: 'JC10: 雷达站',
+        filter: ['==', 'name', 'JC10'],
+        risk: null,
     },
     {
         value: 11,
         label: '断面 JC11',
+        name: 'JC11: 民主沙尾部主路',
+        filter: ['==', 'name', 'JC11'],
+        risk: null,
     },
     {
         value: 12,
-        label: '断面 JC12'
-    }
+        label: '断面 JC12',
+        name: 'JC12: 民主沙尾',
+        filter: ['==', 'name', 'JC12'],
+        risk: null,
+    },
 ])
+
+let shapeChart = null
+let erosionChart = null
+const shapeChartLoad = ref(true)
+const erosionChartLoad = ref(false)
+const shapeGraphRef = ref(null)
+const erosionGraphRef = ref(null)
+let section;
+let beforesection;
+let slopeRate;
+let erosion;
+// let erosion = [2, 3, 5, 1, 2, 3, 5, 1, 6, 9, 11, 4]
 
 const profileSelectChange = (inputValue) => {
     profileValue.value = inputValue
-    drawShapeGraph(
-        shapeChart,
-        profileData[inputValue - 1].section.map((value) => value[2]),
-        profileData[inputValue - 1].beforeSection.map((value) => value[2]),
-        profileData[inputValue - 1].SA[2],
-    )
+    changeProfileData(profileData)
+    mapInstance.setFilter('mzsBankLineChoosen', profileList.value[profileValue.value-1].filter);
 }
 
-let shapeChart = null
-let flowChart = null
-const shapeGraphRef = ref(null)
-const flowGraphRef = ref(null)
-const speed = [2, 3, 5, 1, 2, 3, 5, 1, 6, 9, 11, 4]
+const changeProfileData = (profileData) => {
+    shapeChartLoad.value = true
+    erosionChartLoad.value = true
+    section = profileData[profileValue.value - 1].section.map((value) => value[2]),
+    beforesection = profileData[profileValue.value - 1].beforeSection.map((value) => value[2])
+    slopeRate = profileData[profileValue.value - 1].SA[2]
+    erosion = section.map((value, index) => value-beforesection[index])
+    shapeChart = echarts.init(shapeGraphRef.value)
+    drawShapeGraph(
+        shapeChart,
+        section,
+        beforesection,
+        slopeRate,
+    )
+    shapeChartLoad.value = false
+    erosionChart = echarts.init(erosionGraphRef.value)
+    drawErosionGraph(
+        erosionChart,
+        erosion
+    )
+    erosionChartLoad.value = false
+}
 
+let mapInstance;
 onMounted(async () => {
     // map = new mapboxgl.Map({
     //     container: 'map', // container ID
@@ -412,6 +490,7 @@ onMounted(async () => {
     // })
 
     initScratchMap(mapContainer.value).then((map) => {
+        mapInstance = map
         mapJumpToRiver(map)
         // mapFlyToRiver(map)
         // console.log('map loaded!!!')
@@ -440,6 +519,7 @@ onMounted(async () => {
             type: 'line',
             source: 'mzsPlaceLineSource',
             'source-layer': 'default',
+            // filter:['==', '$type', 'LineString'],
             layout: {
                 'line-cap': 'round',
                 'line-join': 'round',
@@ -501,6 +581,7 @@ onMounted(async () => {
             type: 'line',
             source: 'mzsBankLineSource',
             'source-layer': 'default',
+            filter: ['all'],
             layout: {
                 'line-cap': 'round',
                 'line-join': 'round',
@@ -514,6 +595,23 @@ onMounted(async () => {
 
         const jsonUrl = '/bankWarn/bankWarn.json'
         map.addLayer(new BankWarnLayer(jsonUrl))
+        
+        map.addLayer({
+            id: 'mzsBankLineChoosen',
+            type: 'line',
+            source: 'mzsBankLineSource',
+            'source-layer': 'default',
+            filter: profileList.value[profileValue.value-1].filter,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgb(134, 245, 230)',
+                'line-width': 6,
+            },
+        })
 
         useMapStore().setMap(map)
         console.log('set map!');
@@ -542,20 +640,18 @@ onMounted(async () => {
         return result
     };
     profileData = await getProfileData()
-    console.log(profileData)
 
-    shapeChart = echarts.init(shapeGraphRef.value)
-    drawShapeGraph(
-        shapeChart,
-        profileData[profileValue.value - 1].section.map((value) => value[2]),
-        profileData[profileValue.value - 1].beforeSection.map((value) => value[2]),
-        profileData[profileValue.value - 1].SA[2],
-    )
-    flowChart = echarts.init(flowGraphRef.value)
-    drawFlowGraph(
-        flowChart,
-        speed
-    )
+    profileData.map((value, index) => {
+        const riskLevel = value.risk[2]
+        if (riskLevel < 0.25) {
+            profileList.value[index].risk = 'low'
+        } else if (riskLevel < 0.5) {
+            profileList.value[index].risk = 'middle'
+        } else {
+            profileList.value[index].risk = 'high'
+        }
+    })
+    changeProfileData(profileData)
 })
 
 onUnmounted(() => {
@@ -570,6 +666,7 @@ div.risk-warn-container {
     height: 92vh;
     top: 8vh;
     left: 0;
+    overflow: hidden;
 
     background: rgb(68, 105, 138);
 
@@ -841,14 +938,14 @@ div.risk-warn-container {
             border-radius: 6px;
             border: #3b85e7 2px solid;
 
-            &.profileFlowSpeed {
-                top: 6.1vh;
+            &.profileErosion {
+                top: 47vh;
                 height: 22vh;
                 // background-color: #b6b9eb;
             }
 
             &.profileShape {
-                top: 29vh;
+                top: 6.1vh;
                 height: 40vh;
                 // background-color: #c9cad4;
             }
@@ -929,7 +1026,7 @@ div.risk-warn-container {
                     // background-color: rgba(220, 250, 248, 0.4);
                 }
 
-                &.flow {
+                &.erosion {
                     height: 17vh;
                     backdrop-filter: blur(5px);
                     // background-color: #00098a;
@@ -944,8 +1041,8 @@ div.risk-warn-container {
                         // height: 35vh;
                         // background-color: rgba(220, 250, 248, 0.4);
                     }
-
-                    &.flowspeed {
+                    
+                    &.erosion {
                         // height: 17vh;
                         // background-color: #00098a;
                     }
