@@ -69,7 +69,8 @@ const treeNodeClickHandler = (node, data) => {
         }
         const highlightLayer = useHighlightLayerStore().highlightLayers
         for (let i = 0; i < highlightLayer.length; i++) {
-            map.removeLayer(highlightLayer[i])
+            map.getLayer(highlightLayer[i]) &&
+                map.removeLayer(highlightLayer[i])
         }
         return
     }

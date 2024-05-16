@@ -115,7 +115,6 @@ const SceneTagClickHandler = (i) => {
 }
 const updateLgroupTags = (sceneName) => {
     // LGroupsTagChecked.value = [true, false, false, false, false]
-    console.log(tree);
     let newLayerGroupTags = []
     for (let i = 0; i < tree.length; i++) {
         if (tree[i].label === sceneName) {
@@ -143,7 +142,7 @@ const LGroupsTagClickHandler = async (i) => {
         if (LGroups.value[i] === '江堤港堤') {
             let featArray1 = await getLayerFeatureArray(mapStore.getMap(), '江堤港堤')
             let featArray2 = await getLayerFeatureArray(mapStore.getMap(), '里程桩')
-            console.log('special!', featArray1, featArray2);
+
             if (LGroupsTagChecked.value[i]) {
                 let treeNode1 = {
                     label: '江堤港堤', children: []
@@ -185,8 +184,6 @@ const appednTreeData = async () => {
         layers.push(...sceneStore.LAYERGROUPMAP.value[checkedLayerGroup[i]].layerIDs)
     }
 
-    console.log(layers);
-
     let map = mapStore.getMap()
     for (let i = 0; i < layers.length; i++) {
         // 特殊图层
@@ -198,7 +195,6 @@ const appednTreeData = async () => {
 
         let layerid = layers[i]
         if (!map.getLayer(layerid)) {
-            console.log('图层不存在', layerid);
             ElMessage({
                 message: '图层尚未加载，请先加载相应专题数据',
                 type: 'warning',
@@ -206,7 +202,6 @@ const appednTreeData = async () => {
 
             continue
         }
-        console.log('图层存在', layerid);
         let sourceid = map.getLayer(layerid).source
         // 监测当前treeNode是否已经存在Node
         const treeHasNode = (nodeName) => {
@@ -220,7 +215,6 @@ const appednTreeData = async () => {
         if (treeHasNode(layerid)) continue
 
         let res = await getLayerFeatureArray(map, layerid)
-        console.log(res);
         let treeNode = {
             label: layerid,
             children: []
@@ -246,12 +240,10 @@ const deleteTreeData = async () => {
             noCcheckedLayerGroup.push(LGroups.value[i])
         }
     }
-    console.log(noCcheckedLayerGroup);
     let noLayers = []
     for (let i = 0; i < noCcheckedLayerGroup.length; i++) {
         noLayers.push(...sceneStore.LAYERGROUPMAP.value[noCcheckedLayerGroup[i]].layerIDs)
     }
-    console.log(noLayers);
     for (let i = 0; i < noLayers.length; i++) {
 
         let index = -1
@@ -271,8 +263,6 @@ const detailClickHandler = (node, data) => {
     let layerId = node.parent.data.label
     let featureId = data.label
     let property = data.property
-
-    console.log(data.property)
 
     // 要素高亮
     featureHighLight(layerId, mapStore.getMap(), featureId, property)
@@ -321,7 +311,6 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
     else if (source.type == 'vector') {
         const res = await axios.get(tileServer + `/tile/vector/${sourceId}/info`)
         properties = res.data
-        console.log(sourceId, properties);
 
         // 此处要注意，有的图层未经分类，有的图层经过分类，需要筛选一波
         // 缓一下，整理一下，整体加一波filter的逻辑，先写个if吧
@@ -332,7 +321,6 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
                 if (properties[i].label != '') n.push(properties[i]);
             }
             properties = n
-            // console.log(properties);
         }
         else if (sourceId == 'importantBank') {
             let warningLevelMap = {
@@ -567,6 +555,7 @@ div.total-controller {
             box-shadow: rgb(201, 230, 255) 0px 0px 5px 3px inset;
             border-radius: 1%;
             overflow-y: auto;
+            overflow-x: auto;
 
             .feature-desc {
                 height: 3vh;
@@ -577,6 +566,14 @@ div.total-controller {
                 background-color: rgb(239, 247, 253);
                 height: 24vh;
                 overflow-y: auto;
+                overflow-x: auto;
+
+                .el-tree-node>.el-tree-node__children {
+                    overflow-y: auto;
+                    overflow-x: auto;
+
+
+                }
 
                 &::-webkit-scrollbar {
                     width: 5px;
@@ -594,6 +591,7 @@ div.total-controller {
                 &::-webkit-scrollbar-thumb:hover {
                     background-color: rgb(48, 136, 243);
                 }
+
             }
 
 
