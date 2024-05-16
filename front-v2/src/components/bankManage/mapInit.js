@@ -36,12 +36,12 @@ const mapInit = async (map, vis) => {
             tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
         ],
     })
-    map.addSource('mzsBankLabelSource', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
-        ],
-    })
+    // map.addSource('mzsBankLabelSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+    //     ],
+    // })
     map.addSource('mzsBankLineSource', {
         type: 'vector',
         tiles: [
@@ -119,7 +119,7 @@ const mapInit = async (map, vis) => {
                 '不稳定',
                 '#df8105',
                 '较不稳定',
-                'rgba(214, 44, 61, 0.6)',
+                'rgba(180,194,197, 0.8)',
                 '#18b915',
             ],
         },
@@ -153,11 +153,13 @@ const mapInit = async (map, vis) => {
         layout: {
             'line-cap': 'round',
             'line-join': 'round',
+
         },
         paint: {
             'line-opacity': 1,
             'line-color': 'rgba(31, 14, 223, 0.75)',
             'line-width': 4,
+            'line-dasharray': [1, 1.5]
         },
     })
     // map.addLayer({
@@ -175,21 +177,21 @@ const mapInit = async (map, vis) => {
     //         'line-width': 4,
     //     },
     // })
-    map.addLayer({
-        id: 'mzsBankLabel',
-        type: 'symbol',
-        source: 'mzsBankLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'left',
-        },
-        paint: {
-            'text-color': 'rgba(231, 214, 86, 0.9)',
-        },
-    })
+    // map.addLayer({
+    //     id: 'mzsBankLabel',
+    //     type: 'symbol',
+    //     source: 'mzsBankLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'left',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(231, 214, 86, 0.9)',
+    //     },
+    // })
     map.addLayer({
         id: 'mzsSectionLabel',
         type: 'symbol',
@@ -215,9 +217,10 @@ const mapInit = async (map, vis) => {
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
             // 'text-offset': [0, 1.25],
             'text-anchor': 'left',
+            'text-size': 12
         },
         paint: {
-            'text-color': 'rgba(31, 14, 126, 0.75)',
+            'text-color': 'rgba(31, 14, 126, 0.8)',
         },
     })
 

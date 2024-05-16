@@ -20,7 +20,7 @@
         <!-- <SectionRisk />
         <DeviceWarn /> -->
 
-        <div class="marquee-container">
+        <div class="marquee-container" v-loading="warnLoading">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
                 <div
                     class="marquee-block"
@@ -99,6 +99,7 @@
         <div
             class="warn-detail-container"
             :class="warnActive ? 'active' : 'in-active'"
+            v-loading="detailLoading"
         >
             <div class="warn-detail-title">预警信息详情</div>
             <div class="warn-detail-content">
@@ -118,6 +119,7 @@
         <div
             class="warn-history-container"
             :class="warnActive ? 'active' : 'in-active'"
+            v-loading="historyLoading"
         >
             <div class="warn-detail-title">历史预警信息</div>
         </div>
@@ -150,6 +152,9 @@ const containerDom = ref(null)
 const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const warnActive = ref(false)
+const detailLoading = ref(false)
+const historyLoading = ref(false)
+const warnLoading = ref(true)
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -209,12 +214,25 @@ const gnssIdMap = {
     'MZS120.56944728_32.02070961_1': 'CL-10',
 }
 
+const gnssIdSectionMap = {
+    'MZS120.51749289_32.04059243_1': '南顺堤',
+    'MZS120.51977143_32.04001152_1': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_1': '江滩办事处',
+    'MZS120.52660704_32.03676583_1': '小港池',
+    'MZS120.53334877_32.03227055_1': '张靖皋桥位上游',
+    'MZS120.54599538_32.02837993_1': '海事码头',
+    'MZS120.55327892_32.02707923_1': '海事码头下游',
+    'MZS120.55649757_32.02592404_1': '雷达站',
+    'MZS120.56334257_32.02298144_1': '民主沙尾部主路',
+    'MZS120.56944728_32.02070961_1': '民主沙尾部',
+}
+
 const warnKeyValList = ref([
     { key: '危险区域', val: '暂无' },
     { key: '出险时间', val: '暂无' },
     { key: '设备信息', val: '暂无' },
-    { key: '管理单位', val: '暂无' },
-    { key: '联系方式', val: '暂无' },
+    { key: '管理单位', val: '江苏省水利厅' },
+    { key: '联系方式', val: '025-85829326；18860847206' },
     { key: '是否发送通知', val: '暂无' },
 ])
 
@@ -251,7 +269,12 @@ function unique(arr) {
 const navToManage = () => {
     router.push('/bankManage')
 }
-const updateWarnInfoDesc = () => {
+const buildLocStr = (deviceId) => {
+    deviceId = deviceId.replace("MZS", "")
+    let str = deviceId.split("_").slice(0, 2).join(',')
+    return str
+}
+const updateWarnInfoDesc = async () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
@@ -268,10 +291,14 @@ const updateWarnInfoDesc = () => {
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒')
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
 
-        let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}mm
-        ！`
+        let warnString = `
+            警告：于${warnTime}，${gnssIdSectionMap[deviceId]}断面(${buildLocStr(deviceId)})的 \
+            ${deviceName}(${gnssIdMap[deviceId]})周围区域即将发生崩岸险情 \
+            请注意防汛处置！
+        `
         WARN_TEXT.push(warnString)
     }
+    warnLoading.value = false
     warnKeyValList.value[2].val = unique(deviceNameList).join(',')
     warnKeyValList.value[1].val = unique(warnTimeList).join(',')
     warnKeyValList.value[5].val = '是'
@@ -284,9 +311,9 @@ const updateWarnInfoDesc = () => {
 }
 
 onMounted(async () => {
-    setTimeout(() => {
-        warnActive.value = true
-    }, 3000)
+    // setTimeout(() => {
+    //     warnActive.value = true
+    // }, 3000)
     map = new mapboxgl.Map({
         container: 'map', // container ID
         accessToken:
@@ -326,7 +353,7 @@ onMounted(async () => {
                 'text-size': 20,
             },
             paint: {
-                'text-color': 'rgb(0, 42, 105)',
+                'text-color': 'rgba(0, 42, 105, 0.75)',
             },
         })
         
@@ -339,12 +366,13 @@ onMounted(async () => {
                 'text-field': ['get', 'label'],
                 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                 // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
+                'text-offset': [-1.0, 1.15],
                 'text-anchor': 'top',
-                'text-size': 12,
+                'text-size': 16,
+                'text-allow-overlap': true
             },
             paint: {
-                'text-color': 'rgb(0, 42, 105)',
+                'text-color': 'rgb(0, 22, 145)',
             },
         })
 

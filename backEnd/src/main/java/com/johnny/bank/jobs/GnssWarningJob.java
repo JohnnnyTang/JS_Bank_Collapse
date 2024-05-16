@@ -54,6 +54,9 @@ public class GnssWarningJob implements Job {
         List<GnssData> dangerList = new ArrayList<>();
         for(String gnssId: gnssIdList) {
             GnssData gnssData = gnssDataService.getNewestDataOfDevice(gnssDataService.getDataNode(), gnssId);
+            if(gnssData == null) {
+                continue;
+            }
             double threeDiff = gnssData.getThreeD();
             log.info(gnssId+"-"+gnssData.getMeasureTime()+":"+threeDiff);
             if(threeDiff > 12) {
