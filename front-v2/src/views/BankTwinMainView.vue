@@ -7,11 +7,7 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab
-                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
-                    :items="items"
-                    :columns="2"
-                ></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -22,39 +18,23 @@
 
         <div class="marquee-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <div
-                    class="marquee-block"
-                    ref="marqueeBlockDom"
-                    :style="{ animationDuration: animateTime }"
-                >
-                    <div
-                        class="no-warn-block"
-                        v-if="warningList.length == 0"
-                        style="font-size: calc(0.5vw + 0.7vh); color: #e7f2ff"
-                    >
+                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
+                    <div class="no-warn-block" v-if="warningList.length == 0"
+                        style="font-size: calc(0.5vw + 0.7vh); color: #e7f2ff">
                         {{ `近一小时内无报警信息` }}
                     </div>
-                    <div
-                        v-else
-                        class="warn-block"
-                        v-for="(warningString, index) in warningList"
-                        :key="index"
-                    >
-                        <div
-                            style="
+                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
+                        <div style="
                                 background-size: contain;
                                 background-image: url('/icons/warning.png');
                                 width: 3vh;
                                 height: 3vh;
-                            "
-                        ></div>
-                        <div
-                            style="
+                            "></div>
+                        <div style="
                                 font-size: calc(0.5vw + 0.7vh);
                                 color: #e7f2ff;
                                 margin-left: 0.5vw;
-                            "
-                        >
+                            ">
                             {{ warningString }}
                         </div>
                     </div>
@@ -65,48 +45,70 @@
         <div class="monitor-legend-container">
             <div class="monitor-legend-title">监测设备图例</div>
             <div class="monitor-legend-block">
-                <div
-                    v-for="(item, index) in legendList"
-                    :key="index"
-                    class="monitor-legend-item"
-                >
-                    <div
-                        class="icon-block"
-                        :style="{ backgroundImage: `url(${item.icon})` }"
-                    ></div>
-                    <div class="text-block">
-                        <span>{{ item.text1 }}</span>
-                        <span style="font-weight: bold">{{ item.strong }}</span>
-                        <span>{{ item.text2 }}</span>
-                        <br />
-                        <span
-                            style="
+                <!-- GNSS only -->
+                <div class="monitor-legend-item GNSS">
+                    <div class="item-title">
+                        <span>{{ gnssLegendInfo.text1 }}</span>
+                        <span style="font-weight: bold">{{ gnssLegendInfo.strong }}</span>
+                        <span>{{ gnssLegendInfo.text2 }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: row;">
+                        <div class="legend-block">
+                            <div class="icon-block GNSS-icon" :style="{ backgroundImage: `url(${gnssLegendInfo.icon1})` }">
+                            </div>
+                            <span style="
                                 text-align: center;
                                 width: 100%;
                                 display: block;
-                                text-shadow:
-                                    #eef3ff 1px 1px,
-                                    #eef3ff 1px 1px;
-                            "
-                        >
-                            {{ item.device }}</span
-                        >
+                                line-height: 2.5vh;
+                                color: rgb(16,71,165);
+                                text-shadow: #7388c148 1px 1px 0;
+                            ">
+                                {{ gnssLegendInfo.device1 }}</span>
+                        </div>
+                        <div class="legend-block">
+                            <div class="icon-block GNSS-icon" :style="{ backgroundImage: `url(${gnssLegendInfo.icon2})` }">
+                            </div>
+                            <span style="
+                                text-align: center;
+                                width: 100%;
+                                display: block;
+                                line-height: 2.5vh;
+                                color: rgb(16,71,165);
+                                text-shadow: #7388c148 1px 1px 0;
+                            ">
+                                {{ gnssLegendInfo.device2 }}</span>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- others -->
+                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
+                    <div class="item-title">
+                        <span>{{ item.text1 }}</span>
+                        <span style="font-weight: bold">{{ item.strong }}</span>
+                        <span>{{ item.text2 }}</span>
+                    </div>
+                    <div class="legend-block">
+                        <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
+                        <span style="
+                                text-align: center;
+                                width: 100%;
+                                display: block;
+                                line-height: 2.5vh;
+                                color: rgb(16,71,165);
+                                text-shadow: #7388c148 1px 1px 0;
+                            ">
+                            {{ item.device }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div
-            class="warn-detail-container"
-            :class="warnActive ? 'active' : 'in-active'"
-        >
+        <div class="warn-detail-container" :class="warnActive ? 'active' : 'in-active'">
             <div class="warn-detail-title">预警信息详情</div>
             <div class="warn-detail-content">
-                <div
-                    class="key-val-container"
-                    v-for="(item, index) in warnKeyValList"
-                    :key="index"
-                >
+                <div class="key-val-container" v-for="(item, index) in warnKeyValList" :key="index">
                     <div class="key-text">{{ item.key + '：' }}</div>
                     <el-scrollbar>
                         <div class="val-text">{{ item.val }}</div>
@@ -115,10 +117,7 @@
             </div>
         </div>
 
-        <div
-            class="warn-history-container"
-            :class="warnActive ? 'active' : 'in-active'"
-        >
+        <div class="warn-history-container" :class="warnActive ? 'active' : 'in-active'">
             <div class="warn-detail-title">历史预警信息</div>
         </div>
 
@@ -165,14 +164,25 @@ const items = ref([
 ])
 
 const warningList = ref([])
-const legendList = [
+/*
     {
-        icon: '/icons/GNSS.png',
+        icon: '/icons/GNSS测量站.png',
         text1: '土体',
         strong: '表面位移',
         text2: '监测',
         device: 'GNSS',
     },
+*/
+const gnssLegendInfo = {
+    icon1: '/icons/GNSS测量站.png',
+    icon2: '/icons/GNSS基准站.png',
+    text1: '土体',
+    strong: '表面位移',
+    text2: '监测',
+    device1: 'GNSS测量站',
+    device2: 'GNSS基准站',
+}
+const legendList = [
     {
         icon: '/icons/测斜仪.png',
         text1: '土体',
@@ -329,7 +339,7 @@ onMounted(async () => {
                 'text-color': 'rgb(0, 42, 105)',
             },
         })
-        
+
         map.addLayer({
             id: '点2',
             type: 'symbol',
@@ -635,8 +645,8 @@ div.twin-main-container {
 
             div.monitor-legend-item {
                 display: flex;
-                flex-direction: row;
-                justify-content: space-evenly;
+                flex-direction: column;
+                justify-content: flex-start;
                 align-items: center;
                 width: 10vw;
                 height: 6vh;
@@ -647,22 +657,44 @@ div.twin-main-container {
                 // box-shadow: inset 5px 5px 5px #0400fd, inset -5px -5px 5px #0400fd;
 
                 border-radius: 5%;
+                color: #1d00be;
+                text-shadow: #40b4bf 1px 1px 0;
 
-                div.icon-block {
-                    position: relative;
-                    width: 3vh;
+                div.item-title {
                     height: 3vh;
-                    background-size: contain;
-                    background-repeat: no-repeat;
-                    margin-right: 0.2vw;
-                    margin-left: 0.2vw;
+                    line-height: 3vh;
                 }
 
-                div.text-block {
-                    font-size: calc(0.6vw + 0.4vh);
-                    font-weight: 400;
-                    color: rgb(32, 15, 248);
+                div.legend-block {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+
+                    div.icon-block {
+                        position: relative;
+                        width: 2vh;
+                        height: 2vh;
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        margin-right: 0.2vw;
+                        margin-left: 0.2vw;
+                        transform: translateY(16%);
+                    }
+
+                    div.GNSS-icon {
+                        // width: 2.5vh;
+                        // height: 2.5vh;
+                        // transform: translateY(16%);
+                    }
                 }
+
+
+
+            }
+
+            div.GNSS {
+                width: 14vw;
             }
         }
     }
@@ -761,8 +793,7 @@ div.twin-main-container {
                     color: #1d00be;
                     // max-width: 70%;
                     width: 12vw;
-                    text-align: right
-                    // text-align: center;
+                    text-align: right // text-align: center;
                 }
 
                 // &:nth-child(2n + 1) {
