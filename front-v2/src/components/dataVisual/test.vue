@@ -2,11 +2,6 @@
     <div class="main">
         <!-- <div class="map" ref="mapDom" id="map">
         </div> -->
-        <canvas id="colorLegend" width="50" height="210"></canvas>
-        <!-- <div id="legend"></div> -->
-        <div class="value">
-            <div class="value-item" v-for="item in values">{{ item }}</div>
-        </div>
     </div>
 </template>
 
@@ -18,39 +13,19 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const mapDom = ref()
-const values = [0, -2, -5, -8, -10, -11, -13, -13.5, -15, -16, -20, -30, -60];
 
 onMounted(async () => {
 
-    const canvas = document.getElementById('colorLegend');
-    const ctx = canvas.getContext('2d');
-    const colors = ['rgb(0,153,51)', '#78B766', '#27C731', '#99CC33', '#CCCC33', '#D9D97A', '#FFFF99', '#FFFFFF', '#99FFFF', '#0000FF', '#6699FF', '#0096FF', '#0057DF'];
-    const fontSize = 10;
-    const textBaseline = 'middle';
+    const gnssCodes = (await axios.get('/api/data/gnssInfo')).data
+    console.log(gnssCodes);
+    //http://localhost:5173/api/data/gnssData/minute/20/device/MZS120.52660704_32.03676583_1
+    gnssCodes.forEach(async (element) => {
+        const data = (await axios.get('/api/data/gnssData/minute/20/device/' + element.code)).data
+        console.log(element.code, data.length,data);
+    })
 
-    // Calculate the height of each color section
-    const sectionHeight = canvas.height / values.length;
 
-    values.forEach((val, index) => {
-        // Draw the color sections
-        ctx.fillStyle = colors[index];
-        ctx.fillRect(0, sectionHeight * index, canvas.width, sectionHeight);
 
-        // Draw the value labels to the right of the color sections
-
-    });
-
-    // Optionally, add a border to the color sections
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(canvas.width - 1, 0);
-    ctx.lineTo(canvas.width - 1, canvas.height);
-    ctx.stroke();
-
-    // Draw the right border of the last section
-    ctx.fillRect(canvas.width - 1, sectionHeight * (values.length - 1), 1, sectionHeight);
     // const map = await initMap(mapDom.value)
 
     // !map.getSource('riverPassagePier') &&

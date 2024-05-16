@@ -25,6 +25,7 @@ body,
     margin: 0 0 0 0;
     padding: 0 0 0 0;
 }
+
 .nav-popper {
     .el-scrollbar__wrap {
         width: 14vw;
@@ -68,10 +69,12 @@ body,
             }
         }
     }
+
     &.center {
         .el-scrollbar__wrap {
             width: 12vw;
         }
+
         li {
             justify-content: center;
             font-size: calc(0.8vw + 0.6vh);
@@ -113,6 +116,7 @@ body,
     .el-select-dropdown__footer {
         padding: 0.8vh 4vw 0.8vh 4vw;
         border-top: 2px dashed #1248bb;
+
         div.add-select-button {
             width: 6vw;
             height: 3.6vh;
@@ -181,6 +185,7 @@ body,
     .el-select-dropdown__footer {
         padding: 0.8vh 4vw 0.8vh 4vw;
         border-top: 2px dashed #1248bb;
+
         div.add-select-button {
             width: 6vw;
             height: 3.6vh;
@@ -214,4 +219,90 @@ body,
         }
     }
 }
-</style>
+
+.el-message-box.choice-box.el-message-box--center {
+    width: 10vw;
+    background-color: rgb(215,243,254);
+    backdrop-filter: blur(16px);
+    border: #b2c6f3 2px solid;
+    padding: 0;
+    margin: 0;
+    padding-top: 1vh;
+
+    .el-message-box__header.show-close {
+        display: none;
+    }
+
+    .el-message-box__content {
+
+        .el-message-box__container {
+
+            .el-message-box__message {
+
+                .container {
+                    // transform: translateX(7%);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    .title {
+                        height: 3vh;
+                        line-height: 3vh;
+                        width: 9vw;
+                        text-align: center;
+                        font-size: calc(0.7vw + 0.6vh);
+                        font-weight: bold;
+                        color: rgb(6, 0, 68);
+                        text-shadow:
+                            #eef3ff 1px 1px,
+                            #eef3ff 2px 2px;
+                        letter-spacing: 0.1rem;
+                        border-bottom: #1248bb 2px solid;
+                        margin-bottom: 0.5vh;
+                    }
+
+                    .block {
+                        width: 10vw;
+                        height: 2vh;
+                        margin-bottom: 0.2vh;
+                        transform: translateX(10%);
+
+                        input[type="radio"] {
+                            transform: translateY(10%);
+                        }
+
+                        .text {
+                            line-height: 2vh;
+                            text-align: center;
+                            font-size: calc(0.5vw + 0.6vh);
+                            color: rgb(6, 0, 68);
+                            text-shadow:
+                                #eef3ff 1px 1px,
+                                #eef3ff 2px 2px;
+                            letter-spacing: 0.0rem;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .el-message-box__btns {
+        margin: 0;
+        padding: 0;
+        padding-top: 0.5vh;
+        padding-bottom: 0.5vh;
+
+        .el-button {
+            width: 2.5vw;
+            height: 2.8vh;
+            
+        }
+
+        .el-button.el-button--primary {
+            width: 2.5vw;
+            height: 2.8vh;
+        }
+    }
+
+}</style>
