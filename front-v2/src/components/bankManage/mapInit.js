@@ -469,7 +469,8 @@ const mapInit = async (map, vis) => {
                     let type = 'GNSS'
                     lastPos = setWarningDeviceStyle(map, type, id, item)
                 })
-                useWarnInfoStore().warnInfo = allWarnData
+                if (allWarnData.length != 0)
+                    useWarnInfoStore().warnInfo = allWarnData
 
                 // if (lastPos) {
                 //     map.flyTo({
@@ -628,7 +629,8 @@ const warnInterval = async (map, minute) => {
         let type = 'GNSS'
         lastPos = setWarningDeviceStyle(map, type, id, item)
     })
-    useWarnInfoStore().warnInfo = allWarnData
+    if (allWarnData.length != 0)
+        useWarnInfoStore().warnInfo = allWarnData
     console.log('first-warnInterval!', allWarnData);
 
 
@@ -652,17 +654,17 @@ const open = (features, map) => {
     // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
 
-    const radioGroupVNode = h('div',{class:'container'}, [
-        h('div',{class:'title'}, '选择设备'),
+    const radioGroupVNode = h('div', { class: 'container' }, [
+        h('div', { class: 'title' }, '选择设备'),
         items.map(item => {
             return h(
                 'div',
                 {
                     key: item.properties.machineId,
-                    class:'block',
+                    class: 'block',
                 },
                 [
-                    h('label', {class:'label'},
+                    h('label', { class: 'label' },
                         [
                             h('input', {
                                 type: 'radio',
@@ -673,7 +675,7 @@ const open = (features, map) => {
                                     selectedCode = event.target.value;
                                 }
                             }),
-                            h('span', {class:'text'}, DEVICETYPEMAP[Number(item.properties.type) - 1] + '（' + deviceNameMap[DEVICETYPEMAP[Number(item.properties.type) - 1]][item.properties.code]+'）')
+                            h('span', { class: 'text' }, DEVICETYPEMAP[Number(item.properties.type) - 1] + '（' + deviceNameMap[DEVICETYPEMAP[Number(item.properties.type) - 1]][item.properties.code] + '）')
                         ]
                     )
                 ]
@@ -689,7 +691,7 @@ const open = (features, map) => {
             cancelButtonText: '取消',
             center: true,
             message: radioGroupVNode,
-            'customClass':'choice-box'
+            'customClass': 'choice-box'
         }
     )
         .then(() => {

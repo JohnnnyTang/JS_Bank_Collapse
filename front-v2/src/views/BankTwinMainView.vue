@@ -40,6 +40,9 @@
                     </div>
                 </div>
             </DvBorderBox12>
+            <div class="button-block" @click="warnActive = !warnActive">
+                {{ buttonText }}
+            </div>
         </div>
 
         <div class="monitor-legend-container">
@@ -127,7 +130,7 @@
 
 <script setup>
 import router from '../router'
-import { onMounted, ref, onUnmounted, watch } from 'vue'
+import { onMounted, ref, onUnmounted, watch, computed } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
@@ -149,6 +152,9 @@ const containerDom = ref(null)
 const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const warnActive = ref(false)
+const buttonText = computed(() => {
+    return warnActive.value ? '现场监控' : '预警详情'
+})
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -265,7 +271,7 @@ const updateWarnInfoDesc = () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
-    console.log('1231', warnInfo)
+    console.log('warnInfo! ', warnInfo)
     let deviceNameList = []
     let warnTimeList = []
 
@@ -294,9 +300,9 @@ const updateWarnInfoDesc = () => {
 }
 
 onMounted(async () => {
-    setTimeout(() => {
-        warnActive.value = true
-    }, 3000)
+    // setTimeout(() => {
+    //     warnActive.value = true
+    // }, 5000)
     map = new mapboxgl.Map({
         container: 'map', // container ID
         accessToken:
@@ -554,46 +560,87 @@ div.twin-main-container {
         z-index: 4;
         overflow: hidden;
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
 
-        :deep(.border-box-content) {
+        :deep(.dv-border-box-12) {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 95%;
-            overflow: hidden;
-            transform: translateX(2.5%);
+            justify-content: flex-start;
 
-            div.marquee-block {
+            .border-box-content {
+                position: relative;
                 display: flex;
-                flex-direction: row;
-                white-space: nowrap;
-                justify-content: flex-start;
-                // animation: marquee 15s linear infinite;
-                animation-name: marquee;
-                animation-duration: 0s;
-                animation-timing-function: linear;
-                animation-iteration-count: infinite;
+                justify-content: center;
+                align-items: center;
+                width: 84%;
+                margin-left: 2%;
+                overflow: hidden;
+                // transform: translateX(2.5%);
 
-                div.warn-block {
+                div.marquee-block {
                     display: flex;
                     flex-direction: row;
-                    justify-content: flex-start;
-                    align-items: center;
-                    width: fit-content;
-                    margin-right: 1vw;
-                }
+                    white-space: nowrap;
+                    justify-content: center;
+                    // animation: marquee 15s linear infinite;
+                    animation-name: marquee;
+                    animation-duration: 0s;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
 
-                div.no-warn-block {
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: flex-start;
-                    align-items: center;
-                    width: fit-content;
+                    div.warn-block {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: flex-start;
+                        align-items: center;
+                        width: fit-content;
+                        margin-right: 1vw;
+                    }
+
+                    div.no-warn-block {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: flex-start;
+                        align-items: center;
+                        width: fit-content;
+                        transform: translateX(4vw);
+                    }
                 }
             }
+
+
         }
+
+        div.button-block {
+            position: absolute;
+            background-color: rgb(122, 227, 248);
+            border-radius: 10%; 
+            right: 2%;
+            width: 4vw;
+            height: 3vh;
+            line-height: 3vh;
+            text-align: center;
+            border-right: #a4bfff 2px solid;
+            border-bottom: #a4bfff 4px solid;
+            font-weight: bold;
+            color: #1d00be;
+
+            /* 初始阴影 */
+            &:hover {
+                cursor: pointer;
+                border-right: #a4bfff 2px solid;
+                border-bottom: #a4bfff 4px solid;
+                transition: .3s;
+            }
+
+            &:active {
+                cursor: pointer;
+                border-right: #a4bfff 1px solid;
+                border-bottom: #a4bfff 1px solid;
+                transition: .3s;
+            }
+        }
+
     }
 
     div.monitor-legend-container {
