@@ -160,4 +160,9 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     return { warnInfo }
 })
 
-export { useWarnInfoStore, useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore }
+const useHighlightLayerStore = defineStore('highlightLayerStore', () => {
+    const highlightLayers = ref([])
+    return { highlightLayers }
+})
+
+export { useWarnInfoStore, useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore, useHighlightLayerStore }

@@ -33,7 +33,7 @@ import { onMounted, ref, watch } from 'vue';
 import subSceneContainer from '../common/subSceneContainer.vue';
 import sceneContainer from '../common/sceneContainer.vue'
 import { tree, scenes, layerGroups } from '../js/SCENES'
-import { useMapStore, useNewSceneStore } from '../../../store/mapStore';
+import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../store/mapStore';
 
 const dataSource = ref(tree)
 const mapStore = useMapStore()
@@ -66,6 +66,10 @@ const treeNodeClickHandler = (node, data) => {
             for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
                 dataSource.value[sceneDict[selectedSceneID]].children[i].active = false
             }
+        }
+        const highlightLayer = useHighlightLayerStore().highlightLayers
+        for (let i = 0; i < highlightLayer.length; i++) {
+            map.removeLayer(highlightLayer[i])
         }
         return
     }

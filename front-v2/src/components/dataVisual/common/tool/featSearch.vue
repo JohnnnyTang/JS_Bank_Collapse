@@ -41,7 +41,8 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <span class="text">{{ node.label }}</span>
-                            <el-button type="primary" plain v-if="node.isLeaf && node.label != '江堤港堤' && node.label != '里程桩'"
+                            <el-button type="primary" plain
+                                v-if="node.isLeaf && node.label != '江堤港堤' && node.label != '里程桩'"
                                 @click="detailClickHandler(node, data)">查看详情</el-button>
                             <!-- <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button> -->
                         </span>
@@ -56,7 +57,7 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { Decoration7 } from '@kjgl77/datav-vue3'
 import { ElTree, ElMessage } from 'element-plus';
-import { useMapStore, useNewSceneStore } from '../../../../store/mapStore';
+import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../../store/mapStore';
 import axios from 'axios';
 import { sourceNameMap, sourceZoomMap, sourceColumnMap } from '../../js/tilefieldMAP'
 import { tree } from '../../js/SCENES'
@@ -79,6 +80,8 @@ const sceneTagChecked = ref([true, false, false])
 const LGroups = ref(['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'])
 const LGroupsTagChecked = ref([true, false, false, false, false])
 const featureCount = ref(0)
+const highlightLayer = ref([])
+
 
 watch(filterText, (val) => {
     treeRef.value.filter(val)
@@ -383,48 +386,41 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
             'fill-extrusion-opacity': 1.0
         }
     }
-    if (sourceid.includes('bank-level')) {
-        map.addLayer({
-            id: `${layerId}-highlight-${featureId}`,//自定义
-            type: featureLayer.type,
-            source: featureLayer.source,
-            filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
-            layout: {
 
-            },
-            paint: paintMap[featureLayer.type],
-        })
-    } else {
-        map.addLayer({
-            id: `${layerId}-highlight-${featureId}`,//自定义
-            type: featureLayer.type,
-            source: featureLayer.source,
-            'source-layer': featureLayer.sourceLayer,
-            filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
-            layout: {
+    // 1  add highlight layer
+    map.addLayer({
+        id: `${layerId}-highlight-${featureId}`,//自定义
+        type: featureLayer.type,
+        source: featureLayer.source,
+        'source-layer': featureLayer.sourceLayer,
+        filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
+        layout: {
+        },
+        paint: paintMap[featureLayer.type],
+    })
 
-            },
-            paint: paintMap[featureLayer.type],
-        })
-    }
+    // 2  use expression  但不适用于现在的Map 还是用加图层的办法
+    // map.setPaintProperty(layerId, 'fill-color', [
+    //     'match',
+    //     ['get', sourceNameMap[sourceid]], // 获取要素的'name'属性
+    //     'featureName', ['literal', 'rgba(255, 0, 0, 1)'], // 如果'name'是'123'，则使用红色高亮
+    //     ['literal', map.getPaintProperty(layerId, 'fill-color')] // 否则保持原有样式
+    // ]);
 
 
     let lng = property.center_x
     let lat = property.center_y
-    if (sourceid.includes('bank-level')) {
-        let center = getCenterCoord(property.coord)
-        lng = center[0]
-        lat = center[1]
-    }
     map.jumpTo({
         center: [lng, lat],
         zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10
     });
 
-    setTimeout(() => {
-        if (map.getLayer(`${layerId}-highlight-${featureId}`))
-            map.removeLayer(`${layerId}-highlight-${featureId}`)
-    }, 3000)
+    highlightLayer.value.push(`${layerId}-highlight-${featureId}`)
+    useHighlightLayerStore().highlightLayers = highlightLayer.value;
+    // setTimeout(() => {
+    //     if (map.getLayer(`${layerId}-highlight-${featureId}`))
+    //         map.removeLayer(`${layerId}-highlight-${featureId}`)
+    // }, 3000)
 }
 
 const getCenterCoord = (coordsArray) => {

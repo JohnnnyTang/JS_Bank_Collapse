@@ -131,44 +131,6 @@ onMounted(async () => {
     sceneStore.LAYERGROUPMAP.value = layerGroups
 
     activeStatus.value[0] = true
-
-
-
-    //#region test
-    // feature get test
-    // await layerAddFunctionMap['地形瓦片'](mapInstance)//mvt polygon
-    // await layerAddFunctionMap['沙洲'](mapInstance)//mvt polygon
-    // await layerAddFunctionMap['全江注记'](mapInstance)//mvt point
-    // await layerAddFunctionMap['民主沙区划线'](mapInstance)//mvt line
-    // await layerAddFunctionMap['GNSS'](mapInstance)//geojson point
-    // await layerAddFunctionMap['一级预警岸段'](mapInstance)//geojson line
-
-    /// feature get test
-    // window.addEventListener('keydown', async (e) => {
-    //     console.log(e.key);
-    //     switch (e.key) {
-    //         case '1':
-    //             await tempFunction(mapInstance, '地形瓦片')
-    //             break;
-    //         case '2':
-    //             await tempFunction(mapInstance, '全江注记')
-    //             break;
-    //         case '3':
-    //             await tempFunction(mapInstance, '民主沙区划线')
-    //             break; 
-    //         case '4':
-    //             await tempFunction(mapInstance, 'GNSS')
-    //             break;
-    //         case '5':
-    //             await tempFunction(mapInstance, '一级预警岸段')
-    //             break;
-    //     }
-    // })
-    //#endregion
-
-    // addNewLayer(mapInstance)
-
-
 })
 
 //////////// DEBUG FUNCTIONS
@@ -197,6 +159,7 @@ const tempFunction = async (mapInstance, layerName) => {
 }
 
 onUnmounted(() => {
+    mapStore.getMap().remove()
     mapStore.destroyMap()
 })
 
