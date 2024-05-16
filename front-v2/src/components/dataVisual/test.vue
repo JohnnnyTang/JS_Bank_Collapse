@@ -1,32 +1,45 @@
 <template>
     <div class="main">
-        <!-- <div class="map" ref="mapDom" id="map">
-        </div> -->
+        <div class="map" ref="mapDom" id="map">
+        </div>
+        <canvas id="GPUFrame"></canvas>
     </div>
 </template>
 
 <script setup>
-import { initMap, loadImage } from '../../utils/mapUtils';
+import { initMap, initScratchMap, loadImage } from '../../utils/mapUtils';
 import { onMounted, watch, ref } from 'vue';
 import axios from 'axios';
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import BankWarnLayer from '../../utils/m_demLayer/bankWarnLayer'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const mapDom = ref()
 
+const mapFlyToRiver = (mapIns) => {
+    if (!mapIns) return
+    mapIns.fitBounds(
+        [
+            [120.46987922676836, 32.03201616423072],
+            [120.61089640208264, 32.052171362618625],
+        ],
+        {
+            duration: 500,
+            zoom: 12.5,
+        },
+    )
+}
+
 onMounted(async () => {
 
-    const gnssCodes = (await axios.get('/api/data/gnssInfo')).data
-    console.log(gnssCodes);
-    //http://localhost:5173/api/data/gnssData/minute/20/device/MZS120.52660704_32.03676583_1
-    gnssCodes.forEach(async (element) => {
-        const data = (await axios.get('/api/data/gnssData/minute/20/device/' + element.code)).data
-        console.log(element.code, data.length,data);
-    })
+    const map = await initScratchMap(mapDom.value)
+    const jsonUrl = '/bankWarn/bankWarn.json'
+    map.addLayer(new BankWarnLayer(jsonUrl))
+    
+    mapFlyToRiver(map)
 
 
 
-    // const map = await initMap(mapDom.value)
 
     // !map.getSource('riverPassagePier') &&
     //     map.addSource('riverPassagePier', {
@@ -800,12 +813,14 @@ onMounted(async () => {
         height: 100%;
     }
 
-    canvas#colorLegend {
+    canvas#GPUFrame {
         position: absolute;
-        left: 5vw;
-        // border: 1px solid rgb(248, 248, 248);
-        border: none;
-        top: 10px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 2;
     }
 
     .value {
