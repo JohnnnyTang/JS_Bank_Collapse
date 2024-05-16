@@ -10,6 +10,9 @@
         <!-- <div class="chart" id="chart"></div> -->
         <div class="chart" ref="chartRef"></div>
 
+        <div class="return-button" @click="clickbuttonHandler">
+            返回</div>
+
     </div>
 </template>
 
@@ -22,10 +25,19 @@ import { useSceneStore } from '../../../store/mapStore';
 const selectedFeature = computed(() => useSceneStore().selectedFeature)
 const selectedIndex = ref(0)
 const chartRef = ref()
+const emit = defineEmits(['close'])
+
 
 let myChart
 let chartDom
 let dataAssitant = ref(new MonitorDataAssistant())
+
+
+
+const clickbuttonHandler = () => {
+    emit('close')
+}
+
 
 const showChart = (index) => {
     selectedIndex.value = index;
@@ -85,7 +97,7 @@ $Color5: rgb(6, 102, 192);
 .pure-chart {
     user-select: none;
     position: relative;
-    width: 16vw;
+    width: 24vw;
     height: 32vh;
     padding: calc(0.5vh + 0.2vw);
     background-color: $Color1;
@@ -97,7 +109,8 @@ $Color5: rgb(6, 102, 192);
         display: flex;
         flex-direction: row;
         justify-content: space-around;
-        width: 100%;
+        width: 70%;
+        margin-left: 30%;
         height: 5vh;
         align-items: center;
         font-size: calc(0.5vh + 0.5vw);
@@ -105,19 +118,24 @@ $Color5: rgb(6, 102, 192);
 
         .button {
             width: auto;
-            border-radius: 10px;
-            background-color: $Color5 ;
-            color: $Color2;
-            padding: 7px;
-            margin-bottom: 1vh;
+            height: 3vh;
+            line-height: 3vh;
+            padding-left: 0.5vw;
+            padding-right: 0.5vw;
+            border-radius: 10%;
 
+            color: #ffffff;
+            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
+       
+            background: radial-gradient(ellipse at center, #2692da 0%, #0529ac 100%);
+            transition: all ease-in-out 0.3s;
+
+            font-size: calc(0.5vw + 0.7vh);
 
             &:hover {
                 cursor: pointer;
-            }
-
-            &:active {
-                transform: scale(1.02);
+                box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.35);
+                color: #ffffff;
             }
         }
 
@@ -128,9 +146,35 @@ $Color5: rgb(6, 102, 192);
 
 
     .chart {
-        width: 16vw;
-        height: 34vh;
+        width: 24vw;
+        height: 32vh;
         background-color: rgb(255, 255, 255);
+    }
+
+    .return-button {
+        position: absolute;
+        left: 0.5vw;
+        margin-top: 0.5vh;
+        width: 4vw;
+        height: 3vh;
+        line-height: 3vh;
+
+        border-radius: 10%;
+        text-align: center;
+        color: #ffffffe6;
+        font-size: calc(0.5vw + 0.7vh);
+
+
+        box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.35);
+        // background: radial-gradient(ellipse at center, #2692da 0%, #0529ac 100%);
+        background-color: #2692da;
+        transition: all ease-in-out 0.3s;
+
+        &:hover {
+            cursor: pointer;
+            box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+        }
     }
 
 }

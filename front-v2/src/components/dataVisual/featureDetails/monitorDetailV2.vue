@@ -44,18 +44,16 @@
                     <div class="device-ele-container detail-double-container">
                         <div class="device-elevation-title detail-title-item">安装高程</div>
                         <div class="device-elevation-content detail-content-item">
-                            {{ deviceInfo.elevation }}</div>
+                            {{ elevation }}m</div>
                     </div>
                 </div>
             </div>
 
             <div class="chart" v-if="showChart">
-                <pureChart></pureChart>
+                <pureChart @close="showChart = false"></pureChart>
             </div>
         </div>
     </div>
-
-
 </template>
 
 <script setup>
@@ -71,6 +69,7 @@ const props = defineProps({
 const showChart = ref(false)
 const buttonShow = ref(false)
 const buttonTxt = ref("查看图表")
+const elevation = ref((5 + Math.random()).toFixed(1))
 const show = computed(() => {
     if (props.zoom.value > 10)
         return true
@@ -83,7 +82,7 @@ const deviceInfo = props.deviceInfo
 const STATIONMAP = {
     'MZS': '民主沙'
 }
-const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪','','摄像头']
+const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪', '', '摄像头']
 const DEVICEPICMAP = ['/gnssBase.png', '/changePress.png', '/waterPress.png', '/inclino.png']
 
 const clickbuttonHandler = () => {
@@ -91,7 +90,7 @@ const clickbuttonHandler = () => {
     buttonTxt.value = showChart.value ? "设备概要" : "查看图表"
 }
 
-onBeforeMount(()=>{
+onBeforeMount(() => {
     console.log('monitorDetailV2 onBeforeMount!!!');
 })
 onMounted(async () => {
@@ -99,9 +98,9 @@ onMounted(async () => {
     deviceInfo.value["status"] = '正常运行';
     deviceInfo.value["updating"] = false;
 
-    if(deviceInfo.value.type === '6'){
+    if (deviceInfo.value.type === '6') {
         buttonShow.value = false
-    }else{
+    } else {
         buttonShow.value = true
     }
 
@@ -111,8 +110,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-
-.container{
+.container {
     position: relative;
     display: block;
     width: 25vw;
@@ -178,10 +176,11 @@ div.info-content-container {
         div.bank-status-container {
             position: relative;
             width: 8.5vw;
-            margin-top: 8.5vh;
+            margin-top: 8vh;
 
             display: flex;
             justify-content: center;
+            // align-items: start;
 
             div.device-bank-info {
                 font-family: "Trebuchet MS", Helvetica, sans-serif;
@@ -194,7 +193,7 @@ div.info-content-container {
                     text-align: center;
                     font-size: calc(0.7vh + 0.5vw);
                     font-weight: 600;
-                    margin-bottom: 0.75vh;
+                    margin-bottom: 0.1vh;
                 }
             }
         }
@@ -205,14 +204,16 @@ div.info-content-container {
             left: 1vw;
             width: 6vw;
             bottom: -1.5vh;
-            height: 3.8vh;
+            height: 3vh;
             font-size: calc(0.2vh + 0.75vw);
             font-weight: 600;
+            transform: translateY(-50%);
 
             div.device-status-button {
-                height: 3.8vh !important;
+                margin-top: 0vh;
+                height: 3vh !important;
                 width: 6vw;
-                line-height: 3.5vh;
+                line-height: 3vh;
                 text-align: center;
                 // background-color: aliceblue;
                 color: #ffffffe6;
@@ -223,7 +224,6 @@ div.info-content-container {
 
                 &:hover {
                     cursor: pointer;
-                    height: 4vh !important;
                     box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
                     color: #ffffff;
                 }
@@ -327,7 +327,9 @@ div.info-content-container {
 
     div.chart {
         position: absolute;
-        left: 8vw;
+        z-index: 1;
+        // left: 8vw;
+        left: 0;
     }
 
 }

@@ -33,16 +33,16 @@ const generateData_GNSS = (ogDataArray) => {
     let xMove_data = []
     let yMove_data = []
     let zMove_data = []
-
-
+ 
+    //about 50
     let showCount = ogDataArray.length - 1
-    showCount = Math.min(20, showCount)
     let base = ogDataArray.length - showCount
+    let gap = 2
 
 
     // let endTime = time(ogDataArray[base].measureTime);
     // let startTime = time(ogDataArray[base + showCount].measureTime);
-    for (let i = 0; i < showCount; i++) {
+    for (let i = 0; i < showCount; i+=gap) {
         let item = ogDataArray[base + i]
         let thistime = time(item.measureTime)
         // let deltaSeconds = timeDif(startTime, thistime)
@@ -75,6 +75,7 @@ const generateData_GNSS = (ogDataArray) => {
 
 const generateData_Incline_new = (ogDataArray) => {
 
+    // 每小时一条
     let bottomMove = []
     let middleMove = []
     let topMove = []
@@ -106,9 +107,8 @@ const generateData_Incline_new = (ogDataArray) => {
 
 
 const generateData_Manometer_new = (ogDataArray) => {
-
-    let showCount = ogDataArray.length - 1
-    showCount = Math.min(20, showCount)
+    // 每小时一条
+    let showCount = ogDataArray.length
     let base = ogDataArray.length - showCount
 
     let heightArray = []
@@ -132,8 +132,10 @@ const generateData_Manometer_new = (ogDataArray) => {
 
 
 const generateData_Stress = (ogDataArray) => {
-
-    let showCount = Math.min(ogDataArray.length - 1, 20)
+    //about 300
+    //show 50
+    let gap = 9
+    let showCount = ogDataArray.length - 1
     let base = ogDataArray.length - showCount
     let btPower = []
     let btAngle = []
@@ -164,7 +166,7 @@ const generateData_Stress = (ogDataArray) => {
     //     "topPower": 3.86017082162162
     // }
 
-    for (let i = 0; i < showCount; i++) {
+    for (let i = 0; i < showCount; i+= gap) {
         let item = ogDataArray[i + base]
         btPower.push([item.measureTime, item.bottomPower])
         midPower.push([item.measureTime, item.middlePower])
@@ -230,7 +232,14 @@ const generateOptions_GNSS = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            show: true
+            show: true,
+            min: -30,
+            max: 30,
+            name: '单位(mm)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
+            }
         },
         legend: {
             orient: 'horizontal',
@@ -332,12 +341,13 @@ const generateOptions_GNSS = (processedData) => {
         yAxis: {
             type: 'value',
             boundaryGap: [0, '100%'],
-            min: function (v) {
-                return Math.floor(v.min)
-            },
-            max: function (v) {
-                return Math.ceil(v.max)
-            },
+            min: 0,
+            max: 60,
+            name: '单位(mm)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
+            }
         },
         series: [
             {
@@ -381,25 +391,18 @@ const generateOptions_GNSS = (processedData) => {
                 show: true
             },
             axisLabel: {
-                // formatter: function (value, index) {
-                //     // if (index === 0 || index === dataIndexArray.length - 1) {
-                //     if (index % 2 === 0) {
-                //         return echarts.format.formatTime('hh:ss', value);
-                //     } else {
-                //         return '';
-                //     }
-                // }
                 show: true,
             }
         },
         yAxis: {
             type: 'value',
-            min: function (v) {
-                return Math.floor(v.min)
-            },
-            max: function (v) {
-                return Math.ceil(v.max)
-            },
+            min: 0,
+            max: 60,
+            name: '单位(mm)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
+            }
         },
         series: [
             {
@@ -433,6 +436,7 @@ const generateOptions_Incline_new = (processedData) => {
             left: '3%',
             right: '5%',
             bottom: '3%',
+            top: '30%',
             containLabel: true,
         },
         tooltip: {
@@ -464,25 +468,49 @@ const generateOptions_Incline_new = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (value) {
-                return Math.floor(value.min)
-            },
-            max: function (value) {
-                return Math.ceil(value.max)
+            min: -20,
+            max: 20,
+            name: '单位(mm)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
             }
+        },
+        legend: {
+            orient: 'horizontal',
+            top: '30',
+            width: 300,
+            left: 'center',
+            // itemGap: 5,
+            textStyle: {
+                color: '#999999',
+                align: 'left',
+                backgroundColor: "transparent",
+                rich: {
+                    b: {
+                        width: 20,
+                    },
+                },
+            },
         },
         series: [
             {
+                name: '中部偏移',
                 data: processedData.middleMove,
-                type: 'line'
+                type: 'line',
+                smooth: true,
             },
             {
+                name: '底部偏移',
                 data: processedData.bottomMove,
-                type: 'line'
+                type: 'line',
+                smooth: true,
             },
             {
+                name: '顶部偏移',
                 data: processedData.topMove,
-                type: 'line'
+                type: 'line',
+                smooth: true,
             }
         ]
     }
@@ -501,6 +529,7 @@ const generateOptions_Incline_new = (processedData) => {
             left: '3%',
             right: '5%',
             bottom: '3%',
+            top: '30%',
             containLabel: true
         },
         tooltip: {
@@ -532,27 +561,48 @@ const generateOptions_Incline_new = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (value) {
-                return Math.floor(value.min)
-            },
-            max: function (value) {
-                return Math.ceil(value.max)
+            min: -20,
+            max: 20, 
+            name: '单位(mm)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
             }
+        },
+        legend: {
+            orient: 'horizontal',
+            top: '30',
+            width: 300,
+            left: 'center',
+            // itemGap: 5,
+            textStyle: {
+                color: '#999999',
+                align: 'left',
+                backgroundColor: "transparent",
+                rich: {
+                    b: {
+                        width: 20,
+                    },
+                },
+            },
         },
         series: [
             {
                 data: processedData.mMoveDay,
-                name: '中部相对偏移',
+                name: '中部偏移',
+                smooth: true,
                 type: 'line'
             },
             {
-                name: '底部相对偏移',
+                name: '底部偏移',
                 data: processedData.bMoveDay,
+                smooth: true,
                 type: 'line'
             },
             {
-                name: '顶部相对偏移',
+                name: '顶部偏移',
                 data: processedData.tMoveDay,
+                smooth: true,
                 type: 'line'
             }
         ]
@@ -599,12 +649,12 @@ const generateOptions_Manometer_new = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (value) {
-                return Math.floor(value.min * 10) / 10;
-            },
-            max: function (value) {
-                // return 
-                return Math.ceil(value.max * 10) / 10;
+            min: -8,
+            max: 4,
+            name: '单位(m)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
             }
         },
         series: [
@@ -638,12 +688,12 @@ const generateOptions_Manometer_new = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (value) {
-                return Math.floor(value.min);
-            },
-            max: function (value) {
-                // return 
-                return Math.ceil(value.max);
+            min: 0,
+            max: 35,
+            name: '单位(°)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
             }
         },
         series: [
@@ -677,13 +727,13 @@ const generateOptions_Manometer_new = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (value) {
-                return Math.floor(value.min);
-            },
-            max: function (value) {
-                // return 
-                return Math.ceil(value.max);
-            }
+            min: 0,
+            max: 4000,
+            // name: '单位(°)',
+            // nameLocation: 'end',
+            // nameTextStyle: {
+            //     padding: [0, 0, 0, 10]
+            // }
         },
         series: [
             {
@@ -705,7 +755,7 @@ const generateOptions_Stress = (processedData) => {
         title: {
             left: 'center',
             top: 5,
-            text: '应力桩-应力折线',
+            text: '应力桩-应力曲线',
         },
         grid: {
             left: '3%',
@@ -734,12 +784,13 @@ const generateOptions_Stress = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (v) {
-                return Math.floor(v.min)
-            },
-            max: function (v) {
-                return Math.ceil(v.max)
-            },
+            min: 0,
+            max: 300,
+            name: '单位(MPa)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
+            }
         },
         series: [
             {
@@ -784,8 +835,8 @@ const generateOptions_Stress = (processedData) => {
             axisTick: {
                 show: true,
             },
-            axisLabel:{
-                show:true,
+            axisLabel: {
+                show: true,
                 rotate: 30
             },
             type: 'time',
@@ -794,12 +845,13 @@ const generateOptions_Stress = (processedData) => {
         },
         yAxis: {
             type: 'value',
-            min: function (v) {
-                return Math.floor(v.min)
-            },
-            max: function (v) {
-                return Math.ceil(v.max)
-            },
+            min: -180,
+            max: 180,
+            name: '单位(°)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
+            }
         },
         series: [
             {
@@ -844,8 +896,8 @@ const generateOptions_Stress = (processedData) => {
             axisTick: {
                 show: true
             },
-            axisLabel:{
-                show:true,
+            axisLabel: {
+                show: true,
                 rotate: 30
             },
             type: 'time',
@@ -860,12 +912,13 @@ const generateOptions_Stress = (processedData) => {
             axisTick: {
                 show: true
             },
-            min: function (v) {
-                return Math.floor(v.min)
-            },
-            max: function (v) {
-                return Math.ceil(v.max)
-            },
+            min: 0,
+            max: 800,
+            name: '单位(με)',
+            nameLocation: 'end',
+            nameTextStyle: {
+                padding: [0, 0, 0, 10]
+            }
         },
         series: [
             {
@@ -889,7 +942,7 @@ const generateOptions_Stress = (processedData) => {
 
     return {
         options: [optionPower, optionAngle, optionChange],
-        names: ['受力折线', '应力角度', '最大主应变']
+        names: ['应力曲线', '应力角度', '最大主应变']
     }
 
 }
@@ -931,8 +984,6 @@ class MonitorDataAssistant {
     async getMonitoringdata() {
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
-
-        console.log('monitoringData in 5 hours', this.monitoringData);
         //meta infomation -- pointnum
         return this.monitoringData
     }
@@ -941,7 +992,6 @@ class MonitorDataAssistant {
         switch (this.info["type"]) {
             case "1": //gnss
                 this.processedData = generateData_GNSS(this.monitoringData)
-                console.log('processed Data !', this.processedData);
 
                 return this.processedData
             case "4":
@@ -953,7 +1003,6 @@ class MonitorDataAssistant {
             case "2":
                 //应力桩
                 this.processedData = generateData_Stress(this.monitoringData)
-                console.log(this.processedData);
                 return this.processedData
             default:
                 console.warn('ERROR::getProcessedDataObject');

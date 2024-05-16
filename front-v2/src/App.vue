@@ -253,9 +253,7 @@ body,
                         font-size: calc(0.7vw + 0.6vh);
                         font-weight: bold;
                         color: rgb(6, 0, 68);
-                        text-shadow:
-                            #eef3ff 1px 1px,
-                            #eef3ff 2px 2px;
+
                         letter-spacing: 0.1rem;
                         border-bottom: #1248bb 2px solid;
                         margin-bottom: 0.5vh;
@@ -276,9 +274,6 @@ body,
                             text-align: center;
                             font-size: calc(0.5vw + 0.6vh);
                             color: rgb(6, 0, 68);
-                            text-shadow:
-                                #eef3ff 1px 1px,
-                                #eef3ff 2px 2px;
                             letter-spacing: 0.0rem;
                         }
                     }

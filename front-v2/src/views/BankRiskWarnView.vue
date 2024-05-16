@@ -45,11 +45,8 @@
                 </div>
                 <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 <div class="graph-container flow">
-                    <div 
-                        ref="flowGraphRef"
-                        class="flowspeed graph"
-                        element-loading-background="rgba(214, 235, 255,0.8)"
-                    ></div>
+                    <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)">
+                    </div>
                 </div>
             </div>
             <div class="riskInfo-item profileShape">
@@ -68,15 +65,11 @@
                 </div>
                 <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 <div class="graph-container shape">
-                    <div
-                        ref="shapeGraphRef"
-                        class="shape graph"
-                        element-loading-background="rgba(214, 235, 255,0.8)"
-                    ></div>
+                    <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 </div>
             </div>
         </div>
-        <riskResultVue/>
+        <riskResultVue />
 
         <div class="flow-relative-container">
             <div class="flow-relative-title">
@@ -118,6 +111,7 @@ import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initScratchMap } from '../utils/mapUtils';
 import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask';
+import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
 import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus';
@@ -480,27 +474,27 @@ onMounted(async () => {
                 'fill-color': '#18b915',
             },
         })
-        map.addLayer({
-            id: 'mzsSectionArea1',
-            type: 'fill',
-            source: 'mzsBankAreaSSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': [
-                    'match',
-                    ['get', 'stability'],
-                    '较稳定',
-                    '#18b915',
-                    '稳定',
-                    '#06bef1',
-                    '不稳定',
-                    '#df8105',
-                    '较不稳定',
-                    '#ee3603',
-                    '#18b915',
-                ],
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsSectionArea1',
+        //     type: 'fill',
+        //     source: 'mzsBankAreaSSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': [
+        //             'match',
+        //             ['get', 'stability'],
+        //             '较稳定',
+        //             '#18b915',
+        //             '稳定',
+        //             '#06bef1',
+        //             '不稳定',
+        //             '#df8105',
+        //             '较不稳定',
+        //             '#ee3603',
+        //             '#18b915',
+        //         ],
+        //     },
+        // })
 
         map.addLayer({
             id: 'mzsBankLine',
@@ -517,6 +511,10 @@ onMounted(async () => {
                 'line-width': 4,
             },
         })
+
+        const jsonUrl = '/bankWarn/bankWarn.json'
+        map.addLayer(new BankWarnLayer(jsonUrl))
+
         useMapStore().setMap(map)
         console.log('set map!');
         flow.particleNum.n = 2800;
@@ -525,14 +523,14 @@ onMounted(async () => {
         flow.hide()
     })
 
-    const getProfileData = async() => {
+    const getProfileData = async () => {
         const promises = [];
         const result = [];
         for (let i = 0; i < 12; i++) {
-            promises.push(bankRiskWarn.getProfileData(i+1));
+            promises.push(bankRiskWarn.getProfileData(i + 1));
         }
         const allResponses = await Promise.all(promises);
-        
+
         // 确保每个响应都有 data 属性
         allResponses.forEach(response => {
             if (response && response.data) {
@@ -545,7 +543,7 @@ onMounted(async () => {
     };
     profileData = await getProfileData()
     console.log(profileData)
-    
+
     shapeChart = echarts.init(shapeGraphRef.value)
     drawShapeGraph(
         shapeChart,
@@ -941,12 +939,12 @@ div.risk-warn-container {
                     position: relative;
                     width: 100%;
                     height: 100%;
-                    
+
                     &.shape {
                         // height: 35vh;
                         // background-color: rgba(220, 250, 248, 0.4);
                     }
-                    
+
                     &.flowspeed {
                         // height: 17vh;
                         // background-color: #00098a;
