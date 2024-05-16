@@ -95,9 +95,9 @@ onMounted(async () => {
     //     })
     // await loadImage(map, '/legend/堤防.png', '堤防')
 
-    // !map.getLayer('长江堤防') &&
+    // !map.getLayer('其他堤防') &&
     //     map.addLayer({
-    //         id: '长江堤防',
+    //         id: '其他堤防',
     //         type: 'line',
     //         source: 'embankmentLine',
     //         'source-layer': 'default',
@@ -123,7 +123,7 @@ onMounted(async () => {
     //         ],
     //     })
     // map.addLayer({
-    //     id: '长江堤防-注记',
+    //     id: '其他堤防-注记',
     //     type: 'symbol',
     //     source: 'embankmentLine',
     //     minzoom: 11,
@@ -139,7 +139,7 @@ onMounted(async () => {
     //         'text-color': '#232323',
     //     },
     // })
-    // map.on('click',['长江堤防'],(e)=>{
+    // map.on('click',['其他堤防'],(e)=>{
     //     console.log(e.features[0]);
     // })
 
@@ -331,9 +331,9 @@ onMounted(async () => {
     //             tileServer + '/tile/vector/riverBankLine/{x}/{y}/{z}',
     //         ],
     //     })
-    // !map.getLayer('江堤港堤') &&
+    // !map.getLayer('长江干堤') &&
     //     map.addLayer({
-    //         id: '江堤港堤',
+    //         id: '长江干堤',
     //         type: 'line',
     //         source: 'riverBankLine',
     //         'source-layer': 'default',
@@ -615,9 +615,9 @@ onMounted(async () => {
     //     })
     // await loadImage(map, '/legend/堤防.png', '堤防')
 
-    // !map.getLayer('长江堤防') &&
+    // !map.getLayer('其他堤防') &&
     //     map.addLayer({
-    //         id: '长江堤防',
+    //         id: '其他堤防',
     //         type: 'line',
     //         source: 'embankmentLine',
     //         'source-layer': 'default',

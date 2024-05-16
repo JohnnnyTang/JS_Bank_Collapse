@@ -1028,8 +1028,8 @@ const layerAddFunctionMap = {
 
 
     ////////////// 工程情况
-    ////////长江堤防
-    '长江堤防': async (map) => {
+    ////////其他堤防
+    '其他堤防': async (map) => {
 
         !map.getSource('embankmentLine') &&
             map.addSource('embankmentLine', {
@@ -1040,9 +1040,9 @@ const layerAddFunctionMap = {
             })
         await loadImage(map, '/legend/堤防.png', '堤防')
 
-        !map.getLayer('长江堤防') &&
+        !map.getLayer('其他堤防') &&
             map.addLayer({
-                id: '长江堤防',
+                id: '其他堤防',
                 type: 'line',
                 source: 'embankmentLine',
                 'source-layer': 'default',
@@ -1061,7 +1061,7 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    '长江堤防-注记': async (map) => {
+    '其他堤防-注记': async (map) => {
 
         !map.getSource('embankmentLine') &&
             map.addSource('embankmentLine', {
@@ -1071,7 +1071,7 @@ const layerAddFunctionMap = {
                 ],
             })
         map.addLayer({
-            id: '长江堤防-注记',
+            id: '其他堤防-注记',
             type: 'symbol',
             source: 'embankmentLine',
             minzoom: 11,
@@ -1361,8 +1361,8 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    // 江堤港堤
-    '江堤港堤': async (map) => {
+    // 长江干堤
+    '长江干堤': async (map) => {
         !map.getSource('riverBankLine') &&
             map.addSource('riverBankLine', {
                 type: 'vector',
@@ -1370,9 +1370,9 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverBankLine/{x}/{y}/{z}',
                 ],
             })
-        !map.getLayer('江堤港堤') &&
+        !map.getLayer('长江干堤') &&
             map.addLayer({
-                id: '江堤港堤',
+                id: '长江干堤',
                 type: 'line',
                 source: 'riverBankLine',
                 'source-layer': 'default',

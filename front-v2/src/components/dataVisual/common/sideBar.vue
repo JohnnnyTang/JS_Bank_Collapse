@@ -34,6 +34,8 @@ import subSceneContainer from '../common/subSceneContainer.vue';
 import sceneContainer from '../common/sceneContainer.vue'
 import { tree, scenes, layerGroups } from '../js/SCENES'
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../store/mapStore';
+import { importantFeature, sourceNameMap } from '../js/tilefieldMAP'
+import { layerAddFunction, layerRemoveFunction } from '../layerUtil';
 
 const dataSource = ref(tree)
 const mapStore = useMapStore()
@@ -48,56 +50,79 @@ const expandKey = ['全江概貌']
 const treeNodeClickHandler = (node, data) => {
     // console.log(node);
 
-    if (data.active) {
-        data.active = false
-        //移除
-        let map = mapStore.getMap()
-        if (node.level == 2) { // layerGroup 级别
-            let selectedLayerGroupID = data.label
-            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].hideLayer()
-            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = false
+    if (data.label === '重点数据') {
+        // let keys = Object.keys(importantFeature)
+        // for (let i = 0; i < keys.length; i++) {
+        //     if (importantFeature[keys[i]].length != 0) {
+        //         layerAddFunction(mapStore.getMap(), keys[i])
+        //         const importantFeatureIds = ['feature-id-1', 'feature-id-2', 'feature-id-3', ...];
 
-        } else if (node.level == 1) {
-            let selectedSceneID = data.label
-            sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
-            sceneStore.SCENEMAP.value[selectedSceneID].hideScene()
-            sceneStore.SCENEMAP.value[selectedSceneID].active = false
-            for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-                dataSource.value[sceneDict[selectedSceneID]].children[i].active = false
+        //         // 定义一个过滤表达式，选择'id'字段值在importantFeatureIds数组中的要素
+        //         const filter = ['in', sourceNameMap[mapStore.getMap().getLayers()[0].source], importantFeatureIds];
+
+        //         // 使用setFilter应用过滤表达式
+        //         map.setFilter(keys[i], filter);
+        //     }
+        // }
+
+
+    } else {
+        if (data.active) {
+            data.active = false
+            //移除
+            let map = mapStore.getMap()
+            if (node.level == 2) { // layerGroup 级别
+                let selectedLayerGroupID = data.label
+                sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
+                sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].hideLayer()
+                sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = false
+
+            } else if (node.level == 1) {
+                let selectedSceneID = data.label
+                sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
+                sceneStore.SCENEMAP.value[selectedSceneID].hideScene()
+                sceneStore.SCENEMAP.value[selectedSceneID].active = false
+                for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+                    dataSource.value[sceneDict[selectedSceneID]].children[i].active = false
+                }
+            }
+            const highlightLayer = useHighlightLayerStore().highlightLayers
+            for (let i = 0; i < highlightLayer.length; i++) {
+                map.getLayer(highlightLayer[i]) &&
+                    map.removeLayer(highlightLayer[i])
+            }
+            return
+        }
+        else {
+            data.active = true
+            // 添加
+            let map = mapStore.getMap()
+            if (node.level == 2) { // layerGroup 级别
+                let selectedLayerGroupID = data.label
+                sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
+                sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
+                sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
+                sceneStore.latestLayerGroup = selectedLayerGroupID
+
+                // sceneStore.latestLayerGroup.value = data.label
+
+            } else if (node.level == 1) {
+                let selectedSceneID = data.label
+                sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
+                sceneStore.SCENEMAP.value[selectedSceneID].showScene()
+                sceneStore.SCENEMAP.value[selectedSceneID].active = true
+                for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+                    dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
+                }
+                sceneStore.latestScene = selectedSceneID
             }
         }
-        const highlightLayer = useHighlightLayerStore().highlightLayers
-        for (let i = 0; i < highlightLayer.length; i++) {
-            map.getLayer(highlightLayer[i]) &&
-                map.removeLayer(highlightLayer[i])
-        }
-        return
-    }
-    else {
-        data.active = true
-        // 添加
-        let map = mapStore.getMap()
-        if (node.level == 2) { // layerGroup 级别
-            let selectedLayerGroupID = data.label
-            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
-            sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
-            sceneStore.latestLayerGroup = selectedLayerGroupID
 
-            // sceneStore.latestLayerGroup.value = data.label
-
-        } else if (node.level == 1) {
-            let selectedSceneID = data.label
-            sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
-            sceneStore.SCENEMAP.value[selectedSceneID].showScene()
-            sceneStore.SCENEMAP.value[selectedSceneID].active = true
-            for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-                dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
-            }
-            sceneStore.latestScene = selectedSceneID
-        }
     }
+
+
+
+
 
 
 

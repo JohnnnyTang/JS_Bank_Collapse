@@ -42,7 +42,7 @@
                         <span class="custom-tree-node">
                             <span class="text">{{ node.label }}</span>
                             <el-button type="primary" plain
-                                v-if="node.isLeaf && node.label != '江堤港堤' && node.label != '里程桩'"
+                                v-if="node.isLeaf && node.label != '长江干堤' && node.label != '里程桩'"
                                 @click="detailClickHandler(node, data)">查看详情</el-button>
                             <!-- <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button> -->
                         </span>
@@ -139,13 +139,13 @@ const LGroupsTagClickHandler = async (i) => {
     setTimeout(async () => {
         LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
         // console.log(LGroups[i]);
-        if (LGroups.value[i] === '江堤港堤') {
-            let featArray1 = await getLayerFeatureArray(mapStore.getMap(), '江堤港堤')
+        if (LGroups.value[i] === '长江干堤') {
+            let featArray1 = await getLayerFeatureArray(mapStore.getMap(), '长江干堤')
             let featArray2 = await getLayerFeatureArray(mapStore.getMap(), '里程桩')
 
             if (LGroupsTagChecked.value[i]) {
                 let treeNode1 = {
-                    label: '江堤港堤', children: []
+                    label: '长江干堤', children: []
                 }
                 let treeNode2 = {
                     label: '里程桩', children: []
