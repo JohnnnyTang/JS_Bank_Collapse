@@ -1,9 +1,17 @@
+const fix2OrNull = (value) => {
+    if (value === null) {
+        return null
+    } else {
+        return value.toFixed(2)
+    }
+}
+
 /**
  *
  * @param {any} echarts
- * @param {number[]} erosion
+ * @param {number[]} flowspeed
  */
-export const drawFlowspeedGraph = (echarts, erosion) => {
+export const drawFlowspeedGraph = (echarts, flowspeed) => {
     const option = {
         backgroundColor: "rgba(220, 250, 248, 0.3)",
         tooltip: {
@@ -17,9 +25,9 @@ export const drawFlowspeedGraph = (echarts, erosion) => {
         },
         grid: [
             {
-                top: '12%',
+                top: '15%',
                 height: '75%',
-                width: '80%',
+                width: '85%',
                 show: true,
             }
         ],
@@ -31,7 +39,7 @@ export const drawFlowspeedGraph = (echarts, erosion) => {
         xAxis: [
             {
               type: 'category',
-              data: erosion.map((_, index) => `断面${index + 1}`),
+              data: flowspeed.map((_, index) => `断面${index + 1}`),
               axisLine:{
                 lineStyle:{
                     color:'black'
@@ -41,6 +49,9 @@ export const drawFlowspeedGraph = (echarts, erosion) => {
         ],
         yAxis: [
             {
+              name: "单位：m/s",
+              max: 3,
+              min: 0,
               type: 'value',
               axisLine:{
                 lineStyle:{
@@ -53,7 +64,7 @@ export const drawFlowspeedGraph = (echarts, erosion) => {
             {
               name: '流速',
               type: 'line',
-              data: erosion
+              data: flowspeed
             }
         ],
     }
@@ -124,11 +135,13 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
             {
                 top: '10%',
                 height: '40%',
+                width: '78%',
                 show: true,
             },
             {
                 top: '58%',
                 height: '35%',
+                width: '78%',
                 show: true,
             },
         ],
@@ -159,6 +172,7 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                   }
             },
             {
+                name: '单位: m',
                 gridIndex: 1,
                 type: 'category',
                 data: ratePoints.map((_, index) => index * 5),
@@ -179,8 +193,8 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                     show: false,
                 },
                 scale: true,
-                max: Math.round(max + 1),
-                min: Math.round(min - 1),
+                max: 8,
+                min: -40,
                 axisLine:{
                     lineStyle:{
                         color:'black'
@@ -209,13 +223,7 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                 name: '当前横截面',
                 type: 'line',
                 smooth: true,
-                data: after.map((value) => value.toFixed(2)),
-            },
-            {
-                name: '对比横截面',
-                type: 'line',
-                smooth: true,
-                data: before.map((value) => value.toFixed(2)),
+                data: after.map((value) => fix2OrNull(value)),
                 lineStyle: {
                     color: '#ff7070',
                 },
@@ -224,10 +232,16 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
                 },
             },
             {
+                name: '对比横截面',
+                type: 'line',
+                smooth: true,
+                data: before.map((value) => fix2OrNull(value)),
+            },
+            {
                 name: '坡比',
                 type: 'bar',
                 smooth: true,
-                data: ratePoints.map((value) => value.toFixed(4)),
+                data: ratePoints.map((value) => fix2OrNull(value)),
                 yAxisIndex: 1,
                 xAxisIndex: 1,
                 barCategoryGap: '0%',
@@ -276,17 +290,18 @@ export const drawErosionGraph = (echarts, erosion) => {
             {
                 top: '12%',
                 height: '75%',
-                width: '80%',
+                width: '78%',
                 show: true,
             }
         ],
         legend: {
-            data: ['流速'],
+            data: ['冲淤'],
             right: '10%',
             top: '4%',
         },
         xAxis: [
             {
+                name: '单位: m',
                 type: 'category',
                 data: erosion.map((_, index) => index * 5),
                 position: 'bottom',
@@ -312,7 +327,7 @@ export const drawErosionGraph = (echarts, erosion) => {
         ],
         series: [
             {
-              name: '流速',
+              name: '冲淤',
               type: 'line',
               data: erosion
             }
