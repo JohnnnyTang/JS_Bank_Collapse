@@ -6,9 +6,21 @@
             <div class="model-item-container">
                 <div class="model-choice">
                     <div class="basemap-radio-container">
-                        <input type="radio" id="radio-1" name="tabs" :checked="checky1" @click="radio1Click()" />
+                        <input
+                            type="radio"
+                            id="radio-1"
+                            name="tabs"
+                            :checked="checky1"
+                            @click="radio1Click()"
+                        />
                         <label class="tab" for="radio-1">近岸动力分析</label>
-                        <input type="radio" id="radio-2" name="tabs" :checked="checky2" @click="radio2Click()" />
+                        <input
+                            type="radio"
+                            id="radio-2"
+                            name="tabs"
+                            :checked="checky2"
+                            @click="radio2Click()"
+                        />
                         <label class="tab" for="radio-2">近岸演变分析</label>
                         <span class="glider"></span>
                     </div>
@@ -20,8 +32,12 @@
                             <div class="title-text">{{ title1 }}</div>
                         </div>
                         <div class="buttons">
-                            <div class="button" v-for="(item, index) in buttons" :key="index"
-                                @click="handleClick(index)">
+                            <div
+                                class="button"
+                                v-for="(item, index) in buttons"
+                                :key="index"
+                                @click="handleClick(index)"
+                            >
                                 <div>{{ item }}</div>
                             </div>
                         </div>
@@ -32,22 +48,42 @@
                             <div class="title-text">数据面板</div>
                         </div>
                         <div class="dp-content">
-                            <el-tree style="
-                                    max-width: 600px;
-                                    max-height: 260px;
+                            <el-tree
+                                style="
+                                    max-height: 28vh;
                                     overflow: auto;
-                                " :data="data" :props="defaultProps" @node-contextmenu="handleNodeClick"
-                                node-key="nodeID">
+                                "
+                                :data="data"
+                                :props="defaultProps"
+                                @node-contextmenu="handleNodeClick"
+                                node-key="nodeID"
+                            >
                                 <template #default="{ node, data }">
-                                    <div class="custom-tree-node" style="width: 100%">
-                                        <el-dropdown @command="handleNodeCommand" trigger="contextmenu"
-                                            placement="bottom-end" style="width: 100%">
-                                            <div class="el-dropdown-link" style="width: 100%">
+                                    <div
+                                        class="custom-tree-node"
+                                        style="width: 100%"
+                                    >
+                                        <el-dropdown
+                                            @command="handleNodeCommand"
+                                            trigger="contextmenu"
+                                            placement="bottom-end"
+                                            style="width: 100%"
+                                        >
+                                            <div
+                                                class="el-dropdown-link"
+                                                style="width: 100%"
+                                            >
                                                 {{ node.label }}
                                             </div>
-                                            <template #dropdown v-if="data.nodeID">
+                                            <template
+                                                #dropdown
+                                                v-if="data.nodeID"
+                                            >
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item command="add">添加至图层</el-dropdown-item>
+                                                    <el-dropdown-item
+                                                        command="add"
+                                                        >添加至图层</el-dropdown-item
+                                                    >
                                                 </el-dropdown-menu>
                                             </template>
                                         </el-dropdown>
@@ -63,9 +99,17 @@
                         </div>
                         <div class="lp-content">
                             <div class="checkBox">
-                                <el-checkbox-group v-model="checkedlayers" @change="handleCheckedlayersChange">
-                                    <el-checkbox v-for="city in layers" :key="city" :label="city" :value="city">{{ city
-                                        }}</el-checkbox>
+                                <el-checkbox-group
+                                    v-model="checkedlayers"
+                                    @change="handleCheckedlayersChange"
+                                >
+                                    <el-checkbox
+                                        v-for="city in layers"
+                                        :key="city"
+                                        :label="city"
+                                        :value="city"
+                                        >{{ city }}</el-checkbox
+                                    >
                                 </el-checkbox-group>
                             </div>
                         </div>
@@ -78,32 +122,69 @@
                             <div class="title-text">数据面板</div>
                         </div>
                         <div class="dp-content" style="height: 32vh">
-                            <el-tree style="max-width: 600px" :data="evolutionTreeData" :props="defaultProps"
-                                @node-contextmenu="handleEvolutionTreeClick" node-key="nodeID">
+                            <el-tree
+                                style="max-width: 600px"
+                                :data="evolutionTreeData"
+                                :props="defaultProps"
+                                @node-contextmenu="handleEvolutionTreeClick"
+                                node-key="nodeID"
+                            >
                                 <template #default="{ node, data }">
-                                    <div class="evolution-tree-node" style="width: 100%">
-                                        <el-dropdown @command="handleEvolutionTreeCommand
-                                            " trigger="contextmenu" placement="bottom-end" style="width: 100%">
-                                            <div class="el-dropdown-link" style="width: 100%">
+                                    <div
+                                        class="evolution-tree-node"
+                                        style="width: 100%"
+                                    >
+                                        <el-dropdown
+                                            @command="
+                                                handleEvolutionTreeCommand
+                                            "
+                                            trigger="contextmenu"
+                                            placement="bottom-end"
+                                            style="width: 100%"
+                                        >
+                                            <div
+                                                class="el-dropdown-link"
+                                                style="width: 100%"
+                                            >
                                                 {{ node.label }}
                                             </div>
-                                            <template #dropdown v-if="data.type === 'dem' ||
-                                                data.type ===
-                                                'section-geojson'
-                                                ">
+                                            <template
+                                                #dropdown
+                                                v-if="
+                                                    data.type === 'dem' ||
+                                                    data.type ===
+                                                        'section-geojson'
+                                                "
+                                            >
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item command="layer">添加至图层</el-dropdown-item>
-                                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                                    <el-dropdown-item
+                                                        command="layer"
+                                                        >添加至图层</el-dropdown-item
+                                                    >
+                                                    <el-dropdown-item
+                                                        command="delete"
+                                                        >删除</el-dropdown-item
+                                                    >
                                                 </el-dropdown-menu>
                                             </template>
-                                            <template #dropdown v-if="data.type &&
-                                                data.type !== 'dem' &&
-                                                data.type !==
-                                                'section-geojson'
-                                                ">
+                                            <template
+                                                #dropdown
+                                                v-if="
+                                                    data.type &&
+                                                    data.type !== 'dem' &&
+                                                    data.type !==
+                                                        'section-geojson'
+                                                "
+                                            >
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item command="visualize">可视化</el-dropdown-item>
-                                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                                    <el-dropdown-item
+                                                        command="visualize"
+                                                        >可视化</el-dropdown-item
+                                                    >
+                                                    <el-dropdown-item
+                                                        command="delete"
+                                                        >删除</el-dropdown-item
+                                                    >
                                                 </el-dropdown-menu>
                                             </template>
                                         </el-dropdown>
@@ -118,19 +199,40 @@
                             <div class="title-text">图层面板</div>
                         </div>
                         <div class="dp-content" style="height: 32vh">
-                            <el-tree style="max-width: 600px" :data="evolutionLayerData" :props="defaultProps"
-                                @node-contextmenu="handleEvolutionLayerClick" node-key="nodeID" show-checkbox
-                                @check-change="handleEvolutionLayerCheckChange">
+                            <el-tree
+                                style="max-width: 600px"
+                                :data="evolutionLayerData"
+                                :props="defaultProps"
+                                @node-contextmenu="handleEvolutionLayerClick"
+                                node-key="nodeID"
+                                show-checkbox
+                                @check-change="handleEvolutionLayerCheckChange"
+                            >
                                 <template #default="{ node, data }">
-                                    <div class="evolution-tree-node" style="width: 100%">
-                                        <el-dropdown @command="handleEvolutionLayerCommand
-                                            " trigger="contextmenu" placement="bottom-end" style="width: 100%">
-                                            <div class="el-dropdown-link" style="width: 100%">
+                                    <div
+                                        class="evolution-tree-node"
+                                        style="width: 100%"
+                                    >
+                                        <el-dropdown
+                                            @command="
+                                                handleEvolutionLayerCommand
+                                            "
+                                            trigger="contextmenu"
+                                            placement="bottom-end"
+                                            style="width: 100%"
+                                        >
+                                            <div
+                                                class="el-dropdown-link"
+                                                style="width: 100%"
+                                            >
                                                 {{ node.label }}
                                             </div>
                                             <template #dropdown>
                                                 <el-dropdown-menu>
-                                                    <el-dropdown-item command="delete">删除图层</el-dropdown-item>
+                                                    <el-dropdown-item
+                                                        command="delete"
+                                                        >删除图层</el-dropdown-item
+                                                    >
                                                 </el-dropdown-menu>
                                             </template>
                                         </el-dropdown>
@@ -141,12 +243,25 @@
                     </div>
                 </div>
             </div>
-            <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh" :before-close="sectionConfirmClose">
-                <el-input v-model="sectionConfirmInput" style="width: 240px" placeholder="请输入断面名称" />
+            <el-dialog
+                v-model="sectionConfirmShow"
+                title="绘制断面确认"
+                width="40vh"
+                :before-close="sectionConfirmClose"
+            >
+                <el-input
+                    v-model="sectionConfirmInput"
+                    style="width: 240px"
+                    placeholder="请输入断面名称"
+                />
                 <template #footer>
                     <div class="dialog-footer">
                         <el-button @click="cancelSection">取消</el-button>
-                        <el-button type="primary" @click="confirmSection" :disabled="!sectionConfirmInput.length">
+                        <el-button
+                            type="primary"
+                            @click="confirmSection"
+                            :disabled="!sectionConfirmInput.length"
+                        >
                             确认
                         </el-button>
                     </div>
@@ -158,33 +273,58 @@
                     <canvas id="GPUFrame"></canvas>
                 </div>
                 <div class="model-tooltip-container">
-                    <el-button type="primary" @click="handleRunModelClick" color="#2e8cd9"
-                        v-if="showAnalysis">演变分析计算</el-button>
+                    <div
+                        class="showAnalysisButton"
+                        v-if="showAnalysis"
+                        @click="handleRunModelClick"
+                    >
+                        演变分析计算
+                    </div>
                 </div>
                 <div class="model-container" v-if="isModelPanelShow">
                     <div style="font-size: large; padding-bottom: 16px">
                         近岸演变分析模型
                     </div>
                     <div class="model-list">
-                        <el-card style="height: 300px; object-fit: cover;">
-                            <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                                class="image" style="margin-left: 0;margin-right: 0;">
-                            <div style="padding:4px 0px;">
-                                <el-button @click="handleSelectModelClick('section-graph')">断面形态</el-button>
+                        <el-card style="height: 300px; object-fit: cover">
+                            <img
+                                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                                class="image"
+                                style="margin-left: 0; margin-right: 0"
+                            />
+                            <div style="padding: 4px 0px">
+                                <el-button
+                                    @click="
+                                        handleSelectModelClick('section-graph')
+                                    "
+                                    >断面形态</el-button
+                                >
                             </div>
                         </el-card>
-                        <el-card style="height: 300px; object-fit: cover;">
-                            <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                                class="image" style="margin-left: 0;margin-right: 0;">
-                            <div style="padding:4px 0px;">
-                                <el-button @click="handleSelectModelClick('rate')">断面坡比</el-button>
+                        <el-card style="height: 300px; object-fit: cover">
+                            <img
+                                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                                class="image"
+                                style="margin-left: 0; margin-right: 0"
+                            />
+                            <div style="padding: 4px 0px">
+                                <el-button
+                                    @click="handleSelectModelClick('rate')"
+                                    >断面坡比</el-button
+                                >
                             </div>
                         </el-card>
-                        <el-card style="height: 300px; object-fit: cover;">
-                            <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-                                class="image" style="margin-left: 0;margin-right: 0;">
-                            <div style="padding:4px 0px;">
-                                <el-button @click="handleSelectModelClick('chongyu')">断面冲淤</el-button>
+                        <el-card style="height: 300px; object-fit: cover">
+                            <img
+                                src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                                class="image"
+                                style="margin-left: 0; margin-right: 0"
+                            />
+                            <div style="padding: 4px 0px">
+                                <el-button
+                                    @click="handleSelectModelClick('chongyu')"
+                                    >断面冲淤</el-button
+                                >
                             </div>
                         </el-card>
                     </div>
@@ -193,31 +333,55 @@
                     <div style="font-size: large; padding-bottom: 16px">
                         模型参数设置
                     </div>
-                    <el-form ref="paramsRef" :rules="rules" :model="paramsInfo" label-width="auto" style="width: 600px">
+                    <el-form
+                        ref="paramsRef"
+                        :rules="rules"
+                        :model="paramsInfo"
+                        label-width="auto"
+                        style="width: 600px"
+                    >
                         <el-form-item label="结果名称" prop="name">
                             <el-input v-model="paramsInfo.name" />
                         </el-form-item>
                         <el-form-item label="地形断面" prop="section">
                             <el-select v-model="paramsInfo.section">
-                                <el-option v-for="item in sectionList" :key="item.label" :label="item.label"
-                                    :value="item.nodeID" />
+                                <el-option
+                                    v-for="item in sectionList"
+                                    :key="item.label"
+                                    :label="item.label"
+                                    :value="item.nodeID"
+                                />
                             </el-select>
                         </el-form-item>
                         <el-form-item label="当前地形数据" prop="date">
                             <el-select v-model="paramsInfo.date">
-                                <el-option v-for="item in demList" :key="item.label" :label="item.label"
-                                    :value="item.nodeID" />
+                                <el-option
+                                    v-for="item in demList"
+                                    :key="item.label"
+                                    :label="item.label"
+                                    :value="item.nodeID"
+                                />
                             </el-select>
                         </el-form-item>
                         <el-form-item label="对比地形数据" prop="beforeDate">
                             <el-select v-model="paramsInfo.beforeDate">
-                                <el-option v-for="item in demList" :key="item.label" :label="item.label"
-                                    :value="item.nodeID" />
+                                <el-option
+                                    v-for="item in demList"
+                                    :key="item.label"
+                                    :label="item.label"
+                                    :value="item.nodeID"
+                                />
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="runModel(paramsRef, modelType)">运行模型</el-button>
-                            <el-button @click="handleCancelParams(paramsRef)">取消</el-button>
+                            <el-button
+                                type="primary"
+                                @click="runModel(paramsRef, modelType)"
+                                >运行模型</el-button
+                            >
+                            <el-button @click="handleCancelParams(paramsRef)"
+                                >取消</el-button
+                            >
                         </el-form-item>
                     </el-form>
                 </div>
@@ -227,12 +391,22 @@
                     <div ref="echartRef" class="chart"></div>
                 </div>
 
-                <HydrologicalCondition v-if="showHyCondition" v-on:close="showHyCondition = !showHyCondition"
-                    v-on:condition="conditionHandler">
+                <HydrologicalCondition
+                    v-if="showHyCondition"
+                    v-on:close="showHyCondition = !showHyCondition"
+                    v-on:condition="conditionHandler"
+                >
                 </HydrologicalCondition>
-                <SetParameter v-if="showStParams" v-on:close="showStParams = !showStParams" v-on:params="paramsHandler">
+                <SetParameter
+                    v-if="showStParams"
+                    v-on:close="showStParams = !showStParams"
+                    v-on:params="paramsHandler"
+                >
                 </SetParameter>
-                <ModelStatus v-if="showModelStatus" v-on:close="showModelStatus = !showModelStatus"></ModelStatus>
+                <ModelStatus
+                    v-if="showModelStatus"
+                    v-on:close="showModelStatus = !showModelStatus"
+                ></ModelStatus>
             </div>
         </div>
     </div>
@@ -252,7 +426,13 @@ import ModelStatus from '../stability-sub/ModelStatus.vue'
 import { ElMessage } from 'element-plus'
 import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
 import { useStabilityStore } from '../../../store/stabilityStore.js'
-import { addLineToMap, convertToMercator, deleteLineFromMap, drawChongyuSectionGraph, hideLayer } from '../stability-sub/util.js'
+import {
+    addLineToMap,
+    convertToMercator,
+    deleteLineFromMap,
+    drawChongyuSectionGraph,
+    hideLayer,
+} from '../stability-sub/util.js'
 import {
     demoJson,
     drawRateGraph,
@@ -283,6 +463,7 @@ const radio2Click = () => {
     showAnalysis.value = true
     checky2.value = true
     checky1.value = false
+    showModelStatus.value = false
 }
 
 const mapContainerRef = ref()
@@ -329,6 +510,7 @@ const handleClick = (index) => {
                     clearInterval(id)
                 }
             }, 3000)
+            showModelStatus.value = true
             break
         case 3:
             showModelStatus.value = true
@@ -606,7 +788,7 @@ const handleEvolutionTreeCommand = (command) => {
                 drawSectionGraph(
                     chart,
                     sectionPoints.map((value) => value[2]),
-                    beforeSectionPoints.map((value) => value[2])
+                    beforeSectionPoints.map((value) => value[2]),
                 )
                 chart.resize()
             }, 1)
@@ -621,12 +803,15 @@ const handleEvolutionTreeCommand = (command) => {
                     json.SA[2],
                 )
                 chart.resize()
-            }, 1);
+            }, 1)
         } else if (type === 'chongyu') {
             setTimeout(() => {
                 const sectionPoints = json.section
                 const beforeSectionPoints = json.beforeSection
-                const length = Math.min(sectionPoints.length, beforeSectionPoints.length)
+                const length = Math.min(
+                    sectionPoints.length,
+                    beforeSectionPoints.length,
+                )
                 const result = []
                 sectionPoints.some((value, index) => {
                     if (index >= length) {
@@ -635,10 +820,7 @@ const handleEvolutionTreeCommand = (command) => {
                     result.push(value[2] - beforeSectionPoints[index][2])
                 })
                 console.log(result)
-                drawChongyuSectionGraph(
-                    chart,
-                    result
-                )
+                drawChongyuSectionGraph(chart, result)
                 chart.resize()
             }, 1)
         }
@@ -667,7 +849,6 @@ const handleEvolutionLayerCommand = (command) => {
             hideLayer(map, selectedEvolutionNode.value.nodeID)
             deleteLineFromMap(map, selectedEvolutionNode.value.nodeID)
         }
-
     }
 }
 const handleEvolutionLayerCheckChange = (data, checked) => {
@@ -677,12 +858,16 @@ const handleEvolutionLayerCheckChange = (data, checked) => {
         if (data.type === 'section-geojson') {
             const coord = sectionInfo.value[data.nodeID]
             addLineToMap(map, coord[0], coord[1], data.nodeID)
-            console.log(map.getLayoutProperty(`${data.nodeID}-layer`, "visibility"))
+            console.log(
+                map.getLayoutProperty(`${data.nodeID}-layer`, 'visibility'),
+            )
         }
     } else {
         if (data.type === 'section-geojson') {
             hideLayer(map, data.nodeID)
-            console.log(map.getLayoutProperty(`${data.nodeID}-layer`, "visibility"))
+            console.log(
+                map.getLayoutProperty(`${data.nodeID}-layer`, 'visibility'),
+            )
         }
     }
 }
@@ -777,7 +962,7 @@ const currentSectionID = ref()
 const sectionDrawShow = ref(false)
 const sectionConfirmShow = ref(false)
 const sectionConfirmInput = ref('')
-const sectionConfirmClose = () => { }
+const sectionConfirmClose = () => {}
 const cancelSection = () => {
     sectionConfirmShow.value = false
     draw.deleteAll()
@@ -920,7 +1105,10 @@ onMounted(async () => {
         let endWebMerCoord = convertToMercator(
             lineFeature.geometry.coordinates[1],
         )
-        sectionInfo.value[currentSectionID.value] = [startWebMerCoord, endWebMerCoord]
+        sectionInfo.value[currentSectionID.value] = [
+            startWebMerCoord,
+            endWebMerCoord,
+        ]
     })
     globalMap = map
     map.addLayer(flow)
@@ -969,9 +1157,11 @@ div.model-content-container {
             .el-popper.is-customized {
                 z-index: 3;
                 padding: 6px 12px;
-                background: linear-gradient(90deg,
-                        rgb(179, 255, 171),
-                        rgb(204, 229, 129));
+                background: linear-gradient(
+                    90deg,
+                    rgb(179, 255, 171),
+                    rgb(204, 229, 129)
+                );
             }
 
             .el-popper.is-customized .el-popper__arrow::before {
@@ -1047,7 +1237,7 @@ div.model-content-container {
 
                 input[type='radio'] {
                     &:checked {
-                        &+label {
+                        & + label {
                             color: #185ee0;
                         }
                     }
@@ -1055,7 +1245,7 @@ div.model-content-container {
 
                 input[id='radio-1'] {
                     &:checked {
-                        &~.glider {
+                        & ~ .glider {
                             transform: translateX(0);
                         }
                     }
@@ -1063,7 +1253,7 @@ div.model-content-container {
 
                 input[id='radio-2'] {
                     &:checked {
-                        &~.glider {
+                        & ~ .glider {
                             transform: translateX(100%);
                         }
                     }
@@ -1071,7 +1261,7 @@ div.model-content-container {
 
                 input[id='radio-3'] {
                     &:checked {
-                        &~.glider {
+                        & ~ .glider {
                             transform: translateX(200%);
                         }
                     }
@@ -1115,9 +1305,11 @@ div.model-content-container {
             div.title {
                 height: 5vh;
                 width: 100%;
-                background: linear-gradient(90deg,
-                        rgb(187, 239, 248),
-                        rgb(29, 128, 214));
+                background: linear-gradient(
+                    90deg,
+                    rgb(187, 239, 248),
+                    rgb(29, 128, 214)
+                );
                 display: flex;
                 flex-direction: row;
                 justify-content: center;
@@ -1311,10 +1503,35 @@ div.model-content-container {
     }
 
     div.model-tooltip-container {
-        top: 16px;
-        left: 16px;
+        top: 1vh;
+        left: 1vw;
         z-index: 10;
         position: absolute;
+
+        div.showAnalysisButton {
+            width: 8vw;
+            height: 4vh;
+            line-height: 4vh;
+
+            background-color: #0642b1;
+            text-align: center;
+            font-size: calc(0.6vw + 0.5vh);
+            font-weight: bold;
+            color: #d8f0f8;
+            border-radius: 4px;
+            box-shadow:
+                rgba(0, 132, 255, 0.8) 1px 1px,
+                rgba(0, 119, 255, 0.7) 2px 2px,
+                rgba(0, 119, 255, 0.6) 3px 3px;
+            transition: all 0.1s ease-in-out;
+
+            &:hover {
+                cursor: pointer;
+                transform: translate3d(2px, 2px, 2px);
+                font-weight: bold;
+                box-shadow: rgba(0, 132, 255, 0.8) 1px 1px;
+            }
+        }
     }
 
     div.model-container {
