@@ -425,7 +425,7 @@ def computeSaIndex(
     selectedLSet: list = []
     selectedZSet: list = []
 
-    for i in range(0, totalNum, 10):
+    for i in range(0, totalNum, 4):
         selectedLSet.append(i)
         selectedZSet.append(Z[i])
     if selectedLSet[-1] != totalNum - 1:

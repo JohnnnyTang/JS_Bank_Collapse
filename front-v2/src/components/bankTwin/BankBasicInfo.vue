@@ -20,11 +20,11 @@
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">布设监测设备：</div>
-                    <div class="val-text">41台</div>
+                    <div class="val-text">32台</div>
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">持续监测时间：</div>
-                    <div class="val-text">12天</div>
+                    <div class="val-text">{{ distanceOpenTime('2024-04-20') }}</div>
                 </div>
             </div>
         </e-border-box-3>
@@ -33,6 +33,31 @@
 
 <script setup>
 import { EBorderBox3 } from 'e-datav-vue3'
+
+function distanceOpenTime(showTime) {
+//   let timer = showTime
+
+  const currentTime = new Date()
+  const targetTime = new Date(showTime)
+
+  // 计算时间差（以毫秒为单位）
+  const timeDiff = currentTime.getTime() - targetTime.getTime()
+
+  // 将时间差转换为小时、分钟和秒数
+  const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+//   const hours = Math.floor(timeDiff / (1000 * 60 * 60) % 24)
+//   const minutes = Math.floor((timeDiff / (1000 * 60)) % 60)
+//   const seconds = Math.floor((timeDiff / 1000) % 60)
+
+//   let ret = `${days} 天 ${hours} 小时 ${minutes} 分`
+  let ret = `${days} 天`
+
+  return ret
+}
+
+
+
+
 </script>
 
 <style lang="scss" scoped>

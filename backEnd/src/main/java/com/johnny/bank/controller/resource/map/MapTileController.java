@@ -90,7 +90,32 @@ public class MapTileController {
             value = "/raster/mzs/{year}/{tide}/{x}/{y}/{z}",
             method = RequestMethod.GET
     )
-    public @ResponseBody byte[] getRasterTiles(@PathVariable String year, @PathVariable String tide,@PathVariable String x, @PathVariable String y, @PathVariable String z) throws Exception {
+    public @ResponseBody byte[] getRasterTiles(
+            @PathVariable String year, @PathVariable String tide,
+            @PathVariable String x, @PathVariable String y, @PathVariable String z
+    ) throws Exception {
         return rasterTileService.getMXZRasterInByte(year, tide, Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
+    }
+
+    @CrossOrigin
+    @RequestMapping(
+            value = "/raster/river/{name}/{x}/{y}/{z}",
+            method = RequestMethod.GET
+    )
+    public @ResponseBody byte[] getRiverRasterTiles(
+            @PathVariable String name, @PathVariable String x, @PathVariable String y, @PathVariable String z
+    ) throws Exception {
+        return rasterTileService.getRiverRasterInByte(name, Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
+    }
+
+    @CrossOrigin
+    @RequestMapping(
+            value = "/raster/mzs/flood/{name}/{x}/{y}/{z}",
+            method = RequestMethod.GET
+    )
+    public @ResponseBody byte[] getMzsFloodRasterTiles(
+            @PathVariable String name, @PathVariable String x, @PathVariable String y, @PathVariable String z
+    ) throws Exception {
+        return rasterTileService.getMzsFloodRasterInByte(name, Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
     }
 }

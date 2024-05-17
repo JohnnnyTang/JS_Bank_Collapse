@@ -7,7 +7,7 @@
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div>
                 <div class="place selector-content">
-                    <el-select v-model="placeValue" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
+                    <el-select class="side" v-model="placeValue" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
                         @change="sceneSelectChange" popper-class="risk-popper">
                         <el-option v-for="item in placeList" :key="item.value" :label="item.label" :value="item.value">
                             <span class="section-name-text">{{
@@ -18,10 +18,11 @@
                 </div>
             </div>
             <div class="scene-selector-container selector-item-container">
-                <div class="scene-title selector-title">评估情景：</div>
-                <div class="scene selector-content">
-                    <el-select v-model="sceneValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
-                        @change="sceneSelectChange" popper-class="risk-popper">
+                <!-- <div class="scene-title selector-title">评估情景：</div> -->
+                <div class="before-scene-title selector-title">对比截面:</div>
+                <div class="before-scene selector-content">
+                    <el-select class="before" v-model="sceneBeforeValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
+                        @change="sceneBeforeSelectChange" popper-class="risk-popper">
                         <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
                             <span style="float: left" class="section-name-text">{{ item.place }}</span>
                             <span style="float: right" class="section-class-text">{{ item.year }}</span>
@@ -31,6 +32,19 @@
                         </template>
                     </el-select>
                 </div>
+                <div class="now-scene-title selector-title">当前截面:</div>
+                <div class="now-scene selector-content">  
+                    <el-select class="now" v-model="sceneNowValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
+                        @change="sceneNowSelectChange" popper-class="risk-popper">
+                        <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
+                            <span style="float: left" class="section-name-text">{{ item.place }}</span>
+                            <span style="float: right" class="section-class-text">{{ item.year }}</span>
+                        </el-option>
+                        <template #footer>
+                            <div class="add-select-button">新增评估情景</div>
+                        </template>
+                    </el-select>
+                </div>  
             </div>
         </div>
         <div class="riskInfo-container">
@@ -67,7 +81,7 @@
                 <div class="item-title">
                     近岸冲淤：
                 </div>
-                <div ref="flowGraphRef" class="erosion graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                <div ref="erosionGraphRef" class="erosion graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 <div class="graph-container erosion">
                     <div 
                         ref="erosionGraphRef"
@@ -78,32 +92,29 @@
                 </div>
             </div>
         </div>
-        <riskResultVue 
+        <riskResultVue
+            v-if="showComponent"
             :profileList="profileList"
         />
+        
+        <flowspeedInfoVue
+            v-if="showComponent"
+            :profileList="profileList"
+        />
+        
 
-        <div class="flow-relative-container">
-            <div class="flow-relative-title">
-                <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
-                    流场信息
-                </dv-border-box2>
+        <div class="flow-control-block">
+            <label class="switch">
+                <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
+                <span class="slider"></span>
+            </label>
+            <div class="text-block">
+                <div class="text">流场展示</div>
             </div>
+        </div>
 
-            <div class="flow-relative-content">
-                <div class="flow-control-block">
-                    <label class="switch">
-                        <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
-                        <span class="slider"></span>
-                    </label>
-                    <div class="text-block">
-                        <div class="text">流场展示</div>
-                    </div>
-                </div>
-
-                <div class="time-shower-block">
-                    <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
-                </div>
-            </div>
+        <div class="time-shower-block">
+            <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
         </div>
 
     </div>
@@ -117,6 +128,7 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
+import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 import { drawShapeGraph, drawErosionGraph } from '../components/bankRiskWarn/util.js'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
@@ -176,7 +188,9 @@ const mapJumpToRiver = (mapIns) => {
     // )
 }
 
-const sceneValue = ref('mzs2024')
+const sceneBeforeValue = ref('mzs2023')
+
+const sceneNowValue = ref('mzs2024')
 
 const scenceList = ref([
     {
@@ -203,7 +217,9 @@ const placeValue = ref('mzs')
 
 const placeList = ref([{ value: 'mzs', label: '民主沙右缘示范段' }])
 
-const sceneSelectChange = () => { }
+const sceneBeforeSelectChange = () => { }
+
+const sceneNowSelectChange = () => { }
 
 const onAddOption = () => { }
 
@@ -238,7 +254,7 @@ watch(
 
 
 )
-
+const showComponent = ref(false)
 let profileData = []
 const profileValue = ref(2)
 const profileList = ref([
@@ -247,6 +263,7 @@ const profileList = ref([
         label: '断面 JC01',
         name: 'JC01: 头部围堤',
         filter: ['==', 'name', 'JC01'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -254,6 +271,7 @@ const profileList = ref([
         label: '断面 JC02',
         name: 'JC02: 南顺堤',
         filter: ['==', 'name', 'JC02'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -261,6 +279,7 @@ const profileList = ref([
         label: '断面 JC03',
         name: 'JC03: 南顺堤尾部',
         filter: ['==', 'name', 'JC03'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -268,6 +287,7 @@ const profileList = ref([
         label: '断面 JC04',
         name: 'JC04: 江滩办事处',
         filter: ['==', 'name', 'JC04'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -275,6 +295,7 @@ const profileList = ref([
         label: '断面 JC05',
         name: 'JC05: 小港池',
         filter: ['==', 'name', 'JC05'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -282,6 +303,7 @@ const profileList = ref([
         label: '断面 JC06',
         name: 'JC06: 张靖皋桥位上游',
         filter: ['==', 'name', 'JC06'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -289,6 +311,7 @@ const profileList = ref([
         label: '断面 JC07',
         name: 'JC07: 张靖皋桥位下游',
         filter: ['==', 'name', 'JC07'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -296,6 +319,7 @@ const profileList = ref([
         label: '断面 JC08',
         name: 'JC08: 海事码头',
         filter: ['==', 'name', 'JC08'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -303,6 +327,7 @@ const profileList = ref([
         label: '断面 JC09',
         name: 'JC09: 海事码头下游',
         filter: ['==', 'name', 'JC09'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -310,6 +335,7 @@ const profileList = ref([
         label: '断面 JC10',
         name: 'JC10: 雷达站',
         filter: ['==', 'name', 'JC10'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -317,6 +343,7 @@ const profileList = ref([
         label: '断面 JC11',
         name: 'JC11: 民主沙尾部主路',
         filter: ['==', 'name', 'JC11'],
+        flowspeed:null,
         risk: null,
     },
     {
@@ -324,6 +351,7 @@ const profileList = ref([
         label: '断面 JC12',
         name: 'JC12: 民主沙尾',
         filter: ['==', 'name', 'JC12'],
+        flowspeed:null,
         risk: null,
     },
 ])
@@ -331,14 +359,13 @@ const profileList = ref([
 let shapeChart = null
 let erosionChart = null
 const shapeChartLoad = ref(true)
-const erosionChartLoad = ref(false)
+const erosionChartLoad = ref(true)
 const shapeGraphRef = ref(null)
 const erosionGraphRef = ref(null)
 let section;
 let beforesection;
 let slopeRate;
 let erosion;
-// let erosion = [2, 3, 5, 1, 2, 3, 5, 1, 6, 9, 11, 4]
 
 const profileSelectChange = (inputValue) => {
     profileValue.value = inputValue
@@ -346,13 +373,7 @@ const profileSelectChange = (inputValue) => {
     mapInstance.setFilter('mzsBankLineChoosen', profileList.value[profileValue.value-1].filter);
 }
 
-const changeProfileData = (profileData) => {
-    shapeChartLoad.value = true
-    erosionChartLoad.value = true
-    section = profileData[profileValue.value - 1].section.map((value) => value[2]),
-    beforesection = profileData[profileValue.value - 1].beforeSection.map((value) => value[2])
-    slopeRate = profileData[profileValue.value - 1].SA[2]
-    erosion = section.map((value, index) => value-beforesection[index])
+const DrawGraph = (section, beforesection, slopeRate, erosion) => {
     shapeChart = echarts.init(shapeGraphRef.value)
     drawShapeGraph(
         shapeChart,
@@ -367,6 +388,24 @@ const changeProfileData = (profileData) => {
         erosion
     )
     erosionChartLoad.value = false
+}
+
+const changeProfileData = (profileData) => {
+    shapeChartLoad.value = true
+    erosionChartLoad.value = true
+    try {
+        section = profileData[profileValue.value - 1].section.map((value) => {return value[2] < -999 ? null : value[2]}),
+        beforesection = profileData[profileValue.value - 1].beforeSection.map((value) => {return value[2] < -999 ? null : value[2]})
+        slopeRate = profileData[profileValue.value - 1].SA[2]
+        erosion = section.map((value, index) => {
+            if (value!==null && beforesection[index]!==null){
+                return value-beforesection[index]
+            } else { return null }})
+    } catch (error) {
+        DrawGraph([],[],[],[])
+        return false
+    }
+    DrawGraph(section, beforesection, slopeRate, erosion)
 }
 
 let mapInstance;
@@ -514,6 +553,17 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
         })
+        map.addSource('mapRasterTest', {
+            type: 'raster',
+            tiles: [
+                tileServer + '/tile/raster/mzs/flood/23092209/{x}/{y}/{z}',
+            ],
+            tileSize: 256,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.109, 31.823, 120.855, 32.102],
+        })
+         
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -613,6 +663,15 @@ onMounted(async () => {
             },
         })
 
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'mapRasterTest',
+            'paint': {
+
+            }
+        })
+
         useMapStore().setMap(map)
         console.log('set map!');
         flow.particleNum.n = 2800;
@@ -650,7 +709,13 @@ onMounted(async () => {
         } else {
             profileList.value[index].risk = 'high'
         }
+        try {
+            profileList.value[index].flowspeed = value.deepestPoint[2]
+        } catch (error){
+
+        }
     })
+    showComponent.value = true
     changeProfileData(profileData)
 })
 
@@ -668,7 +733,7 @@ div.risk-warn-container {
     left: 0;
     overflow: hidden;
 
-    background: rgb(68, 105, 138);
+    background: rgb(51, 51, 51);
 
     div.map-container {
         width: 100vw;
@@ -685,129 +750,88 @@ div.risk-warn-container {
         pointer-events: none;
     }
 
-    div.flow-relative-container {
+    div.flow-control-block {
         position: absolute;
-        top: 70vh;
-        right: 1vw;
-        height: 20vh;
-        width: 15vw;
-        border-radius: 8px;
-        border: #167aec 1px solid;
-        background-color: rgba(179, 201, 228, 0.6);
-        backdrop-filter: blur(5px);
-        z-index: 2;
+        top: 46vh;
+        right: 1.5vw;
+        height: 13vh;
+        width: 6vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        z-index:3;
 
-        div.flow-relative-title {
-            height: 4.5vh;
-            width: 15vw;
-            margin-top: 0.6vh;
-            line-height: 4.5vh;
-            border-radius: 6px;
-            // background-color: rgba(235, 240, 247, 0.4);
-            text-align: center;
-            font-family: 'Microsoft YaHei';
-            font-weight: bold;
-            font-size: calc(0.8vw + 0.8vh);
-            color: #0c60af;
-            text-shadow:
-                #eef3ff 1px 1px,
-                #eef3ff 2px 2px,
-                #6493ff 3px 3px;
+        .switch {
+            font-size: 20px;
+            position: relative;
+            display: inline-block;
+            width: 2em;
+            height: 3.5em;
+
+            input {
+                display: none;
+            }
+
+            /* The slider */
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgb(165, 219, 253);
+                transition: 0.4s;
+                border-radius: 10px;
+
+                &:before {
+                    position: absolute;
+                    content: "";
+                    height: 1.4em;
+                    width: 1.4em;
+                    border-radius: 5px;
+                    left: 0.3em;
+                    bottom: 0.3em;
+                    background-color: white;
+                    transition: 0.4s;
+                }
+            }
+
+            input:checked {
+                +.slider {
+                    background-color: rgb(73, 90, 250);
+                }
+
+                +.slider:before {
+                    transform: translateY(-1.5em);
+                }
+            }
+        }
+
+        .text-block {
+            font-size: 20px;
+            width: 3em;
+            height: 5em;
             display: flex;
             justify-content: center;
+            align-items: center;
 
-            :deep(.dv-border-box-2) {
-                width: 8vw;
-                height: 5vh;
+            .text {
+                writing-mode: vertical-lr;
+                color: rgb(0, 80, 166);
+                color-scheme: light;
+                font-family: 'Microsoft YaHei';
+                font-weight: 700;
+                user-select: none;
             }
         }
+    }
 
-        div.flow-relative-content {
-            margin-top: 1vh;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-evenly;
-
-            div.flow-control-block {
-                position: relative;
-                height: 13vh;
-                width: 6vw;
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-
-                .switch {
-                    font-size: 20px;
-                    position: relative;
-                    display: inline-block;
-                    width: 2em;
-                    height: 3.5em;
-
-                    input {
-                        display: none;
-                    }
-
-                    /* The slider */
-                    .slider {
-                        position: absolute;
-                        cursor: pointer;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background-color: rgb(165, 219, 253);
-                        transition: 0.4s;
-                        border-radius: 10px;
-
-                        &:before {
-                            position: absolute;
-                            content: "";
-                            height: 1.4em;
-                            width: 1.4em;
-                            border-radius: 5px;
-                            left: 0.3em;
-                            bottom: 0.3em;
-                            background-color: white;
-                            transition: 0.4s;
-                        }
-                    }
-
-                    input:checked {
-                        +.slider {
-                            background-color: rgb(73, 90, 250);
-                        }
-
-                        +.slider:before {
-                            transform: translateY(-1.5em);
-                        }
-                    }
-                }
-
-                .text-block {
-                    font-size: 20px;
-                    width: 3em;
-                    height: 5em;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    .text {
-                        writing-mode: vertical-lr;
-                        color: rgb(0, 80, 166);
-                        color-scheme: light;
-                        font-family: 'Microsoft YaHei';
-                        font-weight: 700;
-                        user-select: none;
-                    }
-                }
-            }
-
-            div.time-shower-block {
-                position: relative;
-            }
-        }
-
+    div.time-shower-block {
+        position: absolute;
+        top: 56.5vh;
+        right: 3vw;
     }
 
     div.selector-container {
@@ -839,24 +863,60 @@ div.risk-warn-container {
                 border-bottom: 2px solid #116cf5;
             }
 
+            &.scene-selector-container {
+                padding-left: 1vw;
+                padding-right: 0.5vw;
+            }
+
             div.selector-title {
-                letter-spacing: 0.3rem;
+                letter-spacing: 0rem;
                 width: 7vw;
+
+                &.before-scene-title {
+                    margin-top: 1.4vh;
+                    width: 3.5vw;
+                    height: 8vh;
+                    letter-spacing: 0rem;
+                    line-height: 2.5vh;
+                    font-size: calc(0.8vw + 0.4vh);
+                }
+
+                &.now-scene-title {
+                    margin-top: 1.4vh;
+                    margin-right: -1vw;
+                    width: 3.5vw;
+                    height: 8vh;
+                    letter-spacing: 0rem;
+                    line-height: 2.5vh;
+                    font-size: calc(0.8vw + 0.4vh);
+                }
             }
 
             div.selector-content {
-                width: 14vw;
+                width: 10vw;
                 height: 8vh;
 
                 // background-color: #466ca7;
-                :deep(.el-select) {
-                    width: 14vw !important;
+                :deep(.el-select) {  
                     height: 5vh !important;
                     box-shadow:
                         rgba(0, 132, 255, 0.8) 1px 1px,
                         rgba(0, 119, 255, 0.7) 2px 2px,
                         rgba(0, 119, 255, 0.6) 3px 3px;
                     border-radius: 6px;
+
+                    &.side {
+                        width: 14vw !important;
+                    }
+
+                    &.before {
+                        width: 7.8vw !important;
+                    }
+
+                    &.now {
+                        left: 1vw;
+                        width: 8vw !important;
+                    }
                 }
 
                 :deep(.el-select__wrapper) {
@@ -866,6 +926,15 @@ div.risk-warn-container {
                     font-family: 'Microsoft YaHei';
                     font-weight: bold;
                     font-size: calc(0.5vw + 0.8vh);
+                    background-color: #e6f7ff;
+                }
+                :deep(.el-select__wrapper.before) {
+                    height: 5vh;
+                    line-height: 5vh;
+                    border-radius: 6px;
+                    font-family: 'Microsoft YaHei';
+                    font-weight: bold;
+                    font-size: calc(0.5vw + 0.4vh);
                     background-color: #e6f7ff;
                 }
 
@@ -1016,9 +1085,9 @@ div.risk-warn-container {
 
             div.graph-container {
                 position: absolute;
-                width: 22vw;
+                width: 22.5vw;
                 top: 4vh;
-                left: 0.5vw;
+                left: 0.25vw;
 
                 &.shape {
                     height: 35vh;

@@ -23,9 +23,9 @@ public class TaskNodeController extends BaseNodeController<TaskNode> {
     }
 
     @PostMapping("start/multi/default/section/{id}")
-    public ResponseEntity<String> startDefaultMultiIndexTask(@PathVariable Integer id) throws Exception {
+    public ResponseEntity<String> startDefaultMultiIndexWithFixSectionTask(@PathVariable Integer id) throws Exception {
         String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
-                id, null, null
+                id, null, null, null, null
         );
         return ResponseEntity.ok(taskNodeId);
     }
@@ -35,7 +35,18 @@ public class TaskNodeController extends BaseNodeController<TaskNode> {
             @PathVariable Integer id, @PathVariable String begTime, @PathVariable String endTime
     ) throws Exception {
         String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
-                id, begTime, endTime
+                id, begTime, endTime, null, null
+        );
+        return ResponseEntity.ok(taskNodeId);
+    }
+
+    @PostMapping("start/multi/default")
+    public ResponseEntity<String> startDefaultMultiIndexTask(
+            @RequestParam String begTime, @RequestParam String endTime,
+            @RequestParam List<Double> startPt, @RequestParam List<Double> endPt
+    ) throws Exception {
+        String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
+                null, begTime, endTime, startPt, endPt
         );
         return ResponseEntity.ok(taskNodeId);
     }

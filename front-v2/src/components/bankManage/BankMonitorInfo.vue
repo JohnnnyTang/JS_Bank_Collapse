@@ -25,6 +25,7 @@ onBeforeRouteUpdate((to, from) => {
 onMounted(() => {
     // console.log(route.params)
     curPage.value = route.params.id
+    initDevice.value = route.fullPath.split("/").pop()
     // initDevice.value = curPage.value
 })
 </script>

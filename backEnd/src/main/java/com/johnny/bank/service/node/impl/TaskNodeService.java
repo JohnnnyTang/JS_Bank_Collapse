@@ -124,14 +124,24 @@ public class TaskNodeService extends NodeService<TaskNode> {
     }
 
     public String createAndStartSectionDefaultMultiIndexTask(
-            Integer sectionId, String beforeTime, String afterTime
+            Integer sectionId, String beforeTime, String afterTime,
+            List<Double> startPt, List<Double> endPt
     ) throws Exception {
-        // TODO: validate time format
         String datePattern = "\\d{4}-\\d{2}-\\d{2}";
-        SectionLineInfo sectionLineInfo = vectorTileRepo.selectSectionLineInfoById(sectionId);
         ParamNode paramNode = paramNodeRepo.findParamNodeById("6642da4b010453003d568646");
 //        ParamNode paramNode = paramNodeRepo.findParamNodeById("662d1deaca8e246ea1290189");
         paramNode.setId(null);
+        SectionLineInfo sectionLineInfo;
+        if(sectionId != null) {
+            sectionLineInfo = vectorTileRepo.selectSectionLineInfoById(sectionId);
+            if(sectionLineInfo == null) return null;
+        }
+        else {
+            sectionLineInfo = SectionLineInfo.builder()
+                    .id((int) System.currentTimeMillis()).stX(startPt.get(0)).stY(startPt.get(1))
+                    .endX(endPt.get(0)).endY(endPt.get(1)).label("cus-"+System.currentTimeMillis())
+                    .name("cus-"+System.currentTimeMillis()).build();
+        }
         paramNode.getParams().put("x1", sectionLineInfo.getStX());
         paramNode.getParams().put("y1", sectionLineInfo.getStY());
         paramNode.getParams().put("x2", sectionLineInfo.getEndX());
@@ -351,7 +361,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
                 if(endTime != null) {
                     fullJsonResPath += ("_end" + endTime);
                 }
-                fullJsonResPath += ".json";
+                fullJsonResPath += ("-" + System.currentTimeMillis() + ".json");
                 Process process = ProcessUtil.buildSectionTaskNodeProcess(
                         taskNode, multiIndexPath.getWholeDataPath(), fullJsonResPath, multiIndexPath.getCondaEnv()
                 );

@@ -16,7 +16,7 @@
         <!-- <SectionRisk />
         <DeviceWarn /> -->
 
-        <div class="marquee-container">
+        <div class="marquee-container" v-loading="warnLoading">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
                 <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
                     <div class="no-warn-block" v-if="warningList.length == 0"
@@ -108,7 +108,11 @@
             </div>
         </div>
 
-        <div class="warn-detail-container" :class="warnActive ? 'active' : 'in-active'">
+        <div
+            class="warn-detail-container"
+            :class="warnActive ? 'active' : 'in-active'"
+            v-loading="detailLoading"
+        >
             <div class="warn-detail-title">预警信息详情</div>
             <div class="warn-detail-content">
                 <div class="key-val-container" v-for="(item, index) in warnKeyValList" :key="index">
@@ -120,9 +124,7 @@
             </div>
         </div>
 
-        <div class="warn-history-container" :class="warnActive ? 'active' : 'in-active'">
-            <div class="warn-detail-title">历史预警信息</div>
-        </div>
+        <WarnHistoryTable :warnActive="warnActive"/>
 
         <div class="map-container" id="map"></div>
     </div>
@@ -134,12 +136,9 @@ import { onMounted, ref, onUnmounted, watch, computed } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
-import {
-    BorderBox12 as DvBorderBox12,
-    BorderBox7 as DvBorderBox7,
-} from '@kjgl77/datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
+import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 // import SectionRisk from '../components/bankTwin/SectionRisk.vue'
 // import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
@@ -155,6 +154,8 @@ const warnActive = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '现场监控' : '预警详情'
 })
+const detailLoading = ref(false)
+const warnLoading = ref(true)
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -163,6 +164,7 @@ const warnInfoStore = useWarnInfoStore()
 const token = ref(
     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
 )
+
 
 const items = ref([
     { label: '二维视图', value: 'tab1' },
@@ -225,12 +227,25 @@ const gnssIdMap = {
     'MZS120.56944728_32.02070961_1': 'CL-10',
 }
 
+const gnssIdSectionMap = {
+    'MZS120.51749289_32.04059243_1': '南顺堤',
+    'MZS120.51977143_32.04001152_1': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_1': '江滩办事处',
+    'MZS120.52660704_32.03676583_1': '小港池',
+    'MZS120.53334877_32.03227055_1': '张靖皋桥位上游',
+    'MZS120.54599538_32.02837993_1': '海事码头',
+    'MZS120.55327892_32.02707923_1': '海事码头下游',
+    'MZS120.55649757_32.02592404_1': '雷达站',
+    'MZS120.56334257_32.02298144_1': '民主沙尾部主路',
+    'MZS120.56944728_32.02070961_1': '民主沙尾部',
+}
+
 const warnKeyValList = ref([
     { key: '危险区域', val: '暂无' },
     { key: '出险时间', val: '暂无' },
     { key: '设备信息', val: '暂无' },
-    { key: '管理单位', val: '暂无' },
-    { key: '联系方式', val: '暂无' },
+    { key: '管理单位', val: '江苏省水利厅' },
+    { key: '联系方式', val: '025-85829326；18860847206' },
     { key: '是否发送通知', val: '暂无' },
 ])
 
@@ -238,11 +253,11 @@ const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
-            [120.46957922676836, 32.01001616423072],
-            [120.61109640208264, 32.074171362618625],
+            [120.45957922676836, 32.00001616423072],
+            [120.62109640208264, 32.084171362618625],
         ],
         {
-            pitch: 32.45,
+            // pitch: 32.45,
             duration: 1500,
             // zoom: 8,
         },
@@ -267,7 +282,12 @@ function unique(arr) {
 const navToManage = () => {
     router.push('/bankManage')
 }
-const updateWarnInfoDesc = () => {
+const buildLocStr = (deviceId) => {
+    deviceId = deviceId.replace('MZS', '')
+    let str = deviceId.split('_').slice(0, 2).join(',')
+    return str
+}
+const updateWarnInfoDesc = async () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
@@ -284,10 +304,14 @@ const updateWarnInfoDesc = () => {
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒')
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
 
-        let warnString = `警告：${deviceName}(${deviceId})于${warnTime}土体表面累计位移${threeDiff}mm
-        ！`
+        let warnString = `
+            警告：于${warnTime}，${gnssIdSectionMap[deviceId]}断面(${buildLocStr(deviceId)})的 \
+            ${deviceName}(${gnssIdMap[deviceId]})周围区域即将发生崩岸险情 \
+            请注意防汛处置！
+        `
         WARN_TEXT.push(warnString)
     }
+    warnLoading.value = false
     warnKeyValList.value[2].val = unique(deviceNameList).join(',')
     warnKeyValList.value[1].val = unique(warnTimeList).join(',')
     warnKeyValList.value[5].val = '是'
@@ -302,7 +326,7 @@ const updateWarnInfoDesc = () => {
 onMounted(async () => {
     // setTimeout(() => {
     //     warnActive.value = true
-    // }, 5000)
+    // }, 3000)
     map = new mapboxgl.Map({
         container: 'map', // container ID
         accessToken:
@@ -319,50 +343,35 @@ onMounted(async () => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
         useMapStore().setMap(map)
-        map.addSource('ptVector', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
-        })
-        map.addSource('test', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
-        })
+        // map.addSource('ptVector', {
+        //     type: 'vector',
+        //     tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+        // })
+        // map.addSource('test', {
+        //     type: 'vector',
+        //     tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+        // })
         await mapInit(map, true)
-        map.addLayer({
-            id: '点1',
-            type: 'symbol',
-            source: 'ptVector',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-                'text-size': 20,
-            },
-            paint: {
-                'text-color': 'rgb(0, 42, 105)',
-            },
-        })
+        // map.ads
 
-        map.addLayer({
-            id: '点2',
-            type: 'symbol',
-            source: 'test',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'top',
-                'text-size': 12,
-            },
-            paint: {
-                'text-color': 'rgb(0, 42, 105)',
-            },
-        })
+        // map.addLayer({
+        //     id: '点2',
+        //     type: 'symbol',
+        //     source: 'test',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'text-field': ['get', 'label'],
+        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        //         // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+        //         'text-offset': [-1.0, 1.15],
+        //         'text-anchor': 'top',
+        //         'text-size': 16,
+        //         'text-allow-overlap': true
+        //     },
+        //     paint: {
+        //         'text-color': 'rgb(0, 22, 145)',
+        //     },
+        // })
 
         // map.on('click', (e) => {
         //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
@@ -832,7 +841,6 @@ div.twin-main-container {
                     color: #0043fd;
                 }
 
-
                 div.val-text {
                     line-height: 6vh;
                     font-size: calc(0.7vw + 0.5vh);
@@ -840,7 +848,8 @@ div.twin-main-container {
                     color: #1d00be;
                     // max-width: 70%;
                     width: 12vw;
-                    text-align: right // text-align: center;
+                    text-align: right;
+                    // text-align: center;
                 }
 
                 // &:nth-child(2n + 1) {
@@ -875,7 +884,7 @@ div.twin-main-container {
         border-radius: 4px;
         overflow: hidden;
 
-        div.warn-detail-title {
+        div.warn-history-title {
             height: 4vh;
             line-height: 4vh;
             width: 100%;
@@ -890,6 +899,84 @@ div.twin-main-container {
                 #6493ff 3px 3px;
             letter-spacing: 0.4rem;
             border-bottom: 2px solid #0400fd;
+        }
+
+        div.warn-histroy-content {
+            height: 30vh;
+            width: 23vw;
+            margin-left: 0.5vw;
+
+            div.device-status-content {
+                // position: absolute;
+                // top: 5vh;
+                width: 100%;
+                // margin-left: 2.5%;
+                height: 30vh;
+
+                // background-color: #c4fbff;
+
+                div.device-status-row {
+                    height: 4vh;
+                    width: 100%;
+                    border-radius: 2px;
+
+                    // background-color: #2622fd;
+
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: space-around;
+
+                    &.head {
+                        padding-bottom: 4px;
+                    }
+
+                    div.device-item {
+                        width: 28%;
+                        height: 100%;
+                        line-height: 3.2vh;
+                        text-align: center;
+                        font-size: calc(0.5vw + 0.4vh);
+                        border-radius: 2px;
+
+                        background-color: #d2f2ff;
+                        font-weight: bold;
+                        color: #2a5fdb;
+
+                        &.device-name {
+                            width: 40%;
+                        }
+
+                        &.device-time {
+                            width: 32%;
+                        }
+
+                        &.device-count {
+                            display: flex;
+                            justify-content: center;
+
+                            div.normal {
+                                color: #00ca22;
+                            }
+                        }
+
+                        &.head {
+                            background-color: #2a5fdb;
+                            border: 1px solid #aaffff;
+                            font-weight: bold;
+                            color: #dafdff;
+                            box-shadow:
+                                rgba(208, 252, 255, 0.6) 0px 2px 4px,
+                                rgba(208, 252, 255, 0.4) 0px 7px 13px -3px,
+                                rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
+                        }
+
+                        box-shadow:
+                            rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                            rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                            rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                    }
+                }
+            }
         }
     }
 

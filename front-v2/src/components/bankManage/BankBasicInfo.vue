@@ -159,7 +159,7 @@ const mapFlyToRiver = (mapIns) => {
             [120.59089640208264, 32.050171362618625],
         ],
         {
-            pitch: 52.45,
+            // pitch: 52.45,
             duration: 1500,
             // zoom: 8,
         },

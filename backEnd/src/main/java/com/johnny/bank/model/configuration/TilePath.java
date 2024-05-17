@@ -17,4 +17,5 @@ public class TilePath {
     private String mzsTilePath;
     private String worldTilePath;
     private String nodeServicePath;
+    private String riverTilePath;
 }

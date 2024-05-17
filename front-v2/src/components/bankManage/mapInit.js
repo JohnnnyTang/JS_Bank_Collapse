@@ -36,12 +36,28 @@ const mapInit = async (map, vis) => {
             tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
         ],
     })
-    map.addSource('mzsBankLabelSource', {
+    map.addSource('dockAreaSource', {
         type: 'vector',
         tiles: [
-            tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+            tileServer + '/tile/vector/dockArea/{x}/{y}/{z}',
         ],
     })
+    map.addSource('fixProjectAreaSource', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}',
+        ],
+    })
+    map.addSource('mzsSectionLabel', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+    })
+    // map.addSource('mzsBankLabelSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+    //     ],
+    // })
     map.addSource('mzsBankLineSource', {
         type: 'vector',
         tiles: [
@@ -88,6 +104,7 @@ const mapInit = async (map, vis) => {
             'line-width': 2,
         },
     })
+    
     // map.addLayer({
     //     id: 'mzsLabel',
     //     type: 'symbol',
@@ -119,9 +136,29 @@ const mapInit = async (map, vis) => {
                 '不稳定',
                 '#df8105',
                 '较不稳定',
-                'rgba(214, 44, 61, 0.6)',
+                'rgba(180,194,197, 0.8)',
                 '#18b915',
             ],
+        },
+    })
+    map.addLayer({
+        id: 'dockAreaLayer',
+        type: 'fill',
+        source: 'dockAreaSource',
+        'source-layer': 'default',
+        paint: {
+            'fill-color': 'rgba(201,217,238, 0.8)',
+            'fill-outline-color': 'rgba(201,217,238, 0.8)'
+        },
+    })
+    map.addLayer({
+        id: 'fixProjectLayer',
+        type: 'fill',
+        source: 'fixProjectAreaSource',
+        'source-layer': 'default',
+        paint: {
+            'fill-color': 'rgba(20,74,197, 0.8)',
+            'fill-outline-color': 'rgba(20,74,197, 0.8)'
         },
     })
     // map.addLayer({
@@ -153,11 +190,31 @@ const mapInit = async (map, vis) => {
         layout: {
             'line-cap': 'round',
             'line-join': 'round',
+
         },
         paint: {
             'line-opacity': 1,
             'line-color': 'rgba(31, 14, 223, 0.75)',
             'line-width': 4,
+            'line-dasharray': [1, 1.5]
+        },
+    })
+    map.addLayer({
+        id: '点2',
+        type: 'symbol',
+        source: 'mzsSectionLabel',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+            'text-offset': [-1.0, 1.15],
+            'text-anchor': 'top',
+            'text-size': 16,
+            'text-allow-overlap': true
+        },
+        paint: {
+            'text-color': 'rgb(0, 22, 145)',
         },
     })
     // map.addLayer({
@@ -175,36 +232,36 @@ const mapInit = async (map, vis) => {
     //         'line-width': 4,
     //     },
     // })
-    map.addLayer({
-        id: 'mzsBankLabel',
-        type: 'symbol',
-        source: 'mzsBankLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'left',
-        },
-        paint: {
-            'text-color': 'rgba(231, 214, 86, 0.9)',
-        },
-    })
-    map.addLayer({
-        id: 'mzsSectionLabel',
-        type: 'symbol',
-        source: 'mzsSectionLineLabelSource',
-        'source-layer': 'default',
-        layout: {
-            'text-field': ['get', 'label'],
-            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-            // 'text-offset': [0, 1.25],
-            'text-anchor': 'bottom',
-        },
-        paint: {
-            'text-color': 'rgba(81, 154, 86, 0.9)',
-        },
-    })
+    // map.addLayer({
+    //     id: 'mzsBankLabel',
+    //     type: 'symbol',
+    //     source: 'mzsBankLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'left',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(231, 214, 86, 0.9)',
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsSectionLabel',
+    //     type: 'symbol',
+    //     source: 'mzsSectionLineLabelSource',
+    //     'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'label'],
+    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //         // 'text-offset': [0, 1.25],
+    //         'text-anchor': 'bottom',
+    //     },
+    //     paint: {
+    //         'text-color': 'rgba(81, 154, 86, 0.9)',
+    //     },
+    // })
     map.addLayer({
         id: 'mzsLabel',
         type: 'symbol',
@@ -215,9 +272,10 @@ const mapInit = async (map, vis) => {
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
             // 'text-offset': [0, 1.25],
             'text-anchor': 'left',
+            'text-size': 12
         },
         paint: {
-            'text-color': 'rgba(31, 14, 126, 0.75)',
+            'text-color': 'rgba(31, 14, 126, 0.8)',
         },
     })
 

@@ -174,7 +174,7 @@ const mapFlyToRiver = (mapIns) => {
             [120.59109640208264, 32.054171362618625],
         ],
         {
-            pitch: 32.45,
+            // pitch: 32.45,
             duration: 1500,
             // zoom: 8,
         },
@@ -232,6 +232,10 @@ onMounted(() => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}'],
         })
+        map.addSource('placeLabelSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+        })
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -245,6 +249,38 @@ onMounted(() => {
                 'line-opacity': 1,
                 'line-color': 'rgba(26, 87, 138, 0.6)',
                 'line-width': 1,
+            },
+        })
+        map.addLayer({
+            id: 'mzsLabel',
+            type: 'symbol',
+            source: 'mzsPlaceLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+                'text-size': 12,
+            },
+            paint: {
+                'text-color': 'rgba(31, 14, 126, 0.65)',
+            },
+        })
+        map.addLayer({
+            id: 'placeLabel',
+            type: 'symbol',
+            source: 'placeLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+                'text-size': 14,
+            },
+            paint: {
+                'text-color': 'rgba(41, 84, 216, 1)',
             },
         })
 
@@ -264,7 +300,7 @@ onMounted(() => {
                     '不稳定',
                     '#df8105',
                     '较不稳定',
-                    '#ee3603',
+                    'rgba(180,194,197, 0.8)',
                     '#18b915',
                 ],
             },
@@ -280,8 +316,8 @@ onMounted(() => {
             },
             paint: {
                 'line-opacity': 1,
-                'line-color': 'rgba(31, 14, 223, 0.75)',
-                'line-width': 4,
+                'line-color': 'rgba(31, 14, 223, 0.6)',
+                'line-width': 2,
             },
         })
         await loadImage(map, '/geoStyle/video_monitor.png', 'vid-device-icon')
@@ -500,6 +536,7 @@ div.bank-video-container {
                 }
                 div.video-val {
                     width: 16vw;
+                    font-weight: bold;
                 }
             }
 
