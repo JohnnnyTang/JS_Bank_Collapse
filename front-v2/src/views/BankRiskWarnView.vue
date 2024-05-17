@@ -134,7 +134,8 @@ import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initScratchMap } from '../utils/mapUtils';
 import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask';
-import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
+// import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
+import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer';
 import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus';
@@ -643,9 +644,6 @@ onMounted(async () => {
             },
         })
 
-        const jsonUrl = '/bankWarn/bankWarn.json'
-        map.addLayer(new BankWarnLayer(jsonUrl))
-        
         map.addLayer({
             id: 'mzsBankLineChoosen',
             type: 'line',
@@ -672,6 +670,8 @@ onMounted(async () => {
             }
         })
 
+        const jsonUrl = '/bankWarn/bankWarn.json'
+        map.addLayer(new BankWarnLayer(jsonUrl))
         useMapStore().setMap(map)
         console.log('set map!');
         flow.particleNum.n = 2800;
