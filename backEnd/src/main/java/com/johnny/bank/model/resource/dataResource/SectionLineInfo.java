@@ -13,6 +13,8 @@ import lombok.*;
 @EqualsAndHashCode()
 @ToString()
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SectionLineInfo {
     private Integer id;

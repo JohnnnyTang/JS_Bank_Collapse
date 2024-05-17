@@ -783,6 +783,118 @@ div.twin-main-container {
         }
     }
 
+    div.warn-history-container {
+        position: absolute;
+        right: 1vw;
+        bottom: 1vh;
+        height: 34vh;
+        width: 24vw;
+
+        backdrop-filter: blur(16px);
+        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
+        background-color: rgba(156, 195, 255, 0.4);
+        border-radius: 4px;
+        border: 2px solid rgb(28, 105, 247);
+        z-index: 3;
+        border-radius: 4px;
+        overflow: hidden;
+
+        div.warn-history-title {
+            height: 4vh;
+            line-height: 4vh;
+            width: 100%;
+            background-color: transparent;
+            text-align: center;
+            font-size: calc(0.8vw + 0.8vh);
+            font-weight: bold;
+            color: #0400fd;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+            letter-spacing: 0.4rem;
+            border-bottom: 2px solid #0400fd;
+        }
+
+        div.warn-histroy-content {
+            height: 30vh;
+            width: 23vw;
+            margin-left: 0.5vw;
+
+            div.device-status-content {
+                // position: absolute;
+                // top: 5vh;
+                width: 100%;
+                // margin-left: 2.5%;
+                height: 30vh;
+
+                // background-color: #c4fbff;
+
+                div.device-status-row {
+                    height: 4vh;
+                    width: 100%;
+                    border-radius: 2px;
+
+                    // background-color: #2622fd;
+
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: space-around;
+
+                    &.head {
+                        padding-bottom: 4px;
+                    }
+
+                    div.device-item {
+                        width: 28%;
+                        height: 100%;
+                        line-height: 3.2vh;
+                        text-align: center;
+                        font-size: calc(0.5vw + 0.4vh);
+                        border-radius: 2px;
+
+                        background-color: #d2f2ff;
+                        font-weight: bold;
+                        color: #2a5fdb;
+
+                        &.device-name {
+                            width: 40%;
+                        }
+
+                        &.device-time {
+                            width: 32%;
+                        }
+
+                        &.device-count {
+                            display: flex;
+                            justify-content: center;
+
+                            div.normal {
+                                color: #00ca22;
+                            }
+                        }
+
+                        &.head {
+                            background-color: #2a5fdb;
+                            border: 1px solid #aaffff;
+                            font-weight: bold;
+                            color: #dafdff;
+                            box-shadow:
+                                rgba(208, 252, 255, 0.6) 0px 2px 4px,
+                                rgba(208, 252, 255, 0.4) 0px 7px 13px -3px,
+                                rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
+                        }
+
+                        box-shadow:
+                            rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                            rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                            rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                    }
+                }
+            }
+        }
+    }
+
     /* 根据需要调整动画的持续时间 */
 }
 
