@@ -1,10 +1,10 @@
 <template>
     <div class="all">
-        <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" v-show="!showAnalysis" />
+        <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" />
 
-        <div class="model-content-container" v-show="!showAnalysis">
+        <div class="model-content-container">
             <div class="model-item-container">
-                <!-- <div class="model-choice">
+                <div class="model-choice">
                     <div class="basemap-radio-container">
                         <input type="radio" id="radio-1" name="tabs" :checked="checky1" @click="radio1Click()" />
                         <label class="tab" for="radio-1">近岸动力分析</label>
@@ -12,9 +12,8 @@
                         <label class="tab" for="radio-2">近岸演变分析</label>
                         <span class="glider"></span>
                     </div>
-                    <div :class="styleObj" class="title-icon" ref="iconref" @click="iconClick()"></div>
-                </div> -->
-                <div class="main-page" v-if="!showDetail">
+                </div>
+                <div class="main-page" v-show="!showAnalysis">
                     <div class="user-react">
                         <div class="title">
                             <div class="title-icon uricon"></div>
@@ -33,13 +32,17 @@
                             <div class="title-text">数据面板</div>
                         </div>
                         <div class="dp-content">
-                            <el-tree style="max-width: 600px; max-height: 260px; overflow: auto;" :data="data"
-                                :props="defaultProps" @node-contextmenu="handleNodeClick" node-key="nodeID">
+                            <el-tree style="
+                                    max-width: 600px;
+                                    max-height: 260px;
+                                    overflow: auto;
+                                " :data="data" :props="defaultProps" @node-contextmenu="handleNodeClick"
+                                node-key="nodeID">
                                 <template #default="{ node, data }">
-                                    <div class="custom-tree-node" style="width:100%">
+                                    <div class="custom-tree-node" style="width: 100%">
                                         <el-dropdown @command="handleNodeCommand" trigger="contextmenu"
-                                            placement="bottom-end" style="width:100%">
-                                            <div class="el-dropdown-link" style="width:100%">
+                                            placement="bottom-end" style="width: 100%">
+                                            <div class="el-dropdown-link" style="width: 100%">
                                                 {{ node.label }}
                                             </div>
                                             <template #dropdown v-if="data.nodeID">
@@ -68,15 +71,140 @@
                         </div>
                     </div>
                 </div>
-
-                <div v-if="showDetail" class="detail-page">
-                    <ModelInfoVue :modelInfo="modelInfo" />
+                <div class="main-page" v-show="showAnalysis">
+                    <div class="data-panel" style="height: 40vh">
+                        <div class="title">
+                            <div class="title-icon dpicon"></div>
+                            <div class="title-text">数据面板</div>
+                        </div>
+                        <div class="dp-content" style="height: 32vh">
+                            <el-tree style="max-width: 600px" :data="evolutionTreeData" :props="defaultProps"
+                                @node-contextmenu="handleEvolutionTreeClick" node-key="nodeID">
+                                <template #default="{ node, data }">
+                                    <div class="evolution-tree-node" style="width: 100%">
+                                        <el-dropdown @command="handleEvolutionTreeCommand
+                                            " trigger="contextmenu" placement="bottom-end" style="width: 100%">
+                                            <div class="el-dropdown-link" style="width: 100%">
+                                                {{ node.label }}
+                                            </div>
+                                            <template #dropdown v-if="data.type === 'dem' ||
+                                                data.type ===
+                                                'section-geojson'
+                                                ">
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item command="layer">添加至图层</el-dropdown-item>
+                                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                            <template #dropdown v-if="data.type &&
+                                                data.type !== 'dem' &&
+                                                data.type !==
+                                                'section-geojson' &&
+                                                data.type !== 'result'
+                                                ">
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item command="visualize">可视化</el-dropdown-item>
+                                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                            <template #dropdown v-if="data.type &&
+                                                data.type == 'result'
+                                                ">
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
+                                    </div>
+                                </template>
+                            </el-tree>
+                        </div>
+                    </div>
+                    <div class="layer-panel">
+                        <div class="title">
+                            <div class="title-icon lpicon"></div>
+                            <div class="title-text">图层面板</div>
+                        </div>
+                        <div class="dp-content" style="height: 32vh">
+                            <el-tree style="max-width: 600px" :data="evolutionLayerData" :props="defaultProps"
+                                @node-contextmenu="handleEvolutionLayerClick" node-key="nodeID" show-checkbox
+                                @check-change="handleEvolutionLayerCheckChange">
+                                <template #default="{ node, data }">
+                                    <div class="evolution-tree-node" style="width: 100%">
+                                        <el-dropdown @command="handleEvolutionLayerCommand
+                                            " trigger="contextmenu" placement="bottom-end" style="width: 100%">
+                                            <div class="el-dropdown-link" style="width: 100%">
+                                                {{ node.label }}
+                                            </div>
+                                            <template #dropdown>
+                                                <el-dropdown-menu>
+                                                    <el-dropdown-item command="delete">删除图层</el-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
+                                    </div>
+                                </template>
+                            </el-tree>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh" :before-close="sectionConfirmClose">
+                <el-input v-model="sectionConfirmInput" style="width: 240px" placeholder="请输入断面名称" />
+                <template #footer>
+                    <div class="dialog-footer">
+                        <el-button @click="cancelSection">取消</el-button>
+                        <el-button type="primary" @click="confirmSection" :disabled="!sectionConfirmInput.length">
+                            确认
+                        </el-button>
+                    </div>
+                </template>
+            </el-dialog>
             <div class="main">
                 <div class="map-container">
                     <div id="map" ref="mapContainerRef"></div>
                     <canvas id="GPUFrame"></canvas>
+                </div>
+                <div class="model-container">
+                    <el-button type="primary" @click="handleRunModelClick" color="#2e8cd9"
+                        v-if="showAnalysis">演变分析计算</el-button>
+                </div>
+                <div class="model-params-container" v-if="isParamsShow">
+                    <div style="font-size: large; padding-bottom: 16px">
+                        模型参数设置
+                    </div>
+                    <el-form ref="paramsRef" :rules="rules" :model="paramsInfo" label-width="auto" style="width: 600px">
+                        <el-form-item label="结果名称" prop="name">
+                            <el-input v-model="paramsInfo.name" />
+                        </el-form-item>
+                        <el-form-item label="地形断面" prop="section">
+                            <el-select v-model="paramsInfo.section">
+                                <el-option v-for="item in sectionList" :key="item.label" :label="item.label"
+                                    :value="item.nodeID" />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="当前地形数据" prop="date">
+                            <el-select v-model="paramsInfo.date">
+                                <el-option v-for="item in demList" :key="item.label" :label="item.label"
+                                    :value="item.nodeID" />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="对比地形数据" prop="beforeDate">
+                            <el-select v-model="paramsInfo.beforeDate">
+                                <el-option v-for="item in demList" :key="item.label" :label="item.label"
+                                    :value="item.nodeID" />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="runModel(paramsRef)">运行模型</el-button>
+                            <el-button @click="handleCancelParams(paramsRef)">取消</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+
+                <div class="charts-container" v-show="isEchartShow">
+                    <div class="close-icon" @click="handleCloseChart">关闭</div>
+                    <div ref="echartRef" class="chart"></div>
                 </div>
 
                 <HydrologicalCondition v-if="showHyCondition" v-on:close="showHyCondition = !showHyCondition"
@@ -87,23 +215,16 @@
                 <ModelStatus v-if="showModelStatus" v-on:close="showModelStatus = !showModelStatus"></ModelStatus>
             </div>
         </div>
-
-        <div class="analysisCenter" v-show="showAnalysis">
-            <div class="background"></div>
-            <div class="back" @click="backHandle"></div>
-            <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
-                src="http://172.21.212.165:8050/#/analysis/73c29959-16f0-4478-8526-0927d1aff6f7">
-            </iframe>
-        </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
+import * as echarts from 'echarts'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import MapboxDraw from '@mapbox/mapbox-gl-draw'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import { initScratchMap } from '../../../utils/mapUtils.js'
-import { infoItemList } from '../modelInfoList.js'
-import ModelInfoVue from '../ModelInfo.vue'
 import ModelTitleVue from '../ModelTitle.vue'
 import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue'
 import SetParameter from '../stability-sub/SetParameter.vue'
@@ -111,6 +232,12 @@ import ModelStatus from '../stability-sub/ModelStatus.vue'
 import { ElMessage } from 'element-plus'
 import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
 import { useStabilityStore } from '../../../store/stabilityStore.js'
+import { convertToMercator, drawChongyuSectionGraph } from '../stability-sub/util.js'
+import {
+    demoJson,
+    drawRateGraph,
+    drawSectionGraph,
+} from '../stability-sub/util.js'
 
 const showHyCondition = ref(false)
 const showStParams = ref(false)
@@ -122,24 +249,10 @@ const buttons = ref([
     '模型运行状态',
 ])
 const selectedNode = ref(null)
-
-const modelInfo = {
-    application: infoItemList[2].application,
-    usescene: infoItemList[2].usescene,
-    input: infoItemList[2].input,
-    output: infoItemList[2].output,
-    processPicSrc: infoItemList[2].processPicSrc,
-}
-
 const title1 = ref('模型配置')
 const showAnalysis = ref(false)
 const checky1 = ref(true)
 const checky2 = ref(false)
-const backHandle = () => {
-    checky1.value = true
-    checky2.value = false
-    showAnalysis.value = false
-}
 
 const radio1Click = () => {
     showAnalysis.value = false
@@ -153,19 +266,6 @@ const radio2Click = () => {
 }
 
 const mapContainerRef = ref()
-const iconref = ref()
-const showDetail = ref(false)
-const styleObj = ref({
-    detailIcon: true,
-    returnIcon: false,
-})
-const iconClick = () => {
-    styleObj.value = {
-        detailIcon: !styleObj.value.detailIcon,
-        returnIcon: !styleObj.value.returnIcon,
-    }
-    showDetail.value = !showDetail.value
-}
 
 //////////model//////////////
 const modelStore = useStabilityStore()
@@ -197,7 +297,8 @@ const handleClick = (index) => {
             modelStore.modelProgress = 0
             modelStore.modelStatus = 'pending'
             const id = setInterval(() => {
-                modelStore.modelProgress += Math.random() * 100 / 3600 / 0.5 / 24 * 3
+                modelStore.modelProgress +=
+                    ((Math.random() * 100) / 3600 / 0.5 / 24) * 3
                 if (modelStore.modelProgress >= 100) {
                     modelStore.modelStatus = 'success'
                     ElMessage({
@@ -224,22 +325,6 @@ const paramsHandler = (value) => {
     console.log(value)
 }
 
-// const fileHandler = (value) => {
-//     let inputFileNode = []
-//     value.forEach((element) => {
-//         inputFileNode.push({
-//             label: element,
-//             children: [],
-//         })
-//     })
-//     data[0].children.push(...inputFileNode)
-//     ElMessage({
-//         type: 'success',
-//         offset: 100,
-//         message: `上传${inputFileNode.length}条模型文件`,
-//     })
-// }
-
 ////////////tree///////////////
 const handleNodeClick = (_, treeNode) => {
     if (treeNode.nodeID) {
@@ -252,7 +337,6 @@ const handleNodeCommand = (command) => {
     if (selectedNode.value && command === 'add') {
         layers.value.push(selectedNode.value)
     }
-
 }
 const data = reactive([
     {
@@ -263,27 +347,27 @@ const data = reactive([
                 children: [
                     {
                         label: 'fort.13',
-                        nodeID: 'dry-13'
+                        nodeID: 'dry-13',
                     },
                     {
                         label: 'fort.14',
-                        nodeID: 'dry-14'
+                        nodeID: 'dry-14',
                     },
                     {
                         label: 'fort.15',
-                        nodeID: 'dry-15'
+                        nodeID: 'dry-15',
                     },
                     {
                         label: 'fort.16',
-                        nodeID: 'dry-16'
+                        nodeID: 'dry-16',
                     },
                     {
                         label: 'fort.19',
-                        nodeID: 'dry-19'
+                        nodeID: 'dry-19',
                     },
                     {
                         label: 'fort.20',
-                        nodeID: 'dry-20'
+                        nodeID: 'dry-20',
                     },
                 ],
             },
@@ -291,9 +375,9 @@ const data = reactive([
                 label: '输出数据',
                 children: [
                     {
-                        label: "flow",
-                        nodeID: 'dry-flow'
-                    }
+                        label: 'flow',
+                        nodeID: 'dry-flow',
+                    },
                 ],
             },
         ],
@@ -306,27 +390,27 @@ const data = reactive([
                 children: [
                     {
                         label: 'fort.13',
-                        nodeID: 'flood-13'
+                        nodeID: 'flood-13',
                     },
                     {
                         label: 'fort.14',
-                        nodeID: 'flood-14'
+                        nodeID: 'flood-14',
                     },
                     {
                         label: 'fort.15',
-                        nodeID: 'flood-15'
+                        nodeID: 'flood-15',
                     },
                     {
                         label: 'fort.16',
-                        nodeID: 'flood-16'
+                        nodeID: 'flood-16',
                     },
                     {
                         label: 'fort.19',
-                        nodeID: 'flood-19'
+                        nodeID: 'flood-19',
                     },
                     {
                         label: 'fort.20',
-                        nodeID: 'flood-20'
+                        nodeID: 'flood-20',
                     },
                 ],
             },
@@ -334,9 +418,9 @@ const data = reactive([
                 label: '输出数据',
                 children: [
                     {
-                        label: "flow",
-                        nodeID: 'flood-flow'
-                    }
+                        label: 'flow',
+                        nodeID: 'flood-flow',
+                    },
                 ],
             },
         ],
@@ -349,27 +433,27 @@ const data = reactive([
                 children: [
                     {
                         label: 'fort.13',
-                        nodeID: '20-13'
+                        nodeID: '20-13',
                     },
                     {
                         label: 'fort.14',
-                        nodeID: '20-14'
+                        nodeID: '20-14',
                     },
                     {
                         label: 'fort.15',
-                        nodeID: '20-15'
+                        nodeID: '20-15',
                     },
                     {
                         label: 'fort.16',
-                        nodeID: '20-16'
+                        nodeID: '20-16',
                     },
                     {
                         label: 'fort.19',
-                        nodeID: '20-19'
+                        nodeID: '20-19',
                     },
                     {
                         label: 'fort.20',
-                        nodeID: '20-20'
+                        nodeID: '20-20',
                     },
                 ],
             },
@@ -377,9 +461,9 @@ const data = reactive([
                 label: '输出数据',
                 children: [
                     {
-                        label: "flow",
-                        nodeID: '20-flow'
-                    }
+                        label: 'flow',
+                        nodeID: '20-flow',
+                    },
                 ],
             },
         ],
@@ -429,8 +513,394 @@ const handleCheckedlayersChange = (value) => {
     }
 }
 
+// evolution
+// tree and layer
+const selectedEvolutionNode = ref(null)
+const evolutionLayerData = ref(null)
+// KXH type 为 dem, section-geojson, section-graph, rate, chongyu, result, null
+const evolutionTreeData = reactive([
+    {
+        label: '地形数据',
+        type: null,
+        children: [
+            {
+                label: '20200301-dem',
+                nodeID: '20200301-dem-id',
+                type: 'dem',
+            },
+            {
+                label: '20200901-dem',
+                nodeID: '20200901-dem-id',
+                type: 'dem',
+            },
+        ],
+    },
+    {
+        label: '断面数据',
+        type: null,
+        children: [],
+    },
+    {
+        label: '示例断面',
+        type: 'result',
+        children: [
+            {
+                label: '断面形态',
+                nodeID: '20200301-section-graph',
+                type: 'section-graph',
+            },
+            {
+                label: '断面坡比',
+                nodeID: '20200301-rate',
+                type: 'rate',
+            },
+            {
+                label: '断面冲淤',
+                nodeID: '20200301-chongyu',
+                type: 'chongyu',
+            },
+        ],
+    },
+])
+const handleEvolutionTreeClick = (_, treeNode) => {
+    if (treeNode.nodeID) {
+        selectedEvolutionNode.value = treeNode
+    } else {
+        selectedEvolutionNode.value = null
+    }
+}
+const handleEvolutionTreeCommand = (command) => {
+    // KXH 绘制从服务器获取断面数据 json 逻辑
+    if (selectedEvolutionNode.value && command === 'layer') {
+        if (evolutionLayerData.value === null) {
+            evolutionLayerData.value = [selectedEvolutionNode.value]
+        } else {
+            evolutionLayerData.value.push(selectedEvolutionNode.value)
+        }
+    } else if (selectedEvolutionNode.value && command === 'visualize') {
+        const type = selectedEvolutionNode.value.type
+        isEchartShow.value = true
+        const json = demoJson
+        chart.clear()
+        if (type === 'section-graph') {
+            setTimeout(() => {
+                const sectionPoints = json.section
+                drawSectionGraph(
+                    chart,
+                    sectionPoints.map((value) => value[2]),
+                )
+                chart.resize()
+            }, 1)
+        } else if (type === 'rate') {
+            setTimeout(() => {
+                const beforeSectionPoints = json.beforeSection
+                const sectionPoints = json.section
+                drawRateGraph(
+                    chart,
+                    sectionPoints.map((value) => value[2]),
+                    beforeSectionPoints.map((value) => value[2]),
+                    json.SA[2],
+                )
+                chart.resize()
+            }, 1);
+        } else if (type === 'chongyu') {
+            setTimeout(() => {
+                const sectionPoints = json.section
+                const beforeSectionPoints = json.beforeSection
+                const length = Math.min(sectionPoints.length, beforeSectionPoints.length)
+                const result = []
+                sectionPoints.some((value, index) => {
+                    if (index >= length) {
+                        return true
+                    }
+                    result.push(value[2] - beforeSectionPoints[index][2])
+                })
+                console.log(result)
+                drawChongyuSectionGraph(
+                    chart,
+                    result
+                )
+                chart.resize()
+            }, 1)
+        }
+    } else if (selectedEvolutionNode.value && command === 'delete') {
+        // KXH 删除逻辑
+    }
+}
+const handleEvolutionLayerClick = (_, treeNode) => {
+    if (treeNode.nodeID) {
+        selectedEvolutionNode.value = treeNode
+    } else {
+        selectedEvolutionNode.value = null
+    }
+}
+const handleEvolutionLayerCommand = (command) => {
+    console.log(command)
+    if (
+        selectedEvolutionNode.value &&
+        evolutionLayerData.value &&
+        command === 'delete'
+    ) {
+        evolutionLayerData.value = evolutionLayerData.value.filter(
+            (value) => value.nodeID !== selectedEvolutionNode.value.nodeID,
+        )
+    }
+}
+const handleEvolutionLayerCheckChange = (data, checked) => {
+    // KXH 显示和隐藏图层的逻辑
+    console.log(data, checked)
+    if (true) {
+        //
+    } else {
+        //
+    }
+}
+
+// mapbox
+let map
+const draw = new MapboxDraw({
+    displayControlsDefault: false,
+    // Select which mapbox-gl-draw control buttons to add to the map.
+    controls: {
+        line_string: true,
+    },
+    // Set mapbox-gl-draw to draw by default.
+    // The user does not have to click the polygon control button first.
+    // defaultMode: '',
+    styles: [
+        // ACTIVE (being drawn)
+        // line stroke
+        {
+            id: 'gl-draw-line',
+            type: 'line',
+            filter: [
+                'all',
+                ['==', '$type', 'LineString'],
+                ['==', 'mode', 'draw_line_string'],
+            ],
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-color': '#D20C0C',
+                'line-dasharray': [0.2, 2],
+                'line-width': 2,
+            },
+        },
+        // vertex point halos
+        {
+            id: 'gl-draw-polygon-and-line-vertex-halo-active',
+            type: 'circle',
+            filter: [
+                'all',
+                ['==', 'meta', 'vertex'],
+                ['==', '$type', 'Point'],
+                ['==', 'mode', 'draw_line_string'],
+            ],
+            paint: {
+                'circle-radius': 5,
+                'circle-color': '#FFF',
+            },
+        },
+        // vertex points
+        {
+            id: 'gl-draw-polygon-and-line-vertex-active',
+            type: 'circle',
+            filter: [
+                'all',
+                ['==', 'meta', 'vertex'],
+                ['==', '$type', 'Point'],
+                ['==', 'mode', 'draw_line_string'],
+            ],
+            paint: {
+                'circle-radius': 3,
+                'circle-color': '#D20C0C',
+            },
+        },
+        // INACTIVE (static, already drawn)
+        // line stroke
+        {
+            id: 'gl-draw-line-static',
+            type: 'line',
+            filter: [
+                'all',
+                ['==', '$type', 'LineString'],
+                ['!=', 'mode', 'draw_line_string'],
+            ],
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-color': '#000',
+                'line-width': 3,
+            },
+        },
+    ],
+})
+
+// section
+const sectionInfo = ref([])
+const sectionDrawShow = ref(false)
+const sectionConfirmShow = ref(false)
+const sectionConfirmInput = ref('')
+const sectionConfirmClose = () => { }
+const cancelSection = () => {
+    sectionConfirmShow.value = false
+    draw.deleteAll()
+    sectionConfirmInput.value = ''
+}
+const confirmSection = () => {
+    sectionConfirmShow.value = false
+    sectionDrawShow.value = false
+    draw.deleteAll()
+    evolutionTreeData[1].children.push({
+        label: sectionConfirmInput.value,
+        nodeID: 'demo-section',
+        type: 'section-geojson',
+    })
+
+    console.log(sectionInfo)
+    // KXH 保存断面数据到服务器的逻辑
+
+    sectionConfirmInput.value = ''
+}
+
+// model
+const paramsRef = ref()
+const paramsInfo = ref({
+    name: '',
+    date: '',
+    beforeDate: '',
+    section: '',
+})
+const rules = reactive({
+    name: [
+        {
+            required: true,
+            message: 'Please input Activity name',
+            trigger: 'blur',
+        },
+    ],
+    section: [
+        {
+            required: true,
+            trigger: 'change',
+        },
+    ],
+    date: [
+        {
+            required: true,
+            trigger: 'change',
+        },
+    ],
+    beforeDate: [
+        {
+            required: true,
+            trigger: 'change',
+        },
+    ],
+})
+const isParamsShow = ref(false)
+const sectionList = computed(() => {
+    let result = []
+    evolutionTreeData.forEach((value) => {
+        if (value.label === '断面数据') {
+            result = value.children
+        }
+    })
+    console.log(result)
+    return result
+})
+const demList = computed(() => {
+    let result = []
+    evolutionTreeData.forEach((value) => {
+        if (value.label === '地形数据') {
+            result = value.children
+        }
+    })
+    console.log(result)
+    return result
+})
+const handleRunModelClick = () => {
+    if (sectionList.value.length === 0) {
+        ElMessage({
+            message: '当前不存在任意断面, 请先确定断面',
+            type: 'warning',
+        })
+        return
+    }
+    isParamsShow.value = true
+    console.log(isParamsShow.value)
+}
+const runModel = async (paramsRef) => {
+    if (!paramsRef) return
+    await paramsRef.validate((valid, fields) => {
+        if (valid) {
+            isParamsShow.value = false
+            ElMessage('模型开始计算')
+            console.log(paramsInfo.value)
+            // KXH 模型计算相关逻辑
+            evolutionTreeData.push({
+                label: paramsInfo.value.name,
+                type: 'result',
+                children: [
+                    {
+                        label: '断面形态',
+                        nodeID: '20200301-section-graph',
+                        type: 'section-graph',
+                    },
+                    {
+                        label: '断面坡比',
+                        nodeID: '20200301-rate',
+                        type: 'rate',
+                    },
+                    {
+                        label: '断面冲淤',
+                        nodeID: '20200301-chongyu',
+                        type: 'chongyu',
+                    },
+                ],
+            })
+            paramsRef.resetFields()
+        } else {
+            console.log('error submit!', fields)
+        }
+    })
+}
+const handleCancelParams = (formEl) => {
+    formEl.resetFields()
+    console.log(paramsInfo.value)
+    isParamsShow.value = false
+}
+
+// echarts
+const echartRef = ref()
+const isEchartShow = ref(false)
+let chart = null
+const handleCloseChart = () => {
+    isEchartShow.value = false
+}
+
 onMounted(async () => {
-    const map = await initScratchMap(mapContainerRef.value)
+    chart = echarts.init(echartRef.value)
+    map = await initScratchMap(mapContainerRef.value)
+    map.addControl(draw)
+
+    map.on('draw.create', function (e) {
+        console.log('aaa')
+        console.log(e.features)
+        sectionConfirmShow.value = true
+        let lineFeature = e.features[0]
+        let startWebMerCoord = convertToMercator(
+            lineFeature.geometry.coordinates[0],
+        )
+        let endWebMerCoord = convertToMercator(
+            lineFeature.geometry.coordinates[1],
+        )
+        sectionInfo.value = [startWebMerCoord, endWebMerCoord]
+    })
     globalMap = map
     map.addLayer(flow)
     flow.hide()
@@ -530,6 +1000,8 @@ div.model-content-container {
                     0 6px 12px 0 rgba(#0642b1, 0.55);
                 padding: 0.6vh;
                 border-radius: 0.6vw; // just a high number to create pill effect
+                margin-right: auto;
+                margin-left: 8px;
 
                 * {
                     z-index: 7;
@@ -754,52 +1226,27 @@ div.model-content-container {
                     }
                 }
 
-                .lp-content {
-                    height: 25vh;
+                .dp-content {
+                    height: 30vh;
+                    overflow-x: hidden;
+                    overflow-y: scroll;
+                    padding: 1vh;
 
-                    .checkBox {
-                        height: 20vh;
-                        margin-top: 3vh;
-                        display: block;
-                        overflow-x: hidden;
-                        overflow-y: auto;
+                    &::-webkit-scrollbar {
+                        width: 8px;
+                    }
 
-                        &::-webkit-scrollbar {
-                            width: 8px;
-                        }
+                    &::-webkit-scrollbar-track {
+                        background-color: rgba(6, 181, 197, 0.219);
+                    }
 
-                        &::-webkit-scrollbar-track {
-                            background-color: rgba(6, 181, 197, 0.219);
-                        }
+                    &::-webkit-scrollbar-thumb {
+                        background-color: #15a1e294;
+                        border-radius: 5px;
+                    }
 
-                        &::-webkit-scrollbar-thumb {
-                            background-color: #15a1e294;
-                            border-radius: 5px;
-                        }
-
-                        &::-webkit-scrollbar-thumb:hover {
-                            background-color: #3af0f781;
-                        }
-
-                        .el-checkbox-group {
-                            // background-color: aliceblue;
-
-                            .el-checkbox {
-                                padding-left: 2vw;
-                                margin: 0px;
-                                display: block;
-                                color: #000000;
-
-                                :deep() .el-checkbox__input {
-                                    transform: translateY(2px);
-                                }
-
-                                :deep().el-checkbox__label {
-                                    text-shadow: 1px 1px 0 #dfdada;
-                                    color: #00183d;
-                                }
-                            }
-                        }
+                    &::-webkit-scrollbar-thumb:hover {
+                        background-color: #3af0f781;
                     }
                 }
             }
@@ -814,6 +1261,10 @@ div.model-content-container {
 
             // transform: translateY(-1%);
         }
+    }
+
+    div.main {
+        position: relative;
     }
 
     div.map-container {
@@ -836,6 +1287,59 @@ div.model-content-container {
             z-index: 2;
             pointer-events: none;
         }
+    }
+
+    div.model-container {
+        top: 16px;
+        left: 16px;
+        z-index: 10;
+        position: absolute;
+    }
+
+    div.model-params-container {
+        top: 16vh;
+        left: 20vw;
+        z-index: 10;
+        position: absolute;
+        background-color: white;
+        padding: 16px;
+        border-radius: 16px;
+        height: 30vh;
+    }
+
+    div.charts-container {
+        top: 10vh;
+        left: 12vw;
+        z-index: 10;
+        position: absolute;
+        background-color: #d8f0f8;
+        padding: 16px;
+        border-radius: 16px;
+        height: 60vh;
+        width: 50vw;
+        box-shadow: 4px 4px 16px rgba(65, 65, 65, 0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #a6daff;
+
+        div.close-icon {
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            padding: 4px;
+            background-color: #dfdfdf;
+        }
+    }
+
+    div.chart {
+        height: 86%;
+        width: 90%;
+        padding: 16px 16px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 4px 4px 8px rgba(65, 65, 65, 0.2);
     }
 }
 
@@ -915,6 +1419,10 @@ div.model-content-container {
 :deep(.el-tree .el-tree-node__expand-icon.expanded) {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
+}
+
+:deep(.el-tree-node) {
+    padding: 2px 0px;
 }
 
 :deep(.el-checkbox__label) {
