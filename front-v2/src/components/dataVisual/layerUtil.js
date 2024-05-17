@@ -149,7 +149,7 @@ const layerAddFunctionMap = {
                 source: 'riverLand',
                 'source-layer': 'default',
                 paint: {
-                    'fill-color': '#C4632E',
+                    'fill-color': 'rgba(105, 67, 39,0.7)',
                 },
             })
     },
@@ -847,8 +847,8 @@ const layerAddFunctionMap = {
                         ["linear"],
                         ["zoom"],
                         7, ["literal", 0.0],
-                        10, ["literal", 0.3],
-                        13, ["literal", 0.5]
+                        10, ["literal", 0.4],
+                        13, ["literal", 0.6]
                     ],
                     'icon-anchor': 'center',
                     'icon-allow-overlap': true,
@@ -1084,7 +1084,7 @@ const layerAddFunctionMap = {
                     'symbol-placement': 'line',
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     // 'text-offset': [0, 1.25],
-                    'text-anchor': 'center',
+                    'text-anchor': 'top',
                 },
                 paint: {
                     'text-color': '#2e0201',

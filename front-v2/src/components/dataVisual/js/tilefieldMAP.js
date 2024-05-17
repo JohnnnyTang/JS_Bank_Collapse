@@ -348,20 +348,20 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-color': '#C4632E',
+                'background-color': 'rgba(105, 67, 39,0.9)',
             },
             text: '沙洲/江心洲'
         },
-        {
-            style: {
-                'margin-top': '22vh',
-                'margin-left': '1vw',
-                'height': '800%',
-                'width': '75%',
-                'background-image': `url(/legend/地形.png)`,
-            },
-            text: '水下地形'
-        }
+        // {
+        //     style: {
+        //         'margin-top': '22vh',
+        //         'margin-left': '1vw',
+        //         'height': '800%',
+        //         'width': '75%',
+        //         'background-image': `url(/legend/地形.png)`,
+        //     },
+        //     text: '水下地形'
+        // }
     ]
 }
 
@@ -437,10 +437,10 @@ const filterMap = {
     '枢纽工程': ['in', 'name', ...importantFeature['枢纽工程']],
     '长江干堤': [],
     '里程桩': [],
-    '一级预警岸段': ['in', 'bank_name', ...importantFeature['一级预警岸段']],
+    '一级预警岸段': [],
     '二级预警岸段': [],
     '三级预警岸段': [],
-    '岸段-注记': ['in', 'bank_name', ...importantFeature['一级预警岸段']],
+    '岸段-注记': [],
     '历史崩岸': [],
     '近岸地形': [],
     '沙洲': [],

@@ -266,10 +266,11 @@ const appednTreeData = async () => {
 
         let layerid = layers[i]
         if (!map.getLayer(layerid)) {
-            ElMessage({
-                message: '图层尚未加载，请先加载相应专题数据',
-                type: 'warning',
-            })
+            console.log(layerid);
+            // ElMessage({
+            //     message: '图层尚未加载，请先加载相应专题数据',
+            //     type: 'warning',
+            // })
 
             continue
         }
@@ -358,7 +359,7 @@ onMounted(() => {
 const getLayerFeatureArray = async (mapInstance, layerName) => {
 
     // 特殊图层
-    if (layerName.includes('注记') || layerName.includes('地形')) {
+    if (layerName.includes('注记') || layerName.includes('地形') || layerName.includes('沙洲')) {
         return []
     }
 
@@ -453,7 +454,7 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
             'circle-radius': 8,
         },
         'symbol': {
-
+            
         },
         'fill-extrusion': {
             'fill-extrusion-color': '#FF5D06',
@@ -486,9 +487,10 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
 
     let lng = property.center_x
     let lat = property.center_y
-    map.jumpTo({
+    map.flyTo({
         center: [lng, lat],
-        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10
+        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10,
+        duration: 3500
     });
 
     highlightLayer.value.push(`${layerId}-highlight-${featureId}`)

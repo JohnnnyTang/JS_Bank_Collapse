@@ -75,6 +75,7 @@ class LayerGroup {
     async layerFilter() {
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
+                if (this.layerIDs[i].includes('预警岸段')) continue;
                 let filter = filterMap[this.layerIDs[i]]
                 if (filter && filter.length != 0 && this.map.getLayer(this.layerIDs[i]))
                     this.map.setFilter(this.layerIDs[i], filter)
@@ -88,6 +89,7 @@ class LayerGroup {
     async layerNoFilter() {
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
+                if (this.layerIDs[i].includes('预警岸段')) continue;
                 if (this.map.getLayer(this.layerIDs[i]))
                     this.map.setFilter(this.layerIDs[i], null)
                 mapLayerStore.layerState[this.layerIDs[i]].showing = true
@@ -157,7 +159,7 @@ const initLayerGroups = () => {
         '泵站工程': ['泵站工程'],
         '枢纽工程': ['枢纽工程'],
         '长江干堤': ['长江干堤', '里程桩'],
-        '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记'],
+        '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记', '沙洲'],
         '历史崩岸': [],
         '近岸地形': ['近岸地形', '沙洲', '全江注记'],
         '近年冲淤': [],
