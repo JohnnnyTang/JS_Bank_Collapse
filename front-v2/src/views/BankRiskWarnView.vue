@@ -7,9 +7,19 @@
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div>
                 <div class="place selector-content">
-                    <el-select v-model="placeValue" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
-                        @change="sceneSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in placeList" :key="item.value" :label="item.label" :value="item.value">
+                    <el-select
+                        v-model="placeValue"
+                        placeholder="选择岸段"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="sceneSelectChange"
+                        popper-class="risk-popper"
+                    >
+                        <el-option
+                            v-for="item in placeList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
                             <span class="section-name-text">{{
                                 item.label
                             }}</span>
@@ -20,11 +30,29 @@
             <div class="scene-selector-container selector-item-container">
                 <div class="scene-title selector-title">评估情景：</div>
                 <div class="scene selector-content">
-                    <el-select v-model="sceneValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
-                        @change="sceneSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
-                            <span style="float: left" class="section-name-text">{{ item.place }}</span>
-                            <span style="float: right" class="section-class-text">{{ item.year }}</span>
+                    <el-select
+                        v-model="sceneValue"
+                        placeholder="选择专题"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="sceneSelectChange"
+                        popper-class="risk-popper"
+                    >
+                        <el-option
+                            v-for="item in scenceList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
+                            <span
+                                style="float: left"
+                                class="section-name-text"
+                                >{{ item.place }}</span
+                            >
+                            <span
+                                style="float: right"
+                                class="section-class-text"
+                                >{{ item.year }}</span
+                            >
                         </el-option>
                         <template #footer>
                             <div class="add-select-button">新增评估情景</div>
@@ -40,20 +68,32 @@
                 </dv-border-box2>
             </div>
             <div class="riskInfo-item profileShape">
-                <div class="item-title">
-                    断面形态对比：
-                </div>
+                <div class="item-title">断面形态对比：</div>
                 <div class="profile-selector-container">
-                    <el-select v-model="profileValue" placeholder="选择断面" style="width: 10vw; height: 3.5vh"
-                        @change="profileSelectChange" popper-class="profile-popper">
-                        <el-option v-for="item in profileList" :key="item.value" :label="item.label" :value="item.value">
+                    <el-select
+                        v-model="profileValue"
+                        placeholder="选择断面"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="profileSelectChange"
+                        popper-class="profile-popper"
+                    >
+                        <el-option
+                            v-for="item in profileList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
                             <span class="profile-name-text">
                                 {{ item.label }}
                             </span>
                         </el-option>
                     </el-select>
                 </div>
-                <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                <div
+                    ref="shapeGraphRef"
+                    class="shape graph"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                ></div>
                 <div class="graph-container shape">
                     <div
                         ref="shapeGraphRef"
@@ -64,12 +104,14 @@
                 </div>
             </div>
             <div class="riskInfo-item profileErosion">
-                <div class="item-title">
-                    近岸冲淤：
-                </div>
-                <div ref="flowGraphRef" class="erosion graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                <div class="item-title">近岸冲淤：</div>
+                <div
+                    ref="flowGraphRef"
+                    class="erosion graph"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                ></div>
                 <div class="graph-container erosion">
-                    <div 
+                    <div
                         ref="erosionGraphRef"
                         class="erosion graph"
                         v-loading="erosionChartLoad"
@@ -78,9 +120,7 @@
                 </div>
             </div>
         </div>
-        <riskResultVue 
-            :profileList="profileList"
-        />
+        <riskResultVue :profileList="profileList" />
 
         <div class="flow-relative-container">
             <div class="flow-relative-title">
@@ -92,7 +132,11 @@
             <div class="flow-relative-content">
                 <div class="flow-control-block">
                     <label class="switch">
-                        <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
+                        <input
+                            type="checkbox"
+                            :checked="showFlow"
+                            @click="flowControlHandler()"
+                        />
                         <span class="slider"></span>
                     </label>
                     <div class="text-block">
@@ -101,11 +145,14 @@
                 </div>
 
                 <div class="time-shower-block">
-                    <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
+                    <flowTimeShower
+                        :type="'exp'"
+                        :time-step="timeStep"
+                        :total-count="25"
+                    ></flowTimeShower>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -117,16 +164,19 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
-import { drawShapeGraph, drawErosionGraph } from '../components/bankRiskWarn/util.js'
+import {
+    drawShapeGraph,
+    drawErosionGraph,
+} from '../components/bankRiskWarn/util.js'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
-import { initScratchMap } from '../utils/mapUtils';
-import SteadyFlowLayer from '../utils/m_demLayer/newFlow';
-import { useMapStore } from '../store/mapStore';
+import { initScratchMap } from '../utils/mapUtils'
+import SteadyFlowLayer from '../utils/m_demLayer/newFlow'
+import { useMapStore } from '../store/mapStore'
 import * as echarts from 'echarts'
-import { ElMessage } from 'element-plus';
-import axios from 'axios';
-import { filterFields } from 'element-plus/es/components/form/src/utils';
+import { ElMessage } from 'element-plus'
+import axios from 'axios'
+import { filterFields } from 'element-plus/es/components/form/src/utils'
 
 let map = null
 const mapContainer = ref()
@@ -136,12 +186,14 @@ let flowSrc = []
 for (let i = 0; i < 26; i++) {
     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
 }
-let flow = reactive(new SteadyFlowLayer(
-    '近岸流场',
-    '/scratchSomething/terrain_flow/json/station.bin',
-    flowSrc,
-    (url) => url.match(/uv_(\d+)\.bin/)[1],
-))
+let flow = reactive(
+    new SteadyFlowLayer(
+        '近岸流场',
+        '/scratchSomething/terrain_flow/json/station.bin',
+        flowSrc,
+        (url) => url.match(/uv_(\d+)\.bin/)[1],
+    ),
+)
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -201,13 +253,13 @@ const placeValue = ref('mzs')
 
 const placeList = ref([{ value: 'mzs', label: '民主沙右缘示范段' }])
 
-const sceneSelectChange = () => { }
+const sceneSelectChange = () => {}
 
-const onAddOption = () => { }
+const onAddOption = () => {}
 
-const onAddProfileOption = () => { }
+const onAddProfileOption = () => {}
 
-const onAddProfile = () => { }
+const onAddProfile = () => {}
 
 const flowControlHandler = () => {
     showFlow.value = !showFlow.value
@@ -217,24 +269,21 @@ const flowControlHandler = () => {
         if (map) {
             flow.show()
             mapFlyToRiver(map)
-        }
-        else {
+        } else {
             ElMessage({
-                'type': 'warning',
-                'message': '地图尚未加载，请等待'
+                type: 'warning',
+                message: '地图尚未加载，请等待',
             })
         }
     } else flow.hide()
-
 }
 
 watch(
-    () => flow.currentResourcePointer, (v) => {
-    // console.log(flow.currentResourcePointer)
+    () => flow.currentResourcePointer,
+    (v) => {
+        // console.log(flow.currentResourcePointer)
         timeStep.value = flow.currentResourcePointer
-    }
-
-
+    },
 )
 
 let profileData = []
@@ -332,42 +381,41 @@ const shapeChartLoad = ref(true)
 const erosionChartLoad = ref(false)
 const shapeGraphRef = ref(null)
 const erosionGraphRef = ref(null)
-let section;
-let beforesection;
-let slopeRate;
-let erosion;
+let section
+let beforesection
+let slopeRate
+let erosion
 // let erosion = [2, 3, 5, 1, 2, 3, 5, 1, 6, 9, 11, 4]
 
 const profileSelectChange = (inputValue) => {
     profileValue.value = inputValue
     changeProfileData(profileData)
-    mapInstance.setFilter('mzsBankLineChoosen', profileList.value[profileValue.value-1].filter);
+    mapInstance.setFilter(
+        'mzsBankLineChoosen',
+        profileList.value[profileValue.value - 1].filter,
+    )
 }
 
 const changeProfileData = (profileData) => {
     shapeChartLoad.value = true
     erosionChartLoad.value = true
-    section = profileData[profileValue.value - 1].section.map((value) => value[2]),
-    beforesection = profileData[profileValue.value - 1].beforeSection.map((value) => value[2])
+    ;(section = profileData[profileValue.value - 1].section.map(
+        (value) => value[2],
+    )),
+        (beforesection = profileData[profileValue.value - 1].beforeSection.map(
+            (value) => value[2],
+        ))
     slopeRate = profileData[profileValue.value - 1].SA[2]
-    erosion = section.map((value, index) => value-beforesection[index])
+    erosion = section.map((value, index) => value - beforesection[index])
     shapeChart = echarts.init(shapeGraphRef.value)
-    drawShapeGraph(
-        shapeChart,
-        section,
-        beforesection,
-        slopeRate,
-    )
+    drawShapeGraph(shapeChart, section, beforesection, slopeRate)
     shapeChartLoad.value = false
     erosionChart = echarts.init(erosionGraphRef.value)
-    drawErosionGraph(
-        erosionChart,
-        erosion
-    )
+    drawErosionGraph(erosionChart, erosion)
     erosionChartLoad.value = false
 }
 
-let mapInstance;
+let mapInstance
 onMounted(async () => {
     // map = new mapboxgl.Map({
     //     container: 'map', // container ID
@@ -590,13 +638,13 @@ onMounted(async () => {
                 'line-width': 4,
             },
         })
-        
+
         map.addLayer({
             id: 'mzsBankLineChoosen',
             type: 'line',
             source: 'mzsBankLineSource',
             'source-layer': 'default',
-            filter: profileList.value[profileValue.value-1].filter,
+            filter: profileList.value[profileValue.value - 1].filter,
             layout: {
                 'line-cap': 'round',
                 'line-join': 'round',
@@ -608,32 +656,37 @@ onMounted(async () => {
             },
         })
 
+        
+
         useMapStore().setMap(map)
-        console.log('set map!');
-        flow.particleNum.n = 2800;
-        flow.speedFactor.n = 1.0;
+        console.log('set map!')
+        flow.particleNum.n = 2800
+        flow.speedFactor.n = 1.0
         map.addLayer(flow)
         flow.hide()
     })
 
-    const getProfileData = async() => {
-        const promises = [];
-        const result = [];
+    const getProfileData = async () => {
+        const promises = []
+        const result = []
         for (let i = 0; i < 12; i++) {
-            promises.push(bankRiskWarn.getProfileData(i+1));
+            promises.push(bankRiskWarn.getProfileData(i + 1))
         }
-        const allResponses = await Promise.all(promises);
-        
+        const allResponses = await Promise.all(promises)
+
         // 确保每个响应都有 data 属性
-        allResponses.forEach(response => {
+        allResponses.forEach((response) => {
             if (response && response.data) {
-                result.push(response.data);
+                result.push(response.data)
             } else {
-                console.error('响应数据不包含 "data" 属性或响应未定义。', response);
+                console.error(
+                    '响应数据不包含 "data" 属性或响应未定义。',
+                    response,
+                )
             }
-        });
+        })
         return result
-    };
+    }
     profileData = await getProfileData()
 
     profileData.map((value, index) => {
@@ -757,7 +810,7 @@ div.risk-warn-container {
 
                         &:before {
                             position: absolute;
-                            content: "";
+                            content: '';
                             height: 1.4em;
                             width: 1.4em;
                             border-radius: 5px;
@@ -769,11 +822,11 @@ div.risk-warn-container {
                     }
 
                     input:checked {
-                        +.slider {
+                        + .slider {
                             background-color: rgb(73, 90, 250);
                         }
 
-                        +.slider:before {
+                        + .slider:before {
                             transform: translateY(-1.5em);
                         }
                     }
@@ -802,7 +855,6 @@ div.risk-warn-container {
                 position: relative;
             }
         }
-
     }
 
     div.selector-container {
@@ -1031,12 +1083,12 @@ div.risk-warn-container {
                     position: relative;
                     width: 100%;
                     height: 100%;
-                    
+
                     &.shape {
                         // height: 35vh;
                         // background-color: rgba(220, 250, 248, 0.4);
                     }
-                    
+
                     &.erosion {
                         // height: 17vh;
                         // background-color: #00098a;
