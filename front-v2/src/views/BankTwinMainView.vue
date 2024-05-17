@@ -116,13 +116,7 @@
             </div>
         </div>
 
-        <div
-            class="warn-history-container"
-            :class="warnActive ? 'active' : 'in-active'"
-            v-loading="historyLoading"
-        >
-            <div class="warn-detail-title">历史预警信息</div>
-        </div>
+        <WarnHistoryTable :warnActive="warnActive"/>
 
         <div class="map-container" id="map"></div>
     </div>
@@ -134,12 +128,9 @@ import { onMounted, ref, onUnmounted, watch } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
-import {
-    BorderBox12 as DvBorderBox12,
-    BorderBox7 as DvBorderBox7,
-} from '@kjgl77/datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
+import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 // import SectionRisk from '../components/bankTwin/SectionRisk.vue'
 // import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
@@ -153,7 +144,6 @@ const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const warnActive = ref(false)
 const detailLoading = ref(false)
-const historyLoading = ref(false)
 const warnLoading = ref(true)
 
 // mapboxgl.accessToken =
@@ -163,6 +153,7 @@ const warnInfoStore = useWarnInfoStore()
 const token = ref(
     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
 )
+
 
 const items = ref([
     { label: '二维视图', value: 'tab1' },
@@ -240,11 +231,11 @@ const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
-            [120.46957922676836, 32.01001616423072],
-            [120.61109640208264, 32.074171362618625],
+            [120.45957922676836, 32.00001616423072],
+            [120.62109640208264, 32.084171362618625],
         ],
         {
-            pitch: 32.45,
+            // pitch: 32.45,
             duration: 1500,
             // zoom: 8,
         },
@@ -270,8 +261,8 @@ const navToManage = () => {
     router.push('/bankManage')
 }
 const buildLocStr = (deviceId) => {
-    deviceId = deviceId.replace("MZS", "")
-    let str = deviceId.split("_").slice(0, 2).join(',')
+    deviceId = deviceId.replace('MZS', '')
+    let str = deviceId.split('_').slice(0, 2).join(',')
     return str
 }
 const updateWarnInfoDesc = async () => {
@@ -330,51 +321,35 @@ onMounted(async () => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
         useMapStore().setMap(map)
-        map.addSource('ptVector', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
-        })
-        map.addSource('test', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
-        })
+        // map.addSource('ptVector', {
+        //     type: 'vector',
+        //     tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+        // })
+        // map.addSource('test', {
+        //     type: 'vector',
+        //     tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+        // })
         await mapInit(map, true)
-        map.addLayer({
-            id: '点1',
-            type: 'symbol',
-            source: 'ptVector',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-                'text-size': 20,
-            },
-            paint: {
-                'text-color': 'rgba(0, 42, 105, 0.75)',
-            },
-        })
-        
-        map.addLayer({
-            id: '点2',
-            type: 'symbol',
-            source: 'test',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-                'text-offset': [-1.0, 1.15],
-                'text-anchor': 'top',
-                'text-size': 16,
-                'text-allow-overlap': true
-            },
-            paint: {
-                'text-color': 'rgb(0, 22, 145)',
-            },
-        })
+        // map.ads
+
+        // map.addLayer({
+        //     id: '点2',
+        //     type: 'symbol',
+        //     source: 'test',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'text-field': ['get', 'label'],
+        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        //         // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+        //         'text-offset': [-1.0, 1.15],
+        //         'text-anchor': 'top',
+        //         'text-size': 16,
+        //         'text-allow-overlap': true
+        //     },
+        //     paint: {
+        //         'text-color': 'rgb(0, 22, 145)',
+        //     },
+        // })
 
         // map.on('click', (e) => {
         //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
@@ -781,7 +756,6 @@ div.twin-main-container {
                     color: #0043fd;
                 }
 
-
                 div.val-text {
                     line-height: 6vh;
                     font-size: calc(0.7vw + 0.5vh);
@@ -789,7 +763,7 @@ div.twin-main-container {
                     color: #1d00be;
                     // max-width: 70%;
                     width: 12vw;
-                    text-align: right
+                    text-align: right;
                     // text-align: center;
                 }
 
@@ -806,40 +780,6 @@ div.twin-main-container {
                 //     // border-left: 2px solid rgb(0, 32, 175);
                 // }
             }
-        }
-    }
-
-    div.warn-history-container {
-        position: absolute;
-        right: 1vw;
-        bottom: 1vh;
-        height: 34vh;
-        width: 24vw;
-
-        backdrop-filter: blur(16px);
-        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
-        background-color: rgba(156, 195, 255, 0.4);
-        border-radius: 4px;
-        border: 2px solid rgb(28, 105, 247);
-        z-index: 3;
-        border-radius: 4px;
-        overflow: hidden;
-
-        div.warn-detail-title {
-            height: 4vh;
-            line-height: 4vh;
-            width: 100%;
-            background-color: transparent;
-            text-align: center;
-            font-size: calc(0.8vw + 0.8vh);
-            font-weight: bold;
-            color: #0400fd;
-            text-shadow:
-                #eef3ff 1px 1px,
-                #eef3ff 2px 2px,
-                #6493ff 3px 3px;
-            letter-spacing: 0.4rem;
-            border-bottom: 2px solid #0400fd;
         }
     }
 

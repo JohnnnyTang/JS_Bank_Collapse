@@ -500,6 +500,7 @@ div.bank-video-container {
                 }
                 div.video-val {
                     width: 16vw;
+                    font-weight: bold;
                 }
             }
 

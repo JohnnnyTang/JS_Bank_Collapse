@@ -1,5 +1,5 @@
 <template>
-    <div class="realtime-video-container" :class="props.active? 'active': 'in-active'">
+    <div class="realtime-video-container" :class="props.active? 'active': 'in-active'" v-if="props.active">
         <div class="realtime-video-title">实时视频监控</div>
         <div class="video-box" v-for="(item, index) in videoList" :key="index">
             <div class="video-content">

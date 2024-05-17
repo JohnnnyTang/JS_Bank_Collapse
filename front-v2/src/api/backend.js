@@ -144,6 +144,10 @@ export default class BackEndRequest {
         return backendInstance.get('/data/monitorInfo/type/6')
     }
 
+    static getHistoryWarnInfo(timeUnit, timeCount) {
+        return backendInstance.get(`/data/deviceWarn/${timeUnit}/${timeCount}`)
+    }
+
 }
 
 
