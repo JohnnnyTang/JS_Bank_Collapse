@@ -240,6 +240,7 @@ export default class SteadyFlowLayer {
         let getVoronoi = async (url) => {
 
             const res = await axios.get(url, { responseType: 'arraybuffer' })
+            console.log(res.data);
             const meshes = new Delaunay(new Float32Array(res.data))
 
             const vertices = []

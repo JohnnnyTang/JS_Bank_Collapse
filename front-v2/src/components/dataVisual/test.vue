@@ -12,31 +12,72 @@ import { onMounted, watch, ref } from 'vue';
 import axios from 'axios';
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import BankWarnLayer from '../../utils/m_demLayer/bankWarnLayer'
+// import BankWarnLayer from '../../utils/m_demLayer/bankWarnLayer'
+import BankWarnLayer from './js/bankWarnLayer'
+import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask';
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+import { layerAddFunction, layerRemoveFunction } from './layerUtil';
+import { filterMap } from './js/tilefieldMAP'
 const mapDom = ref()
 
-const mapFlyToRiver = (mapIns) => {
-    if (!mapIns) return
-    mapIns.fitBounds(
-        [
-            [120.46987922676836, 32.03201616423072],
-            [120.61089640208264, 32.052171362618625],
-        ],
-        {
-            duration: 500,
-            zoom: 12.5,
-        },
-    )
-}
+// const mapFlyToRiver = (mapIns) => {
+//     if (!mapIns) return
+//     mapIns.fitBounds(
+//         [
+//             [120.46987922676836, 32.03201616423072],
+//             [120.61089640208264, 32.052171362618625],
+//         ],
+//         {
+//             duration: 500,
+//             zoom: 12.5,
+//         },
+//     )
+// }
 
 onMounted(async () => {
 
     const map = await initScratchMap(mapDom.value)
     const jsonUrl = '/bankWarn/bankWarn.json'
-    map.addLayer(new BankWarnLayer(jsonUrl))
-    
-    mapFlyToRiver(map)
+    // let flowSrc = []
+    // for (let i = 0; i < 26; i++) {
+    //     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+    // }
+
+    // let flow = new SteadyFlowLayer(
+    //     '近岸流场',
+    //     '/scratchSomething/terrain_flow/json/station.bin',
+    //     flowSrc,
+    //     (url) => url.match(/uv_(\d+)\.bin/)[1],
+    //     '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
+    // )
+    // map.addLayer(flow)
+    let bankWarnLayer = new BankWarnLayer(jsonUrl)
+    map.addLayer(bankWarnLayer)
+
+    // mapFlyToRiver(map)
+
+
+
+
+
+
+
+    // await layerAddFunction(map, '市级行政区')
+    // await layerAddFunction(map, '市级行政区-注记')
+    // map.setFilter('市级行政区', filterMap['市级行政区'])
+    // map.setFilter('市级行政区-注记', filterMap['市级行政区-注记'])
+
+
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key == '1') {
+    //         console.log('11');
+    //         map.setFilter('市级行政区', null)
+    //         map.setFilter('市级行政区-注记', null)
+    //     } else if (e.key == '2') {
+    //         map.setFilter('市级行政区', filterMap['市级行政区'])
+    //         map.setFilter('市级行政区-注记', filterMap['市级行政区-注记'])
+    //     }
+    // })
 
 
 

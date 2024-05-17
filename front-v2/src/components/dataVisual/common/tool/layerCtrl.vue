@@ -16,7 +16,7 @@
             </div>
             <div class="tree-container">
                 <el-tree ref="treeRef" style="max-width: 600px" class="filter-tree" :data="data" :props="defaultProps"
-                    default-expand-all :filter-node-method="filterNode" @node-click="selectedNodeHandler">
+                :filter-node-method="filterNode" @node-click="selectedNodeHandler">
 
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">

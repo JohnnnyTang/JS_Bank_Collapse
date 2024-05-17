@@ -1,5 +1,6 @@
 import { layerAddFunction, layerRemoveFunction } from "../layerUtil"
 import { useMapLayerStore } from "../../../store/mapStore"
+import { filterMap } from "./tilefieldMAP"
 
 const mapLayerStore = useMapLayerStore()
 class LayerGroup {
@@ -40,6 +41,64 @@ class LayerGroup {
             console.log('WARNING:: NOT VALID MAP');
         }
     }
+
+    async showFilteredLayer() {
+        //important features only
+        if (this.map) {
+            for (let i = 0; i < this.layerIDs.length; i++) {
+                await layerAddFunction(this.map, this.layerIDs[i])
+                let filter = filterMap[this.layerIDs[i]]
+                if (filter && filter.length != 0)
+                    this.map.setFilter(this.layerIDs[i], filter)
+                mapLayerStore.layerState[this.layerIDs[i]].showing = true
+            }
+            this.active = true
+        } else {
+            console.log('WARNING:: NOT VALID MAP');
+        }
+    }
+
+    async showCompleteLayer() {
+        //all features
+        if (this.map) {
+            for (let i = 0; i < this.layerIDs.length; i++) {
+                await layerAddFunction(this.map, this.layerIDs[i])
+                this.map.setFilter(this.layerIDs[i], null)
+                mapLayerStore.layerState[this.layerIDs[i]].showing = true
+            }
+            this.active = true
+        } else {
+            console.log('WARNING:: NOT VALID MAP');
+        }
+    }
+
+    async layerFilter() {
+        if (this.map) {
+            for (let i = 0; i < this.layerIDs.length; i++) {
+                let filter = filterMap[this.layerIDs[i]]
+                if (filter && filter.length != 0 && this.map.getLayer(this.layerIDs[i]))
+                    this.map.setFilter(this.layerIDs[i], filter)
+                mapLayerStore.layerState[this.layerIDs[i]].showing = true
+            }
+            this.active = true
+        } else {
+            console.log('WARNING:: NOT VALID MAP');
+        }
+    }
+    async layerNoFilter() {
+        if (this.map) {
+            for (let i = 0; i < this.layerIDs.length; i++) {
+                if (this.map.getLayer(this.layerIDs[i]))
+                    this.map.setFilter(this.layerIDs[i], null)
+                mapLayerStore.layerState[this.layerIDs[i]].showing = true
+            }
+            this.active = true
+        } else {
+            console.log('WARNING:: NOT VALID MAP');
+        }
+    }
+
+
 }
 
 class LayerScene {
@@ -63,7 +122,7 @@ class LayerScene {
     async showScene() {
         if (this.map) {
             for (let i = 0; i < this.LayerGroups.length; i++) {
-                await this.LayerGroups[i].showLayer()
+                await this.LayerGroups[i].showFilteredLayer()
             }
             this.active = true
         } else {
@@ -117,7 +176,8 @@ const initLayerScenes = () => {
     const dict = {
         '全江概貌': ['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'],
         '工程情况': ['其他堤防', '过江通道', '沿江码头', '水库大坝', '水闸工程', '泵站工程', '枢纽工程', '长江干堤'],
-        '重点岸段': ['近岸地形', '历史崩岸', '岸段名录', '近年冲淤'],
+        // '重点岸段': ['近岸地形', '历史崩岸', '岸段名录', '近年冲淤'],
+        '重点岸段': ['岸段名录']
     }
     let map = new Map()
     for (let key in dict) {
@@ -142,108 +202,113 @@ const mapToObject = (mapObj) => {
 
 const scenes = mapToObject(initLayerScenes())
 const layerGroups = mapToObject(initLayerGroups())
+
 const tree = [
     {
         label: '全江概貌',
+        active: false,
         children: [
             {
                 label: '行政区划',
-                icon: '/icons/行政区划.png'
-
+                icon: '/icons/行政区划.png',
+                active: false,
+                filter: true
             },
             {
                 label: '河道分段',
-                icon: '/icons/河道分段.png'
-
+                icon: '/icons/河道分段.png',
+                active: false,
+                filter: true
             },
             {
                 label: '流域水系',
-                icon: '/icons/流域水系.png'
-
+                icon: '/icons/流域水系.png',
+                active: false,
+                filter: true
             },
             {
                 label: '湖泊河流',
-                icon: '/icons/湖泊河流.png'
-
+                icon: '/icons/湖泊河流.png',
+                active: false,
+                filter: true
             },
             {
                 label: '水文站点',
-                icon: '/icons/水文站点.png'
-
+                icon: '/icons/水文站点.png',
+                active: false,
+                filter: true
             }
         ]
     },
     {
         label: '工程情况',
+        active: false,
+        filter: true,
         children: [
             {
                 label: '长江干堤',
-                icon: '/icons/江堤港堤.png'
+                icon: '/icons/江堤港堤.png',
+                active: false,
+                filter: true
             },
             {
                 label: '其他堤防',
-                icon: '/icons/长江堤防.png'
+                icon: '/icons/长江堤防.png',
+                active: false,
+                filter: true
             },
             {
                 label: '过江通道',
-                icon: '/icons/过江通道.png'
-
+                icon: '/icons/过江通道.png',
+                active: false,
+                filter: true
             },
             {
                 label: '沿江码头',
-                icon: '/icons/沿江码头.png'
-
+                icon: '/icons/沿江码头.png',
+                active: false,
+                filter: true
             },
             {
                 label: '水库大坝',
-                icon: '/icons/水库大坝.png'
-
+                icon: '/icons/水库大坝.png',
+                active: false,
+                filter: true
             },
             {
                 label: '水闸工程',
-                icon: '/icons/水闸工程.png'
-
+                icon: '/icons/水闸工程.png',
+                active: false,
+                filter: true
             },
             {
                 label: '泵站工程',
-                icon: '/icons/泵站工程.png'
-
+                icon: '/icons/泵站工程.png',
+                active: false,
+                filter: true
             },
             {
                 label: '枢纽工程',
-                icon: '/icons/枢纽工程.png'
+                icon: '/icons/枢纽工程.png',
+                active: false,
+                filter: true
             },
-
         ]
     },
     {
         label: '重点岸段',
+        active: false,
+        filter: true,
         children: [
             {
                 label: '岸段名录',
-                icon: '/icons/岸段名录.png'
-
+                icon: '/icons/岸段名录.png',
+                active: false,
+                filter: true
             },
-            // {
-            //     label: '历史崩岸',
-            //     icon: '/icons/历史崩岸.png'
-
-            // },
-            {
-                label: '近岸地形',
-                icon: '/icons/近岸地形.png'
-
-            },
-            // {
-            //     label: '近年冲淤',
-            //     icon: '/icons/近年冲淤.png'
-            // },
         ]
     },
-    // {
-    //     label: '重点数据',
-    // }
-]
+];
 
 const totalLayer = [
     '省级行政区',
@@ -373,14 +438,14 @@ const layerTree = [
                     { label: '岸段-注记' }
                 ]
             },
-            {
-                label: '近岸地形',
-                children: [
-                    { label: '近岸地形' },
-                    { label: '沙洲' },
-                    { label: '全江注记' }
-                ]
-            },
+            // {
+            //     label: '近岸地形',
+            //     children: [
+            //         { label: '近岸地形' },
+            //         { label: '沙洲' },
+            //         { label: '全江注记' }
+            //     ]
+            // },
         ]
     }
 ];

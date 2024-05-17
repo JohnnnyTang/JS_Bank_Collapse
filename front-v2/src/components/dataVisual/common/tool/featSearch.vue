@@ -136,38 +136,36 @@ const updateLgroupTags = (sceneName) => {
 
 
 const LGroupsTagClickHandler = async (i) => {
-    setTimeout(async () => {
-        LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
-        // console.log(LGroups[i]);
-        if (LGroups.value[i] === '长江干堤') {
-            let featArray1 = await getLayerFeatureArray(mapStore.getMap(), '长江干堤')
-            let featArray2 = await getLayerFeatureArray(mapStore.getMap(), '里程桩')
 
-            if (LGroupsTagChecked.value[i]) {
-                let treeNode1 = {
-                    label: '长江干堤', children: []
-                }
-                let treeNode2 = {
-                    label: '里程桩', children: []
-                }
-                data.value.push(treeNode1, treeNode2)
-            } else {
-                deleteTreeData()
+    LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
+
+    if (LGroups.value[i] === '长江干堤') {
+        let featArray1 = await getLayerFeatureArray(mapStore.getMap(), '长江干堤')
+        let featArray2 = await getLayerFeatureArray(mapStore.getMap(), '里程桩')
+
+        if (LGroupsTagChecked.value[i]) {
+            let treeNode1 = {
+                label: '长江干堤', children: []
             }
-            // updateFeatureCount()
-            featureCount.value = (featArray1.length + featArray2.length)
-
+            let treeNode2 = {
+                label: '里程桩', children: []
+            }
+            data.value.push(treeNode1, treeNode2)
         } else {
-            if (LGroupsTagChecked.value[i]) {
-                await appednTreeData()
-            } else {
-                deleteTreeData()
-            }
-            updateFeatureCount()
-
+            deleteTreeData()
         }
+        // updateFeatureCount()
+        featureCount.value = (featArray1.length + featArray2.length)
 
-    }, 500)
+    } else {
+        if (LGroupsTagChecked.value[i]) {
+            await appednTreeData()
+        } else {
+            deleteTreeData()
+        }
+        updateFeatureCount()
+
+    }
 }
 
 const appednTreeData = async () => {
@@ -186,12 +184,85 @@ const appednTreeData = async () => {
 
     let map = mapStore.getMap()
     for (let i = 0; i < layers.length; i++) {
+        //tool
+        const treeHasNode = (nodeName) => {
+            for (let i = 0; i < data.value.length; i++) {
+                if (data.value[i].label === nodeName) {
+                    return true
+                }
+            }
+            return false
+        }
+
         // 特殊图层
         if (layers[i].includes('注记') || layers[i].includes('省级行政区') ||
             layers[i] === '过江通道-桥墩'
         ) {
             continue
         }
+        if (layers[i].includes('过江通道')) {
+            let treeNode1 = {
+                label: '已建通道',
+                children: []
+            }
+            let treeNode2 = {
+                label: '在建通道',
+                children: []
+            }
+            let treeNode3 = {
+                label: '规划通道',
+                children: []
+            }
+            let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+            let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+            // let res = [...res1, ...res2]
+            res1.forEach(item => {
+                item.source = 'riverPassageLine'
+                if (item.plan === 1) {
+                    treeNode1.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === 0) {
+                    treeNode2.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === -1) {
+                    treeNode3.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                }
+            })
+            res2.forEach(item => {
+                item.source = 'riverPassagePolygon'
+                if (item.plan === 1) {
+                    treeNode1.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === 0) {
+                    treeNode2.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === -1) {
+                    treeNode3.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                }
+            })
+            console.log(treeNode1, treeNode2, treeNode3);
+            if (!treeHasNode('已建通道')) data.value.push(treeNode1)
+            if (!treeHasNode('在建通道')) data.value.push(treeNode2)
+            if (!treeHasNode('规划通道')) data.value.push(treeNode3)
+
+            continue
+        }
+
+
 
         let layerid = layers[i]
         if (!map.getLayer(layerid)) {
@@ -204,15 +275,10 @@ const appednTreeData = async () => {
         }
         let sourceid = map.getLayer(layerid).source
         // 监测当前treeNode是否已经存在Node
-        const treeHasNode = (nodeName) => {
-            for (let i = 0; i < data.value.length; i++) {
-                if (data.value[i].label === nodeName) {
-                    return true
-                }
-            }
-            return false
-        }
+
         if (treeHasNode(layerid)) continue
+
+
 
         let res = await getLayerFeatureArray(map, layerid)
         let treeNode = {
@@ -241,6 +307,10 @@ const deleteTreeData = async () => {
         }
     }
     let noLayers = []
+
+    if (noCcheckedLayerGroup.includes('过江通道')) {
+        noLayers = ['已建通道', '在建通道', '规划通道']
+    }
     for (let i = 0; i < noCcheckedLayerGroup.length; i++) {
         noLayers.push(...sceneStore.LAYERGROUPMAP.value[noCcheckedLayerGroup[i]].layerIDs)
     }
@@ -309,6 +379,7 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
         }
     }
     else if (source.type == 'vector') {
+
         const res = await axios.get(tileServer + `/tile/vector/${sourceId}/info`)
         properties = res.data
 
@@ -335,15 +406,32 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
             properties = n
         }
 
+
     }
     return properties;
 }
 
 const featureHighLight = (featureLayerid, map, featureName, property) => {
-    let layerId = featureLayerid
-    let featureId = featureName
-    let featureLayer = map.getLayer(layerId)
-    let sourceid = featureLayer.source
+
+    let layerId
+    let featureId
+    let featureLayer
+    let sourceid
+
+    if (featureLayerid.includes('通道')) {
+        // layerId = '过江通道-'
+        sourceid = property.source
+        layerId = (sourceid === 'riverPassagePolygon' ? '过江通道-桥' : '过江通道-隧道/通道')
+        featureId = featureName
+        featureLayer = map.getLayer(layerId)
+
+    } else {
+        layerId = featureLayerid
+        featureId = featureName
+        featureLayer = map.getLayer(layerId)
+        sourceid = featureLayer.source
+    }
+
 
     emit('featureInfo', {
         ogData: property,
