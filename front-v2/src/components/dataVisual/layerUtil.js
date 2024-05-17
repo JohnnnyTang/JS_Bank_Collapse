@@ -209,170 +209,6 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    '已建通道': async (map) => {
-        if (!map.getSource('channel-built-source')) {
-            let channel = new DataPioneer(
-                '过江通道',
-                (e) => e['llCoords'],
-                'LineString',
-            )
-            await channel.requestData(BackEndRequest.getChannelData)
-            const { built, building, planning } = DataPioneer.getDifChannelData(
-                channel.origin2geojson(),
-            )
-            !map.getSource('channel-built-source') &&
-                map.addSource('channel-built-source', {
-                    type: 'geojson',
-                    data: built,
-                })
-            !map.getSource('channel-building-source') &&
-                map.addSource('channel-building-source', {
-                    type: 'geojson',
-                    data: building,
-                })
-
-            !map.getSource('channel-planning-source') &&
-                map.addSource('channel-planning-source', {
-                    type: 'geojson',
-                    data: planning,
-                })
-        }
-        !map.getLayer('已建通道') &&
-            map.addLayer({
-                id: '已建通道',
-                type: 'line',
-                source: 'channel-built-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round', 'visibility': 'none' },
-                paint: {
-                    'line-color': 'rgb(121, 164, 35)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-    },
-    '在建通道': async (map) => {
-        if (!map.getSource('channel-building-source')) {
-            let channel = new DataPioneer(
-                '过江通道',
-                (e) => e['llCoords'],
-                'LineString',
-            )
-            await channel.requestData(BackEndRequest.getChannelData)
-            const { built, building, planning } = DataPioneer.getDifChannelData(
-                channel.origin2geojson(),
-            )
-            !map.getSource('channel-built-source') &&
-                map.addSource('channel-built-source', {
-                    type: 'geojson',
-                    data: built,
-                })
-            !map.getSource('channel-building-source') &&
-                map.addSource('channel-building-source', {
-                    type: 'geojson',
-                    data: building,
-                })
-
-            !map.getSource('channel-planning-source') &&
-                map.addSource('channel-planning-source', {
-                    type: 'geojson',
-                    data: planning,
-                })
-        }
-
-        !map.getLayer('在建通道') &&
-            map.addLayer({
-                id: '在建通道',
-                type: 'line',
-                source: 'channel-building-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round' },
-                paint: {
-                    'line-color': 'rgb(204, 102, 0)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-    },
-    '规划通道': async (map) => {
-        if (!map.getSource('channel-planning-source')) {
-            let channel = new DataPioneer(
-                '过江通道',
-                (e) => e['llCoords'],
-                'LineString',
-            )
-            await channel.requestData(BackEndRequest.getChannelData)
-            const { built, building, planning } = DataPioneer.getDifChannelData(
-                channel.origin2geojson(),
-            )
-            !map.getSource('channel-built-source') &&
-                map.addSource('channel-built-source', {
-                    type: 'geojson',
-                    data: built,
-                })
-            !map.getSource('channel-building-source') &&
-                map.addSource('channel-building-source', {
-                    type: 'geojson',
-                    data: building,
-                })
-
-            !map.getSource('channel-planning-source') &&
-                map.addSource('channel-planning-source', {
-                    type: 'geojson',
-                    data: planning,
-                })
-        }
-
-        !map.getLayer('规划通道') &&
-            map.addLayer({
-                id: '规划通道',
-                type: 'line',
-                source: 'channel-planning-source',
-                layout: { 'line-join': 'round', 'line-cap': 'round', },
-                paint: {
-                    'line-color': 'rgb(51, 204, 153)',
-                    'line-opacity': 1,
-                    'line-width': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        5,
-                        22,
-                        20,
-                    ],
-                },
-                layout: {
-                    'line-cap': 'round',
-                    'line-join': 'round',
-                    'line-round-limit': 2,
-                },
-            })
-    },
     '民主沙地标': async (map) => {
         !map.getSource('mzsPlaceLabel') &&
             map.addSource('mzsPlaceLabel', {
@@ -831,7 +667,7 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-color': '#CEEFFA',
+                    'fill-color': 'rgb(222, 242, 252)',
                     'fill-opacity': 1.0,
                 },
             })
@@ -1090,6 +926,12 @@ const layerAddFunctionMap = {
 
     },
     ////////过江通道
+    /*
+    已建--plan==1  #ff7875
+    在建--plan==0  #ffd875
+    规划--plan==-1 #b8ff75
+    */
+
     '过江通道-隧道/通道': async (map) => {
         !map.getSource('riverPassageLine') &&
             map.addSource('riverPassageLine', {
@@ -1110,42 +952,19 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'line-opacity': 1,
-                    'line-color': '#E6A23C',
-                    'line-width': 2.0,
-                },
-            })
-    },
-    '过江通道-隧道/通道-注记': async (map) => {
-        !map.getSource('riverPassageLine') &&
-            map.addSource('riverPassageLine', {
-                type: 'vector',
-                tiles: [
-                    tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
-                ],
-            })
-        !map.getLayer('过江通道-隧道/通道-注记') &&
-            map.addLayer({
-                id: '过江通道-隧道/通道-注记',
-                type: 'symbol',
-                source: 'riverPassageLine',
-                'source-layer': 'default',
-                layout: {
-                    'text-field': ['get', 'name'],
-                    'symbol-placement': 'line',
-                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                    // 'text-offset': [0, 1.25],
-                    'text-anchor': 'center',
-                },
-                paint: {
-                    'text-color': '#653400',
-                    'line-width': [
-                        "interpolate",
-                        ["linear"],
-                        ["zoom"],
-                        7, ["literal", 0.5],
-                        10, ["literal", 3.0],
-                        13, ["literal", 7.0]
+                    'line-color': [
+                        "match",
+                        ["get", "plan"],
+                        1,
+                        '#ff7875',
+                        0,
+                        '#ffd875',
+                        -1,
+                        '#b8ff75',
+                        // 如果plan属性不是1, 0, 或 -1，可以设置一个默认颜色
+                        'rgb(0, 0, 0)' // 默认颜色为黑色
                     ],
+                    'line-width': 2.0,
                 },
             })
     },
@@ -1166,7 +985,18 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-extrusion-color': '#E7AE6D',
+                    'fill-extrusion-color': [
+                        "match",
+                        ["get", "plan"],
+                        1,
+                        '#ff7875',
+                        0,
+                        '#ffd875',
+                        -1,
+                        '#b8ff75',
+                        // 如果plan属性不是1, 0, 或 -1，可以设置一个默认颜色
+                        'rgb(0, 0, 0)' // 默认颜色为黑色
+                    ],
                     'fill-extrusion-base': 0,
                     'fill-extrusion-height': 200,
                     'fill-extrusion-opacity': 1.0
@@ -1190,7 +1020,18 @@ const layerAddFunctionMap = {
                 layout: {
                 },
                 paint: {
-                    'fill-extrusion-color': '#FF9925',
+                    'fill-extrusion-color': [
+                        "match",
+                        ["get", "plan"],
+                        1,
+                        '#ff7875',
+                        0,
+                        '#ffd875',
+                        -1,
+                        '#b8ff75',
+                        // 如果plan属性不是1, 0, 或 -1，可以设置一个默认颜色
+                        'rgb(0, 0, 0)' // 默认颜色为黑色
+                    ],
                     'fill-extrusion-base': 200,
                     'fill-extrusion-height': 210,
                     'fill-extrusion-opacity': 1.0
@@ -1220,10 +1061,46 @@ const layerAddFunctionMap = {
                     'text-offset': [0, 0]
                 },
                 paint: {
-                    'text-color': '#653400',
+                    'text-color': '#2e0201',
                 },
             })
     },
+    '过江通道-隧道/通道-注记': async (map) => {
+        !map.getSource('riverPassageLine') &&
+            map.addSource('riverPassageLine', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('过江通道-隧道/通道-注记') &&
+            map.addLayer({
+                id: '过江通道-隧道/通道-注记',
+                type: 'symbol',
+                source: 'riverPassageLine',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'name'],
+                    'symbol-placement': 'line',
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'center',
+                },
+                paint: {
+                    'text-color': '#2e0201',
+                },
+            })
+    },
+    // '已建通道': async (map) => {
+
+    // },
+    // '在建通道': async (map) => {
+
+    // },
+    // '规划通道': async (map) => {
+
+    // },
+
     ///////沿江码头
     '沿江码头': async (map) => {
         !map.getSource('dockArea') &&
@@ -1319,12 +1196,18 @@ const layerAddFunctionMap = {
                 layout: {
                     'icon-image': '泵站',
                     'icon-size': [
-                        'step',
-                        ['zoom'],
-                        ['literal', 0],
-                        7, ['literal', 0],
-                        9.5, ['literal', 0.5],
-                        14, ['literal', 1.0]
+                        // 'step',
+                        // ['zoom'],
+                        // ['literal', 0],
+                        // 7, ['literal', 0],
+                        // 9.5, ['literal', 0.5],
+                        // 14, ['literal', 1.0]
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        10, ["literal", 0],
+                        11, ["literal", 0.4],
+                        14, ["literal", 0.5]
                     ],
                 },
                 paint: {

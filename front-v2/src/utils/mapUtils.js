@@ -37,6 +37,7 @@ const initScratchMap = (ref) => {
                 zoom: 8,
                 projection: 'mercator',
                 GPUFrame: GPUFrame,
+                useWebGL2: true,
                 antialias: true,
                 // minZoom: 8,
             }).on('load', async () => {
@@ -758,7 +759,7 @@ class ScratchMap extends mapboxgl.Map {
         // Pass
         this.outputPass = scr.renderPass({
             name: 'Render Pass (Scratch map)',
-            colorAttachments: [{ colorResource: this.screen }],
+            colorAttachments: [{ colorResource: this.screen ,loadOp: 'load'}],
             depthStencilAttachment: { depthStencilResource: this.depthTexture }
         })
 
