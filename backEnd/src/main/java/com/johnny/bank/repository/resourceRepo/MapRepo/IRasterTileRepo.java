@@ -4,13 +4,10 @@ import com.johnny.bank.model.configuration.TilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @Author: Johnny Tang
@@ -28,9 +25,7 @@ public class IRasterTileRepo {
         this.tilePathConfig = tilePath;
     }
 
-
-    public byte[] getMXSRasterFile(String tilePath) throws Exception {
-        String fullPath = tilePathConfig.getMzsTilePath() + tilePath;
+    private byte[] getRasterDataAsByteArray(String fullPath) throws Exception {
         File file = new File(fullPath);
         if(!file.exists()) {
             fullPath = tilePathConfig.getMzsTilePath() + "blank.png";
@@ -42,5 +37,32 @@ public class IRasterTileRepo {
             log.info(e.getMessage());
             throw new Exception(e.getMessage());
         }
+    }
+
+
+    public byte[] getMXSRasterFile(String tilePath) throws Exception {
+        String fullPath = tilePathConfig.getMzsTilePath() + tilePath;
+//        File file = new File(fullPath);
+//        if(!file.exists()) {
+//            fullPath = tilePathConfig.getMzsTilePath() + "blank.png";
+//        }
+////        System.out.println(mzsRasterPath);
+//        try (FileInputStream in = new FileInputStream(fullPath)){
+//            return IOUtils.toByteArray(in);
+//        } catch (Exception e) {
+//            log.info(e.getMessage());
+//            throw new Exception(e.getMessage());
+//        }
+        return  getRasterDataAsByteArray(fullPath);
+    }
+
+    public byte[] getRiverRasterFile(String tilePath) throws Exception {
+        String fullPath = tilePathConfig.getRiverTilePath() + tilePath;
+        return  getRasterDataAsByteArray(fullPath);
+    }
+
+    public byte[] getMzsFloodRasterFile(String tilePath) throws Exception {
+        String fullPath = tilePathConfig.getMzsTilePath() + "floodTile/" + tilePath;
+        return  getRasterDataAsByteArray(fullPath);
     }
 }
