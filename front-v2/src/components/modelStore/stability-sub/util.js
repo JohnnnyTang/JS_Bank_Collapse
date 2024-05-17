@@ -281,15 +281,68 @@ export function convertToMercator(lonLat) {
     return xy
 }
 
+export const addLineToMap = (map, start, end, id) => {
+    if (!map.getSource(`${id}-source`)) {
+        const feature = {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+                coordinates: [start, end],
+                type: 'LineString',
+            },
+        }
+        map.addSource(`${id}-source`, {
+            type: 'geojson',
+            data: feature,
+        })
+    }
+    if (map.getLayer(`${id}-layer`)) {
+        map.setLayoutProperty(`${id}-layer`, 'visibility', 'visible') // 设置图层可见性
+    } else {
+        map.addLayer({
+            id: `${id}-layer`,
+            type: 'line',
+            source: `${id}-source`,
+            layout: {
+                'line-join': 'round',
+                'line-cap': 'round',
+                visibility: 'visible',
+            },
+            paint: {
+                'line-color': '#888',
+                'line-width': 8,
+            },
+        })
+    }
+}
+
+export const hideLayer = (map, id) => {
+    if (map.getLayer(`${id}-layer`)) {
+        map.setLayoutProperty(`${id}-layer`, 'visibility', 'none') // 设置图层可见性
+    }
+}
+
+export const deleteLineFromMap = (map, id) => {
+    if (map.getLayer(`${id}-layer`)) {
+        map.removeLayer(`${id}-layer`)
+    }
+    if (map.getSource(`${id}-source`)) {
+        map.removeSource(`${id}-source`)
+    }
+}
+
 /**
  *
  * @param {any} echarts
- * @param {number[]} points
+ * @param {number[]} current
+ * @param {number[]} before
  * @param {number} deepestPoint
  */
-export const drawSectionGraph = (echarts, points) => {
-    const min = Math.min(...points)
-    const max = Math.max(...points)
+export const drawSectionGraph = (echarts, current, before) => {
+    console.log(current, before)
+    const min = Math.min(...current, ...before)
+    const max = Math.max(...current, ...before)
+    const length = Math.min(current.length, before.length)
     const option = {
         title: {
             text: '断面形态',
@@ -310,9 +363,14 @@ export const drawSectionGraph = (echarts, points) => {
                 },
             },
         },
+        legend: {
+            data: ['当前横截面', '对比横截面'],
+            right: '10%',
+            top: '2%',
+        },
         xAxis: {
             type: 'category',
-            data: points.map((_, index) => index * 5),
+            data: new Array(length).fill(0).map((_, index) => index * 5),
             position: 'bottom',
         },
         yAxis: {
@@ -329,14 +387,27 @@ export const drawSectionGraph = (echarts, points) => {
         },
         series: [
             {
-                name: '断面深度',
-                data: points.map((value) => value.toFixed(2)),
+                name: '当前横截面',
+                data: current.slice(0, length).map((value) => value.toFixed(2)),
                 type: 'line',
                 smooth: true,
                 // symbol: 'circle',
                 areaStyle: {
                     opacity: 0.8,
                     color: '#2a5fdb',
+                },
+            },
+            {
+                name: '对比横截面',
+                data: before.slice(0, length).map((value) => value.toFixed(2)),
+                type: 'line',
+                smooth: true,
+                // symbol: 'circle',
+                lineStyle: {
+                    color: '#ff7070',
+                },
+                itemStyle: {
+                    color: '#ff7070',
                 },
             },
         ],

@@ -99,18 +99,10 @@
                                             <template #dropdown v-if="data.type &&
                                                 data.type !== 'dem' &&
                                                 data.type !==
-                                                'section-geojson' &&
-                                                data.type !== 'result'
+                                                'section-geojson'
                                                 ">
                                                 <el-dropdown-menu>
                                                     <el-dropdown-item command="visualize">可视化</el-dropdown-item>
-                                                    <el-dropdown-item command="delete">删除</el-dropdown-item>
-                                                </el-dropdown-menu>
-                                            </template>
-                                            <template #dropdown v-if="data.type &&
-                                                data.type == 'result'
-                                                ">
-                                                <el-dropdown-menu>
                                                     <el-dropdown-item command="delete">删除</el-dropdown-item>
                                                 </el-dropdown-menu>
                                             </template>
@@ -165,11 +157,39 @@
                     <div id="map" ref="mapContainerRef"></div>
                     <canvas id="GPUFrame"></canvas>
                 </div>
-                <div class="model-container">
+                <div class="model-tooltip-container">
                     <el-button type="primary" @click="handleRunModelClick" color="#2e8cd9"
                         v-if="showAnalysis">演变分析计算</el-button>
                 </div>
-                <div class="model-params-container" v-if="isParamsShow">
+                <div class="model-container" v-if="isModelPanelShow">
+                    <div style="font-size: large; padding-bottom: 16px">
+                        近岸演变分析模型
+                    </div>
+                    <div class="model-list">
+                        <el-card style="height: 300px; object-fit: cover;">
+                            <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                                class="image" style="margin-left: 0;margin-right: 0;">
+                            <div style="padding:4px 0px;">
+                                <el-button @click="handleSelectModelClick('section-graph')">断面形态</el-button>
+                            </div>
+                        </el-card>
+                        <el-card style="height: 300px; object-fit: cover;">
+                            <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                                class="image" style="margin-left: 0;margin-right: 0;">
+                            <div style="padding:4px 0px;">
+                                <el-button @click="handleSelectModelClick('rate')">断面坡比</el-button>
+                            </div>
+                        </el-card>
+                        <el-card style="height: 300px; object-fit: cover;">
+                            <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+                                class="image" style="margin-left: 0;margin-right: 0;">
+                            <div style="padding:4px 0px;">
+                                <el-button @click="handleSelectModelClick('chongyu')">断面冲淤</el-button>
+                            </div>
+                        </el-card>
+                    </div>
+                </div>
+                <div class="model-params-container" v-if="modelType">
                     <div style="font-size: large; padding-bottom: 16px">
                         模型参数设置
                     </div>
@@ -196,7 +216,7 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="runModel(paramsRef)">运行模型</el-button>
+                            <el-button type="primary" @click="runModel(paramsRef, modelType)">运行模型</el-button>
                             <el-button @click="handleCancelParams(paramsRef)">取消</el-button>
                         </el-form-item>
                     </el-form>
@@ -232,7 +252,7 @@ import ModelStatus from '../stability-sub/ModelStatus.vue'
 import { ElMessage } from 'element-plus'
 import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
 import { useStabilityStore } from '../../../store/stabilityStore.js'
-import { convertToMercator, drawChongyuSectionGraph } from '../stability-sub/util.js'
+import { addLineToMap, convertToMercator, deleteLineFromMap, drawChongyuSectionGraph, hideLayer } from '../stability-sub/util.js'
 import {
     demoJson,
     drawRateGraph,
@@ -517,7 +537,7 @@ const handleCheckedlayersChange = (value) => {
 // tree and layer
 const selectedEvolutionNode = ref(null)
 const evolutionLayerData = ref(null)
-// KXH type 为 dem, section-geojson, section-graph, rate, chongyu, result, null
+// KXH type 为 dem, section-geojson, section-graph, rate, chongyu, null
 const evolutionTreeData = reactive([
     {
         label: '地形数据',
@@ -541,28 +561,23 @@ const evolutionTreeData = reactive([
         children: [],
     },
     {
-        label: '示例断面',
-        type: 'result',
-        children: [
-            {
-                label: '断面形态',
-                nodeID: '20200301-section-graph',
-                type: 'section-graph',
-            },
-            {
-                label: '断面坡比',
-                nodeID: '20200301-rate',
-                type: 'rate',
-            },
-            {
-                label: '断面冲淤',
-                nodeID: '20200301-chongyu',
-                type: 'chongyu',
-            },
-        ],
+        label: '示例断面形态',
+        nodeID: '20200301-section-graph',
+        type: 'section-graph',
+    },
+    {
+        label: '示例断面坡比',
+        nodeID: '20200301-rate',
+        type: 'rate',
+    },
+    {
+        label: '示例断面冲淤',
+        nodeID: '20200301-chongyu',
+        type: 'chongyu',
     },
 ])
 const handleEvolutionTreeClick = (_, treeNode) => {
+    console.log(treeNode)
     if (treeNode.nodeID) {
         selectedEvolutionNode.value = treeNode
     } else {
@@ -571,6 +586,7 @@ const handleEvolutionTreeClick = (_, treeNode) => {
 }
 const handleEvolutionTreeCommand = (command) => {
     // KXH 绘制从服务器获取断面数据 json 逻辑
+    console.log(selectedEvolutionNode.value)
     if (selectedEvolutionNode.value && command === 'layer') {
         if (evolutionLayerData.value === null) {
             evolutionLayerData.value = [selectedEvolutionNode.value]
@@ -579,15 +595,18 @@ const handleEvolutionTreeCommand = (command) => {
         }
     } else if (selectedEvolutionNode.value && command === 'visualize') {
         const type = selectedEvolutionNode.value.type
+        console.log(type)
         isEchartShow.value = true
         const json = demoJson
         chart.clear()
         if (type === 'section-graph') {
             setTimeout(() => {
+                const beforeSectionPoints = json.beforeSection
                 const sectionPoints = json.section
                 drawSectionGraph(
                     chart,
                     sectionPoints.map((value) => value[2]),
+                    beforeSectionPoints.map((value) => value[2])
                 )
                 chart.resize()
             }, 1)
@@ -644,15 +663,27 @@ const handleEvolutionLayerCommand = (command) => {
         evolutionLayerData.value = evolutionLayerData.value.filter(
             (value) => value.nodeID !== selectedEvolutionNode.value.nodeID,
         )
+        if (selectedEvolutionNode.value.type === 'section-geojson') {
+            hideLayer(map, selectedEvolutionNode.value.nodeID)
+            deleteLineFromMap(map, selectedEvolutionNode.value.nodeID)
+        }
+
     }
 }
 const handleEvolutionLayerCheckChange = (data, checked) => {
     // KXH 显示和隐藏图层的逻辑
     console.log(data, checked)
-    if (true) {
-        //
+    if (checked) {
+        if (data.type === 'section-geojson') {
+            const coord = sectionInfo.value[data.nodeID]
+            addLineToMap(map, coord[0], coord[1], data.nodeID)
+            console.log(map.getLayoutProperty(`${data.nodeID}-layer`, "visibility"))
+        }
     } else {
-        //
+        if (data.type === 'section-geojson') {
+            hideLayer(map, data.nodeID)
+            console.log(map.getLayoutProperty(`${data.nodeID}-layer`, "visibility"))
+        }
     }
 }
 
@@ -741,7 +772,8 @@ const draw = new MapboxDraw({
 })
 
 // section
-const sectionInfo = ref([])
+const sectionInfo = ref({})
+const currentSectionID = ref()
 const sectionDrawShow = ref(false)
 const sectionConfirmShow = ref(false)
 const sectionConfirmInput = ref('')
@@ -757,7 +789,7 @@ const confirmSection = () => {
     draw.deleteAll()
     evolutionTreeData[1].children.push({
         label: sectionConfirmInput.value,
-        nodeID: 'demo-section',
+        nodeID: currentSectionID.value,
         type: 'section-geojson',
     })
 
@@ -802,7 +834,8 @@ const rules = reactive({
         },
     ],
 })
-const isParamsShow = ref(false)
+const isModelPanelShow = ref(false)
+const modelType = ref(null)
 const sectionList = computed(() => {
     let result = []
     evolutionTreeData.forEach((value) => {
@@ -831,37 +864,24 @@ const handleRunModelClick = () => {
         })
         return
     }
-    isParamsShow.value = true
-    console.log(isParamsShow.value)
+    isModelPanelShow.value = true
 }
-const runModel = async (paramsRef) => {
+const handleSelectModelClick = (type) => {
+    modelType.value = type
+    isModelPanelShow.value = false
+}
+const runModel = async (paramsRef, type) => {
     if (!paramsRef) return
     await paramsRef.validate((valid, fields) => {
         if (valid) {
-            isParamsShow.value = false
+            modelType.value = null
             ElMessage('模型开始计算')
             console.log(paramsInfo.value)
             // KXH 模型计算相关逻辑
             evolutionTreeData.push({
                 label: paramsInfo.value.name,
-                type: 'result',
-                children: [
-                    {
-                        label: '断面形态',
-                        nodeID: '20200301-section-graph',
-                        type: 'section-graph',
-                    },
-                    {
-                        label: '断面坡比',
-                        nodeID: '20200301-rate',
-                        type: 'rate',
-                    },
-                    {
-                        label: '断面冲淤',
-                        nodeID: '20200301-chongyu',
-                        type: 'chongyu',
-                    },
-                ],
+                nodeID: '20200301-section-graph',
+                type,
             })
             paramsRef.resetFields()
         } else {
@@ -872,7 +892,7 @@ const runModel = async (paramsRef) => {
 const handleCancelParams = (formEl) => {
     formEl.resetFields()
     console.log(paramsInfo.value)
-    isParamsShow.value = false
+    modelType.value = null
 }
 
 // echarts
@@ -891,6 +911,7 @@ onMounted(async () => {
     map.on('draw.create', function (e) {
         console.log('aaa')
         console.log(e.features)
+        currentSectionID.value = crypto.randomUUID()
         sectionConfirmShow.value = true
         let lineFeature = e.features[0]
         let startWebMerCoord = convertToMercator(
@@ -899,7 +920,7 @@ onMounted(async () => {
         let endWebMerCoord = convertToMercator(
             lineFeature.geometry.coordinates[1],
         )
-        sectionInfo.value = [startWebMerCoord, endWebMerCoord]
+        sectionInfo.value[currentSectionID.value] = [startWebMerCoord, endWebMerCoord]
     })
     globalMap = map
     map.addLayer(flow)
@@ -1289,11 +1310,37 @@ div.model-content-container {
         }
     }
 
-    div.model-container {
+    div.model-tooltip-container {
         top: 16px;
         left: 16px;
         z-index: 10;
         position: absolute;
+    }
+
+    div.model-container {
+        top: 10vh;
+        left: 12vw;
+        z-index: 10;
+        position: absolute;
+        background-color: #fafafa;
+        padding: 16px;
+        border-radius: 16px;
+        height: 60vh;
+        width: 50vw;
+        box-shadow: 4px 4px 16px rgba(65, 65, 65, 0.2);
+        border: 1px solid #a6daff;
+
+        div.model-list {
+            height: 85%;
+            background-color: white;
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 4px 4px 16px rgba(65, 65, 65, 0.2);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px 24px;
+            overflow: auto;
+        }
     }
 
     div.model-params-container {
