@@ -70,6 +70,7 @@ def main(jsonPath: str, date: str, condition: str):
     content["PQ"] = PQIndex
     content["KY"] = KYIndex
     content["ZD"] = ZDIndex
+    # coord depth vel level
     content["deepestPoint"] = [
         deepestPointInfo[2],
         deepestPointInfo[1],
