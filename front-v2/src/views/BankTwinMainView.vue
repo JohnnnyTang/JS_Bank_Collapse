@@ -20,7 +20,7 @@
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
                 <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
                     <div class="no-warn-block" v-if="warningList.length == 0"
-                        style="font-size: calc(0.5vw + 0.7vh); color: #e7f2ff">
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
                         {{ `近一小时内无报警信息` }}
                     </div>
                     <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
@@ -31,7 +31,7 @@
                                 height: 3vh;
                             "></div>
                         <div style="
-                                font-size: calc(0.5vw + 0.7vh);
+                                font-size: calc(0.7vw + 1vh);
                                 color: #e7f2ff;
                                 margin-left: 0.5vw;
                             ">
@@ -564,7 +564,8 @@ div.twin-main-container {
         left: 28vw;
         top: 2vh;
         width: 44vw;
-        height: 5vh;
+        height: 7vh;
+        line-height: 7vh;
         // background-color: rgb(0, 75, 249);
         z-index: 4;
         overflow: hidden;
@@ -584,6 +585,7 @@ div.twin-main-container {
                 width: 84%;
                 margin-left: 2%;
                 overflow: hidden;
+                height: 7vh;
                 // transform: translateX(2.5%);
 
                 div.marquee-block {
@@ -596,6 +598,7 @@ div.twin-main-container {
                     animation-duration: 0s;
                     animation-timing-function: linear;
                     animation-iteration-count: infinite;
+                    height: 7vh;
 
                     div.warn-block {
                         display: flex;
