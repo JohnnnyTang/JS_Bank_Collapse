@@ -29,12 +29,12 @@
 
 <script setup>
 import * as echarts from 'echarts'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { drawFlowspeedGraph } from './util.js'
 const props = defineProps({
     profileList: {
         type: Object,
-    }
+    },
 })
 const profileList = ref(props.profileList)
 
@@ -43,15 +43,19 @@ const flowspeedGraphRef = ref(null)
 const flowspeedChartLoad = ref(true)
 
 const DrawGraph = (profileList) => {
-    flowspeedChartLoad.value = true
     flowspeedChart = echarts.init(flowspeedGraphRef.value)
-    const flowspeed = profileList.value.map(item => item.flowspeed)
+    const flowspeed = profileList.map(item => item.flowspeed)
     drawFlowspeedGraph(flowspeedChart, flowspeed)
-    flowspeedChartLoad.value = false
 }
 
 onMounted(() => {
-    DrawGraph(profileList)
+    flowspeedChartLoad.value = true
+    DrawGraph(profileList.value)
+    flowspeedChartLoad.value = false
+})
+
+watch(props.profileList, (newVal) => {
+    DrawGraph(newVal)
 })
 </script>
 

@@ -167,7 +167,6 @@ div.machine-card-container {
         &.active {
             opacity: 1;
             z-index: 2;
-
         }
 
         &.inactive {

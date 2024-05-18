@@ -216,6 +216,7 @@ div.machine-card-container {
             height: 100%;
             padding-top: 10px;
             // background-color: aqua;
+            border-radius: 6px;
 
             img {
                 width: 100%;
