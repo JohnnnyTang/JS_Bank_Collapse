@@ -7,7 +7,7 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2" ></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -126,7 +126,9 @@
 
         <WarnHistoryTable :warnActive="warnActive"/>
 
-        <div class="map-container" id="map"></div>
+        <div class="map-container" id="map" style="z-index: 1;"></div>
+        <canvas id="GPUFrame" class="GPU" style="z-index: 2;"></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 0;"></canvas>
     </div>
 </template>
 
@@ -144,6 +146,7 @@ import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 // import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
+import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -479,6 +482,15 @@ div.twin-main-container {
         top: 0;
         left: 0;
         z-index: 2;
+    }
+    canvas.GPU{
+        position: absolute;
+        width: 100vw;
+        height: 92vh;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        background-color: transparent;
     }
 
     div.visual-tab-container {
