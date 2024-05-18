@@ -20,8 +20,8 @@
             <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
                 ${field}
             </foreach>
-            order by if_important DESC
             from ${name}
+            order by if_important DESC
         ) as result
     </select>
 
