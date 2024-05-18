@@ -156,8 +156,30 @@
                                 : '高风险'
                     }}
                 </div>
+                <div class="detail-info"
+                v-if="tempProfileRisk != ''"
+                @click="showTempProfileDetailInfo">
+                    <div class="detail-info-text">
+                        断面详细信息
+                    </div>
+                </div>
+                <div class="null-text"
+                v-if="tempProfileName == ''">
+                    暂无断面信息
+                </div>
             </div>
         </div>
+        <div v-if="tempProfileDetailInfo">
+            <profileInfoCard
+                @close-temp-profile-detail-info="CloseTempProfileDetailInfo"
+                :profileData = tempProfileData
+            />
+        </div>
+        
+        <!-- <profileInfoCard
+            v-if="true"
+            :profileData = tempProfileData
+        /> -->
         <el-dialog
             v-model="sectionConfirmShow"
             title="绘制断面确认"
@@ -216,6 +238,7 @@ import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
+import profileInfoCard from '../components/bankRiskWarn/profileInfoCard.vue'
 import { drawShapeGraph, drawErosionGraph } from '../components/bankRiskWarn/util.js'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
@@ -232,6 +255,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { convertToMercator } from '../components/bankRiskWarn/coordConvert.js'
 import { rasterMM } from '../components/bankRiskWarn/rasterMM'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import { connectionExists } from '@vue-flow/core';
 
 let map = null
 const mapContainer = ref()
@@ -280,167 +304,7 @@ const mapJumpToRiver = (mapIns) => {
     // )
 }
 
-const sceneBeforeValue = ref('2022after')
-const sceneNowValue = ref('2023before')
-const preSceneBeforeValue = ref('2022after')
-const preSceneNowValue = ref('2023before')
-let sceneBefore
-let sceneNow
-
-const sceneList = ref([
-    {
-        value: '2020before',
-        name: '2020汛前地形数据',
-        label: '2020汛前',
-        year: '2020',
-        time: '汛前',
-        date: '2020-03-01',
-        dateShort: '2003'
-    },
-    {
-        value: '2020after',
-        name: '2020汛后地形数据',
-        label: '2020汛后',
-        year: '2020',
-        time: '汛后',
-        date: '2020-09-01',
-        dateShort: '2009'
-    },
-    {
-        value: '2021before',
-        name: '2021汛前地形数据',
-        label: '2021汛前',
-        year: '2021',
-        time: '汛前',
-        date: '2021-03-01',
-        dateShort: '2103'
-    },
-    {
-        value: '2021after',
-        name: '2021汛后地形数据',
-        label: '2021汛后',
-        year: '2021',
-        time: '汛后',
-        date: '2021-09-01',
-        dateShort: '2109'
-    },
-    {
-        value: '2022before',
-        name: '2022汛前地形数据',
-        label: '2022汛前',
-        year: '2022',
-        time: '汛前',
-        date: '2022-03-01',
-        dateShort: '2203'
-    },
-    {
-        value: '2022after',
-        name: '2022汛后地形数据',
-        label: '2022汛后',
-        year: '2022',
-        time: '汛后',
-        date: '2022-09-01',
-        dateShort: '2209'
-    },
-    {
-        value: '2023before',
-        name: '2023汛前地形数据',
-        label: '2023汛前',
-        year: '2023',
-        time: '汛前',
-        date: '2023-03-01',
-        dateShort: '2303'
-    },
-    {
-        value: '2023after',
-        name: '2023汛后地形数据',
-        label: '2023汛后',
-        year: '2023',
-        time: '汛后',
-        date: '2023-09-01',
-        dateShort: '2309'
-    },
-])
-
-const placeValue = ref('mzs')
-
-const placeList = [
-    {value: 'mzs', label: '民主沙右缘示范段'},
-    {value: 'tpz', label: '太平洲左缘示范段', disabled: true},
-    {value: 'flq', label: '丰乐桥示范段', disabled: true}
-]
-
-const sceneBeforeSelectChange = () => { }
-
-const sceneNowSelectChange = () => { }
-
-const test = () => {
-    sceneBefore = sceneList.value.find(item => item.value === sceneBeforeValue.value)
-    sceneNow = sceneList.value.find(item => item.value === sceneNowValue.value)
-    sceneConfirmShow.value = true
-}
-
-const cancelSceneRese = () => {
-    sceneConfirmShow.value = false
-}
-
-const sureSceneRese = () => {
-    sceneConfirmShow.value = false
-    if ( sceneNow.dateShort <= sceneBefore.dateShort ) {
-        ElMessage.error('当前地形时间不能早于或等于对比地形时间！')
-        return
-    }
-    if ( preSceneBeforeValue.value === sceneBeforeValue.value && preSceneNowValue.value === sceneNowValue.value ) {
-        ElMessage.error('当前地形时间与对比地形时间未发生变化！')
-        return
-    }
-    const time = sceneNow.dateShort + sceneBefore.dateShort
-    mapInstance.removeLayer('mapRaster')
-    mapInstance.removeSource('mapRaster')
-    addRasterLayer(mapInstance, time, 'mapRaster')
-    mapInstance.moveLayer('mapRaster', 'mzsLine')
-
-    preSceneBeforeValue.value = sceneBeforeValue.value
-    preSceneNowValue.value = sceneNowValue.value
-}
-
-const sceneSelectChange = () => { }
-
-const onAddOption = () => { }
-
-const onAddProfileOption = () => { }
-
-const onAddProfile = () => { }
-
-const flowControlHandler = () => {
-    showFlow.value = !showFlow.value
-    // console.log(showFlow.value);
-    if (showFlow.value) {
-        let map = useMapStore().getMap()
-        if (map) {
-            flow.show()
-            mapFlyToRiver(map)
-        }
-        else {
-            ElMessage({
-                'type': 'warning',
-                'message': '地图尚未加载，请等待'
-            })
-        }
-    } else flow.hide()
-
-}
-
-watch(
-    () => flow.currentResourcePointer, (v) => {
-    // console.log(flow.currentResourcePointer)
-        timeStep.value = flow.currentResourcePointer
-    }
-)
-
-const showComponent = ref(false)
-let profileData = []
-const profileValue = ref(2)
+// 数据
 const profileList = ref([
     {
         value: 1,
@@ -539,19 +403,236 @@ const profileList = ref([
         risk: null,
     },
 ])
+const sceneList = ref([
+    {
+        value: '2020before',
+        name: '2020汛前地形数据',
+        label: '2020汛前',
+        year: '2020',
+        time: '汛前',
+        date: '2020-03-01',
+        dateShort: '2003'
+    },
+    {
+        value: '2020after',
+        name: '2020汛后地形数据',
+        label: '2020汛后',
+        year: '2020',
+        time: '汛后',
+        date: '2020-09-01',
+        dateShort: '2009'
+    },
+    {
+        value: '2021before',
+        name: '2021汛前地形数据',
+        label: '2021汛前',
+        year: '2021',
+        time: '汛前',
+        date: '2021-03-01',
+        dateShort: '2103'
+    },
+    {
+        value: '2021after',
+        name: '2021汛后地形数据',
+        label: '2021汛后',
+        year: '2021',
+        time: '汛后',
+        date: '2021-09-01',
+        dateShort: '2109'
+    },
+    {
+        value: '2022before',
+        name: '2022汛前地形数据',
+        label: '2022汛前',
+        year: '2022',
+        time: '汛前',
+        date: '2022-03-01',
+        dateShort: '2203'
+    },
+    {
+        value: '2022after',
+        name: '2022汛后地形数据',
+        label: '2022汛后',
+        year: '2022',
+        time: '汛后',
+        date: '2022-09-01',
+        dateShort: '2209'
+    },
+    {
+        value: '2023before',
+        name: '2023汛前地形数据',
+        label: '2023汛前',
+        year: '2023',
+        time: '汛前',
+        date: '2023-03-01',
+        dateShort: '2303'
+    },
+    {
+        value: '2023after',
+        name: '2023汛后地形数据',
+        label: '2023汛后',
+        year: '2023',
+        time: '汛后',
+        date: '2023-09-01',
+        dateShort: '2309'
+    },
+])
 
+const placeValue = ref('mzs')
+const placeList = [
+    {value: 'mzs', label: '民主沙右缘示范段'},
+    {value: 'tpz', label: '太平洲左缘示范段', disabled: true},
+    {value: 'flq', label: '丰乐桥示范段', disabled: true}
+]
+
+const sceneBeforeSelectChange = () => { }
+
+const sceneNowSelectChange = () => { }
+
+const test = () => {
+    sceneBefore = sceneList.value.find(item => item.value === sceneBeforeValue.value)
+    sceneNow = sceneList.value.find(item => item.value === sceneNowValue.value)
+    sceneConfirmShow.value = true
+}
+
+const cancelSceneRese = () => {
+    sceneConfirmShow.value = false
+}
+
+const sureSceneRese = async() => {
+    sceneConfirmShow.value = false
+    if ( sceneNow.dateShort <= sceneBefore.dateShort ) {
+        ElMessage.error('当前地形时间不能早于或等于对比地形时间！')
+        return
+    }
+    if ( preSceneBeforeValue.value === sceneBeforeValue.value && preSceneNowValue.value === sceneNowValue.value ) {
+        ElMessage.error('当前地形时间与对比地形时间未发生变化！')
+        return
+    }
+    // 添加栅格图层
+    const time = sceneNow.dateShort + sceneBefore.dateShort
+    mapInstance.removeLayer('mapRaster')
+    mapInstance.removeSource('mapRaster')
+    addRasterLayer(mapInstance, time, 'mapRaster')
+    mapInstance.moveLayer('mapRaster', 'mzsLine')
+    // 计算各个断面数据
+    const before = sceneBefore.date
+    const now = sceneNow.date
+    const exist = await profileDataExist(before, now)
+    if (exist) {
+        profileData = await getProfileData(before, now)
+    } else {
+        CalProfile(before, now)
+        profileData = await getProfileData(before, now)
+    }
+    changeProfileData(profileData)
+    preSceneBeforeValue.value = sceneBeforeValue.value
+    preSceneNowValue.value = sceneNowValue.value
+}
+
+const CalProfile = async(before, now) => {
+    const promises = [];
+    for(let i = 0; i < profileList.length; i++) {
+        promises.push(bankRiskWarn.runProfileModel(before, now, i))
+    }
+    await Promise.all(promises)
+}
+
+const profileDataExist = async(before, now) => {
+    const testData = await bankRiskWarn.getProfileData(before, now, 1)
+    if (testData.data.length === 0) {
+        return false
+    }
+    return true
+}
+
+const getProfileData = async (before, now) => {
+        const promises = [];
+        const result = [];
+        for (let i = 0; i < 12; i++) {
+            promises.push(bankRiskWarn.getProfileData(before, now, i + 1));
+        }
+        const allResponses = await Promise.all(promises);
+
+        // 确保每个响应都有 data 属性
+        allResponses.forEach(response => {
+            if (response && response.data) {
+                result.push(response.data);
+            } else {
+                console.log(response);
+            }
+        });
+        return result
+    };
+
+const sceneSelectChange = () => { }
+
+const onAddOption = () => { }
+
+const onAddProfileOption = () => { }
+
+const onAddProfile = () => { }
+
+const flowControlHandler = () => {
+    showFlow.value = !showFlow.value
+    // console.log(showFlow.value);
+    if (showFlow.value) {
+        let map = useMapStore().getMap()
+        if (map) {
+            flow.show()
+            mapFlyToRiver(map)
+        }
+        else {
+            ElMessage({
+                'type': 'warning',
+                'message': '地图尚未加载，请等待'
+            })
+        }
+    } else flow.hide()
+
+}
+
+watch(
+    () => flow.currentResourcePointer, (v) => {
+    // console.log(flow.currentResourcePointer)
+        timeStep.value = flow.currentResourcePointer
+    }
+)
+
+// 地形对比变量
+const sceneBeforeValue = ref('2022after')
+const sceneNowValue = ref('2023before')
+const preSceneBeforeValue = ref('2022after')
+const preSceneNowValue = ref('2023before')
+let sceneBefore
+let sceneNow
+
+// 断面数据变量
+const showComponent = ref(false)
+let profileData = []
+const profileValue = ref(2)
+const tempProfile = ref(null)
+const tempProfileData = ref(null)
+const tempProfileDetailInfo = ref(false)
+const showTempProfileDetailInfo = () => {
+    tempProfileDetailInfo.value = true
+}
+const CloseTempProfileDetailInfo = () => {
+    tempProfileDetailInfo.value = false
+}
+// 断面图表变量
 let shapeChart = null
 let erosionChart = null
 const shapeChartLoad = ref(true)
 const erosionChartLoad = ref(true)
 const shapeGraphRef = ref(null)
 const erosionGraphRef = ref(null)
-const tempProfileName = ref('')
-const tempProfileRisk = ref('')
 let section;
 let beforesection;
 let slopeRate;
 let erosion;
+const tempProfileName = ref('')
+const tempProfileRisk = ref('')
 
 const profileSelectChange = (inputValue) => {
     profileValue.value = inputValue
@@ -592,14 +673,30 @@ const changeProfileData = (profileData) => {
         return false
     }
     DrawGraph(section, beforesection, slopeRate, erosion)
+
+    profileData.map((value, index) => {
+        const riskLevel = value.risk[2]
+        if (riskLevel < 0.25) {
+            profileList.value[index].risk = 'low'
+        } else if (riskLevel < 0.5) {
+            profileList.value[index].risk = 'middle'
+        } else {
+            profileList.value[index].risk = 'high'
+        }
+        try {
+            profileList.value[index].flowspeed = value.deepestPoint[2]
+        } catch (error){
+
+        }
+    })
 }
 
+// 断面绘制变量
 let mapInstance;
 const sectionConfirmShow = ref(false)
 const sceneConfirmShow = ref(false)
 const sectionLineLabel = ref('')
 const sectionLineLabelSec = ref('')
-const calcEnable = ref(false)
 const isRunning = ref(false)
 
 let StartPtX
@@ -740,7 +837,6 @@ const CalProfileByPoint = async(before, now, StartPtX, StartPtY, EndPtX, EndPtY)
 }
 
 const putDataInList = (profileDataItem) => {
-    let tempValue = profileList.value.length + 1
     let tempRisk
     if (profileDataItem.risk[2] < 0.25) {
         tempRisk = 'low'
@@ -750,15 +846,14 @@ const putDataInList = (profileDataItem) => {
         tempRisk = 'high'
     }
     tempProfileRisk.value = tempRisk
-    profileList.value.push({
-        value: tempValue,
+    tempProfile.value = {
         label: tempProfileName.value,
         name: tempProfileName.value,
-        filter: ['==', '$type', `JC${tempValue}`],
+        filter: ['==', '$type', `${tempProfileName.value}`],
         flowspeed: profileDataItem.deepestPoint[2],
         risk: tempRisk,
-    })
-    profileData.push(profileDataItem)
+    }
+    tempProfileData.value = profileDataItem
 }
 
 const changeSceneBefore = (value) => {
@@ -965,41 +1060,8 @@ onMounted(async () => {
         flow.hide()
     })
 
-    const getProfileData = async () => {
-        const promises = [];
-        const result = [];
-        for (let i = 0; i < 12; i++) {
-            promises.push(bankRiskWarn.getProfileData(i + 1));
-        }
-        const allResponses = await Promise.all(promises);
-
-        // 确保每个响应都有 data 属性
-        allResponses.forEach(response => {
-            if (response && response.data) {
-                result.push(response.data);
-            } else {
-                console.error('响应数据不包含 "data" 属性或响应未定义。', response);
-            }
-        });
-        return result
-    };
     profileData = await getProfileData()
 
-    profileData.map((value, index) => {
-        const riskLevel = value.risk[2]
-        if (riskLevel < 0.25) {
-            profileList.value[index].risk = 'low'
-        } else if (riskLevel < 0.5) {
-            profileList.value[index].risk = 'middle'
-        } else {
-            profileList.value[index].risk = 'high'
-        }
-        try {
-            profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error){
-
-        }
-    })
     showComponent.value = true
     changeProfileData(profileData)
 })
@@ -1492,9 +1554,9 @@ div.risk-warn-container {
             div.profile-info-item {
                 font-size: calc(0.6vw + 0.5vh);
                 color: #0f1011;
+                font-weight: bold;
 
                 &.title {
-                    font-weight: bold;
                     font-size: calc(0.7vw + 0.5vh);
                     position: absolute;
                     left: 0.5vw;
@@ -1502,16 +1564,52 @@ div.risk-warn-container {
                 }
 
                 &.name {
+                    color: #001cb8;
                     position: absolute;
-                    left: 1.5vw;
+                    left: 0.5vw;
                     top: 4vh;
                 }
 
                 &.risk {
+                    color: #001cb8;
                     position: absolute;
-                    left: 1.5vw;
+                    left: 0.5vw;
                     top: 7vh;
                 }
+            }
+            
+            div.detail-info {
+                position:absolute;
+                left: 8.4vw;
+                top: 3vh;
+                width: 4vw;
+                height: 6vh;
+                border: 2px solid #1735ae;
+                border-radius: 6px;
+                background-color: #1753ae;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+                &:hover {
+                    transform: scale(1.03);
+                }
+
+                div.detail-info-text {
+                    font-size: calc(0.7vw + 0.5vh);
+                    font-weight: bold;
+                    color: #cefffd;
+                    position: absolute;
+                    left: 0.5vw;
+                    top: 0.5vh;
+                }
+            }
+
+            div.null-text {
+                font-size: calc(1.0vw + 0.7vh);
+                font-weight: bold;
+                position: absolute;
+                left: 2.3vw;
+                top: 4.6vh;
+                color: #001cb8;
             }
         }
     }

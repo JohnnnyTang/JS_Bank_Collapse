@@ -5,13 +5,25 @@ const bankRiskWarnInstance = axios.create({
 })
 
 export class bankRiskWarn {
-    static runProfileModel = (profileId) => {
+    static runProfileModelTest = (profileId) => {
         const url = `/taskNode/start/multi/default/section/${profileId-1}`;
         return bankRiskWarnInstance.post(url)
     }
 
-    static getProfileData = (profileId) => {
+    static getProfileDataTest = (profileId) => {
         const url = profileId < 10 ? `/fileData/json/jsonStr/name/multiWholeRes-JC0${profileId}/newest` : `/fileData/json/jsonStr/name/multiWholeRes-JC${profileId}/newest`;
+        return bankRiskWarnInstance.get(url)
+    }
+
+    static runProfileModel = (before, now, profileId) => {
+        const url = `/taskNode/start/multi/default/section/${profileId-1}/beg/${before}/end/${now}`;
+        return bankRiskWarnInstance.post(url)
+    }
+
+    static getProfileData = (before, now, profileId) => {
+        const url = profileId < 10 ? 
+        `/fileData/json/jsonStr/name/multiWholeRes-JC0${profileId}_beg${before}_end${now}/newest` : 
+        `/fileData/json/jsonStr/name/multiWholeRes-JC${profileId}_beg${before}_end${now}/newest`;
         return bankRiskWarnInstance.get(url)
     }
 
