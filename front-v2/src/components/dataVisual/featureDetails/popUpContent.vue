@@ -5,7 +5,6 @@
     <monitorDetail v-else-if="selectedScene.title === '民主沙预警监测'"></monitorDetail>
     <!-- <terrainDetail v-else-if="selectedScene.title === '全江地形'" :height="props.height"></terrainDetail> -->
 
-    <!-- <sectionDetail v-else-if="selectedScene.title === '断面形态'" :sectionName="props.sectionName"></sectionDetail> -->
 
 </template>
 
@@ -14,7 +13,7 @@ import bankLineDetail from './bankLineDetail.vue';
 import channelDetail from './channelDetail.vue';
 import monitorDetail from './monitorDetail.vue';
 import terrainDetail from './terrainDetail.vue';
-import sectionDetail from './sectionDetail.vue';
+
 
 import { onMounted, ref, computed, watch } from 'vue';
 import { useSceneStore } from '../../../store/mapStore';
