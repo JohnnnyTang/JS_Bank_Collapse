@@ -261,7 +261,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#ff7875',
+                'background-color': 'rgb(52, 0, 143)',
             },
             text: '已建通道'
         },
@@ -269,7 +269,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#ffd875',
+                'background-color': 'rgb(196, 50, 6)',
             },
             text: '在建通道'
         },
@@ -277,7 +277,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#b8ff75',
+                'background-color': 'rgb(179, 4, 74)',
             },
             text: '规划通道'
         },
@@ -324,7 +324,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#FF00B0',
+                'background-color': 'rgb(247, 21, 0)',
             },
             text: '一级预警岸段'
         },
@@ -332,7 +332,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#00FFB0',
+                'background-color': 'rgb(222, 106, 4)',
             },
             text: '二级预警岸段'
         },
@@ -340,18 +340,18 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#0000FF',
+                'background-color': 'rgb(173, 162, 5)',
             },
             text: '三级预警岸段'
         },
-        {
-            style: {
-                'height': '80%',
-                'width': '50%',
-                'background-color': 'rgba(105, 67, 39,0.9)',
-            },
-            text: '沙洲/江心洲'
-        },
+        // {
+        //     style: {
+        //         'height': '80%',
+        //         'width': '50%',
+        //         'background-color': 'rgba(105, 67, 39,0.9)',
+        //     },
+        //     text: '沙洲/江心洲'
+        // },
         // {
         //     style: {
         //         'margin-top': '22vh',
