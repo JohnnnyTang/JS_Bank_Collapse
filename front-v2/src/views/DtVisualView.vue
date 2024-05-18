@@ -130,7 +130,7 @@ onMounted(async () => {
     sceneStore.SCENEMAP.value = scenes
     sceneStore.LAYERGROUPMAP.value = layerGroups
 
-    activeStatus.value[0] = true
+    // activeStatus.value[0] = true
 })
 
 //////////// DEBUG FUNCTIONS

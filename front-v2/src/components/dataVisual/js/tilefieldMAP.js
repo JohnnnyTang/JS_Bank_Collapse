@@ -261,7 +261,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#ff7875',
+                'background-color': 'rgb(52, 0, 143)',
             },
             text: '已建通道'
         },
@@ -269,7 +269,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#ffd875',
+                'background-color': 'rgb(196, 50, 6)',
             },
             text: '在建通道'
         },
@@ -277,7 +277,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#b8ff75',
+                'background-color': 'rgb(179, 4, 74)',
             },
             text: '规划通道'
         },
@@ -324,7 +324,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#FF00B0',
+                'background-color': 'rgb(247, 21, 0)',
             },
             text: '一级预警岸段'
         },
@@ -332,7 +332,7 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#00FFB0',
+                'background-color': 'rgb(222, 106, 4)',
             },
             text: '二级预警岸段'
         },
@@ -340,18 +340,18 @@ const legendMap = {
             style: {
                 'height': '15%',
                 'width': '50%',
-                'background-color': '#0000FF',
+                'background-color': 'rgb(173, 162, 5)',
             },
             text: '三级预警岸段'
         },
-        {
-            style: {
-                'height': '80%',
-                'width': '50%',
-                'background-color': 'rgba(105, 67, 39,0.9)',
-            },
-            text: '沙洲/江心洲'
-        },
+        // {
+        //     style: {
+        //         'height': '80%',
+        //         'width': '50%',
+        //         'background-color': 'rgba(105, 67, 39,0.9)',
+        //     },
+        //     text: '沙洲/江心洲'
+        // },
         // {
         //     style: {
         //         'margin-top': '22vh',
@@ -421,7 +421,9 @@ const filterMap = {
     '河道分段': [],
     '河道分段-注记': [],
     '流域水系': ['in', 'name', ...importantFeature['流域水系']],
+    '流域水系-注记': ['in', 'name', ...importantFeature['流域水系']],
     '湖泊河流': ['in', 'name', ...importantFeature['湖泊河流']],
+    '湖泊河流-注记': ['in', 'name', ...importantFeature['湖泊河流']],
     '水文站点': ['in', 'sp_name', ...importantFeature['水文站点']],
     '水文站点-注记': ['in', 'sp_name', ...importantFeature['水文站点']],
     '其他堤防': ['in', 'sp_name', ...importantFeature['其他堤防']],
@@ -432,10 +434,15 @@ const filterMap = {
     '过江通道-隧道/通道-注记': [],
     '过江通道-桥-注记': [],
     '沿江码头': [],
+    '沿江码头-注记': [],
     '水库大坝': [],
+    '水库大坝-注记': [],
     '水闸工程': ['in', 'sp_name', ...importantFeature['水闸工程']],
+    '水闸工程-注记': ['in', 'sp_name', ...importantFeature['水闸工程']],
     '泵站工程': [],
+    '泵站工程-注记': [],
     '枢纽工程': ['in', 'name', ...importantFeature['枢纽工程']],
+    '枢纽工程-注记': ['in', 'name', ...importantFeature['枢纽工程']],
     '长江干堤': [],
     '里程桩': [],
     '一级预警岸段': [],
