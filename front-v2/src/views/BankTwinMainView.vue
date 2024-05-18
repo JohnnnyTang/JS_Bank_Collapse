@@ -7,7 +7,8 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2" ></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
+                    @change='viewChangeClick'></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -108,11 +109,7 @@
             </div>
         </div>
 
-        <div
-            class="warn-detail-container"
-            :class="warnActive ? 'active' : 'in-active'"
-            v-loading="detailLoading"
-        >
+        <div class="warn-detail-container" :class="warnActive ? 'active' : 'in-active'" v-loading="detailLoading">
             <div class="warn-detail-title">预警信息详情</div>
             <div class="warn-detail-content">
                 <div class="key-val-container" v-for="(item, index) in warnKeyValList" :key="index">
@@ -124,9 +121,9 @@
             </div>
         </div>
 
-        <WarnHistoryTable :warnActive="warnActive"/>
+        <WarnHistoryTable :warnActive="warnActive" />
 
-        <div class="map-container" id="map" style="z-index: 1;"></div>
+        <div class="map-container" id="map" style="z-index: 1;" ref="mapDom"></div>
         <canvas id="GPUFrame" class="GPU" style="z-index: 2;"></canvas>
         <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 0;"></canvas>
     </div>
@@ -145,20 +142,25 @@ import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 // import SectionRisk from '../components/bankTwin/SectionRisk.vue'
 // import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
 import { mapInit } from '../components/bankManage/mapInit'
+
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
-
+import { ElMessage } from 'element-plus'
+import { initScratchMap } from '../utils/mapUtils'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 const animateTime = ref('0s')
 const marqueeBlockDom = ref()
+const unityCanvaDom = ref()
+const mapDom = ref()
 const warnActive = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '查看现场监控' : '查看预警详情'
 })
 const detailLoading = ref(false)
 const warnLoading = ref(true)
+const activeView = ref('tab1')
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -168,10 +170,19 @@ const token = ref(
     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
 )
 
+// custome layer
+/**
+ * @type {customLayers.UnityLayer}
+ */
+let unityLayer
+/**
+* @type {customLayers.MaskLayer}
+*/
+let maskLayer
 
 const items = ref([
-    { label: '二维视图', value: 'tab1' },
-    { label: '三维视图', value: 'tab2' },
+    { label: '二维视图', value: '2d' },
+    { label: '三维视图', value: '3d' },
 ])
 
 const warningList = ref([])
@@ -265,8 +276,35 @@ const mapFlyToRiver = (mapIns) => {
             // zoom: 8,
         },
     )
+
 }
 
+const viewChangeClick = (value) => {
+    console.log('view Change!', value);
+    let map = useMapStore().getMap()
+    if (!map) ElMessage({
+        'type': 'warning',
+        'message': '请等待地图加载后重试'
+    })
+    if (value == '2d') {
+
+        unityLayer && unityLayer.remove()
+        map.getLayer('Mask-Layer') && map.removeLayer('Mask-Layer')
+        map.getLayer('Unity-Layer') && map.removeLayer('Unity-Layer')
+
+    } else if (value == '3d') {
+        const script = document.createElement('script');
+        script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
+        script.onload = async () => {
+            console.log('output.loader.js imported');
+            unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
+            maskLayer = new customLayers.MaskLayer()
+            map.addLayer(unityLayer)
+            map.addLayer(maskLayer)
+        };
+        document.head.appendChild(script);
+    }
+}
 // const resizeObserver = new ResizeObserver((entries) => {
 //     mapFlyToRiver(map)
 // })
@@ -330,59 +368,67 @@ onMounted(async () => {
     // setTimeout(() => {
     //     warnActive.value = true
     // }, 3000)
-    map = new mapboxgl.Map({
-        container: 'map', // container ID
-        accessToken:
-            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-        style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-        center: [120.542, 32.036], // starting position [lng, lat]
-        zoom: 8, // starting zoom
-        bounds: [
-            [114.36611654985586, 30.55501729652339],
-            [124.5709218840081, 35.31358005439914],
-        ],
-    })
-    map.on('load', async () => {
-        // console.log('map loaded!!!')
-        mapFlyToRiver(map)
-        useMapStore().setMap(map)
-        // map.addSource('ptVector', {
-        //     type: 'vector',
-        //     tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
-        // })
-        // map.addSource('test', {
-        //     type: 'vector',
-        //     tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
-        // })
-        await mapInit(map, true)
-        // map.ads
+    // map = new mapboxgl.Map({
+    //     container: 'map', // container ID
+    //     accessToken:
+    //         'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+    //     style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+    //     center: [120.542, 32.036], // starting position [lng, lat]
+    //     zoom: 8, // starting zoom
+    //     bounds: [
+    //         [114.36611654985586, 30.55501729652339],
+    //         [124.5709218840081, 35.31358005439914],
+    //     ],
+    // })
+    //////////return loaded Map
+    map = await initScratchMap(mapDom.value)
+    mapFlyToRiver(map)
+    useMapStore().setMap(map)
+    await mapInit(map, true)
 
-        // map.addLayer({
-        //     id: '点2',
-        //     type: 'symbol',
-        //     source: 'test',
-        //     'source-layer': 'default',
-        //     layout: {
-        //         'text-field': ['get', 'label'],
-        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-        //         // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-        //         'text-offset': [-1.0, 1.15],
-        //         'text-anchor': 'top',
-        //         'text-size': 16,
-        //         'text-allow-overlap': true
-        //     },
-        //     paint: {
-        //         'text-color': 'rgb(0, 22, 145)',
-        //     },
-        // })
 
-        // map.on('click', (e) => {
-        //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
 
-        // })
+    // map.on('load', async () => {
+    //     // console.log('map loaded!!!')
+    //     mapFlyToRiver(map)
+    //     useMapStore().setMap(map)
+    //     // map.addSource('ptVector', {
+    //     //     type: 'vector',
+    //     //     tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+    //     // })
+    //     // map.addSource('test', {
+    //     //     type: 'vector',
+    //     //     tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+    //     // })
+    //     await mapInit(map, true)
+    //     // map.ads
 
-        // resizeObserver.observe(containerDom.value)
-    })
+    //     // map.addLayer({
+    //     //     id: '点2',
+    //     //     type: 'symbol',
+    //     //     source: 'test',
+    //     //     'source-layer': 'default',
+    //     //     layout: {
+    //     //         'text-field': ['get', 'label'],
+    //     //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //     //         // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+    //     //         'text-offset': [-1.0, 1.15],
+    //     //         'text-anchor': 'top',
+    //     //         'text-size': 16,
+    //     //         'text-allow-overlap': true
+    //     //     },
+    //     //     paint: {
+    //     //         'text-color': 'rgb(0, 22, 145)',
+    //     //     },
+    //     // })
+
+    //     // map.on('click', (e) => {
+    //     //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
+
+    //     // })
+
+    //     // resizeObserver.observe(containerDom.value)
+    // })
 
     // const videoAccessKey = (await axios.post(
     //     'https://open.ys7.com/api/lapp/token/get?appKey=d228a2fab09d4c879b4449c356bbd90d&appSecret=0c46042ef59aed43c4eddbb80d637369',
@@ -483,7 +529,8 @@ div.twin-main-container {
         left: 0;
         z-index: 2;
     }
-    canvas.GPU{
+
+    canvas.GPU {
         position: absolute;
         width: 100vw;
         height: 92vh;
@@ -638,7 +685,7 @@ div.twin-main-container {
         div.button-block {
             position: absolute;
             background-color: rgb(122, 227, 248);
-            border-radius: 7px; 
+            border-radius: 7px;
             right: 1%;
             width: 6vw;
             height: 4vh;
@@ -986,10 +1033,9 @@ div.twin-main-container {
                                 rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
                         }
 
-                        box-shadow:
-                            rgba(13, 70, 228, 0.6) 0px 2px 4px,
-                            rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
-                            rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                        box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                        rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                        rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
                     }
                 }
             }
