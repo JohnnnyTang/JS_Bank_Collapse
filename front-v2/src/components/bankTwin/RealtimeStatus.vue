@@ -378,9 +378,11 @@ onMounted(async () => {
             ':' +
             zeroFill(myDate.getSeconds())
     }, 1000)
-    setInterval(() => {
-        updateNewestTime()
-    }, 1000*60*5)
+    setInterval(async () => {
+        deviceStatusLoading.value = true
+        await updateNewestTime()
+        deviceStatusLoading.value = false
+    }, 1000 * 60)
     deviceStatusLoading.value = false
     // console.log('213', newestDataStatus)
     echartIns = echarts.init(chartDom.value)
@@ -399,6 +401,11 @@ onMounted(async () => {
     // console.log('option', gnssOption)
     echartIns.setOption(gnssOption)
     chartDataLoading.value = false
+    setInterval(async () => {
+        chartDataLoading.value = true
+        await deviceSelectChange(selectedDevice.value)
+        chartDataLoading.value = false
+    }, 1000*60*5)
     // console.log('initialData', initialData)
 })
 </script>
