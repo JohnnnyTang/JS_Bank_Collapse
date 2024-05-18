@@ -84,7 +84,7 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
 
     const length = Math.min(after.length, before.length)
     const splitPoint = []
-    for (let index = 0; index < length; index += 10) {
+    for (let index = 0; index < length; index += 4) {
         splitPoint.push(index)
     }
     splitPoint.push(length - 1)
