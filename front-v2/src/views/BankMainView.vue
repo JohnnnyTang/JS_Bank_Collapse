@@ -38,11 +38,11 @@ const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
-            [117.64643582916999, 30.990467310895838],
-            [122.59492087941601, 32.80937651942584],
+            [117.54643582916999, 30.790467310895838],
+            [122.69492087941601, 32.90937651942584],
         ],
         {
-            pitch: 49.45,
+            // pitch: 49.45,
             duration: 800,
             // zoom: 8,
         },
@@ -69,33 +69,78 @@ onMounted(() => {
     map.on('load', () => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
-        map.addSource('mapVector', {
+        map.addSource('cityBoundary', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/cityBoundary/{x}/{y}/{z}'],
+        })
+        map.addLayer({
+            id: '省级行政区',
+            type: 'fill',
+            source: 'cityBoundary',
+            'source-layer': 'default',
+            layout: {},
+            paint: {
+                'fill-color': 'rgb(12, 122, 252)',
+                'fill-opacity': .2,
+            },
+        })
+        map.addSource('cityBoundaryLine', {
             type: 'vector',
             tiles: [
-                // tileServer+'/tile/vector/contour/2021/before/{x}/{y}/{z}',
-                // tileServer+'/tile/vector/contour/2022/before/{x}/{y}/{z}',
-                // tileServer+'/tile/vector/contour/2023/before/{x}/{y}/{z}',
-                // tileServer+'/tile/vector/contour/2020/before/{x}/{y}/{z}',
-                // tileServer+'/tile/vector/contour/2020/after/{x}/{y}/{z}',
-                // tileServer+'/tile/vector/contour/2021/after/{x}/{y}/{z}',
-                tileServer+'/tile/vector/contour/2022/after/{x}/{y}/{z}',
+                tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}',
             ],
         })
-        // map.addSource('worldBase', {
-        //     type: 'vector',
-        //     tiles: [
-        //         'http://127.0.0.1:8989/api/v1/proxy/tiles/world/{z}/{x}/{y}.pbf',
-        //     ],
-        // })
-        // map.addLayer({
-        //     id: 'mzsSectionArea1',
-        //     type: 'fill',
-        //     source: 'worldBase',
-        //     'source-layer': 'water',
-        //     paint: {
-        //         'fill-color': 'rgb(124, 179, 211)',
-        //     },
-        // })
+
+        map.addLayer({
+            id: '市级行政区',
+            type: 'line',
+            source: 'cityBoundaryLine',
+            'source-layer': 'default',
+            layout: {},
+            paint: {
+                'line-color': '#0A215C',
+                'line-width': 3,
+                'line-opacity': 0.75,
+            },
+        })
+        // let data = (await axios.get(`http://localhost:5173/api/tile/vector/cityBoundary/info`)).data
+        // let pointgeoJson = convertToGeoJSON(data)
+
+        map.addSource('District-point', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/center/cityBoundary/{x}/{y}/{z}',
+            ],
+        })
+        
+        map.addLayer({
+            id: '市级行政区-注记',
+            type: 'symbol',
+            source: 'District-point',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'name'],
+                'text-font': [
+                    'Open Sans Semibold',
+                    'Arial Unicode MS Bold',
+                ],
+                'text-anchor': 'bottom',
+                'text-offset': [
+                    'match',
+                    ['get', 'name'],
+                    '无锡市',
+                    [7, 0],
+                    '常州市',
+                    [1, 0],
+                    [0, 0],
+                ],
+                'text-size': 18,
+                'text-allow-overlap': true,
+            },
+            paint: {
+                'text-color': 'rgb(28,13,106)',
+            },
+        })
         map.addSource('depthLineSource', {
             type: 'vector',
             tiles: [
@@ -150,12 +195,12 @@ onMounted(() => {
             ],
         })
 
-        map.addSource('mzsBankLabelSource', {
-            type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsBankLabel/{x}/{y}/{z}',
-            ],
-        })
+        // map.addSource('mzsBankLabelSource', {
+        //     type: 'vector',
+        //     tiles: [
+        //         tileServer+'/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+        //     ],
+        // })
         map.addSource('mzsBankLineSource', {
             type: 'vector',
             tiles: [
@@ -168,12 +213,12 @@ onMounted(() => {
         //         tileServer+'/tile/vector/mzsSectionLine/{x}/{y}/{z}',
         //     ],
         // })
-        map.addSource('mzsSectionLineLabelSource', {
-            type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
-            ],
-        })
+        // map.addSource('mzsSectionLineLabelSource', {
+        //     type: 'vector',
+        //     tiles: [
+        //         tileServer+'/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
+        //     ],
+        // })
         // map.addSource('mzsBankAreaWSource', {
         //     type: 'vector',
         //     tiles: [
@@ -186,21 +231,21 @@ onMounted(() => {
                 tileServer+'/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
             ],
         })
-        map.addLayer({
-            id: '线1',
-            type: 'line',
-            source: 'mapVector',
-            'source-layer': 'default',
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                'line-color': 'rgba(255, 214, 211, 0.5)',
-                'line-width': 4,
-            },
-        })
+        // map.addLayer({
+        //     id: '线1',
+        //     type: 'line',
+        //     source: 'mapVector',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'line-cap': 'round',
+        //         'line-join': 'round',
+        //     },
+        //     paint: {
+        //         'line-opacity': 1,
+        //         'line-color': 'rgba(255, 214, 211, 0.5)',
+        //         'line-width': 4,
+        //     },
+        // })
 
         map.addLayer({
             id: 'fill1',
@@ -282,13 +327,14 @@ onMounted(() => {
         map.addLayer({
             id: 'riverLabel',
             type: 'symbol',
-            source: 'riverLabelSource',
+            source: 'riverSectionLabelSource',
             'source-layer': 'default',
             layout: {
                 'text-field': ['get', 'label'],
                 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                 // 'text-offset': [0, 1.25],
                 'text-anchor': 'left',
+                'symbol-placement': 'line-center'
             },
             paint: {
                 'text-color': 'rgba(13, 22, 189, 0.8)',
@@ -459,36 +505,36 @@ onMounted(() => {
         //         'line-width': 4,
         //     },
         // })
-        map.addLayer({
-            id: 'mzsBankLabel',
-            type: 'symbol',
-            source: 'mzsBankLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(231, 214, 126, 0.9)',
-            },
-        })
-        map.addLayer({
-            id: 'mzsSectionLabel',
-            type: 'symbol',
-            source: 'mzsSectionLineLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(121, 214, 126, 0.9)',
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsBankLabel',
+        //     type: 'symbol',
+        //     source: 'mzsBankLabelSource',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'text-field': ['get', 'label'],
+        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        //         // 'text-offset': [0, 1.25],
+        //         'text-anchor': 'left',
+        //     },
+        //     paint: {
+        //         'text-color': 'rgba(231, 214, 126, 0.9)',
+        //     },
+        // })
+        // map.addLayer({
+        //     id: 'mzsSectionLabel',
+        //     type: 'symbol',
+        //     source: 'mzsSectionLineLabelSource',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'text-field': ['get', 'label'],
+        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        //         // 'text-offset': [0, 1.25],
+        //         'text-anchor': 'left',
+        //     },
+        //     paint: {
+        //         'text-color': 'rgba(121, 214, 126, 0.9)',
+        //     },
+        // })
         // map.addLayer({
         //     id: 'ras',
         //     type: 'raster',
