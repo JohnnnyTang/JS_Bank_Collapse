@@ -4,21 +4,23 @@
     <select id="getVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.TileBox">
         select st_asmvt(result, #{visualId}) tile
         from(
-                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom,
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
                 <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
                     ${field}
                 </foreach>
                 from ${name}
+                order by if_important DESC
             ) as result
     </select>
 
     <select id="getVectorCenterPtTile" resultType="java.lang.Object"  parameterType="com.johnny.bank.model.common.TileBox">
         select st_asmvt(result, #{visualId}) tile
         from(
-            select st_asmvtgeom(ST_Centroid(geom), ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom,
+            select st_asmvtgeom(ST_Centroid(geom), ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
             <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
                 ${field}
             </foreach>
+            order by if_important DESC
             from ${name}
         ) as result
     </select>
@@ -42,16 +44,17 @@
 
     <select id="getLayerBasicInfo" resultType="java.util.Map">
         select
-            ST_X(centroid_geom) as center_x,ST_Y(centroid_geom) as center_Y,
+            ST_X(centroid_geom) as center_x,ST_Y(centroid_geom) as center_Y, if_important,
             <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
                 ${field}
             </foreach>
         from (
-            select ST_Transform(ST_Centroid(geom), 4326) as centroid_geom,
+            select ST_Transform(ST_Centroid(geom), 4326) as centroid_geom, if_important,
                 <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
                     ${field}
                 </foreach>
             from ${tableName}
+            order by if_important DESC
         ) as res
     </select>
 

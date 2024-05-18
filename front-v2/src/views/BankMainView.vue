@@ -282,13 +282,14 @@ onMounted(() => {
         map.addLayer({
             id: 'riverLabel',
             type: 'symbol',
-            source: 'riverLabelSource',
+            source: 'riverSectionLabelSource',
             'source-layer': 'default',
             layout: {
                 'text-field': ['get', 'label'],
                 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                 // 'text-offset': [0, 1.25],
                 'text-anchor': 'left',
+                'symbol-placement': 'line-center'
             },
             paint: {
                 'text-color': 'rgba(13, 22, 189, 0.8)',
