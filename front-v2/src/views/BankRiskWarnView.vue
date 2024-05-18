@@ -2,10 +2,10 @@
     <div class="risk-warn-container">
         <div class="map-container" id="map" ref="mapContainer"></div>
         <canvas id="GPUFrame"></canvas>
-
         <div class="selector-container">
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div>
+                <button @click="test">111</button>
                 <div class="place selector-content">
                     <el-select class="side" v-model="placeValue" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
                         @change="sceneSelectChange" popper-class="risk-popper">
@@ -23,7 +23,7 @@
                 <div class="before-scene selector-content">
                     <el-select class="before" v-model="sceneBeforeValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
                         @change="sceneBeforeSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
+                        <el-option v-for="item in sceneList" :key="item.value" :label="item.label" :value="item.value">
                             <span style="float: left" class="section-name-text">{{ item.year }}</span>
                             <span style="float: right" class="section-class-text">{{ item.time }}</span>
                         </el-option>
@@ -35,8 +35,8 @@
                 <div class="now-scene-title selector-title">当前地形:</div>
                 <div class="now-scene selector-content">  
                     <el-select class="now" v-model="sceneNowValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
-                        @change="sceneNowSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
+                        @change="sceneNowSelectChange(sceneNowValue)" popper-class="risk-popper">
+                        <el-option v-for="item in sceneList" :key="item.value" :label="item.label" :value="item.value">
                             <span style="float: left" class="section-name-text">{{ item.year }}</span>
                             <span style="float: right" class="section-class-text">{{ item.time }}</span>
                         </el-option>
@@ -162,7 +162,6 @@
             v-model="sectionConfirmShow"
             title="绘制断面确认"
             width="40vh"
-            :before-close="sectionConfirmClose"
         >
             <span>确认使用此断面进行计算</span>
             <el-input
@@ -176,6 +175,29 @@
                     <div style="text-align: right;">
                         <el-button @click="cancelSectionRese">取消</el-button>
                         <el-button type="primary" @click="sureSectionRese">
+                            确认
+                        </el-button>
+                    </div>
+                </div>
+            </template>
+        </el-dialog>
+        <el-dialog
+            v-model="sceneConfirmShow"
+            title="切换场景确认"
+            width="40vh"
+        >
+            <span>确认使用以下年份地形数据进行计算：</span>
+            <div style="position:absolute;top:6.5vh;font-weight: bold;">
+                {{ sceneBefore.name }}
+            </div>
+            <div style="position:absolute;top:8.5vh;font-weight: bold;">
+                {{ sceneNow.name }}
+            </div>
+            <template #footer>
+                <div class="dialog-footer">
+                    <div style="text-align: right;">
+                        <el-button @click="cancelSceneRese">取消</el-button>
+                        <el-button type="primary" @click="sureSceneRese">
                             确认
                         </el-button>
                     </div>
@@ -259,65 +281,84 @@ const mapJumpToRiver = (mapIns) => {
 }
 
 const sceneBeforeValue = ref('2022after')
-
 const sceneNowValue = ref('2023before')
+const preSceneBeforeValue = ref('2022after')
+const preSceneNowValue = ref('2023before')
+let sceneBefore
+let sceneNow
 
-const scenceList = ref([
+const sceneList = ref([
     {
         value: '2020before',
+        name: '2020汛前地形数据',
         label: '2020汛前',
         year: '2020',
         time: '汛前',
-        date: '2020-03-01'
+        date: '2020-03-01',
+        dateShort: '2003'
     },
     {
         value: '2020after',
+        name: '2020汛后地形数据',
         label: '2020汛后',
         year: '2020',
         time: '汛后',
-        date: '2020-09-01'
+        date: '2020-09-01',
+        dateShort: '2009'
     },
     {
         value: '2021before',
+        name: '2021汛前地形数据',
         label: '2021汛前',
         year: '2021',
         time: '汛前',
-        date: '2021-03-01'
+        date: '2021-03-01',
+        dateShort: '2103'
     },
     {
         value: '2021after',
+        name: '2021汛后地形数据',
         label: '2021汛后',
         year: '2021',
         time: '汛后',
-        date: '2021-09-01'
+        date: '2021-09-01',
+        dateShort: '2109'
     },
     {
         value: '2022before',
+        name: '2022汛前地形数据',
         label: '2022汛前',
         year: '2022',
         time: '汛前',
-        date: '2022-03-01'
+        date: '2022-03-01',
+        dateShort: '2203'
     },
     {
         value: '2022after',
+        name: '2022汛后地形数据',
         label: '2022汛后',
         year: '2022',
         time: '汛后',
-        date: '2022-09-01'
+        date: '2022-09-01',
+        dateShort: '2209'
     },
     {
         value: '2023before',
+        name: '2023汛前地形数据',
         label: '2023汛前',
         year: '2023',
         time: '汛前',
-        date: '2023-03-01'
+        date: '2023-03-01',
+        dateShort: '2303'
     },
     {
         value: '2023after',
+        name: '2023汛后地形数据',
         label: '2023汛后',
         year: '2023',
         time: '汛后',
-        date: '2023-09-01'
+        date: '2023-09-01',
+        dateShort: '2309'
     },
 ])
 
@@ -332,6 +373,36 @@ const placeList = [
 const sceneBeforeSelectChange = () => { }
 
 const sceneNowSelectChange = () => { }
+
+const test = () => {
+    sceneBefore = sceneList.value.find(item => item.value === sceneBeforeValue.value)
+    sceneNow = sceneList.value.find(item => item.value === sceneNowValue.value)
+    sceneConfirmShow.value = true
+}
+
+const cancelSceneRese = () => {
+    sceneConfirmShow.value = false
+}
+
+const sureSceneRese = () => {
+    sceneConfirmShow.value = false
+    if ( sceneNow.dateShort <= sceneBefore.dateShort ) {
+        ElMessage.error('当前地形时间不能早于或等于对比地形时间！')
+        return
+    }
+    if ( preSceneBeforeValue.value === sceneBeforeValue.value && preSceneNowValue.value === sceneNowValue.value ) {
+        ElMessage.error('当前地形时间与对比地形时间未发生变化！')
+        return
+    }
+    const time = sceneNow.dateShort + sceneBefore.dateShort
+    mapInstance.removeLayer('mapRaster')
+    mapInstance.removeSource('mapRaster')
+    addRasterLayer(mapInstance, time, 'mapRaster')
+    mapInstance.moveLayer('mapRaster', 'mzsLine')
+
+    preSceneBeforeValue.value = sceneBeforeValue.value
+    preSceneNowValue.value = sceneNowValue.value
+}
 
 const sceneSelectChange = () => { }
 
@@ -365,9 +436,8 @@ watch(
     // console.log(flow.currentResourcePointer)
         timeStep.value = flow.currentResourcePointer
     }
-
-
 )
+
 const showComponent = ref(false)
 let profileData = []
 const profileValue = ref(2)
@@ -526,6 +596,7 @@ const changeProfileData = (profileData) => {
 
 let mapInstance;
 const sectionConfirmShow = ref(false)
+const sceneConfirmShow = ref(false)
 const sectionLineLabel = ref('')
 const sectionLineLabelSec = ref('')
 const calcEnable = ref(false)
@@ -631,8 +702,8 @@ const sureSectionRese = async() => {
     }
     isRunning.value = true
     sectionConfirmShow.value = false
-    const before = scenceList.value.find(item => item.value == sceneBeforeValue.value).date
-    const after = scenceList.value.find(item => item.value == sceneNowValue.value).date
+    const before = sceneList.value.find(item => item.value == sceneBeforeValue.value).date
+    const after = sceneList.value.find(item => item.value == sceneNowValue.value).date
     const taskId = await CalProfileByPoint(before, after, StartPtX, StartPtY, EndPtX, EndPtY)
     let RunStatus = ""
     for (;;) {
@@ -713,7 +784,7 @@ const addRasterLayer = (map, time, name) => {
     let rasterMin = rasterMM[time].min
     let rasterMax = rasterMM[time].max
     map.addLayer({
-        id: 'ras',
+        id: name,
         type: 'raster',
         source: name,
         'paint': {
