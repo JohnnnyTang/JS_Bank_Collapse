@@ -848,30 +848,54 @@ onMounted(async () => {
         map.on('click', ['mzsBankLine'], (e) => {
             console.log(e.features[0]);
         })
-        !map.getSource('mzsBankLabel') &&
-            map.addSource('mzsBankLabel', {
-                type: 'vector',
-                tiles: [tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}'],
-            })
-        !map.getLayer('民主沙岸段注记') &&
-            map.addLayer({
-                id: '民主沙岸段注记',
-                type: 'symbol',
-                source: 'mzsBankLabel',
-                'source-layer': 'default',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                        'Arial Unicode MS Bold',
-                    ],
-                    'text-anchor': 'center',
-                    'text-size': 20
-                },
-                paint: {
-                    'text-color': 'rgb(28,13,106)',
-                },
-            })
+
+        map.addSource('mzsSectionLabel', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+        })
+        map.addLayer({
+            id: '点2',
+            type: 'symbol',
+            source: 'mzsSectionLabel',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+                'text-offset': [-1.0, 1.15],
+                'text-anchor': 'top',
+                'text-size': 16,
+                'text-allow-overlap': true
+            },
+            paint: {
+                'text-color': 'rgb(0, 22, 145)',
+            },
+        })
+
+        // !map.getSource('mzsBankLabel') &&
+        //     map.addSource('mzsBankLabel', {
+        //         type: 'vector',
+        //         tiles: [tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}'],
+        //     })
+        // !map.getLayer('民主沙岸段注记') &&
+        //     map.addLayer({
+        //         id: '民主沙岸段注记',
+        //         type: 'symbol',
+        //         source: 'mzsBankLabel',
+        //         'source-layer': 'default',
+        //         layout: {
+        //             'text-field': ['get', 'label'],
+        //             'text-font': [
+        //                 'Open Sans Semibold',
+        //                 'Arial Unicode MS Bold',
+        //             ],
+        //             'text-anchor': 'center',
+        //             'text-size': 20
+        //         },
+        //         paint: {
+        //             'text-color': 'rgb(28,13,106)',
+        //         },
+        //     })
 
         map.addLayer({
             id: 'mzsBankLineChoosen',

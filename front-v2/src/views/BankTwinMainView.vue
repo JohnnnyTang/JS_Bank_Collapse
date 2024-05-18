@@ -441,28 +441,6 @@ onMounted(async () => {
     //     console.log('get key')
     //     token.value = videoAccessKey.data.accessToken
     // }
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key == '1') {
-            const script = document.createElement('script');
-            script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
-            script.onload = async () => {
-                console.log('load.js fine');
-                unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
-                maskLayer = new customLayers.MaskLayer()
-                map.addLayer(unityLayer)
-                map.addLayer(maskLayer)
-            };
-            document.head.appendChild(script);
-        }
-        if (e.key == '2') {
-            // map.addLayer(new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value))
-            console.log('222');
-            unityLayer.remove()
-            map.removeLayer('Mask-Layer')
-            map.removeLayer('Unity-Layer')
-        }
-    })
 })
 
 onUnmounted(() => {
