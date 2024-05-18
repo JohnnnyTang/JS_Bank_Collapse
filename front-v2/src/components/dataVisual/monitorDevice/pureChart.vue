@@ -97,8 +97,8 @@ $Color5: rgb(6, 102, 192);
 .pure-chart {
     user-select: none;
     position: relative;
-    width: 24vw;
-    height: 32vh;
+    width: 32vw;
+    height: 38vh;
     padding: calc(0.5vh + 0.2vw);
     background-color: $Color1;
     display: flex;
@@ -146,8 +146,8 @@ $Color5: rgb(6, 102, 192);
 
 
     .chart {
-        width: 24vw;
-        height: 32vh;
+        width: 100%;
+        height: 100%;
         background-color: rgb(255, 255, 255);
     }
 

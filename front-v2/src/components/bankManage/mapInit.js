@@ -24,6 +24,7 @@ const zoomRef = ref()
 const mapInit = async (map, vis) => {
 
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [
@@ -42,22 +43,38 @@ const mapInit = async (map, vis) => {
             tileServer + '/tile/vector/dockArea/{x}/{y}/{z}',
         ],
     })
+    map.addSource('dockAreaLabelSource', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}',
+        ],
+    })
     map.addSource('fixProjectAreaSource', {
         type: 'vector',
         tiles: [
             tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}',
         ],
     })
+    map.addSource('fixProjectLineSource', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}',
+        ],
+    })
+    map.addSource('fixProjectAreaLabelSource', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}',
+        ],
+    })
     map.addSource('mzsSectionLabel', {
         type: 'vector',
         tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
     })
-    // map.addSource('mzsBankLabelSource', {
-    //     type: 'vector',
-    //     tiles: [
-    //         tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}',
-    //     ],
-    // })
+    map.addSource('riverPlaceLabel', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+    })
     map.addSource('mzsBankLineSource', {
         type: 'vector',
         tiles: [
@@ -104,6 +121,22 @@ const mapInit = async (map, vis) => {
             'line-width': 2,
         },
     })
+
+    map.addLayer({
+        id: 'fjsFixLine',
+        type: 'line',
+        source: 'fixProjectLineSource',
+        'source-layer': 'default',
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+        },
+        paint: {
+            'line-opacity': 1,
+            'line-color': 'rgba(16, 17, 228, 0.5)',
+            'line-width': 4,
+        },
+    })
     
     // map.addLayer({
     //     id: 'mzsLabel',
@@ -147,8 +180,8 @@ const mapInit = async (map, vis) => {
         source: 'dockAreaSource',
         'source-layer': 'default',
         paint: {
-            'fill-color': 'rgba(201,217,238, 0.8)',
-            'fill-outline-color': 'rgba(201,217,238, 0.8)'
+            'fill-color': 'rgba(161,207,238, 0.8)',
+            'fill-outline-color': 'rgba(161,207,238, 0.8)'
         },
     })
     map.addLayer({
@@ -157,8 +190,8 @@ const mapInit = async (map, vis) => {
         source: 'fixProjectAreaSource',
         'source-layer': 'default',
         paint: {
-            'fill-color': 'rgba(20,74,197, 0.8)',
-            'fill-outline-color': 'rgba(20,74,197, 0.8)'
+            'fill-color': 'rgba(220,224,237, 0.8)',
+            'fill-outline-color': 'rgba(220,224,237, 0.8)'
         },
     })
     // map.addLayer({
@@ -217,51 +250,6 @@ const mapInit = async (map, vis) => {
             'text-color': 'rgb(0, 22, 145)',
         },
     })
-    // map.addLayer({
-    //     id: 'mzsSectionLine',
-    //     type: 'line',
-    //     source: 'mzsSectionLineSource',
-    //     'source-layer': 'default',
-    //     layout: {
-    //         'line-cap': 'round',
-    //         'line-join': 'round',
-    //     },
-    //     paint: {
-    //         'line-opacity': 1,
-    //         'line-color': 'rgba(11, 214, 223, 0.75)',
-    //         'line-width': 4,
-    //     },
-    // })
-    // map.addLayer({
-    //     id: 'mzsBankLabel',
-    //     type: 'symbol',
-    //     source: 'mzsBankLabelSource',
-    //     'source-layer': 'default',
-    //     layout: {
-    //         'text-field': ['get', 'label'],
-    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-    //         // 'text-offset': [0, 1.25],
-    //         'text-anchor': 'left',
-    //     },
-    //     paint: {
-    //         'text-color': 'rgba(231, 214, 86, 0.9)',
-    //     },
-    // })
-    // map.addLayer({
-    //     id: 'mzsSectionLabel',
-    //     type: 'symbol',
-    //     source: 'mzsSectionLineLabelSource',
-    //     'source-layer': 'default',
-    //     layout: {
-    //         'text-field': ['get', 'label'],
-    //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-    //         // 'text-offset': [0, 1.25],
-    //         'text-anchor': 'bottom',
-    //     },
-    //     paint: {
-    //         'text-color': 'rgba(81, 154, 86, 0.9)',
-    //     },
-    // })
     map.addLayer({
         id: 'mzsLabel',
         type: 'symbol',
@@ -276,6 +264,54 @@ const mapInit = async (map, vis) => {
         },
         paint: {
             'text-color': 'rgba(31, 14, 126, 0.8)',
+        },
+    })
+    map.addLayer({
+        id: 'dockAreaLabel',
+        type: 'symbol',
+        source: 'dockAreaLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'project_name'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'bottom',
+            'text-size': 12
+        },
+        paint: {
+            'text-color': 'rgba(31, 44, 126, 0.6)',
+        },
+    })
+    map.addLayer({
+        id: 'riverPlaceLabel',
+        type: 'symbol',
+        source: 'riverPlaceLabel',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'left',
+            'text-size': 18
+        },
+        paint: {
+            'text-color': 'rgba(31, 44, 226, 1)',
+        },
+    })
+    map.addLayer({
+        id: 'fixProjectAreaLabel',
+        type: 'symbol',
+        source: 'fixProjectAreaLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'layer'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'right',
+            'text-size': 12
+        },
+        paint: {
+            'text-color': 'rgba(31, 44, 126, 0.6)',
         },
     })
 
@@ -625,7 +661,7 @@ const createPopUp = (deviceProperty, zoom) => {
 
     const domwithComp = container
     const popUp = new mapboxgl.Popup({
-        maxWidth: '1000px',
+        maxWidth: '1500px',
         offset: 25,
     }).setDOMContent(domwithComp)
     return popUp
@@ -641,7 +677,7 @@ const createWarningPopup = (info) => {
 
     const domwithComp = container
     const popUp = new mapboxgl.Popup({
-        maxWidth: '1000px',
+        maxWidth: '1500px',
         offset: 25,
     }).setDOMContent(domwithComp)
     return popUp
@@ -712,72 +748,79 @@ const open = (features, map) => {
     // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
 
-    const radioGroupVNode = h('div', { class: 'container' }, [
-        h('div', { class: 'title' }, '选择设备'),
-        items.map(item => {
-            return h(
-                'div',
-                {
-                    key: item.properties.machineId,
-                    class: 'block',
-                },
-                [
-                    h('label', { class: 'label' },
-                        [
-                            h('input', {
-                                type: 'radio',
-                                name: 'options',
-                                value: item.properties.code,
-                                onChange: event => {
-                                    // 在这里处理选项变化事件
-                                    selectedCode = event.target.value;
-                                }
-                            }),
-                            h('span', { class: 'text' }, DEVICETYPEMAP[Number(item.properties.type) - 1] + '（' + deviceNameMap[DEVICETYPEMAP[Number(item.properties.type) - 1]][item.properties.code] + '）')
-                        ]
-                    )
-                ]
-            );
-        })
-    ]);
+    useSceneStore().setSelectedFeature(items[0].properties)
+    propertyRef.value = items[0].properties
+    const popUp = createPopUp(propertyRef, zoomRef)
+    popUp.setOffset(0).setLngLat([items[0].properties.longitude, items[0].properties.latitude]).addTo(map)
 
-    ElMessageBox.confirm(
-        '',
-        {
-            distinguishCancelAndClose: true,
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            center: true,
-            message: radioGroupVNode,
-            'customClass': 'choice-box'
-        }
-    )
-        .then(() => {
-            ElMessage({
-                type: 'info',
-                message: '加载设备详情',
-            })
-            let targetProperty
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].properties.code === selectedCode) {
-                    targetProperty = items[i].properties
-                }
-            }
+    let dom = document.getElementById('popup')
 
-            useSceneStore().setSelectedFeature(targetProperty)
-            propertyRef.value = targetProperty
-            const popUp = createPopUp(propertyRef, zoomRef)
-            popUp.setOffset(0).setLngLat([targetProperty.longitude, targetProperty.latitude]).addTo(map)
+    // const radioGroupVNode = h('div', { class: 'container' }, [
+    //     h('div', { class: 'title' }, '选择设备'),
+    //     items.map(item => {
+    //         return h(
+    //             'div',
+    //             {
+    //                 key: item.properties.machineId,
+    //                 class: 'block',
+    //             },
+    //             [
+    //                 h('label', { class: 'label' },
+    //                     [
+    //                         h('input', {
+    //                             type: 'radio',
+    //                             name: 'options',
+    //                             value: item.properties.code,
+    //                             onChange: event => {
+    //                                 // 在这里处理选项变化事件
+    //                                 selectedCode = event.target.value;
+    //                             }
+    //                         }),
+    //                         h('span', { class: 'text' }, DEVICETYPEMAP[Number(item.properties.type) - 1] + '（' + deviceNameMap[DEVICETYPEMAP[Number(item.properties.type) - 1]][item.properties.code] + '）')
+    //                     ]
+    //                 )
+    //             ]
+    //         );
+    //     })
+    // ]);
 
-            let dom = document.getElementById('popup')
+    // ElMessageBox.confirm(
+    //     '',
+    //     {
+    //         distinguishCancelAndClose: true,
+    //         confirmButtonText: '确定',
+    //         cancelButtonText: '取消',
+    //         center: true,
+    //         message: radioGroupVNode,
+    //         'customClass': 'choice-box'
+    //     }
+    // )
+    //     .then(() => {
+    //         ElMessage({
+    //             type: 'info',
+    //             message: '加载设备详情',
+    //         })
+    //         let targetProperty
+    //         for (let i = 0; i < items.length; i++) {
+    //             if (items[i].properties.code === selectedCode) {
+    //                 targetProperty = items[i].properties
+    //             }
+    //         }
 
-        })
-        .catch((action) => {
-            ElMessage({
-                type: 'info',
-                message: '取消'
-            })
-        })
+    //         useSceneStore().setSelectedFeature(targetProperty)
+    //         propertyRef.value = targetProperty
+    //         const popUp = createPopUp(propertyRef, zoomRef)
+    //         popUp.setOffset(0).setLngLat([targetProperty.longitude, targetProperty.latitude]).addTo(map)
+
+    //         let dom = document.getElementById('popup')
+
+    //     })
+    //     .catch((action) => {
+    //         ElMessage({
+    //             type: 'info',
+    //             message: '取消'
+    //         })
+    //     })
 }
 
 const deviceNameMap = {
