@@ -956,7 +956,7 @@ div.risk-warn-container {
     div.map-container {
         width: 100vw;
         height: 92vh;
-        background-color: antiquewhite;
+        background-color: hsl(194, 69%, 91%);
     }
 
     canvas#GPUFrame {

@@ -1698,7 +1698,7 @@ const getStyleJson = () => {
                     visibility: 'visible',
                 },
                 paint: {
-                    'fill-color': 'rgb(255,255,255)',
+                    'fill-color': 'rgb(216,241,247)',
                     'fill-opacity': 1.0,
                 },
             },

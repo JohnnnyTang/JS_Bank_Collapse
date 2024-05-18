@@ -528,6 +528,7 @@ div.twin-main-container {
         top: 0;
         left: 0;
         z-index: 2;
+        background-color: hsl(194, 69%, 91%);
     }
 
     canvas.GPU {
