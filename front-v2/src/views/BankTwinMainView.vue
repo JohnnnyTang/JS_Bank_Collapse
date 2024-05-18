@@ -152,7 +152,7 @@ const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const warnActive = ref(false)
 const buttonText = computed(() => {
-    return warnActive.value ? '现场监控' : '预警详情'
+    return warnActive.value ? '查看现场监控' : '查看预警详情'
 })
 const detailLoading = ref(false)
 const warnLoading = ref(true)
@@ -606,7 +606,7 @@ div.twin-main-container {
                         justify-content: flex-start;
                         align-items: center;
                         width: fit-content;
-                        margin-right: 1vw;
+                        margin-right: 2vw;
                     }
 
                     div.no-warn-block {
@@ -626,16 +626,17 @@ div.twin-main-container {
         div.button-block {
             position: absolute;
             background-color: rgb(122, 227, 248);
-            border-radius: 10%; 
-            right: 2%;
-            width: 4vw;
-            height: 3vh;
-            line-height: 3vh;
+            border-radius: 7px; 
+            right: 1%;
+            width: 6vw;
+            height: 4vh;
+            line-height: 4vh;
             text-align: center;
             border-right: #a4bfff 2px solid;
             border-bottom: #a4bfff 4px solid;
             font-weight: bold;
             color: #1d00be;
+            font-size: calc(0.6vw + 0.3vh);
 
             /* 初始阴影 */
             &:hover {

@@ -684,21 +684,12 @@ onMounted(async () => {
     })
 
     const getProfileData = async () => {
-<<<<<<< HEAD
-        const promises = []
-        const result = []
-        for (let i = 0; i < 12; i++) {
-            promises.push(bankRiskWarn.getProfileData(i + 1))
-        }
-        const allResponses = await Promise.all(promises)
-=======
         const promises = [];
         const result = [];
         for (let i = 0; i < 12; i++) {
             promises.push(bankRiskWarn.getProfileData(i + 1));
         }
         const allResponses = await Promise.all(promises);
->>>>>>> master
 
         // 确保每个响应都有 data 属性
         allResponses.forEach((response) => {

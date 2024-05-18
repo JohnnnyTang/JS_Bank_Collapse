@@ -10,7 +10,7 @@
                     <div class="device-id device-item head">序号</div>
                     <div class="device-name device-item head">出险时间</div>
                     <div class="device-count device-item head">出险位置</div>
-                    <div class="device-time device-item head">是否处置</div>
+                    <div class="device-time device-item head">是否通知</div>
                 </div>
                 <el-scrollbar height="30vh">
                     <div
@@ -51,7 +51,7 @@ const props = defineProps({
 const historyLoading = ref(true)
 
 const warnHistoryList = ref([
-    { id: '暂无', time: '暂无', place: '暂无', dealt: '否' },
+    { id: '暂无', time: '暂无', place: '暂无', dealt: '是' },
 ])
 
 const gnssIdSectionMap = {
@@ -74,7 +74,7 @@ const buildHistoryList = (warnRawData) => {
             id: index+1,
             time: item.warnTime,
             place: gnssIdSectionMap[item.deviceId],
-            dealt: '否'
+            dealt: '是'
         })
     })
     return res
