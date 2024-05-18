@@ -3,7 +3,7 @@
         <el-progress type="dashboard" :percentage="percentage">
             <template #default="{ percentage }">
                 <span class="percentage-value">{{ hour + '时' }}</span>
-                <span class="percentage-label">{{ day }}</span>
+                <!-- <span class="percentage-label">{{ day }}</span> -->
             </template>
         </el-progress>
     </div>
@@ -72,17 +72,17 @@ onMounted(() => {
 .percentage-value {
     display: block;
     margin-top: 0px;
-    font-size: 24px;
+    font-size: calc(1.0vw + 0.8vh);
     color: rgb(255, 255, 255);
     font-weight: 600;
 }
 
-.percentage-label {
+/* .percentage-label {
     display: block;
     margin-top: 10px;
     font-size: 14px;
     color: rgb(255, 255, 255);
-}
+} */
 
 :deep(.el-progress-circle__track) {
     stroke: rgb(133, 205, 253);

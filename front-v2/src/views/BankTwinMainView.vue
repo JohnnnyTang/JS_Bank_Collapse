@@ -282,10 +282,13 @@ const mapFlyToRiver = (mapIns) => {
 const viewChangeClick = (value) => {
     console.log('view Change!', value);
     let map = useMapStore().getMap()
-    if (!map) ElMessage({
-        'type': 'warning',
-        'message': '请等待地图加载后重试'
-    })
+    if (!map) {
+        ElMessage({
+            'type': 'warning',
+            'message': '请等待地图加载后重试'
+        })
+        return
+    }
     if (value == '2d') {
 
         unityLayer && unityLayer.remove()
@@ -296,7 +299,7 @@ const viewChangeClick = (value) => {
         const script = document.createElement('script');
         script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
         script.onload = async () => {
-            console.log('output.loader.js imported');
+            console.log('load.js fine');
             unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
             maskLayer = new customLayers.MaskLayer()
             map.addLayer(unityLayer)
@@ -528,6 +531,7 @@ div.twin-main-container {
         top: 0;
         left: 0;
         z-index: 2;
+        background-color: hsl(194, 69%, 91%);
     }
 
     canvas.GPU {
