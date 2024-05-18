@@ -138,6 +138,25 @@
                     {{ '终点：' + sectionLineLabelSec }}
                 </div>
             </div>
+            <div class="profile-info-container">
+                <div class="profile-info-item title">
+                    断面信息：
+                </div>
+                <div class="profile-info-item name"
+                v-if="tempProfileName != ''">
+                    断面名称：{{ tempProfileName }}
+                </div>
+                <div class="profile-info-item risk"
+                v-if="tempProfileRisk != ''">
+                    风险等级：{{ 
+                        tempProfileRisk == 'low'
+                            ? '低风险'
+                            : tempProfileRisk == 'middle'
+                                ? '中风险'
+                                : '高风险'
+                    }}
+                </div>
+            </div>
         </div>
         <el-dialog
             v-model="sectionConfirmShow"
@@ -146,12 +165,20 @@
             :before-close="sectionConfirmClose"
         >
             <span>确认使用此断面进行计算</span>
+            <el-input
+                v-model="tempProfileName"
+                style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
+                placeholder="请输入断面名称"
+                clearable
+            />
             <template #footer>
                 <div class="dialog-footer">
-                    <el-button @click="cancelSectionRese">取消</el-button>
-                    <el-button type="primary" @click="sureSectionRese">
-                        确认
-                    </el-button>
+                    <div style="text-align: right;">
+                        <el-button @click="cancelSectionRese">取消</el-button>
+                        <el-button type="primary" @click="sureSectionRese">
+                            确认
+                        </el-button>
+                    </div>
                 </div>
             </template>
         </el-dialog>
@@ -233,7 +260,7 @@ const mapJumpToRiver = (mapIns) => {
 
 const sceneBeforeValue = ref('2022after')
 
-const sceneNowValue = ref('2023after')
+const sceneNowValue = ref('2023before')
 
 const scenceList = ref([
     {
@@ -449,6 +476,8 @@ const shapeChartLoad = ref(true)
 const erosionChartLoad = ref(true)
 const shapeGraphRef = ref(null)
 const erosionGraphRef = ref(null)
+const tempProfileName = ref('')
+const tempProfileRisk = ref('')
 let section;
 let beforesection;
 let slopeRate;
@@ -593,6 +622,13 @@ const cancelSectionRese = () => {
 }
 
 const sureSectionRese = async() => {
+    if (tempProfileName.value === '') {
+        ElMessage.error('断面名称不为空！')
+        return
+    } else if ( profileList.value.find(item => item.name === tempProfileName.value) ) {
+        ElMessage.error('断面名称已存在！')
+        return
+    }
     isRunning.value = true
     sectionConfirmShow.value = false
     const before = scenceList.value.find(item => item.value == sceneBeforeValue.value).date
@@ -642,10 +678,11 @@ const putDataInList = (profileDataItem) => {
     } else {
         tempRisk = 'high'
     }
+    tempProfileRisk.value = tempRisk
     profileList.value.push({
         value: tempValue,
-        label: `断面 JC${tempValue}`,
-        name: '临时断面',
+        label: tempProfileName.value,
+        name: tempProfileName.value,
         filter: ['==', '$type', `JC${tempValue}`],
         flowspeed: profileDataItem.deepestPoint[2],
         risk: tempRisk,
@@ -660,6 +697,39 @@ const changeSceneBefore = (value) => {
 const changeSceneNow = (value) => {
     sceneNowValue.value = value
     
+}
+
+const addRasterLayer = (map, time, name) => {
+    map.addSource( name, {
+            type: 'raster',
+            tiles: [
+                tileServer + `/tile/raster/mzs/flood/${time}/{x}/{y}/{z}`,
+            ],
+            tileSize: 256,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.109, 31.823, 120.855, 32.102],
+        })
+    let rasterMin = rasterMM[time].min
+    let rasterMax = rasterMM[time].max
+    map.addLayer({
+        id: 'ras',
+        type: 'raster',
+        source: name,
+        'paint': {
+            'raster-color': [
+                'interpolate', 
+                ['linear'],
+                ['raster-value'],
+                -10-rasterMin, 'rgba(0,0,255,1)',
+                0-rasterMin,'rgba(255, 255, 255, 1)',
+                10-rasterMin,'rgba(255, 0, 0, 1)',
+            ],
+            'raster-color-mix': [(rasterMax-rasterMin), 0, 0, 0],
+            'raster-opacity': 0.85,
+            'raster-color-range': [-30, 30]
+        }
+    })
 }
 
 onMounted(async () => {
@@ -717,36 +787,7 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
         })
-        map.addSource('mapRasterBefore', {
-            type: 'raster',
-            tiles: [
-                tileServer + '/tile/raster/mzs/flood/23092209/{x}/{y}/{z}',
-            ],
-            tileSize: 256,
-            minzoom: 10,
-            maxzoom: 20,
-            bounds: [120.109, 31.823, 120.855, 32.102],
-        })
-        let rasterMin = rasterMM[23032209].min
-        let rasterMax = rasterMM[23032209].max
-        map.addLayer({
-            id: 'ras',
-            type: 'raster',
-            source: 'mapRasterBefore',
-            'paint': {
-                'raster-color': [
-                    'interpolate', 
-                    ['linear'],
-                    ['raster-value'],
-                    -10-rasterMin, 'rgba(0,0,255,1)',
-                    0-rasterMin,'rgba(255, 255, 255, 1)',
-                    10-rasterMin,'rgba(255, 0, 0, 1)',
-                ],
-                'raster-color-mix': [(rasterMax-rasterMin), 0, 0, 0],
-                'raster-opacity': 0.85,
-                'raster-color-range': [-30, 30]
-            }
-        })
+        addRasterLayer(map, 23032209, 'mapRaster')
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -808,7 +849,8 @@ onMounted(async () => {
         //         ],
         //     },
         // })
-
+        const jsonUrl = '/bankWarn/bankWarn.json'
+        map.addLayer(new BankWarnLayer(jsonUrl))
         map.addLayer({
             id: 'mzsBankLine',
             type: 'line',
@@ -844,8 +886,6 @@ onMounted(async () => {
         })
         map.addControl(draw)
 
-        const jsonUrl = '/bankWarn/bankWarn.json'
-        map.addLayer(new BankWarnLayer(jsonUrl))
         useMapStore().setMap(map)
         console.log('set map!');
         flow.particleNum.n = 2800;
@@ -1220,7 +1260,7 @@ div.risk-warn-container {
 
     div.flow-control-block {
         position: absolute;
-        top: 67.5vh;
+        top: 64vh;
         right: 1.5vw;
         height: 13vh;
         width: 6vw;
@@ -1298,7 +1338,7 @@ div.risk-warn-container {
 
     div.time-shower-block {
         position: absolute;
-        top: 78vh;
+        top: 75vh;
         right: 3vw;
     }
 
@@ -1367,6 +1407,42 @@ div.risk-warn-container {
                 }
             }
         }
+
+        div.profile-info-container {
+            position: absolute;
+            top: 4vh;
+            right: 0.5vw;
+            width: 13vw;
+            height: 10vh;
+            border-radius: 6px;
+            border: 2px solid #1735ae;
+            z-index: 3;
+
+            div.profile-info-item {
+                font-size: calc(0.6vw + 0.5vh);
+                color: #0f1011;
+
+                &.title {
+                    font-weight: bold;
+                    font-size: calc(0.7vw + 0.5vh);
+                    position: absolute;
+                    left: 0.5vw;
+                    top: 0.5vh
+                }
+
+                &.name {
+                    position: absolute;
+                    left: 1.5vw;
+                    top: 4vh;
+                }
+
+                &.risk {
+                    position: absolute;
+                    left: 1.5vw;
+                    top: 7vh;
+                }
+            }
+        }
     }
 
 }
@@ -1390,7 +1466,7 @@ div.risk-warn-container {
 }
 :deep(.dv-loading.loading-icon) {
     position: absolute;
-    top: 4vh;
+    top: 3.3vh;
     right: -12vw;
 }
 </style>
