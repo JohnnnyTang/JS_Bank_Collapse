@@ -20,7 +20,7 @@
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
                 <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
                     <div class="no-warn-block" v-if="warningList.length == 0"
-                        style="font-size: calc(0.5vw + 0.7vh); color: #e7f2ff">
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
                         {{ `近一小时内无报警信息` }}
                     </div>
                     <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
@@ -31,7 +31,7 @@
                                 height: 3vh;
                             "></div>
                         <div style="
-                                font-size: calc(0.5vw + 0.7vh);
+                                font-size: calc(0.7vw + 1vh);
                                 color: #e7f2ff;
                                 margin-left: 0.5vw;
                             ">
@@ -155,7 +155,7 @@ const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const warnActive = ref(false)
 const buttonText = computed(() => {
-    return warnActive.value ? '现场监控' : '预警详情'
+    return warnActive.value ? '查看现场监控' : '查看预警详情'
 })
 const detailLoading = ref(false)
 const warnLoading = ref(true)
@@ -576,7 +576,8 @@ div.twin-main-container {
         left: 28vw;
         top: 2vh;
         width: 44vw;
-        height: 5vh;
+        height: 7vh;
+        line-height: 7vh;
         // background-color: rgb(0, 75, 249);
         z-index: 4;
         overflow: hidden;
@@ -596,6 +597,7 @@ div.twin-main-container {
                 width: 84%;
                 margin-left: 2%;
                 overflow: hidden;
+                height: 7vh;
                 // transform: translateX(2.5%);
 
                 div.marquee-block {
@@ -608,6 +610,7 @@ div.twin-main-container {
                     animation-duration: 0s;
                     animation-timing-function: linear;
                     animation-iteration-count: infinite;
+                    height: 7vh;
 
                     div.warn-block {
                         display: flex;
@@ -615,7 +618,7 @@ div.twin-main-container {
                         justify-content: flex-start;
                         align-items: center;
                         width: fit-content;
-                        margin-right: 1vw;
+                        margin-right: 2vw;
                     }
 
                     div.no-warn-block {
@@ -635,16 +638,17 @@ div.twin-main-container {
         div.button-block {
             position: absolute;
             background-color: rgb(122, 227, 248);
-            border-radius: 10%; 
-            right: 2%;
-            width: 4vw;
-            height: 3vh;
-            line-height: 3vh;
+            border-radius: 7px; 
+            right: 1%;
+            width: 6vw;
+            height: 4vh;
+            line-height: 4vh;
             text-align: center;
             border-right: #a4bfff 2px solid;
             border-bottom: #a4bfff 4px solid;
             font-weight: bold;
             color: #1d00be;
+            font-size: calc(0.6vw + 0.3vh);
 
             /* 初始阴影 */
             &:hover {

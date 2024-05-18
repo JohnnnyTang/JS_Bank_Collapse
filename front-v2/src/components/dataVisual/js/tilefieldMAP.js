@@ -423,6 +423,7 @@ const filterMap = {
     '流域水系': ['in', 'name', ...importantFeature['流域水系']],
     '湖泊河流': ['in', 'name', ...importantFeature['湖泊河流']],
     '水文站点': ['in', 'sp_name', ...importantFeature['水文站点']],
+    '水文站点-注记': ['in', 'sp_name', ...importantFeature['水文站点']],
     '其他堤防': ['in', 'sp_name', ...importantFeature['其他堤防']],
     '其他堤防-注记': ['in', 'sp_name', ...importantFeature['其他堤防']],
     '过江通道-桥墩': [],

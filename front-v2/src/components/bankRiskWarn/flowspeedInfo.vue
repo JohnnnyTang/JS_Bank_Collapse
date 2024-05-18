@@ -58,7 +58,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 div.flowspeed-content{
     position: absolute;
-    top: 38vh;
+    top: 57vh;
     right: 1vw;
     height: 30vh;
     width: 30.2vw;
