@@ -9,7 +9,7 @@
                 <div class="place selector-content">
                     <el-select class="side" v-model="placeValue" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
                         @change="sceneSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in placeList" :key="item.value" :label="item.label" :value="item.value">
+                        <el-option v-for="item in placeList" :key="item.value" :label="item.label" :value="item.value" :disabled="item.disabled">
                             <span class="section-name-text">{{
                                 item.label
                             }}</span>
@@ -19,30 +19,30 @@
             </div>
             <div class="scene-selector-container selector-item-container">
                 <!-- <div class="scene-title selector-title">评估情景：</div> -->
-                <div class="before-scene-title selector-title">对比截面:</div>
+                <div class="before-scene-title selector-title">对比地形:</div>
                 <div class="before-scene selector-content">
                     <el-select class="before" v-model="sceneBeforeValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
                         @change="sceneBeforeSelectChange" popper-class="risk-popper">
                         <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
-                            <span style="float: left" class="section-name-text">{{ item.place }}</span>
-                            <span style="float: right" class="section-class-text">{{ item.year }}</span>
+                            <span style="float: left" class="section-name-text">{{ item.year }}</span>
+                            <span style="float: right" class="section-class-text">{{ item.time }}</span>
                         </el-option>
-                        <template #footer>
+                        <!-- <template #footer>
                             <div class="add-select-button">新增评估情景</div>
-                        </template>
+                        </template> -->
                     </el-select>
                 </div>
-                <div class="now-scene-title selector-title">当前截面:</div>
+                <div class="now-scene-title selector-title">当前地形:</div>
                 <div class="now-scene selector-content">  
                     <el-select class="now" v-model="sceneNowValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
                         @change="sceneNowSelectChange" popper-class="risk-popper">
                         <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
-                            <span style="float: left" class="section-name-text">{{ item.place }}</span>
-                            <span style="float: right" class="section-class-text">{{ item.year }}</span>
+                            <span style="float: left" class="section-name-text">{{ item.year }}</span>
+                            <span style="float: right" class="section-class-text">{{ item.time }}</span>
                         </el-option>
-                        <template #footer>
+                        <!-- <template #footer>
                             <div class="add-select-button">新增评估情景</div>
-                        </template>
+                        </template> -->
                     </el-select>
                 </div>  
             </div>
@@ -113,8 +113,6 @@
             v-if="showComponent"
             :profileList="profileList"
         />
-        
-
         <div class="flow-control-block">
             <label class="switch">
                 <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
@@ -124,10 +122,51 @@
                 <div class="text">流场展示</div>
             </div>
         </div>
-
         <div class="time-shower-block">
             <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
         </div>
+
+        <div class="profile-draw-content">
+            <div class="profile-draw-title">
+                自定义断面：
+            </div>
+            <dv-loading class="loading-icon" v-show="isRunning">模型计算中...</dv-loading>
+            <div class="current-param-container">
+                <div class="current-param-title">当前绘制断面</div>
+                <div
+                    class="current-param-content"
+                    :class="{ 'two-line': sectionLineLabel != '' }"
+                >
+                    {{
+                        sectionLineLabel == ''
+                            ? '暂未绘制'
+                            : '起点：' + sectionLineLabel
+                    }}
+                </div>
+                <div
+                    class="current-param-content two-line"
+                    v-if="sectionLineLabel != ''"
+                >
+                    {{ '终点：' + sectionLineLabelSec }}
+                </div>
+            </div>
+        </div>
+        <el-dialog
+            v-model="sectionConfirmShow"
+            title="绘制断面确认"
+            width="40vh"
+            :before-close="sectionConfirmClose"
+        >
+            <span>确认使用此断面进行计算</span>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="cancelSectionRese">取消</el-button>
+                    <el-button type="primary" @click="sureSectionRese">
+                        确认
+                    </el-button>
+                </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -149,9 +188,13 @@ import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask';
 import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer';
 import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
-import { ElMessage } from 'element-plus'
-import axios from 'axios'
-import { filterFields } from 'element-plus/es/components/form/src/utils'
+import { ElMessage } from 'element-plus';
+import axios from 'axios';
+import { filterFields } from 'element-plus/es/components/form/src/utils';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { convertToMercator } from '../components/bankRiskWarn/coordConvert.js'
+import { rasterMM } from '../components/bankRiskWarn/rasterMM'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 
 let map = null
 const mapContainer = ref()
@@ -200,40 +243,84 @@ const mapJumpToRiver = (mapIns) => {
     // )
 }
 
-const sceneBeforeValue = ref('mzs2023')
+const sceneBeforeValue = ref('2022after')
 
-const sceneNowValue = ref('mzs2024')
+const sceneNowValue = ref('2023after')
 
 const scenceList = ref([
     {
-        value: 'mzs2019',
-        label: '民主沙2019地形',
-        year: '2019',
-        place: '民主沙右缘',
+        value: '2020before',
+        label: '2020汛前',
+        year: '2020',
+        time: '汛前',
+        date: '2020-03-01'
     },
     {
-        value: 'mzs2023',
-        label: '民主沙2023地形',
+        value: '2020after',
+        label: '2020汛后',
+        year: '2020',
+        time: '汛后',
+        date: '2020-09-01'
+    },
+    {
+        value: '2021before',
+        label: '2021汛前',
+        year: '2021',
+        time: '汛前',
+        date: '2021-03-01'
+    },
+    {
+        value: '2021after',
+        label: '2021汛后',
+        year: '2021',
+        time: '汛后',
+        date: '2021-09-01'
+    },
+    {
+        value: '2022before',
+        label: '2022汛前',
+        year: '2022',
+        time: '汛前',
+        date: '2022-03-01'
+    },
+    {
+        value: '2022after',
+        label: '2022汛后',
+        year: '2022',
+        time: '汛后',
+        date: '2022-09-01'
+    },
+    {
+        value: '2023before',
+        label: '2023汛前',
         year: '2023',
-        place: '民主沙右缘',
+        time: '汛前',
+        date: '2023-03-01'
     },
     {
-        value: 'mzs2024',
-        label: '民主沙2024地形',
-        year: '2024',
-        place: '民主沙右缘',
+        value: '2023after',
+        label: '2023汛后',
+        year: '2023',
+        time: '汛后',
+        date: '2023-09-01'
     },
 ])
 
 const placeValue = ref('mzs')
 
-const placeList = ref([{ value: 'mzs', label: '民主沙右缘示范段' }])
+const placeList = [
+    {value: 'mzs', label: '民主沙右缘示范段'},
+    {value: 'tpz', label: '太平洲左缘示范段', disabled: true},
+    {value: 'flq', label: '丰乐桥示范段', disabled: true}
+]
 
 const sceneBeforeSelectChange = () => { }
 
 const sceneNowSelectChange = () => { }
 
-const onAddOption = () => {}
+const sceneSelectChange = () => { }
+
+const onAddOption = () => { }
 
 const onAddProfileOption = () => {}
 
@@ -413,127 +500,204 @@ const changeProfileData = (profileData) => {
 }
 
 let mapInstance;
+const sectionConfirmShow = ref(false)
+const sectionLineLabel = ref('')
+const sectionLineLabelSec = ref('')
+const calcEnable = ref(false)
+const isRunning = ref(false)
+
+let StartPtX
+let StartPtY
+let EndPtX
+let EndPtY
+const draw = new MapboxDraw({
+    displayControlsDefault: false,
+    // Select which mapbox-gl-draw control buttons to add to the map.
+    controls: {
+        line_string: true,
+        trash: true,
+    },
+    // Set mapbox-gl-draw to draw by default.
+    // The user does not have to click the polygon control button first.
+    // defaultMode: '',
+    styles: [
+        // ACTIVE (being drawn)
+        // line stroke
+        {
+            id: 'gl-draw-line',
+            type: 'line',
+            filter: [
+                'all',
+                ['==', '$type', 'LineString'],
+                ['==', 'mode', 'draw_line_string'],
+            ],
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-color': '#D20C0C',
+                'line-dasharray': [0.2, 2],
+                'line-width': 2,
+            },
+        },
+        // vertex point halos
+        {
+            id: 'gl-draw-polygon-and-line-vertex-halo-active',
+            type: 'circle',
+            filter: [
+                'all',
+                ['==', 'meta', 'vertex'],
+                ['==', '$type', 'Point'],
+                ['==', 'mode', 'draw_line_string'],
+            ],
+            paint: {
+                'circle-radius': 5,
+                'circle-color': '#FFF',
+            },
+        },
+        // vertex points
+        {
+            id: 'gl-draw-polygon-and-line-vertex-active',
+            type: 'circle',
+            filter: [
+                'all',
+                ['==', 'meta', 'vertex'],
+                ['==', '$type', 'Point'],
+                ['==', 'mode', 'draw_line_string'],
+            ],
+            paint: {
+                'circle-radius': 3,
+                'circle-color': '#D20C0C',
+            },
+        },
+        // INACTIVE (static, already drawn)
+        // line stroke
+        {
+            id: 'gl-draw-line-static',
+            type: 'line',
+            filter: [
+                'all',
+                ['==', '$type', 'LineString'],
+                ['!=', 'mode', 'draw_line_string'],
+            ],
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-color': '#000',
+                'line-width': 3,
+            },
+        },
+    ],
+})
+const cancelSectionRese = () => {
+    sectionConfirmShow.value = false
+}
+
+const sureSectionRese = async() => {
+    isRunning.value = true
+    sectionConfirmShow.value = false
+    const before = scenceList.value.find(item => item.value == sceneBeforeValue.value).date
+    const after = scenceList.value.find(item => item.value == sceneNowValue.value).date
+    const taskId = await CalProfileByPoint(before, after, StartPtX, StartPtY, EndPtX, EndPtY)
+    let RunStatus = ""
+    for (;;) {
+        try {
+            RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
+        } catch (error) {
+            console.log(error)
+        }
+        if (RunStatus.data == 2) {
+            break;
+        } else if (RunStatus.data == -1) {
+            alert("模型运行结果失败")
+            return
+        } else if (RunStatus.data == -2) {
+            alert("模型运行生成json失败")
+            return
+        } else if (RunStatus.data == 1) {
+            // alert("模型运行中")
+        }
+        await wait(500);
+    }
+    const profileResult = await bankRiskWarn.getRunResult(taskId.data)
+    putDataInList(profileResult.data)
+    isRunning.value = false
+}
+
+async function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const CalProfileByPoint = async(before, now, StartPtX, StartPtY, EndPtX, EndPtY) => {
+    const taskId = await bankRiskWarn.runProfileModelByLine(before, now, StartPtX, StartPtY, EndPtX, EndPtY)
+    return taskId
+}
+
+const putDataInList = (profileDataItem) => {
+    let tempValue = profileList.value.length + 1
+    let tempRisk
+    if (profileDataItem.risk[2] < 0.25) {
+        tempRisk = 'low'
+    } else if (profileDataItem.risk[2] < 0.5) {
+        tempRisk = 'middle'
+    } else {
+        tempRisk = 'high'
+    }
+    profileList.value.push({
+        value: tempValue,
+        label: `断面 JC${tempValue}`,
+        name: '临时断面',
+        filter: ['==', '$type', `JC${tempValue}`],
+        flowspeed: profileDataItem.deepestPoint[2],
+        risk: tempRisk,
+    })
+    profileData.push(profileDataItem)
+}
+
+const changeSceneBefore = (value) => {
+    sceneBeforeValue.value = value
+}
+
+const changeSceneNow = (value) => {
+    sceneNowValue.value = value
+    
+}
+
 onMounted(async () => {
-    // map = new mapboxgl.Map({
-    //     container: 'map', // container ID
-    //     accessToken:
-    //         'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-    //     style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-    //     center: [120.542, 32.036], // starting position [lng, lat]
-    //     zoom: 8, // starting zoom
-    //     bounds: [
-    //         [114.36611654985586, 30.55501729652339],
-    //         [124.5709218840081, 35.31358005439914],
-    //     ],
-    // })
-    // mapFlyToRiver(map)
-    // map.on('load', async () => {
-    //     // console.log('map loaded!!!')
-    //     mapFlyToRiver(map)
-    //     map.addSource('mzsPlaceLabelSource', {
-    //         type: 'vector',
-    //         tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
-    //     })
-    //     map.addSource('mzsPlaceLineSource', {
-    //         type: 'vector',
-    //         tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
-    //     })
-    //     map.addSource('mzsBankAreaSSource', {
-    //         type: 'vector',
-    //         tiles: [tileServer + '/tile/vector/mzsBankAreaOne/{x}/{y}/{z}'],
-    //     })
-    //     map.addSource('mzsBankLineSource', {
-    //         type: 'vector',
-    //         tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
-    //     })
-    //     map.addSource('dockAreaSource', {
-    //         type: 'vector',
-    //         tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
-    //     })
-    //     map.addLayer({
-    //         id: 'mzsLine',
-    //         type: 'line',
-    //         source: 'mzsPlaceLineSource',
-    //         'source-layer': 'default',
-    //         layout: {
-    //             'line-cap': 'round',
-    //             'line-join': 'round',
-    //         },
-    //         paint: {
-    //             'line-opacity': 1,
-    //             'line-color': 'rgba(26, 87, 138, 0.6)',
-    //             'line-width': 2,
-    //         },
-    //     })
-    //     // map.addLayer({
-    //     //     id: 'mzsLabel',
-    //     //     type: 'symbol',
-    //     //     source: 'mzsPlaceLabelSource',
-    //     //     'source-layer': 'default',
-    //     //     layout: {
-    //     //         'text-field': ['get', 'label'],
-    //     //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-    //     //         // 'text-offset': [0, 1.25],
-    //     //         'text-anchor': 'left',
-    //     //     },
-    //     //     paint: {
-    //     //         'text-color': 'rgba(31, 14, 126, 0.75)',
-    //     //     },
-    //     // })
-    //     map.addLayer({
-    //         id: 'dockArea',
-    //         type: 'fill',
-    //         source: 'dockAreaSource',
-    //         'source-layer': 'default',
-    //         paint: {
-    //             'fill-color': '#18b915',
-    //         },
-    //     })
-    //     map.addLayer({
-    //         id: 'mzsSectionArea1',
-    //         type: 'fill',
-    //         source: 'mzsBankAreaSSource',
-    //         'source-layer': 'default',
-    //         paint: {
-    //             'fill-color': [
-    //                 'match',
-    //                 ['get', 'stability'],
-    //                 '较稳定',
-    //                 '#18b915',
-    //                 '稳定',
-    //                 '#06bef1',
-    //                 '不稳定',
-    //                 '#df8105',
-    //                 '较不稳定',
-    //                 '#ee3603',
-    //                 '#18b915',
-    //             ],
-    //         },
-    //     })
-
-    //     map.addLayer({
-    //         id: 'mzsBankLine',
-    //         type: 'line',
-    //         source: 'mzsBankLineSource',
-    //         'source-layer': 'default',
-    //         layout: {
-    //             'line-cap': 'round',
-    //             'line-join': 'round',
-    //         },
-    //         paint: {
-    //             'line-opacity': 1,
-    //             'line-color': 'rgba(31, 14, 223, 0.5)',
-    //             'line-width': 4,
-    //         },
-    //     })
-    //     // map.on('click', (e) => {
-    //     //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
-
-    //     // })
-    // })
-
+    
     initScratchMap(mapContainer.value).then((map) => {
         mapInstance = map
+
+        map.on('draw.create', function (e) {
+            console.log('aaa')
+            console.log(e.features[0])
+            sectionConfirmShow.value = true
+            let lineFeature = e.features[0]
+            sectionLineLabel.value =
+                lineFeature.geometry.coordinates[0][0].toFixed(6) +
+                ',' +
+                lineFeature.geometry.coordinates[0][1].toFixed(6)
+            sectionLineLabelSec.value =
+                lineFeature.geometry.coordinates[1][0].toFixed(6) +
+                ',' +
+                lineFeature.geometry.coordinates[1][1].toFixed(6)
+            let startWebMerCoord = convertToMercator(
+                lineFeature.geometry.coordinates[0],
+            )
+            let endWebMerCoord = convertToMercator(
+                lineFeature.geometry.coordinates[1],
+            )
+            StartPtX = startWebMerCoord[0]
+            StartPtY = startWebMerCoord[1]
+            EndPtX = endWebMerCoord[0]
+            EndPtY = endWebMerCoord[1]
+            return
+        })
+
+        // map.addControl(new mapboxgl.NavigationControl(), 'top-left')
         mapJumpToRiver(map)
         // mapFlyToRiver(map)
         // console.log('map loaded!!!')
@@ -557,7 +721,7 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
         })
-        map.addSource('mapRasterTest', {
+        map.addSource('mapRasterBefore', {
             type: 'raster',
             tiles: [
                 tileServer + '/tile/raster/mzs/flood/23092209/{x}/{y}/{z}',
@@ -567,7 +731,26 @@ onMounted(async () => {
             maxzoom: 20,
             bounds: [120.109, 31.823, 120.855, 32.102],
         })
-         
+        let rasterMin = rasterMM[23032209].min
+        let rasterMax = rasterMM[23032209].max
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'mapRasterBefore',
+            'paint': {
+                'raster-color': [
+                    'interpolate', 
+                    ['linear'],
+                    ['raster-value'],
+                    -10-rasterMin, 'rgba(0,0,255,1)',
+                    0-rasterMin,'rgba(255, 255, 255, 1)',
+                    10-rasterMin,'rgba(255, 0, 0, 1)',
+                ],
+                'raster-color-mix': [(rasterMax-rasterMin), 0, 0, 0],
+                'raster-opacity': 0.85,
+                'raster-color-range': [-30, 30]
+            }
+        })
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -663,15 +846,7 @@ onMounted(async () => {
                 'line-width': 6,
             },
         })
-
-        map.addLayer({
-            id: 'ras',
-            type: 'raster',
-            source: 'mapRasterTest',
-            'paint': {
-
-            }
-        })
+        map.addControl(draw)
 
         const jsonUrl = '/bankWarn/bankWarn.json'
         map.addLayer(new BankWarnLayer(jsonUrl))
@@ -756,90 +931,6 @@ div.risk-warn-container {
         pointer-events: none;
     }
 
-    div.flow-control-block {
-        position: absolute;
-        top: 46vh;
-        right: 1.5vw;
-        height: 13vh;
-        width: 6vw;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        z-index:3;
-
-        .switch {
-            font-size: 20px;
-            position: relative;
-            display: inline-block;
-            width: 2em;
-            height: 3.5em;
-
-            input {
-                display: none;
-            }
-
-            /* The slider */
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgb(165, 219, 253);
-                transition: 0.4s;
-                border-radius: 10px;
-
-                &:before {
-                    position: absolute;
-                    content: "";
-                    height: 1.4em;
-                    width: 1.4em;
-                    border-radius: 5px;
-                    left: 0.3em;
-                    bottom: 0.3em;
-                    background-color: white;
-                    transition: 0.4s;
-                }
-            }
-
-            input:checked {
-                +.slider {
-                    background-color: rgb(73, 90, 250);
-                }
-
-                +.slider:before {
-                    transform: translateY(-1.5em);
-                }
-            }
-        }
-
-        .text-block {
-            font-size: 20px;
-            width: 3em;
-            height: 5em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            .text {
-                writing-mode: vertical-lr;
-                color: rgb(0, 80, 166);
-                color-scheme: light;
-                font-family: 'Microsoft YaHei';
-                font-weight: 700;
-                user-select: none;
-            }
-        }
-    }
-
-    div.time-shower-block {
-        position: absolute;
-        top: 56.5vh;
-        right: 3vw;
-    }
-
     div.selector-container {
         position: absolute;
         top: 2vh;
@@ -913,35 +1004,43 @@ div.risk-warn-container {
 
                     &.side {
                         width: 14vw !important;
+                        .el-select__wrapper {
+                            height: 5vh;
+                            line-height: 5vh;
+                            border-radius: 6px;
+                            font-family: 'Microsoft YaHei';
+                            font-weight: bold;
+                            font-size: calc(0.5vw + 0.8vh);
+                            background-color: #e6f7ff;
+                        }
                     }
 
                     &.before {
                         width: 7.8vw !important;
+                        .el-select__wrapper {
+                            height: 5vh;
+                            line-height: 5vh;
+                            border-radius: 6px;
+                            font-family: 'Microsoft YaHei';
+                            font-weight: bold;
+                            font-size: calc(0.5vw + 0.4vh);
+                            background-color: #e6f7ff;
+                        }
                     }
 
                     &.now {
                         left: 1vw;
                         width: 8vw !important;
+                        .el-select__wrapper {
+                            height: 5vh;
+                            line-height: 5vh;
+                            border-radius: 6px;
+                            font-family: 'Microsoft YaHei';
+                            font-weight: bold;
+                            font-size: calc(0.5vw + 0.4vh);
+                            background-color: #e6f7ff;
+                        }
                     }
-                }
-
-                :deep(.el-select__wrapper) {
-                    height: 5vh;
-                    line-height: 5vh;
-                    border-radius: 6px;
-                    font-family: 'Microsoft YaHei';
-                    font-weight: bold;
-                    font-size: calc(0.5vw + 0.8vh);
-                    background-color: #e6f7ff;
-                }
-                :deep(.el-select__wrapper.before) {
-                    height: 5vh;
-                    line-height: 5vh;
-                    border-radius: 6px;
-                    font-family: 'Microsoft YaHei';
-                    font-weight: bold;
-                    font-size: calc(0.5vw + 0.4vh);
-                    background-color: #e6f7ff;
                 }
 
                 :deep(.el-select__placeholder) {
@@ -1125,6 +1224,158 @@ div.risk-warn-container {
             }
         }
     }
+
+    div.flow-control-block {
+        position: absolute;
+        top: 67.5vh;
+        right: 1.5vw;
+        height: 13vh;
+        width: 6vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        z-index:3;
+
+        .switch {
+            font-size: 20px;
+            position: relative;
+            display: inline-block;
+            width: 2em;
+            height: 3.5em;
+
+            input {
+                display: none;
+            }
+
+            /* The slider */
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgb(165, 219, 253);
+                transition: 0.4s;
+                border-radius: 10px;
+
+                &:before {
+                    position: absolute;
+                    content: "";
+                    height: 1.4em;
+                    width: 1.4em;
+                    border-radius: 5px;
+                    left: 0.3em;
+                    bottom: 0.3em;
+                    background-color: white;
+                    transition: 0.4s;
+                }
+            }
+
+            input:checked {
+                +.slider {
+                    background-color: rgb(73, 90, 250);
+                }
+
+                +.slider:before {
+                    transform: translateY(-1.5em);
+                }
+            }
+        }
+
+        .text-block {
+            font-size: 20px;
+            width: 3em;
+            height: 5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .text {
+                writing-mode: vertical-lr;
+                color: rgb(0, 80, 166);
+                color-scheme: light;
+                font-family: 'Microsoft YaHei';
+                font-weight: 700;
+                user-select: none;
+            }
+        }
+    }
+
+    div.time-shower-block {
+        position: absolute;
+        top: 78vh;
+        right: 3vw;
+    }
+
+    div.profile-draw-content {
+        position: absolute;
+        top: 2vh;
+        right: 2vw;
+        height: 15vh;
+        width: 29vw;
+        border-radius: 8px;
+        background-color: rgba(164, 212, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border: 2px solid rgb(169, 197, 226);
+        z-index:2;
+
+        div.profile-draw-title {
+            position: absolute;
+            height: 4.5vh;
+            width: 7vw;
+            line-height: 4vh;
+            border-radius: 6px;
+            // background-color: rgba(235, 240, 247, 0.4);
+            text-align: center;
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+            font-size: calc(0.7vw + 0.5vh);
+            color: #0f1011;
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+        }
+
+        div.current-param-container {
+            position: absolute;
+            top: 4vh;
+            left: 0.5vw;
+            width: 14vw;
+            height: 10vh;
+            text-align: center;
+            border-radius: 6px;
+            overflow: hidden;
+            font-weight: bold;
+            border: 2px solid #1735ae;
+            
+            div.current-param-title {
+                height: 4vh;
+                line-height: 4vh;
+                background-color: #1753ae;
+                font-size: calc(0.6vw + 0.6vh);
+                color: #cefffd;
+            }
+
+            div.current-param-content {
+                height: 6vh;
+                line-height: 6vh;
+                background-color: #dcebf8;
+                color: #001cb8;
+                font-size: calc(0.85vw + 0.6vh);
+
+                &.two-line {
+                    height: 3vh;
+                    line-height: 3vh;
+                    font-size: calc(0.65vw + 0.3vh);
+                    // font-weight: 300;
+                }
+            }
+        }
+    }
+
 }
 
 @keyframes border-dance {
@@ -1143,5 +1394,10 @@ div.risk-warn-container {
             0 0,
             100% 100%;
     }
+}
+:deep(.dv-loading.loading-icon) {
+    position: absolute;
+    top: 4vh;
+    right: -12vw;
 }
 </style>

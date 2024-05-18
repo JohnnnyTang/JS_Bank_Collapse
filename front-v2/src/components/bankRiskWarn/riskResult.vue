@@ -130,7 +130,7 @@ const JudgeRiskExist = (risk) => {
     div.risk-result-container {
         position: absolute;
         right: 1vw;
-        top: 2vh;
+        top: 20vh;
         width: 30vw;
         height: 33.5vh;
         border: 2px solid rgb(169, 197, 226);
