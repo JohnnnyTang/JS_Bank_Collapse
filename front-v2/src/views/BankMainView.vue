@@ -38,11 +38,11 @@ const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
-            [117.64643582916999, 30.990467310895838],
-            [122.59492087941601, 32.80937651942584],
+            [117.54643582916999, 30.790467310895838],
+            [122.69492087941601, 32.90937651942584],
         ],
         {
-            pitch: 49.45,
+            // pitch: 49.45,
             duration: 800,
             // zoom: 8,
         },
@@ -80,8 +80,8 @@ onMounted(() => {
             'source-layer': 'default',
             layout: {},
             paint: {
-                'fill-color': 'rgb(222, 242, 252)',
-                'fill-opacity': 1.0,
+                'fill-color': 'rgb(12, 122, 252)',
+                'fill-opacity': .2,
             },
         })
         map.addSource('cityBoundaryLine', {
@@ -134,7 +134,7 @@ onMounted(() => {
                     [1, 0],
                     [0, 0],
                 ],
-                'text-size': 24,
+                'text-size': 18,
                 'text-allow-overlap': true,
             },
             paint: {
@@ -195,12 +195,12 @@ onMounted(() => {
             ],
         })
 
-        map.addSource('mzsBankLabelSource', {
-            type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsBankLabel/{x}/{y}/{z}',
-            ],
-        })
+        // map.addSource('mzsBankLabelSource', {
+        //     type: 'vector',
+        //     tiles: [
+        //         tileServer+'/tile/vector/mzsBankLabel/{x}/{y}/{z}',
+        //     ],
+        // })
         map.addSource('mzsBankLineSource', {
             type: 'vector',
             tiles: [
@@ -505,21 +505,21 @@ onMounted(() => {
         //         'line-width': 4,
         //     },
         // })
-        map.addLayer({
-            id: 'mzsBankLabel',
-            type: 'symbol',
-            source: 'mzsBankLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(231, 214, 126, 0.9)',
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsBankLabel',
+        //     type: 'symbol',
+        //     source: 'mzsBankLabelSource',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'text-field': ['get', 'label'],
+        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        //         // 'text-offset': [0, 1.25],
+        //         'text-anchor': 'left',
+        //     },
+        //     paint: {
+        //         'text-color': 'rgba(231, 214, 126, 0.9)',
+        //     },
+        // })
         // map.addLayer({
         //     id: 'mzsSectionLabel',
         //     type: 'symbol',

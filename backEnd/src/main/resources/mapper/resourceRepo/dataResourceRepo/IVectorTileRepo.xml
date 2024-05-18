@@ -9,7 +9,6 @@
                     ${field}
                 </foreach>
                 from ${name}
-                order by if_important DESC
             ) as result
     </select>
 
@@ -21,7 +20,6 @@
                 ${field}
             </foreach>
             from ${name}
-            order by if_important DESC
         ) as result
     </select>
 
