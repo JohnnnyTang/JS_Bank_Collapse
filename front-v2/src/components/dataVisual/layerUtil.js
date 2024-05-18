@@ -1384,7 +1384,7 @@ const layerAddFunctionMap = {
                     //     // 14,
                     //     // ['literal', 0.5],
                     // ],
-                    'icon-size': 0.3,
+                    'icon-size':0.5,
                     'icon-allow-overlap': true,
                 },
                 paint: {},
@@ -1411,7 +1411,7 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     'text-anchor': 'bottom',
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                     'text-size': 22,
                 },
                 paint: {
@@ -1573,13 +1573,14 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    'text-size': 20,
-                    'text-anchor': 'right',
+                    // 'text-offset': [2.5, 0],
+                    'text-size': 24,
+                    'text-anchor': 'left',
                     'text-allow-overlap': true,
 
                 },
                 paint: {
-                    'text-color': '#232323',
+                    'text-color': 'rgb(24, 59, 9)',
                 },
             })
     },
