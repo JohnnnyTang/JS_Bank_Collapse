@@ -543,9 +543,9 @@ const mapInit = async (map, vis) => {
             zoomRef.value = map.getZoom()
         })
 
-        // setTimeout(() => {
-        //     warnInterval(map, 60)
-        // }, 500)
+        setTimeout(() => {
+            warnInterval(map, 60)
+        }, 500)
         setInterval(() => {
             warnInterval(map, 60)
         }, 60 * 1000 * 20);
