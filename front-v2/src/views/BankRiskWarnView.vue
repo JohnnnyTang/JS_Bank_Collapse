@@ -54,20 +54,32 @@
                 </dv-border-box2>
             </div>
             <div class="riskInfo-item profileShape">
-                <div class="item-title">
-                    断面形态对比：
-                </div>
+                <div class="item-title">断面形态对比：</div>
                 <div class="profile-selector-container">
-                    <el-select v-model="profileValue" placeholder="选择断面" style="width: 10vw; height: 3.5vh"
-                        @change="profileSelectChange" popper-class="profile-popper">
-                        <el-option v-for="item in profileList" :key="item.value" :label="item.label" :value="item.value">
+                    <el-select
+                        v-model="profileValue"
+                        placeholder="选择断面"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="profileSelectChange"
+                        popper-class="profile-popper"
+                    >
+                        <el-option
+                            v-for="item in profileList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
                             <span class="profile-name-text">
                                 {{ item.label }}
                             </span>
                         </el-option>
                     </el-select>
                 </div>
-                <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+                <div
+                    ref="shapeGraphRef"
+                    class="shape graph"
+                    element-loading-background="rgba(214, 235, 255,0.8)"
+                ></div>
                 <div class="graph-container shape">
                     <div
                         ref="shapeGraphRef"
@@ -83,7 +95,7 @@
                 </div>
                 <div ref="erosionGraphRef" class="erosion graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 <div class="graph-container erosion">
-                    <div 
+                    <div
                         ref="erosionGraphRef"
                         class="erosion graph"
                         v-loading="erosionChartLoad"
@@ -637,23 +649,18 @@ const tempProfileRisk = ref('')
 const profileSelectChange = (inputValue) => {
     profileValue.value = inputValue
     changeProfileData(profileData)
-    mapInstance.setFilter('mzsBankLineChoosen', profileList.value[profileValue.value-1].filter);
+    mapInstance.setFilter(
+        'mzsBankLineChoosen',
+        profileList.value[profileValue.value - 1].filter,
+    )
 }
 
 const DrawGraph = (section, beforesection, slopeRate, erosion) => {
     shapeChart = echarts.init(shapeGraphRef.value)
-    drawShapeGraph(
-        shapeChart,
-        section,
-        beforesection,
-        slopeRate,
-    )
+    drawShapeGraph(shapeChart, section, beforesection, slopeRate)
     shapeChartLoad.value = false
     erosionChart = echarts.init(erosionGraphRef.value)
-    drawErosionGraph(
-        erosionChart,
-        erosion
-    )
+    drawErosionGraph(erosionChart, erosion)
     erosionChartLoad.value = false
 }
 
@@ -1039,7 +1046,7 @@ onMounted(async () => {
             type: 'line',
             source: 'mzsBankLineSource',
             'source-layer': 'default',
-            filter: profileList.value[profileValue.value-1].filter,
+            filter: profileList.value[profileValue.value - 1].filter,
             layout: {
                 'line-cap': 'round',
                 'line-join': 'round',
@@ -1053,9 +1060,9 @@ onMounted(async () => {
         map.addControl(draw)
 
         useMapStore().setMap(map)
-        console.log('set map!');
-        flow.particleNum.n = 2800;
-        flow.speedFactor.n = 1.0;
+        console.log('set map!')
+        flow.particleNum.n = 2800
+        flow.speedFactor.n = 1.0
         map.addLayer(flow)
         flow.hide()
     })
@@ -1381,7 +1388,7 @@ div.risk-warn-container {
                         // height: 35vh;
                         // background-color: rgba(220, 250, 248, 0.4);
                     }
-                    
+
                     &.erosion {
                         // height: 17vh;
                         // background-color: #00098a;

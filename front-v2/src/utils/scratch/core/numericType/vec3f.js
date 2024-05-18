@@ -27,6 +27,21 @@ export class Vec3f extends Numeric {
         return this._data[2]
     }
 
+    get xy() {
+
+        return [ this._data[0], this._data[1] ]
+    }
+
+    get yz() {
+
+        return [ this._data[1], this._data[2] ]
+    }
+
+    get xyz() {
+
+        return [ this._data[0], this._data[1], this._data[2] ]
+    }
+
     set x(x) {
 
         this._data[0] = x
@@ -40,6 +55,25 @@ export class Vec3f extends Numeric {
     set z(z) {
 
         this._data[2] = z
+    }
+
+    set xy(xy) {
+
+        this._data[0] = xy[0]
+        this._data[1] = xy[1]
+    }
+
+    set yz(yz) {
+
+        this._data[1] = yz[0]
+        this._data[2] = yz[1]
+    }
+
+    set xyz(xyz) {
+
+        this._data[0] = xyz[0]
+        this._data[1] = xyz[1]
+        this._data[2] = xyz[2]
     }
 
     static create(x, y, z) {
@@ -64,6 +98,43 @@ export class Vec3f extends Numeric {
         if (s instanceof Number) vec3.scale(this._data, s, this._data)
         else if (s instanceof F32) vec3.scale(this._data, s.data, this._data)
         
+        return this
+    }
+
+    static CrossProduct(v1, v2) {
+
+        const v = vec3f()
+        vec3.cross(v1._data, v2._data, v._data)
+        return v
+    }
+
+    static Subtract(v1, v2) {
+
+        const v = vec3f()
+        vec3.subtract(v1._data, v2._data, v._data)
+        return v
+    }
+
+    subtract(v) {
+
+        vec3.subtract(this._data, v._data, this._data)
+        return this
+    }
+
+    dot(v) {
+
+        return vec3.dot(this._data, v._data)
+    }
+
+    cross(v) {
+
+        vec3.cross(this._data, v._data, this._data)
+        return this
+    }
+
+    copy(v) {
+
+        vec3.copy(v._data, this._data)
         return this
     }
 
