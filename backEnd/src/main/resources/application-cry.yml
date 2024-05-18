@@ -34,7 +34,7 @@ multiIndex:
   resPath: E:\Data\bankProjectData\modelRes\
 
 tile:
-  mzsTilePath: E:/Data/bankProjectData/mzsTile
+  mzsTilePath: E:/Data/bankProjectData/mzsTile/
   worldTilePath: E:/Data/bankProjectData/2020-10-planet-14
   nodeServicePath: E:/Data/bankProjectData/node/2020-10-planet-14/index.js
 

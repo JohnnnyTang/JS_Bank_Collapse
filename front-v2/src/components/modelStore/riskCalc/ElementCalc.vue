@@ -595,8 +595,10 @@ const RiskMatrixModelRun = async () => {
             break;
         } else if (RunStatus.value.data == -1) {
             alert("模型运行结果失败")
+            return
         } else if (RunStatus.value.data == -2) {
             alert("模型运行生成json失败")
+            return
         } else if (RunStatus.value.data == 1) {
             // alert("模型运行中")
         }
