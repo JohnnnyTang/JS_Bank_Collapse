@@ -143,9 +143,11 @@ import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 import { drawShapeGraph, drawErosionGraph } from '../components/bankRiskWarn/util.js'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
-import { initScratchMap } from '../utils/mapUtils'
-import SteadyFlowLayer from '../utils/m_demLayer/newFlow'
-import { useMapStore } from '../store/mapStore'
+import { initScratchMap } from '../utils/mapUtils';
+import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask';
+// import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
+import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer';
+import { useMapStore } from '../store/mapStore';
 import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
@@ -159,14 +161,13 @@ let flowSrc = []
 for (let i = 0; i < 26; i++) {
     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
 }
-let flow = reactive(
-    new SteadyFlowLayer(
-        '近岸流场',
-        '/scratchSomething/terrain_flow/json/station.bin',
-        flowSrc,
-        (url) => url.match(/uv_(\d+)\.bin/)[1],
-    ),
-)
+let flow = reactive(new SteadyFlowLayer(
+    '近岸流场',
+    '/scratchSomething/terrain_flow/json/station.bin',
+    flowSrc,
+    (url) => url.match(/uv_(\d+)\.bin/)[1],
+    '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
+))
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -607,27 +608,27 @@ onMounted(async () => {
                 'fill-color': '#18b915',
             },
         })
-        map.addLayer({
-            id: 'mzsSectionArea1',
-            type: 'fill',
-            source: 'mzsBankAreaSSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': [
-                    'match',
-                    ['get', 'stability'],
-                    '较稳定',
-                    '#18b915',
-                    '稳定',
-                    '#06bef1',
-                    '不稳定',
-                    '#df8105',
-                    '较不稳定',
-                    '#ee3603',
-                    '#18b915',
-                ],
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsSectionArea1',
+        //     type: 'fill',
+        //     source: 'mzsBankAreaSSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': [
+        //             'match',
+        //             ['get', 'stability'],
+        //             '较稳定',
+        //             '#18b915',
+        //             '稳定',
+        //             '#06bef1',
+        //             '不稳定',
+        //             '#df8105',
+        //             '较不稳定',
+        //             '#ee3603',
+        //             '#18b915',
+        //         ],
+        //     },
+        // })
 
         map.addLayer({
             id: 'mzsBankLine',
@@ -672,6 +673,8 @@ onMounted(async () => {
             }
         })
 
+        const jsonUrl = '/bankWarn/bankWarn.json'
+        map.addLayer(new BankWarnLayer(jsonUrl))
         useMapStore().setMap(map)
         console.log('set map!')
         flow.particleNum.n = 2800
@@ -681,12 +684,21 @@ onMounted(async () => {
     })
 
     const getProfileData = async () => {
+<<<<<<< HEAD
         const promises = []
         const result = []
         for (let i = 0; i < 12; i++) {
             promises.push(bankRiskWarn.getProfileData(i + 1))
         }
         const allResponses = await Promise.all(promises)
+=======
+        const promises = [];
+        const result = [];
+        for (let i = 0; i < 12; i++) {
+            promises.push(bankRiskWarn.getProfileData(i + 1));
+        }
+        const allResponses = await Promise.all(promises);
+>>>>>>> master
 
         // 确保每个响应都有 data 属性
         allResponses.forEach((response) => {

@@ -68,24 +68,25 @@ onMounted(() => {
             padding-top: 1vh;
             padding-bottom: 1vh;
             background-color: rgb(198, 229, 252);
-
-            .el-descriptions__title {
-                font-size: calc(0.7vw + 0.8vh);
-            }
         }
     }
 
     :deep(.el-descriptions__header) {
+        height: 3vh;
+        border-bottom: inset 3px #4f81ff;
+
+
         .el-descriptions__title {
             position: relative;
             height: 3vh;
             line-height: 3vh;
-            border-radius: 6px;
-            font-family: "Microsoft YaHei";
-            font-weight: bold;
-            font-size: calc(1.0vw + 0.8vh);
-            color: #0a72c7;
-            text-shadow: 0 0 10px #72c0ff;
+            font-weight: 600;
+            font-size: calc(1.0vw + 0.6vh);
+            background: #0237bd;
+            text-shadow: 2px 8px 6px rgba(5, 2, 95, 0.207), 0px -5px 35px rgba(255, 255, 255, 0.167);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     }
 
@@ -93,15 +94,24 @@ onMounted(() => {
 
 
         .el-descriptions__cell.el-descriptions__content.is-bordered-content {
+            background-color: #ffffff;
             text-align: center;
-            background-color: #ecf5ff90;
-            .cell-item{
-                color: white;
+            font-size: calc(0.6vw + 0.3vh);
+            border-right: inset 2px rgb(23,163,248);
+            border-bottom: inset 2px rgb(23,163,248);
+            .cell-item {
+                height: fit-content;
             }
         }
 
         .el-descriptions__label.el-descriptions__cell.is-bordered-label {
-            background-color: rgb(198,229,251);
+            // background-color: rgb(198, 229, 251);
+            color: #0237bd;
+            background: rgb(197, 225, 244);
+            font-size: calc(0.7vw + 0.4vh);
+            height: 3vh;
+            border-right: inset 2px #157acc;
+            border-bottom: inset 2px #05a3ff;
         }
 
         .cell-item {

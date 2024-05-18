@@ -690,6 +690,7 @@ let flow = new SteadyFlowLayer(
     '/scratchSomething/terrain_flow/json/station.bin',
     flowSrc,
     (url) => url.match(/uv_(\d+)\.bin/)[1],
+    '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
 )
 
 watch(checkedlayers, (value) => {

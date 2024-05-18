@@ -72,10 +72,10 @@ watch(() => sceneStore.latestScene, (val) => {
         activeStatus.value[2] = true
         legendList.value = legendMap['重点岸段']
 
-    } else if (val == '涉水工程') {
+    } else if (val == '工程情况') {
         activeStatus.value[2] = true
         // 展示过江通道图例
-        legendList.value = legendMap['涉水工程']
+        legendList.value = legendMap['工程情况']
     }
     else if (val == '全江概貌') {
         activeStatus.value[2] = true
@@ -96,7 +96,7 @@ const mapFlyToRiver = (mapIns) => {
     mapIns.fitBounds(
         [[118.75395171066617, 31.191536515956685],
         [121.94881134428226, 32.68858659779259],],
-        { pitch: 52.45, duration: 1500, },
+        { pitch: 0, duration: 1500, },
     )
 }
 const closeHandler = (index) => {
@@ -131,44 +131,6 @@ onMounted(async () => {
     sceneStore.LAYERGROUPMAP.value = layerGroups
 
     activeStatus.value[0] = true
-
-
-
-    //#region test
-    // feature get test
-    // await layerAddFunctionMap['地形瓦片'](mapInstance)//mvt polygon
-    // await layerAddFunctionMap['沙岛'](mapInstance)//mvt polygon
-    // await layerAddFunctionMap['全江注记'](mapInstance)//mvt point
-    // await layerAddFunctionMap['民主沙区划线'](mapInstance)//mvt line
-    // await layerAddFunctionMap['GNSS'](mapInstance)//geojson point
-    // await layerAddFunctionMap['一级预警岸段'](mapInstance)//geojson line
-
-    /// feature get test
-    // window.addEventListener('keydown', async (e) => {
-    //     console.log(e.key);
-    //     switch (e.key) {
-    //         case '1':
-    //             await tempFunction(mapInstance, '地形瓦片')
-    //             break;
-    //         case '2':
-    //             await tempFunction(mapInstance, '全江注记')
-    //             break;
-    //         case '3':
-    //             await tempFunction(mapInstance, '民主沙区划线')
-    //             break; 
-    //         case '4':
-    //             await tempFunction(mapInstance, 'GNSS')
-    //             break;
-    //         case '5':
-    //             await tempFunction(mapInstance, '一级预警岸段')
-    //             break;
-    //     }
-    // })
-    //#endregion
-
-    // addNewLayer(mapInstance)
-
-
 })
 
 //////////// DEBUG FUNCTIONS
@@ -197,6 +159,7 @@ const tempFunction = async (mapInstance, layerName) => {
 }
 
 onUnmounted(() => {
+    mapStore.getMap().remove()
     mapStore.destroyMap()
 })
 

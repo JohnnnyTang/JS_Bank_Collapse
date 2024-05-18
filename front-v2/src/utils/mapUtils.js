@@ -6,17 +6,20 @@ import popUpContent from '../components/dataVisual/featureDetails/popUpContent.v
 import { layerAddFunctionMap } from '../components/dataVisual/layerUtil'
 
 const initMap = async (ref) => {
-    return new mapboxgl.Map({
-        container: ref.id, // container ID
-        accessToken:
-            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-        style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-        center: [120.312, 31.917], // starting position [lng, lat]
-        zoom: 3, // starting zoom
-        bounds: [
-            [114.36611654985586, 30.55501729652339],
-            [124.5709218840081, 35.31358005439914],
-        ],
+    return new Promise((resolve, reject) => {
+        const map = new mapboxgl.Map({
+            container: ref.id, // container ID
+            accessToken:
+                'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+            style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+            // style:{},
+            center: [120.312, 31.917], // starting position [lng, lat]
+            zoom: 10, // starting zoom
+        })
+        map.on('load', () => {
+            console.log('loaded');
+            resolve(map)
+        })
     })
 }
 
@@ -34,6 +37,7 @@ const initScratchMap = (ref) => {
                 zoom: 8,
                 projection: 'mercator',
                 GPUFrame: GPUFrame,
+                useWebGL2: true,
                 antialias: true,
                 // minZoom: 8,
             }).on('load', async () => {
@@ -1816,7 +1820,7 @@ const showLayersFunction = (map, showLayers) => {
                 useLayerStore().flowLayer.show()
                 let center = map.getCenter()
                 map.flyTo({
-                    center: center,
+                    center:center
                 })
             } else if (layer === '三维地形') {
                 useLayerStore().terrainLayer.show()
@@ -2160,20 +2164,14 @@ class ScratchMap extends mapboxgl.Map {
         })
 
         // Texture-related resource
-        this.screen = scr.screen({
-            canvas: options.GPUFrame,
-            alphaMode: 'premultiplied',
-        })
-        this.depthTexture = this.screen.createScreenDependentTexture(
-            'Texture (Map Common Depth)',
-            'depth32float',
-        )
+        this.screen = scr.screen({ canvas: options.GPUFrame, alphaMode: 'premultiplied'})
+        this.depthTexture = this.screen.createScreenDependentTexture('Texture (Map Common Depth)', 'depth32float')
 
         // Pass
         this.outputPass = scr.renderPass({
             name: 'Render Pass (Scratch map)',
-            colorAttachments: [{ colorResource: this.screen }],
-            depthStencilAttachment: { depthStencilResource: this.depthTexture },
+            colorAttachments: [ { colorResource: this.screen } ],
+            depthStencilAttachment: { depthStencilResource: this.depthTexture }
         })
 
         // Make stages
@@ -2251,6 +2249,7 @@ class ScratchMap extends mapboxgl.Map {
     }
 
     add2PreProcess(prePass) {
+        
         scr.director.addItem(this.preProcessStageName, prePass)
         return this
     }
@@ -2260,8 +2259,8 @@ class ScratchMap extends mapboxgl.Map {
         return this
     }
 
-    remove() {
-        console.log(scr.director)
+    remove(){
+        console.log(scr.director);
         super.remove()
         scr.director.stages = {}
         scr.director.stageNum = 0

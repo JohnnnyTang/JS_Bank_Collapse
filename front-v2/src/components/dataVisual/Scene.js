@@ -9,7 +9,7 @@ import {
 } from '../../utils/mapUtils.js'
 import { useSceneStore, useMapLayerStore, useLayerStore } from '../../store/mapStore.js'
 import { layers as ALL_LAYERS } from './layerUtil.js'
-import { showLayersFunction, hideLayersFunction} from '../../utils/mapUtils.js'
+import { showLayersFunction, hideLayersFunction } from '../../utils/mapUtils.js'
 import BackEndRequest from '../../api/backend.js'
 import monitorDetailV2 from './featureDetails/monitorDetailV2.vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -131,6 +131,7 @@ class DataPioneer {
     static getDifMonitorData(geojson) {
         const features = geojson['features']
         let gnss = []
+        let gnssJZ = []
         let incline = []
         let manometer = [] //压力计
         let stress = [] // 应力桩
@@ -138,7 +139,10 @@ class DataPioneer {
         features.forEach((feat) => {
             switch (feat['properties']['type']) {
                 case '1':
-                    gnss.push(feat)
+                    if (feat['properties']['name'] === 'GNSS-JZ') {
+                        gnssJZ.push(feat)
+                    } else
+                        gnss.push(feat)
                     break
                 case '4':
                     incline.push(feat)
@@ -176,6 +180,10 @@ class DataPioneer {
                 type: 'FeatureCollection',
                 features: camera,
             },
+            gnssJZ:{
+                type: 'FeatureCollection',
+                features: gnssJZ,
+            }
         }
     }
     static generateGeoJson(itemArr, getCoords, type) {
@@ -216,7 +224,7 @@ const initLayers = async (sceneInstance, map) => {
                 '地形瓦片',
                 '河段划分',
                 '河段注记',
-                '沙岛',
+                '沙洲',
                 '全江注记',
                 '深泓线',
                 '已建通道',
@@ -271,7 +279,7 @@ const initLayers = async (sceneInstance, map) => {
                 '地形瓦片',
                 '河段划分',
                 '河段注记',
-                '沙岛',
+                '沙洲',
                 '全江注记',
                 '深泓线',
                 '一级预警岸段',
@@ -515,7 +523,7 @@ class Scene {
         })
 
         layersCollection[0].children.push({
-            label: '沙岛',
+            label: '沙洲',
             children: [],
         })
 
@@ -611,7 +619,7 @@ class Scene {
                 }
             ]
         })
-        
+
         layersCollection[1].children.push({
             label: '近岸流场',
             children: []

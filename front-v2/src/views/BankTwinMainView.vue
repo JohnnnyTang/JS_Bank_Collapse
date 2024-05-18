@@ -7,11 +7,7 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab
-                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
-                    :items="items"
-                    :columns="2"
-                ></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -22,75 +18,91 @@
 
         <div class="marquee-container" v-loading="warnLoading">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <div
-                    class="marquee-block"
-                    ref="marqueeBlockDom"
-                    :style="{ animationDuration: animateTime }"
-                >
-                    <div
-                        class="no-warn-block"
-                        v-if="warningList.length == 0"
-                        style="font-size: calc(0.5vw + 0.7vh); color: #e7f2ff"
-                    >
+                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
+                    <div class="no-warn-block" v-if="warningList.length == 0"
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
                         {{ `近一小时内无报警信息` }}
                     </div>
-                    <div
-                        v-else
-                        class="warn-block"
-                        v-for="(warningString, index) in warningList"
-                        :key="index"
-                    >
-                        <div
-                            style="
+                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
+                        <div style="
                                 background-size: contain;
                                 background-image: url('/icons/warning.png');
                                 width: 3vh;
                                 height: 3vh;
-                            "
-                        ></div>
-                        <div
-                            style="
-                                font-size: calc(0.5vw + 0.7vh);
+                            "></div>
+                        <div style="
+                                font-size: calc(0.7vw + 1vh);
                                 color: #e7f2ff;
                                 margin-left: 0.5vw;
-                            "
-                        >
+                            ">
                             {{ warningString }}
                         </div>
                     </div>
                 </div>
             </DvBorderBox12>
+            <div class="button-block" @click="warnActive = !warnActive">
+                {{ buttonText }}
+            </div>
         </div>
 
         <div class="monitor-legend-container">
             <div class="monitor-legend-title">监测设备图例</div>
             <div class="monitor-legend-block">
-                <div
-                    v-for="(item, index) in legendList"
-                    :key="index"
-                    class="monitor-legend-item"
-                >
-                    <div
-                        class="icon-block"
-                        :style="{ backgroundImage: `url(${item.icon})` }"
-                    ></div>
-                    <div class="text-block">
-                        <span>{{ item.text1 }}</span>
-                        <span style="font-weight: bold">{{ item.strong }}</span>
-                        <span>{{ item.text2 }}</span>
-                        <br />
-                        <span
-                            style="
+                <!-- GNSS only -->
+                <div class="monitor-legend-item GNSS">
+                    <div class="item-title">
+                        <span>{{ gnssLegendInfo.text1 }}</span>
+                        <span style="font-weight: bold">{{ gnssLegendInfo.strong }}</span>
+                        <span>{{ gnssLegendInfo.text2 }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: row;">
+                        <div class="legend-block">
+                            <div class="icon-block GNSS-icon" :style="{ backgroundImage: `url(${gnssLegendInfo.icon1})` }">
+                            </div>
+                            <span style="
                                 text-align: center;
                                 width: 100%;
                                 display: block;
-                                text-shadow:
-                                    #eef3ff 1px 1px,
-                                    #eef3ff 1px 1px;
-                            "
-                        >
-                            {{ item.device }}</span
-                        >
+                                line-height: 2.5vh;
+                                color: rgb(16,71,165);
+                                text-shadow: #7388c148 1px 1px 0;
+                            ">
+                                {{ gnssLegendInfo.device1 }}</span>
+                        </div>
+                        <div class="legend-block">
+                            <div class="icon-block GNSS-icon" :style="{ backgroundImage: `url(${gnssLegendInfo.icon2})` }">
+                            </div>
+                            <span style="
+                                text-align: center;
+                                width: 100%;
+                                display: block;
+                                line-height: 2.5vh;
+                                color: rgb(16,71,165);
+                                text-shadow: #7388c148 1px 1px 0;
+                            ">
+                                {{ gnssLegendInfo.device2 }}</span>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- others -->
+                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
+                    <div class="item-title">
+                        <span>{{ item.text1 }}</span>
+                        <span style="font-weight: bold">{{ item.strong }}</span>
+                        <span>{{ item.text2 }}</span>
+                    </div>
+                    <div class="legend-block">
+                        <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
+                        <span style="
+                                text-align: center;
+                                width: 100%;
+                                display: block;
+                                line-height: 2.5vh;
+                                color: rgb(16,71,165);
+                                text-shadow: #7388c148 1px 1px 0;
+                            ">
+                            {{ item.device }}</span>
                     </div>
                 </div>
             </div>
@@ -103,11 +115,7 @@
         >
             <div class="warn-detail-title">预警信息详情</div>
             <div class="warn-detail-content">
-                <div
-                    class="key-val-container"
-                    v-for="(item, index) in warnKeyValList"
-                    :key="index"
-                >
+                <div class="key-val-container" v-for="(item, index) in warnKeyValList" :key="index">
                     <div class="key-text">{{ item.key + '：' }}</div>
                     <el-scrollbar>
                         <div class="val-text">{{ item.val }}</div>
@@ -124,7 +132,7 @@
 
 <script setup>
 import router from '../router'
-import { onMounted, ref, onUnmounted, watch } from 'vue'
+import { onMounted, ref, onUnmounted, watch, computed } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
@@ -143,6 +151,9 @@ const containerDom = ref(null)
 const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const warnActive = ref(false)
+const buttonText = computed(() => {
+    return warnActive.value ? '现场监控' : '预警详情'
+})
 const detailLoading = ref(false)
 const warnLoading = ref(true)
 
@@ -161,14 +172,25 @@ const items = ref([
 ])
 
 const warningList = ref([])
-const legendList = [
+/*
     {
-        icon: '/icons/GNSS.png',
+        icon: '/icons/GNSS测量站.png',
         text1: '土体',
         strong: '表面位移',
         text2: '监测',
         device: 'GNSS',
     },
+*/
+const gnssLegendInfo = {
+    icon1: '/icons/GNSS测量站.png',
+    icon2: '/icons/GNSS基准站.png',
+    text1: '土体',
+    strong: '表面位移',
+    text2: '监测',
+    device1: 'GNSS测量站',
+    device2: 'GNSS基准站',
+}
+const legendList = [
     {
         icon: '/icons/测斜仪.png',
         text1: '土体',
@@ -269,7 +291,7 @@ const updateWarnInfoDesc = async () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
-    console.log('1231', warnInfo)
+    console.log('warnInfo! ', warnInfo)
     let deviceNameList = []
     let warnTimeList = []
 
@@ -542,51 +564,95 @@ div.twin-main-container {
         left: 28vw;
         top: 2vh;
         width: 44vw;
-        height: 5vh;
+        height: 7vh;
+        line-height: 7vh;
         // background-color: rgb(0, 75, 249);
         z-index: 4;
         overflow: hidden;
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
 
-        :deep(.border-box-content) {
+        :deep(.dv-border-box-12) {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 95%;
-            overflow: hidden;
-            transform: translateX(2.5%);
+            justify-content: flex-start;
 
-            div.marquee-block {
+            .border-box-content {
+                position: relative;
                 display: flex;
-                flex-direction: row;
-                white-space: nowrap;
-                justify-content: flex-start;
-                // animation: marquee 15s linear infinite;
-                animation-name: marquee;
-                animation-duration: 0s;
-                animation-timing-function: linear;
-                animation-iteration-count: infinite;
+                justify-content: center;
+                align-items: center;
+                width: 84%;
+                margin-left: 2%;
+                overflow: hidden;
+                height: 7vh;
+                // transform: translateX(2.5%);
 
-                div.warn-block {
+                div.marquee-block {
                     display: flex;
                     flex-direction: row;
-                    justify-content: flex-start;
-                    align-items: center;
-                    width: fit-content;
-                    margin-right: 1vw;
-                }
+                    white-space: nowrap;
+                    justify-content: center;
+                    // animation: marquee 15s linear infinite;
+                    animation-name: marquee;
+                    animation-duration: 0s;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
+                    height: 7vh;
 
-                div.no-warn-block {
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: flex-start;
-                    align-items: center;
-                    width: fit-content;
+                    div.warn-block {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: flex-start;
+                        align-items: center;
+                        width: fit-content;
+                        margin-right: 1vw;
+                    }
+
+                    div.no-warn-block {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: flex-start;
+                        align-items: center;
+                        width: fit-content;
+                        transform: translateX(4vw);
+                    }
                 }
             }
+
+
         }
+
+        div.button-block {
+            position: absolute;
+            background-color: rgb(122, 227, 248);
+            border-radius: 10%; 
+            right: 2%;
+            width: 4vw;
+            height: 3vh;
+            line-height: 3vh;
+            text-align: center;
+            border-right: #a4bfff 2px solid;
+            border-bottom: #a4bfff 4px solid;
+            font-weight: bold;
+            color: #1d00be;
+
+            /* 初始阴影 */
+            &:hover {
+                cursor: pointer;
+                border-right: #a4bfff 2px solid;
+                border-bottom: #a4bfff 4px solid;
+                transition: .3s;
+            }
+
+            &:active {
+                cursor: pointer;
+                border-right: #a4bfff 1px solid;
+                border-bottom: #a4bfff 1px solid;
+                transition: .3s;
+            }
+        }
+
     }
 
     div.monitor-legend-container {
@@ -638,8 +704,8 @@ div.twin-main-container {
 
             div.monitor-legend-item {
                 display: flex;
-                flex-direction: row;
-                justify-content: space-evenly;
+                flex-direction: column;
+                justify-content: flex-start;
                 align-items: center;
                 width: 10vw;
                 height: 6vh;
@@ -650,22 +716,44 @@ div.twin-main-container {
                 // box-shadow: inset 5px 5px 5px #0400fd, inset -5px -5px 5px #0400fd;
 
                 border-radius: 5%;
+                color: #1d00be;
+                text-shadow: #40b4bf 1px 1px 0;
 
-                div.icon-block {
-                    position: relative;
-                    width: 3vh;
+                div.item-title {
                     height: 3vh;
-                    background-size: contain;
-                    background-repeat: no-repeat;
-                    margin-right: 0.2vw;
-                    margin-left: 0.2vw;
+                    line-height: 3vh;
                 }
 
-                div.text-block {
-                    font-size: calc(0.6vw + 0.4vh);
-                    font-weight: 400;
-                    color: rgb(32, 15, 248);
+                div.legend-block {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+
+                    div.icon-block {
+                        position: relative;
+                        width: 2vh;
+                        height: 2vh;
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        margin-right: 0.2vw;
+                        margin-left: 0.2vw;
+                        transform: translateY(16%);
+                    }
+
+                    div.GNSS-icon {
+                        // width: 2.5vh;
+                        // height: 2.5vh;
+                        // transform: translateY(16%);
+                    }
                 }
+
+
+
+            }
+
+            div.GNSS {
+                width: 14vw;
             }
         }
     }

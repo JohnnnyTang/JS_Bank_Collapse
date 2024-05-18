@@ -332,9 +332,9 @@ const mapInit = async (map, vis) => {
             },
             'Point',
         )
-        const { gnss, incline, stress, manometer, camera } =
+        const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
-        console.log(camera, incline);
+        console.log('监测站！', gnssJZ);
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',
@@ -344,6 +344,10 @@ const mapInit = async (map, vis) => {
         //     clusterRadius: 50,
         // })
 
+        map.addSource('gnss-jz-source', {
+            type: 'geojson',
+            data: gnssJZ,
+        })
         map.addSource('gnss-source', {
             type: 'geojson',
             data: gnss,
@@ -367,7 +371,8 @@ const mapInit = async (map, vis) => {
 
         // image source
 
-        await loadImage(map, '/icons/GNSS.png', 'gnss-static')
+        await loadImage(map, '/icons/GNSS测量站.png', 'gnss-static')
+        await loadImage(map, '/icons/GNSS基准站.png', 'gnss-jz-static')
         await loadImage(map, '/icons/测斜仪.png', 'incline-static')
         await loadImage(map, '/icons/孔隙水压力计.png', 'manometer-static')
         await loadImage(map, '/icons/应力桩.png', 'stress-static')
@@ -412,7 +417,16 @@ const mapInit = async (map, vis) => {
         //     }
         // });
 
-
+        map.addLayer({
+            id: 'GNSS基准站',
+            type: 'symbol',
+            source: 'gnss-jz-source',
+            layout: {
+                'icon-image': 'gnss-jz-static',
+                'icon-size': 0.2,
+                'icon-allow-overlap': true,
+            },
+        })
         map.addLayer({
             id: 'GNSS',
             type: 'symbol',
@@ -464,7 +478,7 @@ const mapInit = async (map, vis) => {
             },
         })
 
-        let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩', '监控摄像头']
+        let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
         map.on('click', deviceLayers, (e) => {
             if (e.features.length > 1) {
@@ -503,25 +517,6 @@ const mapInit = async (map, vis) => {
 
         ///////DEBUG////////
         window.addEventListener('keydown', async (e) => {
-            // if (e.key === '3') {
-            //     setWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
-            // }
-            // if (e.key === '1') {
-            //     setWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-            // }
-            // if (e.key === '2') {
-            //     setWarningDeviceStyle(map, '孔隙水压力计', "MZS120.51957026_32.04008655_3")
-            // }
-            // if (e.key === '4') {
-            //     removeWarningDeviceStyle(map, '测斜仪', "MZS120.51749021_32.04053105_4")
-            // }
-            // if (e.key === '5') {
-            //     removeWarningDeviceStyle(map, 'GNSS', "MZS120.51977143_32.04001152_1")
-            // }
-            // if (e.key === '6') {
-            //     removeWarningDeviceStyle(map, '孔隙水压力计', "MZS120.52566826_32.03799363_3")
-            // }
-
             if (e.key == 'Enter') {
                 const minute = 720
                 let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
@@ -532,7 +527,8 @@ const mapInit = async (map, vis) => {
                     let type = 'GNSS'
                     lastPos = setWarningDeviceStyle(map, type, id, item)
                 })
-                useWarnInfoStore().warnInfo = allWarnData
+                if (allWarnData.length != 0)
+                    useWarnInfoStore().warnInfo = allWarnData
 
                 // if (lastPos) {
                 //     map.flyTo({
@@ -553,13 +549,7 @@ const mapInit = async (map, vis) => {
                 //     })
                 // }, 2000)
             }
-
         })
-
-        // setInterval(async()=>{
-        //     const data = (await BackEndRequest.getDangerousDevice()).data
-        //     warning(data,map)
-        // },5000)
 
 
     }
@@ -697,7 +687,8 @@ const warnInterval = async (map, minute) => {
         let type = 'GNSS'
         lastPos = setWarningDeviceStyle(map, type, id, item)
     })
-    useWarnInfoStore().warnInfo = allWarnData
+    if (allWarnData.length != 0)
+        useWarnInfoStore().warnInfo = allWarnData
     console.log('first-warnInterval!', allWarnData);
 
 
@@ -719,19 +710,19 @@ const open = (features, map) => {
     const selectedDevice = ref({})
     let selectedCode
     // const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
-    const DEVICETYPEMAP = ['GNSS', '应力桩', '压力计', '测斜仪', '', '摄像头']
+    const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
 
-    const radioGroupVNode = h('div', [
-        h('div', { style: { marginBottom: '20px', fontWeight: 'bold', fontSize: '20px' } }, '该区域有多台设备，请选择'),
+    const radioGroupVNode = h('div', { class: 'container' }, [
+        h('div', { class: 'title' }, '选择设备'),
         items.map(item => {
             return h(
                 'div',
                 {
                     key: item.properties.machineId,
-                    style: { marginBottom: '10px' }
+                    class: 'block',
                 },
                 [
-                    h('label', {},
+                    h('label', { class: 'label' },
                         [
                             h('input', {
                                 type: 'radio',
@@ -742,7 +733,7 @@ const open = (features, map) => {
                                     selectedCode = event.target.value;
                                 }
                             }),
-                            h('span', {}, DEVICETYPEMAP[Number(item.properties.type) - 1] + '--' + item.properties.code)
+                            h('span', { class: 'text' }, DEVICETYPEMAP[Number(item.properties.type) - 1] + '（' + deviceNameMap[DEVICETYPEMAP[Number(item.properties.type) - 1]][item.properties.code] + '）')
                         ]
                     )
                 ]
@@ -751,13 +742,14 @@ const open = (features, map) => {
     ]);
 
     ElMessageBox.confirm(
-        '该区域有多台设备，请选择目标设备',
+        '',
         {
             distinguishCancelAndClose: true,
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             center: true,
-            message: radioGroupVNode
+            message: radioGroupVNode,
+            'customClass': 'choice-box'
         }
     )
         .then(() => {
@@ -788,6 +780,50 @@ const open = (features, map) => {
         })
 }
 
-
+const deviceNameMap = {
+    'GNSS': {
+        'MZS120.51749289_32.04059243_1': 'CL-01',
+        'MZS120.51977143_32.04001152_1': 'CL-02',
+        'MZS120.52557975_32.03825056_1': 'CL-03',
+        'MZS120.52660704_32.03676583_1': 'CL-04',
+        'MZS120.53334877_32.03227055_1': 'CL-05',
+        'MZS120.54599538_32.02837993_1': 'CL-06',
+        'MZS120.55327892_32.02707923_1': 'CL-07',
+        'MZS120.55649757_32.02592404_1': 'CL-08',
+        'MZS120.56334257_32.02298144_1': 'CL-09',
+        'MZS120.56944728_32.02070961_1': 'CL-10'
+    },
+    '水压力计': {
+        'MZS120.51726088_32.04054582_3': 'KX-01',
+        'MZS120.51738292_32.04054923_3': 'KX-02',
+        'MZS120.51749021_32.04053105_3': 'KX-03',
+        'MZS120.51957026_32.04008655_3': 'KX-04',
+        'MZS120.51967889_32.04004108_3': 'KX-05',
+        'MZS120.51986665_32.03998992_3': 'KX-06',
+        'MZS120.52557975_32.03825056_3': 'KX-07',
+        'MZS120.52565217_32.03813574_3': 'KX-08',
+        'MZS120.52566826_32.03799363_3': 'KX-09',
+    },
+    '测斜仪': {
+        'MZS120.51967889_32.04004108_4': 'CX-01',
+        'MZS120.51986665_32.03998992_4': 'CX-02',
+        'MZS120.52557975_32.03825056_4': 'CX-03',
+        'MZS120.52565217_32.03813574_4': 'CX-04',
+        'MZS120.52566826_32.03799363_4': 'CX-05',
+        'MZS120.51726088_32.04054582_4': 'CX-06',
+        'MZS120.51738292_32.04054923_4': 'CX-07',
+        'MZS120.51749021_32.04053105_4': 'CX-08',
+        'MZS120.51957026_32.04008655_4': 'CX-09'
+    },
+    '应力桩': {
+        'MZS120.513203_32.042733_2': 'YL-01',
+        'MZS120.515433_32.04231_2': 'YL-02',
+        'MZS120.521221_32.040331_2': 'YL-03',
+        'MZS120.529078_32.034385_2': 'YL-04',
+        'MZS120.541648_32.030524_2': 'YL-05',
+        'MZS120.548925_32.029361_2': 'YL-06',
+        'MZS120.552209_32.028149_2': 'YL-07'
+    },
+}
 
 export { mapInit }

@@ -41,9 +41,10 @@
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <span class="text">{{ node.label }}</span>
-                            <el-button type="primary" plain v-if="node.isLeaf"
+                            <el-button type="primary" plain
+                                v-if="node.isLeaf && node.label != '长江干堤' && node.label != '里程桩'"
                                 @click="detailClickHandler(node, data)">查看详情</el-button>
-                            <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button>
+                            <!-- <el-button type="primary" plain v-else-if="node.level === 2">图例展示</el-button> -->
                         </span>
                     </template>
                 </el-tree>
@@ -56,7 +57,7 @@
 import { onMounted, ref, watch, computed } from 'vue';
 import { Decoration7 } from '@kjgl77/datav-vue3'
 import { ElTree, ElMessage } from 'element-plus';
-import { useMapStore, useNewSceneStore } from '../../../../store/mapStore';
+import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../../store/mapStore';
 import axios from 'axios';
 import { sourceNameMap, sourceZoomMap, sourceColumnMap } from '../../js/tilefieldMAP'
 import { tree } from '../../js/SCENES'
@@ -74,11 +75,13 @@ const sceneStore = useNewSceneStore()
 const mapStore = useMapStore()
 const data = ref([])
 const emit = defineEmits(['close', 'featureInfo'])
-const Scenes = ref(['全江概貌', '涉水工程', '重点岸段'])
+const Scenes = ref(['全江概貌', '工程情况', '重点岸段'])
 const sceneTagChecked = ref([true, false, false])
 const LGroups = ref(['行政区划', '河道分段', '流域水系', '湖泊河流', '水文站点'])
 const LGroupsTagChecked = ref([true, false, false, false, false])
 const featureCount = ref(0)
+const highlightLayer = ref([])
+
 
 watch(filterText, (val) => {
     treeRef.value.filter(val)
@@ -112,7 +115,6 @@ const SceneTagClickHandler = (i) => {
 }
 const updateLgroupTags = (sceneName) => {
     // LGroupsTagChecked.value = [true, false, false, false, false]
-    console.log(tree);
     let newLayerGroupTags = []
     for (let i = 0; i < tree.length; i++) {
         if (tree[i].label === sceneName) {
@@ -134,15 +136,36 @@ const updateLgroupTags = (sceneName) => {
 
 
 const LGroupsTagClickHandler = async (i) => {
-    setTimeout(async () => {
-        LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
+
+    LGroupsTagChecked.value[i] = !LGroupsTagChecked.value[i]
+
+    if (LGroups.value[i] === '长江干堤') {
+        let featArray1 = await getLayerFeatureArray(mapStore.getMap(), '长江干堤')
+        let featArray2 = await getLayerFeatureArray(mapStore.getMap(), '里程桩')
+
+        if (LGroupsTagChecked.value[i]) {
+            let treeNode1 = {
+                label: '长江干堤', children: []
+            }
+            let treeNode2 = {
+                label: '里程桩', children: []
+            }
+            data.value.push(treeNode1, treeNode2)
+        } else {
+            deleteTreeData()
+        }
+        // updateFeatureCount()
+        featureCount.value = (featArray1.length + featArray2.length)
+
+    } else {
         if (LGroupsTagChecked.value[i]) {
             await appednTreeData()
         } else {
             deleteTreeData()
         }
         updateFeatureCount()
-    }, 500)
+
+    }
 }
 
 const appednTreeData = async () => {
@@ -159,30 +182,9 @@ const appednTreeData = async () => {
         layers.push(...sceneStore.LAYERGROUPMAP.value[checkedLayerGroup[i]].layerIDs)
     }
 
-    // console.log(layers);
-
     let map = mapStore.getMap()
     for (let i = 0; i < layers.length; i++) {
-        // 特殊图层
-        if (layers[i].includes('注记') || layers[i].includes('省级行政区') ||
-            layers[i] === '过江通道-桥墩'
-        ) {
-            continue
-        }
-
-        let layerid = layers[i]
-        if (!map.getLayer(layerid)) {
-            console.log('图层不存在', layerid);
-            ElMessage({
-                message: '图层尚未加载，请先加载相应专题数据',
-                type: 'warning',
-            })
-
-            continue
-        }
-        console.log('图层存在', layerid);
-        let sourceid = map.getLayer(layerid).source
-        // 监测当前treeNode是否已经存在Node
+        //tool
         const treeHasNode = (nodeName) => {
             for (let i = 0; i < data.value.length; i++) {
                 if (data.value[i].label === nodeName) {
@@ -191,10 +193,95 @@ const appednTreeData = async () => {
             }
             return false
         }
+
+        // 特殊图层
+        if (layers[i].includes('注记') || layers[i].includes('省级行政区') ||
+            layers[i] === '过江通道-桥墩'
+        ) {
+            continue
+        }
+        if (layers[i].includes('过江通道')) {
+            let treeNode1 = {
+                label: '已建通道',
+                children: []
+            }
+            let treeNode2 = {
+                label: '在建通道',
+                children: []
+            }
+            let treeNode3 = {
+                label: '规划通道',
+                children: []
+            }
+            let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+            let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+            // let res = [...res1, ...res2]
+            res1.forEach(item => {
+                item.source = 'riverPassageLine'
+                if (item.plan === 1) {
+                    treeNode1.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === 0) {
+                    treeNode2.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === -1) {
+                    treeNode3.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                }
+            })
+            res2.forEach(item => {
+                item.source = 'riverPassagePolygon'
+                if (item.plan === 1) {
+                    treeNode1.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === 0) {
+                    treeNode2.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                } else if (item.plan === -1) {
+                    treeNode3.children.push({
+                        label: item.name,
+                        property: item
+                    })
+                }
+            })
+            console.log(treeNode1, treeNode2, treeNode3);
+            if (!treeHasNode('已建通道')) data.value.push(treeNode1)
+            if (!treeHasNode('在建通道')) data.value.push(treeNode2)
+            if (!treeHasNode('规划通道')) data.value.push(treeNode3)
+
+            continue
+        }
+
+
+
+        let layerid = layers[i]
+        if (!map.getLayer(layerid)) {
+            console.log(layerid);
+            // ElMessage({
+            //     message: '图层尚未加载，请先加载相应专题数据',
+            //     type: 'warning',
+            // })
+
+            continue
+        }
+        let sourceid = map.getLayer(layerid).source
+        // 监测当前treeNode是否已经存在Node
+
         if (treeHasNode(layerid)) continue
 
-        let res = await getLayerFeatureArray(map, layerid)
 
+
+        let res = await getLayerFeatureArray(map, layerid)
         let treeNode = {
             label: layerid,
             children: []
@@ -220,12 +307,14 @@ const deleteTreeData = async () => {
             noCcheckedLayerGroup.push(LGroups.value[i])
         }
     }
-    console.log(noCcheckedLayerGroup);
     let noLayers = []
+
+    if (noCcheckedLayerGroup.includes('过江通道')) {
+        noLayers = ['已建通道', '在建通道', '规划通道']
+    }
     for (let i = 0; i < noCcheckedLayerGroup.length; i++) {
         noLayers.push(...sceneStore.LAYERGROUPMAP.value[noCcheckedLayerGroup[i]].layerIDs)
     }
-    console.log(noLayers);
     for (let i = 0; i < noLayers.length; i++) {
 
         let index = -1
@@ -245,8 +334,6 @@ const detailClickHandler = (node, data) => {
     let layerId = node.parent.data.label
     let featureId = data.label
     let property = data.property
-
-    console.log(data.property)
 
     // 要素高亮
     featureHighLight(layerId, mapStore.getMap(), featureId, property)
@@ -272,7 +359,7 @@ onMounted(() => {
 const getLayerFeatureArray = async (mapInstance, layerName) => {
 
     // 特殊图层
-    if (layerName.includes('注记')) {
+    if (layerName.includes('注记') || layerName.includes('地形') || layerName.includes('沙洲')) {
         return []
     }
 
@@ -293,9 +380,12 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
         }
     }
     else if (source.type == 'vector') {
+
         const res = await axios.get(tileServer + `/tile/vector/${sourceId}/info`)
         properties = res.data
-        console.log(sourceId, properties);
+
+        // 此处要注意，有的图层未经分类，有的图层经过分类，需要筛选一波
+        // 缓一下，整理一下，整体加一波filter的逻辑，先写个if吧
         // special
         if (sourceId == 'riverSection') {
             let n = []
@@ -303,18 +393,46 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
                 if (properties[i].label != '') n.push(properties[i]);
             }
             properties = n
-            console.log(properties);
         }
+        else if (sourceId == 'importantBank') {
+            let warningLevelMap = {
+                '一级预警岸段': 1,
+                '二级预警岸段': 2,
+                '三级预警岸段': 3,
+            }
+            let n = []
+            for (let i = 0; i < properties.length; i++) {
+                if (warningLevelMap[layerName] === properties[i].warning_level) n.push(properties[i]);
+            }
+            properties = n
+        }
+
 
     }
     return properties;
 }
 
 const featureHighLight = (featureLayerid, map, featureName, property) => {
-    let layerId = featureLayerid
-    let featureId = featureName
-    let featureLayer = map.getLayer(layerId)
-    let sourceid = featureLayer.source
+
+    let layerId
+    let featureId
+    let featureLayer
+    let sourceid
+
+    if (featureLayerid.includes('通道')) {
+        // layerId = '过江通道-'
+        sourceid = property.source
+        layerId = (sourceid === 'riverPassagePolygon' ? '过江通道-桥' : '过江通道-隧道/通道')
+        featureId = featureName
+        featureLayer = map.getLayer(layerId)
+
+    } else {
+        layerId = featureLayerid
+        featureId = featureName
+        featureLayer = map.getLayer(layerId)
+        sourceid = featureLayer.source
+    }
+
 
     emit('featureInfo', {
         ogData: property,
@@ -336,7 +454,7 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
             'circle-radius': 8,
         },
         'symbol': {
-
+            
         },
         'fill-extrusion': {
             'fill-extrusion-color': '#FF5D06',
@@ -345,48 +463,42 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
             'fill-extrusion-opacity': 1.0
         }
     }
-    if (sourceid.includes('bank-level')) {
-        map.addLayer({
-            id: `${layerId}-highlight-${featureId}`,//自定义
-            type: featureLayer.type,
-            source: featureLayer.source,
-            filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
-            layout: {
 
-            },
-            paint: paintMap[featureLayer.type],
-        })
-    } else {
-        map.addLayer({
-            id: `${layerId}-highlight-${featureId}`,//自定义
-            type: featureLayer.type,
-            source: featureLayer.source,
-            'source-layer': featureLayer.sourceLayer,
-            filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
-            layout: {
+    // 1  add highlight layer
+    map.addLayer({
+        id: `${layerId}-highlight-${featureId}`,//自定义
+        type: featureLayer.type,
+        source: featureLayer.source,
+        'source-layer': featureLayer.sourceLayer,
+        filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
+        layout: {
+        },
+        paint: paintMap[featureLayer.type],
+    })
 
-            },
-            paint: paintMap[featureLayer.type],
-        })
-    }
+    // 2  use expression  但不适用于现在的Map 还是用加图层的办法
+    // map.setPaintProperty(layerId, 'fill-color', [
+    //     'match',
+    //     ['get', sourceNameMap[sourceid]], // 获取要素的'name'属性
+    //     'featureName', ['literal', 'rgba(255, 0, 0, 1)'], // 如果'name'是'123'，则使用红色高亮
+    //     ['literal', map.getPaintProperty(layerId, 'fill-color')] // 否则保持原有样式
+    // ]);
 
 
     let lng = property.center_x
     let lat = property.center_y
-    if (sourceid.includes('bank-level')) {
-        let center = getCenterCoord(property.coord)
-        lng = center[0]
-        lat = center[1]
-    }
-    map.jumpTo({
+    map.flyTo({
         center: [lng, lat],
-        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10
+        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10,
+        duration: 3500
     });
 
-    setTimeout(() => {
-        if (map.getLayer(`${layerId}-highlight-${featureId}`))
-            map.removeLayer(`${layerId}-highlight-${featureId}`)
-    }, 3000)
+    highlightLayer.value.push(`${layerId}-highlight-${featureId}`)
+    useHighlightLayerStore().highlightLayers = highlightLayer.value;
+    // setTimeout(() => {
+    //     if (map.getLayer(`${layerId}-highlight-${featureId}`))
+    //         map.removeLayer(`${layerId}-highlight-${featureId}`)
+    // }, 3000)
 }
 
 const getCenterCoord = (coordsArray) => {
@@ -533,6 +645,7 @@ div.total-controller {
             box-shadow: rgb(201, 230, 255) 0px 0px 5px 3px inset;
             border-radius: 1%;
             overflow-y: auto;
+            overflow-x: auto;
 
             .feature-desc {
                 height: 3vh;
@@ -543,6 +656,7 @@ div.total-controller {
                 background-color: rgb(239, 247, 253);
                 height: 24vh;
                 overflow-y: auto;
+                overflow-x: auto;
 
                 &::-webkit-scrollbar {
                     width: 5px;
@@ -560,6 +674,9 @@ div.total-controller {
                 &::-webkit-scrollbar-thumb:hover {
                     background-color: rgb(48, 136, 243);
                 }
+
+
+
             }
 
 
