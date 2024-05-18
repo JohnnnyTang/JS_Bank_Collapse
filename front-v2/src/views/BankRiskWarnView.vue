@@ -184,17 +184,6 @@ let flow = null
 const mapContainer = ref()
 const timeStep = ref(0)
 const showFlow = ref(false)
-// let flowSrc = []
-// for (let i = 0; i < 26; i++) {
-//     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-// }
-// let flow = reactive(new SteadyFlowLayer(
-//     '近岸流场',
-//     '/scratchSomething/terrain_flow/json/station.bin',
-//     flowSrc,
-//     (url) => url.match(/uv_(\d+)\.bin/)[1],
-//     '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
-// ))
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -318,7 +307,7 @@ const flowControlHandler = () => {
         if (map) {
             if (map.getLayer('近岸流场')) {
                 flow.show()
-                mapFlyToRiver(map)
+                // mapFlyToRiver(map)
             } else {
                 let flowSrc = []
                 for (let i = 0; i < 26; i++) {
@@ -341,7 +330,7 @@ const flowControlHandler = () => {
                         timeStep.value = flow.currentResourcePointer
                     },
                 )
-                mapFlyToRiver(map)
+                // mapFlyToRiver(map)
             }
         } else {
             ElMessage({
@@ -753,8 +742,8 @@ onMounted(async () => {
         })
 
         // map.addControl(new mapboxgl.NavigationControl(), 'top-left')
-        mapJumpToRiver(map)
-        // mapFlyToRiver(map)
+        // mapJumpToRiver(map)
+        mapFlyToRiver(map)
         // console.log('map loaded!!!')
         map.addSource('mzsPlaceLabelSource', {
             type: 'vector',
@@ -856,6 +845,33 @@ onMounted(async () => {
                 'line-width': 4,
             },
         })
+        map.on('click', ['mzsBankLine'], (e) => {
+            console.log(e.features[0]);
+        })
+        !map.getSource('mzsBankLabel') &&
+            map.addSource('mzsBankLabel', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}'],
+            })
+        !map.getLayer('民主沙岸段注记') &&
+            map.addLayer({
+                id: '民主沙岸段注记',
+                type: 'symbol',
+                source: 'mzsBankLabel',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    'text-anchor': 'center',
+                    'text-size': 20
+                },
+                paint: {
+                    'text-color': 'rgb(28,13,106)',
+                },
+            })
 
         map.addLayer({
             id: 'mzsBankLineChoosen',
