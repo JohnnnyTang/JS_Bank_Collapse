@@ -14,12 +14,12 @@
                 </div>
                 <div class="device-button-container" v-show="buttonShow">
                     <div class="device-status-button" @click="clickbuttonHandler">
-                        {{ buttonTxt }}</div>
+                         查看图表 </div>
                 </div>
             </div>
             <div class="detail-info-container">
                 <div class="detail-info-flex">
-                    <div class="device-id">{{ deviceInfo.code }}</div>
+                    <div class="device-id">{{ deviceIdMap[deviceInfo.code] }}</div>
                     <div class="device-type-container detail-double-container">
                         <div class="device-type-title detail-title-item">设备编号</div>
                         <div class="device-type-content detail-content-item">
@@ -64,6 +64,45 @@ const props = defineProps({
     deviceInfo: Object,
     zoom: Object
 })
+
+const deviceIdMap = {
+    'MZS120.51749289_32.04059243_1': 'CL-01',
+    'MZS120.51977143_32.04001152_1': 'CL-02',
+    'MZS120.52557975_32.03825056_1': 'CL-03',
+    'MZS120.52660704_32.03676583_1': 'CL-04',
+    'MZS120.53334877_32.03227055_1': 'CL-05',
+    'MZS120.54599538_32.02837993_1': 'CL-06',
+    'MZS120.55327892_32.02707923_1': 'CL-07',
+    'MZS120.55649757_32.02592404_1': 'CL-08',
+    'MZS120.56334257_32.02298144_1': 'CL-09',
+    'MZS120.56944728_32.02070961_1': 'CL-10',
+    'MZS120.51726088_32.04054582_3': 'KX-01',
+    'MZS120.51738292_32.04054923_3': 'KX-02',
+    'MZS120.51749021_32.04053105_3': 'KX-03',
+    'MZS120.51957026_32.04008655_3': 'KX-04',
+    'MZS120.51967889_32.04004108_3': 'KX-05',
+    'MZS120.51986665_32.03998992_3': 'KX-06',
+    'MZS120.52557975_32.03825056_3': 'KX-07',
+    'MZS120.52565217_32.03813574_3': 'KX-08',
+    'MZS120.52566826_32.03799363_3': 'KX-09',
+    'MZS120.56944728_32.02070961_1': 'KX-10',
+    'MZS120.513203_32.042733_2': 'YL-01',
+    'MZS120.515433_32.04231_2': 'YL-02',
+    'MZS120.521221_32.040331_2': 'YL-03',
+    'MZS120.529078_32.034385_2': 'YL-04',
+    'MZS120.541648_32.030524_2': 'YL-05',
+    'MZS120.548925_32.029361_2': 'YL-06',
+    'MZS120.552209_32.028149_2': 'YL-07',
+    'MZS120.51967889_32.04004108_4': 'CX-01',
+    'MZS120.51986665_32.03998992_4': 'CX-02',
+    'MZS120.52557975_32.03825056_4': 'CX-03',
+    'MZS120.52565217_32.03813574_4': 'CX-04',
+    'MZS120.52566826_32.03799363_4': 'CX-05',
+    'MZS120.51726088_32.04054582_4': 'CX-06',
+    'MZS120.51738292_32.04054923_4': 'CX-07',
+    'MZS120.51749021_32.04053105_4': 'CX-08',
+    'MZS120.51957026_32.04008655_4': 'CX-09',
+}
 
 
 const showChart = ref(false)
@@ -113,24 +152,25 @@ onMounted(async () => {
 .container {
     position: relative;
     display: block;
-    width: 25vw;
-    height: 34vh;
+    // width: 25vw;
+    width: 32vw;
+    height: 38vh;
     transform: scale(0.8) translateY(20%);
 }
 
 div.info-content-container {
     user-select: none;
-    width: 25vw;
+    width: 32vw;
     position: relative;
-    height: 34vh;
+    height: 38vh;
     display: flex;
     justify-content: space-between;
     align-items: center;
     // transform: translateY(-2%) scale(0.9);
 
     div.device-detail-container {
-        width: 8vw;
-        height: calc(32vh - 10px);
+        width: 10vw;
+        height: calc(37vh - 10px);
         position: relative;
         padding-top: 5px;
         padding-bottom: 5px;
@@ -144,7 +184,7 @@ div.info-content-container {
             position: relative;
             height: 6vh;
             line-height: 6vh;
-            width: 8vw;
+            width: 10vw;
             // background-color: antiquewhite;
             text-align: center;
 
@@ -157,16 +197,16 @@ div.info-content-container {
         div.device-pic {
             position: relative;
             margin-bottom: 10%;
-            width: 8vw;
-            height: 10vh;
+            width: 10vw;
+            height: 12vh;
             // background-color: rgb(127, 138, 255);
 
             img.device-pic-img {
                 pointer-events: none;
                 position: absolute;
-                height: calc(9vh + 3.8vw);
-                width: calc((9vh + 3.8vw) * 0.76);
-                transform: scale(1.05) translateX(8.5%);
+                height: calc(9vh + 5.8vw);
+                width: calc((9vh + 5.8vw) * 0.76);
+                transform: scale(1.05) translateX(10%);
                 transform-origin: 50%;
                 z-index: 1;
                 box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
@@ -175,8 +215,8 @@ div.info-content-container {
 
         div.bank-status-container {
             position: relative;
-            width: 8.5vw;
-            margin-top: 8vh;
+            width: 9.5vw;
+            margin-top: 10vh;
 
             display: flex;
             justify-content: center;
@@ -201,8 +241,8 @@ div.info-content-container {
 
         div.device-button-container {
             position: absolute;
-            left: 1vw;
-            width: 6vw;
+            left: 2vw;
+            width: 8vw;
             bottom: -1.5vh;
             height: 3vh;
             font-size: calc(0.2vh + 0.75vw);
@@ -232,8 +272,8 @@ div.info-content-container {
     }
 
     div.detail-info-container {
-        width: 16vw;
-        height: 32vh;
+        width: 21vw;
+        height: 36vh;
         background-color: rgb(163, 206, 245);
         box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.35);
         position: relative;
@@ -242,7 +282,7 @@ div.info-content-container {
         color: rgb(47, 94, 211);
 
         div.detail-info-flex {
-            width: 14vw;
+            width: 23vw;
             height: 29vh;
             margin-top: 2vh;
             // background-color: aliceblue;
@@ -255,21 +295,21 @@ div.info-content-container {
 
             div.device-id {
                 height: 4vh;
-                width: 14vw;
+                width: 23vw;
                 // background-color: antiquewhite;
                 text-align: center;
 
                 // line-height: 3vh;
                 font-family: "Trebuchet MS", Helvetica, sans-serif;
-                font-size: calc(0.4vh + 0.6vw);
+                font-size: calc(1.0vh + 1vw);
                 font-weight: 600;
-                color: rgb(103, 129, 201);
+                color: rgb(0, 19, 70);
                 transform: translateX(-5%);
                 // padding-bottom: 0.3vh;
             }
 
             div.detail-double-container {
-                width: 6vw;
+                width: 9vw;
                 height: 8vh;
                 // background-color: aqua;
                 display: flex;
@@ -277,12 +317,12 @@ div.info-content-container {
                 font-family: 'Microsoft YaHei';
 
                 &.device-time-container {
-                    width: 8vw;
+                    width: 12vw;
                 }
             }
 
             div.detail-single-container {
-                width: 14vw;
+                width: 20vw;
                 height: 8vh;
                 // background-color: aqua;
                 display: flex;
@@ -318,7 +358,7 @@ div.info-content-container {
                 }
 
                 &.device-time-content {
-                    width: 8vw;
+                    width: 12vw;
                 }
             }
         }
@@ -326,6 +366,8 @@ div.info-content-container {
     }
 
     div.chart {
+        width: 32vw;
+        height: 38vh;
         position: absolute;
         z-index: 1;
         // left: 8vw;
