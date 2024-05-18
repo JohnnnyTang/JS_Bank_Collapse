@@ -632,12 +632,12 @@ const CalProfileByPoint = async(before, now, StartPtX, StartPtY, EndPtX, EndPtY)
     return taskId
 }
 
-const putDataInList = (profileData) => {
+const putDataInList = (profileDataItem) => {
     let tempValue = profileList.value.length + 1
     let tempRisk
-    if (profileData.risk[2] < 0.25) {
+    if (profileDataItem.risk[2] < 0.25) {
         tempRisk = 'low'
-    } else if (profileData.risk[2] < 0.5) {
+    } else if (profileDataItem.risk[2] < 0.5) {
         tempRisk = 'middle'
     } else {
         tempRisk = 'high'
@@ -647,9 +647,10 @@ const putDataInList = (profileData) => {
         label: `断面 JC${tempValue}`,
         name: '临时断面',
         filter: ['==', '$type', `JC${tempValue}`],
-        flowspeed: profileData.deepestPoint[2],
+        flowspeed: profileDataItem.deepestPoint[2],
         risk: tempRisk,
     })
+    profileData.push(profileDataItem)
 }
 
 const changeSceneBefore = (value) => {
