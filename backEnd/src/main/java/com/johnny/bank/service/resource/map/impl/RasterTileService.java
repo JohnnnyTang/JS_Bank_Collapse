@@ -28,7 +28,7 @@ public class RasterTileService implements IRasterTileService {
     }
 
     public byte[] getRiverRasterInByte(String name, int z, int x, int y) throws Exception {
-        String filePath = name + "/tiles/" + z + '/' + x + '/' + y + ".png";
+        String filePath = name + "-new/" + z + '/' + x + '/' + y + ".png";
         return RasterTileRepo.getRiverRasterFile(filePath);
     }
 

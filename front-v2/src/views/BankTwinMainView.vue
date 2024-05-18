@@ -123,9 +123,9 @@
 
         <WarnHistoryTable :warnActive="warnActive" />
 
-        <div class="map-container" id="map" style="z-index: 1;" ref="mapDom"></div>
+        <div class="map-container" id="map" style="z-index: 2;" ref="mapDom"></div>
         <canvas id="GPUFrame" class="GPU" style="z-index: 2;"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 0;"></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 2;"></canvas>
     </div>
 </template>
 

@@ -49,10 +49,7 @@
                         </div>
                         <div class="dp-content">
                             <el-tree
-                                style="
-                                    max-height: 28vh;
-                                    overflow: auto;
-                                "
+                                style="max-height: 28vh; overflow: auto"
                                 :data="data"
                                 :props="defaultProps"
                                 @node-contextmenu="handleNodeClick"
@@ -439,6 +436,7 @@ import {
     drawSectionGraph,
 } from '../stability-sub/util.js'
 
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const showHyCondition = ref(false)
 const showStParams = ref(false)
 const showModelStatus = ref(false)
@@ -454,6 +452,27 @@ const showAnalysis = ref(false)
 const checky1 = ref(true)
 const checky2 = ref(false)
 
+const DEMNAMEMAP = {
+    '1998-01-dem': '199801_dem',
+    '2004-08-dem': '200408_dem',
+    '2006-02-dem': '200602_dem',
+}
+
+const DEMMINMAXMAP = {
+    '1998-01-dem': {
+        min: -64.1,
+        max: 11.97,
+    },
+    '2004-08-dem': {
+        min: -69.46,
+        max: 45.16,
+    },
+    '2006-02-dem': {
+        min: -71.16,
+        max: 40.1,
+    },
+}
+
 const radio1Click = () => {
     showAnalysis.value = false
     checky1.value = true
@@ -464,6 +483,84 @@ const radio2Click = () => {
     checky2.value = true
     checky1.value = false
     showModelStatus.value = false
+
+    if (map) {
+        for (let dem in DEMNAMEMAP) {
+            console.log(dem)
+            !map.getLayer('ras-' + dem) &&
+                map.addLayer({
+                    id: 'ras-' + dem,
+                    type: 'raster',
+                    source: dem,
+                    paint: {
+                        'raster-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['raster-value'],
+                            -60 - DEMMINMAXMAP[dem].min,
+                            'rgba(0,100,255,1)',
+                            -30 - DEMMINMAXMAP[dem].min,
+                            'rgba(0,150,255,1)',
+                            -20 - DEMMINMAXMAP[dem].min,
+                            'rgba(102,153,255,1)',
+                            -16 - DEMMINMAXMAP[dem].min,
+                            'rgba(0,204,255,1)',
+                            -15 - DEMMINMAXMAP[dem].min,
+                            'rgba(153,255,255,1)',
+                            -13.5 - DEMMINMAXMAP[dem].min,
+                            'rgba(255,255,255,1)',
+                            -13 - DEMMINMAXMAP[dem].min,
+                            'rgba(255,255,153,1)',
+                            -11 - DEMMINMAXMAP[dem].min,
+                            'rgba(230,230,128,1)',
+                            -10 - DEMMINMAXMAP[dem].min,
+                            'rgba(164,204,51,1)',
+                            -8 - DEMMINMAXMAP[dem].min,
+                            'rgba(153,204,51,1)',
+                            -5 - DEMMINMAXMAP[dem].min,
+                            'rgba(39,139,51,1)',
+                            -2 - DEMMINMAXMAP[dem].min,
+                            'rgba(10,143,82,1)',
+                            0 - DEMMINMAXMAP[dem].min,
+                            'rgba(0,113,11, 1)',
+                        ],
+                        'raster-color-mix': [
+                            DEMMINMAXMAP[dem].max - DEMMINMAXMAP[dem].min,
+                            0,
+                            0,
+                            0,
+                        ],
+                        'raster-opacity': 1,
+                        'raster-color-range': [
+                            0,
+                            DEMMINMAXMAP[dem].max - DEMMINMAXMAP[dem].min,
+                        ],
+                    },
+                    layout: {
+                        visibility: 'none',
+                    },
+                })
+        }
+        map.addControl(draw)
+
+        map.on('draw.create', function (e) {
+            console.log('aaa')
+            console.log(e.features)
+            currentSectionID.value = crypto.randomUUID()
+            sectionConfirmShow.value = true
+            let lineFeature = e.features[0]
+            let startWebMerCoord = convertToMercator(
+                lineFeature.geometry.coordinates[0],
+            )
+            let endWebMerCoord = convertToMercator(
+                lineFeature.geometry.coordinates[1],
+            )
+            sectionInfo.value[currentSectionID.value] = [
+                startWebMerCoord,
+                endWebMerCoord,
+            ]
+        })
+    }
 }
 
 const mapContainerRef = ref()
@@ -690,7 +787,7 @@ let flow = new SteadyFlowLayer(
     '/scratchSomething/terrain_flow/json/station.bin',
     flowSrc,
     (url) => url.match(/uv_(\d+)\.bin/)[1],
-    '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
+    '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
 )
 
 watch(checkedlayers, (value) => {
@@ -719,7 +816,23 @@ const handleCheckedlayersChange = (value) => {
 // evolution
 // tree and layer
 const selectedEvolutionNode = ref(null)
-const evolutionLayerData = ref(null)
+const evolutionLayerData = ref([
+    {
+        label: '1998-01-dem',
+        nodeID: '1998-01-dem-id',
+        type: 'dem',
+    },
+    {
+        label: '2004-08-dem',
+        nodeID: '2004-08-dem-id',
+        type: 'dem',
+    },
+    {
+        label: '2006-02-dem',
+        nodeID: '2006-02-dem-id',
+        type: 'dem',
+    },
+])
 // KXH type 为 dem, section-geojson, section-graph, rate, chongyu, null
 const evolutionTreeData = reactive([
     {
@@ -727,13 +840,18 @@ const evolutionTreeData = reactive([
         type: null,
         children: [
             {
-                label: '20200301-dem',
-                nodeID: '20200301-dem-id',
+                label: '1998-01-dem',
+                nodeID: '1998-01-dem-id',
                 type: 'dem',
             },
             {
-                label: '20200901-dem',
-                nodeID: '20200901-dem-id',
+                label: '2004-08-dem',
+                nodeID: '2004-08-dem-id',
+                type: 'dem',
+            },
+            {
+                label: '2006-02-dem',
+                nodeID: '2006-02-dem-id',
                 type: 'dem',
             },
         ],
@@ -827,6 +945,8 @@ const handleEvolutionTreeCommand = (command) => {
         }
     } else if (selectedEvolutionNode.value && command === 'delete') {
         // KXH 删除逻辑
+    } else if (selectedEvolutionNode.value && command === 'add') {
+        console.log('12321')
     }
 }
 const handleEvolutionLayerClick = (_, treeNode) => {
@@ -862,6 +982,67 @@ const handleEvolutionLayerCheckChange = (data, checked) => {
             console.log(
                 map.getLayoutProperty(`${data.nodeID}-layer`, 'visibility'),
             )
+        } else if (data.type === 'dem') {
+            console.log('111')
+            if (!map.getLayer('ras-' + data.label)) {
+                map.addLayer({
+                    id: 'ras-' + data.label,
+                    type: 'raster',
+                    source: data.label,
+                    paint: {
+                        'raster-color': [
+                            'interpolate',
+                            ['linear'],
+                            ['raster-value'],
+                            -60 - DEMMINMAXMAP[data.label].min,
+                            'rgba(0,100,255,1)',
+                            -30 - DEMMINMAXMAP[data.label].min,
+                            'rgba(0,150,255,1)',
+                            -20 - DEMMINMAXMAP[data.label].min,
+                            'rgba(102,153,255,1)',
+                            -16 - DEMMINMAXMAP[data.label].min,
+                            'rgba(0,204,255,1)',
+                            -15 - DEMMINMAXMAP[data.label].min,
+                            'rgba(153,255,255,1)',
+                            -13.5 - DEMMINMAXMAP[data.label].min,
+                            'rgba(255,255,255,1)',
+                            -13 - DEMMINMAXMAP[data.label].min,
+                            'rgba(255,255,153,1)',
+                            -11 - DEMMINMAXMAP[data.label].min,
+                            'rgba(230,230,128,1)',
+                            -10 - DEMMINMAXMAP[data.label].min,
+                            'rgba(164,204,51,1)',
+                            -8 - DEMMINMAXMAP[data.label].min,
+                            'rgba(153,204,51,1)',
+                            -5 - DEMMINMAXMAP[data.label].min,
+                            'rgba(39,139,51,1)',
+                            -2 - DEMMINMAXMAP[data.label].min,
+                            'rgba(10,143,82,1)',
+                            0 - DEMMINMAXMAP[data.label].min,
+                            'rgba(0,113,11, 1)',
+                        ],
+                        'raster-color-mix': [
+                            DEMMINMAXMAP[data.label].max -
+                                DEMMINMAXMAP[data.label].min,
+                            0,
+                            0,
+                            0,
+                        ],
+                        'raster-opacity': 1,
+                        'raster-color-range': [
+                            0,
+                            DEMMINMAXMAP[data.label].max -
+                                DEMMINMAXMAP[data.label].min,
+                        ],
+                    },
+                })
+            } else {
+                map.setLayoutProperty(
+                    'ras-' + data.label,
+                    'visibility',
+                    'visible',
+                )
+            }
         }
     } else {
         if (data.type === 'section-geojson') {
@@ -869,6 +1050,8 @@ const handleEvolutionLayerCheckChange = (data, checked) => {
             console.log(
                 map.getLayoutProperty(`${data.nodeID}-layer`, 'visibility'),
             )
+        } else if (data.type === 'dem') {
+            map.setLayoutProperty('ras-' + data.label, 'visibility', 'none')
         }
     }
 }
@@ -1092,25 +1275,32 @@ const handleCloseChart = () => {
 onMounted(async () => {
     chart = echarts.init(echartRef.value)
     map = await initScratchMap(mapContainerRef.value)
-    map.addControl(draw)
 
-    map.on('draw.create', function (e) {
-        console.log('aaa')
-        console.log(e.features)
-        currentSectionID.value = crypto.randomUUID()
-        sectionConfirmShow.value = true
-        let lineFeature = e.features[0]
-        let startWebMerCoord = convertToMercator(
-            lineFeature.geometry.coordinates[0],
-        )
-        let endWebMerCoord = convertToMercator(
-            lineFeature.geometry.coordinates[1],
-        )
-        sectionInfo.value[currentSectionID.value] = [
-            startWebMerCoord,
-            endWebMerCoord,
-        ]
+    map.addSource('1998-01-dem', {
+        type: 'raster',
+        tiles: [tileServer + `/tile/raster/river/199801_dem/{x}/{y}/{z}`],
+        tileSize: 256,
+        minzoom: 1,
+        maxzoom: 15,
+        bounds: [118.5791, 31.0413, 121.7718, 32.4197],
     })
+    map.addSource('2004-08-dem', {
+        type: 'raster',
+        tiles: [tileServer + `/tile/raster/river/200408_dem/{x}/{y}/{z}`],
+        tileSize: 256,
+        minzoom: 1,
+        maxzoom: 15,
+        bounds: [118.5791, 31.0413, 121.7718, 32.4197],
+    })
+    map.addSource('2006-02-dem', {
+        type: 'raster',
+        tiles: [tileServer + `/tile/raster/river/200602_dem/{x}/{y}/{z}`],
+        tileSize: 256,
+        minzoom: 1,
+        maxzoom: 15,
+        bounds: [118.5791, 31.0413, 121.7718, 32.4197],
+    })
+
     globalMap = map
     map.addLayer(flow)
     flow.hide()

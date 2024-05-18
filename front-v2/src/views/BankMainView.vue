@@ -80,8 +80,8 @@ onMounted(() => {
             'source-layer': 'default',
             layout: {},
             paint: {
-                'fill-color': 'rgb(12, 122, 252)',
-                'fill-opacity': .2,
+                'fill-color': 'rgb(182, 222, 252)',
+                'fill-opacity': .3,
             },
         })
         map.addSource('cityBoundaryLine', {
@@ -421,7 +421,7 @@ onMounted(() => {
             },
             paint: {
                 'line-opacity': 1,
-                'line-color': 'rgba(12, 214, 211, 0.5)',
+                'line-color': 'rgba(52, 14, 211, 0.5)',
                 'line-width': 4,
             },
         })
@@ -442,21 +442,21 @@ onMounted(() => {
                 'line-width': 3,
             },
         })
-        map.addLayer({
-            id: 'mzsLabel',
-            type: 'symbol',
-            source: 'mzsPlaceLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(231, 214, 86, 0.9)',
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsLabel',
+        //     type: 'symbol',
+        //     source: 'mzsPlaceLabelSource',
+        //     'source-layer': 'default',
+        //     layout: {
+        //         'text-field': ['get', 'label'],
+        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        //         // 'text-offset': [0, 1.25],
+        //         'text-anchor': 'left',
+        //     },
+        //     paint: {
+        //         'text-color': 'rgba(231, 214, 86, 0.9)',
+        //     },
+        // })
         map.addLayer({
             id: 'mzsSectionArea1',
             type: 'fill',

@@ -133,7 +133,7 @@ const mapInit = async (map, vis) => {
         },
         paint: {
             'line-opacity': 1,
-            'line-color': 'rgba(16, 17, 228, 0.5)',
+            'line-color': 'rgba(216, 217, 228, 0.5)',
             'line-width': 4,
         },
     })

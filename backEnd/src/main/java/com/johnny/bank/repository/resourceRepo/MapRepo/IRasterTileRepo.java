@@ -58,6 +58,7 @@ public class IRasterTileRepo {
 
     public byte[] getRiverRasterFile(String tilePath) throws Exception {
         String fullPath = tilePathConfig.getRiverTilePath() + tilePath;
+//        log.info(fullPath);
         return  getRasterDataAsByteArray(fullPath);
     }
 
