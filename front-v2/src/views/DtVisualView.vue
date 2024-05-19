@@ -47,7 +47,7 @@ import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
 import { initScratchMap } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
-import { sourceFieldMap, legendMap } from '../components/dataVisual/js/tilefieldMAP';
+import { sourceFieldMap, legendMap, legendStyleMap } from '../components/dataVisual/js/tilefieldMAP';
 import axios from 'axios';
 
 
@@ -82,6 +82,9 @@ watch(() => sceneStore.latestScene, (val) => {
         legendList.value = legendMap['全江概貌']
     }
 })
+// watch(() => sceneStore.latestLayerGroup, (val) => {
+//     console.log(val);
+// })
 
 // methods
 const toolClick = (i) => {

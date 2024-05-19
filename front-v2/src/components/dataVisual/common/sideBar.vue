@@ -136,7 +136,6 @@ const layerGroupClickHandler = (node, data) => {
         data.active = true
         // 添加
         let map = mapStore.getMap()
-
         let selectedLayerGroupID = data.label
         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showFilteredLayer()
