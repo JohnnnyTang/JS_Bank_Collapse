@@ -327,7 +327,7 @@ const radio2Click = () => {
     checky2.value = true
     checky1.value = false
     showModelStatus.value = false
-
+    showAnalysisCenter.value = true
     if (map) {
         for (let dem in DEMNAMEMAP) {
             console.log(dem)
