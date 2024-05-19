@@ -244,7 +244,7 @@
             <div class="back"
                 @click="showAnalysisCenter = !showAnalysisCenter; checky1 = true; checky2 = false"></div>
             <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
-                src="http://http://localhost:5173">
+                src="http://172.21.212.165:8050/#/analysis/73c29959-16f0-4478-8526-0927d1aff6f7">
 
             </iframe>
         </div>
