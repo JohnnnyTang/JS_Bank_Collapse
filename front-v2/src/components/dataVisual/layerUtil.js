@@ -710,7 +710,7 @@ const layerAddFunctionMap = {
                         [0, 0],
                     ],
                     'text-size': 24,
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                 },
                 paint: {
                     'text-color': 'rgb(28,13,106)',
@@ -763,7 +763,7 @@ const layerAddFunctionMap = {
                     'symbol-placement': 'line-center',
                     'text-size': 20,
                     // 'text-variable-anchor': [ "top", "bottom", "left", "right"],
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                 },
                 paint: {
                     'text-color': 'rgb(242, 111, 51)',
@@ -771,17 +771,17 @@ const layerAddFunctionMap = {
             })
     },
 
-    ////// 流域水系
-    流域水系: async (map) => {
+    ////// 区域水系
+    区域水系: async (map) => {
         !map.getSource('riverArea') &&
             map.addSource('riverArea', {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/riverArea/{x}/{y}/{z}'],
             })
         await loadImage(map, '/legend/河流.png', '河流')
-        !map.getLayer('流域水系') &&
+        !map.getLayer('区域水系') &&
             map.addLayer({
-                id: '流域水系',
+                id: '区域水系',
                 type: 'fill',
                 source: 'riverArea',
                 'source-layer': 'default',
@@ -791,7 +791,7 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    '流域水系-注记': async (map) => {
+    '区域水系-注记': async (map) => {
         if (!map.getSource('riverArea-lable')) {
             map.addSource('riverArea-lable', {
                 type: 'vector',
@@ -800,9 +800,9 @@ const layerAddFunctionMap = {
                 ],
             })
         }
-        !map.getLayer('流域水系-注记') &&
+        !map.getLayer('区域水系-注记') &&
             map.addLayer({
-                id: '流域水系-注记',
+                id: '区域水系-注记',
                 type: 'symbol',
                 source: 'riverArea-lable',
                 'source-layer': 'default',
@@ -813,25 +813,25 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     'text-variable-anchor': ["center", "top", "bottom", "left", "right"],
-                    'text-size': 20,
-                    'text-allow-overlap': true,
+                    'text-size': 14,
+                    // 'text-allow-overlap': false,
                 },
                 paint: {
-                    'text-color': 'rgb(40, 1, 74)',
+                    'text-color': 'rgb(90, 62, 124)',
                 },
             })
     },
-    ////// 湖泊河流
-    湖泊河流: async (map) => {
+    ////// 大型湖泊
+    大型湖泊: async (map) => {
         !map.getSource('lakeArea') &&
             map.addSource('lakeArea', {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/lakeArea/{x}/{y}/{z}'],
             })
         await loadImage(map, '/legend/湖泊.png', '湖泊')
-        !map.getLayer('湖泊河流') &&
+        !map.getLayer('大型湖泊') &&
             map.addLayer({
-                id: '湖泊河流',
+                id: '大型湖泊',
                 type: 'fill',
                 source: 'lakeArea',
                 'source-layer': 'default',
@@ -842,7 +842,7 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    '湖泊河流-注记': async (map) => {
+    '大型湖泊-注记': async (map) => {
         if (!map.getSource('lakeArea-lable')) {
             map.addSource('lakeArea-lable', {
                 type: 'vector',
@@ -851,9 +851,9 @@ const layerAddFunctionMap = {
                 ],
             })
         }
-        !map.getLayer('湖泊河流-注记') &&
+        !map.getLayer('大型湖泊-注记') &&
             map.addLayer({
-                id: '湖泊河流-注记',
+                id: '大型湖泊-注记',
                 type: 'symbol',
                 source: 'lakeArea-lable',
                 'source-layer': 'default',
@@ -1004,7 +1004,7 @@ const layerAddFunctionMap = {
                 'text-size': 23,
                 'text-offset': [5, 0],
 
-                'text-allow-overlap': true,
+                'text-allow-overlap': false,
             },
             paint: {
                 'text-color': 'rgb(105, 2, 89)',
@@ -1283,7 +1283,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-anchor': 'bottom',
                     'text-size': 22,
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
 
                 },
                 paint: {
@@ -1348,7 +1348,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-anchor': 'bottom',
                     'text-size': 22,
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
 
                 },
                 paint: {
@@ -1474,7 +1474,7 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     'text-anchor': 'bottom',
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
 
                     'text-size': 22,
                 },
@@ -1576,7 +1576,7 @@ const layerAddFunctionMap = {
                     // 'text-offset': [2.5, 0],
                     'text-size': 24,
                     'text-anchor': 'left',
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
 
                 },
                 paint: {
