@@ -1125,7 +1125,7 @@ onMounted(async () => {
                 ',' +
                 lineFeature.geometry.coordinates[1][1].toFixed(6)
             let startWebMerCoord = convertToMercator(
-                lineFeature.geometry.coordinates[0],
+                lineFeature.geometry.coordinates[0], 
             )
             let endWebMerCoord = convertToMercator(
                 lineFeature.geometry.coordinates[1],
