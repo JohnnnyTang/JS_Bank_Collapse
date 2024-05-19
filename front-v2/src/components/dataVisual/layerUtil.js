@@ -98,8 +98,8 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'line-opacity': 1,
-                    'line-color': 'rgba(231, 214, 86, 0.9)',
-                    'line-width': 4,
+                    'line-color': 'rgb(135, 89, 186)',
+                    'line-width': 3,
                 },
             })
     },
@@ -647,8 +647,13 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {},
                 paint: {
-                    'fill-color': 'rgb(222, 242, 252)',
-                    'fill-opacity': 1.0,
+                    'fill-color': [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important等于1
+                        "rgb(222, 246, 250)",                // 使用这个颜色
+                        "rgb(222, 242, 252)"                 // 否则使用这个颜色
+                    ],
+                    'fill-opacity': 0.7,
                 },
             })
     },
@@ -669,7 +674,7 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {},
                 paint: {
-                    'line-color': '#0A215C',
+                    'line-color': 'rgb(51, 38, 71)',
                     'line-width': 3,
                     'line-opacity': 0.75,
                 },
@@ -736,7 +741,7 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'line-opacity': 1,
-                    'line-color': 'rgba(231, 14, 16, 0.9)',
+                    'line-color': 'rgb(135, 89, 186)',
                     'line-width': 6,
                 },
             })
@@ -813,11 +818,17 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     'text-variable-anchor': ["center", "top", "bottom", "left", "right"],
-                    'text-size': 14,
-                    // 'text-allow-overlap': false,
+                    'text-size': 18,
+                    'text-allow-overlap': false,
                 },
                 paint: {
-                    'text-color': 'rgb(90, 62, 124)',
+                    'text-color': 'rgb(40, 1, 74)',
+                    'text-opacity': [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        1.0,                    // 则文本颜色为rgb(86, 39, 242)
+                        0.7                       // 否则文本颜色为rgb(26, 11, 74)
+                    ]
                 },
             })
     },
@@ -838,7 +849,7 @@ const layerAddFunctionMap = {
                 layout: {},
                 paint: {
                     // 'fill-pattern': '湖泊',
-                    'fill-color': 'rgb(84,162,232)',
+                    'fill-color': 'rgb(141, 187, 227)',
                 },
             })
     },
@@ -869,6 +880,12 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'text-color': 'rgb(28,13,106)',
+                    'text-opacity': [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        1.0,                    // 则文本颜色为rgb(86, 39, 242)
+                        0.7                      // 否则文本颜色为rgb(26, 11, 74)
+                    ]
                 },
             })
     },
@@ -893,18 +910,12 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {
                     'icon-image': '水文站',
-                    // 'icon-size': [
-                    //     'interpolate',
-                    //     ['linear'],
-                    //     ['zoom'],
-                    //     7,
-                    //     ['literal', 0.0],
-                    //     10,
-                    //     ['literal', 0.8],
-                    //     13,
-                    //     ['literal', 1.8],
-                    // ],
-                    'icon-size': 0.6,
+                    "icon-size": [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        0.6,                                  // 则图标大小为0.6
+                        0.3                                   // 否则图标大小为0.4
+                    ],
                     'icon-anchor': 'center',
                     'icon-allow-overlap': true,
                     'icon-keep-upright': true,
@@ -944,7 +955,12 @@ const layerAddFunctionMap = {
                     'text-allow-overlap': false,
                 },
                 paint: {
-                    'text-color': 'rgb(86, 39, 242)',
+                    "text-color": [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        "rgba(86, 39, 242, 1.0)",                    // 则文本颜色为rgb(86, 39, 242)
+                        "rgba(26, 11, 74, 0.5)"                       // 否则文本颜色为rgb(26, 11, 74)
+                    ]
                 },
             })
     },
@@ -968,17 +984,7 @@ const layerAddFunctionMap = {
                 layout: {},
                 paint: {
                     'line-pattern': '堤防',
-                    // 'line-width': [
-                    //     'interpolate',
-                    //     ['linear'],
-                    //     ['zoom'],
-                    //     7,
-                    //     ['literal', 0.0],
-                    //     10,
-                    //     ['literal', 2],
-                    //     13,
-                    //     ['literal', 5],
-                    // ],
+
                     'line-width': 5,
                 },
             })
@@ -998,16 +1004,22 @@ const layerAddFunctionMap = {
             'source-layer': 'default',
             layout: {
                 'text-field': ['get', 'sp_name'],
-                'symbol-placement': 'line-center',
+                'symbol-placement': 'line',
+                // 'symbol-placement': 'point',
                 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                'text-variable-anchor': ["top", "bottom", "left", "right"],
+                'text-variable-anchor': ["left", "right", "center", "top", "bottom",],
                 'text-size': 23,
                 'text-offset': [5, 0],
-
                 'text-allow-overlap': false,
             },
             paint: {
                 'text-color': 'rgb(105, 2, 89)',
+                'text-opacity': [
+                    "case",
+                    ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                    1.0,                    // 则文本颜色为rgb(86, 39, 242)
+                    0.7                       // 否则文本颜色为rgb(26, 11, 74)
+                ]
             },
         })
     },
@@ -1138,15 +1150,14 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'name'],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
                     // 'text-offset': [0, 1.25],
-                    'text-anchor': 'top',
-                    'text-offset': [0, 0],
-                    'text-size': 22,
+                    'text-variable-anchor': ["bottom", "left", "right", "top", "center"],
+                    'text-size': 23,
                 },
                 paint: {
                     'text-color': '#2e0201',
@@ -1169,14 +1180,14 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'name'],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
                     // 'text-offset': [0, 1.25],
-                    'text-anchor': 'top',
-                    'text-size': 22,
+                    'text-variable-anchor': ["bottom", "left", "right", "top", "center"],
+                    'text-size': 23,
                 },
                 paint: {
                     'text-color': '#2e0201',
@@ -1234,8 +1245,8 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     // 'text-offset': [0, 1.25],
-                    'text-anchor': 'top',
-                    'text-size': 22,
+                    'text-variable-anchor': ["bottom", "top", "left", "right"],
+                    'text-size': 20,
                     'text-allow-overlap': false,
                 },
                 paint: {
@@ -1276,18 +1287,18 @@ const layerAddFunctionMap = {
                 source: 'reservoirArea-label',
                 'source-layer': 'default',
                 layout: {
-                    'text-field': ['get', 'project_name'],
+                    'text-field': ['get', 'sp_name'],
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    'text-anchor': 'bottom',
-                    'text-size': 22,
+                    'text-anchor': 'center',
+                    'text-size': 20,
                     'text-allow-overlap': false,
 
                 },
                 paint: {
-                    'text-color': 'rgb(82, 2, 34)',
+                    'text-color': 'rgb(38, 50, 71)',
                 },
             })
     },
@@ -1309,18 +1320,18 @@ const layerAddFunctionMap = {
                 minzoom: 8,
                 layout: {
                     'icon-image': '水闸',
-                    'icon-size': [
-                        'step',
-                        ['zoom'],
-                        ['literal', 0],
-                        7,
-                        ['literal', 0],
-                        9.5,
-                        ['literal', 0.5],
-                        14,
-                        ['literal', 1.0],
+                    // "icon-size": [
+                    //     "case",
+                    //     ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                    //     0.7,                                  // 则图标大小为0.6
+                    //     0.4                                   // 否则图标大小为0.4
+                    // ],
+                    "icon-size": [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        0.6,                                  // 则图标大小为0.6
+                        0.4                                   // 否则图标大小为0.4
                     ],
-                    'icon-size': 0.3,
                     'icon-allow-overlap': true,
                 },
                 paint: {},
@@ -1353,6 +1364,12 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'text-color': 'rgb(82, 2, 34)',
+                    "text-color": [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        "rgba(82, 2, 34,1.0)",                    // 则文本颜色为rgb(86, 39, 242)
+                        "rgba(82, 2, 34,0.5)"                       // 否则文本颜色为rgb(26, 11, 74)
+                    ]
                 },
             })
     },
@@ -1384,7 +1401,7 @@ const layerAddFunctionMap = {
                     //     // 14,
                     //     // ['literal', 0.5],
                     // ],
-                    'icon-size':0.5,
+                    'icon-size': 0.5,
                     'icon-allow-overlap': true,
                 },
                 paint: {},
@@ -1416,6 +1433,12 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'text-color': 'rgb(82, 2, 34)',
+                    'text-opacity': [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        1.0,                    // 则文本颜色为rgb(86, 39, 242)
+                        0.7                       // 否则文本颜色为rgb(26, 11, 74)
+                    ]
                 },
             })
     },
@@ -1480,6 +1503,12 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'text-color': 'rgb(82, 2, 34)',
+                    'text-opacity': [
+                        "case",
+                        ["==", ["get", "if_important"], 1], // 如果if_important字段为1
+                        1.0,                    // 则文本颜色为rgb(86, 39, 242)
+                        0.7                      // 否则文本颜色为rgb(26, 11, 74)
+                    ]
                 },
             })
     },
@@ -1553,6 +1582,7 @@ const layerAddFunctionMap = {
     ///////////// 重点岸段
     /// 岸段名录
     '岸段-注记': async (map) => {
+        console.log('添加岸段注记');
         !map.getSource('importantBank') &&
             map.addSource('importantBank', {
                 type: 'vector',
@@ -1563,26 +1593,22 @@ const layerAddFunctionMap = {
                 id: '岸段-注记',
                 type: 'symbol',
                 source: 'importantBank',
-                minzoom: 11,
-                maxzoom: 18,
                 'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    // 'text-offset': [2.5, 0],
-                    'text-size': 24,
-                    'text-anchor': 'left',
-                    'text-allow-overlap': false,
-
+                    // 'text-variable-anchor': ["bottom", "left", "right", "top", "center"],
+                    'text-size': 23,
                 },
                 paint: {
-                    'text-color': 'rgb(24, 59, 9)',
+                    'text-color': '#2e0201',
                 },
             })
+
     },
 
     一级预警岸段: async (map) => {
@@ -1615,6 +1641,10 @@ const layerAddFunctionMap = {
                     'line-width': 8,
                 },
             })
+        // console.log(map.getLayer('岸段-注记'))
+        map.on('click', ['一级预警岸段'], (e) => {
+            console.log(e.features[0].properties);
+        })
     },
     二级预警岸段: async (map) => {
         !map.getSource('importantBank') &&
@@ -1671,17 +1701,6 @@ const layerAddFunctionMap = {
                 paint: {
                     // 'line-opacity': 1,=
                     'line-color': 'rgb(173, 162, 5)',
-                    // 'line-width': [
-                    //     'interpolate',
-                    //     ['linear'],
-                    //     ['zoom'],
-                    //     7,
-                    //     ['literal', 0.5],
-                    //     10,
-                    //     ['literal', 3.0],
-                    //     13,
-                    //     ['literal', 7.0],
-                    // ],
                     'line-width': 8,
                 },
             })

@@ -136,7 +136,6 @@ const layerGroupClickHandler = (node, data) => {
         data.active = true
         // 添加
         let map = mapStore.getMap()
-
         let selectedLayerGroupID = data.label
         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showFilteredLayer()
@@ -158,21 +157,21 @@ const filterButtonClickHandler = (node, data) => {
 }
 
 onMounted(async () => {
-    // sceneStore.SCENEMAP.value = scenes
-    // sceneStore.LAYERGROUPMAP.value = layerGroups
-    // setTimeout(() => {
-    //     // wait for map init
-    //     dataSource.value[0].active = true
-    //     let mapInstance = mapStore.getMap()
-    //     let selectedSceneID = '全江概貌'
-    //     sceneStore.latestScene = selectedSceneID
-    //     sceneStore.SCENEMAP.value[selectedSceneID].setMap(mapInstance)
-    //     sceneStore.SCENEMAP.value[selectedSceneID].showScene()
-    //     sceneStore.SCENEMAP.value[selectedSceneID].active = true
-    //     for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-    //         dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
-    //     }
-    // }, 2000)
+    sceneStore.SCENEMAP.value = scenes
+    sceneStore.LAYERGROUPMAP.value = layerGroups
+    setTimeout(() => {
+        // wait for map init
+        dataSource.value[0].active = true
+        let mapInstance = mapStore.getMap()
+        let selectedSceneID = '全江概貌'
+        sceneStore.latestScene = selectedSceneID
+        sceneStore.SCENEMAP.value[selectedSceneID].setMap(mapInstance)
+        sceneStore.SCENEMAP.value[selectedSceneID].showScene()
+        sceneStore.SCENEMAP.value[selectedSceneID].active = true
+        for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+            dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
+        }
+    }, 2000)
 
     window.addEventListener('keydown', (e) => {
         // if(e.key == '1'){
