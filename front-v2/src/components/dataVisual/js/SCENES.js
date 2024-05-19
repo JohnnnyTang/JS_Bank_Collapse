@@ -46,10 +46,16 @@ class LayerGroup {
         //important features only
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
+                // console.log(this.layerIDs[i]);
                 await layerAddFunction(this.map, this.layerIDs[i])
-                let filter = filterMap[this.layerIDs[i]]
-                if (filter && filter.length != 0)
-                    this.map.setFilter(this.layerIDs[i], filter)
+                // special
+                // 长江干堤应该全重要⑧
+                if (this.layerIDs[i].includes('长江干堤')) continue;
+                if (this.layerIDs[i].includes('里程桩')) continue;
+                if (this.layerIDs[i].includes('预警岸段')) continue
+                // let filter = filterMap[this.layerIDs[i]]
+                let filter = ['==', ['get', 'if_important'], 1]
+                this.map.setFilter(this.layerIDs[i], filter)
                 mapLayerStore.layerState[this.layerIDs[i]].showing = true
             }
             this.active = true
@@ -75,8 +81,16 @@ class LayerGroup {
     async layerFilter() {
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
+                // special
                 if (this.layerIDs[i].includes('预警岸段')) continue;
-                let filter = filterMap[this.layerIDs[i]]
+                // 长江干堤应该全重要⑧
+                if (this.layerIDs[i].includes('长江干堤')) continue;
+                if (this.layerIDs[i].includes('里程桩')) continue;
+
+
+
+                // let filter = filterMap[this.layerIDs[i]]
+                let filter = ['==', ['get', 'if_important'], 1]
                 if (filter && filter.length != 0 && this.map.getLayer(this.layerIDs[i]))
                     this.map.setFilter(this.layerIDs[i], filter)
                 mapLayerStore.layerState[this.layerIDs[i]].showing = true
@@ -153,11 +167,11 @@ const initLayerGroups = () => {
         '水文站点': ['水文站点', '水文站点-注记'],
         '其他堤防': ['其他堤防', '其他堤防-注记'],
         '过江通道': ['过江通道-桥墩', '过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
-        '沿江码头': ['沿江码头','沿江码头-注记'],
-        '水库大坝': ['水库大坝','水库大坝-注记'],
-        '水闸工程': ['水闸工程','水闸工程-注记'],
-        '泵站工程': ['泵站工程','泵站工程-注记'],
-        '枢纽工程': ['枢纽工程','枢纽工程-注记'],
+        '沿江码头': ['沿江码头', '沿江码头-注记'],
+        '水库大坝': ['水库大坝', '水库大坝-注记'],
+        '水闸工程': ['水闸工程', '水闸工程-注记'],
+        '泵站工程': ['泵站工程', '泵站工程-注记'],
+        '枢纽工程': ['枢纽工程', '枢纽工程-注记'],
         '长江干堤': ['长江干堤', '里程桩'],
         '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记'],
         '历史崩岸': [],

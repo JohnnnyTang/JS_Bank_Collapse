@@ -406,7 +406,7 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
             }
             properties = n
         }
-
+        console.log(properties);
 
     }
     return properties;
