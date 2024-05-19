@@ -364,7 +364,7 @@ import { connectionExists } from '@vue-flow/core'
 const loading_message = ref('自定义断面信息计算中...')
 
 let map = null
-// let flow = null
+let flow = null
 const mapContainer = ref()
 const timeStep = ref(0)
 const showFlow = ref(false)
@@ -469,19 +469,30 @@ let defaultWarnLayerData = [
     },
 ]
 
-let flowSrc = []
-for (let i = 0; i < 26; i++) {
-    flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-}
-let flow = reactive(
-    new SteadyFlowLayer(
-        '近岸流场',
-        '/scratchSomething/terrain_flow/json/station.bin',
-        flowSrc,
-        (url) => url.match(/uv_(\d+)\.bin/)[1],
-        '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
-    ),
-)
+// let flowSrc = []
+// for (let i = 0; i < 26; i++) {
+//     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+// }
+// let flow = reactive(
+//     new SteadyFlowLayer(
+//         '近岸流场',
+//         '/scratchSomething/terrain_flow/json/station.bin',
+//         flowSrc,
+//         (url) => url.match(/uv_(\d+)\.bin/)[1],
+//         '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
+//     ),
+// )
+// let flowSrc = []
+// for (let i = 0; i < 26; i++) {
+//     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+// }
+// let flow = reactive(new SteadyFlowLayer(
+//     '近岸流场',
+//     '/scratchSomething/terrain_flow/json/station.bin',
+//     flowSrc,
+//     (url) => url.match(/uv_(\d+)\.bin/)[1],
+//     '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
+// ))
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -2119,6 +2130,7 @@ div.risk-warn-container {
         left: 27vw;
         width: 2.9vw;
         height: 32vh;
+        z-index: 3;
         img {
             width: 100%;
             height: 100%;
