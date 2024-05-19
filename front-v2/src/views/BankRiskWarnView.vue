@@ -2,10 +2,14 @@
     <div class="risk-warn-container">
         <div class="map-container" id="map" ref="mapContainer"></div>
         <canvas id="GPUFrame"></canvas>
-
         <div class="selector-container">
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div>
+                <div class="confirm-button" @click="confirmProfileTime">
+                    <div class="confirm-button-text">
+                        确认选择
+                    </div>
+                </div>
                 <div class="place selector-content">
                     <el-select class="side" v-model="placeValue" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
                         @change="sceneSelectChange" popper-class="risk-popper">
@@ -22,9 +26,9 @@
                 <!-- <div class="scene-title selector-title">评估情景：</div> -->
                 <div class="before-scene-title selector-title">对比地形:</div>
                 <div class="before-scene selector-content">
-                    <el-select class="before" v-model="sceneBeforeValue" placeholder="选择专题"
-                        style="width: 10vw; height: 3.5vh" @change="sceneBeforeSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
+                    <el-select class="before" v-model="sceneBeforeValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
+                        @change="sceneBeforeSelectChange" popper-class="risk-popper">
+                        <el-option v-for="item in sceneList" :key="item.value" :label="item.label" :value="item.value">
                             <span style="float: left" class="section-name-text">{{ item.year }}</span>
                             <span style="float: right" class="section-class-text">{{ item.time }}</span>
                         </el-option>
@@ -36,8 +40,8 @@
                 <div class="now-scene-title selector-title">当前地形:</div>
                 <div class="now-scene selector-content">
                     <el-select class="now" v-model="sceneNowValue" placeholder="选择专题" style="width: 10vw; height: 3.5vh"
-                        @change="sceneNowSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in scenceList" :key="item.value" :label="item.label" :value="item.value">
+                        @change="sceneNowSelectChange(sceneNowValue)" popper-class="risk-popper">
+                        <el-option v-for="item in sceneList" :key="item.value" :label="item.label" :value="item.value">
                             <span style="float: left" class="section-name-text">{{ item.year }}</span>
                             <span style="float: right" class="section-class-text">{{ item.time }}</span>
                         </el-option>
@@ -68,8 +72,16 @@
                 </div>
                 <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 <div class="graph-container shape">
-                    <div ref="shapeGraphRef" class="shape graph" v-loading="shapeChartLoad"
-                        element-loading-background="rgba(255, 255, 255, 0.4)"></div>
+                    <div
+                        ref="shapeGraphRef"
+                        class="shape graph"
+                        v-loading="shapeChartLoad"
+                        
+                        element-loading-background="rgba(255, 255, 255, 0.4)"
+                    ></div>
+                    <div v-if="shapeGraphShow" class="empty-graph1">
+                        当前暂无地形数据
+                    </div>
                 </div>
             </div>
             <div class="riskInfo-item profileErosion">
@@ -78,8 +90,16 @@
                 </div>
                 <div ref="erosionGraphRef" class="erosion graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
                 <div class="graph-container erosion">
-                    <div ref="erosionGraphRef" class="erosion graph" v-loading="erosionChartLoad"
-                        element-loading-background="rgba(255, 255, 255, 0.4)"></div>
+                    <div
+                        ref="erosionGraphRef"
+                        class="erosion graph"
+                        v-loading="erosionChartLoad"
+                        
+                        element-loading-background="rgba(255, 255, 255, 0.4)"
+                    ></div>
+                    <div v-if="erosionGraphShow" class="empty-graph2">
+                        当前暂无地形数据
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,15 +115,28 @@
                 <div class="text">流场展示</div>
             </div>
         </div>
+        <div class="raster-control-block">
+            <label class="switch">
+                <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
+                <span class="slider"></span>
+            </label>
+            <div class="text-block">
+                <div class="text">冲淤图展示</div>
+            </div>
+        </div>
+
         <div class="time-shower-block">
             <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
+        </div>
+
+        <div class="raster-legend-container" v-if="showRaster">
+            <img src="/rasterLegend1.png" alt="比例尺">
         </div>
 
         <div class="profile-draw-content">
             <div class="profile-draw-title">
                 自定义断面：
             </div>
-            <dv-loading class="loading-icon" v-show="isRunning">模型计算中...</dv-loading>
             <div class="current-param-container">
                 <div class="current-param-title">当前绘制断面</div>
                 <div class="current-param-content" :class="{ 'two-line': sectionLineLabel != '' }">
@@ -121,11 +154,13 @@
                 <div class="profile-info-item title">
                     断面信息：
                 </div>
-                <div class="profile-info-item name" v-if="tempProfileName != ''">
-                    断面名称：{{ tempProfileName }}
+                <div class="profile-info-item name"
+                v-if="tempProfileName != ''">
+                    断面名称: {{ tempProfileName }}
                 </div>
-                <div class="profile-info-item risk" v-if="tempProfileRisk != ''">
-                    风险等级：{{
+                <div class="profile-info-item risk"
+                v-if="tempProfileRisk != ''">
+                    风险等级: {{ 
                         tempProfileRisk == 'low'
                         ? '低风险'
                         : tempProfileRisk == 'middle'
@@ -133,9 +168,47 @@
                             : '高风险'
                     }}
                 </div>
+                <div class="profile-info-item now"
+                v-if="tempProfileRisk != ''">
+                    当前地形: {{ 
+                        tempProfileBefore
+                    }}
+                </div>
+                <div class="profile-info-item before"
+                v-if="tempProfileRisk != ''">
+                    对比地形: {{ 
+                        tempProfileNow
+                    }}
+                </div>
+                <!-- <div class="detail-info"
+                v-if="tempProfileRisk != ''"
+                @click="showTempProfileDetailInfo">
+                    <div class="detail-info-text">
+                        断面详细信息
+                    </div>
+                </div> -->
+                <div class="null-text"
+                v-if="tempProfileName == ''">
+                    暂无断面信息
+                </div>
             </div>
         </div>
-        <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh" :before-close="sectionConfirmClose">
+        <div v-if="tempProfileDetailInfo">
+            <profileInfoCard
+                @close-temp-profile-detail-info="CloseTempProfileDetailInfo"
+                :profileData = tempProfileData
+            />
+        </div>
+        
+        <!-- <profileInfoCard
+            v-if="true"
+            :profileData = tempProfileData
+        /> -->
+        <el-dialog
+            v-model="sectionConfirmShow"
+            title="绘制断面确认"
+            width="40vh"
+        >
             <span>确认使用此断面进行计算</span>
             <el-input v-model="tempProfileName" style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
                 placeholder="请输入断面名称" clearable />
@@ -150,11 +223,39 @@
                 </div>
             </template>
         </el-dialog>
+        <el-dialog
+            v-model="sceneConfirmShow"
+            title="切换场景确认"
+            width="40vh"
+        >
+            <span>确认使用以下年份地形数据进行计算：</span>
+            <div style="position:absolute;top:6.5vh;font-weight: bold;">
+                {{ sceneBefore.name }}
+            </div>
+            <div style="position:absolute;top:8.5vh;font-weight: bold;">
+                {{ sceneNow.name }}
+            </div>
+            <template #footer>
+                <div class="dialog-footer">
+                    <div style="text-align: right;">
+                        <el-button @click="cancelSceneRese">取消</el-button>
+                        <el-button type="primary" @click="sureSceneRese">
+                            确认
+                        </el-button>
+                    </div>
+                </div>
+            </template>
+        </el-dialog>
+        <div class="loading-container" v-show="isRunning">
+            <dv-loading class="loading-icon">
+                <div class="loading-message">{{ loading_message }}</div>
+            </dv-loading>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, reactive, watch, onUnmounted } from 'vue'
+import { onMounted, ref, reactive, watch, onUnmounted, nextTick } from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -162,6 +263,7 @@ import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
+import profileInfoCard from '../components/bankRiskWarn/profileInfoCard.vue'
 import { drawShapeGraph, drawErosionGraph } from '../components/bankRiskWarn/util.js'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
@@ -178,12 +280,28 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { convertToMercator } from '../components/bankRiskWarn/coordConvert.js'
 import { rasterMM } from '../components/bankRiskWarn/rasterMM'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import { connectionExists } from '@vue-flow/core';
+
+const loading_message = ref("自定义断面信息计算中...")
 
 let map = null
-let flow = null
+// let flow = null
 const mapContainer = ref()
 const timeStep = ref(0)
 const showFlow = ref(false)
+const showRaster = ref(true)
+
+let flowSrc = []
+for (let i = 0; i < 26; i++) {
+    flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+}
+let flow = reactive(new SteadyFlowLayer(
+    '近岸流场',
+    '/scratchSomething/terrain_flow/json/station.bin',
+    flowSrc,
+    (url) => url.match(/uv_(\d+)\.bin/)[1],
+    '/scratchSomething/terrain_flow/json/ChangJiang.geojson'
+))
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -216,71 +334,205 @@ const mapJumpToRiver = (mapIns) => {
     // )
 }
 
-const sceneBeforeValue = ref('2022after')
-
-const sceneNowValue = ref('2023before')
-
-const scenceList = ref([
+// 数据
+const profileList = ref([
+    {
+        value: 1,
+        id: 'JC01',
+        label: '断面 JC01',
+        name: 'JC01: 头部围堤',
+        filter: ['==', 'name', 'JC01'],
+        flowspeed: null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 2,
+        id: 'JC02',
+        label: '断面 JC02',
+        name: 'JC02: 南顺堤',
+        filter: ['==', 'name', 'JC02'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 3,
+        id: 'JC03',
+        label: '断面 JC03',
+        name: 'JC03: 南顺堤尾部',
+        filter: ['==', 'name', 'JC03'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 4,
+        id: 'JC04',
+        label: '断面 JC04',
+        name: 'JC04: 江滩办事处',
+        filter: ['==', 'name', 'JC04'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 5,
+        id: 'JC05',
+        label: '断面 JC05',
+        name: 'JC05: 小港池',
+        filter: ['==', 'name', 'JC05'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 6,
+        id: 'JC06',
+        label: '断面 JC06',
+        name: 'JC06: 张靖皋桥位上游',
+        filter: ['==', 'name', 'JC06'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 7,
+        id: 'JC07',
+        label: '断面 JC07',
+        name: 'JC07: 张靖皋桥位下游',
+        filter: ['==', 'name', 'JC07'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 8,
+        id: 'JC08',
+        label: '断面 JC08',
+        name: 'JC08: 海事码头',
+        filter: ['==', 'name', 'JC08'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 9,
+        id: 'JC09',
+        label: '断面 JC09',
+        name: 'JC09: 海事码头下游',
+        filter: ['==', 'name', 'JC09'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 10,
+        id: 'JC10',
+        label: '断面 JC10',
+        name: 'JC10: 雷达站',
+        filter: ['==', 'name', 'JC10'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 11,
+        id: 'JC11',
+        label: '断面 JC11',
+        name: 'JC11: 民主沙尾部主路',
+        filter: ['==', 'name', 'JC11'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+    {
+        value: 12,
+        id: 'JC12',
+        label: '断面 JC12',
+        name: 'JC12: 民主沙尾',
+        filter: ['==', 'name', 'JC12'],
+        flowspeed:null,
+        risk: null,
+        color: null,
+    },
+])
+const sceneList = ref([
     {
         value: '2020before',
+        name: '2020汛前地形数据',
         label: '2020汛前',
         year: '2020',
         time: '汛前',
-        date: '2020-03-01'
+        date: '2020-03-01',
+        dateShort: '2003'
     },
     {
         value: '2020after',
+        name: '2020汛后地形数据',
         label: '2020汛后',
         year: '2020',
         time: '汛后',
-        date: '2020-09-01'
+        date: '2020-09-01',
+        dateShort: '2009'
     },
     {
         value: '2021before',
+        name: '2021汛前地形数据',
         label: '2021汛前',
         year: '2021',
         time: '汛前',
-        date: '2021-03-01'
+        date: '2021-03-01',
+        dateShort: '2103'
     },
     {
         value: '2021after',
+        name: '2021汛后地形数据',
         label: '2021汛后',
         year: '2021',
         time: '汛后',
-        date: '2021-09-01'
+        date: '2021-09-01',
+        dateShort: '2109'
     },
     {
         value: '2022before',
+        name: '2022汛前地形数据',
         label: '2022汛前',
         year: '2022',
         time: '汛前',
-        date: '2022-03-01'
+        date: '2022-03-01',
+        dateShort: '2203'
     },
     {
         value: '2022after',
+        name: '2022汛后地形数据',
         label: '2022汛后',
         year: '2022',
         time: '汛后',
-        date: '2022-09-01'
+        date: '2022-09-01',
+        dateShort: '2209'
     },
     {
         value: '2023before',
+        name: '2023汛前地形数据',
         label: '2023汛前',
         year: '2023',
         time: '汛前',
-        date: '2023-03-01'
+        date: '2023-03-01',
+        dateShort: '2303'
     },
     {
         value: '2023after',
+        name: '2023汛后地形数据',
         label: '2023汛后',
         year: '2023',
         time: '汛后',
-        date: '2023-09-01'
+        date: '2023-09-01',
+        dateShort: '2309'
     },
 ])
 
 const placeValue = ref('mzs')
-
 const placeList = [
     { value: 'mzs', label: '民主沙右缘示范段' },
     { value: 'tpz', label: '太平洲左缘示范段', disabled: true },
@@ -290,6 +542,164 @@ const placeList = [
 const sceneBeforeSelectChange = () => { }
 
 const sceneNowSelectChange = () => { }
+
+const confirmProfileTime = () => {
+    getProfileTime()
+    sceneConfirmShow.value = true
+}
+
+const getProfileTime = () => {
+    sceneBefore = sceneList.value.find(item => item.value === sceneBeforeValue.value)
+    sceneNow = sceneList.value.find(item => item.value === sceneNowValue.value)
+    tempProfileBefore.value = sceneBefore.label
+    tempProfileNow.value = sceneNow.label
+}
+
+const cancelSceneRese = () => {
+    sceneConfirmShow.value = false
+}
+
+const sureSceneRese = async() => {
+    getProfileTime()
+    sceneConfirmShow.value = false
+    if ( sceneNow.dateShort <= sceneBefore.dateShort ) {
+        ElMessage.error('当前地形时间不能早于或等于对比地形时间！')
+        return
+    }
+    if ( preSceneBeforeValue.value === sceneBeforeValue.value && preSceneNowValue.value === sceneNowValue.value ) {
+        ElMessage.error('当前地形时间与对比地形时间未发生变化！')
+        return
+    }
+    // 添加栅格图层
+    loading_message.value = "冲淤图层加载中..."
+    isRunning.value = true
+    shapeChartLoad.value = true
+    erosionChartLoad.value = true
+    const time = sceneNow.dateShort + sceneBefore.dateShort
+    if (!showRaster.value) {
+        showRaster.value = true
+    }
+    mapInstance.removeLayer('mapRaster')
+    mapInstance.removeSource('mapRaster')
+    addRasterLayer(mapInstance, time, 'mapRaster')
+    mapInstance.moveLayer('mapRaster', 'mzsLine')
+    // 计算各个断面数据
+    ProfileLoadingProcess(sceneBefore, sceneNow)
+}
+
+const ProfileLoadingProcess = async(sceneBefore, sceneNow) => {
+    const before = sceneBefore.date
+    const now = sceneNow.date
+    loading_message.value = "确认计算结果是否存在..."
+    isRunning.value = true
+    const exist = await profileDataExist(before, now)
+    if (exist) {
+        loading_message.value = "地形对比数据加载中..."
+        profileData.value = await getProfileData(before, now)
+    } else {
+        loading_message.value = "地形对比结果计算中..."
+        await CalProfile(before, now)
+        loading_message.value = "地形对比数据加载中..."
+        profileData.value = await getProfileData(before, now)
+    }
+    // loading_message.value = "地形对比结果计算中..."
+    // await CalProfile(before, now)
+    // loading_message.value = "地形对比数据加载中..."
+    // profileData = await getProfileData(before, now)
+    isRunning.value = false
+    shapeChartLoad.value = false
+    erosionChartLoad.value = false
+    changeProfileData(profileData.value)
+    CalProfileList(profileData.value)
+    if (mapInstance.getLayer('mzsBankLineLowRisk')!==undefined) {
+        mapInstance.removeLayer('mzsBankLineLowRisk')
+        addBankLineRiskLayer(mapInstance, profileList)
+    } else {
+        addBankLineRiskLayer(mapInstance, profileList)
+    }
+    preSceneBeforeValue.value = sceneBeforeValue.value
+    preSceneNowValue.value = sceneNowValue.value
+}
+
+const CalProfileList = (profileData) => {
+    profileData.map((value, index) => {
+        const riskLevel = value.risk[2]
+        if (riskLevel < 0.25) {
+            profileList.value[index].risk = 'low'
+            profileList.value[index].color = 'rgb(31, 110, 209)'
+        } else if (riskLevel < 0.5) {
+            profileList.value[index].risk = 'middle'
+            profileList.value[index].color = 'rgb(220, 126, 37)'
+        } else {
+            profileList.value[index].risk = 'high'
+            profileList.value[index].color = 'rgb(220, 55, 36)'
+        } 
+        try {
+            profileList.value[index].flowspeed = value.deepestPoint[2]
+        } catch (error){
+            
+        }
+    })
+}
+
+const CalProfile = async(before, now) => {
+    const promises = [];
+    for(let i = 0; i < profileList.value.length; i++) {
+        promises.push(CalProfileById(before, now, i))
+    }
+    await Promise.all(promises);
+}
+
+const CalProfileById = async(before, now, id) => {
+    const taskId = await bankRiskWarn.runProfileModel(before, now, id+1)
+    let RunStatus;
+    for (;;) {
+        try {
+           RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
+        } catch (error) {
+            // console.log(error)
+        }
+        if (RunStatus.data == 2) {
+            break;
+        } else if (RunStatus.data == -1) {
+            // alert("模型运行结果失败")
+            return
+        } else if (RunStatus.data == -2) {
+            // alert("模型运行生成json失败")
+            return
+        } else if (RunStatus.data == 1) {
+            // alert("模型运行中")
+        }
+        await wait(100);
+    }
+}
+
+const profileDataExist = async(before, now) => {
+    const testData = await bankRiskWarn.getProfileData(before, now, 1)
+    if (testData.data.length === 0) {
+        return false
+    }
+    return true
+}
+
+const getProfileData = async (before, now) => {
+        const promises = [];
+        const result = [];
+        for (let i = 0; i < 12; i++) {
+            promises.push(bankRiskWarn.getProfileData(before, now, i + 1));
+        }
+        const allResponses = await Promise.all(promises);
+
+        // 确保每个响应都有 data 属性
+        allResponses.forEach(response => {
+            if (response && response.data) {
+                result.push(response.data);
+            } else {
+                // console.log(response);
+            }
+        });
+        return result
+    };
 
 const sceneSelectChange = () => { }
 
@@ -334,8 +744,8 @@ const flowControlHandler = () => {
             }
         } else {
             ElMessage({
-                type: 'warning',
-                message: '地图尚未加载，请等待',
+                'type': 'warning',
+                'message': '地图尚未加载，请等待'
             })
         }
     } else {
@@ -350,124 +760,72 @@ const flowControlHandler = () => {
 //         timeStep.value = flow.currentResourcePointer
 //     },
 // )
-const showComponent = ref(false)
-let profileData = []
-const profileValue = ref(2)
-const profileList = ref([
-    {
-        value: 1,
-        label: '断面 JC01',
-        name: 'JC01: 头部围堤',
-        filter: ['==', 'name', 'JC01'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 2,
-        label: '断面 JC02',
-        name: 'JC02: 南顺堤',
-        filter: ['==', 'name', 'JC02'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 3,
-        label: '断面 JC03',
-        name: 'JC03: 南顺堤尾部',
-        filter: ['==', 'name', 'JC03'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 4,
-        label: '断面 JC04',
-        name: 'JC04: 江滩办事处',
-        filter: ['==', 'name', 'JC04'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 5,
-        label: '断面 JC05',
-        name: 'JC05: 小港池',
-        filter: ['==', 'name', 'JC05'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 6,
-        label: '断面 JC06',
-        name: 'JC06: 张靖皋桥位上游',
-        filter: ['==', 'name', 'JC06'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 7,
-        label: '断面 JC07',
-        name: 'JC07: 张靖皋桥位下游',
-        filter: ['==', 'name', 'JC07'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 8,
-        label: '断面 JC08',
-        name: 'JC08: 海事码头',
-        filter: ['==', 'name', 'JC08'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 9,
-        label: '断面 JC09',
-        name: 'JC09: 海事码头下游',
-        filter: ['==', 'name', 'JC09'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 10,
-        label: '断面 JC10',
-        name: 'JC10: 雷达站',
-        filter: ['==', 'name', 'JC10'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 11,
-        label: '断面 JC11',
-        name: 'JC11: 民主沙尾部主路',
-        filter: ['==', 'name', 'JC11'],
-        flowspeed: null,
-        risk: null,
-    },
-    {
-        value: 12,
-        label: '断面 JC12',
-        name: 'JC12: 民主沙尾',
-        filter: ['==', 'name', 'JC12'],
-        flowspeed: null,
-        risk: null,
-    },
-])
 
+
+const RasterControlHandler = () => {
+    if (showRaster.value) {
+        mapInstance.setLayoutProperty('mapRaster','visibility','none')
+    } else{
+        mapInstance.setLayoutProperty('mapRaster','visibility','visible')
+    }
+    showRaster.value = !showRaster.value
+}
+
+// 地形对比变量
+const sceneBeforeValue = ref('2022after')
+const sceneNowValue = ref('2023after')
+const preSceneBeforeValue = ref('2022after')
+const preSceneNowValue = ref('2023after')
+let sceneBefore
+let sceneNow
+
+// 断面数据变量
+const showComponent = ref(false)
+const profileData = ref([])
+const profileValue = ref(2)
+const tempProfile = ref(null)
+const tempProfileData = ref(null)
+const tempProfileDetailInfo = ref(false)
+const showTempProfileDetailInfo = () => {
+    tempProfileDetailInfo.value = true
+}
+const CloseTempProfileDetailInfo = () => {
+    tempProfileDetailInfo.value = false
+}
+// 断面图表变量
 let shapeChart = null
 let erosionChart = null
 const shapeChartLoad = ref(true)
 const erosionChartLoad = ref(true)
+// const flowSpeedLoading = ref(true)
 const shapeGraphRef = ref(null)
 const erosionGraphRef = ref(null)
-const tempProfileName = ref('')
-const tempProfileRisk = ref('')
+const erosionGraphShow = ref(false)
+const shapeGraphShow = ref(false)
 let section;
 let beforesection;
 let slopeRate;
 let erosion;
+const tempProfileName = ref('')
+const tempProfileRisk = ref('')
+const tempProfileBefore = ref('')
+const tempProfileNow = ref('')
 
-const profileSelectChange = (inputValue) => {
-    profileValue.value = inputValue
-    changeProfileData(profileData)
+const profileSelectChange = () => {
+    erosionGraphShow.value = false
+    shapeGraphShow.value = false
+    // profileValue.value = inputValue
+    changeProfileData(profileData.value)
+    const profileDataItem = profileData.value[profileValue.value-1]
+    if (!Object.keys(profileDataItem).includes('beforeSection')
+        || !Object.keys(profileDataItem).includes('section')) {
+        shapeGraphShow.value = true
+        erosionGraphShow.value = true
+    } else {
+        nextTick(() => {
+        // 这里可以执行一些操作，确保组件渲染
+        });
+    }
     mapInstance.setFilter(
         'mzsBankLineChoosen',
         profileList.value[profileValue.value - 1].filter,
@@ -502,11 +860,12 @@ const changeProfileData = (profileData) => {
     DrawGraph(section, beforesection, slopeRate, erosion)
 }
 
+// 断面绘制变量
 let mapInstance;
 const sectionConfirmShow = ref(false)
+const sceneConfirmShow = ref(false)
 const sectionLineLabel = ref('')
 const sectionLineLabelSec = ref('')
-const calcEnable = ref(false)
 const isRunning = ref(false)
 
 let StartPtX
@@ -608,24 +967,27 @@ const sureSectionRese = async () => {
         return
     }
     isRunning.value = true
+    shapeChartLoad.value = true
+    erosionChartLoad.value = true
+    loading_message.value = "自定义断面信息计算中..."
     sectionConfirmShow.value = false
-    const before = scenceList.value.find(item => item.value == sceneBeforeValue.value).date
-    const after = scenceList.value.find(item => item.value == sceneNowValue.value).date
+    const before = sceneList.value.find(item => item.value == sceneBeforeValue.value).date
+    const after = sceneList.value.find(item => item.value == sceneNowValue.value).date
     const taskId = await CalProfileByPoint(before, after, StartPtX, StartPtY, EndPtX, EndPtY)
     let RunStatus = ""
     for (; ;) {
         try {
             RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
         } catch (error) {
-            console.log(error)
+            // console.log(error)
         }
         if (RunStatus.data == 2) {
             break;
         } else if (RunStatus.data == -1) {
-            alert("模型运行结果失败")
+            // alert("模型运行结果失败")
             return
         } else if (RunStatus.data == -2) {
-            alert("模型运行生成json失败")
+            // alert("模型运行生成json失败")
             return
         } else if (RunStatus.data == 1) {
             // alert("模型运行中")
@@ -634,7 +996,10 @@ const sureSectionRese = async () => {
     }
     const profileResult = await bankRiskWarn.getRunResult(taskId.data)
     putDataInList(profileResult.data)
+    profileData.value.push(profileResult.data)
     isRunning.value = false
+    shapeChartLoad.value = false
+    erosionChartLoad.value = false
 }
 
 async function wait(ms) {
@@ -647,7 +1012,6 @@ const CalProfileByPoint = async (before, now, StartPtX, StartPtY, EndPtX, EndPtY
 }
 
 const putDataInList = (profileDataItem) => {
-    let tempValue = profileList.value.length + 1
     let tempRisk
     if (profileDataItem.risk[2] < 0.25) {
         tempRisk = 'low'
@@ -657,15 +1021,16 @@ const putDataInList = (profileDataItem) => {
         tempRisk = 'high'
     }
     tempProfileRisk.value = tempRisk
-    profileList.value.push({
-        value: tempValue,
+    tempProfile.value = {
+        value: profileList.value.length + 1,
         label: tempProfileName.value,
         name: tempProfileName.value,
-        filter: ['==', '$type', `JC${tempValue}`],
+        filter: ['==', '$type', `${tempProfileName.value}`],
         flowspeed: profileDataItem.deepestPoint[2],
         risk: tempRisk,
-    })
-    profileData.push(profileDataItem)
+    }
+    tempProfileData.value = profileDataItem
+    profileList.value.push(tempProfile.value)
 }
 
 const changeSceneBefore = (value) => {
@@ -691,7 +1056,7 @@ const addRasterLayer = (map, time, name) => {
     let rasterMin = rasterMM[time].min
     let rasterMax = rasterMM[time].max
     map.addLayer({
-        id: 'ras',
+        id: name,
         type: 'raster',
         source: name,
         'paint': {
@@ -710,14 +1075,45 @@ const addRasterLayer = (map, time, name) => {
     })
 }
 
+const addBankLineRiskLayer = (map, profileList) => {
+    map.addLayer({
+        id: 'mzsBankLineLowRisk',
+        type: 'line',
+        source: 'mzsBankLineSource',
+        'source-layer': 'default',
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+        },
+        paint: {
+            'line-opacity': 1,
+            'line-color': [
+                'match',
+                ['get', 'name'],
+                'JC01', `${profileList.value[0].color}`,
+                'JC02', `${profileList.value[1].color}`,
+                'JC03', `${profileList.value[2].color}`,
+                'JC04', `${profileList.value[3].color}`,
+                'JC05', `${profileList.value[4].color}`,
+                'JC06', `${profileList.value[5].color}`,
+                'JC07', `${profileList.value[6].color}`,
+                'JC08', `${profileList.value[7].color}`,
+                'JC09', `${profileList.value[8].color}`,
+                'JC10', `${profileList.value[9].color}`,
+                'JC11', `${profileList.value[10].color}`,
+                'JC12', `${profileList.value[11].color}`,
+                'rgb(255, 255, 255)'
+            ],
+            'line-width': 3,
+        },
+    })
+}
+
 onMounted(async () => {
-
-    initScratchMap(mapContainer.value).then((map) => {
+    
+    await initScratchMap(mapContainer.value).then((map) => {
         mapInstance = map
-
         map.on('draw.create', function (e) {
-            console.log('aaa')
-            console.log(e.features[0])
             sectionConfirmShow.value = true
             let lineFeature = e.features[0]
             sectionLineLabel.value =
@@ -910,55 +1306,23 @@ onMounted(async () => {
             paint: {
                 'line-opacity': 1,
                 'line-color': 'rgb(134, 245, 230)',
-                'line-width': 6,
+                'line-width': 10,
             },
         })
+
         map.addControl(draw)
 
         useMapStore().setMap(map)
-        console.log('set map!')
+        // console.log('set map!')
+        flow.particleNum.n = 2800
+        flow.speedFactor.n = 1.0
+        map.addLayer(flow)
+        flow.hide()
     })
 
-    const getProfileData = async () => {
-        const promises = [];
-        const result = [];
-        for (let i = 0; i < 12; i++) {
-            promises.push(bankRiskWarn.getProfileData(i + 1));
-        }
-        const allResponses = await Promise.all(promises);
-
-        // 确保每个响应都有 data 属性
-        allResponses.forEach((response) => {
-            if (response && response.data) {
-                result.push(response.data)
-            } else {
-                console.error(
-                    '响应数据不包含 "data" 属性或响应未定义。',
-                    response,
-                )
-            }
-        })
-        return result
-    }
-    profileData = await getProfileData()
-
-    profileData.map((value, index) => {
-        const riskLevel = value.risk[2]
-        if (riskLevel < 0.25) {
-            profileList.value[index].risk = 'low'
-        } else if (riskLevel < 0.5) {
-            profileList.value[index].risk = 'middle'
-        } else {
-            profileList.value[index].risk = 'high'
-        }
-        try {
-            profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) {
-
-        }
-    })
+    getProfileTime()
     showComponent.value = true
-    changeProfileData(profileData)
+    await ProfileLoadingProcess(sceneBefore, sceneNow)
 })
 
 onUnmounted(() => {
@@ -1028,7 +1392,7 @@ div.risk-warn-container {
 
             div.selector-title {
                 letter-spacing: 0rem;
-                width: 7vw;
+                width: 5,5vw;
 
                 &.before-scene-title {
                     margin-top: 1.4vh;
@@ -1047,6 +1411,36 @@ div.risk-warn-container {
                     letter-spacing: 0rem;
                     line-height: 2.5vh;
                     font-size: calc(0.8vw + 0.4vh);
+                }
+            }
+
+            div.confirm-button {
+                position: absolute;
+                height: 5vh;
+                width: 2.6vw;
+                left: 20.8vw;
+                top: 1.82vh;
+                background-color: rgb(73, 90, 250);
+                z-index: 7;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+                &:hover {
+                    transform: scale(1.03);
+                }
+                border:#82bae7 2px solid;
+                border-radius: 6px;
+
+                div.confirm-button-text {
+                    position: absolute;
+                    height: 5vh;
+                    width: 2.4vw;
+                    left: 0.07vw;
+                    top: 0.5vh;
+                    line-height: 2vh;
+                    font-size: calc(0.6vw + 0.4vh);
+                    font-weight: bold;
+                    color: #fbfcfd;
+                    text-align: center;
                 }
             }
 
@@ -1284,6 +1678,31 @@ div.risk-warn-container {
                         // height: 17vh;
                         // background-color: #00098a;
                     }
+                    z-index: 99;
+                }
+
+                div.empty-graph1 {
+                    position: absolute;
+                    left: 7vw;
+                    top: 13vh;
+                    display: flex;
+                    align-items: center;
+                    color: #1c68cc;
+                    font-size: calc(0.7vw + 0.5vh);
+                    font-family: 'Microsoft YaHei';
+                    font-weight: bold;
+                }
+
+                div.empty-graph2 {
+                    position: absolute;
+                    left: 7vw;
+                    top: 6vh;
+                    display: flex;
+                    align-items: center;
+                    color: #1c68cc;
+                    font-size: calc(0.7vw + 0.5vh);
+                    font-family: 'Microsoft YaHei';
+                    font-weight: bold;
                 }
             }
         }
@@ -1367,10 +1786,103 @@ div.risk-warn-container {
         }
     }
 
+    div.raster-control-block {
+        position: absolute;
+        top: 0vh;
+        left: 26vw;
+        height: 13vh;
+        width: 6vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        z-index:3;
+
+        .switch {
+            font-size: 20px;
+            position: relative;
+            display: inline-block;
+            width: 2em;
+            height: 3.5em;
+
+            input {
+                display: none;
+            }
+
+            /* The slider */
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgb(165, 219, 253);
+                transition: 0.4s;
+                border-radius: 10px;
+
+                &:before {
+                    position: absolute;
+                    content: "";
+                    height: 1.4em;
+                    width: 1.4em;
+                    border-radius: 5px;
+                    left: 0.3em;
+                    bottom: 0.3em;
+                    background-color: white;
+                    transition: 0.4s;
+                }
+            }
+
+            input:checked {
+                +.slider {
+                    background-color: rgb(73, 90, 250);
+                }
+
+                +.slider:before {
+                    transform: translateY(-1.5em);
+                }
+            }
+        }
+
+        .text-block {
+            font-size: 20px;
+            width: 3em;
+            height: 5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .text {
+                writing-mode: vertical-lr;
+                color: rgb(3, 45, 90);
+                color-scheme: light;
+                font-family: 'Microsoft YaHei';
+                font-weight: 700;
+                user-select: none;
+            }
+        }
+    }
+
     div.time-shower-block {
         position: absolute;
         top: 75vh;
         right: 3vw;
+    }
+
+    div.raster-legend-container {
+        position: absolute;
+        top: 12vh;
+        left: 27vw;
+        width: 2.9vw;
+        height: 32vh;
+        img {
+            width: 100%;
+            height: 100%;
+            margin-bottom: 10px;
+            object-fit:contain;
+            
+        }
     }
 
     div.profile-draw-content {
@@ -1450,29 +1962,106 @@ div.risk-warn-container {
             z-index: 3;
 
             div.profile-info-item {
-                font-size: calc(0.6vw + 0.5vh);
-                color: #0f1011;
+                font-size: calc(0.5vw + 0.4vh);
+                color: #001cb8;
+                font-weight: bold;
 
                 &.title {
-                    font-weight: bold;
+                    color: #0f1011;
                     font-size: calc(0.7vw + 0.5vh);
                     position: absolute;
                     left: 0.5vw;
                     top: 0.5vh
                 }
 
-                &.name {
+                &.name { 
                     position: absolute;
-                    left: 1.5vw;
+                    left: 0.3vw;
                     top: 4vh;
                 }
 
                 &.risk {
                     position: absolute;
-                    left: 1.5vw;
+                    left: 0.3vw;
                     top: 7vh;
                 }
+
+                &.before {
+                    color: #b3771d;
+                    position: absolute;
+                    left: 6.4vw;
+                    top: 4vh; 
+                }
+
+                &.now {
+                    color: #b3771d;
+                    position: absolute;
+                    left: 6.4vw;
+                    top: 7vh; 
+                }
+
             }
+            
+            div.detail-info {
+                position:absolute;
+                left: 8.4vw;
+                top: 3vh;
+                width: 4vw;
+                height: 6vh;
+                border: 2px solid #1735ae;
+                border-radius: 6px;
+                background-color: #1753ae;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+                &:hover {
+                    transform: scale(1.03);
+                }
+
+                div.detail-info-text {
+                    font-size: calc(0.7vw + 0.5vh);
+                    font-weight: bold;
+                    color: #cefffd;
+                    position: absolute;
+                    left: 0.5vw;
+                    top: 0.5vh;
+                }
+            }
+
+            div.null-text {
+                font-size: calc(1.0vw + 0.7vh);
+                font-weight: bold;
+                position: absolute;
+                left: 2.3vw;
+                top: 4.6vh;
+                color: #001cb8;
+            }
+        }
+    }
+
+    div.loading-container {
+        position: absolute;
+        top: 2vh;
+        left: 45vw;
+        width: 6vw;
+        height: 10vh;
+        background-color: rgba(190, 222, 230, 0.5);
+        z-index: 5;
+
+        :deep(.dv-loading.loading-icon) {
+            position: absolute;
+            top: -2.5vh;
+            right: 0vw;
+        }
+
+        div.loading-message {
+            text-align: center;
+            position: absolute;
+            left:0.5vw;
+            width: 5vw;
+            height: 6vh;
+            top: 7.3vh;
+            font-size: calc(0.6vw + 0.4svh);
+            font-weight: bold;
         }
     }
 
@@ -1496,9 +2085,4 @@ div.risk-warn-container {
     }
 }
 
-:deep(.dv-loading.loading-icon) {
-    position: absolute;
-    top: 3.3vh;
-    right: -12vw;
-}
 </style>
