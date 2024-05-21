@@ -36,10 +36,10 @@
             <el-tabs type="border-card" class="demo-tabs">
                 <el-tab-pane label="重点要素">
                     <div class="important-feature">
-                        <el-table :data="tableData" style="width: 10vw">
-                            <!-- <el-table-column prop="date" label="Date"/>
-                            <el-table-column prop="name" label="Name"/>
-                            <el-table-column prop="address" label="Address" /> -->
+                        <el-table :data="infoTableData" style="width: 10vw">
+                            <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
+                                :label="item.label"></el-table-column>
+
                         </el-table>
                     </div>
                 </el-tab-pane>
@@ -73,10 +73,10 @@ import "mapbox-gl/dist/mapbox-gl.css"
 
 import { onMounted, ref, watch, onUnmounted } from 'vue';
 import sideBar from '../components/dataVisual/common/sideBar.vue'
-import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
-import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
+// import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
+// import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
-import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
+// import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
 import { initScratchMap } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
@@ -85,6 +85,7 @@ import axios from 'axios';
 
 
 // data
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const mapContainer = ref()
 const mapStore = useMapStore()
 const sceneStore = useNewSceneStore()
@@ -98,28 +99,6 @@ const styles = [
 const featureInfo = ref({})
 const showDetail = ref(false)
 const legendList = ref([])
-const tableData = [
-    {
-        date: '2016-05-03',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-02',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-04',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-01',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-]
 const waterTableData = [
     {
         station: '大通站',
@@ -127,6 +106,9 @@ const waterTableData = [
         level: '无数据',
     },
 ]
+const infoTableData = ref([])
+const infoTableHeader = ref([])
+
 
 watch(() => sceneStore.latestScene, (val) => {
     if (val == '重点岸段') {
@@ -143,17 +125,41 @@ watch(() => sceneStore.latestScene, (val) => {
     }
 })
 
-const detailClickHandler4layerGroup = (lable) => {
+const detailClickHandler4layerGroup = async (lable) => {
     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
     let infoLayer = layers.filter((item) => {
-        if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩')) {
+        if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩')|| item.includes('水闸工程-重点')) {
             return false
         } return true
     })
     let data = []
+    let thData = []
+    let map = mapStore.getMap()
     for (let i = 0; i < infoLayer.length; i++) {
-
+        if (infoLayer[i].includes('过江通道')) {
+            // let t1 = [] // 已
+            // let t2 = []  // 在
+            // let t3 = [] // 规划
+            let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+            let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+            data = [...res1, ...res2]
+            thData = {
+                'name': '名称',
+                'plan': '类型',
+            }
+            break
+        }
+        else if (infoLayer[i].includes('长江干堤')) {
+            console.log('长江干堤  no data')
+        }
+        else {
+            data = await getLayerFeatureArray(map, infoLayer[i])
+            thData = getTableHeader(map, infoLayer[i])
+        }
+        console.log('()()()()');
     }
+    // console.log(data)
+
 }
 
 // methods
@@ -207,10 +213,10 @@ onMounted(async () => {
 })
 
 //////////// DEBUG FUNCTIONS
-const tempFunction = async (mapInstance, layerName) => {
+const getLayerFeatureArray = async (mapInstance, layerName) => {
+
     // 获取要素数组的函数
     let properties = []
-
     let layer = mapInstance.getLayer(layerName)
     if (!layer) return properties
 
@@ -225,16 +231,151 @@ const tempFunction = async (mapInstance, layerName) => {
         }
     }
     else if (source.type == 'vector') {
-        const res = await axios.get(`http://localhost:5173/api/tile/vector/${sourceId}/info`)
+
+        const res = await axios.get(tileServer + `/tile/vector/${sourceId}/info`)
         properties = res.data
+        // special 
+        if (sourceId == 'importantBank') {
+            let warn1 = []
+            let warn2 = []
+            let warn3 = []
+            for (let i = 0; i < properties.length; i++) {
+                if (properties[i].warning_level == 1) warn1.push(properties[i])
+                else if (properties[i].warning_level == 2) warn2.push(properties[i])
+                else if (properties[i].warning_level == 3) warn3.push(properties[i])
+            }
+            if (layerName == '一级预警岸段') properties = warn1
+            else if (layerName == '二级预警岸段') properties = warn2
+            else if (layerName == '三级预警岸段') properties = warn3
+        }
     }
-    console.log(properties);
+    return properties;
+}
+const getTableHeader = (mapInstance, layerName) => {
+    let layer = mapInstance.getLayer(layerName)
+    if (!layer) return properties
+
+    let sourceId = layer.source
+    let source = mapInstance.getSource(sourceId)
+    if (!source) return properties
+    console.log(layerName, sourceId)
+    let title = FieldMap[sourceId]['fieldMap']
+    console.log(title)
+
+
 }
 
 onUnmounted(() => {
     mapStore.getMap().remove()
     mapStore.destroyMap()
 })
+
+const FieldMap = {
+    "combineProjectPoint": {
+        "original": "枢纽工程",
+        "fieldMap": {
+            "id": "编号",
+            "name": "名称"
+        }
+    },
+    "dockArea": {
+        "original": "长江码头工程",
+        "fieldMap": {
+            "new_id": "编号",
+            "project_name": "项目名称",
+            "dock_type": "码头类型",
+            "area_type": "功能区类型",
+        }
+    },
+    "embankmentLine": {
+        "original": "堤防工程",
+        "fieldMap": {
+            "class": "堤防类型",
+            "sp_name": "名称",
+            "length": "长度",
+            "bank": "岸别",
+        }
+    },
+    "hydroStationPoint": {
+        "original": "水文水位站",
+        "fieldMap": {
+            "sp_name": "名称",
+            "begin": "设站日期",
+            "place": "测站地点"
+        }
+    },
+    "lakeArea": {
+        "original": "国普湖泊",
+        "fieldMap": {
+            "name": "名称",
+            "basin": "流域",
+            "water": "水系",
+            "area": "水面面积",
+            "height": "正常蓄水位",
+        }
+    },
+    "pumpArea": {
+        "original": "泵站工程",
+        "fieldMap": {
+            "sp_name": "名称",
+            "river": "所在河流湖泊水库渠道",
+            "level": "级别"
+        }
+    },
+    "reservoirArea": {
+        "original": "水库工程",
+        "fieldMap": {
+            "sp_name": "名称",
+            "class": "水库类型",
+            "area": "坝址控制流域面积",
+            "flow": "坝址多年平均径流量",
+        }
+    },
+    "riverArea": {
+        "original": "国普河流",
+        "fieldMap": {
+            "name": "名称",
+            "area": "水面面积",
+            "height": "正常蓄水位",
+        }
+    },
+    "sluiceArea": {
+        "original": "水闸工程",
+        "fieldMap": {
+            "sp_name": "名称",
+            "river": "所在河流湖泊水库渠道",
+            "class": "水闸类型",
+            "volume": "过闸流量"
+        }
+    },
+    "importantBank": {
+        "original": "重点岸段",
+        "fieldMap": {
+            "bank_name": "名称",
+            "river_name": "所属河段",
+            "monitoring_length": '岸段长度',
+            "warning_level": "预警等级",
+        }
+    },
+    "cityBoundaryLine": {
+        "original": "行政区划",
+        "fieldMap": {
+            'name': '名称',
+        }
+    },
+    "riverPassageLine": {
+        "original": "国普河流",
+        "fieldMap": {
+            'name': '名称',
+        }
+    },
+    "riverPassagePolygon": {
+        "original": "国普河流",
+        "fieldMap": {
+
+        }
+    }
+}
 
 </script>
 
@@ -442,7 +583,8 @@ onUnmounted(() => {
         top: 0vh;
         padding: calc(0.1vw + 0.1vh);
         background-color: aliceblue;
-        .title{
+
+        .title {
             border-bottom: rgb(41, 40, 40) 1px solid;
             font-weight: bold;
             font-size: calc(0.7vw + 0.5vh);
