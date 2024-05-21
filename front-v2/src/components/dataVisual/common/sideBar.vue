@@ -9,13 +9,13 @@
             <hr class="hr_gradient">
 
             <div class="scenes-tree-container">
-                <el-tree style="max-width: 600px" :data="dataSource" :expand-on-click-node="true" node-key="label"
+                <el-tree style="max-width: 600px" :data="dataSource" :expand-on-click-node="false" node-key="label"
                     :default-expanded-keys="expandKey">
                     <template #default="{ node, data }">
                         <span class="custom-tree-node">
                             <!-- <sceneContainer v-if="node.level == 1" :title="data.label" :class="{ active: data.active }">
                             </sceneContainer> -->
-                            <div class="scene-card" v-if="node.level == 1" @click="sceneClickHandler(node, data)">
+                            <div class="scene-card" v-if="node.level == 1">
                                 <div class="scene-top-section" :class="{ active: data.active }">
                                     <div class="scene-title">
                                         <div class="scene-title-text">
@@ -26,8 +26,9 @@
                             </div>
 
                             <div class="subScene-container" v-else-if="node.level == 2">
-                                <div class="card" :class="{ expand: false }" @click="layerGroupClickHandler(node, data)">
-                                    <div class="top-section" :class="{ active: data.active }">
+                                <div class="card" :class="{ active: data.active }"
+                                    @click="layerGroupClickHandler(node, data)">
+                                    <div class="top-section">
                                         <div class="icon-container">
                                             <div class='icon' :style="{ backgroundImage: `url(${data.icon})` }"></div>
                                         </div>
@@ -38,10 +39,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="button-block" @click="filterButtonClickHandler(node, data)">
+                                <div class="button-block" @click="detailClickHandler(node, data)">
                                     <div class="btn">
-                                        {{ buttonText(data) }}
+                                        <!-- {{ buttonText(data) }} -->
                                     </div>
+                                </div>
+                            </div>
+
+                            <div class="feature-container" v-else-if="node.level == 3">
+                                <div class="feature-content" @click="featureClickHandler(node, data)">
+                                    {{ data.label }}
                                 </div>
                             </div>
                         </span>
@@ -50,70 +57,72 @@
             </div>
 
         </div>
+
+        <div class="test-zoom">{{ zoomValue }}</div>
     </dv-border-box9>
 </template>
 
 <script setup>
 import { BorderBox9 as DvBorderBox9, Decoration11 as DvDecoration11 } from '@kjgl77/datav-vue3'
 import { onMounted, ref, watch, computed } from 'vue';
-import { tree, scenes, layerGroups } from '../js/SCENES'
+import { getSideBarTree, getFirstShowLayerGroupIds, scenes, layerGroups } from '../js/SCENES'
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../store/mapStore';
 
+// test 
+import { i_gov_bounds, river_division_point, river_division_line } from '../js/tempData'
+import { loadImage } from '../../../utils/mapUtils';
+import { layerAddFunction, layerInitFunction } from '../layerUtil'
 
-const dataSource = ref(tree)
+const emit = defineEmits(['detailClick'])
+const dataSource = ref([])
 const mapStore = useMapStore()
 const sceneStore = useNewSceneStore()
 const sceneDict = {
-    '全江概貌': 0,
-    '工程情况': 1,
-    '重点岸段': 2,
+    '重点岸段': 0,
+    '全江概貌': 1,
+    '工程情况': 2,
 }
-const expandKey = ['全江概貌']
+const expandKey = ['重点岸段', '全江概貌']
+const zoomValue = ref(0)
+
+// const sceneClickHandler = (node, data) => {
+//     if (data.active) {
+//         data.active = false
+//         //移除
+//         let map = mapStore.getMap()
 
 
+//         let selectedSceneID = data.label
+//         sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
+//         sceneStore.SCENEMAP.value[selectedSceneID].hideScene()
+//         sceneStore.SCENEMAP.value[selectedSceneID].active = false
+//         for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+//             dataSource.value[sceneDict[selectedSceneID]].children[i].active = false
+//         }
 
-const buttonText = (data) => {
-    return data.filter ? '全体要素' : '重点要素'
-}
+//         const highlightLayer = useHighlightLayerStore().highlightLayers
+//         for (let i = 0; i < highlightLayer.length; i++) {
+//             map.getLayer(highlightLayer[i]) &&
+//                 map.removeLayer(highlightLayer[i])
+//         }
+//         return
+//     }
+//     else {
+//         data.active = true
+//         // 添加
+//         let map = mapStore.getMap()
 
-const sceneClickHandler = (node, data) => {
-    if (data.active) {
-        data.active = false
-        //移除
-        let map = mapStore.getMap()
+//         let selectedSceneID = data.label
+//         sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
+//         sceneStore.SCENEMAP.value[selectedSceneID].showScene()
+//         sceneStore.SCENEMAP.value[selectedSceneID].active = true
+//         for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
+//             dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
+//         }
+//         sceneStore.latestScene = selectedSceneID
 
-
-        let selectedSceneID = data.label
-        sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
-        sceneStore.SCENEMAP.value[selectedSceneID].hideScene()
-        sceneStore.SCENEMAP.value[selectedSceneID].active = false
-        for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-            dataSource.value[sceneDict[selectedSceneID]].children[i].active = false
-        }
-
-        const highlightLayer = useHighlightLayerStore().highlightLayers
-        for (let i = 0; i < highlightLayer.length; i++) {
-            map.getLayer(highlightLayer[i]) &&
-                map.removeLayer(highlightLayer[i])
-        }
-        return
-    }
-    else {
-        data.active = true
-        // 添加
-        let map = mapStore.getMap()
-
-        let selectedSceneID = data.label
-        sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
-        sceneStore.SCENEMAP.value[selectedSceneID].showScene()
-        sceneStore.SCENEMAP.value[selectedSceneID].active = true
-        for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-            dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
-        }
-        sceneStore.latestScene = selectedSceneID
-
-    }
-}
+//     }
+// }
 const layerGroupClickHandler = (node, data) => {
     if (data.active) {
         data.active = false
@@ -137,50 +146,83 @@ const layerGroupClickHandler = (node, data) => {
         // 添加
         let map = mapStore.getMap()
         let selectedLayerGroupID = data.label
+        console.log(selectedLayerGroupID);
+        console.log(sceneStore.LAYERGROUPMAP.value);
         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showFilteredLayer()
+        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
         sceneStore.latestLayerGroup = selectedLayerGroupID
 
     }
 }
-const filterButtonClickHandler = (node, data) => {
-    data.filter = !data.filter
-
-    let shouldFilter = data.filter
-    let selectedLayerGroupID = data.label
-    let map = mapStore.getMap()
-    sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-    if (shouldFilter) {
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].layerFilter()
-    } else sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].layerNoFilter()
+const detailClickHandler = (node, data) => {
+    // console.log(node, data);
+    emit('detailClick', data.label)
 }
+const featureClickHandler = (node, data) => {
+    console.log(node, data);
+}
+
+watch(() => mapStore.getMap(), async (newV, oldV) => {
+    console.log('init map firstly!', newV);
+    // 面、线、点、注记
+    let map = newV
+    // 面
+    await layerAddFunction(map, '大型湖泊')
+    await layerAddFunction(map, '区域水系')
+    await layerAddFunction(map, '市级行政区')
+    await layerAddFunction(map, '沿江码头')
+    await layerInitFunction(map, '水闸工程')
+    await layerAddFunction(map, '水库大坝')
+
+    // 线
+    await layerAddFunction(map, '长江干堤')
+    await layerAddFunction(map, '河道分段')
+    await layerAddFunction(map, '一级预警岸段')
+    await layerAddFunction(map, '二级预警岸段')
+    await layerAddFunction(map, '三级预警岸段')
+    await layerInitFunction(map, '过江通道-隧道/通道')
+    await layerInitFunction(map, '过江通道-桥墩')
+    await layerInitFunction(map, '过江通道-桥')
+    await layerAddFunction(map, '重点行政区边界')
+
+    // 点
+    await layerInitFunction(map, '水文站点')
+    await layerInitFunction(map, '水闸工程-重点')
+    await layerInitFunction(map, '泵站工程')
+    await layerInitFunction(map, '枢纽工程')
+    await layerAddFunction(map, '河道分段点')
+
+    // 注记
+    await layerAddFunction(map, '市级行政区-注记')
+    await layerAddFunction(map, '大型湖泊-注记')
+    await layerAddFunction(map, '区域水系-注记')
+    await layerAddFunction(map, '沿江码头-注记')
+    await layerAddFunction(map, '水库大坝-注记')
+
+    await layerAddFunction(map, '岸段-注记')
+    await layerInitFunction(map, '过江通道-桥-注记')
+    await layerInitFunction(map, '过江通道-隧道/通道-注记')
+    await layerInitFunction(map, '水文站点-注记')
+    await layerInitFunction(map, '水闸工程-注记')
+    await layerInitFunction(map, '泵站工程-注记')
+    await layerInitFunction(map, '枢纽工程-注记')
+
+    await layerAddFunction(map, '河道分段-注记')
+    await layerAddFunction(map, '河道分段点-注记')
+
+
+}, {
+    once: true
+})
+
 
 onMounted(async () => {
     sceneStore.SCENEMAP.value = scenes
     sceneStore.LAYERGROUPMAP.value = layerGroups
-    setTimeout(() => {
-        // wait for map init
-        dataSource.value[0].active = true
-        let mapInstance = mapStore.getMap()
-        let selectedSceneID = '全江概貌'
-        sceneStore.latestScene = selectedSceneID
-        sceneStore.SCENEMAP.value[selectedSceneID].setMap(mapInstance)
-        sceneStore.SCENEMAP.value[selectedSceneID].showScene()
-        sceneStore.SCENEMAP.value[selectedSceneID].active = true
-        for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-            dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
-        }
-    }, 2000)
-
-    window.addEventListener('keydown', (e) => {
-        // if(e.key == '1'){
-        //     expand.value = true
-        // }else{
-        //     expand.value = false
-        // }
-    })
-
+    dataSource.value = await getSideBarTree()
+    // let lg = getFirstShowLayerGroupIds()
+    // const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 })
 
 
@@ -354,6 +396,7 @@ div.sideBar-container {
                     justify-content: flex-start;
                     background: rgb(234, 244, 252);
                     position: relative;
+                    transition: .3s linear;
 
                     .icon-container {
                         position: relative;
@@ -373,28 +416,37 @@ div.sideBar-container {
 
                     .title {
                         position: relative;
-                        width: 50%;
+                        width: 70%;
                         height: 4vh;
 
                         .subScene-title-text {
                             color: rgb(20, 115, 196);
-                            font-size: calc(0.8vw + 0.8vh);
+                            font-size: calc(0.7vw + 0.6vh);
+                            font-weight: 600;
                             font-style: normal;
                             margin-left: 1vw;
                             line-height: 4vh;
                             font-family: 'Microsoft YaHei';
                         }
                     }
-
-
-
-                }
-
-                .top-section.active {
-                    background: linear-gradient(45deg, #C9E1F5, #5af4ff);
-
                 }
             }
+
+            .card.active {
+                // box-shadow: #cbeafd 10px 7px 20px 0px;
+                border: inset #C9E1F5 3px solid;
+
+                .top-section {
+                    background: rgb(26, 143, 245);
+
+                    .title {
+                        .subScene-title-text {
+                            color: rgb(234, 244, 252);
+                        }
+                    }
+                }
+            }
+
 
             .card.expand {
                 width: 100%;
@@ -408,48 +460,44 @@ div.sideBar-container {
                 height: 5vh;
                 display: flex;
                 justify-content: center;
+                align-items: center;
                 user-select: none;
 
                 .btn {
-                    background-color: rgb(195, 226, 245);
-                    border-radius: 10%;
-                    margin-left: 0.5vw;
-                    width: 90%;
-                    height: 90%;
-                    // line-height: 2.5vh;
-                    letter-spacing: 0.5vh;
-                    text-align: center;
-                    text-wrap: wrap;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    border-right: rgb(20, 115, 196) 2px solid;
-                    border-bottom: rgb(20, 115, 196) 4px solid;
-                    font-weight: bold;
-                    font-size: calc(0.5vw + 0.6vh);
-                    color: #0151a0;
+                    width: 3.8vh;
+                    height: 3.8vh;
+                    background-size: contain;
+                    background-image: url('/detail.png');
+                    transition: .3s linear;
 
-                    /* 初始阴影 */
                     &:hover {
                         cursor: pointer;
-                        border-right: rgb(20, 115, 196) 2px solid;
-                        border-bottom: rgb(20, 115, 196) 4px solid;
-                        transition: .3s;
-
-                    }
-
-                    &:active {
-                        cursor: pointer;
-                        border-right: rgb(20, 115, 196) 1px solid;
-                        border-bottom: rgb(20, 115, 196) 1px solid;
-                        transition: .3s;
+                        transform: scale(1.05);
                     }
                 }
-
-
-
             }
+        }
 
+        .feature-container {
+            width: 11vw;
+            height: 3vh;
+            display: flex;
+            flex-direction: row;
+            margin: 0.2vh;
+            padding-left: 0;
+            background-color: #C9E1F5;
+            border-radius: 5%;
+            border-color: #0a72c7;
+
+            .feature-content {
+                color: rgb(20, 115, 196);
+                font-size: calc(0.5vw + 0.5vh);
+                font-weight: 600;
+                font-style: normal;
+                margin-left: 0.5vw;
+                line-height: 3vh;
+                font-family: 'Microsoft YaHei';
+            }
         }
     }
 }
@@ -457,7 +505,7 @@ div.sideBar-container {
 :deep(.el-tree) {
 
     .el-tree-node__content {
-        height: 6vh;
+        height: fit-content;
     }
 
     .el-tree-node__content>.el-tree-node__expand-icon {
@@ -471,4 +519,14 @@ div.sideBar-container {
 
 
 }
-</style>
+
+.test-zoom {
+    position: absolute;
+    top: 0;
+    left: 20vw;
+    z-index: 100;
+    width: 5vw;
+    height: 3vh;
+    background-color: #ffffff;
+    color: black;
+}</style>

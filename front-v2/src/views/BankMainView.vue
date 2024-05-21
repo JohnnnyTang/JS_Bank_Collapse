@@ -103,8 +103,6 @@ onMounted(() => {
                 'line-opacity': 0.75,
             },
         })
-        // let data = (await axios.get(`http://localhost:5173/api/tile/vector/cityBoundary/info`)).data
-        // let pointgeoJson = convertToGeoJSON(data)
 
         map.addSource('District-point', {
             type: 'vector',

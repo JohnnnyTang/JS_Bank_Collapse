@@ -1690,71 +1690,71 @@ const getStyleJson = () => {
             },
         },
         layers: [
-            {
-                id: 'JiangSuBoundary-fill',
-                type: 'fill',
-                source: 'JiangSuBoundary',
-                layout: {
-                    visibility: 'visible',
-                },
-                paint: {
-                    'fill-color': 'rgb(216,241,247)',
-                    'fill-opacity': 1.0,
-                },
-            },
-            {
-                id: 'park_polygon',
-                type: 'fill',
-                source: 'offlineMapTiles',
-                minzoom: 0,
-                maxzoom: 22,
-                'source-layer': 'park',
-                layout: {
-                    visibility: 'visible',
-                },
-                paint: {
-                    'fill-color': 'hsl(204, 0%, 100%)',
-                    'fill-opacity': 1.0,
-                },
-                filter: ['==', '$type', 'Polygon'],
-            },
-            {
-                id: 'transportation_line',
-                type: 'line',
-                source: 'offlineMapTiles',
-                minzoom: 0,
-                maxzoom: 22,
-                'source-layer': 'transportation',
-                layout: {
-                    visibility: 'visible',
-                },
-                paint: {
-                    'line-color': 'hsl(207, 84%, 73%)',
-                    'line-width': 1,
-                    'line-opacity': 1.0,
-                },
-                filter: [
-                    'all',
-                    ['==', ['geometry-type'], 'LineString'],
-                    [
-                        'all',
-                        ['!', ['has', 'access']],
-                        [
-                            'match',
-                            ['get', 'class'],
-                            [
-                                'primary',
-                                'primary_construction',
-                                'secondary',
-                                'secondary_construction',
-                                'tertiary',
-                            ],
-                            true,
-                            false,
-                        ],
-                    ],
-                ],
-            },
+            // {
+            //     id: 'JiangSuBoundary-fill',
+            //     type: 'fill',
+            //     source: 'JiangSuBoundary',
+            //     layout: {
+            //         visibility: 'visible',
+            //     },
+            //     paint: {
+            //         'fill-color': 'rgb(216,241,247)',
+            //         'fill-opacity': 1.0,
+            //     },
+            // },
+            // {
+            //     id: 'park_polygon',
+            //     type: 'fill',
+            //     source: 'offlineMapTiles',
+            //     minzoom: 0,
+            //     maxzoom: 22,
+            //     'source-layer': 'park',
+            //     layout: {
+            //         visibility: 'visible',
+            //     },
+            //     paint: {
+            //         'fill-color': 'hsl(204, 0%, 100%)',
+            //         'fill-opacity': 1.0,
+            //     },
+            //     filter: ['==', '$type', 'Polygon'],
+            // },
+            // {
+            //     id: 'transportation_line',
+            //     type: 'line',
+            //     source: 'offlineMapTiles',
+            //     minzoom: 0,
+            //     maxzoom: 22,
+            //     'source-layer': 'transportation',
+            //     layout: {
+            //         visibility: 'visible',
+            //     },
+            //     paint: {
+            //         'line-color': 'hsl(207, 84%, 73%)',
+            //         'line-width': 1,
+            //         'line-opacity': 1.0,
+            //     },
+            //     filter: [
+            //         'all',
+            //         ['==', ['geometry-type'], 'LineString'],
+            //         [
+            //             'all',
+            //             ['!', ['has', 'access']],
+            //             [
+            //                 'match',
+            //                 ['get', 'class'],
+            //                 [
+            //                     'primary',
+            //                     'primary_construction',
+            //                     'secondary',
+            //                     'secondary_construction',
+            //                     'tertiary',
+            //                 ],
+            //                 true,
+            //                 false,
+            //             ],
+            //         ],
+            //     ],
+            // },
             {
                 id: 'water_polygon',
                 type: 'fill',
@@ -1766,7 +1766,7 @@ const getStyleJson = () => {
                     visibility: 'visible',
                 },
                 paint: {
-                    'fill-color': 'hsl(208, 79%, 62%)',
+                    'fill-color': 'rgb(171,225,249)',
                     'fill-opacity': 1,
                 },
                 filter: ['==', '$type', 'Polygon'],

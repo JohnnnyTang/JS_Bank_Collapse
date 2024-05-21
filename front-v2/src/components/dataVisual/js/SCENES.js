@@ -1,7 +1,10 @@
-import { layerAddFunction, layerRemoveFunction } from "../layerUtil"
+import { layerAddFunction, layerRemoveFunction, layerShowFunction, layerHideFunction } from "../layerUtil"
 import { useMapLayerStore } from "../../../store/mapStore"
 import { filterMap } from "./tilefieldMAP"
+import axios from "axios"
 
+
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const mapLayerStore = useMapLayerStore()
 class LayerGroup {
     constructor(title, layerIDs, map = undefined) {
@@ -21,8 +24,8 @@ class LayerGroup {
     async showLayer() {
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
-                await layerAddFunction(this.map, this.layerIDs[i])
-                mapLayerStore.layerState[this.layerIDs[i]].showing = true
+                await layerShowFunction(this.map, this.layerIDs[i])
+                // mapLayerStore.layerState[this.layerIDs[i]].showing = true
             }
             this.active = true
         } else {
@@ -33,8 +36,8 @@ class LayerGroup {
     async hideLayer() {
         if (this.map) {
             for (let i = 0; i < this.layerIDs.length; i++) {
-                layerRemoveFunction(this.map, this.layerIDs[i])
-                mapLayerStore.layerState[this.layerIDs[i]].showing = false
+                layerHideFunction(this.map, this.layerIDs[i])
+                // mapLayerStore.layerState[this.layerIDs[i]].showing = false
             }
             this.active = false
         } else {
@@ -138,7 +141,7 @@ class LayerScene {
     async showScene() {
         if (this.map) {
             for (let i = 0; i < this.LayerGroups.length; i++) {
-                await this.LayerGroups[i].showFilteredLayer()
+                await this.LayerGroups[i].showLayer()
             }
             this.active = true
         } else {
@@ -160,23 +163,25 @@ class LayerScene {
 
 const initLayerGroups = () => {
     const dict = {
-        '行政区划': ['省级行政区', '市级行政区', '市级行政区-注记'],
-        '河道分段': ['河道分段', '河道分段-注记'],
+        '行政区划': ['市级行政区', '市级行政区-注记', '重点行政区边界'],
+        '河道分段': ['河道分段', '河道分段-注记', '河道分段点', '河道分段点-注记'],
         '区域水系': ['区域水系', '区域水系-注记'],
         '大型湖泊': ['大型湖泊', '大型湖泊-注记'],
         '水文站点': ['水文站点', '水文站点-注记'],
-        '其他堤防': ['其他堤防', '其他堤防-注记'],
         '过江通道': ['过江通道-桥墩', '过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
         '沿江码头': ['沿江码头', '沿江码头-注记'],
         '水库大坝': ['水库大坝', '水库大坝-注记'],
-        '水闸工程': ['水闸工程', '水闸工程-注记'],
+        '水闸工程': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
         '泵站工程': ['泵站工程', '泵站工程-注记'],
         '枢纽工程': ['枢纽工程', '枢纽工程-注记'],
-        '长江干堤': ['长江干堤', '里程桩'],
-        '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记'],
+        '长江干堤': ['长江干堤'],
+        // '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记'],
         '历史崩岸': [],
         '近岸地形': ['近岸地形', '沙洲', '全江注记'],
         '近年冲淤': [],
+        '一级预警岸段': ['一级预警岸段'],
+        '二级预警岸段': ['二级预警岸段'],
+        '三级预警岸段': ['三级预警岸段'],
     }
     let map = new Map()
     for (let key in dict) {
@@ -190,10 +195,10 @@ let layerGroupInstanceMap = initLayerGroups()
 
 const initLayerScenes = () => {
     const dict = {
-        '全江概貌': ['行政区划', '河道分段', '区域水系', '大型湖泊', '水文站点'],
-        '工程情况': ['其他堤防', '过江通道', '沿江码头', '水库大坝', '水闸工程', '泵站工程', '枢纽工程', '长江干堤'],
+        '全江概貌': ['行政区划', '区域水系', '大型湖泊', '水文站点'],
+        '工程情况': ['过江通道', '沿江码头', '水库大坝', '水闸工程', '泵站工程', '枢纽工程', '长江干堤'],
         // '重点岸段': ['近岸地形', '历史崩岸', '岸段名录', '近年冲淤'],
-        '重点岸段': ['岸段名录']
+        '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段']
     }
     let map = new Map()
     for (let key in dict) {
@@ -218,7 +223,6 @@ const mapToObject = (mapObj) => {
 
 const scenes = mapToObject(initLayerScenes())
 const layerGroups = mapToObject(initLayerGroups())
-
 const tree = [
     {
         label: '全江概貌',
@@ -288,7 +292,7 @@ const tree = [
             {
                 label: '水库大坝',
                 icon: '/icons/水库大坝.png',
-                active: false,
+                active: true,
                 filter: true
             },
             {
@@ -474,6 +478,152 @@ const layerTree = [
     }
 ];
 
+const getSideBarTree = async () => {
+    let bankData = (await axios.get(tileServer + `/tile/vector/importantBank/info`)).data
+    let warning1 = {
+        label: '一级预警岸段',
+        active: true,
+        icon: '/icons/warn1.png',
+        children: []
+    }
+    let warning2 = {
+        label: '二级预警岸段',
+        icon: '/icons/warn2.png',
+        active: true,
+        children: []
+    }
+    let warning3 = {
+        label: '三级预警岸段',
+        icon: '/icons/warn3.png',
+        active: true,
+        children: []
+    }
+    for (let i = 0; i < bankData.length; i++) {
+        let item = bankData[i]
+        if (item['warning_level'] == 1) {
+            warning1.children.push({ label: item['bank_name'], active: false })
+        } else if (item['warning_level'] == 2) {
+            warning2.children.push({ label: item['bank_name'], active: false })
+        } else if (item['warning_level'] == 3) {
+            warning3.children.push({ label: item['bank_name'], active: false })
+        }
+    }
+
+    let tree = [
+        {
+            label: '重点岸段',
+            active: false,
+            children: [
+                warning1,
+                warning2,
+                warning3
+            ]
+        },
+        {
+            label: '全江概貌',
+            active: false,
+            children: [
+                {
+                    label: '行政区划',
+                    icon: '/icons/行政区划.png',
+                    active: true,
+                    filter: true
+                },
+                {
+                    label: '区域水系',
+                    icon: '/icons/流域水系.png',
+                    active: true,
+                    filter: true
+                },
+                {
+                    label: '大型湖泊',
+                    icon: '/icons/湖泊河流.png',
+                    active: true,
+                    filter: true
+                },
+                {
+                    label: '水文站点',
+                    icon: '/icons/水文站点.png',
+                    active: false,
+                    filter: true
+                }
+            ]
+        },
+        {
+            label: '工程情况',
+            active: false,
+            filter: true,
+            children: [
+                {
+                    label: '长江干堤',
+                    icon: '/icons/江堤港堤.png',
+                    active: true,
+                    filter: true
+                },
+                {
+                    label: '过江通道',
+                    icon: '/icons/过江通道.png',
+                    active: false,
+                    filter: true
+                },
+                {
+                    label: '沿江码头',
+                    icon: '/icons/沿江码头.png',
+                    active: true,
+                    filter: true
+                },
+                {
+                    label: '水库大坝',
+                    icon: '/icons/水库大坝.png',
+                    active: false,
+                    filter: true
+                },
+                {
+                    label: '水闸工程',
+                    icon: '/icons/水闸工程.png',
+                    active: false,
+                    filter: true
+                },
+                {
+                    label: '泵站工程',
+                    icon: '/icons/泵站工程.png',
+                    active: false,
+                    filter: true
+                },
+                {
+                    label: '枢纽工程',
+                    icon: '/icons/枢纽工程.png',
+                    active: false,
+                    filter: true
+                },
+            ]
+        },
+    ]
+
+    return tree
+}
+
+const getFirstShowLayerGroupIds = () => {
+    let layerGroups = [
+        "行政区划",
+        "河道分段",
+        "区域水系",
+        "大型湖泊",
+        // "水文站点",
+        // "过江通道",
+        "沿江码头",
+        // "水库大坝",
+        // "水闸工程",
+        // "泵站工程",
+        // "枢纽工程",
+        "长江干堤",
+        "一级预警岸段",
+        "二级预警岸段",
+        "三级预警岸段"
+    ]
+    return layerGroups
+}
+
 export {
     scenes,
     layerGroups,
@@ -481,5 +631,7 @@ export {
     initLayerGroups,
     tree,
     layerTree,
-    totalLayer
+    getSideBarTree,
+    totalLayer,
+    getFirstShowLayerGroupIds
 }

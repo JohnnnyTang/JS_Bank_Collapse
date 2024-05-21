@@ -1,14 +1,14 @@
 <template>
     <div class="data-visual-container">
         <div class="sideBar">
-            <sideBar></sideBar>
+            <sideBar @detailClick="detailClickHandler4layerGroup"></sideBar>
         </div>
         <div class="mapBase">
             <div ref="mapContainer" id="map"></div>
             <canvas id="GPUFrame"></canvas>
         </div>
         <div class="tools-container">
-            <div class="icon-container" v-for="i in 4" :key="i">
+            <div class="icon-container" v-for="i in 2" :key="i">
                 <div class="icon" :style="styles[i - 1]" @click="toolClick(i - 1)"
                     :class="{ 'active': activeStatus[i - 1] }">
                 </div>
@@ -16,19 +16,52 @@
         </div>
 
 
-        <div class="search-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        <!-- <div class="search-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <featSearch @close="closeHandler" @featureInfo="selectFeatureHandler"></featSearch>
-        </div>
-        <div class="layer-pos" v-show="activeStatus[1]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        </div> -->
+        <!-- <div class="layer-pos" v-show="activeStatus[1]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <layerCtrl @close="closeHandler"></layerCtrl>
-        </div>
-        <div class="legend-pos" v-show="activeStatus[2]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
-            <mapLegend @close="closeHandler" :legendList="legendList"></mapLegend>
+        </div> -->
+        <div class="legend-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+            <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-draggable="{ bounds: 'body' }" v-show="showDetail">
+        <!-- <div class="featDetail" v-draggable="{ bounds: 'body' }" v-show="showDetail">
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
                 @close="closeHandlerr"></featDetail>
+        </div> -->
+
+
+        <div class="infomation-pannel" v-show="true" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+            <el-tabs type="border-card" class="demo-tabs">
+                <el-tab-pane label="重点要素">
+                    <div class="important-feature">
+                        <el-table :data="tableData" style="width: 10vw">
+                            <!-- <el-table-column prop="date" label="Date"/>
+                            <el-table-column prop="name" label="Name"/>
+                            <el-table-column prop="address" label="Address" /> -->
+                        </el-table>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane label="要素查询">
+                    <div class="feature-search">
+                        <div class="e-input">
+                            <span class="text">要素检索</span>
+                            <el-input v-model="filterText" style="width: 13vw" placeholder="请输入关键词" />
+                        </div>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
+
+
+        <div class="hydro-pannel">
+            <div class="title"> 实时水文信息</div>
+            <el-table :data="waterTableData" border style="width: 100%">
+                <el-table-column prop="station" label="站点" />
+                <el-table-column prop="flow" label="流量" />
+                <el-table-column prop="level" label="水位" />
+            </el-table>
         </div>
 
     </div>
@@ -55,17 +88,45 @@ import axios from 'axios';
 const mapContainer = ref()
 const mapStore = useMapStore()
 const sceneStore = useNewSceneStore()
-const activeStatus = ref([false, false, false])
+const activeStatus = ref([false, false])
 const styles = [
-    { backgroundImage: `url('/icons/searching.png')` },
-    { backgroundImage: `url('/icons/layers.png')` },
+    // { backgroundImage: `url('/icons/searching.png')` },
+    // { backgroundImage: `url('/icons/layers.png')` },
     { backgroundImage: `url('/icons/legend.png')` },
     { backgroundImage: `url('/icons/full.png')` },
 ]
 const featureInfo = ref({})
 const showDetail = ref(false)
 const legendList = ref([])
-const t = ref('123')
+const tableData = [
+    {
+        date: '2016-05-03',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
+    {
+        date: '2016-05-02',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
+    {
+        date: '2016-05-04',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
+    {
+        date: '2016-05-01',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
+]
+const waterTableData = [
+    {
+        station: '大通站',
+        flow: '无数据',
+        level: '无数据',
+    },
+]
 
 watch(() => sceneStore.latestScene, (val) => {
     if (val == '重点岸段') {
@@ -74,7 +135,6 @@ watch(() => sceneStore.latestScene, (val) => {
 
     } else if (val == '工程情况') {
         activeStatus.value[2] = true
-        // 展示过江通道图例
         legendList.value = legendMap['工程情况']
     }
     else if (val == '全江概貌') {
@@ -82,13 +142,23 @@ watch(() => sceneStore.latestScene, (val) => {
         legendList.value = legendMap['全江概貌']
     }
 })
-// watch(() => sceneStore.latestLayerGroup, (val) => {
-//     console.log(val);
-// })
+
+const detailClickHandler4layerGroup = (lable) => {
+    let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
+    let infoLayer = layers.filter((item) => {
+        if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩')) {
+            return false
+        } return true
+    })
+    let data = []
+    for (let i = 0; i < infoLayer.length; i++) {
+
+    }
+}
 
 // methods
 const toolClick = (i) => {
-    if (i == 3) { //zoom
+    if (i == 1) { //zoom
         mapFlyToRiver(mapStore.getMap())
         return;
     }
@@ -97,17 +167,17 @@ const toolClick = (i) => {
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
-        [[118.75395171066617, 31.191536515956685],
-        [121.94881134428226, 32.68858659779259],],
+        [[117.66436591731372, 30.72331549710475],
+        [123.46755554741532, 33.43809328513673],],
         { pitch: 0, duration: 1500, },
     )
 }
 const closeHandler = (index) => {
     activeStatus.value[index] = false
 }
-const closeHandlerr = () => {
-    showDetail.value = false
-}
+// const closeHandlerr = () => {
+//     showDetail.value = false
+// }
 const selectFeatureHandler = (info) => {
     console.log(info);
     let sourceid = info.sourceId
@@ -194,7 +264,7 @@ onUnmounted(() => {
             width: 100%;
             height: 100%;
             z-index: 0;
-            background-color: hsl(194, 69%, 91%);
+            background-color: hsl(180, 7%, 94%);
         }
 
         #GPUFrame {
@@ -211,7 +281,7 @@ onUnmounted(() => {
         bottom: 0;
         right: 0;
         width: 4vw;
-        height: 30vh;
+        height: 18vh;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
@@ -274,6 +344,110 @@ onUnmounted(() => {
         z-index: 2;
         left: 20vw;
         top: 10vh;
+    }
+
+    div.infomation-pannel {
+        position: absolute;
+        z-index: 2;
+        left: 20vw;
+        top: 20vh;
+
+        div.important-feature {
+            width: 10vw;
+            height: 30vh;
+
+        }
+
+        div.feature-search {
+            .e-input {
+                width: 18vw;
+                height: 4vh;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                transform: translateY(-20%);
+                scale: 1.0;
+            }
+
+            .tree-container {
+                position: relative;
+                width: 10vw;
+                height: 20vh;
+                padding-left: 1vw;
+                padding-bottom: 1vh;
+                padding-top: 0.5vh;
+                box-shadow: rgb(201, 230, 255) 0px 0px 5px 3px inset;
+                border-radius: 1%;
+                overflow-y: auto;
+                overflow-x: auto;
+
+                .feature-desc {
+                    height: 3vh;
+                    text-align: left;
+                }
+
+                :deep(.el-tree) {
+                    background-color: rgb(239, 247, 253);
+                    height: 24vh;
+                    overflow-y: auto;
+                    overflow-x: auto;
+
+                    &::-webkit-scrollbar {
+                        width: 5px;
+                    }
+
+                    &::-webkit-scrollbar-track {
+                        background-color: rgba(162, 168, 168, 0.219);
+                    }
+
+                    &::-webkit-scrollbar-thumb {
+                        background-color: rgb(94, 164, 250);
+                        border-radius: 5px;
+                    }
+
+                    &::-webkit-scrollbar-thumb:hover {
+                        background-color: rgb(48, 136, 243);
+                    }
+
+
+
+                }
+
+
+
+                .custom-tree-node {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding-right: 8px;
+
+                    .text {
+                        font-size: calc(0.6vw + 0.4vh);
+                        color: rgb(19, 70, 147);
+                        font-weight: 500;
+                        font-family: 'Microsoft YaHei';
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    div.hydro-pannel {
+        position: absolute;
+        z-index: 2;
+        right: 5vw;
+        top: 0vh;
+        padding: calc(0.1vw + 0.1vh);
+        background-color: aliceblue;
+        .title{
+            border-bottom: rgb(41, 40, 40) 1px solid;
+            font-weight: bold;
+            font-size: calc(0.7vw + 0.5vh);
+            line-height: 3vh;
+        }
     }
 
 }
