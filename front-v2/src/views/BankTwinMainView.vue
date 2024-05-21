@@ -7,8 +7,12 @@
         </div>
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
-                    @change='viewChangeClick'></e-tab>
+                <e-tab
+                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
+                    :items="items"
+                    :columns="2"
+                    @change="viewChangeClick"
+                ></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -18,24 +22,42 @@
         <DeviceWarn /> -->
 
         <div class="marquee-container" v-loading="warnLoading">
-            <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }">
-                    <div class="no-warn-block" v-if="warningList.length == 0"
-                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
+            <DvBorderBox12 backgroundColor="rgb(0, 32, 140)">
+                <div
+                    class="marquee-block"
+                    ref="marqueeBlockDom"
+                    :style="{ animationDuration: animateTime }"
+                    style="animation-iteration-count: infinite;"
+                >
+                    <div
+                        class="no-warn-block"
+                        v-if="warningList.length == 0"
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff"
+                    >
                         {{ `近一小时内无报警信息` }}
                     </div>
-                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
-                        <div style="
+                    <div
+                        v-else
+                        class="warn-block"
+                        v-for="(warningString, index) in warningList"
+                        :key="index"
+                    >
+                        <div
+                            style="
                                 background-size: contain;
                                 background-image: url('/icons/warning.png');
                                 width: 3vh;
                                 height: 3vh;
-                            "></div>
-                        <div style="
+                            "
+                        ></div>
+                        <div
+                            style="
                                 font-size: calc(0.7vw + 1vh);
-                                color: #e7f2ff;
+                                color: rgb(254, 14, 11);
                                 margin-left: 0.5vw;
-                            ">
+                                font-weight: bold;
+                            "
+                        >
                             {{ warningString }}
                         </div>
                     </div>
@@ -53,66 +75,99 @@
                 <div class="monitor-legend-item GNSS">
                     <div class="item-title">
                         <span>{{ gnssLegendInfo.text1 }}</span>
-                        <span style="font-weight: bold">{{ gnssLegendInfo.strong }}</span>
+                        <span style="font-weight: bold">{{
+                            gnssLegendInfo.strong
+                        }}</span>
                         <span>{{ gnssLegendInfo.text2 }}</span>
                     </div>
-                    <div style="display: flex; flex-direction: row;">
+                    <div style="display: flex; flex-direction: row">
                         <div class="legend-block">
-                            <div class="icon-block GNSS-icon" :style="{ backgroundImage: `url(${gnssLegendInfo.icon1})` }">
-                            </div>
-                            <span style="
-                                text-align: center;
-                                width: 100%;
-                                display: block;
-                                line-height: 2.5vh;
-                                color: rgb(16,71,165);
-                                text-shadow: #7388c148 1px 1px 0;
-                            ">
-                                {{ gnssLegendInfo.device1 }}</span>
+                            <div
+                                class="icon-block GNSS-icon"
+                                :style="{
+                                    backgroundImage: `url(${gnssLegendInfo.icon1})`,
+                                }"
+                            ></div>
+                            <span
+                                style="
+                                    text-align: center;
+                                    width: 100%;
+                                    display: block;
+                                    line-height: 2.5vh;
+                                    color: rgb(16, 71, 165);
+                                    text-shadow: #7388c148 1px 1px 0;
+                                "
+                            >
+                                {{ gnssLegendInfo.device1 }}</span
+                            >
                         </div>
                         <div class="legend-block">
-                            <div class="icon-block GNSS-icon" :style="{ backgroundImage: `url(${gnssLegendInfo.icon2})` }">
-                            </div>
-                            <span style="
-                                text-align: center;
-                                width: 100%;
-                                display: block;
-                                line-height: 2.5vh;
-                                color: rgb(16,71,165);
-                                text-shadow: #7388c148 1px 1px 0;
-                            ">
-                                {{ gnssLegendInfo.device2 }}</span>
+                            <div
+                                class="icon-block GNSS-icon"
+                                :style="{
+                                    backgroundImage: `url(${gnssLegendInfo.icon2})`,
+                                }"
+                            ></div>
+                            <span
+                                style="
+                                    text-align: center;
+                                    width: 100%;
+                                    display: block;
+                                    line-height: 2.5vh;
+                                    color: rgb(16, 71, 165);
+                                    text-shadow: #7388c148 1px 1px 0;
+                                "
+                            >
+                                {{ gnssLegendInfo.device2 }}</span
+                            >
                         </div>
                     </div>
-
                 </div>
                 <!-- others -->
-                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
+                <div
+                    v-for="(item, index) in legendList"
+                    :key="index"
+                    class="monitor-legend-item"
+                >
                     <div class="item-title">
                         <span>{{ item.text1 }}</span>
                         <span style="font-weight: bold">{{ item.strong }}</span>
                         <span>{{ item.text2 }}</span>
                     </div>
                     <div class="legend-block">
-                        <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
-                        <span style="
+                        <div
+                            class="icon-block"
+                            :style="{ backgroundImage: `url(${item.icon})` }"
+                        ></div>
+                        <span
+                            style="
                                 text-align: center;
                                 width: 100%;
                                 display: block;
                                 line-height: 2.5vh;
-                                color: rgb(16,71,165);
+                                color: rgb(16, 71, 165);
                                 text-shadow: #7388c148 1px 1px 0;
-                            ">
-                            {{ item.device }}</span>
+                            "
+                        >
+                            {{ item.device }}</span
+                        >
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="warn-detail-container" :class="warnActive ? 'active' : 'in-active'" v-loading="detailLoading">
-            <div class="warn-detail-title">预警信息详情</div>
+        <div
+            class="warn-detail-container"
+            :class="warnActive ? 'active' : 'in-active'"
+            v-loading="detailLoading"
+        >
+            <div class="warn-detail-title">报警信息详情</div>
             <div class="warn-detail-content">
-                <div class="key-val-container" v-for="(item, index) in warnKeyValList" :key="index">
+                <div
+                    class="key-val-container"
+                    v-for="(item, index) in warnKeyValList"
+                    :key="index"
+                >
                     <div class="key-text">{{ item.key + '：' }}</div>
                     <el-scrollbar>
                         <div class="val-text">{{ item.val }}</div>
@@ -121,11 +176,26 @@
             </div>
         </div>
 
+        <div class="warn-status-container" v-loading="warnLoading">
+            <div class="warn-status-title">民主沙右缘状态</div>
+            <div
+                class="warn-status-content"
+                :class="statusText == '正常' ? 'normal' : 'warn'"
+            >
+                {{ statusText }}
+            </div>
+        </div>
+
         <WarnHistoryTable :warnActive="warnActive" />
 
-        <div class="map-container" id="map" style="z-index: 2;" ref="mapDom"></div>
-        <canvas id="GPUFrame" class="GPU" style="z-index: 2;"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 2;"></canvas>
+        <div
+            class="map-container"
+            id="map"
+            style="z-index: 2"
+            ref="mapDom"
+        ></div>
+        <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
+        <!-- <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 2;"></canvas> -->
     </div>
 </template>
 
@@ -169,6 +239,7 @@ const warnInfoStore = useWarnInfoStore()
 const token = ref(
     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
 )
+const statusText = ref('正常')
 
 // custome layer
 /**
@@ -176,8 +247,8 @@ const token = ref(
  */
 let unityLayer
 /**
-* @type {customLayers.MaskLayer}
-*/
+ * @type {customLayers.MaskLayer}
+ */
 let maskLayer
 
 const items = ref([
@@ -272,37 +343,41 @@ const mapFlyToRiver = (mapIns) => {
         ],
         {
             // pitch: 32.45,
-            duration: 1500,
+            duration: 1000,
             // zoom: 8,
         },
     )
-
 }
 
 const viewChangeClick = (value) => {
-    console.log('view Change!', value);
+    console.log('view Change!', value)
     let map = useMapStore().getMap()
-    if (!map) ElMessage({
-        'type': 'warning',
-        'message': '请等待地图加载后重试'
-    })
+    if (!map)
+        ElMessage({
+            type: 'warning',
+            message: '请等待地图加载后重试',
+        })
     if (value == '2d') {
-
         unityLayer && unityLayer.remove()
         map.getLayer('Mask-Layer') && map.removeLayer('Mask-Layer')
         map.getLayer('Unity-Layer') && map.removeLayer('Unity-Layer')
-
+        mapFlyToRiver(map)
     } else if (value == '3d') {
-        const script = document.createElement('script');
-        script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
+        const script = document.createElement('script')
+        script.src =
+            '/scratchSomething/unity/collapseBank/build/output.loader.js'
         script.onload = async () => {
-            console.log('output.loader.js imported');
-            unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
+            console.log('output.loader.js imported')
+            unityLayer = new customLayers.UnityLayer(
+                [120.556596, 32.042607],
+                0,
+                unityCanvaDom.value,
+            )
             maskLayer = new customLayers.MaskLayer()
             map.addLayer(unityLayer)
             map.addLayer(maskLayer)
-        };
-        document.head.appendChild(script);
+        }
+        document.head.appendChild(script)
     }
 }
 // const resizeObserver = new ResizeObserver((entries) => {
@@ -352,6 +427,7 @@ const updateWarnInfoDesc = async () => {
         `
         WARN_TEXT.push(warnString)
     }
+    statusText.value = "报警"
     warnLoading.value = false
     warnKeyValList.value[2].val = unique(deviceNameList).join(',')
     warnKeyValList.value[1].val = unique(warnTimeList).join(',')
@@ -361,7 +437,7 @@ const updateWarnInfoDesc = async () => {
     warnActive.value = true
 
     const marqueeBlockWidth = marqueeBlockDom.value.offsetWidth
-    animateTime.value = `${marqueeBlockWidth}s`
+    animateTime.value = `${marqueeBlockWidth / 2}s`
 }
 
 onMounted(async () => {
@@ -385,8 +461,6 @@ onMounted(async () => {
     mapFlyToRiver(map)
     useMapStore().setMap(map)
     await mapInit(map, true)
-
-
 
     // map.on('load', async () => {
     //     // console.log('map loaded!!!')
@@ -438,6 +512,9 @@ onMounted(async () => {
     //     console.log('get key')
     //     token.value = videoAccessKey.data.accessToken
     // }
+    setTimeout(() => {
+        warnLoading.value = false
+    }, 1000);
 })
 
 onUnmounted(() => {
@@ -678,8 +755,6 @@ div.twin-main-container {
                     }
                 }
             }
-
-
         }
 
         div.button-block {
@@ -702,17 +777,16 @@ div.twin-main-container {
                 cursor: pointer;
                 border-right: #a4bfff 2px solid;
                 border-bottom: #a4bfff 4px solid;
-                transition: .3s;
+                transition: 0.3s;
             }
 
             &:active {
                 cursor: pointer;
                 border-right: #a4bfff 1px solid;
                 border-bottom: #a4bfff 1px solid;
-                transition: .3s;
+                transition: 0.3s;
             }
         }
-
     }
 
     div.monitor-legend-container {
@@ -807,9 +881,6 @@ div.twin-main-container {
                         // transform: translateY(16%);
                     }
                 }
-
-
-
             }
 
             div.GNSS {
@@ -1033,11 +1104,59 @@ div.twin-main-container {
                                 rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
                         }
 
-                        box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
-                        rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
-                        rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                        box-shadow:
+                            rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                            rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                            rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
                     }
                 }
+            }
+        }
+    }
+
+    div.warn-status-container {
+        position: absolute;
+        left: 45vw;
+        top: 10vh;
+        width: 10vw;
+        height: 10vh;
+
+        background-color: #000cbbd5;
+        backdrop-filter: blur(8px);
+        z-index: 3;
+        border-radius: 6px;
+        text-align: center;
+        overflow: hidden;
+
+        box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+
+        div.warn-status-title {
+            height: 4vh;
+            line-height: 4vh;
+            width: 10vw;
+            font-size: calc(0.8vw + 0.3vh);
+            font-weight: bold;
+            color: #e3f9ff;
+            box-shadow: 0px 2px rgb(0, 225, 255);
+        }
+
+        div.warn-status-content {
+            height: 6vh;
+            line-height: 6vh;
+            width: 10vw;
+            font-size: calc(1.1vw + 0.8vh);
+            font-weight: bold;
+            // background-color: #2688f8;
+            color: #ebf8ff;
+            text-align: cen;
+            letter-spacing: 1rem;
+            text-indent: 1rem;
+            &.normal {
+                background-color: #28bd03;
+            }
+
+            &.warn {
+                background-color: rgb(209, 15, 15);
             }
         }
     }

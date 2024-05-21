@@ -89,4 +89,15 @@
     <insert id="save" parameterType="com.johnny.bank.model.resource.dataResource.DeviceWarning">
         INSERT INTO device_warning(device_id,device_code,warn_time,warn_value) VALUES (#{deviceId},#{deviceCode},#{warnTime},#{threeDiff});
     </insert>
+
+    <select id="findById" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE id = #{id};
+    </select>
+
+    <update id="updateWarnDealtStatus">
+        UPDATE device_warning
+        SET if_dealt = #{dealt}
+        WHERE id=#{id}
+    </update>
+
 </mapper>

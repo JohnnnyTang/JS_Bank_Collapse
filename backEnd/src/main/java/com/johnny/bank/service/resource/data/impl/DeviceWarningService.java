@@ -314,4 +314,13 @@ public class DeviceWarningService implements IDeviceWarningService {
         return iDeviceWarningRepo.getTotalDangerCountOfDevice(deviceCode);
     }
 
+    public DeviceWarning updateDeviceDealtWithId(String id, Integer dealt) {
+        DeviceWarning deviceWarning = iDeviceWarningRepo.findById(id);
+        if(deviceWarning == null) return null;
+
+        iDeviceWarningRepo.updateWarnDealtStatus(id, dealt);
+        deviceWarning.setIfDealt(dealt);
+        return deviceWarning;
+    }
+
 }

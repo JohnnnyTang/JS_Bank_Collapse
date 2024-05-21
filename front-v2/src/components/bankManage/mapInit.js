@@ -544,10 +544,10 @@ const mapInit = async (map, vis) => {
         })
 
         setTimeout(() => {
-            warnInterval(map, 60)
+            warnInterval(map, 30)
         }, 500)
         setInterval(() => {
-            warnInterval(map, 60)
+            warnInterval(map, 30)
         }, 60 * 1000 * 20);
         // request per 20minutes 
 
@@ -635,8 +635,8 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
 
     // warning
     const popup = createWarningPopup({ warningInfo: warnData })
+    console.log("warn pop", warnData)
     popup.setLngLat([property.longitude, property.latitude]).addTo(map)
-
 
     map.on('render', () => {
         map.triggerRepaint()
@@ -670,7 +670,8 @@ const createPopUp = (deviceProperty, zoom) => {
 
 const createWarningPopup = (info) => {
     // const ap = createApp(warningPop, { warningInfo: info })
-    const ap = createApp(warningPopup)
+    console.log('warn info', info)
+    const ap = createApp(warningPopup, info)
 
     const container = document.createElement('div')
     const componentInstance = ap.mount(container)

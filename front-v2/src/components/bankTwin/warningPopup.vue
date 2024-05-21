@@ -3,7 +3,8 @@
 
         <div class="main">
             <div class="icon"></div>
-            <div class="text titletext">警告</div>
+            <div class="text title-text">报警</div>
+            <div class="text time-text">{{ props.warningInfo.warnTime }}</div>
         </div>
 
         <div class="arrow"></div>
@@ -14,7 +15,14 @@
 import { computed, onMounted } from 'vue';
 const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 
+const props = defineProps({
+    warningInfo: {
+        type: Object
+    }
+})
+
 onMounted(() => {
+    console.log('wqe123', props.warningInfo)
 })
 
 
@@ -23,14 +31,14 @@ onMounted(() => {
 <style lang="scss" scoped>
 .warning-card {
     position: relative;
-    width: 3vw;
+    width: 4vw;
     height: 6vh;
     user-select: none;
 
     div.main {
         position: relative;
-        width: 3vw;
-        height: 6vh;
+        width: 4vw;
+        height: 8vh;
         background-color: rgb(237, 239, 224);
         box-shadow: rgb(255, 193, 160) 0px 0px 25px 3px inset;
         border-radius: 5%;
@@ -47,32 +55,32 @@ onMounted(() => {
             background-size: contain;
             background-repeat: no-repeat;
             background-image: url('/alarm.png');
+            background-position: 50% 50%;
             animation: warn .8s linear infinite;
         }
 
-        .titletext {
-            line-height: 3vh;
+        .title-text {
+            line-height: 2.6vh;
+            height: 2,6vh;
+            font-weight: bold;
             font-size: calc(0.6vw + 0.6vh);
-            color: rgb(253, 75, 75);
+            color: rgb(255, 0, 0);
         }
 
-
-
+        .time-text {
+            line-height: 1vh;
+            height: 2vh;
+            text-align: center;
+            color: rgb(253, 75, 75);
+            font-size: calc(0.4vw + 0.2vh);
+        }
     }
 
-
-    div.text {
-        line-height: 4vh;
-        font-family: "Trebuchet MS", Helvetica, sans-serif;
-        font-weight: 600;
-
-
-    }
 
     div.arrow {
         position: absolute;
-        left: 30%;
-        bottom: -1vh;
+        left: 36%;
+        bottom: -3vh;
         width: 0;
         height: 0;
         border-left: 10px solid transparent;
@@ -86,13 +94,13 @@ onMounted(() => {
 
     0%,
     100% {
-        margin-top: 0.5vh;
+        // margin-top: 0.5vh;
         transform: scale(1.0);
     }
 
     50% {
         // margin-top: 0.3vh;
-        transform: scale(1.1);
+        transform: scale(0.9);
     }
 }
 </style>

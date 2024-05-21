@@ -39,4 +39,8 @@ public interface IDeviceWarningRepo {
     void save(DeviceWarning deviceWarning);
 
     List<DeviceWarning> findByDeviceCode(String deviceCode);
+
+    DeviceWarning findById(String id);
+
+    void updateWarnDealtStatus(String id, Integer dealt);
 }

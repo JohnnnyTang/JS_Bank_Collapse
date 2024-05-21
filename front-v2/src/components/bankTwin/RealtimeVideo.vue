@@ -21,7 +21,7 @@
 import { onMounted, ref, onUnmounted, watch } from 'vue'
 
 const token = ref(
-    'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
+    'at.8z5xddvs305hvthb5emtqno22k38c3s0-6bgwm8993s-0llo4pp-mc0rbdnna',
 )
 
 const props = defineProps({

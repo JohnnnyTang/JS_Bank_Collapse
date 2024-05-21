@@ -1,11 +1,7 @@
 package com.johnny.bank.controller.resource.data;
 
-import com.johnny.bank.controller.resource.data.base.AbstractMonitorDataController;
-import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.DeviceWarning;
-import com.johnny.bank.model.resource.dataResource.base.MonitorData;
 import com.johnny.bank.service.resource.data.impl.DeviceWarningService;
-import com.johnny.bank.service.resource.data.impl.MonitorDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -265,6 +261,15 @@ public class DeviceWarningController {
 //        MonitorInfo monitorInfo = monitorInfoService.getDataById(monitorInfoService.getDataNode(), id);
 //        if(monitorInfo == null) return null;
         return ResponseEntity.ok(deviceWarningService.getByDeviceCode(id));
+    }
+
+    @PutMapping("/id/{id}/deal/{dealt}")
+    public ResponseEntity<DeviceWarning> updateDealtByMonitorId(
+            @PathVariable String id, @PathVariable Integer dealt
+    ) {
+//        MonitorInfo monitorInfo = monitorInfoService.getDataById(monitorInfoService.getDataNode(), id);
+//        if(monitorInfo == null) return null;
+        return ResponseEntity.ok(deviceWarningService.updateDeviceDealtWithId(id, dealt));
     }
 
 }

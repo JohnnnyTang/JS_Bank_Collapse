@@ -49,7 +49,8 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        component: () => import("../views/BankMainView.vue")
+        redirect: '/dataVisual'
+        // component: () => import("../views/BankMainView.vue")
     },
     {
         path: '/main',
