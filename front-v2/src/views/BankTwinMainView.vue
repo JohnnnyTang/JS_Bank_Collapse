@@ -34,7 +34,7 @@
                         v-if="warningList.length == 0"
                         style="font-size: calc(0.7vw + 1vh); color: #e7f2ff"
                     >
-                        {{ `近一小时内无报警信息` }}
+                        {{ `暂无报警信息` }}
                     </div>
                     <div
                         v-else
@@ -156,26 +156,6 @@
             </div>
         </div>
 
-        <div
-            class="warn-detail-container"
-            :class="warnActive ? 'active' : 'in-active'"
-            v-loading="detailLoading"
-        >
-            <div class="warn-detail-title">报警信息详情</div>
-            <div class="warn-detail-content">
-                <div
-                    class="key-val-container"
-                    v-for="(item, index) in warnKeyValList"
-                    :key="index"
-                >
-                    <div class="key-text">{{ item.key + '：' }}</div>
-                    <el-scrollbar>
-                        <div class="val-text">{{ item.val }}</div>
-                    </el-scrollbar>
-                </div>
-            </div>
-        </div>
-
         <div class="warn-status-container" v-loading="warnLoading">
             <div class="warn-status-title">民主沙右缘状态</div>
             <div
@@ -185,7 +165,7 @@
                 {{ statusText }}
             </div>
         </div>
-
+        <BanWarnDetail :warnActive="warnActive"  v-loading="warnLoading"/>
         <WarnHistoryTable :warnActive="warnActive" />
 
         <div
@@ -195,22 +175,20 @@
             ref="mapDom"
         ></div>
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
-        <!-- <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 2;"></canvas> -->
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 2;"></canvas>
     </div>
 </template>
 
 <script setup>
 import router from '../router'
-import { onMounted, ref, onUnmounted, watch, computed } from 'vue'
-import mapboxgl from 'mapbox-gl'
+import { onMounted, ref, onUnmounted, watch, computed, nextTick } from 'vue'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
 import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
-// import SectionRisk from '../components/bankTwin/SectionRisk.vue'
-// import DeviceWarn from '../components/bankTwin/DeviceWarn.vue'
+import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
@@ -410,8 +388,16 @@ const updateWarnInfoDesc = async () => {
     console.log('warnInfo! ', warnInfo)
     let deviceNameList = []
     let warnTimeList = []
+    console.log('print warn info', warnInfo)
+    if(warnInfo.length == 0) {
+        statusText.value = '正常'
+    }
+    else {
+        statusText.value = "报警"
+    }
 
     for (let i = 0; i < warnInfo.length; i++) {
+        console.log('build warn', warnInfo[i])
         // 报警设备信息
         let deviceId = warnInfo[i].deviceId
         deviceNameList.push(gnssIdMap[warnInfo[i].deviceId])
@@ -427,17 +413,18 @@ const updateWarnInfoDesc = async () => {
         `
         WARN_TEXT.push(warnString)
     }
-    statusText.value = "报警"
     warnLoading.value = false
-    warnKeyValList.value[2].val = unique(deviceNameList).join(',')
-    warnKeyValList.value[1].val = unique(warnTimeList).join(',')
+    warnKeyValList.value[2].val = deviceNameList.join(',')
+    warnKeyValList.value[1].val = warnTimeList.join(',')
     warnKeyValList.value[5].val = '是'
 
     warningList.value = WARN_TEXT
     warnActive.value = true
-
+    // 第一次是没有初始化完的长度 所以很快 实际上很长
+    await nextTick()
+    console.log('123123 length: ', marqueeBlockDom.value.offsetWidth)
     const marqueeBlockWidth = marqueeBlockDom.value.offsetWidth
-    animateTime.value = `${marqueeBlockWidth / 2}s`
+    animateTime.value = `${marqueeBlockWidth / warnInfo.length / 10}s`
 }
 
 onMounted(async () => {
@@ -462,47 +449,6 @@ onMounted(async () => {
     useMapStore().setMap(map)
     await mapInit(map, true)
 
-    // map.on('load', async () => {
-    //     // console.log('map loaded!!!')
-    //     mapFlyToRiver(map)
-    //     useMapStore().setMap(map)
-    //     // map.addSource('ptVector', {
-    //     //     type: 'vector',
-    //     //     tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
-    //     // })
-    //     // map.addSource('test', {
-    //     //     type: 'vector',
-    //     //     tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
-    //     // })
-    //     await mapInit(map, true)
-    //     // map.ads
-
-    //     // map.addLayer({
-    //     //     id: '点2',
-    //     //     type: 'symbol',
-    //     //     source: 'test',
-    //     //     'source-layer': 'default',
-    //     //     layout: {
-    //     //         'text-field': ['get', 'label'],
-    //     //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-    //     //         // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-    //     //         'text-offset': [-1.0, 1.15],
-    //     //         'text-anchor': 'top',
-    //     //         'text-size': 16,
-    //     //         'text-allow-overlap': true
-    //     //     },
-    //     //     paint: {
-    //     //         'text-color': 'rgb(0, 22, 145)',
-    //     //     },
-    //     // })
-
-    //     // map.on('click', (e) => {
-    //     //     console.log(map.queryRenderedFeatures([e.point.x, e.point.y]))
-
-    //     // })
-
-    //     // resizeObserver.observe(containerDom.value)
-    // })
 
     // const videoAccessKey = (await axios.post(
     //     'https://open.ys7.com/api/lapp/token/get?appKey=d228a2fab09d4c879b4449c356bbd90d&appSecret=0c46042ef59aed43c4eddbb80d637369',

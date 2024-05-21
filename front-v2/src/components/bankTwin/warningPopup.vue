@@ -33,6 +33,7 @@ onMounted(() => {
     position: relative;
     width: 4vw;
     height: 6vh;
+    // bottom: 0.2vh;
     user-select: none;
 
     div.main {

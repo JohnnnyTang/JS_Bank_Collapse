@@ -32,7 +32,11 @@
                             <div :class="item.ifDealt == 1 ? 'yes' : 'no'">
                                 {{ item.ifDealt ? '是' : '否' }}
                             </div>
-                            <div class="deal-button" v-if="item.ifDealt == 0" @click="dealWithWarn(index)">
+                            <div
+                                class="deal-button"
+                                v-if="item.ifDealt == 0"
+                                @click="dealWithWarn(index)"
+                            >
                                 处置
                             </div>
                         </div>
@@ -46,6 +50,8 @@
 <script setup>
 import { onMounted, ref, onUnmounted, watch } from 'vue'
 import BackEndRequest from '../../api/backend'
+import { useMapStore, useWarnInfoStore } from '../../store/mapStore'
+import { removeWarningDeviceStyle } from '../bankManage/mapInit.js'
 
 const props = defineProps({
     warnActive: {
@@ -54,6 +60,9 @@ const props = defineProps({
 })
 const historyLoading = ref(true)
 const historyRowLoading = ref(new Array(100).fill(false))
+const warnStore = useWarnInfoStore()
+
+const deviceTypeList = ["GNSS", "应力桩", "水压力计", "", "测斜仪"]
 
 const warnHistoryList = ref([
     {
@@ -79,23 +88,28 @@ const gnssIdSectionMap = {
     'MZS120.56944728_32.02070961_1': '民主沙尾部',
 }
 
-const buildHistoryList = (warnRawData) => {
-    let res = []
-    warnRawData.map((item, index) => {
-        res.push({
-            id: index + 1,
-            time: item.warnTime,
-            place: gnssIdSectionMap[item.deviceId],
-            dealt: item.ifDealt,
-        })
-    })
-    return res
-}
 
 const dealWithWarn = async (warnIndex) => {
     console.log(warnHistoryList.value[warnIndex], '123123123212231')
     historyRowLoading.value[warnIndex] = true
-    await BackEndRequest.updateWarnDealtStatus(warnHistoryList.value[warnIndex].id, 1)
+    await BackEndRequest.updateWarnDealtStatus(
+        warnHistoryList.value[warnIndex].id,
+        1,
+    )
+    if (warnHistoryList.value[warnIndex].id in warnStore.warnPopupMap) {
+        console.log(
+            'dealing with this',
+            warnStore.warnPopupMap[warnHistoryList.value[warnIndex].id],
+        )
+        warnStore.warnPopupMap[warnHistoryList.value[warnIndex].id].remove()
+        delete warnStore.warnPopupMap[warnHistoryList.value[warnIndex].id]
+
+        let id = warnHistoryList.value[warnIndex].deviceId
+        let type = deviceTypeList[id.split('_').pop()-1]
+        removeWarningDeviceStyle(useMapStore().getMap(), type, id)
+        warnStore.removeInfoItem(warnHistoryList.value[warnIndex])
+    }
+
     warnHistoryList.value[warnIndex].ifDealt = 1
     historyRowLoading.value[warnIndex] = false
 }
