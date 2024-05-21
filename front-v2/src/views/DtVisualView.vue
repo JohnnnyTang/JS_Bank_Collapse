@@ -15,7 +15,6 @@
             </div>
         </div>
 
-
         <!-- <div class="search-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <featSearch @close="closeHandler" @featureInfo="selectFeatureHandler"></featSearch>
         </div> -->
@@ -26,20 +25,27 @@
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <!-- <div class="featDetail" v-draggable="{ bounds: 'body' }" v-show="showDetail">
+        <div class="featDetail" v-show="showDetail">
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
-                @close="closeHandlerr"></featDetail>
-        </div> -->
+                @close="showDetail = false"></featDetail>
+        </div>
 
-
-        <div class="infomation-pannel" v-show="true" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+            <div class="close" @click="showInfoPannel = false"></div>
             <el-tabs type="border-card" class="demo-tabs">
                 <el-tab-pane label="重点要素">
                     <div class="important-feature">
-                        <el-table :data="infoTableData" style="width: 10vw">
+                        <el-table :data="infoTableData" height="30vh" border>
                             <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
                                 :label="item.label"></el-table-column>
-
+                            <el-table-column fixed="right" label="操作" width="80">
+                                <template #default="scope">
+                                    <el-button link type="primary" size="small"
+                                        @click="detailClickHandler4Feature(scope.row)">
+                                        查看详情
+                                    </el-button>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </div>
                 </el-tab-pane>
@@ -76,11 +82,11 @@ import sideBar from '../components/dataVisual/common/sideBar.vue'
 // import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
 // import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
-// import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
+import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
 import { initScratchMap } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
-import { sourceFieldMap, legendMap, legendStyleMap } from '../components/dataVisual/js/tilefieldMAP';
+import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap } from '../components/dataVisual/js/tilefieldMAP';
 import axios from 'axios';
 
 
@@ -97,7 +103,9 @@ const styles = [
     { backgroundImage: `url('/icons/full.png')` },
 ]
 const featureInfo = ref({})
+let nowSource
 const showDetail = ref(false)
+const showInfoPannel = ref(false)
 const legendList = ref([])
 const waterTableData = [
     {
@@ -126,14 +134,18 @@ watch(() => sceneStore.latestScene, (val) => {
 })
 
 const detailClickHandler4layerGroup = async (lable) => {
+    infoTableData.value = []
+    infoTableHeader.value = []
+
+    showInfoPannel.value = true
     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
     let infoLayer = layers.filter((item) => {
-        if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩')|| item.includes('水闸工程-重点')) {
+        if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩') || item.includes('水闸工程-重点')) {
             return false
         } return true
     })
-    let data = []
-    let thData = []
+    let data
+    let thData
     let map = mapStore.getMap()
     for (let i = 0; i < infoLayer.length; i++) {
         if (infoLayer[i].includes('过江通道')) {
@@ -156,9 +168,40 @@ const detailClickHandler4layerGroup = async (lable) => {
             data = await getLayerFeatureArray(map, infoLayer[i])
             thData = getTableHeader(map, infoLayer[i])
         }
-        console.log('()()()()');
     }
-    // console.log(data)
+    const process = (obj) => {
+        let res = []
+        let keys = Object.keys(obj)
+        keys.forEach(item => {
+            res.push({ 'label': obj[item], 'prop': item })
+        })
+        return res
+    }
+
+    infoTableData.value = data
+    infoTableHeader.value = process(thData)
+    console.log(infoTableHeader.value);
+
+}
+const detailClickHandler4Feature = async (featInfo) => {
+    let newFeatInfomation = {
+        ogData: featInfo,
+        sourceId: nowSource,
+        column: sourceColumnMap[nowSource],
+    }
+    featureInfo.value = newFeatInfomation
+    showDetail.value = true
+
+    let map = mapStore.getMap()
+    map.flyTo({
+        center: [featInfo.center_x, featInfo.center_y],
+        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10,
+        speed: 0.2,
+        curve: 1,
+        easing(t) {
+            return t;
+        }
+    })
 
 }
 
@@ -180,18 +223,6 @@ const mapFlyToRiver = (mapIns) => {
 }
 const closeHandler = (index) => {
     activeStatus.value[index] = false
-}
-// const closeHandlerr = () => {
-//     showDetail.value = false
-// }
-const selectFeatureHandler = (info) => {
-    console.log(info);
-    let sourceid = info.sourceId
-    if (Object.keys(sourceFieldMap).includes(sourceid)) {
-        console.log('showDetail!!');
-        featureInfo.value = info
-        showDetail.value = true
-    }
 }
 
 onMounted(async () => {
@@ -248,6 +279,8 @@ const getLayerFeatureArray = async (mapInstance, layerName) => {
             else if (layerName == '二级预警岸段') properties = warn2
             else if (layerName == '三级预警岸段') properties = warn3
         }
+        // featureInfo.value['sourceId'] = sourceId
+        nowSource = sourceId
     }
     return properties;
 }
@@ -260,9 +293,7 @@ const getTableHeader = (mapInstance, layerName) => {
     if (!source) return properties
     console.log(layerName, sourceId)
     let title = FieldMap[sourceId]['fieldMap']
-    console.log(title)
-
-
+    return title
 }
 
 onUnmounted(() => {
@@ -308,8 +339,6 @@ const FieldMap = {
         "original": "国普湖泊",
         "fieldMap": {
             "name": "名称",
-            "basin": "流域",
-            "water": "水系",
             "area": "水面面积",
             "height": "正常蓄水位",
         }
@@ -336,7 +365,8 @@ const FieldMap = {
         "fieldMap": {
             "name": "名称",
             "area": "水面面积",
-            "height": "正常蓄水位",
+            "basin": "流域",
+            "water": "水系",
         }
     },
     "sluiceArea": {
@@ -493,10 +523,22 @@ const FieldMap = {
         left: 20vw;
         top: 20vh;
 
-        div.important-feature {
-            width: 10vw;
-            height: 30vh;
+        div.close {
+            position: absolute;
+            right: 1vw;
+            top: 1vh;
+            width: 2.2vh;
+            height: 2.2vh;
+            background-size: contain;
+            background-image: url('/icons/minimize.png');
+            z-index: 2;
+        }
 
+        div.important-feature {
+            // width: 20vw;
+            // height: 30vh;
+            width: fit-content;
+            height: 30vh;
         }
 
         div.feature-search {

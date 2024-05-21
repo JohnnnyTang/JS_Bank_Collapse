@@ -575,7 +575,7 @@ const getSideBarTree = async () => {
                 {
                     label: '水库大坝',
                     icon: '/icons/水库大坝.png',
-                    active: false,
+                    active: true,
                     filter: true
                 },
                 {

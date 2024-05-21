@@ -81,7 +81,7 @@ onMounted(() => {
             height: 3vh;
             line-height: 3vh;
             font-weight: 600;
-            font-size: calc(1.0vw + 0.6vh);
+            font-size: calc(0.7vw + 0.6vh);
             background: #0237bd;
             text-shadow: 2px 8px 6px rgba(5, 2, 95, 0.207), 0px -5px 35px rgba(255, 255, 255, 0.167);
             -webkit-background-clip: text;
@@ -97,8 +97,9 @@ onMounted(() => {
             background-color: #ffffff;
             text-align: center;
             font-size: calc(0.6vw + 0.3vh);
-            border-right: inset 2px rgb(23,163,248);
-            border-bottom: inset 2px rgb(23,163,248);
+            border-right: inset 2px rgb(23, 163, 248);
+            border-bottom: inset 2px rgb(23, 163, 248);
+
             .cell-item {
                 height: fit-content;
             }
@@ -122,8 +123,9 @@ onMounted(() => {
     .miniIcon {
         position: absolute;
         right: 0.5vw;
-        width: 4vh;
-        height: 4vh;
+        top: 1vh;
+        width: 2.5vh;
+        height: 2.5vh;
         background-image: url('/icons/minimize.png');
         background-size: contain;
         background-repeat: no-repeat;

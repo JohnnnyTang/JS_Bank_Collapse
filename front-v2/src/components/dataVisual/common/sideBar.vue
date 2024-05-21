@@ -58,7 +58,7 @@
 
         </div>
 
-        <div class="test-zoom">{{ zoomValue }}</div>
+        <!-- <div class="test-zoom">{{ zoomValue }}</div> -->
     </dv-border-box9>
 </template>
 

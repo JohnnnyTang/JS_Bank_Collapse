@@ -878,9 +878,9 @@ const layerAddFunctionMap = {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/riverArea/{x}/{y}/{z}'],
             })
-        const waterInZoom1 = [1, 2, 3]
-        const waterInZoom2 = [1, 2, 3, 4]
-        const waterInZoom3 = [1, 2, 3, 4, 5, 6]
+        const waterInZoom1 = [1, 2, 3, 4, 5]
+        const waterInZoom2 = [1, 2, 3, 4, 5, 6]
+        const waterInZoom3 = [1, 2, 3, 4, 5, 6, 7]
         const waterInZoom4 = [1, 2, 3, 4, 5, 6, 7, 8]
         !map.getLayer('区域水系') &&
             map.addLayer({
@@ -929,9 +929,9 @@ const layerAddFunctionMap = {
             })
     },
     '区域水系-注记': async (map) => {
-        const waterInZoom1 = [1, 2, 3]
-        const waterInZoom2 = [1, 2, 3, 4]
-        const waterInZoom3 = [1, 2, 3, 4, 5, 6]
+        const waterInZoom1 = [1, 2, 3, 4, 5]
+        const waterInZoom2 = [1, 2, 3, 4, 5, 6]
+        const waterInZoom3 = [1, 2, 3, 4, 5, 6, 7]
         const waterInZoom4 = [1, 2, 3, 4, 5, 6, 7, 8]
         if (!map.getSource('riverArea-lable')) {
             map.addSource('riverArea-lable', {
