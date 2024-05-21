@@ -25,14 +25,15 @@
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-show="showDetail">
+        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
                 @close="showDetail = false"></featDetail>
         </div>
 
-        <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
-            <div class="close" @click="showInfoPannel = false"></div>
-            <el-tabs type="border-card" class="demo-tabs">
+        <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+            v-loading="pannelLoading" v-click-out-side="() => showInfoPannel = false">
+            <div class="close" @click="showInfoPannel = false; showDetail = false"></div>
+            <el-tabs type="border-card" class="demo-tabs" style="min-width: 12vw;">
                 <el-tab-pane label="重点要素">
                     <div class="important-feature">
                         <el-table :data="infoTableData" height="30vh" border>
@@ -86,8 +87,9 @@ import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
 import { initScratchMap } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
-import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap } from '../components/dataVisual/js/tilefieldMAP';
+import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt } from '../components/dataVisual/js/tilefieldMAP';
 import axios from 'axios';
+import { clickOutSide as vClickOutSide } from '@mahdikhashan/vue3-click-outside'
 
 
 // data
@@ -116,26 +118,30 @@ const waterTableData = [
 ]
 const infoTableData = ref([])
 const infoTableHeader = ref([])
+const pannelLoading = ref(true)
 
 
-watch(() => sceneStore.latestScene, (val) => {
-    if (val == '重点岸段') {
-        activeStatus.value[2] = true
-        legendList.value = legendMap['重点岸段']
+// watch(() => sceneStore.latestScene, (val) => {
+//     if (val == '重点岸段') {
+//         activeStatus.value[2] = true
+//         legendList.value = legendMap['重点岸段']
 
-    } else if (val == '工程情况') {
-        activeStatus.value[2] = true
-        legendList.value = legendMap['工程情况']
-    }
-    else if (val == '全江概貌') {
-        activeStatus.value[2] = true
-        legendList.value = legendMap['全江概貌']
-    }
-})
+//     } else if (val == '工程情况') {
+//         activeStatus.value[2] = true
+//         legendList.value = legendMap['工程情况']
+//     }
+//     else if (val == '全江概貌') {
+//         activeStatus.value[2] = true
+//         legendList.value = legendMap['全江概貌']
+//     }
+// })
+
 
 const detailClickHandler4layerGroup = async (lable) => {
     infoTableData.value = []
     infoTableHeader.value = []
+    pannelLoading.value = true
+
 
     showInfoPannel.value = true
     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
@@ -180,6 +186,7 @@ const detailClickHandler4layerGroup = async (lable) => {
 
     infoTableData.value = data
     infoTableHeader.value = process(thData)
+    pannelLoading.value = false
     console.log(infoTableHeader.value);
 
 }
@@ -191,18 +198,17 @@ const detailClickHandler4Feature = async (featInfo) => {
     }
     featureInfo.value = newFeatInfomation
     showDetail.value = true
-
+    console.log('map fly');
     let map = mapStore.getMap()
     map.flyTo({
         center: [featInfo.center_x, featInfo.center_y],
-        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10,
-        speed: 0.2,
+        zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
+        speed: 1.0,
         curve: 1,
         easing(t) {
             return t;
         }
     })
-
 }
 
 // methods
@@ -216,8 +222,8 @@ const toolClick = (i) => {
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
-        [[117.66436591731372, 30.72331549710475],
-        [123.46755554741532, 33.43809328513673],],
+        [[118.40770531586725, 31.015473926104463],
+        [122.06874017956159, 32.73217294711945],],
         { pitch: 0, duration: 1500, },
     )
 }
@@ -237,10 +243,19 @@ onMounted(async () => {
     mapInstance.addControl(new mapboxgl.ScaleControl({ maxWidth: 150 }), 'bottom-left');
     mapFlyToRiver(mapInstance)
 
+    legendList.value = legendListt
+
     sceneStore.SCENEMAP.value = scenes
     sceneStore.LAYERGROUPMAP.value = layerGroups
 
     // activeStatus.value[0] = true
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key == 'b') {
+            console.log(mapInstance.getBounds())
+        }
+    })
+
 })
 
 //////////// DEBUG FUNCTIONS

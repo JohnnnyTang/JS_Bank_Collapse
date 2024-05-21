@@ -174,6 +174,7 @@ watch(() => mapStore.getMap(), async (newV, oldV) => {
     await layerAddFunction(map, '沿江码头')
     await layerInitFunction(map, '水闸工程')
     await layerAddFunction(map, '水库大坝')
+    await layerInitFunction(map, '洲滩')
 
     // 线
     await layerAddFunction(map, '长江干堤')
@@ -182,7 +183,7 @@ watch(() => mapStore.getMap(), async (newV, oldV) => {
     await layerAddFunction(map, '二级预警岸段')
     await layerAddFunction(map, '三级预警岸段')
     await layerInitFunction(map, '过江通道-隧道/通道')
-    await layerInitFunction(map, '过江通道-桥墩')
+    // await layerInitFunction(map, '过江通道-桥墩')
     await layerInitFunction(map, '过江通道-桥')
     await layerAddFunction(map, '重点行政区边界')
 
@@ -192,13 +193,17 @@ watch(() => mapStore.getMap(), async (newV, oldV) => {
     await layerInitFunction(map, '泵站工程')
     await layerInitFunction(map, '枢纽工程')
     await layerAddFunction(map, '河道分段点')
+    await layerAddFunction(map, '行政点')
 
     // 注记
-    await layerAddFunction(map, '市级行政区-注记')
+    // await layerAddFunction(map, '市级行政区-注记')
     await layerAddFunction(map, '大型湖泊-注记')
     await layerAddFunction(map, '区域水系-注记')
     await layerAddFunction(map, '沿江码头-注记')
     await layerAddFunction(map, '水库大坝-注记')
+    await layerAddFunction(map, '洲滩-注记')
+    await layerAddFunction(map, '行政点-注记')
+
 
     await layerAddFunction(map, '岸段-注记')
     await layerInitFunction(map, '过江通道-桥-注记')

@@ -5,7 +5,10 @@ import BackEndRequest from '../../api/backend'
 import { DataPioneer } from './Scene'
 import axios from 'axios'
 import { loadImage } from '../../utils/mapUtils'
-import { i_gov_bounds, river_division_point, river_division_line } from './js/tempData.js'
+import {
+    i_gov_bounds, river_division_point, river_division_line,
+    district_point, sandbar
+} from './js/tempData.js'
 
 
 const layers = [
@@ -672,6 +675,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}',
                 ],
             })
+        await loadImage(map, '/icons/市界.png', '市界')
         !map.getLayer('市级行政区') &&
             map.addLayer({
                 id: '市级行政区',
@@ -680,17 +684,18 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {},
                 paint: {
-                    'line-color': 'rgb(176,176,153)',
+                    'line-pattern': '市界',
+                    // 'line-color': 'rgb(176,176,153)',
                     // 'line-width': 1.0,
-                    // 'line-opacity': 0.75,
                     'line-width': 1.0,
                     'line-opacity': [
                         "case",
                         ["==", ["get", "if_important"], 1], // 如果if_important字段为1
-                        0.5,
+                        // 0.5,
+                        1.0,
                         0.0
                     ],
-                    "line-dasharray": [5, 3],
+                    // 'line-dasharray': [10, 5, 2],
                 },
             })
     },
@@ -833,7 +838,7 @@ const layerAddFunctionMap = {
                 minzoom: 7,
                 maxzoom: 14,
                 paint: {
-                    'circle-color': '#FF8C00',
+                    'circle-color': 'rgb(35,46,71)',
                     'circle-radius': 5.0,
                 }
             })
@@ -858,7 +863,7 @@ const layerAddFunctionMap = {
                     'text-anchor': 'top'
                 },
                 paint: {
-                    'text-color': '#FF8C00',
+                    'text-color': 'rgb(35,46,71)',
                     'text-opacity': [
                         'match',
                         ["get", "name"],
@@ -1226,6 +1231,10 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
                 ],
             })
+        await loadImage(map, '/legend/test.png', 'test')
+        await loadImage(map, '/legend/已建通道.png', '已建')
+        await loadImage(map, '/legend/在建通道.png', '在建')
+        await loadImage(map, '/legend/规划通道.png', '规划')
         !map.getLayer('过江通道-隧道/通道') &&
             map.addLayer({
                 id: '过江通道-隧道/通道',
@@ -1238,18 +1247,30 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     'line-opacity': 1,
-                    'line-color': [
+                    // 'line-pattern': 'test',
+                    'line-pattern': [
                         'match',
                         ['get', 'plan'],
                         1,
-                        'rgb(8, 74, 1)',
+                        '已建',
                         0,
-                        'rgb(16, 138, 3)',
+                        '在建',
                         -1,
-                        'rgb(23, 209, 2)',
-                        'rgb(0, 0, 0)', // 默认颜色为黑色
+                        '规划',
+                        'test', // 默认颜色为黑色
                     ],
-                    'line-width': 2.0,
+                    // 'line-color': [
+                    //     'match',
+                    //     ['get', 'plan'],
+                    //     1,
+                    //     'rgb(8, 74, 1)',
+                    //     0,
+                    //     'rgb(16, 138, 3)',
+                    //     -1,
+                    //     'rgb(23, 209, 2)',
+                    //     'rgb(0, 0, 0)', // 默认颜色为黑色
+                    // ],
+                    'line-width': 4.0,
                 },
             })
     },
@@ -1295,28 +1316,52 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverPassagePolygon/{x}/{y}/{z}',
                 ],
             })
+        // await loadImage(map, '/legend/test.png', 'test')
+
         !map.getLayer('过江通道-桥') &&
+            // map.addLayer({
+            //     id: '过江通道-桥',
+            //     type: 'fill-extrusion',
+            //     source: 'riverPassagePolygon',
+            //     'source-layer': 'default',
+            //     layout: {},
+            //     paint: {
+            //         'fill-extrusion-color': [
+            //             'match',
+            //             ['get', 'plan'],
+            //             1,
+            //             'rgb(8, 74, 1)',
+            //             0,
+            //             'rgb(16, 138, 3)',
+            //             -1,
+            //             'rgb(23, 209, 2)',
+            //             'rgb(0, 0, 0)', // 默认颜色为黑色
+            //         ],
+            //         'fill-extrusion-base': 200,
+            //         'fill-extrusion-height': 210,
+            //         'fill-extrusion-opacity': 1.0,
+            //     },
+            // })
             map.addLayer({
                 id: '过江通道-桥',
-                type: 'fill-extrusion',
+                type: 'fill',
                 source: 'riverPassagePolygon',
                 'source-layer': 'default',
                 layout: {},
                 paint: {
-                    'fill-extrusion-color': [
-                        'match',
-                        ['get', 'plan'],
-                        1,
-                        'rgb(8, 74, 1)',
-                        0,
-                        'rgb(16, 138, 3)',
-                        -1,
-                        'rgb(23, 209, 2)',
-                        'rgb(0, 0, 0)', // 默认颜色为黑色
-                    ],
-                    'fill-extrusion-base': 200,
-                    'fill-extrusion-height': 210,
-                    'fill-extrusion-opacity': 1.0,
+                    // 'fill-color': [
+                    //     'match',
+                    //     ['get', 'plan'],
+                    //     1,
+                    //     'rgb(8, 74, 1)',
+                    //     0,
+                    //     'rgb(16, 138, 3)',
+                    //     -1,
+                    //     'rgb(23, 209, 2)',
+                    //     'rgb(0, 0, 0)', // 默认颜色为黑色
+                    // ],
+                    'fill-color': 'rgb(63,61,61)'
+                    // 'fill-pattern': 'test',
                 },
             })
     },
@@ -1332,16 +1377,32 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '过江通道-桥-注记',
                 type: 'symbol',
-                minzoom: 12,
+                minzoom: 11,
                 source: 'riverPassagePolygon',
                 'source-layer': 'default',
+
                 layout: {
-                    'text-field': ['get', 'name'],
+                    // 'text-field': ['get', 'name'],
+                    "text-field": [
+                        "concat",
+                        ["get", "name"], // 首先获取name字段的值
+                        ["case",
+                            ["==", ["get", "plan"], 1],
+                            '   已建',
+                            ["==", ["get", "plan"], 0],
+                            '   在建',
+                            ["==", ["get", "plan"], -1],
+                            '   规划',
+                            ""
+                        ]
+                    ],
+   
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
                     'text-anchor': 'bottom',
+                    'symbol-placement': 'line',
                     'text-size': 12,
                     'text-writing-mode': ['vertical', 'horizontal'],
                 },
@@ -1364,20 +1425,34 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: '过江通道-隧道/通道-注记',
                 type: 'symbol',
-                minzoom: 12,
+                minzoom: 11,
                 source: 'riverPassageLine',
                 'source-layer': 'default',
                 layout: {
-                    'text-field': ['get', 'name'],
-                    // 'symbol-placement': 'line',
+                    // 'text-field': ['get', 'name'],
+                    "text-field": [
+                        "concat",
+                        ["get", "name"], // 首先获取name字段的值
+                        ["case",
+                            ["==", ["get", "plan"], 1],
+                            '  已建',
+                            ["==", ["get", "plan"], 0],
+                            '  在建',
+                            ["==", ["get", "plan"], -1],
+                            '  规划',
+                            ""
+                        ]
+                        // '  已建'
+                    ],
+                    'symbol-placement': 'line',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    'text-offset': [0, 2],
+                    'text-offset': [0, 1],
                     'text-anchor': 'bottom',
                     'text-size': 12,
-                    'text-writing-mode': ['vertical', 'horizontal'],
+                    // 'text-writing-mode': ['vertical', 'horizontal'],
                 },
                 paint: {
                     'text-color': 'rgb(84, 78, 76)',
@@ -1874,7 +1949,7 @@ const layerAddFunctionMap = {
                 minzoom: 10,
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    'symbol-placement': 'line',
+                    'symbol-placement': 'point',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -1912,7 +1987,7 @@ const layerAddFunctionMap = {
                 },
                 filter: ['==', 'warning_level', 1],
                 paint: {
-                    'line-color': 'rgb(250, 5, 29)',
+                    'line-color': '#ff3d2b',
                     'line-width': [
                         'interpolate',
                         ['linear'],
@@ -1945,7 +2020,7 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 2],
                 paint: {
                     // 'line-opacity': 1,
-                    'line-color': 'rgb(242, 5, 242)',
+                    'line-color': 'rgb(27, 74, 245)',
                     'line-width': [
                         'interpolate',
                         ['linear'],
@@ -1979,7 +2054,7 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 3],
                 paint: {
                     // 'line-opacity': 1,=
-                    'line-color': 'rgb(5, 5, 242)',
+                    'line-color': 'rgb(48, 207, 63)',
                     'line-width': [
                         'interpolate',
                         ['linear'],
@@ -2049,6 +2124,125 @@ const layerAddFunctionMap = {
     },
     /// 近年冲淤
     近年冲淤: async (map) => { },
+
+    洲滩: async (map) => {
+        !map.getSource('sandBar') &&
+            map.addSource('sandBar', {
+                type: 'geojson',
+                data: sandbar
+            })
+        !map.getLayer('洲滩') &&
+            map.addLayer({
+                id: '洲滩',
+                type: 'fill',
+                source: 'sandBar',
+                // 'source-layer': 'default',
+                // minzoom: 8,
+                layout: {
+                },
+                paint: {
+                    'fill-color': 'rgb(243,243,133)',
+                },
+            })
+    },
+    '洲滩-注记': async (map) => {
+        !map.getSource('sandBar') &&
+            map.addSource('sandBar', {
+                type: 'geojson',
+                data: sandbar
+            })
+        !map.getLayer('洲滩-注记') &&
+            map.addLayer({
+                id: '洲滩-注记',
+                type: 'symbol',
+                source: 'sandBar',
+                // 'source-layer': 'default',
+                minzoom: 10,
+                layout: {
+                    'text-field': ['get', 'name'],
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    // 'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
+                    'text-size': 11,
+                    'text-padding': 0,
+                    'text-ignore-placement': true,
+                    'text-allow-overlap': true,
+                },
+                paint: {
+                    'text-color': 'rgb(155, 155, 155)',
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 2.0,
+                },
+            })
+    },
+    行政点: async (map) => {
+        !map.getSource('DistrictPoint') &&
+            map.addSource('DistrictPoint', {
+                type: 'geojson',
+                data: district_point
+            })
+        !map.getLayer('行政点') &&
+            map.addLayer({
+                id: '行政点',
+                type: 'circle',
+                source: 'DistrictPoint',
+                minzoom: 7,
+                maxzoom: 14,
+                // 'source-layer': 'default',
+                layout: {},
+                paint: {
+                    'circle-color': 'rgb(222,34,1)',
+                    // 'circle-blur': 0.5,
+                    'circle-radius': [
+                        "case",
+                        ["==", ["get", "Level"], 1], // 如果if_important字段为1
+                        5.5,                    // 则文本颜色为rgb(86, 39, 242)
+                        3.5                      // 否则文本颜色为rgb(26, 11, 74)
+                    ],
+                    'circle-opacity': 0.8
+                },
+            })
+    },
+    '行政点-注记': async (map) => {
+        !map.getSource('DistrictPoint') &&
+            map.addSource('DistrictPoint', {
+                type: 'geojson',
+                data: district_point
+            })
+        !map.getLayer('行政点-注记') &&
+            map.addLayer({
+                id: '行政点-注记',
+                type: 'symbol',
+                source: 'DistrictPoint',
+                // 'source-layer': 'default',
+                // minzoom: 10,
+                layout: {
+                    'text-field': ['get', 'City'],
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    'text-offset': [0, 1.0],
+                    // 'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
+                    'text-size': [
+                        "case",
+                        ["==", ["get", "Level"], 1],
+                        14,
+                        11
+                    ],
+                    'text-padding': 0,
+                    'text-ignore-placement': true,
+                    'text-allow-overlap': true,
+                },
+                paint: {
+                    'text-color': 'rgb(135, 135, 135)',
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 2.0,
+                },
+            })
+    }
 }
 
 const layerAddFunction = async (map, layerID) => {
