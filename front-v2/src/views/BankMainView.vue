@@ -14,7 +14,7 @@
         <RealtimeRiskVue />
         <StableStatusVue />
         <div style="position: absolute;left: 40vw;top: 20vh;height: 28vh;width: 24vw;z-index: 4;">
-            <BedFlowChart />
+            <WaterProcessChart />
         </div>
     </div>
 </template>
@@ -29,7 +29,7 @@ import TickClockVue from '../components/bankMain/TickClock.vue'
 import RealtimeRiskVue from '../components/bankMain/RealtimeRisk.vue'
 import BankTableVue from '../components/bankMain/BankTable.vue'
 import WarnNoticeVue from '../components/bankMain/WarnNotice.vue'
-import BedFlowChart from '../components/bankRiskWarn/BedFlowChart.vue'
+import WaterProcessChart from '../components/bankRiskWarn/WaterProcessChart.vue'
 
 mapboxgl.accessToken =
     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
