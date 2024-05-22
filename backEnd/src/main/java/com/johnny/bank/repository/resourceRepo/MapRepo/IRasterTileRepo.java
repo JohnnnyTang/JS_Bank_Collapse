@@ -66,4 +66,11 @@ public class IRasterTileRepo {
         String fullPath = tilePathConfig.getMzsTilePath() + "floodTile/" + tilePath;
         return  getRasterDataAsByteArray(fullPath);
     }
+
+    public byte[] getBaseImageRasterFile(String tilePath) throws Exception {
+//        String fullPath = "E:\\imageRaster\\base\\" + tilePath;
+        String fullPath = tilePathConfig.getRiverImagePath() + tilePath;
+//        System.out.println(fullPath);
+        return  getRasterDataAsByteArray(fullPath);
+    }
 }

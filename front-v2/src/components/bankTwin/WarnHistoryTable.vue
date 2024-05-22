@@ -115,7 +115,7 @@ const dealWithWarn = async (warnIndex) => {
 }
 
 onMounted(async () => {
-    const warnData = (await BackEndRequest.getHistoryWarnInfo('day', 1)).data
+    const warnData = (await BackEndRequest.getHistoryWarnInfo('hour', 1)).data
     // console.log('warn', warnData)
     historyRowLoading.value = new Array(warnData.length).fill(false)
     // console.log('123123', historyRowLoading.value)

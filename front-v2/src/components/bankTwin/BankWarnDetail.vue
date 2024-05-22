@@ -9,12 +9,52 @@
             <el-scrollbar class="accordion-scroll">
                 <el-collapse>
                     <el-collapse-item
-                        :title="deviceIdMap[warn.deviceId]+'报警详情-'+warn.warnTime"
+                        :title="
+                            deviceIdMap[warn.deviceId] +
+                            '报警详情-' +
+                            warn.warnTime
+                        "
                         v-for="warn in warnInfoStore.warnInfo"
                         :key="warn.id"
                     >
                         <div class="detail-content-container">
-                            
+                            <el-descriptions
+                                direction="vertical"
+                                :column="4"
+                                border
+                                style="width: 100%;"
+                            >
+                                <el-descriptions-item label="报警区域" :span="1"
+                                    >{{ deviceIdPlaceMap[warn.deviceId] }}</el-descriptions-item
+                                >
+                                <el-descriptions-item label="报警时间" :span="3"
+                                    >{{ warn.warnTime }}</el-descriptions-item
+                                >
+                                <el-descriptions-item label="风险点责任人" :span="2"
+                                    >高卫南</el-descriptions-item
+                                >
+                                <el-descriptions-item label="责任人联系方式" :span="2"
+                                    >15161059955</el-descriptions-item
+                                >
+                                <el-descriptions-item label="巡查队伍" :span="2"
+                                    >靖江市西来镇巡堤查险队</el-descriptions-item
+                                >
+                                <el-descriptions-item label="巡查队伍责任人" :span="2"
+                                    >刘宏江</el-descriptions-item
+                                >
+                                <el-descriptions-item label="巡查队伍联系方式" :span="2"
+                                    >13921738638</el-descriptions-item
+                                >
+                                <el-descriptions-item label="抢险队伍" :span="2"
+                                    >江苏龙源水利工程有限公司抢险队 </el-descriptions-item
+                                >
+                                <el-descriptions-item label="抢险队伍责任人" :span="2"
+                                    >吴明灿</el-descriptions-item
+                                >
+                                <el-descriptions-item label="抢险队伍联系方式" :span="2"
+                                    >13815981186</el-descriptions-item
+                                >
+                            </el-descriptions>
                         </div>
                     </el-collapse-item>
                 </el-collapse>
@@ -243,7 +283,7 @@ div.warn-detail-container {
             --el-collapse-border-color: #104da8;
             --el-collapse-header-height: 8vh;
             .el-collapse-item__header {
-                background-color: rgb(210,242,255);
+                background-color: rgb(210, 242, 255);
                 padding-left: 1vw;
                 font-weight: bold;
                 color: #14129e;
@@ -263,7 +303,7 @@ div.warn-detail-container {
         }
         div.detail-content-container {
             width: 96%;
-            height: 20vh;
+            height: 32vh;
             margin-left: 2%;
             // padding-left: 2%;
             // padding-right: 2%;
@@ -273,7 +313,6 @@ div.warn-detail-container {
             display: flex;
             flex-flow: row wrap;
             justify-content: center;
-
         }
     }
 
@@ -326,7 +365,7 @@ div.warn-detail-container {
             border-radius: 4px;
 
             border: 2px solid rgb(0, 119, 255);
-            background-color: #8bd4ff;
+            background-color: #8beeff;
 
             &:hover {
                 cursor: pointer;

@@ -18,4 +18,5 @@ public class TilePath {
     private String worldTilePath;
     private String nodeServicePath;
     private String riverTilePath;
+    private String riverImagePath;
 }

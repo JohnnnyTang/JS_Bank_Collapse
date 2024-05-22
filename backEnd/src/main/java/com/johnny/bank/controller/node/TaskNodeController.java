@@ -25,7 +25,15 @@ public class TaskNodeController extends BaseNodeController<TaskNode> {
     @PostMapping("start/multi/default/section/{id}")
     public ResponseEntity<String> startDefaultMultiIndexWithFixSectionTask(@PathVariable Integer id) throws Exception {
         String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
-                id, null, null, null, null
+                id, null, null, null, null, false
+        );
+        return ResponseEntity.ok(taskNodeId);
+    }
+
+    @PostMapping("start/multi/default/section/long/{id}")
+    public ResponseEntity<String> startDefaultMultiIndexWithFixLongSectionTask(@PathVariable Integer id) throws Exception {
+        String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
+                id, null, null, null, null, true
         );
         return ResponseEntity.ok(taskNodeId);
     }
@@ -35,7 +43,17 @@ public class TaskNodeController extends BaseNodeController<TaskNode> {
             @PathVariable Integer id, @PathVariable String begTime, @PathVariable String endTime
     ) throws Exception {
         String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
-                id, begTime, endTime, null, null
+                id, begTime, endTime, null, null, false
+        );
+        return ResponseEntity.ok(taskNodeId);
+    }
+
+    @PostMapping("start/multi/default/section/long/{id}/beg/{begTime}/end/{endTime}")
+    public ResponseEntity<String> startMultiIndexLongWithTimeTask(
+            @PathVariable Integer id, @PathVariable String begTime, @PathVariable String endTime
+    ) throws Exception {
+        String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
+                id, begTime, endTime, null, null, true
         );
         return ResponseEntity.ok(taskNodeId);
     }
@@ -46,7 +64,7 @@ public class TaskNodeController extends BaseNodeController<TaskNode> {
             @RequestParam List<Double> startPt, @RequestParam List<Double> endPt
     ) throws Exception {
         String taskNodeId = ((TaskNodeService) nodeServiceImpl).createAndStartSectionDefaultMultiIndexTask(
-                null, begTime, endTime, startPt, endPt
+                null, begTime, endTime, startPt, endPt, false
         );
         return ResponseEntity.ok(taskNodeId);
     }
