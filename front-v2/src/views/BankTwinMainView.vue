@@ -121,7 +121,7 @@
             </div>
         </div>
         <BanWarnDetail :warnActive="warnActive" v-loading="warnLoading" />
-        <WarnHistoryTable :warnActive="warnActive" />
+        <WarnHistoryTable :warnActive="warnActive" v-if="warnActive"/>
 
         <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
@@ -700,8 +700,8 @@ div.twin-main-container {
     div.monitor-legend-container {
         position: absolute;
         bottom: 1vh;
-        left: 27vw;
-        width: 46vw;
+        left: 28vw;
+        width: 43vw;
         height: 10vh;
 
         z-index: 4;
@@ -740,12 +740,12 @@ div.twin-main-container {
 
         div.monitor-legend-block {
             position: relative;
-            width: 46vw;
+            width: 43vw;
             height: 7vh;
             margin-top: 2vh;
             display: flex;
             flex-direction: row;
-            justify-content: space-evenly;
+            justify-content: space-around;
             align-items: center;
 
             div.monitor-legend-item {
