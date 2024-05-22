@@ -220,6 +220,42 @@ export const profileListInput = [
 ]
 export const sceneListInput = [
     {
+        value: '2012after',
+        name: '2012汛后地形数据',
+        label: '2012汛后',
+        year: '2012',
+        time: '汛后',
+        date: '2012-10-01',
+        dateShort: '1210',
+    },
+    {
+        value: '2019before',
+        name: '2019汛前地形数据',
+        label: '2019汛前',
+        year: '2019',
+        time: '汛前',
+        date: '2019-04-01',
+        dateShort: '1904',
+    },
+    {
+        value: '2023before1',
+        name: '2023汛前地形数据',
+        label: '2023汛前',
+        year: '2023',
+        time: '汛前',
+        date: '2023-04-01',
+        dateShort: '2304',
+    },
+    {
+        value: '2020before',
+        name: '2020汛前地形数据',
+        label: '2020汛前',
+        year: '2020',
+        time: '汛前',
+        date: '2020-03-01',
+        dateShort: '2003',
+    },
+    {
         value: '2020before',
         name: '2020汛前地形数据',
         label: '2020汛前',

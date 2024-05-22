@@ -130,7 +130,7 @@
     div.riskInfo-container {
         position: absolute;
         top: 43vh;
-        left: 1vw;
+        left: 75vw;
         height: 47.5vh;
         width: 24vw;
         border-radius: 8px;

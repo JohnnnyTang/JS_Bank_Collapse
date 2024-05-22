@@ -97,28 +97,59 @@
                         </template> -->
                     <!-- </el-select>
                 </div> -->
-                <div class="current-param-container year1">
-                    <div class="current-param-title">2021年数据</div>
-                    <div class="current-param-content">
-                        汛前
+                <div class="risk-year-container">
+                    <div class="risk-year-title">
+                        风险评估数据时效：
                     </div>
-                </div>
-                <div class="current-param-container year2">
-                    <div class="current-param-title">2022年数据</div>
-                    <div class="current-param-content">
-                        汛后
-                    </div>
-                </div>
-                <div class="current-param-container year3">
-                    <div class="current-param-title">2023年数据</div>
-                    <div class="current-param-content">
-                        汛前
+                    <div class="risk-year-content">
+                        2023年汛后
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="tree-container">
+        <div class="risk-item-container">
+            <div
+                class="risk-item waterpower"
+                @click="showWaterPowerFunc"
+            >
+                <div class="risk-item-text">
+                    水流动力因素
+                </div>
+            </div>
+            <div class="risk-item riverbed">
+                <div class="risk-item-text">
+                    河床演变因子
+                </div>
+            </div>
+            <div class="risk-item bankGeology">
+                <div class="risk-item-text">
+                    岸坡地质因子
+                </div>
+            </div>
+            <div class="risk-item outproject">
+                <div class="risk-item-text">
+                    外部工程因子
+                </div>
+            </div>
+        </div>
+
+        <div class="raster-control-block">
+            <label class="switch">
+                <input
+                    type="checkbox"
+                    :checked="showRaster"
+                    @click="RasterControlHandler()"
+                />
+                <span class="slider"></span>
+            </label>
+            <div class="text-block">
+                <div class="text">冲淤图展示</div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button @click="showYearlyProfileShapeFunc">单一断面形态</button>
             <button @click="showProfileShapeFunc">断面形态</button>
             <button @click="showProfileSlopeFunc">岸坡最大坡比</button>
             <button @click="showProfileErosionFunc">近岸冲刷速率</button>
@@ -135,10 +166,19 @@
             :erosionChartLoad="erosionChartLoad"
         />
 
+        <profileShapeYearlyVue
+            v-if="showYearlyProfileShape"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
+            :profileList="profileList"
+            :shapeYearlyChartLoad="shapeYearlyChartLoad"
+        />
+
         <profileShapeVue
             v-if="showProfileShape"
             @profile-value-change="changeProfileValue"
             :profileData="profileData"
+            :profileDataCompare="profileDataCompare"
             :profileList="profileList"
             :shapeChartLoad="shapeChartLoad"
         />
@@ -178,19 +218,6 @@
             </label>
             <div class="text-block">
                 <div class="text">流场展示</div>
-            </div>
-        </div>
-        <div v-if="showFlowSpeed" class="raster-control-block">
-            <label class="switch">
-                <input
-                    type="checkbox"
-                    :checked="showRaster"
-                    @click="RasterControlHandler()"
-                />
-                <span class="slider"></span>
-            </label>
-            <div class="text-block">
-                <div class="text">冲淤图展示</div>
             </div>
         </div>
         <div v-if="showFlowSpeed" class="time-shower-block">
@@ -364,8 +391,11 @@ const flowspeedInfoVue = defineAsyncComponent(() =>
 const profileInfoVue = defineAsyncComponent(() =>
   import('../components/bankRiskWarn/profileInfo.vue')
 )
+const profileShapeYearlyVue = defineAsyncComponent(() =>
+  import('../components/bankRiskWarn/profileShapeYearly.vue')
+)
 const profileShapeVue = defineAsyncComponent(() =>
-  import('../components/bankRiskWarn/profileShape.vue')
+  import('../components/bankRiskWarn/profileShapeCompare.vue')
 )
 const profileSlopeVue = defineAsyncComponent(() =>
   import('../components/bankRiskWarn/profileSlope.vue')
@@ -454,8 +484,12 @@ const getProfileTime = () => {
     sceneNow = sceneList.value.find(
         (item) => item.value === sceneNowValue.value,
     )
-    tempProfileBefore.value = sceneBefore.label
-    tempProfileNow.value = sceneNow.label
+    sceneCompare = sceneList.value.find(
+        (item) => item.value === sceneCompareValue.value,
+    )
+    // tempProfileBefore.value = sceneBefore.label
+    // tempProfileNow.value = sceneNow.label
+    // tempProfileAfter.value = sceneAfter.label
 }
 
 // 场景选择
@@ -491,7 +525,7 @@ const sureSceneRese = async () => {
     addRasterLayer(mapInstance, time, 'mapRaster')
     mapInstance.moveLayer('mapRaster', 'mzsLine')
     // 计算各个断面数据
-    ProfileLoadingProcess(sceneBefore, sceneNow)
+    ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompare)
 }
 
 const changeProfileValue = (value) => {
@@ -502,9 +536,10 @@ const changeProfileValue = (value) => {
 }
 
 // 加载断面数据和图层1
-const ProfileLoadingProcess = async (sceneBefore, sceneNow) => {
+const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompare) => {
     const before = sceneBefore.date
     const now = sceneNow.date
+    const compare = sceneCompare.date
     loading_message.value = '确认计算结果是否存在...'
     isRunning.value = true
     let exist
@@ -512,11 +547,13 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow) => {
     if (exist) {
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
+        profileDataCompare.value = await getProfileData(compare, before)
     } else {
         loading_message.value = '地形对比结果计算中...'
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
+        profileDataCompare.value = await getProfileData(compare, before)
     }
     // loading_message.value = "地形对比结果计算中..."
     // await CalProfile(before, now)
@@ -660,6 +697,7 @@ const onAddProfileOption = () => {}
 const onAddProfile = () => {}
 
 const flowControlHandler = () => {
+    console.log('!!!!flow  control');
     showFlow.value = !showFlow.value
     // console.log(showFlow.value);
     if (showFlow.value) {
@@ -725,15 +763,25 @@ const RasterControlHandler = () => {
 }
 
 // 地形对比变量
-const sceneBeforeValue = ref('2022after')
-const sceneNowValue = ref('2023after')
-const preSceneBeforeValue = ref('2022after')
-const preSceneNowValue = ref('2023after')
+const sceneBeforeValue = ref('2019before')
+const sceneNowValue = ref('2023before1')
+const sceneCompareValue = ref('2012after')
+const preSceneBeforeValue = ref('2019before')
+const preSceneNowValue = ref('2023before1')
+const preSceneCompareValue = ref('2012after')
 let sceneBefore
 let sceneNow
+let sceneCompare
 
-// 断面数据变量
+// 窗口显示变量
 const showProfileInfo = ref(false)
+const showYearlyProfileShape = ref(false)
+const showYearlyProfileShapeFunc = () => {
+    loading_message.value = '正在加载单一滩槽高程信息...'
+    isRunning.value = true
+    showYearlyProfileShape.value = !showYearlyProfileShape.value
+    isRunning.value = false
+}
 const showProfileShape = ref(false)
 const showProfileShapeFunc = () => {
     loading_message.value = '正在加载滩槽高程信息...'
@@ -774,27 +822,22 @@ const showFlowSpeedFunc = () => {
     isRunning.value = false
     flowControlHandler()
 }
+
+// 展示水动力因素指标，包括:
+// 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
+const showWaterPowerFunc = () => {
+    showProfileShapeFunc()
+    showYearlyProfileShapeFunc()
+}
+
 const profileData = ref([])
-const riskDataAll = ref([
-    {
-        value: 'low',
-        label: '低风险'
-    },
-    {
-        value: 'middle',
-        label: '中风险'
-    },
-    {
-        value: 'high',
-        label: '高风险'
-    },
-])
-// const riskDataIndex = ref(0)
+const profileDataCompare = ref([])
+const riskDataIndex = ref(0)
 const tempProfile = ref(null)
 const tempProfileData = ref(null)
 
 // 断面图表变量
-
+const shapeYearlyChartLoad = ref(true)
 const shapeChartLoad = ref(true)
 const slopeChartLoad = ref(true)
 const erosionChartLoad = ref(true)
@@ -902,7 +945,7 @@ const draw = new MapboxDraw({
 const cancelSectionRese = () => {
     sectionConfirmShow.value = false
 }
-
+// 两年版本
 const sureSectionRese = async () => {
     if (tempProfileName.value === '') {
         ElMessage.error('断面名称不为空！')
@@ -914,6 +957,7 @@ const sureSectionRese = async () => {
         return
     }
     isRunning.value = true
+    shapeYearlyChartLoad.value = true
     shapeChartLoad.value = true
     slopeChartLoad.value = true
     erosionChartLoad.value = true
@@ -957,6 +1001,7 @@ const sureSectionRese = async () => {
     putDataInList(profileResult.data)
     profileData.value.push(profileResult.data)
     isRunning.value = false
+    shapeYearlyChartLoad.value = false
     shapeChartLoad.value = false
     slopeChartLoad.value = false
     erosionChartLoad.value = false
@@ -1298,11 +1343,7 @@ onMounted(async () => {
         map.addControl(draw)
 
         useMapStore().setMap(map)
-        // console.log('set map!')
-        flow.particleNum.n = 2800
-        flow.speedFactor.n = 1.0
-        map.addLayer(flow)
-        flow.hide()
+      
     })
 
     getProfileTime()
@@ -1312,7 +1353,7 @@ onMounted(async () => {
     showProfileErosion.value = false
     showRiskResult.value = false
     showFlowSpeed.value = false
-    await ProfileLoadingProcess(sceneBefore, sceneNow)
+    await ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompare)
 })
 
 onUnmounted(() => {
@@ -1555,12 +1596,12 @@ div.risk-warn-container {
         }
     }
 
-    div.tree-container {
+    div.button-container {
         position: absolute;
-        top: 20vh;
+        top: 88vh;
         left: 2vw;
-        width: 22vw;
-        height: 30vh;
+        width: 15vw;
+        height: 2vh;
         background-color: rgba(48, 49, 51, 0.6);
         backdrop-filter: blur(5px);
         border-radius: 10px;
@@ -1664,6 +1705,109 @@ div.risk-warn-container {
             }
         }
     }
+
+    div.risk-year-container {
+        position: absolute;
+        top: 8.5vh;
+        left: 0.2vw;
+        height: 6.8vh;
+        width: 23.5vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        border: rgba(0, 119, 255, 0.6) 2px solid;
+        border-radius: 6px;
+        z-index: 3;
+
+        div.risk-year-title {
+            position: absolute;
+            top: -0.8vh;
+            left: 2vw;
+            color: rgb(159, 68, 187);
+            text-shadow:
+                #eef3ff 1px 1px,
+                #eef3ff 2px 2px,
+                #6493ff 3px 3px;
+            color-scheme: light;
+            font-family: 'Microsoft YaHei';
+            font-weight: bolder;
+            font-size: calc(0.9vw + 0.6vh);
+        }
+
+        div.risk-year-content {
+            position: absolute;
+            top: -0.7vh;
+            left: 14vw;
+            color: rgb(24, 116, 170);
+            color-scheme: light;
+            font-family: 'Microsoft YaHei';
+            font-weight: bolder;
+            font-size: calc(1.0vw + 0.6vh);
+        }
+    }
+
+    div.risk-item-container {
+        position: absolute;
+        top: 20vh;
+        left: 1vw;
+        height: 67vh;
+        width: 23.9vw;
+        background-color: rgba(197, 211, 228, 0.6);
+        border: rgba(0, 119, 255, 0.6) 2px solid;
+        border-radius: 6px;
+        z-index: 3;
+
+        div.risk-item {
+            position: absolute;
+            left: 1vw;
+            height: 4vh;
+            width: 8vw;
+            border: rgba(0, 119, 255, 0.6) 2px solid;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            &:hover {
+                transform: scale(1.03);
+            }
+
+            &.waterpower {
+                top: 4vh;
+                background-color: rgba(28, 85, 156, 0.6);
+            }
+
+            &.riverbed {
+                top: 20vh;
+                background-color: rgba(39, 145, 87, 0.6);
+            }
+
+            &.bankGeology {
+                top: 38vh;
+                background-color: rgba(95, 21, 138, 0.6);
+            }
+
+            &.outproject {
+                top: 56vh;
+                background-color: rgba(228, 143, 16, 0.6);
+            }
+
+            div.risk-item-text {
+                position: absolute;
+                top: 0.9vh;
+                left: 1.2vw;
+                font-size: calc(0.6vw + 0.4vh);
+                color: white;
+                font-family: 'Microsoft YaHei';
+                font-weight: bolder;
+                text-shadow:
+                #101113 2px 2px,
+                #767779 2px 2px,
+                #6493ff 3px 3px;
+            }
+        }
+
+    }
+
 
     div.raster-control-block {
         position: absolute;
@@ -1791,42 +1935,6 @@ div.risk-warn-container {
                 #eef3ff 1px 1px,
                 #eef3ff 2px 2px,
                 #6493ff 3px 3px;
-        }
-
-        div.current-param-container {
-            position: absolute;
-            top: 4vh;
-            left: 0.5vw;
-            width: 14vw;
-            height: 10vh;
-            text-align: center;
-            border-radius: 6px;
-            overflow: hidden;
-            font-weight: bold;
-            border: 2px solid #1735ae;
-
-            div.current-param-title {
-                height: 4vh;
-                line-height: 4vh;
-                background-color: #1753ae;
-                font-size: calc(0.6vw + 0.6vh);
-                color: #cefffd;
-            }
-
-            div.current-param-content {
-                height: 6vh;
-                line-height: 6vh;
-                background-color: #dcebf8;
-                color: #001cb8;
-                font-size: calc(0.85vw + 0.6vh);
-
-                &.two-line {
-                    height: 3vh;
-                    line-height: 3vh;
-                    font-size: calc(0.65vw + 0.3vh);
-                    // font-weight: 300;
-                }
-            }
         }
 
         div.profile-info-container {
