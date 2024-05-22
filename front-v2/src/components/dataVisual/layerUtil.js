@@ -677,6 +677,7 @@ const layerAddFunctionMap = {
                     'line-color': 'rgb(51, 38, 71)',
                     'line-width': 3,
                     'line-opacity': 0.75,
+                    
                 },
             })
     },

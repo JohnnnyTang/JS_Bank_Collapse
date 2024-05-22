@@ -81,7 +81,7 @@
                         <span>{{ gnssLegendInfo.text2 }}</span>
                     </div>
                     <div style="display: flex; flex-direction: row">
-                        <div class="legend-block">
+                        <div class="legend-block" @click="GNSSShow">
                             <div
                                 class="icon-block GNSS-icon"
                                 :style="{
@@ -304,7 +304,7 @@ const gnssIdSectionMap = {
 }
 
 const warnKeyValList = ref([
-    { key: '危险区域', val: '暂无' },
+    { key: '报警区域', val: '暂无' },
     { key: '出险时间', val: '暂无' },
     { key: '设备信息', val: '暂无' },
     { key: '管理单位', val: '江苏省水利厅' },
@@ -325,6 +325,14 @@ const mapFlyToRiver = (mapIns) => {
             // zoom: 8,
         },
     )
+}
+
+const gnssShow = true
+
+const GNSSShow = () => {
+    let map = useMapStore().getMap()
+
+    // map.
 }
 
 const viewChangeClick = (value) => {
@@ -463,12 +471,16 @@ onMounted(async () => {
     }, 1000);
 })
 
+// onUnmounted(() => {
+//     // resizeObserver.disconnect()
+//     // resizeObserver.unobserve(containerDom.value)
+//     console.log('onUnmounted')
+//     map && map.remove()
+//     console.log('map.remove')
+// })
 onUnmounted(() => {
-    // resizeObserver.disconnect()
-    // resizeObserver.unobserve(containerDom.value)
-    console.log('onUnmounted')
-    map && map.remove()
-    console.log('map.remove')
+    useMapStore().getMap().remove()
+    useMapStore().destroyMap()
 })
 </script>
 

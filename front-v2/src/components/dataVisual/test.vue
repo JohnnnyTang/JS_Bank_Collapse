@@ -7,18 +7,15 @@
 </template>
 
 <script setup>
-import { initMap, initScratchMap, loadImage } from '../../utils/mapUtils';
-import { onMounted, watch, ref } from 'vue';
-import axios from 'axios';
+import { initMap, initScratchMap, loadImage } from '../../utils/mapUtils'
+import { onMounted, watch, ref } from 'vue'
+import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import BankWarnLayer from './js/bankWarnLayer'
-import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask';
-import { layerAddFunction, layerRemoveFunction } from './layerUtil';
-import * as customLayers from '../../utils/WebGL/customLayers';
-
-
-
+import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
+import { layerAddFunction, layerRemoveFunction } from './layerUtil'
+import * as customLayers from '../../utils/WebGL/customLayers'
 
 const mapDom = ref()
 const unityCanvaDom = ref()
@@ -39,37 +36,42 @@ const mapFlyToRiver = (mapIns) => {
 }
 
 onMounted(async () => {
-
     const map = await initScratchMap(mapDom.value)
     const jsonUrl = '/bankWarn/bankWarn.json'
     let bankWarnLayer = new BankWarnLayer(jsonUrl)
     map.addLayer(bankWarnLayer)
     mapFlyToRiver(map)
+    
     /**
      * @type {customLayers.UnityLayer}
      */
     let unityLayer
     /**
-   * @type {customLayers.MaskLayer}
-   */
+     * @type {customLayers.MaskLayer}
+     */
     let maskLayer
 
     window.addEventListener('keydown', (e) => {
         if (e.key == '1') {
-            const script = document.createElement('script');
-            script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
+            const script = document.createElement('script')
+            script.src =
+                '/scratchSomething/unity/collapseBank/build/output.loader.js'
             script.onload = async () => {
-                console.log('load.js fine');
-                unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
+                console.log('load.js fine')
+                unityLayer = new customLayers.UnityLayer(
+                    [120.556596, 32.042607],
+                    0,
+                    unityCanvaDom.value,
+                )
                 maskLayer = new customLayers.MaskLayer()
                 map.addLayer(unityLayer)
                 map.addLayer(maskLayer)
-            };
-            document.head.appendChild(script);
+            }
+            document.head.appendChild(script)
         }
         if (e.key == '2') {
             // map.addLayer(new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value))
-            console.log('222');
+            console.log('222')
             unityLayer.remove()
             map.removeLayer('Mask-Layer')
             map.removeLayer('Unity-Layer')
@@ -85,8 +87,6 @@ onMounted(async () => {
     //     map.addLayer(new customLayers.MaskLayer())
     // };
     // document.head.appendChild(script);
-
-
 
     // const jsonUrl = '/bankWarn/bankWarn.json'
     // let flowSrc = []
@@ -106,19 +106,10 @@ onMounted(async () => {
     // map.addLayer(bankWarnLayer)
     // mapFlyToRiver(map)
 
-
-
-
-
-
-
-
-
     // await layerAddFunction(map, '市级行政区')
     // await layerAddFunction(map, '市级行政区-注记')
     // map.setFilter('市级行政区', filterMap['市级行政区'])
     // map.setFilter('市级行政区-注记', filterMap['市级行政区-注记'])
-
 
     // window.addEventListener('keydown', (e) => {
     //     if (e.key == '1') {
@@ -130,18 +121,7 @@ onMounted(async () => {
     //         map.setFilter('市级行政区-注记', filterMap['市级行政区-注记'])
     //     }
     // })
-
 })
-
-
-
-
-
-
-
-
-
-
 </script>
 
 <style lang="scss" scoped>
@@ -176,7 +156,6 @@ onMounted(async () => {
     canvas#UnityCanvas {
         z-index: 1;
     }
-
 
     .value {
         position: absolute;

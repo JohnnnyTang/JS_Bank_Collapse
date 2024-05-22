@@ -36,4 +36,11 @@ public class RasterTileService implements IRasterTileService {
         String filePath = name + '/' + z + '/' + x + '/' + y + ".png";
         return RasterTileRepo.getMzsFloodRasterFile(filePath);
     }
+
+    public byte[] getBaseImageInByte(int z, int x, int y) throws Exception {
+//        System.out.println(y);
+        String filePath = (z) + "/" + x + "_" + (y) + ".png";
+//        System.out.println(filePath);
+        return RasterTileRepo.getBaseImageRasterFile(filePath);
+    }
 }

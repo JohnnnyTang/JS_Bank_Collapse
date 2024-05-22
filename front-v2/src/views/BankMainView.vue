@@ -81,14 +81,20 @@ onMounted(() => {
             layout: {},
             paint: {
                 'fill-color': 'rgb(182, 222, 252)',
-                'fill-opacity': .3,
+                'fill-opacity': 0.3,
             },
         })
         map.addSource('cityBoundaryLine', {
             type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}'],
+        })
+        map.addSource('disBoundaryLine', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/districtLine/{x}/{y}/{z}'],
+        })
+        map.addSource('disBoundaryPoint', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/districtPoint/{x}/{y}/{z}'],
         })
 
         map.addLayer({
@@ -99,8 +105,36 @@ onMounted(() => {
             layout: {},
             paint: {
                 'line-color': '#0A215C',
-                'line-width': 3,
+                'line-width': 1.5,
                 'line-opacity': 0.75,
+            },
+        })
+        map.addLayer({
+            id: '县级行政区',
+            type: 'line',
+            source: 'disBoundaryLine',
+            'source-layer': 'default',
+            layout: {},
+            paint: {
+                'line-color': '#0A215C',
+                'line-width': 1,
+                'line-opacity': 0.6,
+            },
+        })
+        map.addLayer({
+            id: '点23',
+            type: 'symbol',
+            source: 'disBoundaryPoint',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'mc'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+            },
+            paint: {
+                'text-color': '#1FAEB3',
             },
         })
         // let data = (await axios.get(`http://localhost:5173/api/tile/vector/cityBoundary/info`)).data
@@ -112,7 +146,7 @@ onMounted(() => {
                 tileServer + '/tile/vector/center/cityBoundary/{x}/{y}/{z}',
             ],
         })
-        
+
         map.addLayer({
             id: '市级行政区-注记',
             type: 'symbol',
@@ -120,10 +154,7 @@ onMounted(() => {
             'source-layer': 'default',
             layout: {
                 'text-field': ['get', 'name'],
-                'text-font': [
-                    'Open Sans Semibold',
-                    'Arial Unicode MS Bold',
-                ],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                 'text-anchor': 'bottom',
                 'text-offset': [
                     'match',
@@ -148,51 +179,37 @@ onMounted(() => {
                 // tileServer+'/tile/vector/depthLine/2004/{x}/{y}/{z}',
                 // tileServer+'/tile/vector/depthLine/2006/{x}/{y}/{z}',
                 // tileServer+'/tile/vector/depthLine/2015/{x}/{y}/{z}',
-                tileServer+'/tile/vector/depthLine/2017/{x}/{y}/{z}',
+                tileServer + '/tile/vector/depthLine/2017/{x}/{y}/{z}',
             ],
         })
         map.addSource('riverSectionLabelSource', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/riverSection/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/riverSection/{x}/{y}/{z}'],
         })
         map.addSource('riverBg', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/riverBg/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/riverBg/{x}/{y}/{z}'],
         })
         map.addSource('riverLand', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/riverLand/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/riverLand/{x}/{y}/{z}'],
         })
         map.addSource('ptVector', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/placeLabel/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
         })
         map.addSource('riverLabelSource', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/riverName/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/riverName/{x}/{y}/{z}'],
         })
 
         map.addSource('mzsPlaceLabelSource', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
         })
         map.addSource('mzsPlaceLineSource', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
         })
 
         // map.addSource('mzsBankLabelSource', {
@@ -203,9 +220,7 @@ onMounted(() => {
         // })
         map.addSource('mzsBankLineSource', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsBankLine/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
         })
         // map.addSource('mzsSectionLineSource', {
         //     type: 'vector',
@@ -227,9 +242,7 @@ onMounted(() => {
         // })
         map.addSource('mzsBankAreaSSource', {
             type: 'vector',
-            tiles: [
-                tileServer+'/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
-            ],
+            tiles: [tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}'],
         })
         // map.addLayer({
         //     id: '线1',
@@ -334,7 +347,7 @@ onMounted(() => {
                 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                 // 'text-offset': [0, 1.25],
                 'text-anchor': 'left',
-                'symbol-placement': 'line-center'
+                'symbol-placement': 'line-center',
             },
             paint: {
                 'text-color': 'rgba(13, 22, 189, 0.8)',
@@ -540,6 +553,25 @@ onMounted(() => {
         //     type: 'raster',
         //     source: 'mapRaster6',
         // })
+
+        map.addSource('mapRaster22', {
+            type: 'raster',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/image/base/{x}/{y}/{z}',
+            ],
+            tileSize: 256,
+            minzoom: 9,
+            maxzoom: 14,
+            bounds: [
+                118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+                32.835981186719593,
+            ],
+        })
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'mapRaster22',
+        })
         map.on('click', (e) => {
             var features = map.queryRenderedFeatures(e.point, {
                 layers: ['land1', 'fill1'],

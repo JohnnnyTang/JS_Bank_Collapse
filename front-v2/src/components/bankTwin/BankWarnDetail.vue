@@ -2,11 +2,64 @@
     <div
         class="warn-detail-container"
         :class="props.warnActive ? 'active' : 'in-active'"
-        v-loading="detailLoading"
         v-if="props.warnActive"
     >
         <div class="warn-detail-title">报警信息详情</div>
-        <div class="warn-detail-content"></div>
+        <div class="warn-detail-content" v-loading="detailLoading">
+            <el-scrollbar class="accordion-scroll">
+                <el-collapse>
+                    <el-collapse-item
+                        :title="
+                            deviceIdMap[warn.deviceId] +
+                            '报警详情-' +
+                            warn.warnTime
+                        "
+                        v-for="warn in warnInfoStore.warnInfo"
+                        :key="warn.id"
+                    >
+                        <div class="detail-content-container">
+                            <el-descriptions
+                                direction="vertical"
+                                :column="4"
+                                border
+                                style="width: 100%;"
+                            >
+                                <el-descriptions-item label="报警区域" :span="1"
+                                    >{{ deviceIdPlaceMap[warn.deviceId] }}</el-descriptions-item
+                                >
+                                <el-descriptions-item label="报警时间" :span="3"
+                                    >{{ warn.warnTime }}</el-descriptions-item
+                                >
+                                <el-descriptions-item label="风险点责任人" :span="2"
+                                    >高卫南</el-descriptions-item
+                                >
+                                <el-descriptions-item label="责任人联系方式" :span="2"
+                                    >15161059955</el-descriptions-item
+                                >
+                                <el-descriptions-item label="巡查队伍" :span="2"
+                                    >靖江市西来镇巡堤查险队</el-descriptions-item
+                                >
+                                <el-descriptions-item label="巡查队伍责任人" :span="2"
+                                    >刘宏江</el-descriptions-item
+                                >
+                                <el-descriptions-item label="巡查队伍联系方式" :span="2"
+                                    >13921738638</el-descriptions-item
+                                >
+                                <el-descriptions-item label="抢险队伍" :span="2"
+                                    >江苏龙源水利工程有限公司抢险队 </el-descriptions-item
+                                >
+                                <el-descriptions-item label="抢险队伍责任人" :span="2"
+                                    >吴明灿</el-descriptions-item
+                                >
+                                <el-descriptions-item label="抢险队伍联系方式" :span="2"
+                                    >13815981186</el-descriptions-item
+                                >
+                            </el-descriptions>
+                        </div>
+                    </el-collapse-item>
+                </el-collapse>
+            </el-scrollbar>
+        </div>
         <div class="plan-button-group">
             <div class="plan-button-title">
                 <div>处置预案</div>
@@ -16,28 +69,168 @@
                 class="plan-button-item"
                 v-for="but in buttonInfoList"
                 :key="but.index"
+                @click="openPlanPdf(but)"
             >
                 <div class="plan-button-name">{{ but.name }}</div>
                 <div class="plan-button-func">预览</div>
             </div>
         </div>
+        <el-dialog
+            v-model="dialogVisible"
+            :title="dialogTitle"
+            width="fit-content"
+            :append-to-body="true"
+        >
+            <VuePDF :pdf="pdf" :page="curPage" />
+            <el-pagination
+                layout="prev, pager, next"
+                background
+                :page-count="pages"
+                v-model:current-page="curPage"
+                style="justify-content: center"
+            />
+        </el-dialog>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { VuePDF, usePDF } from '@tato30/vue-pdf'
+import { useWarnInfoStore } from '../../store/mapStore'
 const props = defineProps({
     warnActive: {
         type: Boolean,
         default: true,
     },
 })
+const detailLoading = ref(false)
+const warnInfoStore = useWarnInfoStore()
+const warnDetailList = ref([])
+
+const deviceIdMap = {
+    'MZS120.51749289_32.04059243_1': 'CL-01',
+    'MZS120.51977143_32.04001152_1': 'CL-02',
+    'MZS120.52557975_32.03825056_1': 'CL-03',
+    'MZS120.52660704_32.03676583_1': 'CL-04',
+    'MZS120.53334877_32.03227055_1': 'CL-05',
+    'MZS120.54599538_32.02837993_1': 'CL-06',
+    'MZS120.55327892_32.02707923_1': 'CL-07',
+    'MZS120.55649757_32.02592404_1': 'CL-08',
+    'MZS120.56334257_32.02298144_1': 'CL-09',
+    'MZS120.56944728_32.02070961_1': 'CL-10',
+    'MZS120.51726088_32.04054582_3': 'KX-01',
+    'MZS120.51738292_32.04054923_3': 'KX-02',
+    'MZS120.51749021_32.04053105_3': 'KX-03',
+    'MZS120.51957026_32.04008655_3': 'KX-04',
+    'MZS120.51967889_32.04004108_3': 'KX-05',
+    'MZS120.51986665_32.03998992_3': 'KX-06',
+    'MZS120.52557975_32.03825056_3': 'KX-07',
+    'MZS120.52565217_32.03813574_3': 'KX-08',
+    'MZS120.52566826_32.03799363_3': 'KX-09',
+    'MZS120.513203_32.042733_2': 'YL-01',
+    'MZS120.515433_32.04231_2': 'YL-02',
+    'MZS120.521221_32.040331_2': 'YL-03',
+    'MZS120.529078_32.034385_2': 'YL-04',
+    'MZS120.541648_32.030524_2': 'YL-05',
+    'MZS120.548925_32.029361_2': 'YL-06',
+    'MZS120.552209_32.028149_2': 'YL-07',
+    'MZS120.51967889_32.04004108_4': 'CX-01',
+    'MZS120.51986665_32.03998992_4': 'CX-02',
+    'MZS120.52557975_32.03825056_4': 'CX-03',
+    'MZS120.52565217_32.03813574_4': 'CX-04',
+    'MZS120.52566826_32.03799363_4': 'CX-05',
+    'MZS120.51726088_32.04054582_4': 'CX-06',
+    'MZS120.51738292_32.04054923_4': 'CX-07',
+    'MZS120.51749021_32.04053105_4': 'CX-08',
+    'MZS120.51957026_32.04008655_4': 'CX-09',
+}
+
+const deviceIdPlaceMap = {
+    '': '暂无',
+    'MZS120.51749289_32.04059243_1': '南顺堤',
+    'MZS120.51977143_32.04001152_1': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_1': '江滩办事处',
+    'MZS120.52660704_32.03676583_1': '小港池',
+    'MZS120.53334877_32.03227055_1': '张靖皋桥位上游',
+    'MZS120.54599538_32.02837993_1': '海事码头',
+    'MZS120.55327892_32.02707923_1': '海事码头下游',
+    'MZS120.55649757_32.02592404_1': '雷达站',
+    'MZS120.56334257_32.02298144_1': '民主沙尾部主路',
+    'MZS120.56944728_32.02070961_1': '民主沙尾部',
+    'MZS120.51726088_32.04054582_3': '南顺堤',
+    'MZS120.51738292_32.04054923_3': '南顺堤',
+    'MZS120.51749021_32.04053105_3': '南顺堤',
+    'MZS120.51957026_32.04008655_3': '南顺堤尾部',
+    'MZS120.51967889_32.04004108_3': '南顺堤尾部',
+    'MZS120.51986665_32.03998992_3': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_3': '江滩办事处',
+    'MZS120.52565217_32.03813574_3': '江滩办事处',
+    'MZS120.52566826_32.03799363_3': '江滩办事处',
+    'MZS120.513203_32.042733_2': '南顺堤',
+    'MZS120.515433_32.04231_2': '南顺堤尾部',
+    'MZS120.521221_32.040331_2': '江滩办事处',
+    'MZS120.529078_32.034385_2': '张靖皋桥位上游',
+    'MZS120.541648_32.030524_2': '海事码头',
+    'MZS120.548925_32.029361_2': '海事码头下游',
+    'MZS120.552209_32.028149_2': '雷达站',
+    'MZS120.51967889_32.04004108_4': '南顺堤',
+    'MZS120.51986665_32.03998992_4': '南顺堤',
+    'MZS120.52557975_32.03825056_4': '南顺堤',
+    'MZS120.52565217_32.03813574_4': '南顺堤尾部',
+    'MZS120.52566826_32.03799363_4': '南顺堤尾部',
+    'MZS120.51726088_32.04054582_4': '南顺堤尾部',
+    'MZS120.51738292_32.04054923_4': '江滩办事处',
+    'MZS120.51749021_32.04053105_4': '江滩办事处',
+    'MZS120.51957026_32.04008655_4': '江滩办事处',
+}
 
 const buttonInfoList = ref([
-    { index: 0, name: '撤离预案', url: '' },
-    { index: 1, name: '行洪运用预案', url: '' },
-    { index: 2, name: '重点防御预案', url: '' },
+    {
+        index: 0,
+        name: '南通段预案',
+        url: '/pdf/11.长江南通段民主沙撤离预案.pdf',
+        pageNum: '29',
+    },
+    {
+        index: 1,
+        name: '靖江段预案',
+        url: '/pdf/30.靖江市民主沙行洪运用预案.pdf',
+        pageNum: '41',
+    },
+    {
+        index: 2,
+        name: '重点防御预案',
+        url: '/pdf/75靖江市民主沙(右缘)险工段重点防御预案.pdf',
+        pageNum: '63',
+    },
 ])
+
+const curPage = ref(1)
+
+const curPdf = ref('/pdf/11.长江南通段民主沙撤离预案.pdf')
+
+const { pdf, pages, info } = usePDF(curPdf)
+
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+
+const detailInfo = ref({
+    basic: '',
+    cause: '',
+    plan: '',
+    after: '',
+    video: '',
+})
+
+const openPlanPdf = (info) => {
+    curPage.value = 1
+    dialogVisible.value = true
+    curPdf.value = info.url
+}
+
+onMounted(() => {
+    warnDetailList.value = warnInfoStore.warnInfo
+})
 </script>
 
 <style lang="scss" scoped>
@@ -76,79 +269,50 @@ div.warn-detail-container {
 
     div.warn-detail-content {
         height: 35vh;
-        width: 23vw;
-        margin-left: 0.5vw;
+        width: 23.5vw;
+        margin-left: 0.25vw;
 
         background-color: #6493ff;
 
-        display: flex;
-        flex-flow: row wrap;
-        align-content: flex-start;
-        justify-content: center;
+        div.accordion-scroll {
+            height: 100%;
+            width: 100%;
+        }
 
-        div.key-val-container {
-            margin-top: 0.6vh;
-            width: 90%;
-            height: 6vh;
+        :deep(.el-collapse) {
+            --el-collapse-border-color: #104da8;
+            --el-collapse-header-height: 8vh;
+            .el-collapse-item__header {
+                background-color: rgb(210, 242, 255);
+                padding-left: 1vw;
+                font-weight: bold;
+                color: #14129e;
+                font-size: calc(0.7vw + 0.4vh);
+                &.is-active {
+                    color: rgb(221, 251, 255);
+                    background-color: #0019a5;
+                }
+            }
+
+            .el-collapse-item__content {
+                background-color: rgb(221, 251, 255);
+            }
+        }
+        :deep(.el-collapse-item__wrap) {
+            background-color: transparent !important;
+        }
+        div.detail-content-container {
+            width: 96%;
+            height: 32vh;
+            margin-left: 2%;
+            // padding-left: 2%;
+            // padding-right: 2%;
+            // background-color: rgb(92, 125, 154);
+            border-bottom: 2px solid #0018a3;
+
             display: flex;
             flex-flow: row wrap;
-            justify-content: space-between;
-            // background-color: #0446a8;
-            text-align: center;
-            border-bottom: 2px solid rgb(0, 32, 175);
-
-            &:first-child {
-                margin-top: 0;
-            }
-
-            div.icon {
-                width: 20%;
-                height: 3vh;
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-position: 50% 50%;
-                background-color: transparent;
-
-                &#warning-icon {
-                    background-image: url('/warning.png');
-                }
-
-                &#length-icon {
-                    background-image: url('/distance.png');
-                }
-            }
-
-            div.key-text {
-                width: width;
-                line-height: 6vh;
-                background-color: transparent;
-                font-size: calc(0.7vw + 0.6vh);
-                color: #0043fd;
-            }
-
-            div.val-text {
-                line-height: 6vh;
-                font-size: calc(0.7vw + 0.5vh);
-                font-weight: bold;
-                color: #1d00be;
-                // max-width: 70%;
-                width: 12vw;
-                text-align: right;
-                // text-align: center;
-            }
-
-            // &:nth-child(2n + 1) {
-            //     text-align: left;
-
-            //     // padding-left: 6%;
-            //     // border-right: 2px solid rgb(0, 32, 175);
-            // }
-            // &:nth-child(2n) {
-            //     text-align: right;
-            //     justify-content: flex-end;
-            //     // padding-right: 6%;
-            //     // border-left: 2px solid rgb(0, 32, 175);
-            // }
+            justify-content: center;
         }
     }
 
@@ -201,7 +365,7 @@ div.warn-detail-container {
             border-radius: 4px;
 
             border: 2px solid rgb(0, 119, 255);
-            background-color: #b9d7ff;
+            background-color: #8beeff;
 
             &:hover {
                 cursor: pointer;

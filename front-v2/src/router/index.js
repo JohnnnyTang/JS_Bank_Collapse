@@ -53,6 +53,11 @@ const routes = [
         // component: () => import("../views/BankMainView.vue")
     },
     {
+        path: '/home',
+        name: 'main',
+        component: () => import("../views/BankMainView.vue")
+    },
+    {
         path: '/main',
         component: () => import("../views/BankMainView.vue")
     },
