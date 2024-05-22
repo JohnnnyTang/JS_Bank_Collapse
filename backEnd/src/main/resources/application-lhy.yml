@@ -13,7 +13,7 @@ spring:
       idle-timeout: 0
     default:
       #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
-      url: jdbc:postgresql://localhost:5432/shore0519?stringtype=unspecified
+      url: jdbc:postgresql://localhost:5432/shore522?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: QWERBOOM123

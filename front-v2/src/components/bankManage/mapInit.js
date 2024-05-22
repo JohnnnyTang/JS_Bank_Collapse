@@ -510,13 +510,11 @@ const mapInit = async (map, vis) => {
             const property = e.features[0].properties
             useSceneStore().setSelectedFeature(property)
             propertyRef.value = property
-            console.log('click feature!', propertyRef.value)
             const popUp = createPopUp(propertyRef, zoomRef)
             popUp
                 .setOffset(0)
                 .setLngLat([p.longitude, p.latitude])
                 .addTo(map)
-            console.log('singgle popUp added!')
             // }
         })
         map.on('mousemove', deviceLayers, (e) => {
@@ -543,7 +541,7 @@ const mapInit = async (map, vis) => {
         ///////DEBUG////////
         window.addEventListener('keydown', async (e) => {
             if (e.key == 'Enter') {
-                const minute = 720
+                const minute = 60*6
                 let allWarnData = (
                     await axios.get(`/api/data/deviceWarn/minute/${minute}`)
                 ).data
@@ -614,7 +612,6 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
         孔隙水压力计: 'manometer-source',
         应力桩: 'stress-source',
     }
-    console.log(deviceLayer, deviceCode, sourceMap[deviceLayer]);
 
     if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
         map.addLayer({
@@ -636,10 +633,8 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
 
     // warning
     const popup = createWarningPopup({ warningInfo: warnData })
-    // console.log('warn pop', warnData)
     popup.setLngLat([property.longitude, property.latitude]).addTo(map)
     useWarnInfoStore().warnPopupMap[warnData.id] = popup
-    // console.log('look look warnPopMap',useWarnInfoStore().warnPopupMap);
     return [property.longitude, property.latitude]
 }
 
@@ -663,7 +658,6 @@ const createPopUp = (deviceProperty, zoom) => {
     const container = document.createElement('div')
     container.id = 'monitorDetailV2-div'
     const componentInstance = ap.mount(container)
-    console.log('VueComponent Mounted')
 
     const domwithComp = container
     const popUp = new mapboxgl.Popup({
@@ -675,7 +669,6 @@ const createPopUp = (deviceProperty, zoom) => {
 
 const createWarningPopup = (info) => {
     // const ap = createApp(warningPop, { warningInfo: info })
-    console.log('warn info', info)
     const ap = createApp(warningPopup, info)
 
     const container = document.createElement('div')
@@ -727,7 +720,6 @@ const warnInterval = async (map, minute) => {
     filteredData.forEach((item) => {
         let id = item.deviceId
         let type = 'GNSS'
-        console.log("log warn filter data", item)
         lastPos = setWarningDeviceStyle(map, type, id, item)
     })
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)

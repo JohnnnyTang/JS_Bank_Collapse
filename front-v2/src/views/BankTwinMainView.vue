@@ -49,7 +49,7 @@
         </div>
 
         <div class="monitor-legend-container">
-            <div class="monitor-legend-title">监测设备图例</div>
+            <div class="monitor-legend-title" @click="deviceShowControl(-1)">监测设备图例</div>
             <div class="monitor-legend-block">
                 <!-- GNSS only -->
                 <div class="monitor-legend-item GNSS">
@@ -75,7 +75,7 @@
                                 ">
                                 {{ gnssLegendInfo.device1 }}</span>
                         </div>
-                        <div class="legend-block">
+                        <div class="legend-block" @click="deviceShowControl(1)">
                             <div class="icon-block GNSS-icon" :style="{
                                 backgroundImage: `url(${gnssLegendInfo.icon2})`,
                             }"></div>
@@ -98,7 +98,7 @@
                         <span style="font-weight: bold">{{ item.strong }}</span>
                         <span>{{ item.text2 }}</span>
                     </div>
-                    <div class="legend-block" @click="deviceShowControl(index + 1)">
+                    <div class="legend-block" @click="deviceShowControl(index + 2)">
                         <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
                         <span style="
                                 text-align: center;
@@ -234,17 +234,50 @@ const legendList = [
     }
 ]
 
-const gnssIdMap = {
-    'MZS120.51749289_32.04059243_1': 'CL-01',
-    'MZS120.51977143_32.04001152_1': 'CL-02',
-    'MZS120.52557975_32.03825056_1': 'CL-03',
-    'MZS120.52660704_32.03676583_1': 'CL-04',
-    'MZS120.53334877_32.03227055_1': 'CL-05',
-    'MZS120.54599538_32.02837993_1': 'CL-06',
-    'MZS120.55327892_32.02707923_1': 'CL-07',
-    'MZS120.55649757_32.02592404_1': 'CL-08',
-    'MZS120.56334257_32.02298144_1': 'CL-09',
-    'MZS120.56944728_32.02070961_1': 'CL-10',
+const deviceNameMap = {
+    GNSS: {
+        'MZS120.51749289_32.04059243_1': 'CL-01',
+        'MZS120.51977143_32.04001152_1': 'CL-02',
+        'MZS120.52557975_32.03825056_1': 'CL-03',
+        'MZS120.52660704_32.03676583_1': 'CL-04',
+        'MZS120.53334877_32.03227055_1': 'CL-05',
+        'MZS120.54599538_32.02837993_1': 'CL-06',
+        'MZS120.55327892_32.02707923_1': 'CL-07',
+        'MZS120.55649757_32.02592404_1': 'CL-08',
+        'MZS120.56334257_32.02298144_1': 'CL-09',
+        'MZS120.56944728_32.02070961_1': 'CL-10',
+    },
+    水压力计: {
+        'MZS120.51726088_32.04054582_3': 'KX-01',
+        'MZS120.51738292_32.04054923_3': 'KX-02',
+        'MZS120.51749021_32.04053105_3': 'KX-03',
+        'MZS120.51957026_32.04008655_3': 'KX-04',
+        'MZS120.51967889_32.04004108_3': 'KX-05',
+        'MZS120.51986665_32.03998992_3': 'KX-06',
+        'MZS120.52557975_32.03825056_3': 'KX-07',
+        'MZS120.52565217_32.03813574_3': 'KX-08',
+        'MZS120.52566826_32.03799363_3': 'KX-09',
+    },
+    测斜仪: {
+        'MZS120.51967889_32.04004108_4': 'CX-01',
+        'MZS120.51986665_32.03998992_4': 'CX-02',
+        'MZS120.52557975_32.03825056_4': 'CX-03',
+        'MZS120.52565217_32.03813574_4': 'CX-04',
+        'MZS120.52566826_32.03799363_4': 'CX-05',
+        'MZS120.51726088_32.04054582_4': 'CX-06',
+        'MZS120.51738292_32.04054923_4': 'CX-07',
+        'MZS120.51749021_32.04053105_4': 'CX-08',
+        'MZS120.51957026_32.04008655_4': 'CX-09',
+    },
+    应力桩: {
+        'MZS120.513203_32.042733_2': 'YL-01',
+        'MZS120.515433_32.04231_2': 'YL-02',
+        'MZS120.521221_32.040331_2': 'YL-03',
+        'MZS120.529078_32.034385_2': 'YL-04',
+        'MZS120.541648_32.030524_2': 'YL-05',
+        'MZS120.548925_32.029361_2': 'YL-06',
+        'MZS120.552209_32.028149_2': 'YL-07',
+    },
 }
 
 const gnssIdSectionMap = {
@@ -292,19 +325,24 @@ const gnssShow = true
 //     // map.
 // }
 const deviceShowControl = (index) => {
-    let layerNameList = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩', '监控摄像头']
-    // console.log(index);
-    let layerName = layerNameList[index]
+    let layerNameList = ['GNSS', 'GNSS基准站', '测斜仪', '孔隙水压力计', '应力桩', '监控摄像头']
     let map = useMapStore().getMap()
-
+    if (index == -1) {
+        layerNameList.forEach((item) => {
+            map.getLayer(item) && map.setLayoutProperty(item, 'visibility', 'visible')
+        })
+        return
+    }
+    let layerName = layerNameList[index]
     layerNameList.forEach((item) => {
         map.getLayer(item) && map.setLayoutProperty(item, 'visibility', 'none')
     })
     map.getLayer(layerName) && map.setLayoutProperty(layerName, 'visibility', 'visible')
+
 }
 
 const viewChangeClick = (value) => {
-    console.log('view Change!', value)
+    // console.log('view Change!', value)
     let map = useMapStore().getMap()
     if (!map)
         ElMessage({
@@ -361,10 +399,10 @@ const updateWarnInfoDesc = async () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
-    console.log('warnInfo! ', warnInfo)
+    // console.log('warnInfo! ', warnInfo)
     let deviceNameList = []
     let warnTimeList = []
-    console.log('print warn info', warnInfo)
+    // console.log('print warn info', warnInfo)
     if (warnInfo.length == 0) {
         statusText.value = '正常'
     }
@@ -373,18 +411,20 @@ const updateWarnInfoDesc = async () => {
     }
 
     for (let i = 0; i < warnInfo.length; i++) {
-        console.log('build warn', warnInfo[i])
+        // console.log('build warn', warnInfo[i])
         // 报警设备信息
         let deviceId = warnInfo[i].deviceId
-        deviceNameList.push(gnssIdMap[warnInfo[i].deviceId])
-        warnTimeList.push(warnInfo[i].warnTime.split(' ')[1])
         let deviceName = DEVICETYPEMAP[deviceId.slice(-1) - 1]
+
+        deviceNameList.push(deviceNameMap[deviceName][warnInfo[i].deviceId])
+        warnTimeList.push(warnInfo[i].warnTime.split(' ')[1])
+
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒')
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
 
         let warnString = `
             警告：于${warnTime}，${gnssIdSectionMap[deviceId]}断面(${buildLocStr(deviceId)})的 \
-            ${deviceName}(${gnssIdMap[deviceId]})周围区域即将发生崩岸险情 \
+            ${deviceName}(${deviceNameMap[deviceName][deviceId]})周围区域即将发生崩岸险情 \
             请注意防汛处置！
         `
         WARN_TEXT.push(warnString)
@@ -692,6 +732,10 @@ div.twin-main-container {
             letter-spacing: 0.2rem;
             padding-left: 0.5vw;
             padding-right: 0.5vw;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
 
         div.monitor-legend-block {
@@ -755,7 +799,7 @@ div.twin-main-container {
                 width: 14vw;
             }
 
-            &:hover{
+            &:hover {
                 cursor: pointer;
             }
         }
