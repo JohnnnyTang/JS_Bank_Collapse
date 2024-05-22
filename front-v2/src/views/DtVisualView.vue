@@ -71,6 +71,13 @@
             </el-table>
         </div>
 
+        <!-- 底图切换 -->
+        <div class="radio-container">
+            <el-radio-group v-model="baseMapRadio" size="large" @change="baseMapChangeHandler">
+                <el-radio-button label="矢量底图" value=1 />
+                <el-radio-button label="影像底图" value=0 />
+            </el-radio-group>
+        </div>
     </div>
 </template>
 
@@ -84,7 +91,7 @@ import sideBar from '../components/dataVisual/common/sideBar.vue'
 // import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
 import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
-import { initBaseMap } from '../utils/mapUtils';
+import { initBaseMap, getStyleJson4base } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
 import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt } from '../components/dataVisual/js/tilefieldMAP';
@@ -119,23 +126,19 @@ const waterTableData = [
 const infoTableData = ref([])
 const infoTableHeader = ref([])
 const pannelLoading = ref(true)
+const baseMapRadio = ref(1)
 
 
-// watch(() => sceneStore.latestScene, (val) => {
-//     if (val == '重点岸段') {
-//         activeStatus.value[2] = true
-//         legendList.value = legendMap['重点岸段']
 
-//     } else if (val == '工程情况') {
-//         activeStatus.value[2] = true
-//         legendList.value = legendMap['工程情况']
-//     }
-//     else if (val == '全江概貌') {
-//         activeStatus.value[2] = true
-//         legendList.value = legendMap['全江概貌']
-//     }
-// })
-
+const baseMapChangeHandler = () => {
+    let map = mapStore.getMap()
+    if (baseMapRadio.value == 0) {
+        map.setStyle('mapbox://styles/mapbox/satellite-v9')
+    } else {
+        let styleJson = getStyleJson4base()
+        map.setStyle(styleJson)
+    }
+}
 
 const detailClickHandler4layerGroup = async (lable) => {
     infoTableData.value = []
@@ -649,6 +652,12 @@ const FieldMap = {
             font-size: calc(0.7vw + 0.5vh);
             line-height: 3vh;
         }
+    }
+
+    div.radio-container {
+        position: absolute;
+        top: 2vh;
+        right: 20vw;
     }
 
 }

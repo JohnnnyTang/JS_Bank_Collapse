@@ -50,7 +50,7 @@ const initScratchMap = (ref) => {
 
 const initBaseMap = (ref) => {
     return new Promise((resolve, reject) => {
-        const map = new ScratchMap({
+        const map = new mapboxgl.Map({
             container: ref.id, // container ID
             accessToken:
                 'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',

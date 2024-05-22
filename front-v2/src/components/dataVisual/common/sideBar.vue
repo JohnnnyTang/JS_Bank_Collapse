@@ -69,9 +69,9 @@ import { getSideBarTree, getFirstShowLayerGroupIds, scenes, layerGroups } from '
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../store/mapStore';
 
 // test 
-import { i_gov_bounds, river_division_point, river_division_line } from '../js/tempData'
-import { loadImage } from '../../../utils/mapUtils';
-import { layerAddFunction, layerInitFunction } from '../layerUtil'
+// import { i_gov_bounds, river_division_point, river_division_line } from '../js/tempData'
+// import { loadImage } from '../../../utils/mapUtils';
+import { initSortedLayer } from '../layerUtil'
 
 const emit = defineEmits(['detailClick'])
 const dataSource = ref([])
@@ -165,70 +165,29 @@ const featureClickHandler = (node, data) => {
 
 watch(() => mapStore.getMap(), async (newV, oldV) => {
     console.log('init map firstly!', newV);
-    // 面、线、点、注记
     let map = newV
-    // 面
-    await layerAddFunction(map, '大型湖泊')
-    await layerAddFunction(map, '区域水系')
-    await layerAddFunction(map, '市级行政区')
-    await layerAddFunction(map, '沿江码头')
-    await layerInitFunction(map, '水闸工程')
-    await layerAddFunction(map, '水库大坝')
-    await layerInitFunction(map, '洲滩')
+    await initSortedLayer(map)
 
-    // 线
-    await layerAddFunction(map, '长江干堤')
-    await layerAddFunction(map, '河道分段')
-    await layerAddFunction(map, '一级预警岸段')
-    await layerAddFunction(map, '二级预警岸段')
-    await layerAddFunction(map, '三级预警岸段')
-    await layerInitFunction(map, '过江通道-隧道/通道')
-    // await layerInitFunction(map, '过江通道-桥墩')
-    await layerInitFunction(map, '过江通道-桥')
-    await layerAddFunction(map, '重点行政区边界')
-
-    // 点
-    await layerInitFunction(map, '水文站点')
-    await layerInitFunction(map, '水闸工程-重点')
-    await layerInitFunction(map, '泵站工程')
-    await layerInitFunction(map, '枢纽工程')
-    await layerAddFunction(map, '河道分段点')
-    await layerAddFunction(map, '行政点')
-
-    // 注记
-    // await layerAddFunction(map, '市级行政区-注记')
-    await layerAddFunction(map, '大型湖泊-注记')
-    await layerAddFunction(map, '区域水系-注记')
-    await layerAddFunction(map, '沿江码头-注记')
-    await layerAddFunction(map, '水库大坝-注记')
-    await layerAddFunction(map, '洲滩-注记')
-    await layerAddFunction(map, '行政点-注记')
-
-
-    await layerAddFunction(map, '岸段-注记')
-    await layerInitFunction(map, '过江通道-桥-注记')
-    await layerInitFunction(map, '过江通道-隧道/通道-注记')
-    await layerInitFunction(map, '水文站点-注记')
-    await layerInitFunction(map, '水闸工程-注记')
-    await layerInitFunction(map, '泵站工程-注记')
-    await layerInitFunction(map, '枢纽工程-注记')
-
-    await layerAddFunction(map, '河道分段-注记')
-    await layerAddFunction(map, '河道分段点-注记')
-
+    map.on('style.load', async () => {
+        // console.log('A style load event occurred.');
+        await initSortedLayer(map)
+    });
 
 }, {
     once: true
 })
 
 
+
 onMounted(async () => {
     sceneStore.SCENEMAP.value = scenes
     sceneStore.LAYERGROUPMAP.value = layerGroups
     dataSource.value = await getSideBarTree()
+    console.log(dataSource.value);
     // let lg = getFirstShowLayerGroupIds()
     // const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 })
+
 
 
 </script>
@@ -534,4 +493,5 @@ div.sideBar-container {
     height: 3vh;
     background-color: #ffffff;
     color: black;
-}</style>
+}
+</style>
