@@ -161,7 +161,7 @@ const sourceColumnMap = {
     "pumpArea": 2,
     "reservoirArea": 2,
     "sluiceArea": 2,
-    "importantBank": 4,
+    "importantBank": 2,
 }
 const legendStyleMap = {
     '全江概貌': {

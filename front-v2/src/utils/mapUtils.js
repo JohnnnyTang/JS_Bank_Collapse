@@ -1708,77 +1708,12 @@ const getStyleJson4base = () => {
                 minzoom: 0,
                 maxzoom: 22, //local TILES max zoom::12
             },
-            JiangSuBoundary: {
-                type: 'geojson',
-                data: geojson,
-            },
+            // JiangSuBoundary: {
+            //     type: 'geojson',
+            //     data: geojson,
+            // },
         },
         layers: [
-            // {
-            //     id: 'JiangSuBoundary-fill',
-            //     type: 'fill',
-            //     source: 'JiangSuBoundary',
-            //     layout: {
-            //         visibility: 'visible',
-            //     },
-            //     paint: {
-            //         'fill-color': 'rgb(216,241,247)',
-            //         'fill-opacity': 1.0,
-            //     },
-            // },
-            // {
-            //     id: 'park_polygon',
-            //     type: 'fill',
-            //     source: 'offlineMapTiles',
-            //     minzoom: 0,
-            //     maxzoom: 22,
-            //     'source-layer': 'park',
-            //     layout: {
-            //         visibility: 'visible',
-            //     },
-            //     paint: {
-            //         'fill-color': 'hsl(204, 0%, 100%)',
-            //         'fill-opacity': 1.0,
-            //     },
-            //     filter: ['==', '$type', 'Polygon'],
-            // },
-            // {
-            //     id: 'transportation_line',
-            //     type: 'line',
-            //     source: 'offlineMapTiles',
-            //     minzoom: 0,
-            //     maxzoom: 22,
-            //     'source-layer': 'transportation',
-            //     layout: {
-            //         visibility: 'visible',
-            //     },
-            //     paint: {
-            //         'line-color': 'hsl(207, 84%, 73%)',
-            //         'line-width': 1,
-            //         'line-opacity': 1.0,
-            //     },
-            //     filter: [
-            //         'all',
-            //         ['==', ['geometry-type'], 'LineString'],
-            //         [
-            //             'all',
-            //             ['!', ['has', 'access']],
-            //             [
-            //                 'match',
-            //                 ['get', 'class'],
-            //                 [
-            //                     'primary',
-            //                     'primary_construction',
-            //                     'secondary',
-            //                     'secondary_construction',
-            //                     'tertiary',
-            //                 ],
-            //                 true,
-            //                 false,
-            //             ],
-            //         ],
-            //     ],
-            // },
             {
                 id: 'water_polygon',
                 type: 'fill',
@@ -3375,6 +3310,30 @@ const getStyleJson = () => {
     return styleJson
 }
 
+const getImageStyleJson = () => {
+    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    return {
+        // local img
+        'version': 8,
+        'sources': {
+            'raster-tiles': {
+                'type': 'raster',
+                'tiles': [tileServer + '/tile/raster/image/base/{x}/{y}/{z}'],
+                'tileSize': 256,
+            }
+        },
+        'layers': [
+            {
+                'id': 'simple-tiles',
+                'type': 'raster',
+                'source': 'raster-tiles',
+                'minzoom': 1,
+                'maxzoom': 14
+            }
+        ]
+    }
+}
+
 
 const showLayersFunction = (map, showLayers) => {
     // new Promise?
@@ -4074,6 +4033,7 @@ export {
     createPopUp,
     getStyleJson,
     getStyleJson4base,
+    getImageStyleJson,
     initLoadedMap,
     showLayersFunction,
     hideLayersFunction,

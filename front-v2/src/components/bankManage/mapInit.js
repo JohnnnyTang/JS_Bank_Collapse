@@ -12,7 +12,7 @@ import { useWarnInfoStore } from '../../store/mapStore'
 import { ref, createApp, h } from 'vue'
 import axios from 'axios'
 import { useSceneStore } from '../../store/mapStore'
-import { ElMessageBox, ElMessage } from 'element-plus'
+import { ElMessageBox, ElMessage, dayjs } from 'element-plus'
 // import ElementPlus from "element-plus";
 
 const propertyRef = ref({})
@@ -23,16 +23,16 @@ const filterWarnData = (warnDataList) => {
     let filterMap = {}
 
     warnDataList.map((item) => {
-        if (!item.ifDealt) {
-            if (
+        if (!item.ifDealt) {    //if not dealt with
+            if (    // new Item and warnTime smaller
                 !(item.deviceId in filterMap) ||
                 filterMap[item.deviceId].warnTime < item.warnTime
             ) {
-                filterMap[item.deviceId] = item
+                filterMap[item.deviceId] = item // strore it
             }
         }
     })
-
+    console.log('filter!!', filterMap, Object.values(filterMap));
     return Object.values(filterMap)
 }
 
@@ -357,7 +357,6 @@ const mapInit = async (map, vis) => {
         )
         const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
-        console.log('监测站！', gnssJZ)
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',
@@ -503,22 +502,22 @@ const mapInit = async (map, vis) => {
         let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
         map.on('click', deviceLayers, (e) => {
-            if (e.features.length > 1) {
-                console.log('click features!', e.features)
-                open(e.features, map)
-            } else if (e.features.length === 1) {
-                let p = e.features[0].properties
-                const property = e.features[0].properties
-                useSceneStore().setSelectedFeature(property)
-                propertyRef.value = property
-                console.log('click feature!', propertyRef.value)
-                const popUp = createPopUp(propertyRef, zoomRef)
-                popUp
-                    .setOffset(0)
-                    .setLngLat([p.longitude, p.latitude])
-                    .addTo(map)
-                console.log('singgle popUp added!')
-            }
+            // if (e.features.length > 1) {
+            //     console.log('click features!', e.features)
+            //     open(e.features, map)
+            // } else if (e.features.length === 1) {
+            let p = e.features[0].properties
+            const property = e.features[0].properties
+            useSceneStore().setSelectedFeature(property)
+            propertyRef.value = property
+            console.log('click feature!', propertyRef.value)
+            const popUp = createPopUp(propertyRef, zoomRef)
+            popUp
+                .setOffset(0)
+                .setLngLat([p.longitude, p.latitude])
+                .addTo(map)
+            console.log('singgle popUp added!')
+            // }
         })
         map.on('mousemove', deviceLayers, (e) => {
             map.getCanvas().style.cursor = 'pointer'
@@ -533,7 +532,7 @@ const mapInit = async (map, vis) => {
         setTimeout(() => {
             warnInterval(map, 40)
         }, 500)
-        setInterval(
+        useWarnInfoStore().warnWatchTimer = setInterval(
             () => {
                 warnInterval(map, 40)
             },
@@ -551,13 +550,11 @@ const mapInit = async (map, vis) => {
                 let filteredData = filterWarnData(allWarnData)
                 let lastPos
                 filteredData.forEach((item) => {
-                    // console.log('1231123', item)
                     let id = item.deviceId
-                    let type = deviceTypeList[id.split('_').pop()-1]
+                    let type = deviceTypeList[id.split('_').pop() - 1]
                     lastPos = setWarningDeviceStyle(map, type, id, item)
                 })
-                if (filteredData.length != 0)
-                    useWarnInfoStore().warnInfo = filteredData
+                if (filteredData.length != 0) useWarnInfoStore().warnInfo = filteredData
 
                 // if (lastPos) {
                 //     map.flyTo({
@@ -569,50 +566,67 @@ const mapInit = async (map, vis) => {
                 //         essential: true,
                 //     })
                 // }
+            }
+            else if (e.key == 'f') {
+                // 11111  clear warnStore and warnLayer
+                useWarnInfoStore().warnInfo.forEach((item) => {
+                    removeWarningDeviceStyle2(map, item.deviceId)
+                })
+                useWarnInfoStore().resetWarnInfo()
+                // 22222 set fake data
+                useWarnInfoStore().fake = true
+                useWarnInfoStore().warnInfo = fakeWarnInfo
 
-                // setTimeout(() => {
-                //     allWarnData.forEach((item) => {
-                //         let id = item.deviceId
-                //         let type = 'GNSS'
-                //         removeWarningDeviceStyle(map, type, id)
-                //     })
-                // }, 2000)
+                let allWarnData = fakeWarnInfo
+                let filteredData = filterWarnData(allWarnData)
+                let typeList = ["GNSS", "应力桩", "孔隙水压力计", "测斜仪"]
+                filteredData.forEach((item) => {
+                    let id = item.deviceId
+                    let type = typeList[id.split('_').pop() - 1]
+                    setWarningDeviceStyle(map, type, id, item)
+                })
+                if (filteredData.length != 0) useWarnInfoStore().warnInfo = filteredData
+
+
+
             }
         })
     }
 }
 
 const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
-    const pulsingCVSMap = {
-        GNSS: 'point',
-        测斜仪: 'rectangle',
-        孔隙水压力计: 'diamond',
-        应力桩: 'triangle',
-    }
-    const pulsingMap = {
-        GNSS: 'gnss-dot-pulsing',
-        测斜仪: 'incline-dot-pulsing',
-        孔隙水压力计: 'manometer-dot-pulsing',
-        应力桩: 'stress-dot-pulsing',
-    }
-
+    // const pulsingCVSMap = {
+    //     GNSS: 'point',
+    //     测斜仪: 'rectangle',
+    //     孔隙水压力计: 'diamond',
+    //     应力桩: 'triangle',
+    // }
+    // const pulsingMap = {
+    //     GNSS: 'gnss-dot-pulsing',
+    //     测斜仪: 'incline-dot-pulsing',
+    //     孔隙水压力计: 'manometer-dot-pulsing',
+    //     应力桩: 'stress-dot-pulsing',
+    // }
+    const pulsingImageId = 'gnss-dot-pulsing' //only one style
     const sourceMap = {
         GNSS: 'gnss-source',
         测斜仪: 'incline-source',
         孔隙水压力计: 'manometer-source',
         应力桩: 'stress-source',
     }
+    console.log(deviceLayer, deviceCode, sourceMap[deviceLayer]);
+
     if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
         map.addLayer({
             id: `${deviceLayer}-${deviceCode}`,
             type: 'symbol',
             source: sourceMap[deviceLayer],
             layout: {
-                'icon-image': pulsingMap[deviceLayer],
+                'icon-image': pulsingImageId,
                 'icon-size': 1,
                 'icon-allow-overlap': true,
             },
-            filter: ['all',['==', 'code', deviceCode]],
+            filter: ['all', ['==', 'code', deviceCode]],
         })
     }
     let json = map.getSource(sourceMap[deviceLayer])['_data']
@@ -625,10 +639,7 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
     // console.log('warn pop', warnData)
     popup.setLngLat([property.longitude, property.latitude]).addTo(map)
     useWarnInfoStore().warnPopupMap[warnData.id] = popup
-
-    map.on('render', () => {
-        map.triggerRepaint()
-    })
+    // console.log('look look warnPopMap',useWarnInfoStore().warnPopupMap);
     return [property.longitude, property.latitude]
 }
 
@@ -637,6 +648,14 @@ const removeWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
     map.getLayer(`${deviceLayer}-${deviceCode}`) &&
         map.removeLayer(`${deviceLayer}-${deviceCode}`)
 }
+
+const removeWarningDeviceStyle2 = (map, deviceCode) => {
+    const daviceLayerMap = ["GNSS", "应力桩", "水压力计", "", "测斜仪"]
+    let deviceLayer = daviceLayerMap[deviceCode.split('_').pop() - 1]
+    map.getLayer(`${deviceLayer}-${deviceCode}`) &&
+        map.removeLayer(`${deviceLayer}-${deviceCode}`)
+}
+
 
 const createPopUp = (deviceProperty, zoom) => {
     const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
@@ -690,7 +709,7 @@ const warnInterval = async (map, minute) => {
         水压力计: [],
         应力桩: [],
     }
-    
+
     let deviceInfo = (await axios.get('/api/data/monitorInfo')).data
     deviceInfo.forEach((item) => {
         const type = Number(item['type']) - 1
@@ -701,11 +720,9 @@ const warnInterval = async (map, minute) => {
         }
     })
 
-    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`))
-        .data
+    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
+    // let warnType = 'GNSS'
     let filteredData = filterWarnData(allWarnData)
-    // console.log('all warn', allWarnData)
-    // console.log('filtered warn', filteredData)
     let lastPos
     filteredData.forEach((item) => {
         let id = item.deviceId
@@ -747,7 +764,7 @@ const open = (features, map) => {
         ])
         .addTo(map)
 
-    let dom = document.getElementById('popup')
+    // let dom = document.getElementById('popup')
 
     // const radioGroupVNode = h('div', { class: 'container' }, [
     //     h('div', { class: 'title' }, '选择设备'),
@@ -817,6 +834,10 @@ const open = (features, map) => {
     //     })
 }
 
+
+
+
+
 const deviceNameMap = {
     GNSS: {
         'MZS120.51749289_32.04059243_1': 'CL-01',
@@ -862,5 +883,48 @@ const deviceNameMap = {
         'MZS120.552209_32.028149_2': 'YL-07',
     },
 }
+/*
+//  'KX-01': 'MZS120.51726088_32.04054582_3',   
+ 'CX-01': 'MZS120.51967889_32.04004108_4',
+ 'CL-06': 'MZS120.54599538_32.02837993_1',
+ 'YL-05': 'MZS120.541648_32.030524_2',
+
+ {
+     "deviceCode": "DVI3010425438293",
+     "deviceId": "MZS120.55327892_32.02707923_1",
+     "id": "c6ae8d58-a506-4acc-ad86-998db55195a3",
+     "ifDealt": null,
+     "threeDiff": 31.4255215,
+     "warnTime": "2024-05-22 20:53:22"
+ }
+ */
+
+const fakeWarnInfo = [
+    {
+        "deviceCode": "DVI3010425438293",
+        "deviceId": "MZS120.55327892_32.02707923_1",
+        "id": "c6ae8d58-a506-4acc-ad86-998db55195a3",
+        "ifDealt": 0,
+        "threeDiff": 31.4255215,
+        "warnTime": dayjs().subtract(3, 'minute').format('YYYY-MM-DD HH:mm:ss')
+    },
+    {
+        "deviceCode": "DVI3010425438293",
+        "deviceId": "MZS120.51967889_32.04004108_4",
+        "id": "c6ae8d58-a506-4acc-ad86-998db55195a4",
+        "ifDealt": 0,
+        "threeDiff": 31.4255215,
+        "warnTime": dayjs().subtract(38, 'second').format('YYYY-MM-DD HH:mm:ss')
+    },
+    {
+        "deviceCode": "DVI3010425438293",
+        "deviceId": "MZS120.541648_32.030524_2",
+        "id": "c6ae8d58-a506-4acc-ad86-998db55195a5",
+        "ifDealt": 0,
+        "threeDiff": 31.4255215,
+        "warnTime": dayjs().subtract(1, 'minute').format('YYYY-MM-DD HH:mm:ss')
+    }
+]
+
 
 export { mapInit, removeWarningDeviceStyle }

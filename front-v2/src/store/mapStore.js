@@ -141,8 +141,6 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
             layerState.value[id].showing = true
         })
     }
-
-
     function layerRemove(id) {
         layerState.value[id].added = false
     }
@@ -166,11 +164,26 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
 const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const warnInfo = ref([])
     const warnPopupMap = ref({})
+    const warnWatchTimer = ref(0)
+    const fake = ref(false)
+
     function removeInfoItem(removeItem) {
         warnInfo.value = warnInfo.value.filter(item => item.id !== removeItem.id)
     }
-    
-    return { warnInfo, warnPopupMap, removeInfoItem }
+    function resetWarnInfo() {
+        //clear warn infomation
+        warnInfo.value.forEach((item) => {
+            warnPopupMap.value["" + item.id].remove()
+        })
+        //stop watch
+        clearInterval(warnWatchTimer.value)
+        //reset value
+        warnInfo.value = []
+        warnPopupMap.value = {}
+        warnWatchTimer.value = 0
+    }
+
+    return { fake, warnInfo, warnPopupMap, removeInfoItem, resetWarnInfo, warnWatchTimer }
 })
 
 const useHighlightLayerStore = defineStore('highlightLayerStore', () => {

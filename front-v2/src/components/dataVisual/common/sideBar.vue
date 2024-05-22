@@ -15,7 +15,7 @@
                         <span class="custom-tree-node">
                             <!-- <sceneContainer v-if="node.level == 1" :title="data.label" :class="{ active: data.active }">
                             </sceneContainer> -->
-                            <div class="scene-card" v-if="node.level == 1">
+                            <div class="scene-card" v-if="data.type == 'title1'">
                                 <div class="scene-top-section" :class="{ active: data.active }">
                                     <div class="scene-title">
                                         <div class="scene-title-text">
@@ -25,7 +25,7 @@
                                 </div>
                             </div>
 
-                            <div class="subScene-container" v-else-if="node.level == 2">
+                            <div class="subScene-container" v-else-if="data.type == 'title2'">
                                 <div class="card" :class="{ active: data.active }"
                                     @click="layerGroupClickHandler(node, data)">
                                     <div class="top-section">
@@ -46,7 +46,7 @@
                                 </div>
                             </div>
 
-                            <div class="feature-container" v-else-if="node.level == 3">
+                            <div class="feature-container" v-else-if="data.type == 'feature'">
                                 <div class="feature-content" @click="featureClickHandler(node, data)">
                                     {{ data.label }}
                                 </div>
@@ -163,19 +163,18 @@ const featureClickHandler = (node, data) => {
     console.log(node, data);
 }
 
-watch(() => mapStore.getMap(), async (newV, oldV) => {
-    console.log('init map firstly!', newV);
-    let map = newV
-    await initSortedLayer(map)
+// watch(() => mapStore.getMap(), async (newV, oldV) => {
+//     console.log('init map firstly!', newV);
+//     let map = newV
+//     await initSortedLayer(map)
+//     map.on('style.load', async () => {
+//         // console.log('A style load event occurred.');
+//         await initSortedLayer(map)
+//     });
 
-    map.on('style.load', async () => {
-        // console.log('A style load event occurred.');
-        await initSortedLayer(map)
-    });
-
-}, {
-    once: true
-})
+// }, {
+//     once: true
+// })
 
 
 
@@ -183,7 +182,16 @@ onMounted(async () => {
     sceneStore.SCENEMAP.value = scenes
     sceneStore.LAYERGROUPMAP.value = layerGroups
     dataSource.value = await getSideBarTree()
-    console.log(dataSource.value);
+
+    setTimeout(async () => {
+        let map = mapStore.getMap()
+        await initSortedLayer(map)
+        map.on('style.load', async () => {
+            console.log('A style load event occurred.');
+            await initSortedLayer(map)
+        });
+    }, 1000)
+
     // let lg = getFirstShowLayerGroupIds()
     // const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 })

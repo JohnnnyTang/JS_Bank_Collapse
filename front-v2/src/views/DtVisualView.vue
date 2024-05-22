@@ -30,7 +30,7 @@
                 @close="showDetail = false"></featDetail>
         </div>
 
-        <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+        <!-- <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
             v-loading="pannelLoading" v-click-out-side="() => showInfoPannel = false">
             <div class="close" @click="showInfoPannel = false; showDetail = false"></div>
             <el-tabs type="border-card" class="demo-tabs" style="min-width: 12vw;">
@@ -59,7 +59,7 @@
                     </div>
                 </el-tab-pane>
             </el-tabs>
-        </div>
+        </div> -->
 
 
         <div class="hydro-pannel">
@@ -91,7 +91,7 @@ import sideBar from '../components/dataVisual/common/sideBar.vue'
 // import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
 import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
-import { initBaseMap, getStyleJson4base } from '../utils/mapUtils';
+import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
 import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt } from '../components/dataVisual/js/tilefieldMAP';
@@ -114,7 +114,7 @@ const styles = [
 const featureInfo = ref({})
 let nowSource
 const showDetail = ref(false)
-const showInfoPannel = ref(false)
+// const showInfoPannel = ref(false)
 const legendList = ref([])
 const waterTableData = [
     {
@@ -133,10 +133,9 @@ const baseMapRadio = ref(1)
 const baseMapChangeHandler = () => {
     let map = mapStore.getMap()
     if (baseMapRadio.value == 0) {
-        map.setStyle('mapbox://styles/mapbox/satellite-v9')
+        map.setStyle(getImageStyleJson())
     } else {
-        let styleJson = getStyleJson4base()
-        map.setStyle(styleJson)
+        map.setStyle(getStyleJson4base())
     }
 }
 
@@ -146,7 +145,7 @@ const detailClickHandler4layerGroup = async (lable) => {
     pannelLoading.value = true
 
 
-    showInfoPannel.value = true
+    // showInfoPannel.value = true
     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
     let infoLayer = layers.filter((item) => {
         if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩') || item.includes('水闸工程-重点')) {
@@ -676,4 +675,6 @@ const FieldMap = {
     text-align: center;
     font-size: calc(0.5vw + 0.5vh);
 }
+
+
 </style>
