@@ -68,7 +68,7 @@
 
 <script setup>
 import { ref, onMounted, watch, defineEmits } from 'vue'
-import { drawShapeGraph, drawErosionGraph } from './util.js'
+import { drawShapeSlopeGraph, drawErosionGraph } from './util.js'
 import * as echarts from 'echarts'
 
 const shapeGraphNotShow = ref(false)
@@ -140,7 +140,7 @@ const DrawGraph = (section, beforesection, slopeRate, erosion) => {
     //     erosionChart.dispose();
     // }
     shapeChart = echarts.init(shapeGraphRef.value)
-    drawShapeGraph(
+    drawShapeSlopeGraph(
         shapeChart,
         section,
         beforesection,

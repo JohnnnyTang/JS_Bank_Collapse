@@ -2,10 +2,10 @@
 <div class="riskInfo-container">
     <div class="riskInfo-title">
         <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
-            滩槽高程
+            近岸冲刷速率
         </dv-border-box2>
     </div>
-    <div class="riskInfo-item profileShape">
+    <div class="riskInfo-item profileErosion">
         <div class="item-title">{{ profileName }}</div>
         <div class="profile-selector-container">
             <el-select
@@ -28,36 +28,36 @@
             </el-select>
         </div>
         <div
-            ref="shapeGraphRef"
-            class="shape graph"
+            ref="erosionGraphRef"
+            class="erosion graph"
             element-loading-background="rgba(214, 235, 255,0.8)"
         ></div>
-        <div class="graph-container shape">
+        <div class="graph-container erosion">
             <div
-                ref="shapeGraphRef"
-                class="shape graph"
-                v-loading="props.shapeChartLoad"
+                ref="erosionGraphRef"
+                class="erosion graph"
+                v-loading="props.erosionChartLoad"
                 element-loading-background="rgba(255, 255, 255, 0.4)"
             ></div>
-            <div v-if="shapeGraphNotShow" class="empty-graph">
+            <div v-if="erosionGraphNotShow" class="empty-graph1">
                 当前暂无地形数据
             </div>
         </div>
     </div>
-</div>]
+</div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch, defineEmits } from 'vue'
-import { drawShapeGraph } from './util.js'
+import { drawErosionGraph } from './util.js'
 import * as echarts from 'echarts'
 
-const shapeGraphNotShow = ref(false)
-const shapeGraphRef = ref(null)
-let shapeChart = null
-let section;
-let beforeSection;
-let slopeRate;
+const erosionGraphNotShow = ref(false)
+const erosionGraphRef = ref(null)
+let erosionChart = null
+let section
+let beforeSection
+let erosionRate;
 
 const emit = defineEmits(['profileValueChange'])
 
@@ -71,14 +71,14 @@ const props = defineProps({
     profileList: {
         type: Object
     },
-    shapeChartLoad: {
+    erosionChartLoad: {
         type: Boolean
     }
 })
 
 const calProfileData = () => {
     emit('profileValueChange', profileValue.value)
-    shapeGraphNotShow.value = false
+    erosionGraphNotShow.value = false
     const profileDataItem = props.profileData[profileValue.value-1]
     const profileInfoItem = props.profileList[profileValue.value-1]
     profileName.value = profileInfoItem.name
@@ -91,28 +91,28 @@ const calProfileData = () => {
         .beforeSection.map((value) => {
             return value[2] < -999 ? null : value[2]
         })
-        slopeRate = profileDataItem.SA[2]
+        erosionRate = profileDataItem.SA[2]
     } catch (error) {
         DrawGraph([],[],[],[])
-        shapeGraphNotShow.value = true
+        erosionGraphNotShow.value = true
         return
     }
-    DrawGraph(section, beforeSection, slopeRate)
+    DrawGraph(beforeSection, section, erosionRate)
 }
 
-const DrawGraph = (section, beforesection, slopeRate) => {
-    // if (shapeChart !== null) {
-    //     shapeChart.dispose();
+const DrawGraph = (before, after, erosionRate) => {
+    // if (erosionChart !== null) {
+    //     erosionChart.dispose();
     // }
     // if (erosionChart !== null) {
     //     erosionChart.dispose();
     // }
-    shapeChart = echarts.init(shapeGraphRef.value)
-    drawShapeGraph(
-        shapeChart,
-        section,
-        beforesection,
-        slopeRate,
+    erosionChart = echarts.init(erosionGraphRef.value)
+    drawErosionGraph(
+        erosionChart,
+        before,
+        after,
+        erosionRate,
     )
 }
 
@@ -129,9 +129,9 @@ watch(()=>props.profileData, ()=>{
 <style lang="scss" scoped>
 div.riskInfo-container {
     position: absolute;
-    top: 45vh;
+    top: 52vh;
     left: 1vw;
-    height: 47.5vh;
+    height: 32vh;
     width: 24vw;
     border-radius: 8px;
     border: #167aec 1px solid;
@@ -141,8 +141,8 @@ div.riskInfo-container {
 
     div.riskInfo-title {
         height: 4.5vh;
-        width: 8vw;
-        margin-left: 8vw;
+        width: 10vw;
+        margin-left: 7.3vw;
         margin-top: 0.6vh;
         line-height: 4.5vh;
         border-radius: 6px;
@@ -158,7 +158,7 @@ div.riskInfo-container {
             #6493ff 3px 3px;
 
         :deep(.dv-border-box-2) {
-            width: 8vw;
+            width: 10vw;
             height: 5vh;
         }
     }
@@ -171,15 +171,9 @@ div.riskInfo-container {
         border: #3b85e7 2px solid;
 
         &.profileErosion {
-            top: 47vh;
-            height: 22vh;
+            top: 6vh;
+            height: 25vh;
             // background-color: #b6b9eb;
-        }
-
-        &.profileShape {
-            top: 6.1vh;
-            height: 40vh;
-            // background-color: #c9cad4;
         }
 
         div.item-title {
@@ -252,16 +246,10 @@ div.riskInfo-container {
             top: 4vh;
             left: 0.25vw;
 
-            &.shape {
-                height: 35vh;
+            &.erosion {
+                height: 20.5vh;
                 backdrop-filter: blur(5px);
                 // background-color: rgba(220, 250, 248, 0.4);
-            }
-
-            &.erosion {
-                height: 17vh;
-                backdrop-filter: blur(5px);
-                // background-color: #00098a;
             }
 
             div.graph {
@@ -269,22 +257,30 @@ div.riskInfo-container {
                 width: 100%;
                 height: 100%;
 
-                &.shape {
+                &.erosion {
                     // height: 35vh;
                     // background-color: rgba(220, 250, 248, 0.4);
                 }
 
-                &.erosion {
-                    // height: 17vh;
-                    // background-color: #00098a;
-                }
                 z-index: 99;
             }
 
-            div.empty-graph {
+            div.empty-graph1 {
                 position: absolute;
                 left: 7vw;
-                top: 18vh;
+                top: 13vh;
+                display: flex;
+                align-items: center;
+                color: #1c68cc;
+                font-size: calc(0.7vw + 0.5vh);
+                font-family: 'Microsoft YaHei';
+                font-weight: bold;
+            }
+
+            div.empty-graph2 {
+                position: absolute;
+                left: 7vw;
+                top: 6vh;
                 display: flex;
                 align-items: center;
                 color: #1c68cc;
@@ -296,4 +292,4 @@ div.riskInfo-container {
     }
 }
 </style>
-    
+        

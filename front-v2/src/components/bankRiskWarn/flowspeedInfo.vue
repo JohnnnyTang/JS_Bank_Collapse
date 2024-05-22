@@ -9,6 +9,26 @@
             <div class="item-title">
                 沿岸流速分布：
             </div>
+            <div class="profile-selector-container">
+                <el-select
+                    v-model="waterConditionValue"
+                    placeholder="选择水文条件"
+                    style="width: 7vw; height: 3.5vh"
+                    @change="calFlowspeedData"
+                    popper-class="water-condition-popper"
+                >
+                    <el-option
+                        v-for="item in props.waterCondition"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                    >
+                        <span class="profile-name-text">
+                            {{ item.label }}
+                        </span>
+                    </el-option>
+                </el-select>
+            </div>
             <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
             <div class="graph-container flowspeed">
                 <div 
@@ -35,6 +55,9 @@ const props = defineProps({
     profileList: {
         type: Object,
     },
+    waterCondition: {
+        type: Object,
+    },
     flowspeedChartLoad: {
         type: Boolean,
     }
@@ -42,6 +65,11 @@ const props = defineProps({
 
 let flowspeedChart = null
 const flowspeedGraphRef = ref(null)
+const waterConditionValue = ref(1)
+
+const calFlowspeedData = () => {
+    
+}
 
 const DrawGraph = () => {
     flowspeedChart = echarts.init(flowspeedGraphRef.value)
@@ -125,6 +153,59 @@ div.flowspeed-content{
             // color: #a231e4;
             // text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
         }
+
+        div.profile-selector-container {
+                position: absolute;
+                width: 10vw;
+                height: 4vh;
+                left: 9.2vw;
+                // background-color: #d1d2db;
+    
+                :deep(.el-select) {
+                    left: 4vw;
+                    top: 0.4vh;
+                    width: 6.5vw !important;
+                    height: 3vh !important;
+                    box-shadow:
+                        rgba(248, 248, 248, 0.3) 1px 1px,
+                        rgba(171, 184, 211, 0.7) 1px 1px,
+                        rgba(243, 244, 245, 0.6) 2px 2px;
+                    border-radius: 6px;
+                }
+    
+                :deep(.el-select__wrapper) {
+                    height: 3vh;
+                    line-height: 3vh;
+                    border-radius: 6px;
+                    font-family: 'Microsoft YaHei';
+                    font-weight: bold;
+                    font-size: calc(0.4vw + 0.5vh);
+                    background-color: rgba(20, 64, 211, 0.7);
+                }
+    
+                :deep(.el-select__placeholder) {
+                    color: #f6f8fa;
+                }
+    
+                :deep(.el-icon) {
+                    width: 0.8vw;
+                    height: 0.8vw;
+    
+                    svg {
+                        width: 0.8vw;
+                        height: 0.8vw;
+    
+                        path {
+                            fill: #00098a;
+                        }
+                    }
+                }
+    
+                :deep(.el-select__tags-text) {
+                    color: #2b61f7;
+                    font-size: calc(0.4vw + 0.4vh);
+                }
+            }
 
         div.graph-container {
             position: absolute;
