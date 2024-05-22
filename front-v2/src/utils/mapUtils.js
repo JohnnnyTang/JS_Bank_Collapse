@@ -3330,7 +3330,8 @@ const getImageStyleJson = () => {
                 'minzoom': 1,
                 'maxzoom': 14
             }
-        ]
+        ],
+        glyphs: '/glyphs/mapbox/{fontstack}/{range}.pbf',
     }
 }
 

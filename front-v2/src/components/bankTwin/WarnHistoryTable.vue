@@ -51,7 +51,7 @@ const historyLoading = ref(true)
 const historyRowLoading = ref(new Array(100).fill(false))
 const warnStore = useWarnInfoStore()
 
-const deviceTypeList = ["GNSS", "应力桩", "水压力计","测斜仪"]
+const deviceTypeList = ["GNSS", "应力桩", "水压力计", "测斜仪"]
 
 const warnHistoryList = ref([
     {
@@ -134,8 +134,10 @@ watch(() => useWarnInfoStore().fake, (newVal) => {
     console.log('history watching fake!!', newVal);
     // 3 fake items
     let fakeWarnInfo = useWarnInfoStore().warnInfo
-    let newhistoryRowLoading = [...historyRowLoading.value]
-    let newwarnHistorList = [...warnHistoryList.value]
+    // let newhistoryRowLoading = [...historyRowLoading.value]
+    // let newwarnHistorList = [...warnHistoryList.value]
+    let newhistoryRowLoading = []
+    let newwarnHistorList = []
     newhistoryRowLoading.unshift(...[false, false, false])
     newwarnHistorList.unshift(...fakeWarnInfo)
 
@@ -150,11 +152,11 @@ watch(() => useWarnInfoStore().fake, (newVal) => {
 })
 
 onMounted(async () => {
-    const warnData = (await BackEndRequest.getHistoryWarnInfo('hour', 1)).data
-    console.log('warn', warnData)
-    historyRowLoading.value = new Array(warnData.length).fill(false)
-    console.log('123123', historyRowLoading.value)
-    warnHistoryList.value = warnData
+    // const warnData = (await BackEndRequest.getHistoryWarnInfo('hour', 1)).data
+    // console.log('warn', warnData)
+    // historyRowLoading.value = new Array(warnData.length).fill(false)
+    // console.log('123123', historyRowLoading.value)
+    // warnHistoryList.value = warnData
     historyLoading.value = false
 })
 </script>

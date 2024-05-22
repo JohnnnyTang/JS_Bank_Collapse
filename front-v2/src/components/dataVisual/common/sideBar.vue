@@ -185,11 +185,12 @@ onMounted(async () => {
 
     setTimeout(async () => {
         let map = mapStore.getMap()
+        console.log('hello map',map);
         await initSortedLayer(map)
-        map.on('style.load', async () => {
-            console.log('A style load event occurred.');
-            await initSortedLayer(map)
-        });
+        // map.on('style.load', async () => {
+        //     console.log('A style load event occurred.');
+        //     await initSortedLayer(map)
+        // });
     }, 1000)
 
     // let lg = getFirstShowLayerGroupIds()
