@@ -32,3 +32,4 @@ tile:
   mzsTilePath:  E:/WATER/BankCollapse/backdata/rasterTIle/
   worldTilePath: E:/WATER/offline_map
   nodeServicePath: E:/WATER/BankCollapse/JS_Bank_Collapse/backEnd/src/main/resources/node/index.js
+  riverImagePath: E:/WATER/BankCollapse/backdata/imageTiles/tiles/

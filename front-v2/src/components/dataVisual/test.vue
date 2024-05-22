@@ -1,8 +1,8 @@
 <template>
     <div class="main">
         <div class="map" ref="mapDom" id="map"></div>
-        <canvas id="GPUFrame" class="GPU"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas>
+        <!-- <canvas id="GPUFrame" class="GPU"></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas> -->
     </div>
 </template>
 
@@ -12,6 +12,7 @@ import { onMounted, watch, ref } from 'vue'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { getStyleJson4base } from '../../utils/mapUtils'
 import BankWarnLayer from './js/bankWarnLayer'
 import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
 import { layerAddFunction, layerRemoveFunction } from './layerUtil'
@@ -30,53 +31,88 @@ const mapFlyToRiver = (mapIns) => {
         ],
         {
             duration: 500,
-            zoom: 12.5,
+            zoom: 8,
         },
     )
 }
 
 onMounted(async () => {
-    const map = await initScratchMap(mapDom.value)
-    const jsonUrl = '/bankWarn/bankWarn.json'
-    let bankWarnLayer = new BankWarnLayer(jsonUrl)
-    map.addLayer(bankWarnLayer)
+
+    // const map = await initScratchMap(mapDom.value)
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: getStyleJson4base(),
+        // style: baseImageStyle,
+        accessToken:
+            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+        center: [120.312, 31.917], // starting position [lng, lat]
+        maxZoom: 18,
+        zoom: 8,
+        projection: 'mercator',
+        antialias: true,
+        useWebGL2: true,
+    });
+
     mapFlyToRiver(map)
-    
-    /**
-     * @type {customLayers.UnityLayer}
-     */
-    let unityLayer
-    /**
-     * @type {customLayers.MaskLayer}
-     */
-    let maskLayer
 
     window.addEventListener('keydown', (e) => {
-        if (e.key == '1') {
-            const script = document.createElement('script')
-            script.src =
-                '/scratchSomething/unity/collapseBank/build/output.loader.js'
-            script.onload = async () => {
-                console.log('load.js fine')
-                unityLayer = new customLayers.UnityLayer(
-                    [120.556596, 32.042607],
-                    0,
-                    unityCanvaDom.value,
-                )
-                maskLayer = new customLayers.MaskLayer()
-                map.addLayer(unityLayer)
-                map.addLayer(maskLayer)
-            }
-            document.head.appendChild(script)
-        }
-        if (e.key == '2') {
-            // map.addLayer(new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value))
-            console.log('222')
-            unityLayer.remove()
-            map.removeLayer('Mask-Layer')
-            map.removeLayer('Unity-Layer')
+        if (e.key == 'i') {
+            console.log('add img');
+            map.addSource('img', {
+                type: 'raster',
+                // tiles: [tileServer + '/proxy/tiles/raster/image/base/{x}/{y}/{z}'],
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/raster/image/base/{x}/{y}/{z}'
+                ],
+                minzoom: 0,
+                maxzoom: 14, //local TILES max zoom::12
+            })
+            map.addLayer({
+                id: 'ras',
+                type: 'raster',
+                source: 'img',
+            })
+
         }
     })
+
+
+
+    // const jsonUrl = '/bankWarn/bankWarn.json'
+    // let bankWarnLayer = new BankWarnLayer(jsonUrl)
+    // map.addLayer(bankWarnLayer)
+
+
+    //     /**
+    //      * @type {customLayers.UnityLayer}
+    //      */
+    //     let unityLayer
+    //     /**
+    //    * @type {customLayers.MaskLayer}
+    //    */
+    //     let maskLayer
+
+    //     window.addEventListener('keydown', (e) => {
+    //         if (e.key == '1') {
+    //             const script = document.createElement('script');
+    //             script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
+    //             script.onload = async () => {
+    //                 console.log('load.js fine');
+    //                 unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
+    //                 maskLayer = new customLayers.MaskLayer()
+    //                 map.addLayer(unityLayer)
+    //                 map.addLayer(maskLayer)
+    //             };
+    //             document.head.appendChild(script);
+    //         }
+    //         if (e.key == '2') {
+    //             // map.addLayer(new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value))
+    //             console.log('222');
+    //             unityLayer.remove()
+    //             map.removeLayer('Mask-Layer')
+    //             map.removeLayer('Unity-Layer')
+    //         }
+    //     })
 
     // const script = document.createElement('script');
     // script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
@@ -122,6 +158,31 @@ onMounted(async () => {
     //     }
     // })
 })
+
+
+const baseImageStyle = {
+    // local img
+    'version': 8,
+    'sources': {
+        'raster-tiles': {
+            'type': 'raster',
+            'tiles': [tileServer + '/tile/raster/image/base/{x}/{y}/{z}'],
+            'tileSize': 256,
+        }
+    },
+    'layers': [
+        {
+            'id': 'simple-tiles',
+            'type': 'raster',
+            'source': 'raster-tiles',
+            'minzoom': 1,
+            'maxzoom': 14
+        }
+    ]
+}
+
+
+
 </script>
 
 <style lang="scss" scoped>

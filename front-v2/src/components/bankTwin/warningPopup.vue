@@ -1,29 +1,86 @@
 <template>
     <div class="warning-card">
 
-        <div class="main">
+        <div class="main" @click="clickHandler">
             <div class="icon"></div>
             <div class="text title-text">报警</div>
             <div class="text time-text">{{ props.warningInfo.warnTime }}</div>
         </div>
 
         <div class="arrow"></div>
+
+
+
+        <dv-border-box10 :color="['rgb(84,163,232)', 'rgb(64,150,242)']" v-show="showChart">
+            <div class="warning-chart">
+                <div class="tabs">tabs region</div>
+                <div class="chart" ref="chartDom"></div>
+            </div>
+        </dv-border-box10>
+
+
     </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
-const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+import { computed, onMounted, ref, nextTick } from 'vue';
+import * as echarts from 'echarts'
+import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
+import {
+    getGNSSoption,
+    getInclineoption,
+    getStressoption,
+} from './data'
 
 const props = defineProps({
     warningInfo: {
         type: Object
     }
 })
+const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
+const chartDom = ref()
+const showChart = ref(false)
+const chartDataLoading = ref(true)
+
+let myChart = undefined
+
+const clickHandler = () => {
+    /*
+    {
+        "deviceCode": "DVI3010425438293",
+        "deviceId": "MZS120.51726088_32.04054582_3",
+        "id": "c6ae8d58-a506-4acc-ad86-998db55195a4",
+        "ifDealt": null,
+        "threeDiff": 31.4255215,
+        "warnTime": "2024-05-22 21:35:27"
+    }
+    */
+    nextTick(() => {
+        showChart.value = !showChart.value
+
+        // console.log(props.warningInfo)
+        const daviceMap = ["GNSS", "应力桩", "水压力计", "测斜仪"]
+        let deviceType = daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
+        chartConfig(deviceType)
+    })
+}
+
+const chartConfig = (deviceType) => {
+    let optionMap = {
+        'GNSS': getGNSSoption,
+        '测斜仪': getInclineoption,
+        '应力桩': getStressoption
+    }
+
+    myChart = echarts.init(chartDom.value);
+    myChart.setOption(optionMap[deviceType]());
+    chartDataLoading.value = false
+}
 
 onMounted(() => {
     console.log('wqe123', props.warningInfo)
 })
+
 
 
 </script>
@@ -35,6 +92,7 @@ onMounted(() => {
     height: 6vh;
     // bottom: 0.2vh;
     user-select: none;
+    z-index: 4;
 
     div.main {
         position: relative;
@@ -62,7 +120,7 @@ onMounted(() => {
 
         .title-text {
             line-height: 2.6vh;
-            height: 2,6vh;
+            height: 2, 6vh;
             font-weight: bold;
             font-size: calc(0.6vw + 0.6vh);
             color: rgb(255, 0, 0);
@@ -77,17 +135,47 @@ onMounted(() => {
         }
     }
 
-
-    div.arrow {
+    :deep(.dv-border-box-10) {
+        width: 22vw;
+        height: 27vh;
         position: absolute;
-        left: 36%;
-        bottom: -3vh;
-        width: 0;
-        height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-top: 15px solid rgb(244, 215, 190);
+        bottom: 6vh;
+        left: -9vw;
+
+        background-color: rgb(255, 255, 255);
+
+        div.warning-chart {
+            width: 95%;
+            height: 95%;
+            // background-color: aliceblue;
+
+
+            .tabs {
+                width: 20vw;
+                height: 3vh;
+            }
+
+            .chart {
+                width: 22vw;
+                height: 24vh;
+                // background-color: antiquewhite;
+            }
+        }
+
+        div.arrow {
+            position: absolute;
+            left: 45%;
+            bottom: -2.7vh;
+            width: 0;
+            height: 0;
+            border-left: calc(0.1vw + 0.3vh) solid transparent;
+            border-right: calc(0.1vw + 0.3vh) solid transparent;
+            border-top: calc(0.2vw + 0.3vh) solid rgb(244, 215, 190);
+        }
+
+
     }
+
 }
 
 
