@@ -15,57 +15,57 @@ import { useSceneStore } from '../../store/mapStore'
 import { ElMessageBox, ElMessage } from 'element-plus'
 // import ElementPlus from "element-plus";
 
-
 const propertyRef = ref({})
 const zoomRef = ref()
+const deviceTypeList = ["GNSS", "应力桩", "水压力计", "", "测斜仪"]
 
+const filterWarnData = (warnDataList) => {
+    let filterMap = {}
 
+    warnDataList.map((item) => {
+        if (!item.ifDealt) {
+            if (
+                !(item.deviceId in filterMap) ||
+                filterMap[item.deviceId].warnTime < item.warnTime
+            ) {
+                filterMap[item.deviceId] = item
+            }
+        }
+    })
+
+    return Object.values(filterMap)
+}
 
 const mapInit = async (map, vis) => {
-
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
     })
     map.addSource('mzsPlaceLineSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
     })
     map.addSource('dockAreaSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/dockArea/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
     })
     map.addSource('dockAreaLabelSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}'],
     })
     map.addSource('fixProjectAreaSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}'],
     })
     map.addSource('fixProjectLineSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
     })
     map.addSource('fixProjectAreaLabelSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}'],
     })
     map.addSource('mzsSectionLabel', {
         type: 'vector',
@@ -77,9 +77,7 @@ const mapInit = async (map, vis) => {
     })
     map.addSource('mzsBankLineSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
     })
     // map.addSource('mzsSectionLineSource', {
     //     type: 'vector',
@@ -89,9 +87,7 @@ const mapInit = async (map, vis) => {
     // })
     map.addSource('mzsSectionLineLabelSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}'],
     })
     // map.addSource('mzsBankAreaWSource', {
     //     type: 'vector',
@@ -101,9 +97,7 @@ const mapInit = async (map, vis) => {
     // })
     map.addSource('mzsBankAreaSSource', {
         type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}',
-        ],
+        tiles: [tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}'],
     })
 
     map.addLayer({
@@ -137,7 +131,7 @@ const mapInit = async (map, vis) => {
             'line-width': 4,
         },
     })
-    
+
     // map.addLayer({
     //     id: 'mzsLabel',
     //     type: 'symbol',
@@ -181,7 +175,7 @@ const mapInit = async (map, vis) => {
         'source-layer': 'default',
         paint: {
             'fill-color': 'rgba(161,207,238, 0.8)',
-            'fill-outline-color': 'rgba(161,207,238, 0.8)'
+            'fill-outline-color': 'rgba(161,207,238, 0.8)',
         },
     })
     map.addLayer({
@@ -191,7 +185,7 @@ const mapInit = async (map, vis) => {
         'source-layer': 'default',
         paint: {
             'fill-color': 'rgba(220,224,237, 0.8)',
-            'fill-outline-color': 'rgba(220,224,237, 0.8)'
+            'fill-outline-color': 'rgba(220,224,237, 0.8)',
         },
     })
     // map.addLayer({
@@ -223,13 +217,12 @@ const mapInit = async (map, vis) => {
         layout: {
             'line-cap': 'round',
             'line-join': 'round',
-
         },
         paint: {
             'line-opacity': 1,
             'line-color': 'rgba(31, 14, 223, 0.75)',
             'line-width': 4,
-            'line-dasharray': [1, 1.5]
+            'line-dasharray': [1, 1.5],
         },
     })
     map.addLayer({
@@ -244,7 +237,7 @@ const mapInit = async (map, vis) => {
             'text-offset': [-1.0, 1.15],
             'text-anchor': 'top',
             'text-size': 16,
-            'text-allow-overlap': true
+            'text-allow-overlap': true,
         },
         paint: {
             'text-color': 'rgb(0, 22, 145)',
@@ -260,7 +253,7 @@ const mapInit = async (map, vis) => {
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
             // 'text-offset': [0, 1.25],
             'text-anchor': 'left',
-            'text-size': 12
+            'text-size': 12,
         },
         paint: {
             'text-color': 'rgba(31, 14, 126, 0.8)',
@@ -276,7 +269,7 @@ const mapInit = async (map, vis) => {
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
             // 'text-offset': [0, 1.25],
             'text-anchor': 'bottom',
-            'text-size': 12
+            'text-size': 12,
         },
         paint: {
             'text-color': 'rgba(31, 44, 126, 0.6)',
@@ -292,7 +285,7 @@ const mapInit = async (map, vis) => {
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
             // 'text-offset': [0, 1.25],
             'text-anchor': 'left',
-            'text-size': 18
+            'text-size': 18,
         },
         paint: {
             'text-color': 'rgba(31, 44, 226, 1)',
@@ -308,7 +301,7 @@ const mapInit = async (map, vis) => {
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
             // 'text-offset': [0, 1.25],
             'text-anchor': 'right',
-            'text-size': 12
+            'text-size': 12,
         },
         paint: {
             'text-color': 'rgba(31, 44, 126, 0.6)',
@@ -316,26 +309,21 @@ const mapInit = async (map, vis) => {
     })
 
     if (vis) {
-
         const pulsingCVSMap = {
-            'GNSS': 'point',
-            '测斜仪': 'rectangle',
-            '孔隙水压力计': 'diamond',
-            '应力桩': 'triangle',
+            GNSS: 'point',
+            测斜仪: 'rectangle',
+            孔隙水压力计: 'diamond',
+            应力桩: 'triangle',
         }
         const pulsingMap = {
-            'GNSS': 'gnss-dot-pulsing',
-            '测斜仪': 'incline-dot-pulsing',
-            '孔隙水压力计': 'manometer-dot-pulsing',
-            '应力桩': 'stress-dot-pulsing',
+            GNSS: 'gnss-dot-pulsing',
+            测斜仪: 'incline-dot-pulsing',
+            孔隙水压力计: 'manometer-dot-pulsing',
+            应力桩: 'stress-dot-pulsing',
         }
-        map.addImage(
-            pulsingMap['GNSS'],
-            pulsing[pulsingCVSMap['GNSS']],
-            {
-                pixelRatio: 1,
-            },
-        )
+        map.addImage(pulsingMap['GNSS'], pulsing[pulsingCVSMap['GNSS']], {
+            pixelRatio: 1,
+        })
         // map.addImage(
         //     pulsingMap['测斜仪'],
         //     pulsing[pulsingCVSMap['测斜仪']],
@@ -358,7 +346,6 @@ const mapInit = async (map, vis) => {
         //     },
         // )
 
-
         //////////////monitor device////////////
         let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
         let monitorDevice = DataPioneer.generateGeoJson(
@@ -370,7 +357,7 @@ const mapInit = async (map, vis) => {
         )
         const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
-        console.log('监测站！', gnssJZ);
+        console.log('监测站！', gnssJZ)
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',
@@ -413,7 +400,6 @@ const mapInit = async (map, vis) => {
         await loadImage(map, '/icons/孔隙水压力计.png', 'manometer-static')
         await loadImage(map, '/icons/应力桩.png', 'stress-static')
         await loadImage(map, '/icons/视频监控.png', 'camera-static')
-
 
         // map.addLayer({
         //     id: '聚合点',
@@ -518,19 +504,20 @@ const mapInit = async (map, vis) => {
 
         map.on('click', deviceLayers, (e) => {
             if (e.features.length > 1) {
-                console.log('click features!', e.features);
+                console.log('click features!', e.features)
                 open(e.features, map)
-            }
-            else if (e.features.length === 1) {
+            } else if (e.features.length === 1) {
                 let p = e.features[0].properties
                 const property = e.features[0].properties
                 useSceneStore().setSelectedFeature(property)
                 propertyRef.value = property
-                console.log('click feature!', propertyRef.value);
+                console.log('click feature!', propertyRef.value)
                 const popUp = createPopUp(propertyRef, zoomRef)
-                popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
-                console.log('singgle popUp added!');
-
+                popUp
+                    .setOffset(0)
+                    .setLngLat([p.longitude, p.latitude])
+                    .addTo(map)
+                console.log('singgle popUp added!')
             }
         })
         map.on('mousemove', deviceLayers, (e) => {
@@ -544,27 +531,33 @@ const mapInit = async (map, vis) => {
         })
 
         setTimeout(() => {
-            warnInterval(map, 60)
+            warnInterval(map, 40)
         }, 500)
-        setInterval(() => {
-            warnInterval(map, 60)
-        }, 60 * 1000 * 20);
-        // request per 20minutes 
+        setInterval(
+            () => {
+                warnInterval(map, 40)
+            },
+            60 * 1000 * 20,
+        )
+        // request per 20minutes
 
         ///////DEBUG////////
         window.addEventListener('keydown', async (e) => {
             if (e.key == 'Enter') {
                 const minute = 720
-                let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
-
+                let allWarnData = (
+                    await axios.get(`/api/data/deviceWarn/minute/${minute}`)
+                ).data
+                let filteredData = filterWarnData(allWarnData)
                 let lastPos
-                allWarnData.forEach((item) => {
+                filteredData.forEach((item) => {
+                    // console.log('1231123', item)
                     let id = item.deviceId
-                    let type = 'GNSS'
+                    let type = deviceTypeList[id.split('_').pop()-1]
                     lastPos = setWarningDeviceStyle(map, type, id, item)
                 })
-                if (allWarnData.length != 0)
-                    useWarnInfoStore().warnInfo = allWarnData
+                if (filteredData.length != 0)
+                    useWarnInfoStore().warnInfo = filteredData
 
                 // if (lastPos) {
                 //     map.flyTo({
@@ -586,13 +579,10 @@ const mapInit = async (map, vis) => {
                 // }, 2000)
             }
         })
-
-
     }
 }
 
 const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
-
     const pulsingCVSMap = {
         GNSS: 'point',
         测斜仪: 'rectangle',
@@ -622,27 +612,26 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
                 'icon-size': 1,
                 'icon-allow-overlap': true,
             },
-            filter: ['==', 'code', deviceCode],
+            filter: ['all',['==', 'code', deviceCode]],
         })
     }
     let json = map.getSource(sourceMap[deviceLayer])['_data']
 
-    let property = findProptyFromJson(
-        json,
-        deviceCode
-    )
+    let property = findProptyFromJson(json, deviceCode)
     propertyRef.value = property
 
     // warning
     const popup = createWarningPopup({ warningInfo: warnData })
+    // console.log('warn pop', warnData)
     popup.setLngLat([property.longitude, property.latitude]).addTo(map)
-
+    useWarnInfoStore().warnPopupMap[warnData.id] = popup
 
     map.on('render', () => {
         map.triggerRepaint()
     })
     return [property.longitude, property.latitude]
 }
+
 
 const removeWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
     map.getLayer(`${deviceLayer}-${deviceCode}`) &&
@@ -655,9 +644,7 @@ const createPopUp = (deviceProperty, zoom) => {
     const container = document.createElement('div')
     container.id = 'monitorDetailV2-div'
     const componentInstance = ap.mount(container)
-    console.log('VueComponent Mounted');
-
-
+    console.log('VueComponent Mounted')
 
     const domwithComp = container
     const popUp = new mapboxgl.Popup({
@@ -667,10 +654,10 @@ const createPopUp = (deviceProperty, zoom) => {
     return popUp
 }
 
-
 const createWarningPopup = (info) => {
     // const ap = createApp(warningPop, { warningInfo: info })
-    const ap = createApp(warningPopup)
+    console.log('warn info', info)
+    const ap = createApp(warningPopup, info)
 
     const container = document.createElement('div')
     const componentInstance = ap.mount(container)
@@ -682,7 +669,6 @@ const createWarningPopup = (info) => {
     }).setDOMContent(domwithComp)
     return popUp
 }
-
 
 const findProptyFromJson = (geoJson, code) => {
     const features = geoJson.features
@@ -696,37 +682,40 @@ const findProptyFromJson = (geoJson, code) => {
     return prop
 }
 
-
 const warnInterval = async (map, minute) => {
     const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
     const DeviceIDs = {
-        'GNSS': [],
-        '测斜仪': [],
-        '水压力计': [],
-        '应力桩': [],
+        GNSS: [],
+        测斜仪: [],
+        水压力计: [],
+        应力桩: [],
     }
+    
     let deviceInfo = (await axios.get('/api/data/monitorInfo')).data
     deviceInfo.forEach((item) => {
-        const type = Number(item["type"]) - 1
+        const type = Number(item['type']) - 1
 
         if (type != 4 && type != 5) {
             // camera -- 5
-            DeviceIDs[DEVICETYPEMAP[type]].push(item["code"])
+            DeviceIDs[DEVICETYPEMAP[type]].push(item['code'])
         }
     })
 
-    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
-
+    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`))
+        .data
+    let filteredData = filterWarnData(allWarnData)
+    // console.log('all warn', allWarnData)
+    // console.log('filtered warn', filteredData)
     let lastPos
-    allWarnData.forEach((item) => {
+    filteredData.forEach((item) => {
         let id = item.deviceId
         let type = 'GNSS'
+        console.log("log warn filter data", item)
         lastPos = setWarningDeviceStyle(map, type, id, item)
     })
-    if (allWarnData.length != 0)
-        useWarnInfoStore().warnInfo = allWarnData
-    console.log('first-warnInterval!', allWarnData);
-
+    // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)
+    if (filteredData.length != 0) useWarnInfoStore().warnInfo = filteredData
+    // console.log('first-warnInterval!', filteredData)
 
     // if (lastPos) {
     //     map.flyTo({
@@ -740,7 +729,6 @@ const warnInterval = async (map, minute) => {
     // }
 }
 
-
 const open = (features, map) => {
     const items = features
     const selectedDevice = ref({})
@@ -751,7 +739,13 @@ const open = (features, map) => {
     useSceneStore().setSelectedFeature(items[0].properties)
     propertyRef.value = items[0].properties
     const popUp = createPopUp(propertyRef, zoomRef)
-    popUp.setOffset(0).setLngLat([items[0].properties.longitude, items[0].properties.latitude]).addTo(map)
+    popUp
+        .setOffset(0)
+        .setLngLat([
+            items[0].properties.longitude,
+            items[0].properties.latitude,
+        ])
+        .addTo(map)
 
     let dom = document.getElementById('popup')
 
@@ -824,7 +818,7 @@ const open = (features, map) => {
 }
 
 const deviceNameMap = {
-    'GNSS': {
+    GNSS: {
         'MZS120.51749289_32.04059243_1': 'CL-01',
         'MZS120.51977143_32.04001152_1': 'CL-02',
         'MZS120.52557975_32.03825056_1': 'CL-03',
@@ -834,9 +828,9 @@ const deviceNameMap = {
         'MZS120.55327892_32.02707923_1': 'CL-07',
         'MZS120.55649757_32.02592404_1': 'CL-08',
         'MZS120.56334257_32.02298144_1': 'CL-09',
-        'MZS120.56944728_32.02070961_1': 'CL-10'
+        'MZS120.56944728_32.02070961_1': 'CL-10',
     },
-    '水压力计': {
+    水压力计: {
         'MZS120.51726088_32.04054582_3': 'KX-01',
         'MZS120.51738292_32.04054923_3': 'KX-02',
         'MZS120.51749021_32.04053105_3': 'KX-03',
@@ -847,7 +841,7 @@ const deviceNameMap = {
         'MZS120.52565217_32.03813574_3': 'KX-08',
         'MZS120.52566826_32.03799363_3': 'KX-09',
     },
-    '测斜仪': {
+    测斜仪: {
         'MZS120.51967889_32.04004108_4': 'CX-01',
         'MZS120.51986665_32.03998992_4': 'CX-02',
         'MZS120.52557975_32.03825056_4': 'CX-03',
@@ -856,17 +850,17 @@ const deviceNameMap = {
         'MZS120.51726088_32.04054582_4': 'CX-06',
         'MZS120.51738292_32.04054923_4': 'CX-07',
         'MZS120.51749021_32.04053105_4': 'CX-08',
-        'MZS120.51957026_32.04008655_4': 'CX-09'
+        'MZS120.51957026_32.04008655_4': 'CX-09',
     },
-    '应力桩': {
+    应力桩: {
         'MZS120.513203_32.042733_2': 'YL-01',
         'MZS120.515433_32.04231_2': 'YL-02',
         'MZS120.521221_32.040331_2': 'YL-03',
         'MZS120.529078_32.034385_2': 'YL-04',
         'MZS120.541648_32.030524_2': 'YL-05',
         'MZS120.548925_32.029361_2': 'YL-06',
-        'MZS120.552209_32.028149_2': 'YL-07'
+        'MZS120.552209_32.028149_2': 'YL-07',
     },
 }
 
-export { mapInit }
+export { mapInit, removeWarningDeviceStyle }

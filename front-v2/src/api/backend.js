@@ -148,6 +148,10 @@ export default class BackEndRequest {
         return backendInstance.get(`/data/deviceWarn/${timeUnit}/${timeCount}`)
     }
 
+    static updateWarnDealtStatus(dataId, dealt) {
+        return backendInstance.put(`/data/deviceWarn/id/${dataId}/deal/${dealt}`)
+    }
+
 }
 
 

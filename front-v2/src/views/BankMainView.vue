@@ -90,6 +90,18 @@ onMounted(() => {
                 tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}',
             ],
         })
+        map.addSource('disBoundaryLine', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/districtLine/{x}/{y}/{z}',
+            ],
+        })
+        map.addSource('disBoundaryPoint', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/districtPoint/{x}/{y}/{z}',
+            ],
+        })
 
         map.addLayer({
             id: '市级行政区',
@@ -99,8 +111,36 @@ onMounted(() => {
             layout: {},
             paint: {
                 'line-color': '#0A215C',
-                'line-width': 3,
+                'line-width': 1.5,
                 'line-opacity': 0.75,
+            },
+        })
+        map.addLayer({
+            id: '县级行政区',
+            type: 'line',
+            source: 'disBoundaryLine',
+            'source-layer': 'default',
+            layout: {},
+            paint: {
+                'line-color': '#0A215C',
+                'line-width': 1,
+                'line-opacity': 0.6,
+            },
+        })
+        map.addLayer({
+            id: '点23',
+            type: 'symbol',
+            source: 'disBoundaryPoint',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'mc'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+            },
+            paint: {
+                'text-color': '#1FAEB3',
             },
         })
         // let data = (await axios.get(`http://localhost:5173/api/tile/vector/cityBoundary/info`)).data

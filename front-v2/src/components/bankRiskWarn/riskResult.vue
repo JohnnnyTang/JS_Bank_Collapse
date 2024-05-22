@@ -129,8 +129,8 @@ const JudgeRiskExist = (risk) => {
 <style lang="scss" scoped>
     div.risk-result-container {
         position: absolute;
-        right: 1vw;
-        top: 20vh;
+        // right: 13vw;
+        // top: 6vh;
         width: 30vw;
         height: 33.5vh;
         border: 2px solid rgb(169, 197, 226);

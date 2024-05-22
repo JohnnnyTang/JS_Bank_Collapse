@@ -3,21 +3,21 @@ import mapboxgl from 'mapbox-gl'
 
 export default class BankWarnLayer {
 
-    constructor(JsonUrl) {
+    constructor(JsonData) {
         this.id = '岸段预警'
-        this.jsonUrl = JsonUrl
+        this.jsonData = JsonData
         this.map = undefined
         this.type = 'custom'
         this.showLayer = false
         this.prepared = false
     }
     async onAdd(map, gl) {
-        const data = (await axios.get(this.jsonUrl)).data
+        // const data = JsonData
         this.map = map
         this.vertexData = []
         this.warnValues = []
         this.vertexCount = 0
-        data.forEach(element => {
+        this.jsonData.forEach(element => {
             //coords 1
             let pos1 = mapboxgl.MercatorCoordinate.fromLngLat({
                 lng: element.coords[0][0],
@@ -60,16 +60,35 @@ export default class BankWarnLayer {
             //     0xfb3704,
             //     0xff0000,
             // }
-
-            // int botIndex = floor(v_warnValue * 10.0);
-            // int topIndex = ceil(v_warnValue * 10.0);
+            // int pallete[3] = {
+            //     0x00b0f0,
+            //     0x76a9c8,
+            //     0xff0000,
+            // }
+            // int botIndex = floor(v_warnValue * 2);
+            // int topIndex = floor(v_warnValue * 2 + 0.5);
             // int interval = value * 10.0 - botIndex;
 
             // vec3 botColor = colorFromInt(rampColors[botIndex]);
+            // vec3 topColor = colorFromInt(rampColors[botIndex+1]);
             // vec3 topColor = colorFromInt(rampColors[topIndex]);
             // vec3 resultColor = mix(botColor, topColor, interval);
 
-            gl_FragColor  = vec4(v_warnValue, 0.0, 0.0, 0.7); // 使用 fragColor 代替 gl_FragColor
+            // vec3 green = vec3(0.0, 1.0, 0.0);
+            vec3 blue = vec3(0.0, 0.0, 1.0);
+            vec3 orange = vec3(240.0, 120.0, 0.0) / 255.0;
+            vec3 red = vec3(1.0, 0.0, 0.0);
+            float v_warnValueP = clamp(v_warnValue*1.4, 0.0, 1.0);
+
+
+            vec3 greenToBlue = mix(blue, orange, smoothstep(0.0, 0.5, v_warnValueP));
+            // Interpolate between blue and red from 0.5 to 1.0
+            vec3 blueToRed = mix(orange, red, smoothstep(0.5, 1.0, v_warnValueP));
+            // Combine the two interpolations
+            vec3 color = mix(greenToBlue, blueToRed, smoothstep(0.0, 1.0, v_warnValueP));
+
+            // gl_FragColor  = vec4(v_warnValueP, 0, 1.0-v_warnValueP, 0.85); // 使用 fragColor 代替 gl_FragColor
+            gl_FragColor  = vec4(color, 0.85); // 使用 fragColor 代替 gl_FragColor
         }`;
         // shader
         const vertexShader = gl.createShader(gl.VERTEX_SHADER);

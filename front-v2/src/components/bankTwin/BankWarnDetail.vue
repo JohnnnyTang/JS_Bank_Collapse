@@ -1,0 +1,340 @@
+<template>
+    <div
+        class="warn-detail-container"
+        :class="props.warnActive ? 'active' : 'in-active'"
+        v-if="props.warnActive"
+    >
+        <div class="warn-detail-title">报警信息详情</div>
+        <div class="warn-detail-content" v-loading="detailLoading">
+            <el-scrollbar class="accordion-scroll">
+                <el-collapse>
+                    <el-collapse-item
+                        :title="deviceIdMap[warn.deviceId]+'报警详情-'+warn.warnTime"
+                        v-for="warn in warnInfoStore.warnInfo"
+                        :key="warn.id"
+                    >
+                        <div class="detail-content-container">
+                            
+                        </div>
+                    </el-collapse-item>
+                </el-collapse>
+            </el-scrollbar>
+        </div>
+        <div class="plan-button-group">
+            <div class="plan-button-title">
+                <div>处置预案</div>
+                <div>预览</div>
+            </div>
+            <div
+                class="plan-button-item"
+                v-for="but in buttonInfoList"
+                :key="but.index"
+                @click="openPlanPdf(but)"
+            >
+                <div class="plan-button-name">{{ but.name }}</div>
+                <div class="plan-button-func">预览</div>
+            </div>
+        </div>
+        <el-dialog
+            v-model="dialogVisible"
+            :title="dialogTitle"
+            width="fit-content"
+            :append-to-body="true"
+        >
+            <VuePDF :pdf="pdf" :page="curPage" />
+            <el-pagination
+                layout="prev, pager, next"
+                background
+                :page-count="pages"
+                v-model:current-page="curPage"
+                style="justify-content: center"
+            />
+        </el-dialog>
+    </div>
+</template>
+
+<script setup>
+import { onMounted, ref } from 'vue'
+import { VuePDF, usePDF } from '@tato30/vue-pdf'
+import { useWarnInfoStore } from '../../store/mapStore'
+const props = defineProps({
+    warnActive: {
+        type: Boolean,
+        default: true,
+    },
+})
+const detailLoading = ref(false)
+const warnInfoStore = useWarnInfoStore()
+const warnDetailList = ref([])
+
+const deviceIdMap = {
+    'MZS120.51749289_32.04059243_1': 'CL-01',
+    'MZS120.51977143_32.04001152_1': 'CL-02',
+    'MZS120.52557975_32.03825056_1': 'CL-03',
+    'MZS120.52660704_32.03676583_1': 'CL-04',
+    'MZS120.53334877_32.03227055_1': 'CL-05',
+    'MZS120.54599538_32.02837993_1': 'CL-06',
+    'MZS120.55327892_32.02707923_1': 'CL-07',
+    'MZS120.55649757_32.02592404_1': 'CL-08',
+    'MZS120.56334257_32.02298144_1': 'CL-09',
+    'MZS120.56944728_32.02070961_1': 'CL-10',
+    'MZS120.51726088_32.04054582_3': 'KX-01',
+    'MZS120.51738292_32.04054923_3': 'KX-02',
+    'MZS120.51749021_32.04053105_3': 'KX-03',
+    'MZS120.51957026_32.04008655_3': 'KX-04',
+    'MZS120.51967889_32.04004108_3': 'KX-05',
+    'MZS120.51986665_32.03998992_3': 'KX-06',
+    'MZS120.52557975_32.03825056_3': 'KX-07',
+    'MZS120.52565217_32.03813574_3': 'KX-08',
+    'MZS120.52566826_32.03799363_3': 'KX-09',
+    'MZS120.513203_32.042733_2': 'YL-01',
+    'MZS120.515433_32.04231_2': 'YL-02',
+    'MZS120.521221_32.040331_2': 'YL-03',
+    'MZS120.529078_32.034385_2': 'YL-04',
+    'MZS120.541648_32.030524_2': 'YL-05',
+    'MZS120.548925_32.029361_2': 'YL-06',
+    'MZS120.552209_32.028149_2': 'YL-07',
+    'MZS120.51967889_32.04004108_4': 'CX-01',
+    'MZS120.51986665_32.03998992_4': 'CX-02',
+    'MZS120.52557975_32.03825056_4': 'CX-03',
+    'MZS120.52565217_32.03813574_4': 'CX-04',
+    'MZS120.52566826_32.03799363_4': 'CX-05',
+    'MZS120.51726088_32.04054582_4': 'CX-06',
+    'MZS120.51738292_32.04054923_4': 'CX-07',
+    'MZS120.51749021_32.04053105_4': 'CX-08',
+    'MZS120.51957026_32.04008655_4': 'CX-09',
+}
+
+const deviceIdPlaceMap = {
+    '': '暂无',
+    'MZS120.51749289_32.04059243_1': '南顺堤',
+    'MZS120.51977143_32.04001152_1': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_1': '江滩办事处',
+    'MZS120.52660704_32.03676583_1': '小港池',
+    'MZS120.53334877_32.03227055_1': '张靖皋桥位上游',
+    'MZS120.54599538_32.02837993_1': '海事码头',
+    'MZS120.55327892_32.02707923_1': '海事码头下游',
+    'MZS120.55649757_32.02592404_1': '雷达站',
+    'MZS120.56334257_32.02298144_1': '民主沙尾部主路',
+    'MZS120.56944728_32.02070961_1': '民主沙尾部',
+    'MZS120.51726088_32.04054582_3': '南顺堤',
+    'MZS120.51738292_32.04054923_3': '南顺堤',
+    'MZS120.51749021_32.04053105_3': '南顺堤',
+    'MZS120.51957026_32.04008655_3': '南顺堤尾部',
+    'MZS120.51967889_32.04004108_3': '南顺堤尾部',
+    'MZS120.51986665_32.03998992_3': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_3': '江滩办事处',
+    'MZS120.52565217_32.03813574_3': '江滩办事处',
+    'MZS120.52566826_32.03799363_3': '江滩办事处',
+    'MZS120.513203_32.042733_2': '南顺堤',
+    'MZS120.515433_32.04231_2': '南顺堤尾部',
+    'MZS120.521221_32.040331_2': '江滩办事处',
+    'MZS120.529078_32.034385_2': '张靖皋桥位上游',
+    'MZS120.541648_32.030524_2': '海事码头',
+    'MZS120.548925_32.029361_2': '海事码头下游',
+    'MZS120.552209_32.028149_2': '雷达站',
+    'MZS120.51967889_32.04004108_4': '南顺堤',
+    'MZS120.51986665_32.03998992_4': '南顺堤',
+    'MZS120.52557975_32.03825056_4': '南顺堤',
+    'MZS120.52565217_32.03813574_4': '南顺堤尾部',
+    'MZS120.52566826_32.03799363_4': '南顺堤尾部',
+    'MZS120.51726088_32.04054582_4': '南顺堤尾部',
+    'MZS120.51738292_32.04054923_4': '江滩办事处',
+    'MZS120.51749021_32.04053105_4': '江滩办事处',
+    'MZS120.51957026_32.04008655_4': '江滩办事处',
+}
+
+const buttonInfoList = ref([
+    {
+        index: 0,
+        name: '南通段预案',
+        url: '/pdf/11.长江南通段民主沙撤离预案.pdf',
+        pageNum: '29',
+    },
+    {
+        index: 1,
+        name: '靖江段预案',
+        url: '/pdf/30.靖江市民主沙行洪运用预案.pdf',
+        pageNum: '41',
+    },
+    {
+        index: 2,
+        name: '重点防御预案',
+        url: '/pdf/75靖江市民主沙(右缘)险工段重点防御预案.pdf',
+        pageNum: '63',
+    },
+])
+
+const curPage = ref(1)
+
+const curPdf = ref('/pdf/11.长江南通段民主沙撤离预案.pdf')
+
+const { pdf, pages, info } = usePDF(curPdf)
+
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+
+const detailInfo = ref({
+    basic: '',
+    cause: '',
+    plan: '',
+    after: '',
+    video: '',
+})
+
+const openPlanPdf = (info) => {
+    curPage.value = 1
+    dialogVisible.value = true
+    curPdf.value = info.url
+}
+
+onMounted(() => {
+    warnDetailList.value = warnInfoStore.warnInfo
+})
+</script>
+
+<style lang="scss" scoped>
+div.warn-detail-container {
+    position: absolute;
+    right: 1vw;
+    top: 10vh;
+    height: 45vh;
+    width: 24vw;
+
+    backdrop-filter: blur(12px);
+    box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
+    background-color: rgba(156, 195, 255, 0.8);
+    border-radius: 4px;
+    border: 2px solid rgb(28, 105, 247);
+    z-index: 3;
+    border-radius: 4px;
+    overflow: hidden;
+
+    div.warn-detail-title {
+        height: 4vh;
+        line-height: 4vh;
+        width: 100%;
+        background-color: transparent;
+        text-align: center;
+        font-size: calc(0.8vw + 0.8vh);
+        font-weight: bold;
+        color: #0400fd;
+        text-shadow:
+            #eef3ff 1px 1px,
+            #eef3ff 2px 2px,
+            #6493ff 3px 3px;
+        letter-spacing: 0.4rem;
+        border-bottom: 2px solid #0400fd;
+    }
+
+    div.warn-detail-content {
+        height: 35vh;
+        width: 23.5vw;
+        margin-left: 0.25vw;
+
+        background-color: #6493ff;
+
+        div.accordion-scroll {
+            height: 100%;
+            width: 100%;
+        }
+
+        :deep(.el-collapse) {
+            --el-collapse-border-color: #104da8;
+            --el-collapse-header-height: 8vh;
+            .el-collapse-item__header {
+                background-color: rgb(210,242,255);
+                padding-left: 1vw;
+                font-weight: bold;
+                color: #14129e;
+                font-size: calc(0.7vw + 0.4vh);
+                &.is-active {
+                    color: rgb(221, 251, 255);
+                    background-color: #0019a5;
+                }
+            }
+
+            .el-collapse-item__content {
+                background-color: rgb(221, 251, 255);
+            }
+        }
+        :deep(.el-collapse-item__wrap) {
+            background-color: transparent !important;
+        }
+        div.detail-content-container {
+            width: 96%;
+            height: 20vh;
+            margin-left: 2%;
+            // padding-left: 2%;
+            // padding-right: 2%;
+            // background-color: rgb(92, 125, 154);
+            border-bottom: 2px solid #0018a3;
+
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+
+        }
+    }
+
+    div.plan-button-group {
+        height: 4.8vh;
+        width: 23vw;
+        margin-left: 0.5vw;
+        margin-top: 0.5vh;
+
+        // background-color: red;
+        border-radius: 2px;
+        box-shadow:
+            4px 3px rgb(0, 111, 175),
+            -4px -3px rgb(20, 94, 255);
+        display: flex;
+        flex-flow: row nowrap;
+
+        justify-content: space-between;
+        align-items: center;
+
+        div.plan-button-title {
+            height: 4.5vh;
+            line-height: 2vh;
+            padding-left: 0.5vw;
+            padding-right: 0.5vw;
+
+            font-size: calc(0.5vw + 0.65vh);
+            font-weight: bold;
+
+            box-shadow: 3px 0px rgb(4, 0, 255);
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        div.plan-button-item {
+            margin-right: 0.5vw;
+            padding-left: 0.5vw;
+            padding-right: 0.5vw;
+            font-size: calc(0.5vw + 0.4vh);
+            height: 4vh;
+            line-height: 2vh;
+            font-weight: bold;
+
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+
+            border: 2px solid rgb(0, 119, 255);
+            background-color: #8bd4ff;
+
+            &:hover {
+                cursor: pointer;
+                border: 2px solid rgb(0, 204, 255);
+                background-color: #002897;
+                color: #dcebff;
+            }
+        }
+    }
+}
+</style>

@@ -88,6 +88,7 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
         splitPoint.push(index)
     }
     splitPoint.push(length - 1)
+    // console.log('213123', after, before, rates)
 
     const ratePoints = []
     for (
@@ -99,6 +100,7 @@ export const drawShapeGraph = (echarts, after, before, rates) => {
             const start = splitPoint[index]
             const end = splitPoint[index + 1]
             for (let j = start; j < end; j++) {
+                // console.log(rates[rateIndex])
                 ratePoints.push(rates[rateIndex])
             }
         }

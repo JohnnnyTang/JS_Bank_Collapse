@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.SectionLineInfo;
 import com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo;
+import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IDeviceWarningRepo;
 import com.johnny.bank.service.node.impl.DataNodeService;
 import com.johnny.bank.service.resource.data.impl.StationInfoService;
 import com.johnny.bank.utils.MailUtil;
@@ -30,6 +31,9 @@ class BankApplicationTests {
     @Qualifier("VectorTileRepo")
     @Autowired
     IVectorTileRepo vectorTileRepo;
+    @Qualifier("DeviceWarningRepo")
+    @Autowired
+    IDeviceWarningRepo deviceWarningRepo;
 
 //    @Test
     void testStation() {
@@ -74,6 +78,11 @@ class BankApplicationTests {
     void testSectionInfo() {
         SectionLineInfo res = vectorTileRepo.selectSectionLineInfoById(1);
         System.out.println(res);
+    }
+
+//    @Test
+    void testUpdateDeviceWarn() {
+        deviceWarningRepo.updateWarnDealtStatus("125a3b38-a602-45c3-b747-54504ef186c4", 1);
     }
 
 }

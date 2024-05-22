@@ -165,8 +165,12 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
 
 const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const warnInfo = ref([])
+    const warnPopupMap = ref({})
+    function removeInfoItem(removeItem) {
+        warnInfo.value = warnInfo.value.filter(item => item.id !== removeItem.id)
+    }
     
-    return { warnInfo }
+    return { warnInfo, warnPopupMap, removeInfoItem }
 })
 
 const useHighlightLayerStore = defineStore('highlightLayerStore', () => {

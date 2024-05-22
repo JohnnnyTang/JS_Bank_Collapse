@@ -29,15 +29,17 @@ public class DeviceWarning {
     private String deviceCode;
     private Timestamp warnTime;
     private double threeDiff;
+    private Integer ifDealt;
 
     public DeviceWarning(
             String id, String deviceId, String deviceCode,
-            Timestamp warnTime, double threeDiff
+            Timestamp warnTime, double threeDiff, Integer ifDealt
     ) {
         this.id = id;
         this.deviceId = deviceId;
         this.deviceCode = deviceCode;
         this.warnTime = warnTime;
         this.threeDiff = threeDiff;
+        this.ifDealt = ifDealt;
     }
 }

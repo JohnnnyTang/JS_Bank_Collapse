@@ -26,9 +26,9 @@
                             {{ deviceInfo.machineId }}</div>
                     </div>
                     <div class="device-user-container detail-double-container">
-                        <div class="device-user-title detail-title-item">录入人员</div>
+                        <div class="device-user-title detail-title-item">监测岸段</div>
                         <div class="device-user-content detail-content-item">
-                            {{ deviceInfo.operateUser }}</div>
+                            {{ deviceIdPlaceMap[deviceInfo.code] }}</div>
                     </div>
                     <div class="device-loc-container detail-single-container">
                         <div class="device-loc-title detail-title-item">安装位置</div>
@@ -102,6 +102,45 @@ const deviceIdMap = {
     'MZS120.51738292_32.04054923_4': 'CX-07',
     'MZS120.51749021_32.04053105_4': 'CX-08',
     'MZS120.51957026_32.04008655_4': 'CX-09',
+}
+
+const deviceIdPlaceMap = {
+    '': '暂无',
+    'MZS120.51749289_32.04059243_1': '南顺堤',
+    'MZS120.51977143_32.04001152_1': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_1': '江滩办事处',
+    'MZS120.52660704_32.03676583_1': '小港池',
+    'MZS120.53334877_32.03227055_1': '张靖皋桥位上游',
+    'MZS120.54599538_32.02837993_1': '海事码头',
+    'MZS120.55327892_32.02707923_1': '海事码头下游',
+    'MZS120.55649757_32.02592404_1': '雷达站',
+    'MZS120.56334257_32.02298144_1': '民主沙尾部主路',
+    'MZS120.56944728_32.02070961_1': '民主沙尾部',
+    'MZS120.51726088_32.04054582_3': '南顺堤',
+    'MZS120.51738292_32.04054923_3': '南顺堤',
+    'MZS120.51749021_32.04053105_3': '南顺堤',
+    'MZS120.51957026_32.04008655_3': '南顺堤尾部',
+    'MZS120.51967889_32.04004108_3': '南顺堤尾部',
+    'MZS120.51986665_32.03998992_3': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_3': '江滩办事处',
+    'MZS120.52565217_32.03813574_3': '江滩办事处',
+    'MZS120.52566826_32.03799363_3': '江滩办事处',
+    'MZS120.513203_32.042733_2': '南顺堤',
+    'MZS120.515433_32.04231_2': '南顺堤尾部',
+    'MZS120.521221_32.040331_2': '江滩办事处',
+    'MZS120.529078_32.034385_2': '张靖皋桥位上游',
+    'MZS120.541648_32.030524_2': '海事码头',
+    'MZS120.548925_32.029361_2': '海事码头下游',
+    'MZS120.552209_32.028149_2': '雷达站',
+    'MZS120.51967889_32.04004108_4': '南顺堤',
+    'MZS120.51986665_32.03998992_4': '南顺堤',
+    'MZS120.52557975_32.03825056_4': '南顺堤',
+    'MZS120.52565217_32.03813574_4': '南顺堤尾部',
+    'MZS120.52566826_32.03799363_4': '南顺堤尾部',
+    'MZS120.51726088_32.04054582_4': '南顺堤尾部',
+    'MZS120.51738292_32.04054923_4': '江滩办事处',
+    'MZS120.51749021_32.04053105_4': '江滩办事处',
+    'MZS120.51957026_32.04008655_4': '江滩办事处',
 }
 
 
@@ -272,12 +311,12 @@ div.info-content-container {
     }
 
     div.detail-info-container {
-        width: 21vw;
+        width: 22vw;
         height: 36vh;
         background-color: rgb(163, 206, 245);
         box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.35);
         position: relative;
-        padding-left: 1.5vw;
+        padding-left: .5vw;
         padding-top: 0vh;
         color: rgb(47, 94, 211);
 
@@ -355,6 +394,9 @@ div.info-content-container {
                 &.device-user-content,
                 &.device-elevation-content {
                     text-align: right;
+                }
+                &.device-user-content {
+                    width: 6vw;
                 }
 
                 &.device-time-content {

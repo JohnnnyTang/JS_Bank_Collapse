@@ -35,6 +35,9 @@
                                 <div class="device-time device-item head">
                                     最新更新时间
                                 </div>
+                                <div class="device-freq device-item head">
+                                    更新频次
+                                </div>
                             </div>
                             <div
                                 class="device-status-row body"
@@ -57,6 +60,11 @@
                                     v-loading="deviceStatusLoading"
                                 >
                                     {{ item.time }}
+                                </div>
+                                <div
+                                    class="device-freq device-item body"
+                                >
+                                    {{ item.freq }}
                                 </div>
                             </div>
                         </div>
@@ -140,11 +148,11 @@ const chartDataLoading = ref(true)
 const deviceStatusLoading = ref(true)
 
 const deviceStatusDataList = ref([
-    { name: '位移基准/测量站', count: 13, time: '2024' },
-    { name: '应力桩', count: 7, time: '2024' },
-    { name: '孔隙水压力计', count: 9, time: '2024' },
-    { name: '测斜仪', count: 9, time: '2024' },
-    { name: '视频监控', count: 3, time: '2024' },
+    { name: '位移测量站', count: 10, time: '2024', freq: '10分钟' },
+    { name: '应力桩', count: 7, time: '2024', freq: '1分钟' },
+    { name: '孔隙水压力计', count: 9, time: '2024', freq: '1小时' },
+    { name: '测斜仪', count: 9, time: '2024', freq: '1小时' },
+    { name: '视频监控', count: 3, time: '2024', freq: '实时' },
 ])
 
 const deviceListMap = {
@@ -245,15 +253,15 @@ const deviceTypeTimeMap = {
     },
     测斜仪: {
         timeUnit: 'day',
-        timeCount: 2,
+        timeCount: 1,
     },
     孔隙水压力计: {
         timeUnit: 'day',
-        timeCount: 2,
+        timeCount: 1,
     },
     应力桩: {
         timeUnit: 'hour',
-        timeCount: 5,
+        timeCount: 6,
     },
 }
 
@@ -525,11 +533,11 @@ div.device-info-container {
                     }
 
                     div.device-item {
-                        width: 28%;
+                        width: 26%;
                         height: 100%;
                         line-height: 3.2vh;
                         text-align: center;
-                        font-size: calc(0.5vw + 0.4vh);
+                        font-size: calc(0.5vw + 0.3vh);
                         border-radius: 2px;
 
                         background-color: #d2f2ff;
@@ -537,11 +545,15 @@ div.device-info-container {
                         color: #2a5fdb;
 
                         &.device-name {
-                            width: 40%;
+                            width: 27%;
                         }
 
                         &.device-time {
-                            width: 32%;
+                            width: 27%;
+                        }
+
+                        &.device-freq {
+                            width: 20%;
                         }
 
                         &.device-count {
