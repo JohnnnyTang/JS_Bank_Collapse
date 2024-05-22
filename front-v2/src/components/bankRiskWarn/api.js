@@ -15,8 +15,13 @@ export class bankRiskWarn {
         return bankRiskWarnInstance.get(url)
     }
 
-    static runProfileModel = (before, now, profileId) => {
+    static runProfileModel_short = (before, now, profileId) => {
         const url = `/taskNode/start/multi/default/section/${profileId-1}/beg/${before}/end/${now}`;
+        return bankRiskWarnInstance.post(url)
+    }
+
+    static runProfileModel_long = (before, now, profileId) => {
+        const url = `/taskNode/start/multi/default/section/long/${profileId-1}/beg/${before}/end/${now}`;
         return bankRiskWarnInstance.post(url)
     }
 
