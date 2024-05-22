@@ -78,7 +78,6 @@ const chartConfig = (deviceType) => {
 }
 
 onMounted(() => {
-    console.log('wqe123', props.warningInfo)
 })
 
 

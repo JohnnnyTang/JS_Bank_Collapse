@@ -1,8 +1,5 @@
 <template>
-    <div
-        class="warn-history-container"
-        :class="props.warnActive ? 'active' : 'in-active'"
-    >
+    <div class="warn-history-container" :class="props.warnActive ? 'active' : 'in-active'">
         <div class="warn-history-title">报警信息列表</div>
         <div class="warn-histroy-content" v-loading="historyLoading">
             <div class="device-status-content">
@@ -13,12 +10,8 @@
                     <div class="device-time device-item head">是否处置</div>
                 </div>
                 <el-scrollbar height="30vh">
-                    <div
-                        class="device-status-row body"
-                        v-for="(item, index) in warnHistoryList"
-                        :key="index"
-                        v-loading="historyRowLoading[index]"
-                    >
+                    <div class="device-status-row body" v-for="(item, index) in warnHistoryList" :key="index"
+                        v-loading="historyRowLoading[index]">
                         <div class="device-id device-item body">
                             {{ index + 1 }}
                         </div>
@@ -26,17 +19,13 @@
                             {{ item.warnTime }}
                         </div>
                         <div class="device-count device-item body">
-                            <div>{{ gnssIdSectionMap[item.deviceId] }}</div>
+                            <div>{{ warnPosNameMap[item.deviceId] }}</div>
                         </div>
                         <div class="device-time device-item body">
                             <div :class="item.ifDealt == 1 ? 'yes' : 'no'">
                                 {{ item.ifDealt ? '是' : '否' }}
                             </div>
-                            <div
-                                class="deal-button"
-                                v-if="item.ifDealt == 0"
-                                @click="dealWithWarn(index)"
-                            >
+                            <div class="deal-button" v-if="item.ifDealt == 0" @click="dealWithWarn(index)">
                                 处置
                             </div>
                         </div>
@@ -62,7 +51,7 @@ const historyLoading = ref(true)
 const historyRowLoading = ref(new Array(100).fill(false))
 const warnStore = useWarnInfoStore()
 
-const deviceTypeList = ["GNSS", "应力桩", "水压力计", "", "测斜仪"]
+const deviceTypeList = ["GNSS", "应力桩", "水压力计","测斜仪"]
 
 const warnHistoryList = ref([
     {
@@ -74,7 +63,7 @@ const warnHistoryList = ref([
     },
 ])
 
-const gnssIdSectionMap = {
+const warnPosNameMap = {
     '': '暂无',
     'MZS120.51749289_32.04059243_1': '南顺堤',
     'MZS120.51977143_32.04001152_1': '南顺堤尾部',
@@ -86,6 +75,32 @@ const gnssIdSectionMap = {
     'MZS120.55649757_32.02592404_1': '雷达站',
     'MZS120.56334257_32.02298144_1': '民主沙尾部主路',
     'MZS120.56944728_32.02070961_1': '民主沙尾部',
+    'MZS120.51726088_32.04054582_3': '南顺堤',
+    'MZS120.51738292_32.04054923_3': '南顺堤',
+    'MZS120.51749021_32.04053105_3': '南顺堤',
+    'MZS120.51957026_32.04008655_3': '南顺堤尾部',
+    'MZS120.51967889_32.04004108_3': '南顺堤尾部',
+    'MZS120.51986665_32.03998992_3': '南顺堤尾部',
+    'MZS120.52557975_32.03825056_3': '江滩办事处',
+    'MZS120.52565217_32.03813574_3': '江滩办事处',
+    'MZS120.52566826_32.03799363_3': '江滩办事处',
+    'MZS120.513203_32.042733_2': '南顺堤',
+    'MZS120.515433_32.04231_2': '南顺堤尾部',
+    'MZS120.521221_32.040331_2': '江滩办事处',
+    'MZS120.529078_32.034385_2': '张靖皋桥位上游',
+    'MZS120.541648_32.030524_2': '海事码头',
+    'MZS120.548925_32.029361_2': '海事码头下游',
+    'MZS120.552209_32.028149_2': '雷达站',
+    'MZS120.51967889_32.04004108_4': '南顺堤',
+    'MZS120.51986665_32.03998992_4': '南顺堤',
+    'MZS120.52557975_32.03825056_4': '南顺堤',
+    'MZS120.52565217_32.03813574_4': '南顺堤尾部',
+    'MZS120.52566826_32.03799363_4': '南顺堤尾部',
+    'MZS120.51726088_32.04054582_4': '南顺堤尾部',
+    'MZS120.51738292_32.04054923_4': '江滩办事处',
+    'MZS120.51749021_32.04053105_4': '江滩办事处',
+    'MZS120.51957026_32.04008655_4': '江滩办事处',
+
 }
 
 
@@ -105,7 +120,8 @@ const dealWithWarn = async (warnIndex) => {
         delete warnStore.warnPopupMap[warnHistoryList.value[warnIndex].id]
 
         let id = warnHistoryList.value[warnIndex].deviceId
-        let type = deviceTypeList[id.split('_').pop()-1]
+        let type = deviceTypeList[id.split('_').pop() - 1]
+        console.log(type, id);
         removeWarningDeviceStyle(useMapStore().getMap(), type, id)
         warnStore.removeInfoItem(warnHistoryList.value[warnIndex])
     }
@@ -114,11 +130,30 @@ const dealWithWarn = async (warnIndex) => {
     historyRowLoading.value[warnIndex] = false
 }
 
+watch(() => useWarnInfoStore().fake, (newVal) => {
+    console.log('history watching fake!!', newVal);
+    // 3 fake items
+    let fakeWarnInfo = useWarnInfoStore().warnInfo
+    let newhistoryRowLoading = [...historyRowLoading.value]
+    let newwarnHistorList = [...warnHistoryList.value]
+    newhistoryRowLoading.unshift(...[false, false, false])
+    newwarnHistorList.unshift(...fakeWarnInfo)
+
+    console.log('1', historyRowLoading.value);
+    console.log('1', warnHistoryList.value);
+    console.log('@', newhistoryRowLoading);
+    console.log('@', newwarnHistorList);
+
+    historyRowLoading.value = newhistoryRowLoading
+    warnHistoryList.value = newwarnHistorList
+
+})
+
 onMounted(async () => {
     const warnData = (await BackEndRequest.getHistoryWarnInfo('hour', 1)).data
-    // console.log('warn', warnData)
+    console.log('warn', warnData)
     historyRowLoading.value = new Array(warnData.length).fill(false)
-    // console.log('123123', historyRowLoading.value)
+    console.log('123123', historyRowLoading.value)
     warnHistoryList.value = warnData
     historyLoading.value = false
 })
@@ -206,6 +241,7 @@ div.warn-history-container {
 
                     &.device-name {
                         width: 34%;
+
                         &.body {
                             font-size: calc(0.5vw + 0.2vh);
                         }
@@ -224,9 +260,11 @@ div.warn-history-container {
                         div.yes {
                             color: #00ca22;
                         }
+
                         div.no {
                             color: #ff0000;
                         }
+
                         div.deal-button {
                             padding-left: 6%;
                             padding-right: 6%;
@@ -258,10 +296,9 @@ div.warn-history-container {
                             rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
                     }
 
-                    box-shadow:
-                        rgba(13, 70, 228, 0.6) 0px 2px 4px,
-                        rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
-                        rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                    box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                    rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                    rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
                 }
             }
         }
