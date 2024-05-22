@@ -413,19 +413,20 @@ const timeStep = ref(0)
 const showFlow = ref(false)
 const showRaster = ref(true)
 
-let flowSrc = []
-for (let i = 0; i < 26; i++) {
-    flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-}
-let flow = reactive(
-    new SteadyFlowLayer(
-        '近岸流场',
-        '/scratchSomething/terrain_flow/json/station.bin',
-        flowSrc,
-        (url) => url.match(/uv_(\d+)\.bin/)[1],
-        '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
-    ),
-)
+// let flowSrc = []
+// for (let i = 0; i < 26; i++) {
+//     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+// }
+// let flow = reactive(
+//     new SteadyFlowLayer(
+//         '近岸流场',
+//         '/scratchSomething/terrain_flow/json/station.bin',
+//         flowSrc,
+//         (url) => url.match(/uv_(\d+)\.bin/)[1],
+//         '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
+//     ),
+// )
+let flow = null
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -1597,6 +1598,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+    useMapStore().getMap().remove()
     useMapStore().destroyMap()
 })
 </script>

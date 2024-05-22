@@ -118,4 +118,15 @@ public class MapTileController {
     ) throws Exception {
         return rasterTileService.getMzsFloodRasterInByte(name, Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
     }
+
+    @CrossOrigin
+    @RequestMapping(
+            value = "/raster/image/base/{x}/{y}/{z}",
+            method = RequestMethod.GET
+    )
+    public @ResponseBody byte[] getBaseImageTiles(
+            @PathVariable String x, @PathVariable String y, @PathVariable String z
+    ) throws Exception {
+        return rasterTileService.getBaseImageInByte(Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
+    }
 }

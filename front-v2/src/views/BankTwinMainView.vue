@@ -81,7 +81,7 @@
                         <span>{{ gnssLegendInfo.text2 }}</span>
                     </div>
                     <div style="display: flex; flex-direction: row">
-                        <div class="legend-block">
+                        <div class="legend-block" @click="GNSSShow">
                             <div
                                 class="icon-block GNSS-icon"
                                 :style="{
@@ -327,6 +327,14 @@ const mapFlyToRiver = (mapIns) => {
     )
 }
 
+const gnssShow = true
+
+const GNSSShow = () => {
+    let map = useMapStore().getMap()
+
+    // map.
+}
+
 const viewChangeClick = (value) => {
     console.log('view Change!', value)
     let map = useMapStore().getMap()
@@ -463,12 +471,16 @@ onMounted(async () => {
     }, 1000);
 })
 
+// onUnmounted(() => {
+//     // resizeObserver.disconnect()
+//     // resizeObserver.unobserve(containerDom.value)
+//     console.log('onUnmounted')
+//     map && map.remove()
+//     console.log('map.remove')
+// })
 onUnmounted(() => {
-    // resizeObserver.disconnect()
-    // resizeObserver.unobserve(containerDom.value)
-    console.log('onUnmounted')
-    map && map.remove()
-    console.log('map.remove')
+    useMapStore().getMap().remove()
+    useMapStore().destroyMap()
 })
 </script>
 

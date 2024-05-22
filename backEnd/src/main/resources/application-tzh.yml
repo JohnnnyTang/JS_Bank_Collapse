@@ -48,6 +48,7 @@ tile:
   worldTilePath: D:/2024-work/shore_collapse/data/mbtiles/data
   nodeServicePath: D:\2024-work\shore_collapse\code\project\backEnd\src\main\resources\node\index.js
   riverTilePath: D:/2024-work/shore_collapse/data/riverRasterTile/
+  riverImagePath: D:/2024-work/shore_collapse/tiles/worldImage/tiles/
 
 video:
   yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4

@@ -125,7 +125,7 @@ public class TaskNodeService extends NodeService<TaskNode> {
 
     public String createAndStartSectionDefaultMultiIndexTask(
             Integer sectionId, String beforeTime, String afterTime,
-            List<Double> startPt, List<Double> endPt
+            List<Double> startPt, List<Double> endPt, Boolean ifLong
     ) throws Exception {
         String datePattern = "\\d{4}-\\d{2}-\\d{2}";
         ParamNode paramNode = paramNodeRepo.findParamNodeById("6642da4b010453003d568646");
@@ -133,7 +133,12 @@ public class TaskNodeService extends NodeService<TaskNode> {
         paramNode.setId(null);
         SectionLineInfo sectionLineInfo;
         if(sectionId != null) {
-            sectionLineInfo = vectorTileRepo.selectSectionLineInfoById(sectionId);
+            if(ifLong) {
+                sectionLineInfo = vectorTileRepo.selectLongSectionLineInfoById(sectionId);
+            }
+            else {
+                sectionLineInfo = vectorTileRepo.selectSectionLineInfoById(sectionId);
+            }
             if(sectionLineInfo == null) return null;
         }
         else {

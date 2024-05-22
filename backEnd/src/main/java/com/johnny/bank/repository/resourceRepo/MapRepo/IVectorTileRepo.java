@@ -31,4 +31,5 @@ public interface IVectorTileRepo {
     List<SectionLineInfo> selectSectionLineInfo();
 
     SectionLineInfo selectSectionLineInfoById(Integer id);
+    SectionLineInfo selectLongSectionLineInfoById(Integer id);
 }
