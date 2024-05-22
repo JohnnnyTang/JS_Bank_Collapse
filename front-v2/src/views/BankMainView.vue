@@ -13,6 +13,9 @@
         <WarnNoticeVue />
         <RealtimeRiskVue />
         <StableStatusVue />
+        <div style="position: absolute;left: 40vw;top: 20vh;height: 28vh;width: 24vw;z-index: 4;">
+            <WaterProcessChart />
+        </div>
     </div>
 </template>
 
@@ -26,6 +29,7 @@ import TickClockVue from '../components/bankMain/TickClock.vue'
 import RealtimeRiskVue from '../components/bankMain/RealtimeRisk.vue'
 import BankTableVue from '../components/bankMain/BankTable.vue'
 import WarnNoticeVue from '../components/bankMain/WarnNotice.vue'
+import WaterProcessChart from '../components/bankRiskWarn/WaterProcessChart.vue'
 
 mapboxgl.accessToken =
     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -560,7 +564,7 @@ onMounted(() => {
                 'http://127.0.0.1:8989/api/v1/tile/raster/image/base/{x}/{y}/{z}',
             ],
             tileSize: 256,
-            minzoom: 9,
+            minzoom: 1,
             maxzoom: 14,
             bounds: [
                 118.3372672298279582, 30.5615244886408277, 122.3900937696443378,

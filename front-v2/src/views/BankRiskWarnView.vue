@@ -33,7 +33,7 @@
             </div>
             <div class="scene-selector-container selector-item-container">
                 <!-- 11<div class="scene-title selector-title">评估情景：</div> -->
-                <div class="before-scene-title selector-title">对比地形:</div>
+                <!-- <div class="before-scene-title selector-title">对比地形:</div>
                 <div class="before-scene selector-content">
                     <el-select
                         class="before"
@@ -59,11 +59,11 @@
                                 class="section-class-text"
                                 >{{ item.time }}</span
                             >
-                        </el-option>
+                        </el-option> -->
                         <!-- 11<template #footer>
                             <div class="add-select-button">新增评估情景</div>
                         </template> -->
-                    </el-select>
+                    <!-- </el-select>
                 </div>
                 <div class="now-scene-title selector-title">当前地形:</div>
                 <div class="now-scene selector-content">
@@ -91,13 +91,13 @@
                                 class="section-class-text"
                                 >{{ item.time }}</span
                             >
-                        </el-option>
+                        </el-option> -->
                         <!-- 11<template #footer>
                             <div class="add-select-button">新增评估情景</div>
                         </template> -->
-                    </el-select>
-                </div>
-                <!-- <div class="current-param-container year1">
+                    <!-- </el-select>
+                </div> -->
+                <div class="current-param-container year1">
                     <div class="current-param-title">2021年数据</div>
                     <div class="current-param-content">
                         汛前
@@ -114,76 +114,19 @@
                     <div class="current-param-content">
                         汛前
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
         
-        <div class="risk-result-shower">
-            <dv-decoration-2
-                :Dur="2"
-                :reverse="true"
-                :color="['rgba(255, 255, 255, 1)']"
-                style="position: absolute; height: 43vh; width: 0.45vw; top: 1vh"
-            />
-            <div class="risk-result-wrapper">
-                <div class="risk-title-container">
-                    <div class="risk-title-text">
-                        岸段风险状态
-                    </div>
-                </div>
-                <div class="risk-line"></div>
-                <div class="risk-index-container low" v-if="riskDataAll[riskDataIndex].value==='low'">
-                    <div class="risk-index-image">
-                        <img src="/left_triangle.png" alt="左箭头">
-                    </div>
-                    <div class="risk-index-text low">
-                        {{ riskDataAll[riskDataIndex].label }}
-                    </div>
-                </div>
-                <div class="risk-index-container middle" v-else-if="riskDataAll[riskDataIndex].value==='middle'">
-                    <div class="risk-index-image">
-                        <img src="/left_triangle.png" alt="左箭头">
-                    </div>
-                    <div class="risk-index-text middle">
-                        {{ riskDataAll[riskDataIndex].label }}
-                    </div>
-                </div>
-                <div class="risk-index-container high" v-else>
-                    <div class="risk-index-image">
-                        <img src="/left_triangle.png" alt="左箭头">
-                    </div>
-                    <div class="risk-index-text high">
-                        {{ riskDataAll[riskDataIndex].label }}
-                    </div>
-                </div>
-                <div
-                    class="show-more-text"
-                    v-if="showRiskResult===false"
-                    @click="showRiskResult=!showRiskResult"
-                >
-                    <dv-decoration-7 style="position:absolute;width:8vw;height:2.5vh;top:40vh">
-                        具体断面信息
-                    </dv-decoration-7>
-                </div>
-                <div
-                    class="show-more-text"
-                    v-else
-                    @click="showRiskResult=!showRiskResult"
-                >
-                    <dv-decoration-7 style="position:absolute;width:8vw;height:2.5vh;top:40vh">
-                        关闭
-                    </dv-decoration-7>
-                </div>
-            </div>
-            <dv-decoration-2
-                :Dur="2"
-                :reverse="true"
-                :color="['rgba(255, 255, 255, 1)']"
-                style="position: absolute; height: 43vh; width: 19.55vw; top: 1vh"
-            />
+        <div class="tree-container">
+            <button @click="showProfileShapeFunc">断面形态</button>
+            <button @click="showProfileSlopeFunc">岸坡最大坡比</button>
+            <button @click="showProfileErosionFunc">近岸冲刷速率</button>
+            <button @click="showFlowSpeedFunc">流速指标</button>
+            <!-- <button @click="showProfileShapeFunc">断面形态</button> -->
         </div>
 
-        <profileInfo
+        <profileInfoVue
             v-if="showProfileInfo"
             @profile-value-change="changeProfileValue"
             :profileData="profileData"
@@ -192,7 +135,7 @@
             :erosionChartLoad="erosionChartLoad"
         />
 
-        <profileShape
+        <profileShapeVue
             v-if="showProfileShape"
             @profile-value-change="changeProfileValue"
             :profileData="profileData"
@@ -200,24 +143,31 @@
             :shapeChartLoad="shapeChartLoad"
         />
 
-        <div class="riskResult-drag" v-show="true" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
-            <riskResultVue
-                v-if="showRiskResult"
-                :profileList="profileList"
-            />
-        </div>
-        <!-- <riskResultVue
-            v-if="showRiskResult"
+        <!-- <div class="drag profileSlope" v-if="showProfileSlope" v-draggable="{ bounds: 'body', cancel: 'div.content' }"> -->
+        <profileSlopeVue
+            v-if="showProfileSlope"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
             :profileList="profileList"
-        /> -->
+            :slopeChartLoad="slopeChartLoad"
+        />
+        <!-- </div> -->
+
+        <profileErosionVue
+            v-if="showProfileErosion"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
+            :profileList="profileList"
+            :slopeChartLoad="erosionChartLoad"
+        />
 
         <flowspeedInfoVue
             v-if="showFlowSpeed"
             :profileList="profileList"
+            :waterCondition="waterCondition"
             :flowspeedChartLoad="flowspeedChartLoad"
         />
-
-        <div class="flow-control-block">
+        <div v-if="showFlowSpeed" class="flow-control-block">
             <label class="switch">
                 <input
                     type="checkbox"
@@ -230,7 +180,7 @@
                 <div class="text">流场展示</div>
             </div>
         </div>
-        <div class="raster-control-block">
+        <div v-if="showFlowSpeed" class="raster-control-block">
             <label class="switch">
                 <input
                     type="checkbox"
@@ -243,13 +193,23 @@
                 <div class="text">冲淤图展示</div>
             </div>
         </div>
-
-        <div class="time-shower-block">
+        <div v-if="showFlowSpeed" class="time-shower-block">
             <flowTimeShower
                 :type="'exp'"
                 :time-step="timeStep"
                 :total-count="25"
             ></flowTimeShower>
+        </div>
+
+        <!-- <riskResultBarVue
+            :riskDataIndex="riskDataIndex"
+            :showRiskResult="showRiskResult"
+        /> -->
+
+        <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+            <riskResultVue
+                :profileList="profileList"
+            />
         </div>
 
         <div class="raster-legend-container" v-if="showRaster">
@@ -387,22 +347,31 @@ import { convertToMercator } from '../components/bankRiskWarn/coordConvert.js'
 import { rasterMM } from '../components/bankRiskWarn/rasterMM'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import { connectionExists } from '@vue-flow/core'
+import { defaultWarnLayerDataInput, profileListInput, sceneListInput, placeList, InfoTree, waterCondition } from '../components/bankRiskWarn/data'
 // import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 // import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
 
+const riskResultBarVue = defineAsyncComponent(() =>
+  import('../components/bankRiskWarn/riskResultBar.vue')
+)
 const riskResultVue = defineAsyncComponent(() =>
   import('../components/bankRiskWarn/riskResult.vue')
 );
 const flowspeedInfoVue = defineAsyncComponent(() =>
   import('../components/bankRiskWarn/flowspeedInfo.vue')
 );
-const profileInfo = defineAsyncComponent(() =>
+const profileInfoVue = defineAsyncComponent(() =>
   import('../components/bankRiskWarn/profileInfo.vue')
 )
-
-const profileShape = defineAsyncComponent(() =>
+const profileShapeVue = defineAsyncComponent(() =>
   import('../components/bankRiskWarn/profileShape.vue')
+)
+const profileSlopeVue = defineAsyncComponent(() =>
+  import('../components/bankRiskWarn/profileSlope.vue')
+)
+const profileErosionVue = defineAsyncComponent(() =>
+  import('../components/bankRiskWarn/profileErosion.vue')
 )
 
 // const activeStatus = ref([true, false, false])
@@ -412,6 +381,7 @@ const mapContainer = ref()
 const timeStep = ref(0)
 const showFlow = ref(false)
 const showRaster = ref(true)
+const infoTreeData = ref(InfoTree)
 
 // let flowSrc = []
 // for (let i = 0; i < 26; i++) {
@@ -460,306 +430,11 @@ const mapJumpToRiver = (mapIns) => {
 }
 
 // 数据
-let defaultWarnLayerData = [
-    {
-        name: 'JC01',
-        coords: [
-            [120.49989610501109, 32.044845778820694],
-            [120.49965852902085, 32.043054010465546],
-        ],
-        warnValue: 0,
-    },
-    {
-        name: 'JC02',
-        coords: [
-            [120.51211644811006, 32.04310480824947],
-            [120.51157809855385, 32.04135665004222],
-        ],
-        warnValue: 0.18,
-    },
-    {
-        name: 'JC03',
-        coords: [
-            [120.51598399026375, 32.04244111945512],
-            [120.51554162835052, 32.04064910386879],
-        ],
-        warnValue: 0.18,
-    },
-    {
-        name: 'JC04',
-        coords: [
-            [120.52163733002358, 32.040317481106044],
-            [120.52010747944439, 32.03901766791365],
-        ],
-        warnValue: 0.18,
-    },
-    {
-        name: 'JC05',
-        coords: [
-            [120.52344753736321, 32.03912224359854],
-            [120.52202732882418, 32.037765786589944],
-        ],
-        warnValue: 0.18,
-    },
-    {
-        name: 'JC06',
-        coords: [
-            [120.5300568728269, 32.035076196597906],
-            [120.52886185568613, 32.03359585101801],
-        ],
-        warnValue: 0.42,
-    },
-    {
-        name: 'JC07',
-        coords: [
-            [120.53577029390934, 32.03306474923213],
-            [120.53521759568126, 32.03132371065091],
-        ],
-        warnValue: 0.42,
-    },
-    {
-        name: 'JC08',
-        coords: [
-            [120.54259039936055, 32.03113531223312],
-            [120.54191211481913, 32.0294311450221],
-        ],
-        warnValue: 0.42,
-    },
-    {
-        name: 'JC09',
-        coords: [
-            [120.54845619793755, 32.02942703528161],
-            [120.547645906125, 32.027757714058616],
-        ],
-        warnValue: 0.18,
-    },
-    {
-        name: 'JC10',
-        coords: [
-            [120.55217332294447, 32.02819103999115],
-            [120.55139957273384, 32.02651468780271],
-        ],
-        warnValue: 0.18,
-    },
-    {
-        name: 'JC11',
-        coords: [
-            [120.55987007042168, 32.0256085153387],
-            [120.55938372124096, 32.02385317986381],
-        ],
-        warnValue: 0.42,
-    },
-    {
-        name: 'JC12',
-        coords: [
-            [120.56542283954619, 32.023997421425335],
-            [120.56490201809913, 32.022254233310434],
-        ],
-        warnValue: 0.18,
-    },
-]
-const profileList = ref([
-    {
-        value: 1,
-        id: 'JC01',
-        label: '断面 JC01',
-        name: 'JC01: 头部围堤',
-        filter: ['==', 'name', 'JC01'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 2,
-        id: 'JC02',
-        label: '断面 JC02',
-        name: 'JC02: 南顺堤',
-        filter: ['==', 'name', 'JC02'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 3,
-        id: 'JC03',
-        label: '断面 JC03',
-        name: 'JC03: 南顺堤尾部',
-        filter: ['==', 'name', 'JC03'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 4,
-        id: 'JC04',
-        label: '断面 JC04',
-        name: 'JC04: 江滩办事处',
-        filter: ['==', 'name', 'JC04'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 5,
-        id: 'JC05',
-        label: '断面 JC05',
-        name: 'JC05: 小港池',
-        filter: ['==', 'name', 'JC05'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 6,
-        id: 'JC06',
-        label: '断面 JC06',
-        name: 'JC06: 张靖皋桥位上游',
-        filter: ['==', 'name', 'JC06'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 7,
-        id: 'JC07',
-        label: '断面 JC07',
-        name: 'JC07: 张靖皋桥位下游',
-        filter: ['==', 'name', 'JC07'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 8,
-        id: 'JC08',
-        label: '断面 JC08',
-        name: 'JC08: 海事码头',
-        filter: ['==', 'name', 'JC08'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 9,
-        id: 'JC09',
-        label: '断面 JC09',
-        name: 'JC09: 海事码头下游',
-        filter: ['==', 'name', 'JC09'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 10,
-        id: 'JC10',
-        label: '断面 JC10',
-        name: 'JC10: 雷达站',
-        filter: ['==', 'name', 'JC10'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 11,
-        id: 'JC11',
-        label: '断面 JC11',
-        name: 'JC11: 民主沙尾部主路',
-        filter: ['==', 'name', 'JC11'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-    {
-        value: 12,
-        id: 'JC12',
-        label: '断面 JC12',
-        name: 'JC12: 民主沙尾',
-        filter: ['==', 'name', 'JC12'],
-        flowspeed: null,
-        risk: null,
-        color: null,
-    },
-])
-const sceneList = ref([
-    {
-        value: '2020before',
-        name: '2020汛前地形数据',
-        label: '2020汛前',
-        year: '2020',
-        time: '汛前',
-        date: '2020-03-01',
-        dateShort: '2003',
-    },
-    {
-        value: '2020after',
-        name: '2020汛后地形数据',
-        label: '2020汛后',
-        year: '2020',
-        time: '汛后',
-        date: '2020-09-01',
-        dateShort: '2009',
-    },
-    {
-        value: '2021before',
-        name: '2021汛前地形数据',
-        label: '2021汛前',
-        year: '2021',
-        time: '汛前',
-        date: '2021-03-01',
-        dateShort: '2103',
-    },
-    {
-        value: '2021after',
-        name: '2021汛后地形数据',
-        label: '2021汛后',
-        year: '2021',
-        time: '汛后',
-        date: '2021-09-01',
-        dateShort: '2109',
-    },
-    {
-        value: '2022before',
-        name: '2022汛前地形数据',
-        label: '2022汛前',
-        year: '2022',
-        time: '汛前',
-        date: '2022-03-01',
-        dateShort: '2203',
-    },
-    {
-        value: '2022after',
-        name: '2022汛后地形数据',
-        label: '2022汛后',
-        year: '2022',
-        time: '汛后',
-        date: '2022-09-01',
-        dateShort: '2209',
-    },
-    {
-        value: '2023before',
-        name: '2023汛前地形数据',
-        label: '2023汛前',
-        year: '2023',
-        time: '汛前',
-        date: '2023-03-01',
-        dateShort: '2303',
-    },
-    {
-        value: '2023after',
-        name: '2023汛后地形数据',
-        label: '2023汛后',
-        year: '2023',
-        time: '汛后',
-        date: '2023-09-01',
-        dateShort: '2309',
-    },
-])
+const profileList = ref(profileListInput)
+const sceneList = ref(sceneListInput)
+let defaultWarnLayerData = defaultWarnLayerDataInput
+
 const placeValue = ref('mzs')
-const placeList = [
-    { value: 'mzs', label: '民主沙右缘示范段' },
-    { value: 'tpz', label: '太平洲左缘示范段', disabled: true },
-    { value: 'flq', label: '丰乐桥示范段', disabled: true },
-]
 
 
 // 场景与地形选择
@@ -849,6 +524,7 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow) => {
     // profileData = await getProfileData(before, now)
     isRunning.value = false
     shapeChartLoad.value = false
+    slopeChartLoad.value = false
     erosionChartLoad.value = false
     flowspeedChartLoad.value = false
     // changeProfileData(profileData.value)
@@ -914,7 +590,7 @@ const CalProfile = async (before, now) => {
     await Promise.all(promises)
 }
 const CalProfileById = async (before, now, id) => {
-    const taskId = await bankRiskWarn.runProfileModel(before, now, id + 1)
+    const taskId = await bankRiskWarn.runProfileModel_long(before, now, id + 1)
     let RunStatus
     for (;;) {
         try {
@@ -1059,8 +735,45 @@ let sceneNow
 // 断面数据变量
 const showProfileInfo = ref(false)
 const showProfileShape = ref(false)
+const showProfileShapeFunc = () => {
+    loading_message.value = '正在加载滩槽高程信息...'
+    isRunning.value = true
+    showProfileShape.value = !showProfileShape.value
+    isRunning.value = false
+}
+const showProfileSlope = ref(false)
+const showProfileSlopeFunc = () => {
+    loading_message.value = '正在加载岸坡最大坡比信息...'
+    isRunning.value = true
+    showProfileSlope.value = !showProfileSlope.value
+    isRunning.value = false
+}
+const showProfileErosion = ref(false)
+const showProfileErosionFunc = () => {
+    loading_message.value = '正在加载近岸冲刷速率信息...'
+    isRunning.value = true
+    showProfileErosion.value = !showProfileErosion.value
+    isRunning.value = false
+}
 const showRiskResult = ref(false)
+const showRiskResultFunc = () => {
+    loading_message.value = '正在加载风险详细信息...'
+    isRunning.value = true
+    showRiskResult.value = !showRiskResult.value
+    isRunning.value = false
+}
 const showFlowSpeed = ref(false)
+const showFlowSpeedFunc = () => {
+    if (showFlow.value === false && showFlowSpeed.value === true) {
+        showFlowSpeed.value = false
+        return 
+    }
+    loading_message.value = '正在加载流速指标信息...'
+    isRunning.value = true
+    showFlowSpeed.value = !showFlowSpeed.value
+    isRunning.value = false
+    flowControlHandler()
+}
 const profileData = ref([])
 const riskDataAll = ref([
     {
@@ -1076,15 +789,16 @@ const riskDataAll = ref([
         label: '高风险'
     },
 ])
-const riskDataIndex = ref(0)
+// const riskDataIndex = ref(0)
 const tempProfile = ref(null)
 const tempProfileData = ref(null)
 
 // 断面图表变量
+
 const shapeChartLoad = ref(true)
+const slopeChartLoad = ref(true)
 const erosionChartLoad = ref(true)
 const flowspeedChartLoad = ref(true)
-// const flowSpeedLoading = ref(true)
 
 const tempProfileName = ref('')
 const tempProfileRisk = ref('')
@@ -1201,6 +915,7 @@ const sureSectionRese = async () => {
     }
     isRunning.value = true
     shapeChartLoad.value = true
+    slopeChartLoad.value = true
     erosionChartLoad.value = true
     loading_message.value = '自定义断面信息计算中...'
     sectionConfirmShow.value = false
@@ -1243,6 +958,7 @@ const sureSectionRese = async () => {
     profileData.value.push(profileResult.data)
     isRunning.value = false
     shapeChartLoad.value = false
+    slopeChartLoad.value = false
     erosionChartLoad.value = false
 }
 
@@ -1590,10 +1306,12 @@ onMounted(async () => {
     })
 
     getProfileTime()
-    showProfileInfo.value = true
-    // showProfileShape.value = true
+    showProfileInfo.value = false
+    showProfileShape.value = false
+    showProfileSlope.value = false
+    showProfileErosion.value = false
     showRiskResult.value = false
-    showFlowSpeed.value = true
+    showFlowSpeed.value = false
     await ProfileLoadingProcess(sceneBefore, sceneNow)
 })
 
@@ -1837,149 +1555,36 @@ div.risk-warn-container {
         }
     }
 
-    div.risk-result-shower {
+    div.tree-container {
         position: absolute;
-        top: 6vh;
-        right: 2.5vw;
-        width: 10vw;
-        height: 45vh;
+        top: 20vh;
+        left: 2vw;
+        width: 22vw;
+        height: 30vh;
         background-color: rgba(48, 49, 51, 0.6);
         backdrop-filter: blur(5px);
         border-radius: 10px;
         border: #167aec 1px solid;
         z-index: 2;
-
-        div.risk-result-wrapper {
-            position: absolute;
-            top: 0.4vh;
-            right: 0.45vw;
-            width: 9vw;
-            height: 44vh;
-            backdrop-filter: blur(5px);
-            background-color: rgba(252, 253, 255, 0.9);
-            border-radius: 10px;
-            border: #167aec 1px solid;
-            z-index: 2;
-
-            div.risk-title-container {
-                position: absolute;
-                top: 0.5vh;
-                right: 0.24vw;
-                width: 8.5vw;
-                height: 4vh;
-                border-radius: 6px;
-                background-color: rgb(73, 90, 250);
-
-                div.risk-title-text {
-                    position: absolute;
-                    top: 0.3vh;
-                    left: 0.6vw;
-                    text-align: center;
-                    font-family: 'Microsoft YaHei';
-                    font-weight: bold;
-                    font-size: calc(0.9vw + 0.6vh);
-                    color:rgb(255, 255, 255);
-                }
-            }
-
-            div.risk-line {
-                position: absolute;
-                top: 6vh;
-                left: 1vw;
-                width: 1vw;
-                height: 33vh;
-                border-radius: 20px;
-                border:#0f1011 2px solid;
-                z-index: 2;
-                background-image: linear-gradient(to bottom, rgb(17, 17, 255), rgb(220, 126, 37), rgb(255, 9, 9))
-            }
-
-            div.risk-index-container {
-                position: absolute;
-                left: 1vw;
-                width: 4vw;
-                height: 2.5vh;
-
-                &.low {
-                    top: 6vh;
-                }
-
-                &.middle {
-                    top: 20vh;
-                }
-
-                &.high {
-                    top: 34vh;
-                }
-
-                div.risk-index-image {
-                    position: absolute;
-                    left: 1.2vw;
-                    top: 1vh;
-                    width: 2.5vw;
-                    height: 2vh;
-
-                    img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                    }
-                }
-
-                div.risk-index-text {
-                    position: absolute;
-                    left: 3.8vw;
-                    top: 0.4vh;
-                    width: 3.5vw;
-                    height: 2vh;
-                    font-family: 'Microsoft YaHei';
-                    font-weight: bold;
-                    font-size: calc(0.8vw + 0.5vh);
-                    text-shadow:
-                    #eef3ff 1px 1px,
-                    #eef3ff 2px 2px,
-                    #6493ff 3px 3px;
-                
-                    &.low {
-                        color: rgb(32, 93, 207);
-                    }
-
-                    &.middle {
-                        color: rgb(220, 126, 37);
-                    }
-
-                    &.high {
-                        color: rgb(255, 9, 9);
-                    }
-                }
-
-            }
-
-            div.show-more-text {
-                position: absolute;
-                top: 0.4vh;
-                left: 0.5vw;
-                width: 6vw;
-                font-family: 'Microsoft YaHei';
-                font-weight: bold;
-                font-size: calc(0.6vw + 0.4vh);
-                cursor: pointer;
-                transition: transform 0.3s ease;
-                &:hover {
-                    transform: scale(1.01);
-                }
-
-            }
-        }
     }
 
-    div.riskResult-drag {
+    div.drag {
         position: absolute;
         cursor: grab;
-        right: 13vw;
-        top: 6vh;
-        width: 30vw;
-        height: 33.5vh;
+    
+        &.riskResult {
+            right: 13vw;
+            top: 6vh;
+            width: 30vw;
+            height: 33.5vh;
+        }
+
+        &.profileSlope {
+            right: 13vw;
+            top: 6vh;
+            width: 30vw;
+            height: 33.5vh;
+        }
     }
 
     div.flow-control-block {
@@ -2355,4 +1960,5 @@ div.risk-warn-container {
             100% 100%;
     }
 }
+
 </style>
