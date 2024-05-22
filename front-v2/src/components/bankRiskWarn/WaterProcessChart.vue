@@ -43,6 +43,12 @@ const options = [
     },
 ]
 
+const nameMap = {
+    '20': '20年一遇潮位过程',
+    'dry': '枯季潮位过程',
+    'flood': '洪季潮位过程'
+}
+
 const hour = [
     '0',
     '1',
@@ -223,6 +229,7 @@ let chart
 
 const selectChange = (val) => {
     option.series[0].data = waterProcessData[val]
+    option.series[0].name = nameMap[val]
     chart.setOption(option)
 }
 
