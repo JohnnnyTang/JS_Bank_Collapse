@@ -360,7 +360,7 @@ export const drawErosionGraph = (echarts, erosion) => {
                     style: {
                         text: '高程(m)',
                         x: 20,
-                        y: 15,
+                        y: 8,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
@@ -370,8 +370,8 @@ export const drawErosionGraph = (echarts, erosion) => {
                     type: 'text',
                     style: {
                         text: '距离(m)',
-                        x: 470,
-                        y: 215,
+                        x: 475,
+                        y: 165,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
@@ -522,6 +522,305 @@ export const drawShapeGraph = (echarts, after, before) => {
                         text: '距离(m)',
                         x: 470,
                         y: 370,
+                        textFill: 'black',
+                        fontSize: 12,
+                        fontWeight: 'bold'
+                    }
+                },
+            ]
+        },
+    }
+    echarts.setOption(option)
+}
+
+/**
+ *
+ * @param {any} echarts
+ * @param {number[]} before
+ *  @param {number[]} after
+ */
+export const drawShapeYearlyGraph = (echarts, yearly) => {
+
+    const length = yearly.length
+    const splitPoint = []
+    for (let index = 0; index < length; index += 4) {
+        splitPoint.push(index)
+    }
+    splitPoint.push(length - 1)
+
+    const option = {
+        backgroundColor: "rgba(220, 250, 248, 0.3)",
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985',
+                },
+            },
+        },
+        grid: [
+            {
+                top: '20%',
+                height: '70%',
+                width: '78%',
+                show: true,
+            },
+        ],
+        legend: {
+            data: ['2023年地形'],
+            right: '40%',
+            top: '2%',
+        },
+        axisPointer: {
+            link: [
+                {
+                    xAxisIndex: 'all',
+                },
+            ],
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: yearly.map((_, index) => index * 5),
+                position: 'bottom',
+                //  axisLabel:{
+                //     show:false
+                //  }
+                axisLine:{
+                    lineStyle:{
+                        color:'black'
+                    },
+                    onZero: false,
+                  }
+            },
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                splitLine: {
+                    show: false,
+                },
+                scale: true,
+                max: 8,
+                min: -40,
+                axisLine:{
+                    lineStyle:{
+                        color:'black'
+                    }
+                },
+            },
+        ],
+        series: [
+            {
+                name: '2023年地形',
+                type: 'line',
+                smooth: true,
+                data: yearly.map((value) => fix2OrNull(value)),
+                lineStyle: {
+                    color: '#ff7070',
+                },
+                itemStyle: {
+                    color: '#ff7070',
+                },
+            }
+        ],
+        graphic: {
+            elements: [
+                {
+                    type: 'text',
+                    style: {
+                        text: '民主沙右缘岸滩',
+                        x: 70,
+                        y: 40,
+                        textFill: 'black',
+                        fontSize: 15,
+                    }
+                },
+                {
+                    type: 'text',
+                    style: {
+                        text: '浏海沙水道右岸',
+                        x: 350,
+                        y: 40,
+                        textFill: 'black',
+                        fontSize: 15,
+                    }
+                },
+                {
+                    type: 'text',
+                    style: {
+                        text: '高程(m)',
+                        x: 20,
+                        y: 20,
+                        textFill: 'black',
+                        fontSize: 12,
+                        fontWeight: 'bold'
+                    }
+                },
+                {
+                    type: 'text',
+                    style: {
+                        text: '距离(m)',
+                        x: 470,
+                        y: 268,
+                        textFill: 'black',
+                        fontSize: 12,
+                        fontWeight: 'bold'
+                    }
+                },
+            ]
+        },
+    }
+    echarts.setOption(option)
+}
+
+/**
+ *
+ * @param {any} echarts
+ * @param {number[]} before
+ *  @param {number[]} after
+ * @param {number[]} compare
+ */
+export const drawShapeCompareGraph = (echarts, after, before, compare) => {
+    const min = Math.min(...after, ...before)
+    const max = Math.max(...after, ...before)
+
+    const length = Math.min(after.length, before.length, compare.length)
+    const splitPoint = []
+    for (let index = 0; index < length; index += 4) {
+        splitPoint.push(index)
+    }
+    splitPoint.push(length - 1)
+
+    const option = {
+        backgroundColor: "rgba(220, 250, 248, 0.3)",
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985',
+                },
+            },
+        },
+        grid: [
+            {
+                top: '20%',
+                height: '70%',
+                width: '78%',
+                show: true,
+            },
+        ],
+        legend: {
+            data: ['2012年地形', '2022年地形', '2023年地形'],
+            right: '20%',
+            top: '2%',
+        },
+        axisPointer: {
+            link: [
+                {
+                    xAxisIndex: 'all',
+                },
+            ],
+        },
+        xAxis: [
+            {
+                type: 'category',
+                data: before.map((_, index) => index * 5),
+                position: 'bottom',
+                //  axisLabel:{
+                //     show:false
+                //  }
+                axisLine:{
+                    lineStyle:{
+                        color:'black'
+                    },
+                    onZero: false,
+                  }
+            },
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                splitLine: {
+                    show: false,
+                },
+                scale: true,
+                max: 8,
+                min: -40,
+                axisLine:{
+                    lineStyle:{
+                        color:'black'
+                    }
+                },
+            },
+        ],
+        series: [
+            {
+                name: '2012年地形',
+                type: 'line',
+                smooth: true,
+                data: compare.map((value) => fix2OrNull(value)),
+            },
+            {
+                name: '2022年地形',
+                type: 'line',
+                smooth: true,
+                data: before.map((value) => fix2OrNull(value)),
+            },
+            {
+                name: '2023年地形',
+                type: 'line',
+                smooth: true,
+                data: after.map((value) => fix2OrNull(value)),
+                lineStyle: {
+                    color: '#ff7070',
+                },
+                itemStyle: {
+                    color: '#ff7070',
+                },
+            },
+        ],
+        graphic: {
+            elements: [
+                {
+                    type: 'text',
+                    style: {
+                        text: '民主沙右缘岸滩',
+                        x: 70,
+                        y: 40,
+                        textFill: 'black',
+                        fontSize: 15,
+                    }
+                },
+                {
+                    type: 'text',
+                    style: {
+                        text: '浏海沙水道右岸',
+                        x: 350,
+                        y: 40,
+                        textFill: 'black',
+                        fontSize: 15,
+                    }
+                },
+                {
+                    type: 'text',
+                    style: {
+                        text: '高程(m)',
+                        x: 20,
+                        y: 20,
+                        textFill: 'black',
+                        fontSize: 12,
+                        fontWeight: 'bold'
+                    }
+                },
+                {
+                    type: 'text',
+                    style: {
+                        text: '距离(m)',
+                        x: 470,
+                        y: 268,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'

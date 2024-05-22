@@ -1,9 +1,9 @@
 <template>
 <div class="riskInfo-container">
     <div class="riskInfo-title">
-        近岸冲刷速率
+        当前年份断面
     </div>
-    <div class="riskInfo-item profileErosion">
+    <div class="riskInfo-item profileShape">
         <div class="item-title">{{ profileName }}</div>
         <div class="profile-selector-container">
             <el-select
@@ -26,20 +26,26 @@
             </el-select>
         </div>
         <div
-            ref="erosionGraphRef"
-            class="erosion graph"
+            ref="shapeYearlyGraphRef"
+            class="shape graph"
             element-loading-background="rgba(214, 235, 255,0.8)"
         ></div>
-        <div class="graph-container erosion">
+        <div class="graph-container shape">
             <div
-                ref="erosionGraphRef"
-                class="erosion graph"
-                v-loading="props.erosionChartLoad"
+                ref="shapeYearlyGraphRef"
+                class="shape graph"
+                v-loading="props.shapeYearlyChartLoad"
                 element-loading-background="rgba(255, 255, 255, 0.4)"
             ></div>
-            <div v-if="erosionGraphNotShow" class="empty-graph1">
+            <div v-if="shapeYearlyGraphNotShow" class="empty-graph">
                 当前暂无地形数据
             </div>
+        </div>
+    </div>
+    <div class="text-info-container">
+        <div class="text-info-item">
+            该断面滩槽高差为 <span style="color: red;">{{ gaochaList[profileValue-1]}}</span> m，
+            岸坡坡比为 <span style="color: red;">{{ pobiList[profileValue-1] }}</span>
         </div>
     </div>
 </div>
@@ -47,15 +53,17 @@
 
 <script setup>
 import { ref, onMounted, watch, defineEmits } from 'vue'
-import { drawErosionGraph } from './util.js'
+import { drawShapeYearlyGraph } from './util.js'
 import * as echarts from 'echarts'
 
-const erosionGraphNotShow = ref(false)
-const erosionGraphRef = ref(null)
-let erosionChart = null
-let section
-let beforeSection
-let erosionRate;
+const shapeYearlyGraphNotShow = ref(false)
+const shapeYearlyGraphRef = ref(null)
+let shapeYearlyChart = null
+let section;
+
+const gaochaList = ref([38.27, 32.72, 33.56, 30.84, 34.94, 32.88, 
+33.65, 31.45, 28.53, 27.61, 27.01, 25.73])
+const pobiList = ref(["1/4.1","1/3.9","1/4.0","1/6.3","1/3.9","1/3.3","1/3.1","1/3.1","1/6.5","1/7.9","1/11.3","1/11.0"])
 
 const emit = defineEmits(['profileValueChange'])
 
@@ -69,14 +77,14 @@ const props = defineProps({
     profileList: {
         type: Object
     },
-    erosionChartLoad: {
+    shapeYearlyChartLoad: {
         type: Boolean
     }
 })
 
 const calProfileData = () => {
     emit('profileValueChange', profileValue.value)
-    erosionGraphNotShow.value = false
+    shapeYearlyGraphNotShow.value = false
     const profileDataItem = props.profileData[profileValue.value-1]
     const profileInfoItem = props.profileList[profileValue.value-1]
     profileName.value = profileInfoItem.name
@@ -84,33 +92,26 @@ const calProfileData = () => {
         section = profileDataItem
         .section.map((value) => {
             return value[2] < -999 ? null : value[2]
-        }),
-        beforeSection = profileDataItem
-        .beforeSection.map((value) => {
-            return value[2] < -999 ? null : value[2]
         })
-        erosionRate = profileDataItem.SA[2]
     } catch (error) {
-        DrawGraph([],[],[],[])
-        erosionGraphNotShow.value = true
+        DrawGraph([])
+        shapeYearlyGraphNotShow.value = true
         return
     }
-    DrawGraph(beforeSection, section, erosionRate)
+    DrawGraph(section)
 }
 
-const DrawGraph = (before, after, erosionRate) => {
-    // if (erosionChart !== null) {
-    //     erosionChart.dispose();
+const DrawGraph = (section) => {
+    // if (shapeYearlyChart !== null) {
+    //     shapeYearlyChart.dispose();
     // }
     // if (erosionChart !== null) {
     //     erosionChart.dispose();
     // }
-    erosionChart = echarts.init(erosionGraphRef.value)
-    drawErosionGraph(
-        erosionChart,
-        before,
-        after,
-        erosionRate,
+    shapeYearlyChart = echarts.init(shapeYearlyGraphRef.value)
+    drawShapeYearlyGraph(
+        shapeYearlyChart,
+        section
     )
 }
 
@@ -127,9 +128,9 @@ watch(()=>props.profileData, ()=>{
 <style lang="scss" scoped>
 div.riskInfo-container {
     position: absolute;
-    top: 66vh;
+    top: 2vh;
     right: 2vw;
-    height: 25.5vh;
+    height: 43vh;
     width: 24vw;
     border-radius: 8px;
     border: #167aec 1px solid;
@@ -148,7 +149,7 @@ div.riskInfo-container {
         text-align: center;
         font-family: 'Microsoft YaHei';
         font-weight: bold;
-        font-size: calc(0.8vw + 0.5vh);
+        font-size: calc(0.8vw + 0.6vh);
         color: #0c60af;
         text-shadow:
             #eef3ff 1px 1px,
@@ -164,9 +165,15 @@ div.riskInfo-container {
         border: #3b85e7 2px solid;
 
         &.profileErosion {
-            top: 3.5vh;
-            height: 21vh;
+            top: 47vh;
+            height: 22vh;
             // background-color: #b6b9eb;
+        }
+
+        &.profileShape {
+            top: 3.5vh;
+            height: 30vh;
+            // background-color: #c9cad4;
         }
 
         div.item-title {
@@ -239,10 +246,16 @@ div.riskInfo-container {
             top: 4vh;
             left: 0.25vw;
 
-            &.erosion {
-                height: 16vh;
+            &.shape {
+                height: 25.5vh;
                 backdrop-filter: blur(5px);
                 // background-color: rgba(220, 250, 248, 0.4);
+            }
+
+            &.erosion {
+                height: 17vh;
+                backdrop-filter: blur(5px);
+                // background-color: #00098a;
             }
 
             div.graph {
@@ -250,30 +263,22 @@ div.riskInfo-container {
                 width: 100%;
                 height: 100%;
 
-                &.erosion {
+                &.shape {
                     // height: 35vh;
                     // background-color: rgba(220, 250, 248, 0.4);
                 }
 
+                &.erosion {
+                    // height: 17vh;
+                    // background-color: #00098a;
+                }
                 z-index: 99;
             }
 
-            div.empty-graph1 {
+            div.empty-graph {
                 position: absolute;
                 left: 7vw;
-                top: 13vh;
-                display: flex;
-                align-items: center;
-                color: #1c68cc;
-                font-size: calc(0.7vw + 0.5vh);
-                font-family: 'Microsoft YaHei';
-                font-weight: bold;
-            }
-
-            div.empty-graph2 {
-                position: absolute;
-                left: 7vw;
-                top: 6vh;
+                top: 18vh;
                 display: flex;
                 align-items: center;
                 color: #1c68cc;
@@ -283,6 +288,26 @@ div.riskInfo-container {
             }
         }
     }
+
+    div.text-info-container {
+        position:absolute;
+        width: 23.15vw;
+        height: 5.25vh;
+        left: 0.5vw;
+        bottom: 2vh;
+        background-color: rgba(7, 24, 182, 0.5);
+        border-radius: 5px;
+
+        div.text-info-item {
+            position: absolute;
+            left: 1.3vw;
+            top: 1.3vh;
+            color: #f2f4f7;
+            font-size: calc(0.7vw + 0.5vh);
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+        }
+    }
 }
 </style>
-        
+    

@@ -91,16 +91,15 @@ const calProfileData = () => {
         .beforeSection.map((value) => {
             return value[2] < -999 ? null : value[2]
         })
-        slopeRate = profileDataItem.SA[2]
     } catch (error) {
         DrawGraph([],[],[],[])
         shapeGraphNotShow.value = true
         return
     }
-    DrawGraph(section, beforeSection, slopeRate)
+    DrawGraph(section, beforeSection)
 }
 
-const DrawGraph = (section, beforesection, slopeRate) => {
+const DrawGraph = (section, beforesection) => {
     // if (shapeChart !== null) {
     //     shapeChart.dispose();
     // }
@@ -112,7 +111,6 @@ const DrawGraph = (section, beforesection, slopeRate) => {
         shapeChart,
         section,
         beforesection,
-        slopeRate,
     )
 }
 
