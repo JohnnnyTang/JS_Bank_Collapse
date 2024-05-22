@@ -304,7 +304,7 @@ const gnssIdSectionMap = {
 }
 
 const warnKeyValList = ref([
-    { key: '危险区域', val: '暂无' },
+    { key: '报警区域', val: '暂无' },
     { key: '出险时间', val: '暂无' },
     { key: '设备信息', val: '暂无' },
     { key: '管理单位', val: '江苏省水利厅' },
