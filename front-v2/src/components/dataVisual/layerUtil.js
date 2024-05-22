@@ -1883,6 +1883,7 @@ const layerAddFunctionMap = {
                 type: 'geojson',
                 data: i_gov_bounds
             })
+        await loadImage(map, '/legend/省界.png','省界')
         !map.getLayer('重点行政区边界') &&
             map.addLayer({
                 id: '重点行政区边界',
@@ -1892,9 +1893,10 @@ const layerAddFunctionMap = {
                     'line-join': 'round',
                 },
                 paint: {
-                    'line-color': 'rgb(159, 139, 163)',
-                    'line-width': 5.0,
-                    'line-blur': 2,
+                    // 'line-color': 'rgb(159, 139, 163)',
+                    'line-pattern':'省界',
+                    'line-width': 2.0,
+                    // 'line-blur': 2,
                 }
             })
     },
@@ -2054,7 +2056,7 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 3],
                 paint: {
                     // 'line-opacity': 1,=
-                    'line-color': 'rgb(161,151,173)',
+                    'line-color': 'rgb(127, 113, 143)',
                     'line-width': [
                         'interpolate',
                         ['linear'],
@@ -2136,12 +2138,10 @@ const layerAddFunctionMap = {
                 id: '洲滩',
                 type: 'fill',
                 source: 'sandBar',
-                // 'source-layer': 'default',
-                // minzoom: 8,
                 layout: {
                 },
                 paint: {
-                    'fill-color': 'rgb(243,243,133)',
+                    'fill-color': 'rgb(240, 239, 209)',
                 },
             })
     },
@@ -2291,6 +2291,59 @@ const layerRemoveFunction = (map, layerID) => {
         }
     }
 }
+
+const initSortedLayer = async (map) => {
+    // 面
+    await layerAddFunction(map, '大型湖泊')
+    await layerAddFunction(map, '区域水系')
+    await layerAddFunction(map, '市级行政区')
+    await layerAddFunction(map, '沿江码头')
+    await layerInitFunction(map, '水闸工程')
+    await layerAddFunction(map, '水库大坝')
+    await layerAddFunction(map, '洲滩')
+
+    // 线
+    await layerAddFunction(map, '长江干堤')
+    await layerAddFunction(map, '河道分段')
+    await layerAddFunction(map, '一级预警岸段')
+    await layerAddFunction(map, '二级预警岸段')
+    await layerAddFunction(map, '三级预警岸段')
+    await layerInitFunction(map, '过江通道-隧道/通道')
+    // await layerInitFunction(map, '过江通道-桥墩')
+    await layerInitFunction(map, '过江通道-桥')
+    await layerAddFunction(map, '重点行政区边界')
+
+    // 点
+    await layerInitFunction(map, '水文站点')
+    await layerInitFunction(map, '水闸工程-重点')
+    await layerInitFunction(map, '泵站工程')
+    await layerInitFunction(map, '枢纽工程')
+    await layerAddFunction(map, '河道分段点')
+    await layerAddFunction(map, '行政点')
+
+    // 注记
+    // await layerAddFunction(map, '市级行政区-注记')
+    await layerAddFunction(map, '大型湖泊-注记')
+    await layerAddFunction(map, '区域水系-注记')
+    // await layerAddFunction(map, '沿江码头-注记')
+    await layerAddFunction(map, '水库大坝-注记')
+    await layerAddFunction(map, '洲滩-注记')
+    await layerAddFunction(map, '行政点-注记')
+
+
+    await layerAddFunction(map, '岸段-注记')
+    await layerInitFunction(map, '过江通道-桥-注记')
+    await layerInitFunction(map, '过江通道-隧道/通道-注记')
+    await layerInitFunction(map, '水文站点-注记')
+    await layerInitFunction(map, '水闸工程-注记')
+    await layerInitFunction(map, '泵站工程-注记')
+    await layerInitFunction(map, '枢纽工程-注记')
+
+    await layerAddFunction(map, '河道分段-注记')
+    await layerAddFunction(map, '河道分段点-注记')
+}
+
+
 export {
     layers,
     layerAddFunctionMap,
@@ -2299,4 +2352,5 @@ export {
     layerInitFunction,
     layerRemoveFunction, // hide and remove
     layerAddFunction, // add and show
+    initSortedLayer
 }

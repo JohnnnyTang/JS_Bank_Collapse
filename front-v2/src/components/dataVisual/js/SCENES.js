@@ -485,120 +485,151 @@ const getSideBarTree = async () => {
         label: '一级预警岸段',
         active: true,
         icon: '/icons/warn1.png',
+        type: 'title2',
         children: []
     }
     let warning2 = {
         label: '二级预警岸段',
         icon: '/icons/warn2.png',
+        type: 'title2',
         active: true,
         children: []
     }
     let warning3 = {
         label: '三级预警岸段',
         icon: '/icons/warn3.png',
+        type: 'title2',
         active: true,
         children: []
     }
     for (let i = 0; i < bankData.length; i++) {
         let item = bankData[i]
         if (item['warning_level'] == 1) {
-            warning1.children.push({ label: item['bank_name'], active: false })
+            warning1.children.push({ label: item['bank_name'], active: false, type: 'feature' })
         } else if (item['warning_level'] == 2) {
-            warning2.children.push({ label: item['bank_name'], active: false })
+            warning2.children.push({ label: item['bank_name'], active: false, type: 'feature' })
         } else if (item['warning_level'] == 3) {
-            warning3.children.push({ label: item['bank_name'], active: false })
+            warning3.children.push({ label: item['bank_name'], active: false, type: 'feature' })
         }
     }
+    const zt = [
+        "永隆兴隆沙",
+        "炮子洲",
+        "征润洲",
+        "八卦洲",
+        "新生洲",
+        "潜洲",
+        "新潜洲",
+        "梅子洲",
+        "槽坊沙",
+        "子母洲",
+        "新洲",
+        "星洲",
+        "和畅洲",
+        "世业洲",
+        "民主沙",
+        "狼山沙",
+        "新开沙",
+        "白茆沙",
+        "大长青沙",
+        "新济洲",
+        "福姜沙",
+        "录安洲",
+        "太平洲",
+        "落成洲",
+        "天星洲",
+        "杜家沙",
+        "小泡沙",
+        "启兴沙",
+        "通州沙"
+    ];
+    let mainZt = {
+        label: '主要洲滩',
+        active: true,
+        // icon: '/icons/洲滩.png',
+        type: 'title1',
+        children: []
+    }
+    zt.forEach((name) => {
+        mainZt.children.push({ label: name, active: false, type: 'feature' })
+    })
 
     let tree = [
         {
             label: '重点岸段',
             active: false,
+            type: 'title1',
             children: [
                 warning1,
                 warning2,
                 warning3
             ]
         },
+        mainZt,
         {
-            label: '全江概貌',
+            label: '区域水系',
+            icon: '/icons/流域水系.png',
+            type: 'title1',
+            active: true,
+            filter: true
+        },
+        {
+            label: '重要水闸',
+            icon: '/icons/水闸工程.png',
+            type: 'title1',
             active: false,
+            filter: true
+        },
+        {
+            label: '重要泵站',
+            icon: '/icons/泵站工程.png',
+            type: 'title1',
+            active: false,
+            filter: true
+        },
+        {
+            label: '长江堤防',
+            icon: '/icons/江堤港堤.png',
+            type: 'title1',
+            active: true,
+            filter: true
+        },
+        {
+            label: '过江通道',
+            icon: '/icons/过江通道.png',
+            type: 'title1',
+            active: false,
+            filter: true
+        },
+        {
+            label: '其他',
+            active: false,
+            type: 'title1',
             children: [
                 {
                     label: '行政区划',
                     icon: '/icons/行政区划.png',
+                    type: 'title2',
                     active: true,
                     filter: true
                 },
+
                 {
-                    label: '区域水系',
-                    icon: '/icons/流域水系.png',
-                    active: true,
-                    filter: true
-                },
-                {
-                    label: '大型湖泊',
+                    label: '重要湖泊',
                     icon: '/icons/湖泊河流.png',
+                    type: 'title2',
                     active: true,
                     filter: true
                 },
                 {
                     label: '水文站点',
                     icon: '/icons/水文站点.png',
+                    type: 'title2',
                     active: false,
                     filter: true
                 }
             ]
-        },
-        {
-            label: '工程情况',
-            active: false,
-            filter: true,
-            children: [
-                {
-                    label: '长江干堤',
-                    icon: '/icons/江堤港堤.png',
-                    active: true,
-                    filter: true
-                },
-                {
-                    label: '过江通道',
-                    icon: '/icons/过江通道.png',
-                    active: false,
-                    filter: true
-                },
-                {
-                    label: '沿江码头',
-                    icon: '/icons/沿江码头.png',
-                    active: true,
-                    filter: true
-                },
-                {
-                    label: '水库大坝',
-                    icon: '/icons/水库大坝.png',
-                    active: true,
-                    filter: true
-                },
-                {
-                    label: '水闸工程',
-                    icon: '/icons/水闸工程.png',
-                    active: false,
-                    filter: true
-                },
-                {
-                    label: '泵站工程',
-                    icon: '/icons/泵站工程.png',
-                    active: false,
-                    filter: true
-                },
-                {
-                    label: '枢纽工程',
-                    icon: '/icons/枢纽工程.png',
-                    active: false,
-                    filter: true
-                },
-            ]
-        },
+        }
     ]
 
     return tree
