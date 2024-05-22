@@ -84,7 +84,7 @@ import sideBar from '../components/dataVisual/common/sideBar.vue'
 // import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
 import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
-import { initScratchMap } from '../utils/mapUtils';
+import { initBaseMap } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
 import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt } from '../components/dataVisual/js/tilefieldMAP';
@@ -233,7 +233,7 @@ const closeHandler = (index) => {
 
 onMounted(async () => {
 
-    const mapInstance = await initScratchMap(mapContainer.value)
+    const mapInstance = await initBaseMap(mapContainer.value)
     mapStore.setMap(mapInstance)
     mapInstance.addControl(new mapboxgl.NavigationControl({
         showZoom: false,
