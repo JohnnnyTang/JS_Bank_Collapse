@@ -163,6 +163,7 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
 
 const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const warnInfo = ref([])
+    const warnInfo_history = ref([])
     const warnPopupMap = ref({})
     const warnWatchTimer = ref(0)
     const fake = ref(false)
@@ -183,7 +184,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
         warnWatchTimer.value = 0
     }
 
-    return { fake, warnInfo, warnPopupMap, removeInfoItem, resetWarnInfo, warnWatchTimer }
+    return { fake, warnInfo, warnPopupMap, removeInfoItem, resetWarnInfo, warnWatchTimer, warnInfo_history }
 })
 
 const useHighlightLayerStore = defineStore('highlightLayerStore', () => {

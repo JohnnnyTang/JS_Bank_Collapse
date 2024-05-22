@@ -537,11 +537,11 @@ const mapInit = async (map, vis) => {
             60 * 1000 * 20,
         )
         // request per 20minutes
-
+        
         ///////DEBUG////////
         window.addEventListener('keydown', async (e) => {
             if (e.key == 'Enter') {
-                const minute = 60*6
+                const minute = 60 * 36
                 let allWarnData = (
                     await axios.get(`/api/data/deviceWarn/minute/${minute}`)
                 ).data
@@ -552,18 +552,10 @@ const mapInit = async (map, vis) => {
                     let type = deviceTypeList[id.split('_').pop() - 1]
                     lastPos = setWarningDeviceStyle(map, type, id, item)
                 })
-                if (filteredData.length != 0) useWarnInfoStore().warnInfo = filteredData
-
-                // if (lastPos) {
-                //     map.flyTo({
-                //         center: lastPos,
-                //         pitch: 61.99999999999988,
-                //         bearing: 0,
-                //         zoom: 15.845427972376211,
-                //         speed: 0.5,
-                //         essential: true,
-                //     })
-                // }
+                if (filteredData.length != 0) {
+                    useWarnInfoStore().warnInfo = filteredData
+                    useWarnInfoStore().warnInfo_history = [...filteredData]
+                }
             }
             else if (e.key == 'f') {
                 // 11111  clear warnStore and warnLayer
@@ -572,8 +564,9 @@ const mapInit = async (map, vis) => {
                 })
                 useWarnInfoStore().resetWarnInfo()
                 // 22222 set fake data
-                useWarnInfoStore().fake = true
                 useWarnInfoStore().warnInfo = fakeWarnInfo
+                useWarnInfoStore().warnInfo_history = [...fakeWarnInfo]
+                useWarnInfoStore().fake = true
 
                 let allWarnData = fakeWarnInfo
                 let filteredData = filterWarnData(allWarnData)
@@ -587,6 +580,9 @@ const mapInit = async (map, vis) => {
 
 
 
+            }
+            else if (e.key == 'a'){
+                useWarnInfoStore().warnInfo_history = []
             }
         })
     }

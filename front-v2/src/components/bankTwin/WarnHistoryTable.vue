@@ -130,34 +130,42 @@ const dealWithWarn = async (warnIndex) => {
     historyRowLoading.value[warnIndex] = false
 }
 
-watch(() => useWarnInfoStore().fake, (newVal) => {
-    console.log('history watching fake!!', newVal);
-    // 3 fake items
-    let fakeWarnInfo = useWarnInfoStore().warnInfo
-    // let newhistoryRowLoading = [...historyRowLoading.value]
-    // let newwarnHistorList = [...warnHistoryList.value]
-    let newhistoryRowLoading = []
-    let newwarnHistorList = []
-    newhistoryRowLoading.unshift(...[false, false, false])
-    newwarnHistorList.unshift(...fakeWarnInfo)
+// watch(() => useWarnInfoStore().fake, (newVal) => {
+//     console.log('history watching fake!!', newVal);
+//     // 3 fake items
+//     let fakeWarnInfo = useWarnInfoStore().warnInfo
+//     // let newhistoryRowLoading = [...historyRowLoading.value]
+//     // let newwarnHistorList = [...warnHistoryList.value]
+//     let newhistoryRowLoading = []
+//     let newwarnHistorList = []
+//     newhistoryRowLoading.unshift(...[false, false, false])
+//     newwarnHistorList.unshift(...fakeWarnInfo)
 
-    console.log('1', historyRowLoading.value);
-    console.log('1', warnHistoryList.value);
-    console.log('@', newhistoryRowLoading);
-    console.log('@', newwarnHistorList);
+//     console.log('1', historyRowLoading.value);
+//     console.log('1', warnHistoryList.value);
+//     console.log('@', newhistoryRowLoading);
+//     console.log('@', newwarnHistorList);
 
-    historyRowLoading.value = newhistoryRowLoading
-    warnHistoryList.value = newwarnHistorList
+//     historyRowLoading.value = newhistoryRowLoading
+//     warnHistoryList.value = newwarnHistorList
+// })
+
+watch(() => useWarnInfoStore().warnInfo_history, (newVal) => {
+    console.log('watching!!!!!!!!!!');
+    const warnData = newVal
+    console.log('warn', warnData)
+    historyRowLoading.value = new Array(warnData.length).fill(false)
+    console.log('123123', historyRowLoading.value)
+    warnHistoryList.value = warnData
+    historyLoading.value = false
 
 })
 
 onMounted(async () => {
-    // const warnData = (await BackEndRequest.getHistoryWarnInfo('hour', 1)).data
-    // console.log('warn', warnData)
-    // historyRowLoading.value = new Array(warnData.length).fill(false)
-    // console.log('123123', historyRowLoading.value)
-    // warnHistoryList.value = warnData
     historyLoading.value = false
+    // setTimeout(async () => {
+    //     historyLoading.value = false
+    // }, 1000)
 })
 </script>
 
