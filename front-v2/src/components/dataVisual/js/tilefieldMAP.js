@@ -344,6 +344,146 @@ const legendStyleMap = {
     }
 }
 
+const legendListt = [
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-image': `url('/legend/水文站.png')`,
+            'transform': 'translateX(25%)',
+        },
+        text: '水文站点'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-color': 'rgb(239,241,241)',
+            'border-color': 'rgb(51, 38, 71)',
+            'border-width': '1px',
+            'border-style': 'solid',
+        },
+        text: '行政区划'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            // 'background-image': `url('/legend/湖泊.png')`,
+            'background-color': `rgb(171,225,247)`,
+            'background-size': 'cover',
+        },
+        text: '湖泊/河流/水库'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-image': `url('/legend/水闸.png')`,
+            'transform': 'translateX(16%)',
+        },
+        text: '水闸工程'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-image': `url('/legend/泵站.png')`,
+            'transform': 'translateX(35%) scale(1.3)',
+        },
+        text: '泵站工程'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-image': `url('/legend/枢纽.png')`,
+            'transform': 'translateX(25%)',
+        },
+        text: '枢纽工程'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': '#958E54',
+        },
+        text: '长江干堤'
+    },
+    /*
+    已建--plan==1  #ff7875
+    在建--plan==0  #ffd875
+    规划--plan==-1 #b8ff75
+    */
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(52, 0, 143)',
+        },
+        text: '已建通道'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(196, 50, 6)',
+        },
+        text: '在建通道'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(179, 4, 74)',
+        },
+        text: '规划通道'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-image': `url('/legend/码头.png')`,
+            'background-size': 'cover',
+        },
+        text: '码头工程'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-image': `url('/legend/水库.png')`,
+            'background-size': 'cover',
+        },
+        text: '水库工程'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(247, 21, 0)',
+        },
+        text: '一级预警岸段'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(222, 106, 4)',
+        },
+        text: '二级预警岸段'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(173, 162, 5)',
+        },
+        text: '三级预警岸段'
+    },
+
+]
+
 
 const legendMap = {
     // 按点线面
@@ -387,6 +527,8 @@ const legendMap = {
             },
             text: '国普湖泊'
         },
+
+
 
     ],
     '工程情况': [
@@ -649,4 +791,5 @@ export {
     legendMap,
     legendStyleMap,
     filterMap,
+    legendListt
 }

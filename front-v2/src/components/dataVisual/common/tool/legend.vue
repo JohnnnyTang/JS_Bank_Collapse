@@ -83,8 +83,8 @@ div.legend-container {
         .miniIcon {
             position: absolute;
             right: 0.5vw;
-            width: 4vh;
-            height: 4vh;
+            width: 2.2vh;
+            height: 2.2vh;
             background-image: url('/icons/minimize.png');
             background-size: contain;
             background-repeat: no-repeat;
