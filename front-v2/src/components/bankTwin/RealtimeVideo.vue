@@ -1,7 +1,16 @@
 <template>
-    <div class="realtime-video-container" :class="props.active? 'active': 'in-active'" v-if="props.active">
+    <div
+        class="realtime-video-container"
+        :class="props.active ? 'active' : 'in-active'"
+        v-if="props.active"
+    >
         <div class="realtime-video-title">实时视频监控</div>
-        <div class="video-box" v-for="(item, index) in videoList" :key="index">
+        <div
+            class="video-box"
+            v-for="(item, index) in videoList"
+            :key="index"
+            :id="index"
+        >
             <div class="video-content">
                 <iframe
                     :src="item.videoUrl + token"
@@ -27,28 +36,28 @@ const token = ref(
 const props = defineProps({
     active: {
         type: Boolean,
-        default: false
-    }
+        default: false,
+    },
 })
 
 const videoList = ref([
     {
-        name: '民主沙上游围堤监控',
-        position: '32.0432963, 120.5122242',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        name: '民主沙海事码头监控',
+        position: '32.0316674, 120.5402574',
+        videoUrl: `https://open.ys7.com/ezopen`,
+        //  videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
     },
     {
-        name: '民主沙海事码头监控',
-        position: '32.0316674, 120.5402574',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
+        name: '民主沙上游围堤监控',
+        position: '32.0432963, 120.5122242',
+        videoUrl: `https://open.ys7.com/ezopen`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
     },
 ])
 </script>
@@ -56,16 +65,19 @@ const videoList = ref([
 <style lang="scss" scoped>
 div.realtime-video-container {
     position: absolute;
-    right: 1vw;
+    right: 0.5vw;
     top: 9vh;
 
     height: 82vh;
-    width: 24vw;
+    width: 26vw;
 
     z-index: 4;
     display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-between;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-content: flex-start;
+    column-gap: 1vw;
+    row-gap: 1vh;
 
     backdrop-filter: blur(12px);
     box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
@@ -76,6 +88,7 @@ div.realtime-video-container {
     div.realtime-video-title {
         height: 4vh;
         line-height: 4vh;
+        width: 100%;
         text-align: center;
 
         font-size: calc(0.8vw + 0.8vh);
@@ -91,15 +104,15 @@ div.realtime-video-container {
     }
 
     div.video-box {
-        width: 23vw;
-        margin-left: 0.5vw;
-        height: 25vh;
+        width: 12.5vw;
+        // margin-left: 0.5vw;
+        height: 16vh;
 
         background-color: rgba(3, 63, 173, 1);
 
         div.video-content {
-            height: 22vh;
-            width: 23vw;
+            height: calc(100% - 3vh);
+            width: 100%;
 
             background-color: rgb(34, 75, 165);
         }
@@ -110,11 +123,19 @@ div.realtime-video-container {
             text-align: center;
 
             font-weight: bold;
-            font-size: calc(0.6vw + 0.6vh);
+            font-size: calc(0.4vw + 0.4vh);
             color: #eef3ff;
         }
-    }
 
+        &[id='0'] {
+            width: 26vw;
+            height: 32vh;
+
+            div.video-title {
+                font-size: calc(0.6vw + 0.6vh);
+            }
+        }
+    }
 
     transition: transform 0.2s ease-in-out;
     &.in-active {

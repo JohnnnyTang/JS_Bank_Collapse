@@ -591,67 +591,6 @@ div.twin-main-container {
         // background-color: antiquewhite;
     }
 
-    div.realtime-video-container {
-        position: absolute;
-        right: 1vw;
-        top: 9vh;
-
-        height: 82vh;
-        width: 24vw;
-
-        z-index: 4;
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: space-between;
-
-        backdrop-filter: blur(12px);
-        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
-        background-color: rgba(156, 195, 255, 0.4);
-        border-radius: 4px;
-        border: 2px solid rgb(28, 105, 247);
-
-        div.realtime-video-title {
-            height: 4vh;
-            line-height: 4vh;
-            text-align: center;
-
-            font-size: calc(0.8vw + 0.8vh);
-            font-weight: bold;
-            color: #0400fd;
-            text-shadow:
-                #eef3ff 1px 1px,
-                #eef3ff 2px 2px,
-                #6493ff 3px 3px;
-            letter-spacing: 0.4rem;
-
-            border-bottom: 2px solid #0400fd;
-        }
-
-        div.video-box {
-            width: 23vw;
-            margin-left: 0.5vw;
-            height: 25vh;
-
-            background-color: rgba(3, 63, 173, 1);
-
-            div.video-content {
-                height: 22vh;
-                width: 23vw;
-
-                background-color: rgb(34, 75, 165);
-            }
-
-            div.video-title {
-                line-height: 3vh;
-                height: 3vh;
-                text-align: center;
-
-                font-weight: bold;
-                font-size: calc(0.6vw + 0.6vh);
-                color: #eef3ff;
-            }
-        }
-    }
 
     div.marquee-container {
         position: absolute;
