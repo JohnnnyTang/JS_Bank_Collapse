@@ -2,6 +2,8 @@
     <div class="bed-chart-container">
         <div class="bed-chart-title">造床流量当量指标</div>
         <div class="bed-chart-content" ref="chartDom"></div>
+        <div class="bed-desc-text">2023年无超过造床流量(45000)时期</div>
+        <div class="bed-desc-equa"></div>
     </div>
 </template>
 
@@ -127,6 +129,32 @@ div.bed-chart-container {
         width: 100%;
 
         background-color: rgb(208, 236, 255);
+    }
+
+    div.bed-desc-text {
+        position: absolute;
+        height: 2vh;
+        line-height: 2vh;
+        top: 4.5vh;
+        right: 0.2vw;
+        padding: 0.2vh 0.2vw;
+
+        background-color: rgb(42, 117, 255);
+        color: aliceblue;
+    }
+
+    div.bed-desc-equa {
+        position: absolute;
+        top: 4.8vh;
+        left: 20%;
+        width: 20%;
+        height: 10%;
+
+        // background-color: aqua;
+        background-image: url('/math.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        
     }
 }
 </style>
