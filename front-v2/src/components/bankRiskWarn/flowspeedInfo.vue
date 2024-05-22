@@ -14,7 +14,7 @@
                 <div 
                     ref="flowspeedGraphRef"
                     class="flowspeed graph"
-                    v-loading="flowspeedChartLoad"
+                    v-loading="props.flowspeedChartLoad"
                     element-loading-background="rgba(255, 255, 255, 0.4)"
                 ></div>
             </div>
@@ -35,27 +35,26 @@ const props = defineProps({
     profileList: {
         type: Object,
     },
+    flowspeedChartLoad: {
+        type: Boolean,
+    }
 })
-const profileList = ref(props.profileList)
 
 let flowspeedChart = null
 const flowspeedGraphRef = ref(null)
-const flowspeedChartLoad = ref(true)
 
-const DrawGraph = (profileList) => {
+const DrawGraph = () => {
     flowspeedChart = echarts.init(flowspeedGraphRef.value)
-    const flowspeed = profileList.map(item => item.flowspeed)
+    const flowspeed = props.profileList.map(item => item.flowspeed)
     drawFlowspeedGraph(flowspeedChart, flowspeed)
 }
 
 onMounted(() => {
-    flowspeedChartLoad.value = true
-    DrawGraph(profileList.value)
-    flowspeedChartLoad.value = false
+    DrawGraph()
 })
 
-watch(props.profileList, (newVal) => {
-    DrawGraph(newVal)
+watch(props.profileList, () => {
+    DrawGraph()
 })
 </script>
 
