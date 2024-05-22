@@ -1,8 +1,8 @@
 <template>
     <div class="main">
         <div class="map" ref="mapDom" id="map"></div>
-        <canvas id="GPUFrame" class="GPU"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas>
+        <!-- <canvas id="GPUFrame" class="GPU"></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas> -->
     </div>
 </template>
 
@@ -40,41 +40,85 @@ const mapFlyToRiver = (mapIns) => {
 
 onMounted(async () => {
 
-    const map = await initScratchMap(mapDom.value)
-    const jsonUrl = '/bankWarn/bankWarn.json'
-    let bankWarnLayer = new BankWarnLayer(jsonUrl)
-    map.addLayer(bankWarnLayer)
-    mapFlyToRiver(map)
-    /**
-     * @type {customLayers.UnityLayer}
-     */
-    let unityLayer
-    /**
-   * @type {customLayers.MaskLayer}
-   */
-    let maskLayer
+    // const map = await initScratchMap(mapDom.value)
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: {
+            "version": 8,
+            "sources": {
+                //天地图底图分成底图和注记两部分，需设置两个数据源
+                "tiandituimg": {
+                    "type": "raster",
+                    "tiles": ["http://t0.tianditu.com/img_w/wmts?tk=8180f5540ef94fd8d99e309905bb6299&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles"],
+                    // "tiles":["https://t0.tianditu.gov.cn/DataServer?T=cva_c&x={x}&y={y}&l={z}&tk=8180f5540ef94fd8d99e309905bb6299"],
+                    // "tiles": ["http://t0.tianditu.com/vec_c/wmts?tk=8180f5540ef94fd8d99e309905bb6299"],
+                    // "scheme": "xyz",
+                    "tileSize": 256
+                },
+            },
+            "layers": [{
+                //根据数据源，添加两个图层
+                "id": "tiandituimg",
+                "type": "raster",
+                "source": "tiandituimg",
+                "minzoom": 0,
+                "maxzoom": 18
+            }],
+        },
+        accessToken:
+            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+        center: [120.312, 31.917], // starting position [lng, lat]
+        maxZoom: 18,
+        zoom: 8,
+        projection: 'mercator',
+        antialias: true,
+        useWebGL2: true,
+    });
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key == '1') {
-            const script = document.createElement('script');
-            script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
-            script.onload = async () => {
-                console.log('load.js fine');
-                unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
-                maskLayer = new customLayers.MaskLayer()
-                map.addLayer(unityLayer)
-                map.addLayer(maskLayer)
-            };
-            document.head.appendChild(script);
-        }
-        if (e.key == '2') {
-            // map.addLayer(new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value))
-            console.log('222');
-            unityLayer.remove()
-            map.removeLayer('Mask-Layer')
-            map.removeLayer('Unity-Layer')
-        }
-    })
+
+
+
+    mapFlyToRiver(map)
+
+
+
+
+
+    // const jsonUrl = '/bankWarn/bankWarn.json'
+    // let bankWarnLayer = new BankWarnLayer(jsonUrl)
+    // map.addLayer(bankWarnLayer)
+
+
+    //     /**
+    //      * @type {customLayers.UnityLayer}
+    //      */
+    //     let unityLayer
+    //     /**
+    //    * @type {customLayers.MaskLayer}
+    //    */
+    //     let maskLayer
+
+    //     window.addEventListener('keydown', (e) => {
+    //         if (e.key == '1') {
+    //             const script = document.createElement('script');
+    //             script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';
+    //             script.onload = async () => {
+    //                 console.log('load.js fine');
+    //                 unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
+    //                 maskLayer = new customLayers.MaskLayer()
+    //                 map.addLayer(unityLayer)
+    //                 map.addLayer(maskLayer)
+    //             };
+    //             document.head.appendChild(script);
+    //         }
+    //         if (e.key == '2') {
+    //             // map.addLayer(new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value))
+    //             console.log('222');
+    //             unityLayer.remove()
+    //             map.removeLayer('Mask-Layer')
+    //             map.removeLayer('Unity-Layer')
+    //         }
+    //     })
 
     // const script = document.createElement('script');
     // script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js';

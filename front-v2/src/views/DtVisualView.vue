@@ -241,6 +241,8 @@ onMounted(async () => {
         visualizePitch: true
     }), 'top-right')
     mapInstance.addControl(new mapboxgl.ScaleControl({ maxWidth: 150 }), 'bottom-left');
+    mapInstance.dragRotate.disable();
+    mapInstance.touchZoomRotate.disableRotation()
     mapFlyToRiver(mapInstance)
 
     legendList.value = legendListt

@@ -2054,7 +2054,7 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 3],
                 paint: {
                     // 'line-opacity': 1,=
-                    'line-color': 'rgb(48, 207, 63)',
+                    'line-color': 'rgb(161,151,173)',
                     'line-width': [
                         'interpolate',
                         ['linear'],
