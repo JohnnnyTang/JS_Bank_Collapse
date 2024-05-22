@@ -453,6 +453,9 @@ onMounted(async () => {
     // })
     //////////return loaded Map
     map = await initScratchMap(mapDom.value)
+    map.on('render', () => {
+        map.triggerRepaint()
+    })
     mapFlyToRiver(map)
     useMapStore().setMap(map)
     await mapInit(map, true)

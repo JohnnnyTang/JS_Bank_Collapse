@@ -12,6 +12,7 @@ import { onMounted, watch, ref } from 'vue'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { getStyleJson4base } from '../../utils/mapUtils'
 import BankWarnLayer from './js/bankWarnLayer'
 import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
 import { layerAddFunction, layerRemoveFunction } from './layerUtil'
@@ -30,7 +31,7 @@ const mapFlyToRiver = (mapIns) => {
         ],
         {
             duration: 500,
-            zoom: 12.5,
+            zoom: 8,
         },
     )
 }
@@ -40,28 +41,8 @@ onMounted(async () => {
     // const map = await initScratchMap(mapDom.value)
     const map = new mapboxgl.Map({
         container: 'map',
-        style: {
-            "version": 8,
-            "sources": {
-                //天地图底图分成底图和注记两部分，需设置两个数据源
-                "tiandituimg": {
-                    "type": "raster",
-                    "tiles": ["http://t0.tianditu.com/img_w/wmts?tk=8180f5540ef94fd8d99e309905bb6299&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=tiles"],
-                    // "tiles":["https://t0.tianditu.gov.cn/DataServer?T=cva_c&x={x}&y={y}&l={z}&tk=8180f5540ef94fd8d99e309905bb6299"],
-                    // "tiles": ["http://t0.tianditu.com/vec_c/wmts?tk=8180f5540ef94fd8d99e309905bb6299"],
-                    // "scheme": "xyz",
-                    "tileSize": 256
-                },
-            },
-            "layers": [{
-                //根据数据源，添加两个图层
-                "id": "tiandituimg",
-                "type": "raster",
-                "source": "tiandituimg",
-                "minzoom": 0,
-                "maxzoom": 18
-            }],
-        },
+        style: getStyleJson4base(),
+        // style: baseImageStyle,
         accessToken:
             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
         center: [120.312, 31.917], // starting position [lng, lat]
@@ -72,12 +53,28 @@ onMounted(async () => {
         useWebGL2: true,
     });
 
-
-
-
     mapFlyToRiver(map)
 
+    window.addEventListener('keydown', (e) => {
+        if (e.key == 'i') {
+            console.log('add img');
+            map.addSource('img', {
+                type: 'raster',
+                // tiles: [tileServer + '/proxy/tiles/raster/image/base/{x}/{y}/{z}'],
+                tiles: [
+                    'http://127.0.0.1:8989/api/v1/tile/raster/image/base/{x}/{y}/{z}'
+                ],
+                minzoom: 0,
+                maxzoom: 14, //local TILES max zoom::12
+            })
+            map.addLayer({
+                id: 'ras',
+                type: 'raster',
+                source: 'img',
+            })
 
+        }
+    })
 
 
 
@@ -161,6 +158,31 @@ onMounted(async () => {
     //     }
     // })
 })
+
+
+const baseImageStyle = {
+    // local img
+    'version': 8,
+    'sources': {
+        'raster-tiles': {
+            'type': 'raster',
+            'tiles': [tileServer + '/tile/raster/image/base/{x}/{y}/{z}'],
+            'tileSize': 256,
+        }
+    },
+    'layers': [
+        {
+            'id': 'simple-tiles',
+            'type': 'raster',
+            'source': 'raster-tiles',
+            'minzoom': 1,
+            'maxzoom': 14
+        }
+    ]
+}
+
+
+
 </script>
 
 <style lang="scss" scoped>
