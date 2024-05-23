@@ -29,25 +29,53 @@
         <div class="video-controller-container">
             <div class="video-controller-title">当前监控云台控制</div>
             <div class="crc-directions">
-                <div class="crc-directions-up">
+                <div class="crc-directions-up" @click="basicVideoFunction(0)">
                     <ArrowUpBold
                         style="width: 3vh; height: 3vh; display: block"
                     />
                 </div>
-                <div class="crc-directions-left">
+                <div class="crc-directions-left" @click="basicVideoFunction(2)">
                     <ArrowLeftBold
                         style="width: 3vh; height: 3vh; display: block"
                     />
                 </div>
-                <div class="crc-directions-right">
+                <div
+                    class="crc-directions-right"
+                    @click="basicVideoFunction(3)"
+                >
                     <ArrowRightBold
                         style="width: 3vh; height: 3vh; display: block"
                     />
                 </div>
-                <div class="crc-directions-down">
+                <div class="crc-directions-down" @click="basicVideoFunction(1)">
                     <ArrowDownBold
                         style="width: 3vh; height: 3vh; display: block"
                     />
+                </div>
+            </div>
+            <div class="function-button-group">
+                <div class="preset button-title">预设点</div>
+
+                <div class="preset button-column">
+                    <div
+                        class="preset button-item"
+                        v-for="i in 4"
+                        :key="i"
+                        @click="move2PresetPoint(i)"
+                    >
+                        {{ '预设点-' + i }}
+                    </div>
+                </div>
+                <div class="zoom button-title">视角缩放</div>
+                <div class="zoom button-column">
+                    <div
+                        class="zoom button-item"
+                        v-for="(func, index) in zoomFuncList"
+                        :key="index"
+                        @click="basicVideoFunction(index + 4)"
+                    >
+                        {{ func.label }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -55,7 +83,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onUnmounted, watch } from 'vue'
+import { onMounted, ref, onUnmounted, watch, onBeforeUnmount, onBeforeMount } from 'vue'
+import axios from 'axios'
 
 const token = ref(
     'at.8z5xddvs305hvthb5emtqno22k38c3s0-6bgwm8993s-0llo4pp-mc0rbdnna',
@@ -68,22 +97,47 @@ const props = defineProps({
     },
 })
 
+const zoomFuncList = [
+    { label: '放大', func: '' },
+    { label: '缩小', func: '' },
+    { label: '远焦距', func: '' },
+    { label: '近焦距', func: '' },
+]
+
+let controlParam = {
+    deviceSerial: 'FB5033035',
+    channelNo: '1',
+    direction: '9',
+    speed: 2,
+}
+
+let presetParam = {
+    deviceSerial: 'FB5033035',
+    channelNo: '1',
+    index: '1',
+}
+
+const functionIndexList = [0, 1, 2, 3, 8, 9, 10, 11]
+
 const videoList = ref([
     {
         name: '民主沙海事码头监控',
         position: '32.0316674, 120.5402574',
+        deviceId: 'FB5033035',
         // videoUrl: `https://open.ys7.com/ezopen`,
-         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
+        deviceId: 'FB5033037',
         // videoUrl: `https://open.ys7.com/ezopen`,
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
+        deviceId: 'FB5033036',
         // videoUrl: `https://open.ys7.com/ezopen`,
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
     },
@@ -95,6 +149,81 @@ const focusOn = (index) => {
         videoList.value[0],
     ]
 }
+
+const basicVideoFunction = async (functionIndex) => {
+    controlParam.deviceSerial = videoList.value[0].deviceId
+    controlParam.direction = functionIndexList[functionIndex]
+    // console.log('curent func param', controlParam)
+    let stRes = await axios.post(
+        'https://open.ys7.com/api/lapp/device/ptz/start',
+        null,
+        {
+            params: { accessToken: token.value, ...controlParam },
+        },
+    )
+    setTimeout(async () => {
+        let stopRes = await axios.post(
+            'https://open.ys7.com/api/lapp/device/ptz/stop',
+            null,
+            {
+                params: { accessToken: token.value, ...controlParam },
+            },
+        )
+        // console.log('control stopped', stRes, stopRes)
+    }, 100)
+}
+
+const move2PresetPoint = async (presetIndex) => {
+    presetParam.deviceSerial = videoList.value[0].deviceId
+    presetParam.index = presetIndex
+    // console.log('preset param', presetParam)
+    let stRes = await axios.post(
+        'https://open.ys7.com/api/lapp/device/preset/move',
+        null,
+        {
+            params: { accessToken: token.value, ...presetParam },
+        },
+    )
+    // console.log('preset move', stRes)
+}
+
+const moveBack2Origin = async () => {
+    const moveBackPost = []
+    for (let video of videoList.value) {
+        console.log(video)
+        moveBackPost.push(
+            axios.post(
+                'https://open.ys7.com/api/lapp/device/preset/move',
+                null,
+                {
+                    params: {
+                        accessToken: token.value,
+                        channelNo: '1',
+                        index: '1',
+                        deviceSerial: video.deviceId
+                    },
+                },
+            ),
+        )
+    }
+    const res = await axios.all(moveBackPost)
+    console.log('back back', res)
+}
+
+onBeforeMount(async() => {
+    await moveBack2Origin()
+})
+
+onMounted(() => {
+    // let res = await axios.post('https://open.ys7.com/api/lapp/device/ptz/start', null, {
+    //     params: {accessToken: token.value, ...controlParam}
+    // })
+    // console.log('zooooom', res.data)
+})
+
+onBeforeUnmount(async () => {
+    await moveBack2Origin()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -215,8 +344,11 @@ div.realtime-video-container {
         height: 22vh;
         display: flex;
         flex-flow: column wrap;
+        justify-content: center;
+        align-content: flex-start;
+        column-gap: 1.5vw;
 
-        background-color: #6aa5f1;
+        background-color: #a4cbff94;
         border: 2px solid #001885;
         border-radius: 4px;
 
@@ -226,8 +358,9 @@ div.realtime-video-container {
             width: 2vw;
             height: 22vh;
             font-weight: bold;
-            font-size: calc(0.7vw + 0.8vh);
+            font-size: calc(0.6vw + 0.9vh);
             text-align: center;
+            letter-spacing: 0.2rem;
             color: #001885;
 
             box-shadow: 3px 0px rgb(0, 3, 196);
@@ -237,19 +370,19 @@ div.realtime-video-container {
             position: relative;
             list-style-type: none;
             margin: 0;
-            transform: translate(
-                -4px,
-                -50%
-            ); //2px border offset fix
+            // transform: translate(
+            //     -4px,
+            //     -50%
+            // ); //2px border offset fix
             &-directions {
                 position: relative;
                 display: block;
                 height: 18vh;
                 width: 18vh;
                 background: white;
-                top: 50%;
+                // top: 50%;
                 // left: 50%;
-                transform: translate(-50%, -50%);
+                // transform: translate(-50%, -50%);
                 z-index: 2;
                 border-radius: 50%;
                 box-shadow: 12px 8px 20px -10px rgba(0, 0, 0, 0.4);
@@ -350,6 +483,69 @@ div.realtime-video-container {
                         }
                     }
                     z-index: 4;
+                }
+            }
+        }
+
+        div.function-button-group {
+            width: calc(21vw - 18vh);
+            height: 20vh;
+
+            // background-color: #0059fd;
+
+            display: flex;
+            flex-flow: column wrap;
+            column-gap: 0.5vw;
+            border-radius: 4px;
+            overflow: hidden;
+            padding: 0.2vh;
+
+            div.button-title {
+                width: 46%;
+                height: 3vh;
+                line-height: 3vh;
+                text-align: center;
+                font-size: calc(0.4vw + 0.7vh);
+                font-weight: bold;
+                color: #eef3ff;
+                border-top-right-radius: 4px;
+                border-top-left-radius: 4px;
+                border: #000985 solid 2px;
+
+                background-color: #0062e2;
+            }
+
+            div.button-column {
+                width: 46%;
+                height: 16vh;
+                border-bottom-right-radius: 4px;
+                background-color: #b3daff;
+                display: flex;
+                flex-flow: column nowrap;
+                justify-content: space-around;
+                align-items: center;
+                border-bottom-left-radius: 4px;
+                border-bottom: #001885 solid 2px;
+                border-right: #001885 solid 2px;
+                border-left: #001885 solid 2px;
+
+                div.button-item {
+                    width: 80%;
+                    height: 3vh;
+                    line-height: 3vh;
+                    text-align: center;
+                    border-radius: 4px;
+                    color: #eef3ff;
+                    // font-weight: bold;
+                    font-size: calc(0.4vw + 0.6vh);
+
+                    background-color: #001885;
+
+                    &:hover {
+                        cursor: pointer;
+                        font-weight: bold;
+                        color: #9df8ff;
+                    }
                 }
             }
         }
