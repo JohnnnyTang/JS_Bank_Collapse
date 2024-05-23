@@ -541,6 +541,7 @@ export const drawShapeGraph = (echarts, after, before) => {
  */
 export const drawShapeYearlyGraph = (echarts, yearly) => {
 
+    yearly = yearly.reverse()
     const length = yearly.length
     const splitPoint = []
     for (let index = 0; index < length; index += 4) {
@@ -685,7 +686,9 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
 export const drawShapeCompareGraph = (echarts, after, before, compare) => {
     const min = Math.min(...after, ...before)
     const max = Math.max(...after, ...before)
-
+    before = before.reverse()
+    after = after.reverse()
+    compare = compare.reverse()
     const length = Math.min(after.length, before.length, compare.length)
     const splitPoint = []
     for (let index = 0; index < length; index += 4) {
@@ -713,7 +716,7 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
             },
         ],
         legend: {
-            data: ['2012年地形', '2022年地形', '2023年地形'],
+            data: ['2012年地形', '2019年地形', '2023年地形'],
             right: '20%',
             top: '2%',
         },
@@ -764,7 +767,7 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
                 data: compare.map((value) => fix2OrNull(value)),
             },
             {
-                name: '2022年地形',
+                name: '2019年地形',
                 type: 'line',
                 smooth: true,
                 data: before.map((value) => fix2OrNull(value)),

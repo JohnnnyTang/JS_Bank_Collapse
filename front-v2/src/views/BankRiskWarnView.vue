@@ -5,9 +5,9 @@
         <div class="selector-container">
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div>
-                <div class="confirm-button" @click="confirmProfileTime">
+                <!-- <div class="confirm-button" @click="confirmProfileTime">
                     <div class="confirm-button-text">确认选择</div>
-                </div>
+                </div> -->
                 <div class="place selector-content">
                     <el-select
                         class="side"
@@ -162,6 +162,15 @@
                 风险等级图例：
             </div>
             <div class="risk-line"></div>
+            <div class="risk-line-mark low">
+                低风险
+            </div>
+            <div class="risk-line-mark middle">
+                中风险
+            </div>
+            <div class="risk-line-mark high">
+                高风险
+            </div>
         </div>
         
         <div class="warn-status-container" v-if="showRiskStatus">
@@ -171,6 +180,14 @@
             </div> -->
             <div class="warn-status-content high">
                 高风险
+            </div>
+        </div>
+        <div v-if="showRiskStatus" class="warn-detail-container high">
+            <div class="warn-detail-title">
+                高风险区域集中在：
+            </div>
+            <div class="warn-detail-profile">
+                {{ getRiskAreas('high') }}
             </div>
         </div>
 
@@ -231,7 +248,7 @@
         
         <div 
             v-if="showBedFlowChart"
-            style="position: absolute; top:1vh; right:2vw; width:30.2vw; height: 29vh; z-index: 10;">
+            style="position: absolute; top:1vh; right:1vw; width:30.2vw; height: 29vh; z-index: 10;">
             <bedFlowChartVue/>
         </div>
 
@@ -264,7 +281,7 @@
 
         <div 
             v-if="showWaterProcessChart"
-            style="position: absolute; top:62vh; right:2vw; width:30.2vw; height: 29vh; z-index: 10;">
+            style="position: absolute; top:62vh; right:1vw; width:30.2vw; height: 29vh; z-index: 10;">
             <waterProcessChartVue/>
         </div>
 
@@ -530,7 +547,6 @@ const riskDataAll = ref([
         label: '高风险'
     },
 ])
-
 const placeValue = ref('mzs')
 
 
@@ -543,7 +559,7 @@ const confirmProfileTime = () => {
     sceneConfirmShow.value = true
 }
 
-// 获取当前场景时间
+// 获取当前场景内容
 const getProfileTime = () => {
     sceneBefore = sceneList.value.find(
         (item) => item.value === sceneBeforeValue.value,
@@ -557,6 +573,24 @@ const getProfileTime = () => {
     // tempProfileBefore.value = sceneBefore.label
     // tempProfileNow.value = sceneNow.label
     // tempProfileAfter.value = sceneAfter.label
+}
+
+const getRiskAreas = (riskLevel) => {
+    let resultString = ""
+    profileList.value.map((item) => {
+        if (item.risk === riskLevel) {
+            resultString = resultString + item.nickname + '  '
+        }
+    })
+    return resultString
+}
+
+const getRiskAreasAll = () => {
+    let resultString = ""
+    profileList.value.map((item) => {
+        resultString + item.nickname + ' '
+    })
+    return resultString
 }
 
 // 场景选择
@@ -617,10 +651,15 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompare) => {
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
         profileDataCompare.value = await getProfileData(compare, before)
+    } else if (exist && !existCompare) {
+        loading_message.value = '地形对比结果计算中...'
+        await CalProfile(compare, before)
+        loading_message.value = '地形对比数据加载中...'
+        profileData.value = await getProfileData(before, now)
+        profileDataCompare.value = await getProfileData(compare, before)
     } else {
         loading_message.value = '地形对比结果计算中...'
         await CalProfile(before, now)
-        await CalProfile(compare, before)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
         profileDataCompare.value = await getProfileData(compare, before)
@@ -907,28 +946,60 @@ const showFlowSpeedFunc = async() => {
     showFlowSpeed.value = !showFlowSpeed.value
     await flowControlHandler()
 }
-const showGeologyAndProject = ref(false)
-const showGeologyAndProjectFunc = () => {
-    showGeologyAndProject.value = !showGeologyAndProject.value
-}
 
 // 展示水动力因素指标，包括:
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
+const showWaterPower = ref(false)
 const showWaterPowerFunc = async() => {
+    if (showRiverBed.value === true) {
+        showRiverBedFunc()
+    } else if (showGeologyAndProject.value === true) {
+        showGeologyAndProjectFunc()
+    }
+    
+    showWaterPower.value = !showWaterPower.value
     showBedFlowChartFunc()
     showWaterProcessChartFunc()
     await showFlowSpeedFunc()
 }
 
+const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
+
+    if (showWaterPower.value === true) {
+        showWaterPowerFunc()
+    } else if (showGeologyAndProject.value === true) {
+        showGeologyAndProjectFunc()
+    }
+
+    showRiverBed.value = !showRiverBed.value
+    if ((showRaster.value === false && showProfileShape.value === true)
+        || (showRaster.value === true && showProfileShape.value === false) ) {
+        showProfileShapeFunc()
+        showYearlyProfileShapeFunc()
+        return
+    }
     showProfileShapeFunc()
     showYearlyProfileShapeFunc()
-    showRaster.value = !showRaster.value  
+    RasterControlHandler()
+}
+
+const showGeologyAndProject = ref(false)
+const showGeologyAndProjectFunc = () => {
+
+    if (showWaterPower.value === true) {
+        showWaterPowerFunc()
+    } else if (showRiverBed.value === true) {
+        showRiverBedFunc()
+    }
+
+    showGeologyAndProject.value = !showGeologyAndProject.value
 }
 
 const profileData = ref([])
 const profileDataCompare = ref([])
 const riskDataIndex = ref(0)
+const riskAreas = ref([])
 const tempProfile = ref(null)
 const tempProfileData = ref(null)
 
@@ -1448,7 +1519,7 @@ onMounted(async () => {
             },
         })
 
-        map.addControl(draw)
+        // map.addControl(draw)
 
         useMapStore().setMap(map)
       
@@ -1591,6 +1662,7 @@ div.risk-warn-container {
 
                 // background-color: #466ca7;
                 :deep(.el-select) {
+                    left: 1vw;
                     height: 5vh !important;
                     box-shadow:
                         rgba(0, 132, 255, 0.8) 1px 1px,
@@ -1707,8 +1779,8 @@ div.risk-warn-container {
 
     div.warn-status-container {
         position: absolute;
-        left: 45vw;
-        top: 78vh;
+        left: 36vw;
+        top: 80vh;
         width: 10vw;
         height: 10vh;
 
@@ -1756,6 +1828,51 @@ div.risk-warn-container {
             }
         }
     }
+    div.warn-detail-container {
+        position: absolute;
+        left: 47vw;
+        top: 80.3vh;
+        width: 20vw;
+        height: 9vh;
+        border-radius: 6px;
+        backdrop-filter: blur(5px);
+        background-color: rgba(244, 246, 248, 0.8);
+        z-index: 4;
+
+        &.low {
+            border: #0a59ec solid 3px;
+        }
+
+        &.middle {
+            border: #ec820a solid 3px;
+        }
+
+        &.high {
+            border: #ec250a solid 3px;
+        }
+
+        div.warn-detail-title {
+            position: absolute;
+            left: 0.5vw;
+            top: 0.5vh;
+            font-size: calc(0.7vw + 0.4vh);
+            font-weight: bold;
+            text-shadow:
+            #b9bec9 1px 1px,
+            #d7d8dd 1px 1px,
+            #161618 1px 1px;
+        }
+
+        div.warn-detail-profile {
+            position: absolute;
+            line-height: 2.2vh;
+            top: 3.5vh;
+            left: 0.5vw;
+            color: rgba(43, 46, 49, 0.8);
+            font-size: calc(0.5vw + 0.4vh);
+            font-weight: bold;
+        }
+    }
 
     div.risk-line-container {
         position: absolute;
@@ -1782,7 +1899,7 @@ div.risk-warn-container {
 
         div.risk-line {
             position: absolute;
-            top: 1.5vh;
+            top: 1vh;
             left: 9vw;
             width: 20vw;
             height: 2vh;
@@ -1791,6 +1908,34 @@ div.risk-warn-container {
             z-index: 5;
             background-image: linear-gradient(to right, rgb(17, 17, 255), rgb(220, 126, 37), rgb(255, 9, 9));
             box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+        }
+
+        div.risk-line-mark {
+            position: absolute;
+            top: 3.2vh;
+            width: 20vw;
+            height: 2vh;
+            border-radius: 20px;
+            z-index: 5;
+            font-family: 'Microsoft YaHei';
+            font-weight: bolder;
+            font-size: calc(0.5vw + 0.3vh);
+            text-shadow:
+            #eef3ff 1px 1px,
+            #eef3ff 2px 2px,
+            #f0f1f3 1px 1px;
+
+            &.low {
+                left: 10vw;
+            }
+
+            &.middle {
+                left: 18vw;
+            }
+
+            &.high {
+                left: 26vw;
+            }
         }
     }
 
@@ -2223,8 +2368,8 @@ div.risk-warn-container {
 
     div.loading-container {
         position: absolute;
-        top: 2vh;
-        left: 45vw;
+        top: 9vh;
+        left: 47.5vw;
         width: 6vw;
         height: 10vh;
         background-color: rgba(190, 222, 230, 0.5);

@@ -1,7 +1,7 @@
 <template>
 <div class="riskInfo-container">
     <div class="riskInfo-title">
-        滩槽高程
+        历史断面变化
     </div>
     <div class="riskInfo-item profileShape">
         <div class="item-title">{{ profileName }}</div>

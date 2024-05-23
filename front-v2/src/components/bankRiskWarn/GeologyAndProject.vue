@@ -11,7 +11,7 @@
     <div class="item-container geology">
         <div class="img-container">
             <el-image
-                style="width: 100%; height: 100%; "
+                style="width: 60%; height: 100%;"
                 :src="UrlPart1"
                 :zoom-rate="1.2"
                 :max-scale="7"
@@ -29,7 +29,7 @@
     <div class="item-container project">
         <div class="img-container">
             <el-image
-                style="width: 100%; height: 100%"
+                style="width: 100%; height: 80%"
                 :src="UrlPart2"
                 :zoom-rate="1.2"
                 :max-scale="7"
