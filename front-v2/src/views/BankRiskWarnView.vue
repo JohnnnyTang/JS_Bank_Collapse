@@ -174,7 +174,7 @@
             </div>
         </div>
 
-        <div class="button-container">
+        <!-- <div class="button-container">
             <button @click="showYearlyProfileShapeFunc">单一断面形态</button>
             <button @click="showProfileShapeFunc">断面形态</button>
             <button @click="showProfileSlopeFunc">岸坡最大坡比</button>
@@ -183,7 +183,7 @@
             <button @click="showFlowSpeedFunc">流速指标</button>
             <button @click="showWaterProcessChartFunc">水位变幅指标</button>
             <button @click="showGeologyAndProjectFunc">地质条件</button>
-        </div>
+        </div> -->
 
         <profileInfoVue
             v-if="showProfileInfo"
