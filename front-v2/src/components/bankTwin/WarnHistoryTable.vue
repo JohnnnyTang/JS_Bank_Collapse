@@ -1,5 +1,5 @@
 <template>
-    <div class="warn-history-container" :class="props.warnActive ? 'active' : 'in-active'">
+    <div class="warn-history-container" >
         <div class="warn-history-title">报警信息列表</div>
         <div class="warn-histroy-content" v-loading="historyLoading">
             <div class="device-status-content">
@@ -42,11 +42,6 @@ import BackEndRequest from '../../api/backend'
 import { useMapStore, useWarnInfoStore } from '../../store/mapStore'
 import { removeWarningDeviceStyle } from '../bankManage/mapInit.js'
 
-const props = defineProps({
-    warnActive: {
-        type: Boolean,
-    },
-})
 const historyLoading = ref(true)
 const historyRowLoading = ref(new Array(100).fill(false))
 const warnStore = useWarnInfoStore()
@@ -158,10 +153,9 @@ watch(() => useWarnInfoStore().warnInfo_history, (newVal) => {
     console.log('123123', historyRowLoading.value)
     warnHistoryList.value = warnData
     historyLoading.value = false
-
 })
 
-onMounted(async () => {
+onMounted(() => {
     historyLoading.value = false
     // setTimeout(async () => {
     //     historyLoading.value = false
