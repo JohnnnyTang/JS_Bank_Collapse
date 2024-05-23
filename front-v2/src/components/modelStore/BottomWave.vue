@@ -19,25 +19,25 @@
                     xlink:href="#gentle-wave"
                     x="48"
                     y="0"
-                    fill="rgba(255,255,255,0.7)"
+                    fill="rgba(15,75,255,0.7)"
                 />
                 <use
                     xlink:href="#gentle-wave"
                     x="48"
                     y="3"
-                    fill="rgba(255,255,255,0.5)"
+                    fill="rgba(15,75,255,0.5)"
                 />
                 <use
                     xlink:href="#gentle-wave"
                     x="48"
                     y="5"
-                    fill="rgba(255,205,255,0.2)"
+                    fill="rgba(15,75,255,0.2)"
                 />
                 <use
                     xlink:href="#gentle-wave"
                     x="48"
                     y="7"
-                    fill="rgba(240,240,240,0.9)"
+                    fill="rgba(15,75,255,0.9)"
                 />
             </g>
         </svg>

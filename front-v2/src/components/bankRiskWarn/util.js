@@ -541,7 +541,6 @@ export const drawShapeGraph = (echarts, after, before) => {
  */
 export const drawShapeYearlyGraph = (echarts, yearly) => {
 
-    yearly = yearly.reverse()
     const length = yearly.length
     const splitPoint = []
     for (let index = 0; index < length; index += 4) {
@@ -686,9 +685,6 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
 export const drawShapeCompareGraph = (echarts, after, before, compare) => {
     const min = Math.min(...after, ...before)
     const max = Math.max(...after, ...before)
-    before = before.reverse()
-    after = after.reverse()
-    compare = compare.reverse()
     const length = Math.min(after.length, before.length, compare.length)
     const splitPoint = []
     for (let index = 0; index < length; index += 4) {
