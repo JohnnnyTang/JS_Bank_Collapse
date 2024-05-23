@@ -15,7 +15,7 @@
                             :disabled="item.disabled">
                             <span class="section-name-text">{{
                                 item.label
-                                }}</span>
+                            }}</span>
                         </el-option>
                     </el-select>
                 </div>
@@ -2096,61 +2096,72 @@ div.risk-warn-container {
             flex: 1 1 0;
             position: relative;
             display: flex;
-            top: 1.2vh;
         }
 
         div.risk-sub-index-container {
             flex: 1 1 0;
             display: flex;
             flex-direction: column;
-            gap: 0.6vh;
 
             div.risk-sub-index {
-                margin: 0 1vw;
-                height: 4vh;
-                border: rgba(0, 119, 255, 0.6) 2px solid;
-                border-radius: 6px;
+                flex: 1 1 0;
                 transition: transform 0.3s ease;
                 position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
                 &.waterpower {
+                    background-color: rgba(33, 100, 182, 0.4);
+                }
+
+                &.waterpower:nth-child(2n+1) {
                     background-color: rgba(33, 100, 182, 0.5);
                 }
 
                 &.riverbed {
+                    background-color: rgba(45, 165, 99, 0.4);
+                }
+
+                &.riverbed:nth-child(2n+1) {
                     background-color: rgba(45, 165, 99, 0.5);
                 }
 
+
                 &.bankGeology {
+                    background-color: rgba(107, 24, 155, 0.4);
+                }
+
+                &.bankGeology:nth-child(2n+1) {
                     background-color: rgba(107, 24, 155, 0.5);
                 }
 
                 &.outproject {
+                    background-color: rgba(245, 155, 20, 0.4);
+                }
+
+                &.outproject:nth-child(2n+1) {
                     background-color: rgba(245, 155, 20, 0.5);
                 }
 
                 div.risk-item-text {
                     position: relative;
-                    top: 0.8vh;
                     text-align: center;
-                    font-size: calc(0.6vw + 0.4vh);
+                    font-size: calc(0.6vw + 0.6vh);
                     color: white;
                     font-family: 'Microsoft YaHei';
+                    font-weight: bolder;
                     text-shadow:
-                        #101113 2px 1px,
-                        // #767779 1px 1px,
-                        // #6493ff 1px 1px;
+                        #101113 2px 2px,
+                        // #767779 2px 2px,
+                        // #6493ff 3px 3px;
                 }
             }
         }
 
 
         div.risk-main-index {
-            margin: 0 1vw;
-            height: 14vh;
             width: 8vw;
-            border: rgba(0, 119, 255, 0.6) 2px solid;
-            border-radius: 6px;
             cursor: pointer;
             transition: transform 0.3s ease;
             position: relative;
@@ -2159,9 +2170,9 @@ div.risk-warn-container {
             align-items: center;
             justify-content: center;
 
-            &:hover {
-                transform: scale(1.03);
-            }
+            // &:hover {
+            //     transform: scale(1.03);
+            // }
 
             &.waterpower {
                 background-color: rgba(28, 85, 156, 0.6);
@@ -2181,7 +2192,7 @@ div.risk-warn-container {
 
             div.risk-item-text {
                 text-align: center;
-                font-size: calc(0.6vw + 0.8vh);
+                font-size: calc(0.6vw + 1.2vh);
                 color: white;
                 font-family: 'Microsoft YaHei';
                 font-weight: bolder;
