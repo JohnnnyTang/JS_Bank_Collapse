@@ -115,6 +115,15 @@ const sourceFieldMap = {
             "description": '简介',
         }
     },
+    'sandBar':{
+        "original": "主要洲滩",
+        "fieldMap": {
+            "name": "名称",
+            "region": "所属区域",
+            "river": "所属河段",
+            "sortId": '洲滩编号',
+        }
+    }
 }
 
 const sourceNameMap = {
@@ -148,7 +157,8 @@ const sourceZoomMap = {
     "sluiceArea": 15,
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
-    'importantBank': 12
+    'importantBank': 12,
+    'sandBar': 12
 }
 
 const sourceColumnMap = {
@@ -162,6 +172,7 @@ const sourceColumnMap = {
     "reservoirArea": 2,
     "sluiceArea": 2,
     "importantBank": 2,
+    'sandBar': 2
 }
 const legendStyleMap = {
     '全江概貌': {
@@ -736,6 +747,7 @@ const layerSourceMap = {
     '岸段-注记': 'importantBank',
     '水闸工程': 'sluiceArea',
     '枢纽工程': 'combineProjectPoint',
+    '主要洲滩':'sandBar'
 }
 
 const filterMap = {
@@ -791,5 +803,6 @@ export {
     legendMap,
     legendStyleMap,
     filterMap,
-    legendListt
+    legendListt,
+    layerSourceMap
 }
