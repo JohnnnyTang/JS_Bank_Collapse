@@ -610,8 +610,10 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompare) => {
     loading_message.value = '确认计算结果是否存在...'
     isRunning.value = true
     let exist
+    let existCompare
     exist = await profileDataExist(before, now)
-    if (exist) {
+    existCompare = await profileDataExist(compare, before)
+    if (exist && existCompare) {
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
         profileDataCompare.value = await getProfileData(compare, before)
