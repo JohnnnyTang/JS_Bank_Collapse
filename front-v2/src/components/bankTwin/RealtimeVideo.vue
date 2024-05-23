@@ -12,14 +12,14 @@
             :id="index"
         >
             <div class="video-content">
-                <!-- <iframe
+                <iframe
                     :src="item.videoUrl + token"
                     width="100%"
                     height="100%"
                     :id="item.name"
                     allowfullscreen
                 >
-                </iframe> -->
+                </iframe>
             </div>
             <div class="video-title">{{ item.name }}</div>
             <div class="video-focus" v-if="index != 0" @click="focusOn(index)">
