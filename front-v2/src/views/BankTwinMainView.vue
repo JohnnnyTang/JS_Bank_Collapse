@@ -138,7 +138,7 @@
 
 <script setup>
 import router from '../router'
-import { onMounted, ref, onUnmounted, watch, computed, nextTick } from 'vue'
+import { onMounted, ref, onUnmounted, watch, computed, nextTick, createApp } from 'vue'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
@@ -147,6 +147,8 @@ import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
 import { mapInit } from '../components/bankManage/mapInit'
+// test bank3d popUP
+import threedVue from '../components/bankTwin/threedPopup.vue'
 
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
 import * as customLayers from '../utils/WebGL/customLayers'
@@ -303,7 +305,7 @@ const gnssIdSectionMap = {
     // fake sectionNameMap
     // 'MZS120.55327892_32.02707923_1': '海事码头下游',
     'MZS120.51967889_32.04004108_4': 'MZ03顺堤尾',
-    'MZS120.541648_32.030524_2':'MZ08海事码头'
+    'MZS120.541648_32.030524_2': 'MZ08海事码头'
 
 }
 
@@ -370,30 +372,22 @@ const viewChangeClick = (value) => {
         mapFlyToRiver(map)
     } else if (value == '3d') {
         threeDLoading.value = true
-        const scriptInteract = document.createElement('script')
-        scriptInteract.src = './src/utils/unityInteraction.js'
-        scriptInteract.onload = async () => {
-
-            const script = document.createElement('script')
-            script.src =
-                '/scratchSomething/unity/collapseBank/build/output.loader.js'
-            script.onload = async () => {
-                console.log('output.loader.js imported')
-                unityLayer = new customLayers.UnityLayer(
-                    [120.556596, 32.042607],
-                    0,
-                    unityCanvaDom.value,
-                )
-                // maskLayer = new customLayers.MaskLayer()
-                map.addLayer(unityLayer)
-                setTimeout(() => {
-                    threeDLoading.value = false
-                }, 3000)
-                // map.addLayer(maskLayer)
-            }
-            document.head.appendChild(script)
+        console.log('pickUp')
+        console.log(pickUp)
+        const script = document.createElement('script')
+        script.src = '/scratchSomething/unity/collapseBank/build/output.loader.js'
+        document.head.appendChild(script)
+        script.onload = async () => {
+            // DeviceInfoBox
+            console.log('output.loader.js imported')
+            unityLayer = new customLayers.UnityLayer([120.556596, 32.042607], 0, unityCanvaDom.value)
+            map.addLayer(unityLayer)
+            setTimeout(() => {
+                threeDLoading.value = false
+                // createCompIns()
+            }, 3000)
+            // map.addLayer(maskLayer)
         }
-        document.head.appendChild(scriptInteract)
 
 
     }
@@ -508,17 +502,17 @@ onMounted(async () => {
     }, 1000);
 })
 
-// onUnmounted(() => {
-//     // resizeObserver.disconnect()
-//     // resizeObserver.unobserve(containerDom.value)
-//     console.log('onUnmounted')
-//     map && map.remove()
-//     console.log('map.remove')
-// })
 onUnmounted(() => {
     useMapStore().getMap().remove()
     useMapStore().destroyMap()
 })
+
+///////// DEBUG REGION 
+// const createCompIns = () => {
+//     const bankApp = createApp(threedVue)
+//     let fatherDom = document.querySelector('#DeviceInfoBox')
+//     bankApp.mount(fatherDom)
+// }
 </script>
 
 <style lang="scss" scoped>

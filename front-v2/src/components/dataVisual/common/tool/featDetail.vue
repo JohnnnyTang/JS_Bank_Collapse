@@ -9,7 +9,7 @@
                     </div>
                 </template>
                 <el-scrollbar max-height="10vh">
-                    {{ data[key] }}
+                    {{ noDataMap(data[key]) }}
                 </el-scrollbar>
             </el-descriptions-item>
         </el-descriptions>
@@ -42,6 +42,13 @@ watch(props, (V) => {
 })
 const close = () => {
     emit('close')
+}
+const noDataMap = (data) => {
+    if (data === '0' || data === '*' || data === '' || data === undefined || data === null) {
+        return '暂无数据'
+    } else {
+        return data
+    }
 }
 
 onMounted(() => {

@@ -102,11 +102,11 @@ export const drawShapeSlopeGraph = (echarts, after, before, rates) => {
                 //  axisLabel:{
                 //     show:false
                 //  }
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     }
-                  }
+                }
             },
             {
                 name: '单位: m',
@@ -117,8 +117,8 @@ export const drawShapeSlopeGraph = (echarts, after, before, rates) => {
                 axisLine: {
                     show: true,
                     onZero: false,
-                    lineStyle:{
-                        color:'black'
+                    lineStyle: {
+                        color: 'black'
                     }
                 },
             },
@@ -132,11 +132,11 @@ export const drawShapeSlopeGraph = (echarts, after, before, rates) => {
                 scale: true,
                 max: 8,
                 min: -40,
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     }
-                  }
+                }
             },
             {
                 type: 'value',
@@ -146,8 +146,8 @@ export const drawShapeSlopeGraph = (echarts, after, before, rates) => {
                 gridIndex: 1,
                 axisLine: {
                     show: false,
-                    lineStyle:{
-                        color:'black'
+                    lineStyle: {
+                        color: 'black'
                     }
                 },
                 scale: true,
@@ -238,33 +238,33 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
         },
         xAxis: [
             {
-              type: 'category',
-              data: flowspeed.map((_, index) => `断面${index + 1}`),
-              axisLine:{
-                lineStyle:{
-                    color:'black'
+                type: 'category',
+                data: flowspeed.map((_, index) => `断面${index + 1}`),
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
+                    }
                 }
-              }
             }
         ],
         yAxis: [
             {
-              name: "单位：m/s",
-              max: 3,
-              min: 0,
-              type: 'value',
-              axisLine:{
-                lineStyle:{
-                    color:'black'
+                name: "单位：m/s",
+                max: 3,
+                min: 0,
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
+                    }
                 }
-              }
             }
         ],
         series: [
             {
-              name: '流速',
-              type: 'line',
-              data: flowspeed
+                name: '流速',
+                type: 'line',
+                data: flowspeed
             }
         ],
     }
@@ -309,28 +309,28 @@ export const drawErosionGraph = (echarts, erosion) => {
                 //  axisLabel:{
                 //     show:false
                 //  }
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     }
-                  }
+                }
             },
         ],
         yAxis: [
             {
-              type: 'value',
-              axisLine:{
-                lineStyle:{
-                    color:'black'
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
+                    }
                 }
-              }
             }
         ],
         series: [
             {
-              name: '冲淤',
-              type: 'line',
-              data: erosion
+                name: '冲淤',
+                type: 'line',
+                data: erosion
             }
         ],
         graphic: {
@@ -439,12 +439,12 @@ export const drawShapeGraph = (echarts, after, before) => {
                 //  axisLabel:{
                 //     show:false
                 //  }
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     },
                     onZero: false,
-                  }
+                }
             },
         ],
         yAxis: [
@@ -456,9 +456,9 @@ export const drawShapeGraph = (echarts, after, before) => {
                 scale: true,
                 max: 8,
                 min: -40,
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     }
                 },
             },
@@ -587,12 +587,12 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
                 //  axisLabel:{
                 //     show:false
                 //  }
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     },
                     onZero: false,
-                  }
+                }
             },
         ],
         yAxis: [
@@ -604,9 +604,9 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
                 scale: true,
                 max: 8,
                 min: -40,
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     }
                 },
             },
@@ -731,12 +731,12 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
                 //  axisLabel:{
                 //     show:false
                 //  }
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     },
                     onZero: false,
-                  }
+                }
             },
         ],
         yAxis: [
@@ -748,9 +748,9 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
                 scale: true,
                 max: 8,
                 min: -40,
-                axisLine:{
-                    lineStyle:{
-                        color:'black'
+                axisLine: {
+                    lineStyle: {
+                        color: 'black'
                     }
                 },
             },
@@ -761,12 +761,25 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
                 type: 'line',
                 smooth: true,
                 data: compare.map((value) => fix2OrNull(value)),
+                lineStyle: {
+                    //16,16,255
+                    color: 'rgb(16,16,255)',
+                },
+                itemStyle: {
+                    color: 'rgb(16,16,255)',
+                },
             },
             {
                 name: '2019年地形',
                 type: 'line',
                 smooth: true,
                 data: before.map((value) => fix2OrNull(value)),
+                lineStyle: {
+                    color: 'rgb(19, 122, 7)',
+                },
+                itemStyle: {
+                    color: 'rgb(19, 122, 7',
+                },
             },
             {
                 name: '2023年地形',
@@ -886,7 +899,7 @@ export const drawSlopeGraph = (echarts, before, after, rates) => {
         legend: {
             data: [
                 {
-                    name:'坡比',
+                    name: '坡比',
                     itemStyle: {
                         color: 'green'
                     }
@@ -911,8 +924,8 @@ export const drawSlopeGraph = (echarts, before, after, rates) => {
                 axisLine: {
                     show: true,
                     onZero: false,
-                    lineStyle:{
-                        color:'black'
+                    lineStyle: {
+                        color: 'black'
                     }
                 },
             },
@@ -926,8 +939,8 @@ export const drawSlopeGraph = (echarts, before, after, rates) => {
                 gridIndex: 0,
                 axisLine: {
                     show: false,
-                    lineStyle:{
-                        color:'black'
+                    lineStyle: {
+                        color: 'black'
                     }
                 },
                 scale: true,
@@ -964,7 +977,7 @@ export const drawSlopeGraph = (echarts, before, after, rates) => {
                 },
                 markPoint: {
                     symbol: 'circle',
-                    symbolSize: 5, 
+                    symbolSize: 5,
                     data: [
                         {
                             name: '最大值',
@@ -975,17 +988,17 @@ export const drawSlopeGraph = (echarts, before, after, rates) => {
                                 borderWidth: 0.5,
                             },
                             label: {
-                              normal: {
-                                show: true,
-                                position: 'top',
-                                formatter: () => {
-                                  return "最大值: "+Math.max(...slope_y).toFixed(2);
-                                },
-                                textStyle: {
-                                  color: '#333',
-                                  fontSize: 12
+                                normal: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: () => {
+                                        return "最大值: " + Math.max(...slope_y).toFixed(2);
+                                    },
+                                    textStyle: {
+                                        color: '#333',
+                                        fontSize: 12
+                                    }
                                 }
-                              }
                             }
                         },
                         {
@@ -997,17 +1010,17 @@ export const drawSlopeGraph = (echarts, before, after, rates) => {
                                 borderWidth: 0.5,
                             },
                             label: {
-                              normal: {
-                                show: true,
-                                position: 'bottom',
-                                formatter: () => {
-                                  return "最小值: "+Math.min(...slope_y).toFixed(2);
-                                },
-                                textStyle: {
-                                  color: '#333',
-                                  fontSize: 12
+                                normal: {
+                                    show: true,
+                                    position: 'bottom',
+                                    formatter: () => {
+                                        return "最小值: " + Math.min(...slope_y).toFixed(2);
+                                    },
+                                    textStyle: {
+                                        color: '#333',
+                                        fontSize: 12
+                                    }
                                 }
-                              }
                             }
                         }
                     ]

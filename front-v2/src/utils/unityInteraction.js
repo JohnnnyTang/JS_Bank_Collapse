@@ -1,5 +1,7 @@
-// import { ref, createApp } from 'vue'
 // import bank3dTest from '../components/bankTwin/bank3dTest.vue'
+// import { ref, createApp } from 'vue'
+
+// const app = createApp(bank3dTest)
 
 const infoBoxDiv = document.createElement('div')
 infoBoxDiv.style.backgroundColor = 'red'
@@ -17,81 +19,76 @@ infoBoxDiv.style.width = '50px'
 infoBoxDiv.id = 'DeviceInfoBox'
 document.body.appendChild(infoBoxDiv)
 
-// const container = document.createElement('div')
-// container.id = 'Unity-DeviceInfo-Box'
-// const app = createApp(bank3dTest, {test:'hello test'})
-// const componentIns = app.mount(container)
+// app.mount(infoBoxDiv)
 
+// pickedObject = {
 
+//   /** @type { string } */ _name: '',
 
-const pickedObject = {
+//   /** @type { number[] } */ _position: [0.0, 0.0],
 
-  /** @type { string } */ _name: '',
+//   /** @type { number[] } */ boxSize: [150.0, 150.0],
 
-  /** @type { number[] } */ _position: [0.0, 0.0],
+//   /** @type { HTMLDivElement } */ infoBox: infoBoxDiv,
 
-  /** @type { number[] } */ boxSize: [150.0, 150.0],
+//   /** @type { number } */ pixelRation: window.devicePixelRatio,
 
-  /** @type { HTMLDivElement } */ infoBox: infoBoxDiv,
+//   /**
+//    * @param { string } nameStr
+//    */
+//   set name(nameStr) {
 
-  /** @type { number } */ pixelRation: window.devicePixelRatio,
+//     pickedObject.infoBox.innerHTML = nameStr
 
-  /**
-   * @param { string } nameStr
-   */
-  set name(nameStr) {
+//     this._name = nameStr
+//   },
 
-    pickedObject.infoBox.innerHTML = nameStr
+//   get name() {
 
-    this._name = nameStr
-  },
+//     return this._name
+//   },
 
-  get name() {
+//   /**
+//   * @param { number[] } xy
+//   */
+//   set position(xy) {
 
-    return this._name
-  },
+//     const [x, y] = xy
 
-  /**
-  * @param { number[] } xy
-  */
-  set position(xy) {
+//     if (x === -1 && y === -1) {
 
-    const [x, y] = xy
+//       this.infoBox.style.display = 'none'
 
-    if (x === -1 && y === -1) {
+//     } else {
 
-      this.infoBox.style.display = 'none'
+//       this.infoBox.style.display = 'block'
+//       this.infoBox.style.bottom = `${y / this.pixelRation}px`
+//       this.infoBox.style.left = `${x / this.pixelRation - this.boxSize[0] / 2}px`
 
-    } else {
+//     }
 
-      this.infoBox.style.display = 'block'
-      this.infoBox.style.bottom = `${y / this.pixelRation}px`
-      this.infoBox.style.left = `${x / this.pixelRation - this.boxSize[0] / 2}px`
+//     this._position = xy
+//   },
 
-    }
+//   get position() {
 
-    this._position = xy
-  },
+//     return this._position
+//   },
+// }
 
-  get position() {
+// // function consoleLogMessageFromUnity(message) {
 
-    return this._position
-  },
-}
+// //   console.log("Received message from Unity:", message);
+// // }
 
-function consoleLogMessageFromUnity(message) {
+// // function pickUp(name) {
 
-  console.log("Received message from Unity:", message);
-}
+// //   pickedObject.name = name
+// //   pickedObject.infoBox.style.width = `${pickedObject.boxSize[0]}px`
+// //   pickedObject.infoBox.style.height = `${pickedObject.boxSize[1]}px`
+// // }
 
-function pickUp(name) {
+// // function pickScreenPos(x, y) {
 
-  pickedObject.name = name
-  pickedObject.infoBox.style.width = `${pickedObject.boxSize[0]}px`
-  pickedObject.infoBox.style.height = `${pickedObject.boxSize[1]}px`
-}
-
-function pickScreenPos(x, y) {
-
-  pickedObject.position = [x, y]
-}
+// //   pickedObject.position = [x, y]
+// // }
