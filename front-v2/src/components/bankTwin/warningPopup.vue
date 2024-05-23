@@ -41,8 +41,14 @@ const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 const chartDom = ref()
 const showChart = ref(false)
 const chartDataLoading = ref(true)
+const fakeWarnCodeList = [
+    'MZS120.55327892_32.02707923_1',
+    'MZS120.51967889_32.04004108_4',
+    'MZS120.541648_32.030524_2'
+]
 
 let myChart = undefined
+
 
 const clickHandler = () => {
     /*
@@ -57,11 +63,11 @@ const clickHandler = () => {
     */
     nextTick(() => {
         showChart.value = !showChart.value
-
-        // console.log(props.warningInfo)
         const daviceMap = ["GNSS", "应力桩", "水压力计", "测斜仪"]
-        let deviceType = daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
-        chartConfig(deviceType)
+        if (fakeWarnCodeList.includes(props.warningInfo.deviceId)) {
+            let deviceType = daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
+            chartConfig(deviceType)
+        }
     })
 }
 
@@ -105,7 +111,7 @@ onMounted(() => {
         align-items: center;
         justify-content: center;
 
-        &:hover{
+        &:hover {
             cursor: pointer;
         }
 

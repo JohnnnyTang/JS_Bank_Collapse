@@ -1,3 +1,4 @@
+// import { useWarninfoStore } from ''
 const infoBoxDiv = document.createElement('div')
 infoBoxDiv.style.backgroundColor = 'red'
 infoBoxDiv.style.pointerEvents = 'none'
@@ -18,9 +19,9 @@ const pickedObject = {
 
   /** @type { string } */ _name: '',
 
-  /** @type { number[] } */ _position: [ 0.0, 0.0 ],
+  /** @type { number[] } */ _position: [0.0, 0.0],
 
-  /** @type { number[] } */ boxSize: [ 150.0, 150.0 ],
+  /** @type { number[] } */ boxSize: [150.0, 150.0],
 
   /** @type { HTMLDivElement } */ infoBox: infoBoxDiv,
 
@@ -37,8 +38,8 @@ const pickedObject = {
   },
 
   get name() {
-    
-      return this._name
+
+    return this._name
   },
 
   /**
@@ -46,8 +47,8 @@ const pickedObject = {
   */
   set position(xy) {
 
-    const [ x, y ] = xy
-      
+    const [x, y] = xy
+
     if (x === -1 && y === -1) {
 
       this.infoBox.style.display = 'none'
@@ -55,11 +56,11 @@ const pickedObject = {
     } else {
 
       this.infoBox.style.display = 'block'
-      this.infoBox.style.bottom = `${ y / this.pixelRation }px`
-      this.infoBox.style.left = `${ x / this.pixelRation - this.boxSize[0] / 2 }px`
+      this.infoBox.style.bottom = `${y / this.pixelRation}px`
+      this.infoBox.style.left = `${x / this.pixelRation - this.boxSize[0] / 2}px`
 
     }
-    
+
     this._position = xy
   },
 
@@ -71,17 +72,17 @@ const pickedObject = {
 
 function consoleLogMessageFromUnity(message) {
 
-    console.log("Received message from Unity:", message);
+  console.log("Received message from Unity:", message);
 }
 
 function pickUp(name) {
 
   pickedObject.name = name
-  pickedObject.infoBox.style.width = `${ pickedObject.boxSize[0] }px`
-  pickedObject.infoBox.style.height = `${ pickedObject.boxSize[1] }px`
+  pickedObject.infoBox.style.width = `${pickedObject.boxSize[0]}px`
+  pickedObject.infoBox.style.height = `${pickedObject.boxSize[1]}px`
 }
 
 function pickScreenPos(x, y) {
-  
-  pickedObject.position = [ x, y ]
+
+  pickedObject.position = [x, y]
 }

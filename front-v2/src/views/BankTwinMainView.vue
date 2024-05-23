@@ -365,7 +365,6 @@ const viewChangeClick = (value) => {
     } else if (value == '3d') {
         threeDLoading.value = true
         const scriptInteract = document.createElement('script')
-        // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\src\utils\unityInteraction.js
         scriptInteract.src = './src/utils/unityInteraction.js'
         scriptInteract.onload = async () => {
 
@@ -381,9 +380,9 @@ const viewChangeClick = (value) => {
                 )
                 // maskLayer = new customLayers.MaskLayer()
                 map.addLayer(unityLayer)
-                setTimeout(()=>{
+                setTimeout(() => {
                     threeDLoading.value = false
-                },3000)
+                }, 3000)
                 // map.addLayer(maskLayer)
             }
             document.head.appendChild(script)
@@ -610,7 +609,7 @@ div.twin-main-container {
     div.loading-container {
         position: absolute;
         top: 10vh;
-        left:57vw;
+        left: 57vw;
         width: 6vw;
         height: 10vh;
         background-color: rgba(249, 254, 255, 0.336);

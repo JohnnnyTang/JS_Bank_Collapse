@@ -19,14 +19,14 @@
                                 class="video-js vjs-default-skin"
                             ><source :src="item.videoUrl" /></video> -->
                             <!-- <videoPlay :src="item.videoUrl" autoPlay :type="m3u8"/> -->
-                            <iframe
+                            <!-- <iframe
                                 :src="item.videoUrl + token"
                                 width="100%"
                                 height="100%"
                                 :id="item.name"
                                 allowfullscreen
                             >
-                            </iframe>
+                            </iframe> -->
                         </div>
                         <div class="video-title">{{ item.name }}</div>
                     </div>

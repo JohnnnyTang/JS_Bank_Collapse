@@ -371,7 +371,7 @@ const legendListt = [
             'height': '80%',
             'width': '50%',
             'background-image': `url('/legend/水闸.png')`,
-            'transform': 'translateX(16%)',
+            'transform': 'translateX(10%) scale(0.95)',
         },
         text: '水闸工程'
     },

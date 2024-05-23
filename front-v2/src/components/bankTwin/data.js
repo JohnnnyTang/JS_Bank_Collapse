@@ -770,7 +770,7 @@ const getGNSSoption = () => {
             top: '10%'
         },
         grid: {
-            left: "3%",
+            left: "7%",
             right: "4%",
             bottom: "3%",
             top: '20%',
@@ -786,7 +786,14 @@ const getGNSSoption = () => {
             boundaryGap: false,
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            name: '土体表面累计位移监测(mm)',
+            nameLocation: 'center',
+            nameTextStyle: { // 设置名称的样式
+                rotate: 90 // 将名称旋转 90 度
+            },
+            nameGap: 40,
+
         },
         series: [
             {
@@ -849,7 +856,7 @@ const getInclineoption = () => {
             top: '10%',
         },
         grid: {
-            left: "3%",
+            left: "8%",
             right: "4%",
             bottom: "3%",
             top: '20%',
@@ -865,7 +872,13 @@ const getInclineoption = () => {
             boundaryGap: false,
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            name: '土体内部位移(mm)',
+            nameLocation: 'center',
+            nameTextStyle: { // 设置名称的样式
+                rotate: 90 // 将名称旋转 90 度
+            },
+            nameGap: 40,
         },
         series: [
             {
@@ -898,7 +911,7 @@ const getStressoption = () => {
             top: '10%',
         },
         grid: {
-            left: "3%",
+            left: "8%",
             right: "4%",
             bottom: "3%",
             top: '20%',
@@ -915,11 +928,12 @@ const getStressoption = () => {
         },
         yAxis: {
             type: "value",
-            name: '土体表面累计位移监测值(mm)',
+            name: '土体内部应力桩应变监测值（με)',
             nameLocation: 'center',
             nameTextStyle: { // 设置名称的样式
                 rotate: 90 // 将名称旋转 90 度
-            }
+            },
+            nameGap: 40,
         },
         series: [
             {
