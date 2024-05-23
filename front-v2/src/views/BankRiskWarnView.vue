@@ -1872,7 +1872,7 @@ div.risk-warn-container {
 
     div.warn-status-container {
         position: absolute;
-        left: 34vw;
+        left: 33vw;
         top: 80vh;
         width: 14vw;
         height: 10vh;
@@ -1924,7 +1924,7 @@ div.risk-warn-container {
 
     div.warn-detail-container {
         position: absolute;
-        left: 49vw;
+        left: 48vw;
         top: 80.3vh;
         width: 20vw;
         height: 9vh;
