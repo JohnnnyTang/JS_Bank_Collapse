@@ -126,7 +126,7 @@
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
-                    <div class="risk-item-text">河床演变因子</div>
+                    <div class="risk-item-text">河床演变因素</div>
                 </div>
                 <div class="risk-sub-index-container">
                     <div class="risk-sub-index riverbed">
@@ -145,7 +145,7 @@
                     class="risk-main-index bankGeology"
                     @click="showGeologyAndProjectFunc"
                 >
-                    <div class="risk-item-text">岸坡地质因子</div>
+                    <div class="risk-item-text">岸坡地质因素</div>
                 </div>
                 <div class="risk-sub-index-container">
                     <div class="risk-sub-index bankGeology">
@@ -161,7 +161,7 @@
                     class="risk-main-index outproject"
                     @click="showGeologyAndProjectFunc"
                 >
-                    <div class="risk-item-text">外部工程因子</div>
+                    <div class="risk-item-text">外部工程因素</div>
                 </div>
                 <div class="risk-sub-index-container">
                     <div class="risk-sub-index outproject">
@@ -564,12 +564,12 @@ const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
-            [120.46987922676836, 32.03201616423072],
-            [120.61089640208264, 32.052171362618625],
+            [120.43987922676836, 32.03201616423072],
+            [120.59089640208264, 32.052171362618625],
         ],
         {
             duration: 1500,
-            zoom: 11.5,
+            // zoom: 11.5,
         },
     )
 }
@@ -837,7 +837,7 @@ const CalProfileList = (profileData) => {
         highNum = 0
     profileData.map((value, index) => {
         const riskLevel = value.risk[2]
-        defaultWarnLayerData[index].warnValue = value.risk[2]
+        // defaultWarnLayerData[index].warnValue = value.risk[2]
         if (riskLevel < 0.25) {
             profileList.value[index].risk = 'low'
             profileList.value[index].color = 'rgb(31, 110, 209)'
@@ -862,16 +862,16 @@ const CalProfileList = (profileData) => {
             profileList.value[index].flowspeed = value.deepestPoint[2]
         } catch (error) {}
     })
-    let map = useMapStore().getMap()
-    if (map) {
-        // console.log('12312321', defaultWarnLayerData)
-        // map.removeLayer('岸段预警')
-        // map.addLayer(new BankWarnLayer(defaultWarnLayerData))
-    }
+    // let map = useMapStore().getMap()
+    // if (map) {
+    //     // console.log('12312321', defaultWarnLayerData)
+    //     // map.removeLayer('岸段预警')
+    //     // map.addLayer(new BankWarnLayer(defaultWarnLayerData))
+    // }
 }
 const CalProfileListForShow = (profileData) => {
     profileData.map((value, index) => {
-        defaultWarnLayerData[index].warnValue = value.risk[2]
+        // defaultWarnLayerData[index].warnValue = value.risk[2]
         if (profileList.value[index].risk === 'low') {
             profileList.value[index].color = 'rgb(31, 110, 209)'
         } else if (profileList.value[index].risk === 'middle') {
@@ -1451,6 +1451,7 @@ onMounted(async () => {
             tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
         })
         addRasterLayer(map, 23032209, 'mapRaster')
+        map.setLayoutProperty('mapRaster', 'visibility', 'none')
         map.addLayer({
             id: 'mzsLine',
             type: 'line',

@@ -10,6 +10,7 @@ export default class BankWarnLayer {
         this.type = 'custom'
         this.showLayer = false
         this.prepared = false
+        console.log('contruictasd12312', this.jsonData)
     }
     async onAdd(map, gl) {
         // const data = JsonData

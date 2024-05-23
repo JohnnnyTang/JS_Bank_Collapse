@@ -127,7 +127,7 @@
 
         <!-- BANK3D -->
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 2;"></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 1;"></canvas>
         <div class="loading-container" v-show="threeDLoading">
             <dv-loading class="loading-icon">
                 <div class="loading-message">三维视图资源加载中</div>

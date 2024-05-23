@@ -65,13 +65,22 @@ let flowspeedChart = null
 const flowspeedGraphRef = ref(null)
 const waterConditionValue = ref(1)
 
-const calFlowspeedData = () => {
-    
+const calFlowspeedData = (val) => {
+    console.log('changed', val)
+    drawFlowspeedGraph(flowspeedChart, flowSpeedList[val-1])
 }
+
+const flowSpeedList = [
+    [0.418, 0.452, 0.516, 1.243, 1.547, 1.37, 1.525,1.167, 0.999, 1.043, 1.21, 0.951],
+    [0.218, 0.182, 0.316, 0.543, 0.947, 0.843, 1.125, 1.07, 0.789, 0.643, 0.38, 0.451],
+    [0.488, 0.472, 0.632, 0.988, 1.142, 1.623, 1.512, 1.647, 1.199, 1.043, 1.121, 0.843],
+]
 
 const DrawGraph = () => {
     flowspeedChart = echarts.init(flowspeedGraphRef.value)
-    const flowspeed = props.profileList.map(item => item.flowspeed)
+    // const flowspeed = props.profileList.map(item => item.flowspeed)
+    const flowspeed = [0.418, 0.452, 0.516, 1.243, 1.547, 1.37, 1.525,1.167, 0.999, 1.043, 1.21, 0.951]
+
     drawFlowspeedGraph(flowspeedChart, flowspeed)
 }
 

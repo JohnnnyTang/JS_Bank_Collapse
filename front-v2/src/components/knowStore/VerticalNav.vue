@@ -44,12 +44,12 @@ const navMenuList = ref([
         path: '/knowledgeStore/param',
         active: false,
     },
-    {
-        name: '专家经验库',
-        iconUrl: '/rating.png',
-        path: '/knowledgeStore/experience',
-        active: false,
-    },
+    // {
+    //     name: '专家经验库',
+    //     iconUrl: '/rating.png',
+    //     path: '/knowledgeStore/experience',
+    //     active: false,
+    // },
 ])
 
 const pathIndexMap = {

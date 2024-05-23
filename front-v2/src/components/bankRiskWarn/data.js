@@ -373,7 +373,7 @@ export const InfoTree = [
         ]
     },
     {
-        label: '河床演变因子',
+        label: '河床演变因素',
         active: false,
         filter: true,
         children: [
@@ -398,7 +398,7 @@ export const InfoTree = [
         ]
     },
     {
-        label: '岸坡地质因子',
+        label: '岸坡地质因素',
         active: false,
         filter: true,
         children: [
@@ -417,7 +417,7 @@ export const InfoTree = [
         ]
     },
     {
-        label: '外部工程因子',
+        label: '外部工程因素',
         active: false,
         filter: true,
         children: [
@@ -440,14 +440,14 @@ export const InfoTree = [
 export const waterCondition = [
     {
         value:1,
-        label:"水文条件1"
+        label:"洪季"
     },
     {
         value:2,
-        label:"水文条件2"
+        label:"枯季"
     },
     {
         value:3,
-        label:"水文条件3"
+        label:"20年一遇"
     },
 ]
