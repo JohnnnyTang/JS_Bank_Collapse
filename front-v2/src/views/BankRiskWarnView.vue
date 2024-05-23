@@ -117,17 +117,26 @@
                     水流动力因素
                 </div>
             </div>
-            <div class="risk-item riverbed">
+            <div 
+                class="risk-item riverbed"
+                @click="showRiverBedFunc"
+            >
                 <div class="risk-item-text">
                     河床演变因子
                 </div>
             </div>
-            <div class="risk-item bankGeology">
+            <div
+                class="risk-item bankGeology"
+                @click="showGeologyAndProjectFunc"
+            >
                 <div class="risk-item-text">
                     岸坡地质因子
                 </div>
             </div>
-            <div class="risk-item outproject">
+            <div
+                class="risk-item outproject"
+                @click="showGeologyAndProjectFunc"
+            >
                 <div class="risk-item-text">
                     外部工程因子
                 </div>
@@ -148,14 +157,33 @@
             </div>
         </div>
 
-        <div class="button-container">
+        <div class="risk-line-container">
+            <div class="risk-line-title">
+                风险等级图例：
+            </div>
+            <div class="risk-line"></div>
+        </div>
+        
+        <div class="warn-status-container" v-if="showRiskStatus">
+            <div class="warn-status-title">民主沙右缘风险状态</div>
+            <!-- <div class="warn-status-content" :class="riskDataAll[riskDataIndex-1].value">
+                {{ riskDataAll[riskDataIndex-1].label }}
+            </div> -->
+            <div class="warn-status-content high">
+                高风险
+            </div>
+        </div>
+
+        <!-- <div class="button-container">
             <button @click="showYearlyProfileShapeFunc">单一断面形态</button>
             <button @click="showProfileShapeFunc">断面形态</button>
             <button @click="showProfileSlopeFunc">岸坡最大坡比</button>
             <button @click="showProfileErosionFunc">近岸冲刷速率</button>
+            <button @click="showBedFlowChartFunc">造床流量当量指标</button>
             <button @click="showFlowSpeedFunc">流速指标</button>
-            <!-- <button @click="showProfileShapeFunc">断面形态</button> -->
-        </div>
+            <button @click="showWaterProcessChartFunc">水位变幅指标</button>
+            <button @click="showGeologyAndProjectFunc">地质条件</button>
+        </div> -->
 
         <profileInfoVue
             v-if="showProfileInfo"
@@ -200,6 +228,12 @@
             :profileList="profileList"
             :slopeChartLoad="erosionChartLoad"
         />
+        
+        <div 
+            v-if="showBedFlowChart"
+            style="position: absolute; top:1vh; right:2vw; width:30.2vw; height: 29vh; z-index: 10;">
+            <bedFlowChartVue/>
+        </div>
 
         <flowspeedInfoVue
             v-if="showFlowSpeed"
@@ -227,6 +261,16 @@
                 :total-count="25"
             ></flowTimeShower>
         </div>
+
+        <div 
+            v-if="showWaterProcessChart"
+            style="position: absolute; top:62vh; right:2vw; width:30.2vw; height: 29vh; z-index: 10;">
+            <waterProcessChartVue/>
+        </div>
+
+        <geologyAndProjectVue
+            v-if="showGeologyAndProject"    
+        />
 
         <!-- <riskResultBarVue
             :riskDataIndex="riskDataIndex"
@@ -403,6 +447,15 @@ const profileSlopeVue = defineAsyncComponent(() =>
 const profileErosionVue = defineAsyncComponent(() =>
   import('../components/bankRiskWarn/profileErosion.vue')
 )
+const bedFlowChartVue = defineAsyncComponent(() =>
+  import('../components/bankRiskWarn/BedFlowChart.vue')
+)
+const waterProcessChartVue = defineAsyncComponent(() =>
+  import('../components/bankRiskWarn/WaterProcessChart.vue')
+)
+const geologyAndProjectVue = defineAsyncComponent(() =>
+  import('../components/bankRiskWarn/GeologyAndProject.vue')
+)
 
 // const activeStatus = ref([true, false, false])
 // 地图与基本信息展示
@@ -463,6 +516,20 @@ const mapJumpToRiver = (mapIns) => {
 const profileList = ref(profileListInput)
 const sceneList = ref(sceneListInput)
 let defaultWarnLayerData = defaultWarnLayerDataInput
+const riskDataAll = ref([
+    {
+        value: 'low',
+        label: '低风险'
+    },
+    {
+        value: 'middle',
+        label: '中风险'
+    },
+    {
+        value: 'high',
+        label: '高风险'
+    },
+])
 
 const placeValue = ref('mzs')
 
@@ -565,13 +632,16 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompare) => {
     erosionChartLoad.value = false
     flowspeedChartLoad.value = false
     // changeProfileData(profileData.value)
-    CalProfileList(profileData.value)
+    changeProfileListForShow() //展示高风险
+    CalProfileListForShow(profileData.value)
+    // CalProfileList(profileData.value)
     if (mapInstance.getLayer('mzsBankLineLowRisk') !== undefined) {
         mapInstance.removeLayer('mzsBankLineLowRisk')
         addBankLineRiskLayer(mapInstance, profileList)
     } else {
         addBankLineRiskLayer(mapInstance, profileList)
     }
+    showRiskStatus.value = true
     preSceneBeforeValue.value = sceneBeforeValue.value
     preSceneNowValue.value = sceneNowValue.value
 }
@@ -682,9 +752,30 @@ const CalProfileList = (profileData) => {
     })
     let map = useMapStore().getMap()
     if (map) {
-        console.log('12312321', defaultWarnLayerData)
-        map.removeLayer('岸段预警')
-        map.addLayer(new BankWarnLayer(defaultWarnLayerData))
+        // console.log('12312321', defaultWarnLayerData)
+        // map.removeLayer('岸段预警')
+        // map.addLayer(new BankWarnLayer(defaultWarnLayerData))
+    }
+}
+const CalProfileListForShow = (profileData) => {
+    profileData.map((value, index) => {
+        defaultWarnLayerData[index].warnValue = value.risk[2]
+        if (profileList.value[index].risk === 'low') {
+            profileList.value[index].color = 'rgb(31, 110, 209)'
+        } else if (profileList.value[index].risk === 'middle') {
+            profileList.value[index].color = 'rgb(220, 126, 37)'
+        } else {
+            profileList.value[index].color = 'rgb(250, 55, 36)'
+        }
+        try {
+            profileList.value[index].flowspeed = value.deepestPoint[2]
+        } catch (error) {}
+    })
+    let map = useMapStore().getMap()
+    if (map) {
+        // console.log('12312321', defaultWarnLayerData)
+        // map.removeLayer('岸段预警')
+        // map.addLayer(new BankWarnLayer(defaultWarnLayerData))
     }
 }
 
@@ -696,7 +787,7 @@ const onAddProfileOption = () => {}
 
 const onAddProfile = () => {}
 
-const flowControlHandler = () => {
+const flowControlHandler = async() => {
     console.log('!!!!flow  control');
     showFlow.value = !showFlow.value
     // console.log(showFlow.value);
@@ -774,53 +865,48 @@ let sceneNow
 let sceneCompare
 
 // 窗口显示变量
+const showRiskStatus = ref(false)
 const showProfileInfo = ref(false)
 const showYearlyProfileShape = ref(false)
 const showYearlyProfileShapeFunc = () => {
-    loading_message.value = '正在加载单一滩槽高程信息...'
-    isRunning.value = true
     showYearlyProfileShape.value = !showYearlyProfileShape.value
-    isRunning.value = false
 }
 const showProfileShape = ref(false)
 const showProfileShapeFunc = () => {
-    loading_message.value = '正在加载滩槽高程信息...'
-    isRunning.value = true
     showProfileShape.value = !showProfileShape.value
-    isRunning.value = false
 }
 const showProfileSlope = ref(false)
 const showProfileSlopeFunc = () => {
-    loading_message.value = '正在加载岸坡最大坡比信息...'
-    isRunning.value = true
     showProfileSlope.value = !showProfileSlope.value
-    isRunning.value = false
 }
 const showProfileErosion = ref(false)
 const showProfileErosionFunc = () => {
-    loading_message.value = '正在加载近岸冲刷速率信息...'
-    isRunning.value = true
     showProfileErosion.value = !showProfileErosion.value
-    isRunning.value = false
 }
 const showRiskResult = ref(false)
 const showRiskResultFunc = () => {
-    loading_message.value = '正在加载风险详细信息...'
-    isRunning.value = true
     showRiskResult.value = !showRiskResult.value
-    isRunning.value = false
+}
+const showBedFlowChart = ref(false)
+const showBedFlowChartFunc = () => {
+    showBedFlowChart.value = !showBedFlowChart.value
+}
+const showWaterProcessChart = ref(false)
+const showWaterProcessChartFunc = () => {
+    showWaterProcessChart.value = !showWaterProcessChart.value
 }
 const showFlowSpeed = ref(false)
-const showFlowSpeedFunc = () => {
+const showFlowSpeedFunc = async() => {
     if (showFlow.value === false && showFlowSpeed.value === true) {
         showFlowSpeed.value = false
         return 
     }
-    loading_message.value = '正在加载流速指标信息...'
-    isRunning.value = true
     showFlowSpeed.value = !showFlowSpeed.value
-    isRunning.value = false
-    flowControlHandler()
+    await flowControlHandler()
+}
+const showGeologyAndProject = ref(false)
+const showGeologyAndProjectFunc = () => {
+    showGeologyAndProject.value = !showGeologyAndProject.value
 }
 
 // 展示水动力因素指标，包括:
@@ -828,6 +914,12 @@ const showFlowSpeedFunc = () => {
 const showWaterPowerFunc = () => {
     showProfileShapeFunc()
     showYearlyProfileShapeFunc()
+}
+
+const showRiverBedFunc = async() => {
+    showBedFlowChartFunc()
+    showWaterProcessChartFunc()
+    await showFlowSpeedFunc()
 }
 
 const profileData = ref([])
@@ -1094,6 +1186,18 @@ const addRasterLayer = (map, time, name) => {
     })
 }
 
+const changeProfileListForShow = () => {
+    for(let i=0; i<12; i++) {
+       if ( defaultWarnLayerDataInput[i].warnValue < 0.25) {
+            profileList.value[i].risk = 'low'
+        } else if (defaultWarnLayerDataInput[i].warnValue < 0.5) {
+            profileList.value[i].risk = 'middle'
+        } else {
+            profileList.value[i].risk ='high'
+        }
+    }
+}
+
 const addBankLineRiskLayer = (map, profileList) => {
     map.addLayer({
         id: 'mzsBankLineLowRisk',
@@ -1347,6 +1451,7 @@ onMounted(async () => {
     })
 
     getProfileTime()
+    showRiskStatus.value = false
     showProfileInfo.value = false
     showProfileShape.value = false
     showProfileSlope.value = false
@@ -1596,11 +1701,100 @@ div.risk-warn-container {
         }
     }
 
+    div.warn-status-container {
+        position: absolute;
+        left: 45vw;
+        top: 78vh;
+        width: 10vw;
+        height: 10vh;
+
+        background-color: #000cbbd5;
+        backdrop-filter: blur(8px);
+        z-index: 3;
+        border-radius: 6px;
+        text-align: center;
+        overflow: hidden;
+
+        box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+
+        div.warn-status-title {
+            height: 4vh;
+            line-height: 4vh;
+            width: 10vw;
+            font-size: calc(0.8vw + 0.3vh);
+            font-weight: bold;
+            color: #e3f9ff;
+            box-shadow: 0px 2px rgb(0, 225, 255);
+        }
+
+        div.warn-status-content {
+            height: 6vh;
+            line-height: 6vh;
+            width: 10vw;
+            font-size: calc(1.1vw + 0.8vh);
+            font-weight: bold;
+            // background-color: #2688f8;
+            color: #ebf8ff;
+            text-align: cen;
+            letter-spacing: 1rem;
+            text-indent: 1rem;
+
+            &.low {
+                background-color: rgb(17, 17, 255);
+            }
+
+            &.middle {
+                background-color: rgb(220, 126, 37);
+            }
+
+            &.high {
+                background-color: rgb(255, 9, 9);
+            }
+        }
+    }
+
+    div.risk-line-container {
+        position: absolute;
+        left: 35vw;
+        top: 2vh;
+        width: 30vw;
+        height: 5vh;
+        backdrop-filter: blur(2px);
+        z-index: 4;
+        border:#1313d8 2px solid;
+        border-radius: 6px;
+
+        div.risk-line-title {
+            position: absolute;
+            top: 0.9vh;
+            left: 0.8vw;
+            font-size: calc(0.8vw + 0.6vh);
+            font-weight: bold;
+            text-shadow:
+            #eef3ff 1px 1px,
+            #eef3ff 2px 2px,
+            #6493ff 3px 3px;
+        }
+
+        div.risk-line {
+            position: absolute;
+            top: 1.5vh;
+            left: 9vw;
+            width: 20vw;
+            height: 2vh;
+            border-radius: 20px;
+            // border:#0f1011 2px solid;
+            z-index: 5;
+            background-image: linear-gradient(to right, rgb(17, 17, 255), rgb(220, 126, 37), rgb(255, 9, 9));
+            box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+        }
+    }
+
     div.button-container {
         position: absolute;
         top: 88vh;
         left: 2vw;
-        width: 15vw;
+        width: 20vw;
         height: 2vh;
         background-color: rgba(48, 49, 51, 0.6);
         backdrop-filter: blur(5px);
@@ -1630,8 +1824,8 @@ div.risk-warn-container {
 
     div.flow-control-block {
         position: absolute;
-        top: 64vh;
-        right: 1.5vw;
+        top: 39vh;
+        right: 3vw;
         height: 13vh;
         width: 6vw;
         display: flex;
@@ -1889,8 +2083,8 @@ div.risk-warn-container {
 
     div.time-shower-block {
         position: absolute;
-        top: 75vh;
-        right: 3vw;
+        top: 49.5vh;
+        right: 4.4vw;
     }
 
     div.raster-legend-container {
