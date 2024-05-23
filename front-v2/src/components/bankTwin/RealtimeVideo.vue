@@ -27,18 +27,27 @@
             </div>
         </div>
         <div class="video-controller-container">
+            <div class="video-controller-title">当前监控云台控制</div>
             <div class="crc-directions">
                 <div class="crc-directions-up">
-                    <i class="fas fa-chevron-up"></i>
+                    <ArrowUpBold
+                        style="width: 3vh; height: 3vh; display: block"
+                    />
                 </div>
                 <div class="crc-directions-left">
-                    <i class="fas fa-chevron-left"></i>
+                    <ArrowLeftBold
+                        style="width: 3vh; height: 3vh; display: block"
+                    />
                 </div>
                 <div class="crc-directions-right">
-                    <i class="fas fa-chevron-right"></i>
+                    <ArrowRightBold
+                        style="width: 3vh; height: 3vh; display: block"
+                    />
                 </div>
                 <div class="crc-directions-down">
-                    <i class="fas fa-chevron-down"></i>
+                    <ArrowDownBold
+                        style="width: 3vh; height: 3vh; display: block"
+                    />
                 </div>
             </div>
         </div>
@@ -63,20 +72,20 @@ const videoList = ref([
     {
         name: '民主沙海事码头监控',
         position: '32.0316674, 120.5402574',
-        videoUrl: `https://open.ys7.com/ezopen`,
-        //  videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen`,
+         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
-        videoUrl: `https://open.ys7.com/ezopen`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
-        videoUrl: `https://open.ys7.com/ezopen`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
     },
 ])
 
@@ -89,6 +98,9 @@ const focusOn = (index) => {
 </script>
 
 <style lang="scss" scoped>
+$hoverColor: rgb(0, 160, 252);
+$splitColor: rgba(0, 51, 160, 0.575);
+
 div.realtime-video-container {
     position: absolute;
     right: 0.5vw;
@@ -201,231 +213,143 @@ div.realtime-video-container {
         order: 2;
         width: 27vw;
         height: 22vh;
+        display: flex;
+        flex-flow: column wrap;
 
-        background-color: #0400fd;
+        background-color: #6aa5f1;
+        border: 2px solid #001885;
+        border-radius: 4px;
+
+        div.video-controller-title {
+            writing-mode: vertical-lr;
+            padding-left: 0.5vw;
+            width: 2vw;
+            height: 22vh;
+            font-weight: bold;
+            font-size: calc(0.7vw + 0.8vh);
+            text-align: center;
+            color: #001885;
+
+            box-shadow: 3px 0px rgb(0, 3, 196);
+        }
 
         .crc {
-            &-wrapper {
-                position: relative;
-                width: 250px;
-                height: 250px;
-                overflow: hidden;
-                border-radius: 50%;
-                border: 2px solid white;
-            }
             position: relative;
             list-style-type: none;
             margin: 0;
             transform: translate(
-                calc(-50% - 4px),
+                -4px,
                 -50%
             ); //2px border offset fix
-            &-item {
-                position: absolute;
-                width: 125px;
-                height: 125px;
-                background-color: white;
-                transform-origin: 100% 100%;
-                overflow: hidden;
-                border-bottom: 1px solid #d9d3d5;
-                top: 50%;
-                left: 50%;
-                transition: border 0.3s ease;
-                i {
-                    transition: all 0.2s ease-in-out;
-                }
-                &.active {
-                    background-color: teal;
-                    border-bottom: 2px solid teal;
-                    a {
-                        i {
-                            color: white;
-                        }
-                        &:hover {
-                            i {
-                                color: white;
-                            }
-                        }
-                    }
-                }
-                &:hover {
-                    border-bottom: 4px solid teal;
-                    a i {
-                        color: teal;
-                    }
-                }
-                &:first-child {
-                    transform: rotate(0deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-
-                &:nth-child(2) {
-                    transform: rotate(45deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) rotate(-45deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-
-                &:nth-child(3) {
-                    transform: rotate(90deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) rotate(-90deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-
-                &:nth-child(4) {
-                    transform: rotate(135deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) rotate(-135deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-
-                &:nth-child(5) {
-                    transform: rotate(180deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) rotate(-180deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-
-                &:nth-child(6) {
-                    transform: rotate(225deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) rotate(-225deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-
-                &:nth-child(7) {
-                    transform: rotate(270deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) rotate(-270deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-
-                &:nth-child(8) {
-                    transform: rotate(315deg) skew(45deg);
-                    i {
-                        transform: skew(-45deg) rotate(-315deg) scale(1);
-                        margin-top: 60%;
-                        color: black;
-                        margin-left: 20%;
-                    }
-                }
-                a {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    text-decoration: none;
-                    color: #fff;
-                    text-align: center;
-                    transition:
-                        opacity 0.3s,
-                        color 0.3s;
-                    &:hover {
-                        color: rgba(255, 255, 255, 0.5);
-                    }
-                }
-            }
             &-directions {
-                position: absolute;
+                position: relative;
                 display: block;
-                height: 100px;
-                width: 100px;
+                height: 18vh;
+                width: 18vh;
                 background: white;
                 top: 50%;
-                left: 50%;
+                // left: 50%;
                 transform: translate(-50%, -50%);
                 z-index: 2;
                 border-radius: 50%;
-                box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.25);
-                i {
-                    color: gray;
-                }
-                &-wrapper {
-                    position: absolute;
+                box-shadow: 12px 8px 20px -10px rgba(0, 0, 0, 0.4);
+                &::before {
+                    position: relative;
+                    content: '';
                     display: block;
-                    top: 50%;
-                    left: 50%;
-                    width: 150px;
-                    height: 150px;
-                    background-color: white;
-                    transform: translate(-50%, -50%);
-                    z-index: 1;
+                    height: 18vh;
+                    width: 18vh;
                     border-radius: 50%;
+                    background: linear-gradient(
+                        45deg,
+                        transparent 49%,
+                        $splitColor 51%,
+                        $splitColor 51%,
+                        transparent 51%
+                    );
+                    z-index: 2;
                 }
+                &::after {
+                    position: relative;
+                    content: '';
+                    display: block;
+                    height: 18vh;
+                    width: 18vh;
+                    transform: translateY(-18vh);
+                    border-radius: 50%;
+                    background: linear-gradient(
+                        135deg,
+                        transparent 49%,
+                        $splitColor 51%,
+                        $splitColor 51%,
+                        transparent 51%
+                    );
+                    z-index: 2;
+                }
+
                 &-up {
                     position: absolute;
-                    top: 4px;
+                    top: 1vh;
                     left: 50%;
                     transform: translateX(-50%);
                     cursor: pointer;
-                    tranistion: all 250ms ease-in-out;
-                    &:hover {
-                        i {
-                            color: teal;
+                    transition: all 250ms ease-in-out;
+                    svg {
+                        &:hover {
+                            :deep(path) {
+                                fill: $hoverColor !important;
+                            }
                         }
                     }
+                    z-index: 4;
                 }
                 &-down {
                     position: absolute;
-                    bottom: 4px;
+                    bottom: 1vh;
                     left: 50%;
                     transform: translateX(-50%);
                     cursor: pointer;
-                    tranistion: all 250ms ease-in-out;
-                    &:hover {
-                        i {
-                            color: teal;
+                    transition: all 250ms ease-in-out;
+                    svg {
+                        &:hover {
+                            :deep(path) {
+                                fill: $hoverColor !important;
+                            }
                         }
                     }
+                    z-index: 4;
                 }
                 &-left {
                     position: absolute;
                     top: 50%;
-                    left: 4px;
+                    left: 1vh;
                     transform: translateY(-50%);
                     cursor: pointer;
-                    tranistion: all 250ms ease-in-out;
-                    &:hover {
-                        i {
-                            color: teal;
+                    transition: all 250ms ease-in-out;
+                    svg {
+                        &:hover {
+                            :deep(path) {
+                                fill: $hoverColor !important;
+                            }
                         }
                     }
+                    z-index: 4;
                 }
                 &-right {
                     position: absolute;
                     top: 50%;
-                    right: 4px;
+                    right: 1vh;
                     transform: translateY(-50%);
                     cursor: pointer;
-                    tranistion: all 250ms ease-in-out;
-                    &:hover {
-                        i {
-                            color: teal;
+                    transition: all 250ms ease-in-out;
+                    svg {
+                        &:hover {
+                            :deep(path) {
+                                fill: $hoverColor !important;
+                            }
                         }
                     }
+                    z-index: 4;
                 }
             }
         }

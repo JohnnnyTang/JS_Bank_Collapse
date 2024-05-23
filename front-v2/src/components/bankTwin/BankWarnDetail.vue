@@ -22,36 +22,54 @@
                                 direction="vertical"
                                 :column="4"
                                 border
-                                style="width: 100%;"
+                                style="width: 100%"
                             >
-                                <el-descriptions-item label="报警区域" :span="1"
-                                    >{{ deviceIdPlaceMap[warn.deviceId] }}</el-descriptions-item
+                                <el-descriptions-item
+                                    label="报警区域"
+                                    :span="1"
+                                    >{{
+                                        deviceIdPlaceMap[warn.deviceId]
+                                    }}</el-descriptions-item
                                 >
-                                <el-descriptions-item label="报警时间" :span="3"
+                                <el-descriptions-item
+                                    label="报警时间"
+                                    :span="3"
                                     >{{ warn.warnTime }}</el-descriptions-item
                                 >
-                                <el-descriptions-item label="风险点责任人" :span="2"
+                                <el-descriptions-item
+                                    label="风险点责任人"
+                                    :span="2"
                                     >高卫南</el-descriptions-item
                                 >
-                                <el-descriptions-item label="责任人联系方式" :span="2"
+                                <el-descriptions-item
+                                    label="责任人联系方式"
+                                    :span="2"
                                     >15161059955</el-descriptions-item
                                 >
                                 <el-descriptions-item label="巡查队伍" :span="2"
                                     >靖江市西来镇巡堤查险队</el-descriptions-item
                                 >
-                                <el-descriptions-item label="巡查队伍责任人" :span="2"
+                                <el-descriptions-item
+                                    label="巡查队伍责任人"
+                                    :span="2"
                                     >刘宏江</el-descriptions-item
                                 >
-                                <el-descriptions-item label="巡查队伍联系方式" :span="2"
+                                <el-descriptions-item
+                                    label="巡查队伍联系方式"
+                                    :span="2"
                                     >13921738638</el-descriptions-item
                                 >
                                 <el-descriptions-item label="抢险队伍" :span="2"
-                                    >江苏龙源水利工程有限公司抢险队 </el-descriptions-item
-                                >
-                                <el-descriptions-item label="抢险队伍责任人" :span="2"
+                                    >江苏龙源水利工程有限公司抢险队
+                                </el-descriptions-item>
+                                <el-descriptions-item
+                                    label="抢险队伍责任人"
+                                    :span="2"
                                     >吴明灿</el-descriptions-item
                                 >
-                                <el-descriptions-item label="抢险队伍联系方式" :span="2"
+                                <el-descriptions-item
+                                    label="抢险队伍联系方式"
+                                    :span="2"
                                     >13815981186</el-descriptions-item
                                 >
                             </el-descriptions>
@@ -313,6 +331,32 @@ div.warn-detail-container {
             display: flex;
             flex-flow: row wrap;
             justify-content: center;
+
+            // :deep(div.el-descriptions__title) {
+            //     font-size: calc(0.6vw + 0.4vh);
+            //     color: #021e7a;
+            // }
+
+            :deep(
+                    .el-descriptions__body
+                        .el-descriptions__table
+                        .el-descriptions__cell
+                ) {
+                font-size: calc(0.5vw + 0.3vh);
+                text-align: center;
+                background-color: rgb(31, 43, 83);
+                color: rgba(246, 250, 255, 1);
+                // box-shadow: 0 0 0 1px #dbedff inset;
+
+                &.is-bordered-content {
+                    text-align: center;
+                    font-size: calc(0.6vw + 0.3vh);
+                    color: hsl(234, 100%, 15%);
+                    box-shadow: 0 0 0 1px #b4a3ff inset;
+                    background-color: rgb(238, 248, 255);
+                    font-weight: 600;
+                }
+            }
         }
     }
 
