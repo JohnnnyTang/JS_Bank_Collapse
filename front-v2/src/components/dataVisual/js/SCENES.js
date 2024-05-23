@@ -1,6 +1,7 @@
 import { layerAddFunction, layerRemoveFunction, layerShowFunction, layerHideFunction } from "../layerUtil"
 import { useMapLayerStore } from "../../../store/mapStore"
 import { filterMap } from "./tilefieldMAP"
+import { sandbar } from "./tempData"
 import axios from "axios"
 
 
@@ -164,22 +165,22 @@ class LayerScene {
 const initLayerGroups = () => {
     const dict = {
         '行政区划': ['市级行政区', '市级行政区-注记', '重点行政区边界'],
-        '河道分段': ['河道分段', '河道分段-注记', '河道分段点', '河道分段点-注记'],
+        // '河道分段': ['河道分段', '河道分段-注记', '河道分段点', '河道分段点-注记'],
         '区域水系': ['区域水系', '区域水系-注记'],
-        '大型湖泊': ['大型湖泊', '大型湖泊-注记'],
+        '重要湖泊': ['大型湖泊', '大型湖泊-注记'],
         '水文站点': ['水文站点', '水文站点-注记'],
         // '过江通道': ['过江通道-桥墩', '过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
         '过江通道': ['过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
-        '沿江码头': ['沿江码头', '沿江码头-注记'],
-        '水库大坝': ['水库大坝', '水库大坝-注记'],
-        '水闸工程': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
-        '泵站工程': ['泵站工程', '泵站工程-注记'],
-        '枢纽工程': ['枢纽工程', '枢纽工程-注记'],
-        '长江干堤': ['长江干堤'],
+        // '沿江码头': ['沿江码头', '沿江码头-注记'],
+        // '水库大坝': ['水库大坝', '水库大坝-注记'],
+        '重要水闸': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
+        '重要泵站': ['泵站工程', '泵站工程-注记'],
+        // '枢纽工程': ['枢纽工程', '枢纽工程-注记'],
+        '长江堤防': ['长江干堤'],
         // '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记'],
-        '历史崩岸': [],
-        '近岸地形': ['近岸地形', '沙洲', '全江注记'],
-        '近年冲淤': [],
+        // '历史崩岸': [],
+        // '近岸地形': ['近岸地形', '沙洲', '全江注记'],
+        // '近年冲淤': [],
         '一级预警岸段': ['一级预警岸段'],
         '二级预警岸段': ['二级预警岸段'],
         '三级预警岸段': ['三级预警岸段'],
@@ -196,10 +197,11 @@ let layerGroupInstanceMap = initLayerGroups()
 
 const initLayerScenes = () => {
     const dict = {
-        '全江概貌': ['行政区划', '区域水系', '大型湖泊', '水文站点'],
-        '工程情况': ['过江通道', '沿江码头', '水库大坝', '水闸工程', '泵站工程', '枢纽工程', '长江干堤'],
-        // '重点岸段': ['近岸地形', '历史崩岸', '岸段名录', '近年冲淤'],
-        '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段']
+        // '全江概貌': ['行政区划', '区域水系', '大型湖泊', '水文站点'],
+        // '工程情况': ['过江通道', '沿江码头', '水库大坝', '水闸工程', '泵站工程', '枢纽工程', '长江干堤'],
+        '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段'],
+        '主要洲滩': ['主要洲滩'],
+        '区域水系': ['区域水系'],
     }
     let map = new Map()
     for (let key in dict) {
@@ -505,44 +507,18 @@ const getSideBarTree = async () => {
     for (let i = 0; i < bankData.length; i++) {
         let item = bankData[i]
         if (item['warning_level'] == 1) {
-            warning1.children.push({ label: item['bank_name'], active: false, type: 'feature' })
+            warning1.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
         } else if (item['warning_level'] == 2) {
-            warning2.children.push({ label: item['bank_name'], active: false, type: 'feature' })
+            warning2.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
         } else if (item['warning_level'] == 3) {
-            warning3.children.push({ label: item['bank_name'], active: false, type: 'feature' })
+            warning3.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
         }
     }
-    const zt = [
-        "永隆兴隆沙",
-        "炮子洲",
-        "征润洲",
-        "八卦洲",
-        "新生洲",
-        "潜洲",
-        "新潜洲",
-        "梅子洲",
-        "槽坊沙",
-        "子母洲",
-        "新洲",
-        "星洲",
-        "和畅洲",
-        "世业洲",
-        "民主沙",
-        "狼山沙",
-        "新开沙",
-        "白茆沙",
-        "大长青沙",
-        "新济洲",
-        "福姜沙",
-        "录安洲",
-        "太平洲",
-        "落成洲",
-        "天星洲",
-        "杜家沙",
-        "小泡沙",
-        "启兴沙",
-        "通州沙"
-    ];
+    let zt = []
+    let features = sandbar.features
+    for (let i = 0; i < features.length; i++) {
+        zt.push(features[i])
+    }
     let mainZt = {
         label: '主要洲滩',
         active: true,
@@ -550,9 +526,13 @@ const getSideBarTree = async () => {
         type: 'title1',
         children: []
     }
-    zt.forEach((name) => {
-        mainZt.children.push({ label: name, active: false, type: 'feature' })
+    zt.forEach((item) => {
+        let firstCoord = item.geometry.coordinates[0][0][0]
+        item.properties.center_x = firstCoord[0]
+        item.properties.center_y = firstCoord[1]
+        mainZt.children.push({ label: item.properties.name, active: false, type: 'feature', property: item.properties })
     })
+    // let quyushuixi = []
 
     let tree = [
         {
@@ -635,28 +615,23 @@ const getSideBarTree = async () => {
     return tree
 }
 
-const getFirstShowLayerGroupIds = () => {
-    let layerGroups = [
-        "行政区划",
-        "河道分段",
-        "区域水系",
-        "大型湖泊",
-        // "水文站点",
-        // "过江通道",
-        "沿江码头",
-        // "水库大坝",
-        // "水闸工程",
-        // "泵站工程",
-        // "枢纽工程",
-        "长江干堤",
-        "一级预警岸段",
-        "二级预警岸段",
-        "三级预警岸段"
-    ]
-    return layerGroups
+const lableLayerMap = {
+    '一级预警岸段':['一级预警岸段','岸段-注记'],
+    '二级预警岸段':['二级预警岸段','岸段-注记'],
+    '三级预警岸段':['三级预警岸段','岸段-注记'],
+    '主要洲滩':['洲滩','洲滩-注记'],
+    '区域水系':['区域水系','水系-注记'],
+    '重要水闸':['水闸工程-重点','水闸工程-注记','水闸工程'],
+    '重要泵站':['泵站工程-注记','泵站工程'],
+    '长江堤防':['长江干堤'],
+    '过江通道':['过江通道-隧道/通道','过江通道-桥','过江通道-隧道/通道-注记','过江通道-桥-注记'],
+    '行政区划':['行政点','行政点-注记','重点行政区边界'],
+    '重要湖泊':['大型湖泊','大型湖泊-注记'],
+    '水文站点':['水文站点','水文站点-注记'],
 }
 
 export {
+    LayerGroup,
     scenes,
     layerGroups,
     initLayerScenes,
@@ -665,5 +640,5 @@ export {
     layerTree,
     getSideBarTree,
     totalLayer,
-    getFirstShowLayerGroupIds
+    lableLayerMap,
 }

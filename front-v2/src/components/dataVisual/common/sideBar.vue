@@ -12,7 +12,7 @@
                 <el-tree style="max-width: 600px" :data="dataSource" :expand-on-click-node="false" node-key="label"
                     :default-expanded-keys="expandKey">
                     <template #default="{ node, data }">
-                        <span class="custom-tree-node">
+                        <span class="custom-tree-node" @click="sideBarClickHandler(node, data)">
                             <!-- <sceneContainer v-if="node.level == 1" :title="data.label" :class="{ active: data.active }">
                             </sceneContainer> -->
                             <div class="scene-card" v-if="data.type == 'title1'">
@@ -26,12 +26,11 @@
                             </div>
 
                             <div class="subScene-container" v-else-if="data.type == 'title2'">
-                                <div class="card" :class="{ active: data.active }"
-                                    @click="layerGroupClickHandler(node, data)">
+                                <div class="card" :class="{ active: data.active }">
                                     <div class="top-section">
-                                        <div class="icon-container">
+                                        <!-- <div class="icon-container">
                                             <div class='icon' :style="{ backgroundImage: `url(${data.icon})` }"></div>
-                                        </div>
+                                        </div> -->
                                         <div class="title">
                                             <div class="subScene-title-text">
                                                 {{ data.label }}
@@ -39,15 +38,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="button-block" @click="detailClickHandler(node, data)">
+                                <!-- <div class="button-block" @click="detailClickHandler(node, data)">
                                     <div class="btn">
-                                        <!-- {{ buttonText(data) }} -->
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
 
                             <div class="feature-container" v-else-if="data.type == 'feature'">
-                                <div class="feature-content" @click="featureClickHandler(node, data)">
+                                <div class="feature-content">
                                     {{ data.label }}
                                 </div>
                             </div>
@@ -65,8 +63,9 @@
 <script setup>
 import { BorderBox9 as DvBorderBox9, Decoration11 as DvDecoration11 } from '@kjgl77/datav-vue3'
 import { onMounted, ref, watch, computed } from 'vue';
-import { getSideBarTree, getFirstShowLayerGroupIds, scenes, layerGroups } from '../js/SCENES'
+import { getSideBarTree, LayerGroup, lableLayerMap } from '../js/SCENES'
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../store/mapStore';
+import { sourceNameMap, sourceZoomMap, sourceColumnMap } from '../js/tilefieldMAP'
 
 // test 
 // import { i_gov_bounds, river_division_point, river_division_line } from '../js/tempData'
@@ -123,45 +122,90 @@ const zoomValue = ref(0)
 
 //     }
 // }
-const layerGroupClickHandler = (node, data) => {
-    if (data.active) {
-        data.active = false
-        //移除
-        let map = mapStore.getMap()
+// const layerGroupClickHandler = (node, data) => {
+//     if (data.active) {
+//         data.active = false
+//         //移除
+//         let map = mapStore.getMap()
 
-        let selectedLayerGroupID = data.label
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].hideLayer()
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = false
+//         let selectedLayerGroupID = data.label
+//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
+//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].hideLayer()
+//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = false
 
-        const highlightLayer = useHighlightLayerStore().highlightLayers
-        for (let i = 0; i < highlightLayer.length; i++) {
-            map.getLayer(highlightLayer[i]) &&
-                map.removeLayer(highlightLayer[i])
+//         const highlightLayer = useHighlightLayerStore().highlightLayers
+//         for (let i = 0; i < highlightLayer.length; i++) {
+//             map.getLayer(highlightLayer[i]) &&
+//                 map.removeLayer(highlightLayer[i])
+//         }
+//         return
+//     }
+//     else {
+//         data.active = true
+//         // 添加
+//         let map = mapStore.getMap()
+//         let selectedLayerGroupID = data.label
+//         console.log(selectedLayerGroupID);
+//         console.log(sceneStore.LAYERGROUPMAP.value);
+//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
+//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
+//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
+//         sceneStore.latestLayerGroup = selectedLayerGroupID
+
+//     }
+// }
+// const detailClickHandler = (node, data) => {
+//     // console.log(node, data);
+//     emit('detailClick', data.label)
+// }
+
+const sideBarClickHandler = (node, data) => {
+    if (node.level === 1) {
+        //必然是全体控制
+        if (data.label === '重点岸段') {
+
         }
-        return
-    }
-    else {
-        data.active = true
-        // 添加
-        let map = mapStore.getMap()
-        let selectedLayerGroupID = data.label
-        console.log(selectedLayerGroupID);
-        console.log(sceneStore.LAYERGROUPMAP.value);
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
-        sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
-        sceneStore.latestLayerGroup = selectedLayerGroupID
+        if (data.type == 'title1' && data.label !== '其他') {
+            let lgId = data.label
+            if (data.active == true) {
+                hideLayers(mapStore.getMap(), lableLayerMap[lgId])
+                data.active = false
+            }else{
+                showLayers(mapStore.getMap(), lableLayerMap[lgId])
+                data.active = true
+            }
+        }
+    } else if (node.level === 2) {
+        //可能要素,可能图层
+        if (data.type == 'feature') {
+            emit('detailClick', data.property, node.parent.data.label)
+        }
+        if (data.type == 'title2') {
+            let lgId = data.label
+            if (data.active == true) {
+                let lgId = data.label
+                hideLayers(mapStore.getMap(), lableLayerMap[lgId])
+                data.active = false
+            }else{
+                let lgId = data.label
+                showLayers(mapStore.getMap(), lableLayerMap[lgId])
+                data.active = true
+            }
+        }
 
+    } else if (node.level === 3) {
+        //要素
+        if (data.type == 'feature') {
+            emit('detailClick', data.property, node.parent.data.label)
+        }
     }
 }
-const detailClickHandler = (node, data) => {
-    // console.log(node, data);
-    emit('detailClick', data.label)
-}
-const featureClickHandler = (node, data) => {
-    console.log(node, data);
-}
+
+
+
+// const featureClickHandler = (node, data) => {
+//     console.log(node, data);
+// }
 
 // watch(() => mapStore.getMap(), async (newV, oldV) => {
 //     console.log('init map firstly!', newV);
@@ -179,24 +223,88 @@ const featureClickHandler = (node, data) => {
 
 
 onMounted(async () => {
-    sceneStore.SCENEMAP.value = scenes
-    sceneStore.LAYERGROUPMAP.value = layerGroups
+    // sceneStore.SCENEMAP.value = scenes
+    // sceneStore.LAYERGROUPMAP.value = layerGroups
     dataSource.value = await getSideBarTree()
+
+
 
     setTimeout(async () => {
         let map = mapStore.getMap()
-        console.log('hello map',map);
+        let lg = initLayerGroups()
+        console.log('LGLGLGLG!', lg);
+
         await initSortedLayer(map)
-        // map.on('style.load', async () => {
-        //     console.log('A style load event occurred.');
-        //     await initSortedLayer(map)
-        // });
+
     }, 1000)
 
     // let lg = getFirstShowLayerGroupIds()
     // const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 })
 
+const dict = {
+    '行政区划': ['市级行政区', '市级行政区-注记', '重点行政区边界'],
+    // '河道分段': ['河道分段', '河道分段-注记', '河道分段点', '河道分段点-注记'],
+    '区域水系': ['区域水系', '区域水系-注记'],
+    '重要湖泊': ['大型湖泊', '大型湖泊-注记'],
+    '水文站点': ['水文站点', '水文站点-注记'],
+    // '过江通道': ['过江通道-桥墩', '过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
+    '过江通道': ['过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
+    // '沿江码头': ['沿江码头', '沿江码头-注记'],
+    // '水库大坝': ['水库大坝', '水库大坝-注记'],
+    '重要水闸': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
+    '重要泵站': ['泵站工程', '泵站工程-注记'],
+    // '枢纽工程': ['枢纽工程', '枢纽工程-注记'],
+    '长江堤防': ['长江干堤'],
+    // '岸段名录': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '岸段-注记'],
+    // '历史崩岸': [],
+    // '近岸地形': ['近岸地形', '沙洲', '全江注记'],
+    // '近年冲淤': [],
+    '一级预警岸段': ['一级预警岸段'],
+    '二级预警岸段': ['二级预警岸段'],
+    '三级预警岸段': ['三级预警岸段'],
+}
+const initLayerGroups = () => {
+    let map = new Map()
+    for (let key in dict) {
+        let LGins = new LayerGroup(key, dict[key])
+        map.set(key, LGins)
+    }
+    const mapToObject = (mapObj) => {
+        const obj = {}
+        mapObj.forEach((value, key) => {
+            obj[key] = value
+        })
+        return obj
+    }
+    return mapToObject(map)
+}
+
+const hideLayers = (map, layersArr) => {
+    if (map) {
+        for (let i = 0; i < layersArr.length; i++) {
+            let layerID = layersArr[i]
+            if (map.getLayer(layerID)) {
+                // 隐藏
+                map.setLayoutProperty(layerID, 'visibility', 'none')
+            }
+        }
+    } else {
+        console.log('WARNING:: NOT VALID MAP');
+    }
+}
+const showLayers = (map, layersArr) => {
+    if (map) {
+        for (let i = 0; i < layersArr.length; i++) {
+            let layerID = layersArr[i]
+            if (map.getLayer(layerID)) {
+                map.setLayoutProperty(layerID, 'visibility', 'visible')
+            }
+        }
+    } else {
+        console.log('WARNING:: NOT VALID MAP');
+    }
+}
 
 
 </script>
@@ -340,7 +448,7 @@ div.sideBar-container {
 
             .card {
 
-                width: 75%;
+                width: 88%;
                 height: 4vh;
                 border-radius: 5px;
                 background: rgb(20, 115, 196);
@@ -452,7 +560,7 @@ div.sideBar-container {
         }
 
         .feature-container {
-            width: 11vw;
+            width: 10vw;
             height: 3vh;
             display: flex;
             flex-direction: row;

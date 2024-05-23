@@ -1396,7 +1396,7 @@ const layerAddFunctionMap = {
                             ""
                         ]
                     ],
-   
+
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -1883,7 +1883,9 @@ const layerAddFunctionMap = {
                 type: 'geojson',
                 data: i_gov_bounds
             })
-        await loadImage(map, '/legend/省界.png','省界')
+        await loadImage(map, '/icons/市界.png', '市界')
+        await loadImage(map, '/legend/省界.png', '省界')
+        await loadImage(map, '/legend/海岸线.png', '海岸线')
         !map.getLayer('重点行政区边界') &&
             map.addLayer({
                 id: '重点行政区边界',
@@ -1894,7 +1896,17 @@ const layerAddFunctionMap = {
                 },
                 paint: {
                     // 'line-color': 'rgb(159, 139, 163)',
-                    'line-pattern':'省界',
+                    'line-pattern': [
+                        'match',
+                        ['get', 'type'],
+                        '省界',
+                        '省界',
+                        '市界',
+                        '市界',
+                        '海岸',
+                        '海岸线',
+                        '省界', // 默认颜色为黑色
+                    ],
                     'line-width': 2.0,
                     // 'line-blur': 2,
                 }

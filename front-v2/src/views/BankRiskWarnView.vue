@@ -174,7 +174,7 @@
         </div>
         
         <div class="warn-status-container" v-if="showRiskStatus">
-            <div class="warn-status-title">民主沙右缘风险状态</div>
+            <div class="warn-status-title">民主沙右缘风险评估结果</div>
             <!-- <div class="warn-status-content" :class="riskDataAll[riskDataIndex-1].value">
                 {{ riskDataAll[riskDataIndex-1].label }}
             </div> -->
@@ -1796,7 +1796,7 @@ div.risk-warn-container {
         div.warn-status-title {
             height: 4vh;
             line-height: 4vh;
-            width: 10vw;
+            width: 14vw;
             font-size: calc(0.8vw + 0.3vh);
             font-weight: bold;
             color: #e3f9ff;
@@ -1806,7 +1806,7 @@ div.risk-warn-container {
         div.warn-status-content {
             height: 6vh;
             line-height: 6vh;
-            width: 10vw;
+            width: 14vw;
             font-size: calc(1.1vw + 0.8vh);
             font-weight: bold;
             // background-color: #2688f8;
