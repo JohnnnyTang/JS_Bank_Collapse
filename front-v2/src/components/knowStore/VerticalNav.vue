@@ -23,14 +23,14 @@
 import { onMounted, ref } from 'vue'
 import router from '../../router/index'
 
-const preActiveIndex = ref(0)
+const preActiveIndex = ref(-1)
 
 const navMenuList = ref([
     {
         name: '历史崩岸库',
         iconUrl: '/history.png',
         path: '/knowledgeStore/history',
-        active: true,
+        active: false,
     },
     {
         name: '相关规划库',
@@ -63,7 +63,9 @@ function changeActive(index) {
     if (index === preActiveIndex.value) {
         return
     } else {
-        navMenuList.value[preActiveIndex.value].active = false
+        if (preActiveIndex.value != -1) {
+            navMenuList.value[preActiveIndex.value].active = false
+        }
         navMenuList.value[index].active = true
         preActiveIndex.value = index
         router.push(navMenuList.value[preActiveIndex.value].path)
@@ -72,13 +74,16 @@ function changeActive(index) {
 
 onMounted(() => {
     // console.log(router.currentRoute.value.path)
+
     let pathSplit = router.currentRoute.value.path.split('/')
-    let splitPath = pathSplit[pathSplit.length-1]
+    let splitPath = pathSplit[pathSplit.length - 1]
     // console.log(splitPath)
-    if (splitPath === '' || splitPath === 'knowledgeStore') {
+    if (splitPath === 'home' || splitPath === 'knowledgeStore') {
         return
     } else if (pathIndexMap[splitPath] != preActiveIndex.value) {
-        navMenuList.value[preActiveIndex.value].active = false
+        if (preActiveIndex.value != -1) {
+            navMenuList.value[preActiveIndex.value].active = false
+        }
         navMenuList.value[pathIndexMap[splitPath]].active = true
         preActiveIndex.value = pathIndexMap[splitPath]
     }
@@ -180,6 +185,10 @@ div.vertical-nav-container {
         transition: all 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
 
         z-index: 10;
+
+        &[active-id='-1'] {
+            top: -4.5vw;
+        }
 
         &[active-id='0'] {
             top: 0vh;

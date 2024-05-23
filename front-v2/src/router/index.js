@@ -15,13 +15,14 @@ const routes = [
     },
     {
         path: '/knowledgeStore',
+        redirect: '/knowledgeStore/home',
         component: () => import('../views/KnowledgeStoreView.vue'),
+        // component: () => import('../components/knowStore/TempKnow.vue'),
         children: [
             {
-                path: '',
+                path: 'home',
                 component: () =>
-                    import('../components/knowStore/views/ScrollHistory.vue'),
-                    props: true
+                    import('../components/knowStore/views/KnowFlowChart.vue'),
             },
             {
                 path: 'history',
@@ -71,7 +72,8 @@ const routes = [
         children: [
             {
                 path: 'main', // 默认子页面
-                component: () => import('../views/ModelStoreView.vue')
+                // component: () => import('../views/ModelStoreView.vue')
+                component: () => import('../components/modelStore/ModelTemp.vue')
             },
             {
                 path: 'dataInterpretation',
