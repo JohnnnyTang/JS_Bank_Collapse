@@ -17,14 +17,16 @@ import { ElMessageBox, ElMessage, dayjs } from 'element-plus'
 
 const propertyRef = ref({})
 const zoomRef = ref()
-const deviceTypeList = ["GNSS", "应力桩", "水压力计", "", "测斜仪"]
+const deviceTypeList = ['GNSS', '应力桩', '水压力计', '', '测斜仪']
 
 const filterWarnData = (warnDataList) => {
     let filterMap = {}
 
     warnDataList.map((item) => {
-        if (!item.ifDealt) {    //if not dealt with
-            if (    // new Item and warnTime smaller
+        if (!item.ifDealt) {
+            //if not dealt with
+            if (
+                // new Item and warnTime smaller
                 !(item.deviceId in filterMap) ||
                 filterMap[item.deviceId].warnTime < item.warnTime
             ) {
@@ -32,7 +34,7 @@ const filterWarnData = (warnDataList) => {
             }
         }
     })
-    console.log('filter!!', filterMap, Object.values(filterMap));
+    console.log('filter!!', filterMap, Object.values(filterMap))
     return Object.values(filterMap)
 }
 
@@ -511,10 +513,7 @@ const mapInit = async (map, vis) => {
             useSceneStore().setSelectedFeature(property)
             propertyRef.value = property
             const popUp = createPopUp(propertyRef, zoomRef)
-            popUp
-                .setOffset(0)
-                .setLngLat([p.longitude, p.latitude])
-                .addTo(map)
+            popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
             // }
         })
         map.on('mousemove', deviceLayers, (e) => {
@@ -528,16 +527,16 @@ const mapInit = async (map, vis) => {
         })
 
         setTimeout(() => {
-            warnInterval(map, 40)
+            warnInterval(map, 60)
         }, 500)
         useWarnInfoStore().warnWatchTimer = setInterval(
             () => {
-                warnInterval(map, 40)
+                warnInterval(map, 60)
             },
             60 * 1000 * 20,
         )
         // request per 20minutes
-        
+
         ///////DEBUG////////
         window.addEventListener('keydown', async (e) => {
             if (e.key == 'Enter') {
@@ -556,8 +555,7 @@ const mapInit = async (map, vis) => {
                     useWarnInfoStore().warnInfo = filteredData
                     useWarnInfoStore().warnInfo_history = [...filteredData]
                 }
-            }
-            else if (e.key == 'f') {
+            } else if (e.key == 'f') {
                 // 11111  clear warnStore and warnLayer
                 useWarnInfoStore().warnInfo.forEach((item) => {
                     removeWarningDeviceStyle2(map, item.deviceId)
@@ -570,18 +568,15 @@ const mapInit = async (map, vis) => {
 
                 let allWarnData = fakeWarnInfo
                 let filteredData = filterWarnData(allWarnData)
-                let typeList = ["GNSS", "应力桩", "孔隙水压力计", "测斜仪"]
+                let typeList = ['GNSS', '应力桩', '孔隙水压力计', '测斜仪']
                 filteredData.forEach((item) => {
                     let id = item.deviceId
                     let type = typeList[id.split('_').pop() - 1]
                     setWarningDeviceStyle(map, type, id, item)
                 })
-                if (filteredData.length != 0) useWarnInfoStore().warnInfo = filteredData
-
-
-
-            }
-            else if (e.key == 'a'){
+                if (filteredData.length != 0)
+                    useWarnInfoStore().warnInfo = filteredData
+            } else if (e.key == 'a') {
                 useWarnInfoStore().warnInfo_history = []
             }
         })
@@ -634,19 +629,17 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
     return [property.longitude, property.latitude]
 }
 
-
 const removeWarningDeviceStyle = (map, deviceLayer, deviceCode) => {
     map.getLayer(`${deviceLayer}-${deviceCode}`) &&
         map.removeLayer(`${deviceLayer}-${deviceCode}`)
 }
 
 const removeWarningDeviceStyle2 = (map, deviceCode) => {
-    const daviceLayerMap = ["GNSS", "应力桩", "水压力计", "", "测斜仪"]
+    const daviceLayerMap = ['GNSS', '应力桩', '水压力计', '', '测斜仪']
     let deviceLayer = daviceLayerMap[deviceCode.split('_').pop() - 1]
     map.getLayer(`${deviceLayer}-${deviceCode}`) &&
         map.removeLayer(`${deviceLayer}-${deviceCode}`)
 }
-
 
 const createPopUp = (deviceProperty, zoom) => {
     const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
@@ -709,7 +702,8 @@ const warnInterval = async (map, minute) => {
         }
     })
 
-    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`)).data
+    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`))
+        .data
     // let warnType = 'GNSS'
     let filteredData = filterWarnData(allWarnData)
     let lastPos
@@ -718,8 +712,12 @@ const warnInterval = async (map, minute) => {
         let type = 'GNSS'
         lastPos = setWarningDeviceStyle(map, type, id, item)
     })
+    console.log('in interval, ', filteredData)
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)
-    if (filteredData.length != 0) useWarnInfoStore().warnInfo = filteredData
+    if (filteredData.length != 0) {
+        useWarnInfoStore().warnInfo = filteredData
+        useWarnInfoStore().warnInfo_history = [...filteredData]
+    }
     // console.log('first-warnInterval!', filteredData)
 
     // if (lastPos) {
@@ -822,10 +820,6 @@ const open = (features, map) => {
     //     })
 }
 
-
-
-
-
 const deviceNameMap = {
     GNSS: {
         'MZS120.51749289_32.04059243_1': 'CL-01',
@@ -889,30 +883,29 @@ const deviceNameMap = {
 
 const fakeWarnInfo = [
     {
-        "deviceCode": "DVI3010425438293",
-        "deviceId": "MZS120.55327892_32.02707923_1",
-        "id": "c6ae8d58-a506-4acc-ad86-998db55195a3",
-        "ifDealt": 0,
-        "threeDiff": 31.4255215,
-        "warnTime": dayjs().subtract(3, 'minute').format('YYYY-MM-DD HH:mm:ss')
+        deviceCode: 'DVI3010425438293',
+        deviceId: 'MZS120.55327892_32.02707923_1',
+        id: 'c6ae8d58-a506-4acc-ad86-998db55195a3',
+        ifDealt: 0,
+        threeDiff: 31.4255215,
+        warnTime: dayjs().subtract(3, 'minute').format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-        "deviceCode": "DVI3010425438293",
-        "deviceId": "MZS120.51967889_32.04004108_4",
-        "id": "c6ae8d58-a506-4acc-ad86-998db55195a4",
-        "ifDealt": 0,
-        "threeDiff": 31.4255215,
-        "warnTime": dayjs().subtract(38, 'second').format('YYYY-MM-DD HH:mm:ss')
+        deviceCode: 'DVI3010425438293',
+        deviceId: 'MZS120.51967889_32.04004108_4',
+        id: 'c6ae8d58-a506-4acc-ad86-998db55195a4',
+        ifDealt: 0,
+        threeDiff: 31.4255215,
+        warnTime: dayjs().subtract(38, 'second').format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-        "deviceCode": "DVI3010425438293",
-        "deviceId": "MZS120.541648_32.030524_2",
-        "id": "c6ae8d58-a506-4acc-ad86-998db55195a5",
-        "ifDealt": 0,
-        "threeDiff": 31.4255215,
-        "warnTime": dayjs().subtract(1, 'minute').format('YYYY-MM-DD HH:mm:ss')
-    }
+        deviceCode: 'DVI3010425438293',
+        deviceId: 'MZS120.541648_32.030524_2',
+        id: 'c6ae8d58-a506-4acc-ad86-998db55195a5',
+        ifDealt: 0,
+        threeDiff: 31.4255215,
+        warnTime: dayjs().subtract(1, 'minute').format('YYYY-MM-DD HH:mm:ss'),
+    },
 ]
-
 
 export { mapInit, removeWarningDeviceStyle }

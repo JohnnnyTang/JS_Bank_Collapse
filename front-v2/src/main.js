@@ -4,16 +4,23 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router/index'
 import ElementPlus from 'element-plus'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 import DataVVue3 from '@kjgl77/datav-vue3'
-import { DraggablePlugin } from '@braks/revue-draggable';
+import { DraggablePlugin } from '@braks/revue-draggable'
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
-createApp(App)
+const app = createApp(App)
     .use(DraggablePlugin)
     .use(router)
     .use(DataVVue3)
     .use(ElementPlus)
     .use(pinia)
-    .mount('#app')
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component)
+}
+
+
+app.mount('#app')

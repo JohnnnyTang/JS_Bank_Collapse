@@ -121,7 +121,7 @@
             </div>
         </div>
         <BanWarnDetail :warnActive="warnActive" v-loading="warnLoading" />
-        <WarnHistoryTable :warnActive="warnActive" v-show="warnActive" />
+        <WarnHistoryTable v-show="warnActive" />
 
         <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
