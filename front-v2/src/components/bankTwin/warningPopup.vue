@@ -13,7 +13,7 @@
 
         <dv-border-box10 :color="['rgb(84,163,232)', 'rgb(64,150,242)']" v-show="showChart">
             <div class="warning-chart">
-                <div class="tabs">tabs region</div>
+                <!-- <div class="tabs"></div> -->
                 <div class="chart" ref="chartDom"></div>
             </div>
         </dv-border-box10>
@@ -105,6 +105,10 @@ onMounted(() => {
         align-items: center;
         justify-content: center;
 
+        &:hover{
+            cursor: pointer;
+        }
+
         // background-color: #e1c39b;
 
         .icon {
@@ -156,7 +160,7 @@ onMounted(() => {
 
             .chart {
                 width: 22vw;
-                height: 24vh;
+                height: 27vh;
                 // background-color: antiquewhite;
             }
         }

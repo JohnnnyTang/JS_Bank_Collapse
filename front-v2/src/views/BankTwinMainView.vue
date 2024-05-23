@@ -124,8 +124,15 @@
         <WarnHistoryTable v-show="warnActive" />
 
         <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
+
+        <!-- BANK3D -->
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
         <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 2;"></canvas>
+        <div class="loading-container" v-show="threeDLoading">
+            <dv-loading class="loading-icon">
+                <div class="loading-message">三维视图资源加载中</div>
+            </dv-loading>
+        </div>
     </div>
 </template>
 
@@ -145,7 +152,7 @@ import { useMapStore, useWarnInfoStore } from '../store/mapStore'
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
-import { initScratchMap } from '../utils/mapUtils'
+import { initScratchMap, initPureScratchMap } from '../utils/mapUtils'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 const animateTime = ref('0s')
@@ -159,6 +166,7 @@ const buttonText = computed(() => {
 const detailLoading = ref(false)
 const warnLoading = ref(true)
 const activeView = ref('tab1')
+const threeDLoading = ref(false)
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -355,21 +363,34 @@ const viewChangeClick = (value) => {
         map.getLayer('Unity-Layer') && map.removeLayer('Unity-Layer')
         mapFlyToRiver(map)
     } else if (value == '3d') {
-        const script = document.createElement('script')
-        script.src =
-            '/scratchSomething/unity/collapseBank/build/output.loader.js'
-        script.onload = async () => {
-            console.log('output.loader.js imported')
-            unityLayer = new customLayers.UnityLayer(
-                [120.556596, 32.042607],
-                0,
-                unityCanvaDom.value,
-            )
-            maskLayer = new customLayers.MaskLayer()
-            map.addLayer(unityLayer)
-            map.addLayer(maskLayer)
+        threeDLoading.value = true
+        const scriptInteract = document.createElement('script')
+        // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\src\utils\unityInteraction.js
+        scriptInteract.src = './src/utils/unityInteraction.js'
+        scriptInteract.onload = async () => {
+
+            const script = document.createElement('script')
+            script.src =
+                '/scratchSomething/unity/collapseBank/build/output.loader.js'
+            script.onload = async () => {
+                console.log('output.loader.js imported')
+                unityLayer = new customLayers.UnityLayer(
+                    [120.556596, 32.042607],
+                    0,
+                    unityCanvaDom.value,
+                )
+                // maskLayer = new customLayers.MaskLayer()
+                map.addLayer(unityLayer)
+                setTimeout(()=>{
+                    threeDLoading.value = false
+                },3000)
+                // map.addLayer(maskLayer)
+            }
+            document.head.appendChild(script)
         }
-        document.head.appendChild(script)
+        document.head.appendChild(scriptInteract)
+
+
     }
 }
 // const resizeObserver = new ResizeObserver((entries) => {
@@ -460,7 +481,7 @@ onMounted(async () => {
     //     ],
     // })
     //////////return loaded Map
-    map = await initScratchMap(mapDom.value)
+    map = await initPureScratchMap(mapDom.value)
     map.on('render', () => {
         map.triggerRepaint()
     })
@@ -584,6 +605,34 @@ div.twin-main-container {
         left: 0;
         pointer-events: none;
         background-color: transparent;
+    }
+
+    div.loading-container {
+        position: absolute;
+        top: 10vh;
+        left:57vw;
+        width: 6vw;
+        height: 10vh;
+        background-color: rgba(249, 254, 255, 0.336);
+        backdrop-filter: blur(5px);
+        z-index: 5;
+
+        :deep(.dv-loading.loading-icon) {
+            position: absolute;
+            top: -2.5vh;
+            right: 0vw;
+        }
+
+        div.loading-message {
+            text-align: center;
+            position: absolute;
+            left: 0.5vw;
+            width: 5vw;
+            height: 6vh;
+            top: 7.3vh;
+            font-size: calc(0.6vw + 0.4svh);
+            font-weight: bold;
+        }
     }
 
     div.visual-tab-container {
