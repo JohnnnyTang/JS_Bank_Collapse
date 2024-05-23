@@ -751,7 +751,7 @@ const getGNSSoption = () => {
     let timeData = [];
     let nowTime = dayjs()
     for (let i = xmove.length - 1; i >= 0; i--) {
-        timeData.push(nowTime.subtract(i, 'second').format('YYYY-MM-DD HH:mm:ss'))
+        timeData.push(nowTime.subtract(i, 'hour').format('YYYY-MM-DD HH:mm:ss'))
     }
     let xmoveDT = getData(timeData, xmove)
     let ymoveDT = getData(timeData, ymove)
@@ -831,11 +831,10 @@ const getGNSSoption = () => {
                 data: mmoveDT,
                 markLine: {
                     data: [{
-                        xAxis: dayjs().subtract(10, 'second').format('YYYY-MM-DD HH:mm:ss')
+                        xAxis: dayjs().subtract(10, 'hour').format('YYYY-MM-DD HH:mm:ss')
                     }]
                 }
             },
-
         ]
     };
     return option
@@ -860,7 +859,7 @@ const getInclineoption = () => {
     let timeData = [];
     let nowTime = dayjs()
     for (let i = bottommove.length - 1; i >= 0; i--) {
-        timeData.push(nowTime.subtract(i, 'second').format('YYYY-MM-DD HH:mm:ss'))
+        timeData.push(nowTime.subtract(i, 'hour').format('YYYY-MM-DD HH:mm:ss'))
     }
     const bottommoveDT = getData(timeData, bottommove)
     let option = {
@@ -920,7 +919,7 @@ const getInclineoption = () => {
                 data: bottommoveDT,
                 markLine: {
                     data: [{
-                        xAxis: dayjs().subtract(20, 'second').format('YYYY-MM-DD HH:mm:ss')
+                        xAxis: dayjs().subtract(20, 'hour').format('YYYY-MM-DD HH:mm:ss')
                     }]
                 }
             },
@@ -933,7 +932,7 @@ const getStressoption = () => {
     let timeData = [];
     let nowTime = dayjs()
     for (let i = stressValue.length - 1; i >= 0; i--) {
-        timeData.push(nowTime.subtract(i, 'second').format('YYYY-MM-DD HH:mm:ss'))
+        timeData.push(nowTime.subtract(i, 'minute').format('YYYY-MM-DD HH:mm:ss'))
     }
     const stressDT = getData(timeData, stressValue)
     let option = {
@@ -986,6 +985,7 @@ const getStressoption = () => {
                 rotate: 90 // 将名称旋转 90 度
             },
             nameGap: 40,
+            min: 300,
         },
         series: [
             {
@@ -994,7 +994,7 @@ const getStressoption = () => {
                 data: stressDT,
                 markLine: {
                     data: [{
-                        xAxis: dayjs().subtract(10, 'minute').format('YYYY-MM-DD HH:mm:ss')
+                        xAxis: dayjs().subtract(10, 'hour').format('YYYY-MM-DD HH:mm:ss')
                     }]
                 }
             },
