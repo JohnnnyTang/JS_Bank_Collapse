@@ -253,6 +253,10 @@ class UnityLayer {
         if (this.map.getLayer('Mask-Layer'))
             this.map.removeLayer('Mask-Layer')
 
+        // hide dom
+        let dom = document.querySelector('#DeviceInfoBox')
+        dom.style.display = 'none'
+
 
         this.tb = undefined
         this.map = undefined

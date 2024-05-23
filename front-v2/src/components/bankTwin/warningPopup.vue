@@ -18,8 +18,7 @@
             </div>
         </dv-border-box10>
 
-        <div v-show="showFakeStressPic" class="fake-stress-pic"></div>
-
+        <!-- <div v-show="showFakeStressPic" class="fake-stress-pic"></div> -->
 
     </div>
 </template>
