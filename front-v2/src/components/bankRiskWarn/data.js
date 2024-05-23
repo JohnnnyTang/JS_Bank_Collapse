@@ -5,7 +5,7 @@ export const defaultWarnLayerDataInput = [
             [120.49989610501109, 32.044845778820694],
             [120.49965852902085, 32.043054010465546],
         ],
-        warnValue: 0,
+        warnValue: 0.32,
     },
     {
         name: 'JC02',
@@ -13,7 +13,7 @@ export const defaultWarnLayerDataInput = [
             [120.51211644811006, 32.04310480824947],
             [120.51157809855385, 32.04135665004222],
         ],
-        warnValue: 0.18,
+        warnValue: 0.45,
     },
     {
         name: 'JC03',
@@ -21,7 +21,7 @@ export const defaultWarnLayerDataInput = [
             [120.51598399026375, 32.04244111945512],
             [120.51554162835052, 32.04064910386879],
         ],
-        warnValue: 0.18,
+        warnValue: 0.53,
     },
     {
         name: 'JC04',
@@ -29,7 +29,7 @@ export const defaultWarnLayerDataInput = [
             [120.52163733002358, 32.040317481106044],
             [120.52010747944439, 32.03901766791365],
         ],
-        warnValue: 0.18,
+        warnValue: 0.58,
     },
     {
         name: 'JC05',
@@ -37,7 +37,7 @@ export const defaultWarnLayerDataInput = [
             [120.52344753736321, 32.03912224359854],
             [120.52202732882418, 32.037765786589944],
         ],
-        warnValue: 0.18,
+        warnValue: 0.70,
     },
     {
         name: 'JC06',
@@ -45,7 +45,7 @@ export const defaultWarnLayerDataInput = [
             [120.5300568728269, 32.035076196597906],
             [120.52886185568613, 32.03359585101801],
         ],
-        warnValue: 0.42,
+        warnValue: 0.83,
     },
     {
         name: 'JC07',
@@ -53,7 +53,7 @@ export const defaultWarnLayerDataInput = [
             [120.53577029390934, 32.03306474923213],
             [120.53521759568126, 32.03132371065091],
         ],
-        warnValue: 0.42,
+        warnValue: 0.90,
     },
     {
         name: 'JC08',
@@ -61,7 +61,7 @@ export const defaultWarnLayerDataInput = [
             [120.54259039936055, 32.03113531223312],
             [120.54191211481913, 32.0294311450221],
         ],
-        warnValue: 0.42,
+        warnValue: 0.73,
     },
     {
         name: 'JC09',
@@ -69,7 +69,7 @@ export const defaultWarnLayerDataInput = [
             [120.54845619793755, 32.02942703528161],
             [120.547645906125, 32.027757714058616],
         ],
-        warnValue: 0.18,
+        warnValue: 0.53,
     },
     {
         name: 'JC10',
@@ -77,7 +77,7 @@ export const defaultWarnLayerDataInput = [
             [120.55217332294447, 32.02819103999115],
             [120.55139957273384, 32.02651468780271],
         ],
-        warnValue: 0.18,
+        warnValue: 0.43,
     },
     {
         name: 'JC11',
@@ -85,7 +85,7 @@ export const defaultWarnLayerDataInput = [
             [120.55987007042168, 32.0256085153387],
             [120.55938372124096, 32.02385317986381],
         ],
-        warnValue: 0.42,
+        warnValue: 0.29,
     },
     {
         name: 'JC12',
