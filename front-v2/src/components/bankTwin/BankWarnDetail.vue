@@ -75,6 +75,7 @@
                             </el-descriptions>
                         </div>
                     </el-collapse-item>
+                    <div v-show="warnInfoStore.warnInfo.length == 0" class="no-data">暂无</div>
                 </el-collapse>
             </el-scrollbar>
         </div>
@@ -297,6 +298,18 @@ div.warn-detail-container {
             width: 100%;
         }
 
+        div.no-data {
+            margin-top: 1vh;
+            text-align: center;
+            width: 100%;
+            height: 4vh;
+            line-height: 4vh;
+            font-weight: bold;
+            font-size: calc(0.8vw + 0.8vh);
+
+            background-color: #c7ebff;
+        }
+
         :deep(.el-collapse) {
             --el-collapse-border-color: #104da8;
             --el-collapse-header-height: 8vh;
@@ -344,7 +357,7 @@ div.warn-detail-container {
                 ) {
                 font-size: calc(0.5vw + 0.3vh);
                 text-align: center;
-                background-color: rgb(31, 43, 83);
+                background-color: #0e1c6d;
                 color: rgba(246, 250, 255, 1);
                 // box-shadow: 0 0 0 1px #dbedff inset;
 

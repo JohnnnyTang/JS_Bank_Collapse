@@ -1071,8 +1071,8 @@ const layerAddFunctionMap = {
                     "icon-size": [
                         "case",
                         ["==", ["get", "if_important"], 1], // 如果if_important字段为1
-                        1.0,                                  // 则图标大小为0.6
-                        0.8                                   // 否则图标大小为0.4
+                        1.4,                                  // 则图标大小为0.6
+                        1.0                                   // 否则图标大小为0.4
                     ],
                     'icon-anchor': 'center',
                     'icon-allow-overlap': true,

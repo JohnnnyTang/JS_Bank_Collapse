@@ -795,6 +795,20 @@ const getGNSSoption = () => {
             nameGap: 40,
 
         },
+        graphic: [{
+            type: 'text',
+            // left: 'center',
+            right:'100',
+            top: '100',
+            z: 100,
+            style: {
+                fill: '#333',
+                width: '30',
+                text: '累积位移变化速率加快\n超过2mm/h，岸坡临界崩塌',
+                lineHeight: 20,
+                font: '15px Microsoft YaHei'
+            },
+        }],
         series: [
             {
                 name: "累计X向水平位移",
@@ -814,8 +828,14 @@ const getGNSSoption = () => {
             {
                 name: "三维累计位移",
                 type: "line",
-                data: mmoveDT
-            }
+                data: mmoveDT,
+                markLine: {
+                    data: [{
+                        xAxis: dayjs().subtract(10, 'second').format('YYYY-MM-DD HH:mm:ss')
+                    }]
+                }
+            },
+
         ]
     };
     return option
@@ -880,11 +900,29 @@ const getInclineoption = () => {
             },
             nameGap: 40,
         },
+        graphic: [{
+            type: 'text',
+            left: 'center',
+            top: '100',
+            z: 100,
+            style: {
+                fill: '#333',
+                width: '30',
+                text: '内部位移变化速率加快\n超过1mm/h，岸坡临界崩塌',
+                lineHeight: 20,
+                font: '15px Microsoft YaHei'
+            },
+        }],
         series: [
             {
                 name: "底部位移",
                 type: "line",
-                data: bottommoveDT
+                data: bottommoveDT,
+                markLine: {
+                    data: [{
+                        xAxis: dayjs().subtract(20, 'second').format('YYYY-MM-DD HH:mm:ss')
+                    }]
+                }
             },
         ]
     }
@@ -910,6 +948,20 @@ const getStressoption = () => {
         legend: {
             top: '10%',
         },
+
+        graphic: [{
+            type: 'text',
+            right: '100',
+            top: '100',
+            z: 100,
+            style: {
+                fill: '#333',
+                width: '30',
+                text: '应力桩应变变形速率加快\n超过15ue/h，岸坡临界崩塌',
+                lineHeight: 20,
+                font: '15px Microsoft YaHei'
+            },
+        }],
         grid: {
             left: "8%",
             right: "4%",
@@ -939,7 +991,12 @@ const getStressoption = () => {
             {
                 name: "上层主应变",
                 type: "line",
-                data: stressDT
+                data: stressDT,
+                markLine: {
+                    data: [{
+                        xAxis: dayjs().subtract(10, 'minute').format('YYYY-MM-DD HH:mm:ss')
+                    }]
+                }
             },
         ]
     }

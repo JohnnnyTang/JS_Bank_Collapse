@@ -534,6 +534,99 @@ const getSideBarTree = async () => {
     })
     // let quyushuixi = []
 
+    let quyushuixi = {
+        label: '区域水系',
+        icon: '/icons/流域水系.png',
+        type: 'title1',
+        active: true,
+        filter: true,
+        children: []
+    }
+    let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
+    dt.forEach((item) => {
+        quyushuixi.children.push({ label: item['name'], active: false, type: 'feature', property: item })
+    })
+
+    let sluice = {
+        label: '重要水闸',
+        icon: '/icons/水闸工程.png',
+        type: 'title1',
+        active: true,
+        filter: true,
+        children: []
+    }
+    dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
+    dt.forEach((item) => {
+        sluice.children.push({ label: item['sp_name'], active: false, type: 'feature', property: item })
+    })
+
+    let pump = {
+        label: '重要泵站',
+        icon: '/icons/泵站工程.png',
+        type: 'title1',
+        active: false,
+        filter: true,
+        children: []
+    }
+    dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
+    dt.forEach((item) => {
+        pump.children.push({ label: item['sp_name'], active: false, type: 'feature', property: item })
+    })
+    let treeNode1 = {
+        label: '已建通道',
+        type: 'title2',
+        children: []
+    }
+    let treeNode2 = {
+        label: '在建通道',
+        type: 'title2',
+        children: []
+    }
+    let treeNode3 = {
+        label: '规划通道',
+        type: 'title2',
+        children: []
+    }
+    let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+    let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+    let res = [...res1, ...res2]
+    res.forEach(item => {
+        if (item.plan === 1) {
+            item.planning = '已建通道'
+            treeNode1.children.push({
+                label: item.name,
+                type: 'feature',
+                property: item
+            })
+        } else if (item.plan === 0) {
+            item.planning = '在建通道'
+            treeNode2.children.push({
+                label: item.name,
+                type: 'feature',
+                property: item
+            })
+        } else if (item.plan === -1) {
+            item.planning = '规划通道'
+            treeNode3.children.push({
+                label: item.name,
+                type: 'feature',
+                property: item
+            })
+        }
+    })
+    console.log(treeNode1);
+    let riverPassageLine = {
+        label: '过江通道',
+        type: 'title1',
+        active: false,
+        filter: true,
+        children: [
+            treeNode1,
+            treeNode2,
+            treeNode3
+        ]
+    }
+
     let tree = [
         {
             label: '重点岸段',
@@ -546,27 +639,9 @@ const getSideBarTree = async () => {
             ]
         },
         mainZt,
-        {
-            label: '区域水系',
-            icon: '/icons/流域水系.png',
-            type: 'title1',
-            active: true,
-            filter: true
-        },
-        {
-            label: '重要水闸',
-            icon: '/icons/水闸工程.png',
-            type: 'title1',
-            active: false,
-            filter: true
-        },
-        {
-            label: '重要泵站',
-            icon: '/icons/泵站工程.png',
-            type: 'title1',
-            active: false,
-            filter: true
-        },
+        quyushuixi,
+        sluice,
+        pump,
         {
             label: '长江堤防',
             icon: '/icons/江堤港堤.png',
@@ -574,13 +649,7 @@ const getSideBarTree = async () => {
             active: true,
             filter: true
         },
-        {
-            label: '过江通道',
-            icon: '/icons/过江通道.png',
-            type: 'title1',
-            active: false,
-            filter: true
-        },
+        riverPassageLine,
         {
             label: '其他',
             active: false,
@@ -616,18 +685,18 @@ const getSideBarTree = async () => {
 }
 
 const lableLayerMap = {
-    '一级预警岸段':['一级预警岸段','岸段-注记'],
-    '二级预警岸段':['二级预警岸段','岸段-注记'],
-    '三级预警岸段':['三级预警岸段','岸段-注记'],
-    '主要洲滩':['洲滩','洲滩-注记'],
-    '区域水系':['区域水系','水系-注记'],
-    '重要水闸':['水闸工程-重点','水闸工程-注记','水闸工程'],
-    '重要泵站':['泵站工程-注记','泵站工程'],
-    '长江堤防':['长江干堤'],
-    '过江通道':['过江通道-隧道/通道','过江通道-桥','过江通道-隧道/通道-注记','过江通道-桥-注记'],
-    '行政区划':['行政点','行政点-注记','重点行政区边界'],
-    '重要湖泊':['大型湖泊','大型湖泊-注记'],
-    '水文站点':['水文站点','水文站点-注记'],
+    '一级预警岸段': ['一级预警岸段', '岸段-注记'],
+    '二级预警岸段': ['二级预警岸段', '岸段-注记'],
+    '三级预警岸段': ['三级预警岸段', '岸段-注记'],
+    '主要洲滩': ['洲滩', '洲滩-注记'],
+    '区域水系': ['区域水系', '水系-注记'],
+    '重要水闸': ['水闸工程-重点', '水闸工程-注记', '水闸工程'],
+    '重要泵站': ['泵站工程-注记', '泵站工程'],
+    '长江堤防': ['长江干堤'],
+    '过江通道': ['过江通道-隧道/通道', '过江通道-桥', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
+    '行政区划': ['行政点', '行政点-注记', '重点行政区边界'],
+    '重要湖泊': ['大型湖泊', '大型湖泊-注记'],
+    '水文站点': ['水文站点', '水文站点-注记'],
 }
 
 export {

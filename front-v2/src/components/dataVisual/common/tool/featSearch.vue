@@ -219,16 +219,19 @@ const appednTreeData = async () => {
             res1.forEach(item => {
                 item.source = 'riverPassageLine'
                 if (item.plan === 1) {
+                    item.planning = '已建通道'
                     treeNode1.children.push({
                         label: item.name,
                         property: item
                     })
                 } else if (item.plan === 0) {
+                    item.planning = '在建通道'
                     treeNode2.children.push({
                         label: item.name,
                         property: item
                     })
                 } else if (item.plan === -1) {
+                    item.planning = '规划通道'
                     treeNode3.children.push({
                         label: item.name,
                         property: item

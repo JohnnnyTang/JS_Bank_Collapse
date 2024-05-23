@@ -1,4 +1,6 @@
-// import { useWarninfoStore } from ''
+// import { ref, createApp } from 'vue'
+// import bank3dTest from '../components/bankTwin/bank3dTest.vue'
+
 const infoBoxDiv = document.createElement('div')
 infoBoxDiv.style.backgroundColor = 'red'
 infoBoxDiv.style.pointerEvents = 'none'
@@ -14,6 +16,13 @@ infoBoxDiv.style.color = 'white'
 infoBoxDiv.style.width = '50px'
 infoBoxDiv.id = 'DeviceInfoBox'
 document.body.appendChild(infoBoxDiv)
+
+// const container = document.createElement('div')
+// container.id = 'Unity-DeviceInfo-Box'
+// const app = createApp(bank3dTest, {test:'hello test'})
+// const componentIns = app.mount(container)
+
+
 
 const pickedObject = {
 

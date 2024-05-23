@@ -18,6 +18,7 @@ import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
 import { layerAddFunction, layerRemoveFunction } from './layerUtil'
 import * as customLayers from '../../utils/WebGL/customLayers'
 
+
 const mapDom = ref()
 const unityCanvaDom = ref()
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -55,27 +56,12 @@ onMounted(async () => {
 
     mapFlyToRiver(map)
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key == 'i') {
-            console.log('add img');
-            map.addSource('img', {
-                type: 'raster',
-                // tiles: [tileServer + '/proxy/tiles/raster/image/base/{x}/{y}/{z}'],
-                tiles: [
-                    'http://127.0.0.1:8989/api/v1/tile/raster/image/base/{x}/{y}/{z}'
-                ],
-                minzoom: 0,
-                maxzoom: 14, //local TILES max zoom::12
-            })
-            map.addLayer({
-                id: 'ras',
-                type: 'raster',
-                source: 'img',
-            })
-
-        }
-    })
-
+    const scriptInteract = document.createElement('script')
+    scriptInteract.src = './src/utils/unityInteraction.js'
+    scriptInteract.onload = async () => {
+        console.log('unityInteraction   文件执行完毕');
+    }
+    document.body.appendChild(scriptInteract)
 
 
     // const jsonUrl = '/bankWarn/bankWarn.json'
