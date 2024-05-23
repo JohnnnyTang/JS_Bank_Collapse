@@ -113,6 +113,7 @@ const sourceFieldMap = {
             "monitoring_length": '岸段长度',
             "warning_level": "预警等级",
             "description": '简介',
+            "fix_project":'治理工程'
         }
     },
     'sandBar':{
