@@ -1,19 +1,28 @@
-// import { useWarninfoStore } from ''
-const infoBoxDiv = document.createElement('div')
-infoBoxDiv.style.backgroundColor = 'red'
-infoBoxDiv.style.pointerEvents = 'none'
-infoBoxDiv.style.position = 'absolute'
-infoBoxDiv.style.textAlign = 'center'
-infoBoxDiv.style.lineHeight = '50px'
-infoBoxDiv.style.fontSize = '20px'
-infoBoxDiv.style.display = 'none'
-infoBoxDiv.style.zIndex = '1000'
-infoBoxDiv.style.height = '50px'
-infoBoxDiv.style.opacity = '0.8'
-infoBoxDiv.style.color = 'white'
-infoBoxDiv.style.width = '50px'
-infoBoxDiv.id = 'DeviceInfoBox'
-document.body.appendChild(infoBoxDiv)
+import { ref, createApp } from 'vue'
+import bank3dTest from '../components/bankTwin/bank3dTest.vue'
+
+// const infoBoxDiv = document.createElement('div')
+// infoBoxDiv.style.backgroundColor = 'red'
+// infoBoxDiv.style.pointerEvents = 'none'
+// infoBoxDiv.style.position = 'absolute'
+// infoBoxDiv.style.textAlign = 'center'
+// infoBoxDiv.style.lineHeight = '50px'
+// infoBoxDiv.style.fontSize = '20px'
+// infoBoxDiv.style.display = 'none'
+// infoBoxDiv.style.zIndex = '1000'
+// infoBoxDiv.style.height = '50px'
+// infoBoxDiv.style.opacity = '0.8'
+// infoBoxDiv.style.color = 'white'
+// infoBoxDiv.style.width = '50px'
+// infoBoxDiv.id = 'DeviceInfoBox'
+// document.body.appendChild(infoBoxDiv)
+
+const container = document.createElement('div')
+container.id = 'Unity-DeviceInfo-Box'
+const app = createApp(bank3dTest, {test:'hello test'})
+const componentIns = app.mount(container)
+
+
 
 const pickedObject = {
 

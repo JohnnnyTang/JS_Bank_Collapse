@@ -84,13 +84,12 @@ const sourceFieldMap = {
     "riverArea": {
         "original": "国普河流",
         "fieldMap": {
-            "id": "id",
+            "name": "名称",
             "code": "编号",
             "basin": "流域",
             "water": "水系",
             "area": "水面面积",
             "height": "正常蓄水位",
-            "name": "名称"
         }
     },
     "sluiceArea": {
@@ -120,12 +119,56 @@ const sourceFieldMap = {
         "original": "主要洲滩",
         "fieldMap": {
             "name": "名称",
-            "region": "所属区域",
             "river": "所属河段",
-            "sortId": '洲滩编号',
+            // "sortId": '洲滩编号',
+            "0m线内面积(km3)": '面积(km3)',
+            "洲滩内人口": '人口',
+            "2019年GDP\n（万元）": '2019年GDP(万元)',
+            "岸线功能区名称": '岸线功能区',
+            "预案": '防汛预案'
+        }
+    },
+    'channel': {
+        "original": "过江通道",
+        "fieldMap": {
+            "name": "名称",
+            "planning":"类型",
+            // "river": "所属河段",
+            // "0m线内面积(km3)": '面积(km3)',
+            // "洲滩内人口": '人口',
+            // "2019年GDP\n（万元）": '2019年GDP(万元)',
+            // "岸线功能区名称": '岸线功能区',
+            // "预案": '防汛预案'
         }
     }
 }
+/*
+{
+    "name": "炮子洲",
+    "id": 1,
+    "region": "扬中市",
+    "river": "扬中河段",
+    "sortId": 18,
+    "所属河道": "长江",
+    "市（地）级行政区": "镇江",
+    "县级行政区": "扬中市",
+    "位置坐标": "492094.966,3545126.220",
+    "是否圈围出水（全部/部分/无圈围）": "是",
+    "主江防洪水位(85基面，m)": 6.03,
+    "防洪设计水位": null,
+    "0m线内面积(km3)": "0",
+    "洲滩内人口": "16484（居民）",
+    "洲滩内耕地面积(m2)": "5399142.8555100001",
+    "洲滩内耕地占比": "0.3194759086100592",
+    "2019年GDP\n（万元）": "236600",
+    "岸线功能区名称": "保留区/控制利用区",
+    "功能岸线长度(km)": "10.09/9.17",
+    "预案": "沙家港站水位达8.05m，全部撤离",
+    "center_x": 119.906304863248,
+    "center_y": 32.05590864640032
+}
+*/
+
 
 const sourceNameMap = {
     "cityBoundaryLine": "name",
@@ -147,7 +190,7 @@ const sourceNameMap = {
 const sourceZoomMap = {
     "cityBoundaryLine": 8.5,
     "riverSection": 9,
-    "riverArea": 11.5,
+    "riverArea": 13,
     "lakeArea": 12,
     "hydroStationPoint": 11,
     "combineProjectPoint": 13,
@@ -159,7 +202,8 @@ const sourceZoomMap = {
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
     'importantBank': 12,
-    'sandBar': 12
+    'sandBar': 12,
+    'channel': 13,
 }
 
 const sourceColumnMap = {
@@ -371,7 +415,7 @@ const legendListt = [
             'height': '80%',
             'width': '50%',
             'background-image': `url('/legend/水闸.png')`,
-            'transform': 'translateX(10%) scale(0.95)',
+            'transform': 'translateX(10%) scale(0.8)',
         },
         text: '水闸工程'
     },
@@ -386,9 +430,10 @@ const legendListt = [
     },
     {
         style: {
-            'height': '15%',
+            'height': '60%',
             'width': '50%',
-            'background-color': '#958E54',
+            'background-image': `url('/legend/堤防.png')`,
+            'transform': 'translateX(10%)',
         },
         text: '长江干堤'
     },
@@ -418,33 +463,35 @@ const legendListt = [
     },
     {
         style: {
-            'height': '15%',
+            'height': '50%',
             'width': '50%',
-            'background-color': 'rgb(52, 0, 143)',
+            // 'background-color': 'rgb(52, 0, 143)',
+            'background-image': `url('/legend/在建通道.png')`,
+            'transform': 'scaleY(0.5) translateX(5%)'
         },
-        text: '已建通道'
+        text: '过江通道'
     },
-    {
-        style: {
-            'height': '15%',
-            'width': '50%',
-            'background-color': 'rgb(196, 50, 6)',
-        },
-        text: '在建通道'
-    },
-    {
-        style: {
-            'height': '15%',
-            'width': '50%',
-            'background-color': 'rgb(179, 4, 74)',
-        },
-        text: '规划通道'
-    },
-    {
+    // {
+    //     style: {
+    //         'height': '15%',
+    //         'width': '50%',
+    //         'background-color': 'rgb(196, 50, 6)',
+    //     },
+    //     text: '在建通道'
+    // },
+    // {
+    //     style: {
+    //         'height': '15%',
+    //         'width': '50%',
+    //         'background-color': 'rgb(179, 4, 74)',
+    //     },
+    //     text: '规划通道'
+    // },
+    {//128,128,128
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('/legend/码头.png')`,
+            'background-color': `rgb(128,128,128)`,
             'background-size': 'cover',
         },
         text: '码头工程'
@@ -457,6 +504,15 @@ const legendListt = [
             'background-size': 'cover',
         },
         text: '湖泊/河流/水库'
+    },
+    {
+        style: {
+            'height': '80%',
+            'width': '50%',
+            'background-color': `rgb(240,239,209)`,
+            'background-size': 'cover',
+        },
+        text: '主要洲滩'
     },
 ]
 
@@ -712,7 +768,10 @@ const layerSourceMap = {
     '岸段-注记': 'importantBank',
     '水闸工程': 'sluiceArea',
     '枢纽工程': 'combineProjectPoint',
-    '主要洲滩': 'sandBar'
+    '主要洲滩': 'sandBar',
+    '已建通道': 'channel',
+    '在建通道': 'channel',
+    '规划通道': 'channel'
 }
 
 const filterMap = {

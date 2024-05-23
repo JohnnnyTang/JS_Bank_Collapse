@@ -200,7 +200,6 @@ const detailClickHandler4Feature = async (featInfo,lgId) => {
     console.log(featInfo,lgId);
     // let nowSource = 'importantBank'
     let nowSource = layerSourceMap[lgId]
-    console.log(nowSource);
     let newFeatInfomation = {
         ogData: featInfo,
         sourceId: nowSource,
@@ -208,7 +207,6 @@ const detailClickHandler4Feature = async (featInfo,lgId) => {
     }
     featureInfo.value = newFeatInfomation
     showDetail.value = true
-    console.log('map fly');
     let map = mapStore.getMap()
     map.flyTo({
         center: [featInfo.center_x, featInfo.center_y],

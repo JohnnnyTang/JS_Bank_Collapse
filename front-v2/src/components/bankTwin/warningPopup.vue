@@ -62,9 +62,9 @@ const clickHandler = () => {
     }
     */
     nextTick(() => {
-        showChart.value = !showChart.value
         const daviceMap = ["GNSS", "应力桩", "水压力计", "测斜仪"]
         if (fakeWarnCodeList.includes(props.warningInfo.deviceId)) {
+            showChart.value = !showChart.value
             let deviceType = daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
             chartConfig(deviceType)
         }
