@@ -47,15 +47,8 @@ def main(
             json.dump(content, f, ensure_ascii=False)
         return False
 
-    vertex0 = None
-    vertex1 = None
-    if currentSectionPoints[0][2] > currentSectionPoints[-1][2]:
-        vertex0 = (x1, y1)
-        vertex1 = (x2, y2)
-    else:
-        vertex0 = (x2, y2)
-        vertex1 = (x1, y1)
-        currentSectionPoints.reverse()
+    vertex0 = (x1, y1)
+    vertex1 = (x2, y2)
 
     # write json
     content = {

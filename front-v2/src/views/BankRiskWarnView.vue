@@ -196,6 +196,16 @@
             </div>
         </div>
 
+        <div class="bankLine-control-block">
+            <label class="switch">
+                <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
+                <span class="slider"></span>
+            </label>
+            <div class="text-block">
+                <div class="text">岸段展示</div>
+            </div>
+        </div>
+
         <div class="risk-line-container">
             <div class="risk-line-title">
                 风险等级图例：
@@ -467,6 +477,7 @@ const mapContainer = ref()
 const timeStep = ref(0)
 const showFlow = ref(false)
 const showRaster = ref(false)
+const showBankLine = ref(true)
 const infoTreeData = ref(InfoTree)
 
 // let flowSrc = []
@@ -565,7 +576,7 @@ const getRiskAreas = (riskLevel) => {
     let resultString = ""
     profileList.value.map((item) => {
         if (item.risk === riskLevel) {
-            resultString = resultString + item.nickname + '  '
+            resultString = resultString + item.name + '; '
         }
     })
     return resultString
@@ -643,8 +654,15 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompare) => {
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
         profileDataCompare.value = await getProfileData(compare, before)
+    } else if (!exist && existCompare) {
+        loading_message.value = '地形对比结果计算中...'
+        await CalProfile(before, now)
+        loading_message.value = '地形对比数据加载中...'
+        profileData.value = await getProfileData(before, now)
+        profileDataCompare.value = await getProfileData(compare, before)
     } else {
         loading_message.value = '地形对比结果计算中...'
+        await CalProfile(compare, before)
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
@@ -879,6 +897,15 @@ const RasterControlHandler = () => {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
     }
     showRaster.value = !showRaster.value
+}
+
+const BankLineControlHandler = () => {
+    if (showBankLine.value) {
+        mapInstance.setLayoutProperty('岸段预警', 'visibility', 'none')
+    } else {
+        mapInstance.setLayoutProperty('岸段预警', 'visibility', 'visible')
+    }
+    showBankLine.value = !showBankLine.value
 }
 
 // 地形对比变量
@@ -1420,22 +1447,22 @@ onMounted(async () => {
         // })
         // const jsonUrl = '/bankWarn/bankWarn.json'
         map.addLayer(new BankWarnLayer(defaultWarnLayerData))
-        map.addLayer({
-            id: 'mzsBankLine',
-            type: 'line',
-            source: 'mzsBankLineSource',
-            'source-layer': 'default',
-            filter: ['all'],
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                'line-color': 'rgba(31, 14, 223, 0.5)',
-                'line-width': 4,
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsBankLine',
+        //     type: 'line',
+        //     source: 'mzsBankLineSource',
+        //     'source-layer': 'default',
+        //     filter: ['all'],
+        //     layout: {
+        //         'line-cap': 'round',
+        //         'line-join': 'round',
+        //     },
+        //     paint: {
+        //         'line-opacity': 1,
+        //         'line-color': 'rgba(31, 14, 223, 0.5)',
+        //         'line-width': 4,
+        //     },
+        // })
         map.on('click', ['mzsBankLine'], (e) => {
             console.log(e.features[0])
         })
@@ -1767,9 +1794,9 @@ div.risk-warn-container {
 
     div.warn-status-container {
         position: absolute;
-        left: 36vw;
+        left: 34vw;
         top: 80vh;
-        width: 10vw;
+        width: 14vw;
         height: 10vh;
 
         background-color: #000cbbd5;
@@ -1819,7 +1846,7 @@ div.risk-warn-container {
 
     div.warn-detail-container {
         position: absolute;
-        left: 47vw;
+        left: 49vw;
         top: 80.3vh;
         width: 20vw;
         height: 9vh;
@@ -1902,7 +1929,7 @@ div.risk-warn-container {
         div.risk-line-mark {
             position: absolute;
             top: 3.2vh;
-            width: 20vw;
+            width: 4vw;
             height: 2vh;
             border-radius: 20px;
             z-index: 5;
@@ -2210,7 +2237,85 @@ div.risk-warn-container {
     div.raster-control-block {
         position: absolute;
         top: 0vh;
-        left: 26vw;
+        left: 25vw;
+        height: 13vh;
+        width: 6vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        z-index: 3;
+
+        .switch {
+            font-size: 20px;
+            position: relative;
+            display: inline-block;
+            width: 2em;
+            height: 3.5em;
+
+            input {
+                display: none;
+            }
+
+            /* The slider */
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgb(165, 219, 253);
+                transition: 0.4s;
+                border-radius: 10px;
+
+                &:before {
+                    position: absolute;
+                    content: '';
+                    height: 1.4em;
+                    width: 1.4em;
+                    border-radius: 5px;
+                    left: 0.3em;
+                    bottom: 0.3em;
+                    background-color: white;
+                    transition: 0.4s;
+                }
+            }
+
+            input:checked {
+                +.slider {
+                    background-color: rgb(73, 90, 250);
+                }
+
+                +.slider:before {
+                    transform: translateY(-1.5em);
+                }
+            }
+        }
+
+        .text-block {
+            font-size: 20px;
+            width: 3em;
+            height: 5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .text {
+                writing-mode: vertical-lr;
+                color: rgb(3, 45, 90);
+                color-scheme: light;
+                font-family: 'Microsoft YaHei';
+                font-weight: 700;
+                user-select: none;
+            }
+        }
+    }
+
+    div.bankLine-control-block {
+        position: absolute;
+        top: 0vh;
+        left: 29.7vw;
         height: 13vh;
         width: 6vw;
         display: flex;
