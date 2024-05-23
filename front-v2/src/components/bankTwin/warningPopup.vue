@@ -18,6 +18,8 @@
             </div>
         </dv-border-box10>
 
+        <div v-show="showFakeStressPic" class="fake-stress-pic"></div>
+
 
     </div>
 </template>
@@ -41,6 +43,7 @@ const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 const chartDom = ref()
 const showChart = ref(false)
 const chartDataLoading = ref(true)
+const showFakeStressPic = ref(false)
 const fakeWarnCodeList = [
     'MZS120.55327892_32.02707923_1',
     'MZS120.51967889_32.04004108_4',
@@ -67,6 +70,9 @@ const clickHandler = () => {
             showChart.value = !showChart.value
             let deviceType = daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
             chartConfig(deviceType)
+            if(deviceType === '应力桩'){
+                showFakeStressPic.value = true
+            }
         }
     })
 }
@@ -182,10 +188,21 @@ onMounted(() => {
             border-top: calc(0.2vw + 0.3vh) solid rgb(244, 215, 190);
         }
 
-
     }
-
 }
+
+div.fake-stress-pic {
+    position: absolute;
+    width: 5vw;
+    height: 13vh;
+    bottom: 15vh;
+    left: -6vw;
+    background-image: url('/fakeStressPic.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 4;
+}
+
 
 
 @keyframes warn {

@@ -30,7 +30,6 @@ export default class MaskLayer {
         enableAllExtensions(gl)
 
         // this.offScreenShader = await createShader(gl, '/shaders/examples/webgl/triangle.glsl')
-        // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\terrainWebGL\shader\quad.glsl
         this.shader = await createShader(gl, '/scratchSomething/terrainWebGL/shader/quad.glsl')
 
         const tl = fromLonLat([ this.bbox[0], this.bbox[3] ])
@@ -265,4 +264,8 @@ function fromLonLat(lonLat) {
 function lerp(a, b, t) {
 
     return (1 - t) * a + t * b
+}
+
+export{
+    MaskLayer
 }

@@ -38,7 +38,7 @@ class UnityLayer {
     }
 
     onAdd(map, gl) {
-        // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\unity\collapseBank
+
         // Set Unity instance configuration
         const buildUrl = "/scratchSomething/unity/collapseBank/build"
         const config = {
@@ -120,8 +120,6 @@ class UnityLayer {
         // Init Unity insatnce
         createUnityInstance(this.unityCanvas, config, (progress) => {
 
-            console.log(progress)
-
         }).then((unityInstance) => {
 
             this.map.addLayer(new MaskLayer())
@@ -174,7 +172,7 @@ class UnityLayer {
 
     tick() {
 
-        const xCamera = updateWorldCamera(this.map.transform.clone(), this.tb.Constants.WORLD_SIZE)
+        const xCamera = updateWorldCamera(this.map.transform.clone(), this.tb.Constants.WORLD_SIZE, -30.0)
 
         const flip = new THREE.Matrix4().set(
             1.0, 0.0, 0.0, 0.0,
@@ -188,12 +186,21 @@ class UnityLayer {
         const xProjection = this.tb.utils.makePerspectiveMatrix(xCamera.fov, xCamera.aspect, xCamera.nearZ, xCamera.farZ)
         const xMVP = xProjection.multiply(xView).multiply(xModel).multiply(flip)
 
-        const center = this.worldToModel(xCamera.center.x, xCamera.center.y)
-        const position = this.worldToModel(xCamera.position.x, xCamera.position.y)
-
+        const center = this.worldToModel(xCamera.center.x, xCamera.center.y, xCamera.center.z, 25.0, 0.0, -10.0)
+        const position = this.worldToModel(xCamera.position.x, xCamera.position.y, xCamera.position.z, 25.0, 0.0, -10.0)
+        console.log(xCamera.fov)
+        const up = xCamera.up;
         this.dispatchMessage({
             Method: 'Tick',
-            F32Array: [...xMVP.elements, position[0], position[1], position[2], center[0], center[1], center[2]]
+            F32Array: [
+                /* 0 - 15 */    ...xMVP.elements,
+                /* 16 - 18 */   position[0], position[2], position[1],
+                /* 19 - 21 */   up.x, up.z, up.y,
+                /* 22 */        xCamera.fov * 180.0 / Math.PI,
+                /* 23 - 25 */   center[0], center[2], center[1],
+                /* 26 */        xCamera.nearZ,
+                /* 27 */        xCamera.farZ,
+            ]
         })
     }
 
@@ -224,12 +231,12 @@ class UnityLayer {
         ]
     }
 
-    worldToModel(x, y) {
+    worldToModel(x, y, z, offsetX = 0.0, offsetY = 0.0, offsetZ = 0.0) {
 
         return [
-            x - this.op_world[0],
-            0.0,
-            y - this.op_world[1]
+            x - this.op_world[0] + offsetX,
+            y - this.op_world[1] + offsetY,
+            z + offsetZ,
         ]
     }
 
@@ -243,7 +250,7 @@ class UnityLayer {
             })
             this.unity = null
         }
-        if(this.map.getLayer('Mask-Layer'))
+        if (this.map.getLayer('Mask-Layer'))
             this.map.removeLayer('Mask-Layer')
 
 
@@ -299,7 +306,7 @@ function updateWorldCamera(t, mercatorWorldSize, minElevation = -30.0) {
 
     const pitchMatrix = new THREE.Matrix4().makeRotationX(pitch)
     const angleMatrix = new THREE.Matrix4().makeRotationZ(angle)
-    const worldToCamera = new THREE.Matrix4().multiplyMatrices(angleMatrix, pitchMatrix)
+    const worldToCamera = pitchMatrix.premultiply(angleMatrix)
 
     const x = t.pointMerc.x
     const y = t.pointMerc.y
@@ -308,7 +315,7 @@ function updateWorldCamera(t, mercatorWorldSize, minElevation = -30.0) {
     const center = new THREE.Vector3(centerX, centerY, 0)
 
     const up = new THREE.Vector3(0, 1, 0)
-        .applyMatrix4(worldToCamera)
+        .applyMatrix4(angleMatrix)
 
     const position = new THREE.Vector3(0, 0, 1)
         .applyMatrix4(worldToCamera)
