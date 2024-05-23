@@ -463,7 +463,7 @@ const loading_message = ref('自定义断面信息计算中...')
 const mapContainer = ref()
 const timeStep = ref(0)
 const showFlow = ref(false)
-const showRaster = ref(true)
+const showRaster = ref(false)
 const infoTreeData = ref(InfoTree)
 
 // let flowSrc = []
@@ -618,6 +618,7 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompare) => {
     } else {
         loading_message.value = '地形对比结果计算中...'
         await CalProfile(before, now)
+        await CalProfile(compare, before)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
         profileDataCompare.value = await getProfileData(compare, before)
@@ -911,15 +912,16 @@ const showGeologyAndProjectFunc = () => {
 
 // 展示水动力因素指标，包括:
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
-const showWaterPowerFunc = () => {
-    showProfileShapeFunc()
-    showYearlyProfileShapeFunc()
-}
-
-const showRiverBedFunc = async() => {
+const showWaterPowerFunc = async() => {
     showBedFlowChartFunc()
     showWaterProcessChartFunc()
     await showFlowSpeedFunc()
+}
+
+const showRiverBedFunc = () => {
+    showProfileShapeFunc()
+    showYearlyProfileShapeFunc()
+    showRaster.value = !showRaster.value  
 }
 
 const profileData = ref([])
