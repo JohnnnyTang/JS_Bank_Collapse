@@ -2177,15 +2177,15 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     // 'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
-                    'text-size': 11,
+                    'text-size': 13,
                     'text-padding': 0,
                     'text-ignore-placement': true,
                     'text-allow-overlap': true,
                 },
                 paint: {
-                    'text-color': 'rgb(155, 155, 155)',
+                    'text-color': 'rgb(111, 111, 111)',
                     'text-halo-color': "rgba(255, 255, 255, 1.0)",
-                    'text-halo-width': 2.0,
+                    'text-halo-width': 1.0,
                 },
             })
     },

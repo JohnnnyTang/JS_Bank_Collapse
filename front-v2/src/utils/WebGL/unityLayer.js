@@ -1,9 +1,10 @@
 import { Threebox } from 'threebox-plugin'
 import * as THREE from 'three'
+import MaskLayer from './maskLayer'
 
 // const unityCanvas = document.createElement('canvas')
 // unityCanvas.id = 'UnityCanvas'
-// unityCanvas.style.zIndex = '1 !important'
+// unityCanvas.style.zIndex = '1'
 // unityCanvas.style.width = '100%'
 // unityCanvas.style.height = '100%'
 // unityCanvas.style.border = 'none'
@@ -12,7 +13,7 @@ import * as THREE from 'three'
 // unityCanvas.style.background = 'transparent !important'
 // document.body.appendChild(unityCanvas)
 
-export class UnityLayer {
+class UnityLayer {
 
     constructor(originPosition, visibleZoom, unityCanvas) {
 
@@ -32,12 +33,12 @@ export class UnityLayer {
 
         // Get Unity canvas
         this.unityCanvas = unityCanvas
-        this.unityCanvas.style.width = this.unityCanvas.clientWidth
-        this.unityCanvas.style.height = this.unityCanvas.clientHeight
+        unityCanvas.style.width = unityCanvas.clientWidth
+        unityCanvas.style.height = unityCanvas.clientHeight
     }
 
     onAdd(map, gl) {
-
+        // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\unity\collapseBank
         // Set Unity instance configuration
         const buildUrl = "/scratchSomething/unity/collapseBank/build"
         const config = {
@@ -71,17 +72,59 @@ export class UnityLayer {
         // Set origin point
         // this.originPoint = this.tb.projectToWorld(this.originPosition)
 
-        const worldSize = this.tb.Constants.WORLD_SIZE
-        const op_webMercator = fromLonLat(this.originPosition)
-        this.op_world = [
-            (op_webMercator[0] - 0.5) * worldSize,
-            (0.5 - op_webMercator[1]) * worldSize
-        ]
+        this.op_world = this.wgs84ToWorld(this.originPosition[0], this.originPosition[1])
+        //     120.51988006, 32.04023661,
+        //     120.54608256, 32.02842654,
+        //     120.56382537, 32.02344990,
+        //     120.51749289, 32.04059243,
+        //     120.51977143, 32.04001152,
+        //     120.52561059, 32.03824715,
+        //     120.52660704, 32.03676583,
+        //     120.53334877, 32.03227055,
+        //     120.54599538, 32.02837993,
+        //     120.55330842, 32.02691551,
+        //     120.55649757, 32.02592404,
+        //     120.56334257, 32.02298144,
+        //     120.56944728, 32.02070961,
+        //     120.51738456, 32.04042984,
+        //     120.51958506, 32.03998636,
+        //     120.52551656, 32.03811304,
+        //     120.53327833, 32.03217940,
+        //     120.54588866, 32.02838767,
+        //     120.55315814, 32.02692744,
+        //     120.55672182, 32.02580795,
+        //     120.51726088, 32.04054582,
+        //     120.51738292, 32.04054923,
+        //     120.51749021, 32.04053105,
+        //     120.51957026, 32.04008655,
+        //     120.51967889, 32.04004108,
+        //     120.51986665, 32.03998992,
+        //     120.52557975, 32.03825056,
+        //     120.52565217, 32.03813574,
+        //     120.52566826, 32.03799363,
+        //     120.51992163, 32.04023206,
+        //     120.52666202, 32.03683063,
+        //     120.54611474, 32.02839471,
+        // ]
+        // const positions_MS = []
+        // for (let i = 0; i < coords.length / 2; i++) {
+        //     const lon = coords[2 * i + 0]
+        //     const lat = coords[2 * i + 1]
+        //     const pos_WS = this.wgs84ToWorld(lon, lat)
+        //     const pos_MS = this.worldToModel(pos_WS[0], pos_WS[1])
+        //     positions_MS.push(pos_MS[0])
+        //     positions_MS.push(pos_MS[1])
+        //     positions_MS.push(pos_MS[2])
+        // }
 
         // Init Unity insatnce
         createUnityInstance(this.unityCanvas, config, (progress) => {
 
+            console.log(progress)
+
         }).then((unityInstance) => {
+
+            this.map.addLayer(new MaskLayer())
 
             this.unity = unityInstance
 
@@ -102,38 +145,12 @@ export class UnityLayer {
     render(gl, matrix) {
 
         if (!this.unity) return
+
         this.map.triggerRepaint()
 
-        // Render or not
-        // const currentZoom = this.map.getZoom()
-        // if (this.zoom < this.visibleZoom && currentZoom >= this.visibleZoom) {
-
-        //     this.keep(true)
-        // }
-        // else if (this.zoom >= this.visibleZoom && currentZoom < this.visibleZoom) {
-
-        //     this.keep(false)
-        //     this.clear()
-        // }
-        // this.zoom = currentZoom
-
-        // // Tick logic
-        // if (this.zoom >= this.visibleZoom) {
-
-        //     this.tb.camera.far = 1500000.0
-        //     this.tb.camera.near = this.tb.camera.far / 100000.0
-        //     this.tb.camera.updateProjectionMatrix()
-        //     this.tb.update()
-        //     this.tick()
-        // }
-        // this.tb.camera.far = this.map.far.n
-        // this.tb.camera.near = Math.max(this.tb.camera.far / 100000.0, 0.1)
-        // this.tb.camera.far = 150000.0
-        // this.tb.camera.near = this.tb.camera.far / 100000.0
         this.tb.camera.updateProjectionMatrix()
         this.tb.update()
         this.tick()
-        // this.map.triggerRepaint()
     }
 
     // Unity interfaces
@@ -146,57 +163,37 @@ export class UnityLayer {
 
     pick(x, y) {
 
-        // this.dispatchMessage({
-        //     Method: 'Pick',
-        //     F32Array: [
-        //         2.0 * x / this.unityCanvas.clientWidth - 1.0,
-        //         2.0 * (this.unityCanvas.clientHeight - y) / this.unityCanvas.clientHeight - 1.0
-        //     ]
-        // })
+        this.dispatchMessage({
+            Method: 'Pick',
+            F32Array: [
+                2.0 * x / this.unityCanvas.clientWidth - 1.0,
+                2.0 * (this.unityCanvas.clientHeight - y) / this.unityCanvas.clientHeight - 1.0
+            ]
+        })
     }
 
     tick() {
 
-        updateCamera$2(this.tb.cameraSync, this.tb.Constants.WORLD_SIZE)
+        const xCamera = updateWorldCamera(this.map.transform.clone(), this.tb.Constants.WORLD_SIZE)
 
-        // console.log(this.tb.cameraSync.updateCameraState())
         const flip = new THREE.Matrix4().set(
             1.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 1.0,
         )
-        // const model = this.tb.world.matrixWorld.multiply(new THREE.Matrix4().makeTranslation(this.originPoint.x, this.originPoint.y, this.originPoint.z))
-        // const view = new THREE.Matrix4().copy(this.tb.camera.matrixWorldInverse)
-        // const projection = new THREE.Matrix4().copy(this.tb.camera.projectionMatrix)
-        // const mvp = projection.multiply(view).multiply(model).multiply(flip)
-
-
-        // this.xCamera={
-        //     position:cameraP,
-        //     center:centerP,
-        //     up:upDir,
-        //     fov,
-        //     aspect:cameraAspect,
-        //     nearZ:cameraToCenterDistance/10,
-        //     farZ:cameraToCenterDistance*5,
-        // }
-
-        const xCamera = this.tb.cameraSync.xCamera
 
         const xModel = new THREE.Matrix4().multiply(new THREE.Matrix4().makeTranslation(this.op_world[0] - 25.0, this.op_world[1], 10.0))
-        const xView = new THREE.Matrix4().lookAt(xCamera.position, xCamera.center, xCamera.up).premultiply(new THREE.Matrix4().makeTranslation(xCamera.position.x, xCamera.position.y, xCamera.position.z)).invert()
+        const xView = xCamera.view
         const xProjection = this.tb.utils.makePerspectiveMatrix(xCamera.fov, xCamera.aspect, xCamera.nearZ, xCamera.farZ)
         const xMVP = xProjection.multiply(xView).multiply(xModel).multiply(flip)
 
-        // const cameraPos = new THREE.Vector4(0, 0, 0, 1.0).applyMatrix4(this.tb.camera.matrixWorld)
-        // console.log(cameraPos)
+        const center = this.worldToModel(xCamera.center.x, xCamera.center.y)
+        const position = this.worldToModel(xCamera.position.x, xCamera.position.y)
 
         this.dispatchMessage({
             Method: 'Tick',
-            F32Array: [...xMVP.elements, xCamera.position.x, xCamera.position.z, xCamera.position.y, xCamera.center.x, xCamera.center.z, xCamera.center.y]
-            // F32Array: xMVP.elements
-            // F32Array: mvp.elements
+            F32Array: [...xMVP.elements, position[0], position[1], position[2], center[0], center[1], center[2]]
         })
     }
 
@@ -217,16 +214,37 @@ export class UnityLayer {
         gl.clearColor(0.0, 0.0, 0.0, 0.0)
     }
 
+    wgs84ToWorld(lon, lat) {
+
+        const worldSize = this.tb.Constants.WORLD_SIZE
+        const WMC = fromLonLat([lon, lat])
+        return [
+            (WMC[0] - 0.5) * worldSize,
+            (0.5 - WMC[1]) * worldSize
+        ]
+    }
+
+    worldToModel(x, y) {
+
+        return [
+            x - this.op_world[0],
+            0.0,
+            y - this.op_world[1]
+        ]
+    }
+
     remove() {
         if (this.unity) {
             console.log('unityLayer removing')
             this.keep(false)
             this.clear()
-            this.unity.Quit(function() {
+            this.unity.Quit(function () {
                 console.log("done!")
             })
             this.unity = null
         }
+        if(this.map.getLayer('Mask-Layer'))
+            this.map.removeLayer('Mask-Layer')
 
 
         this.tb = undefined
@@ -236,13 +254,11 @@ export class UnityLayer {
         this.originPoint = undefined
         this.dispatchMessage = undefined
         this.unityCanvas = undefined
+
     }
 }
 
 // Helpers //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 function mercatorXfromLon(lon) {
 
     return (180. + lon) / 360.
@@ -262,97 +278,57 @@ function fromLonLat(lonLat) {
 }
 
 
-function updateCamera$2(cameraSync, _worldSize) {
+function updateWorldCamera(t, mercatorWorldSize, minElevation = -30.0) {
 
-    if (!cameraSync.camera) {
-        console.log('nocamera')
-        return;
-    }
-    const t = cameraSync.map.transform;
-    const cameraAspect = t.width / t.height;
-    const offset = t.centerOffset || new THREE.Vector3();
-    let mercatorWorldSize = _worldSize
-    let farZ = 0;
-    let furthestDistance = 0;
-    const halfFov = t._fov / 2;
-    const fov = t._fov;
-    const groundAngle = Math.PI / 2 + t._pitch;
-    const pitchAngle = Math.cos(Math.PI / 2 - t._pitch);
-    let zoomPow = t.scale * cameraSync.state.worldSizeRatio;
-    const cameraToCenterDistance = 0.5 / Math.tan(cameraSync.halfFov) * mercatorWorldSize / t.scale * t.height / 512;
-    let pixelsPerMeter = 1;
-    let worldSize = 5120000
-    if (cameraSync.map.tb.mapboxVersion >= 2.0) {
-        // mapbox version >= 2.0
-        // pixelsPerMeter = cameraSync.mercatorZfromAltitude(1, t.center.lat) * worldSize;
-        // const fovAboveCenter = t._fov * (0.5 + t.centerOffset.y / t.height);
+    const fov = t._fov
+    const halfFov = t._fov / 2
 
-        // // Adjust distance to MSL by the minimum possible elevation visible on screen,
-        // // this way the far plane is pushed further in the case of negative elevation.
-        // const minElevationInPixels = t.elevation ? t.elevation.getMinElevationBelowMSL() * pixelsPerMeter : 0;
-        // const cameraToSeaLevelDistance = ((t._camera.position[2] * worldSize) - minElevationInPixels) / Math.cos(t._pitch);
-        // const topHalfSurfaceDistance = Math.sin(fovAboveCenter) * cameraToSeaLevelDistance / Math.sin(utils.clamp(Math.PI - groundAngle - fovAboveCenter, 0.01, Math.PI - 0.01));
+    const angle = t.angle
+    const pitch = t._pitch
 
-        // // Calculate z distance of the farthest fragment that should be rendered.
-        // furthestDistance = pitchAngle * topHalfSurfaceDistance + cameraToSeaLevelDistance;
+    const aspect = t.width / t.height
 
-        // // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
-        // const horizonDistance = cameraToSeaLevelDistance * (1 / t._horizonShift);
-        // farZ = Math.min(furthestDistance * 1.01, horizonDistance);
-    } else {
-        // mapbox version < 2.0 or azure maps
-        // Furthest distance optimized by @jscastro76
-        const topHalfSurfaceDistance = Math.sin(cameraSync.halfFov) * cameraSync.cameraToCenterDistance / Math.sin(Math.PI - groundAngle - cameraSync.halfFov);
+    const cameraToCenterDistance = 0.5 / Math.tan(halfFov) * mercatorWorldSize / t.scale * t.height / 512.0
 
-        // Calculate z distance of the farthest fragment that should be rendered. 
-        furthestDistance = pitchAngle * topHalfSurfaceDistance + cameraSync.cameraToCenterDistance;
+    // let minElevation = -80.06899999999999 * 30.0
+    const cameraToSeaLevelDistance = ((t._camera.position[2] * mercatorWorldSize) - minElevation) / Math.cos(pitch)
+    const topHalfSurfaceDistance = Math.sin(halfFov) * cameraToSeaLevelDistance / Math.sin(Math.max(Math.PI / 2.0 - pitch - halfFov, 0.01))
+    const furthestDistance = Math.sin(pitch) * topHalfSurfaceDistance + cameraToSeaLevelDistance
+    const horizonDistance = cameraToSeaLevelDistance / t._horizonShift
+    const farZ = Math.min(furthestDistance * 1.01, horizonDistance)
 
-        // Add a bit extra to avoid precision problems when a fragment's distance is exactly `furthestDistance`
-        farZ = furthestDistance * 1.01;
-    }
-    const nz = (t.height / 50); //min near z as coded by @ansis
-    const nearZ = Math.max(nz * pitchAngle, nz); //on changes in the pitch nz could be too low
+    const pitchMatrix = new THREE.Matrix4().makeRotationX(pitch)
+    const angleMatrix = new THREE.Matrix4().makeRotationZ(angle)
+    const worldToCamera = new THREE.Matrix4().multiplyMatrices(angleMatrix, pitchMatrix)
 
-    let x = t.pointMerc.x
-    let y = t.pointMerc.y
+    const x = t.pointMerc.x
+    const y = t.pointMerc.y
+    const centerX = (x - 0.5) * mercatorWorldSize
+    const centerY = (0.5 - y) * mercatorWorldSize
+    const center = new THREE.Vector3(centerX, centerY, 0)
 
-    let centerX = (x - 0.5) * mercatorWorldSize;
-    let centerY = (0.5 - y) * mercatorWorldSize;
-    let centerP = new THREE.Vector3(centerX, centerY, 0);
+    const up = new THREE.Vector3(0, 1, 0)
+        .applyMatrix4(worldToCamera)
 
-    const _pitch = t._pitch;
-    const _angle = t.angle;
+    const position = new THREE.Vector3(0, 0, 1)
+        .applyMatrix4(worldToCamera)
+        .multiplyScalar(cameraToCenterDistance)
+        .add(center)
 
+    const view = new THREE.Matrix4().makeTranslation(position.x, position.y, position.z).multiply(worldToCamera).invert()
 
-    let pitchMatrix = new THREE.Matrix4().makeRotationX(_pitch);
-    let angleMatrix = new THREE.Matrix4().makeRotationZ(_angle);
-
-    let cameraViewMatrix1 = new THREE.Matrix4()
-        .premultiply(pitchMatrix)
-        .premultiply(angleMatrix);
-
-    let cameraP = new THREE.Vector3(0, 0, 1).applyMatrix4(cameraViewMatrix1);
-    cameraP.multiplyScalar(cameraToCenterDistance);
-    cameraP.add(centerP);
-
-    let upDir = new THREE.Vector3(0, 1, 0).applyMatrix4(angleMatrix);
-
-    cameraSync.xCamera = {
-        position: cameraP,
-        center: centerP,
-        up: upDir,
+    return {
+        position,
+        center,
+        up,
         fov,
-        aspect: cameraAspect,
+        aspect,
+        farZ,
         nearZ: cameraToCenterDistance / 200,
-        farZ: cameraToCenterDistance * 200 + 10000,
+        view,
     }
 }
 
-// {
-//     // Used used Matrix Rotation
-//     const zFlipMatrix = new THREE.Matrix4().makeScale(1, 1, -1)
-//     const rotationZ = new THREE.Matrix4().makeRotationZ(Math.PI)
-//     const rotationX = new THREE.Matrix4().makeRotationX(Math.PI / 2)
-//     const rotationMatrix = new THREE.Matrix4().multiplyMatrices(rotationX, rotationZ)
-//     mvp.multiply(zFlipMatrix).multiply(rotationMatrix)
-// }
+export {
+    UnityLayer
+}

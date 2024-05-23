@@ -540,8 +540,8 @@ const FieldMap = {
     div.featDetail {
         position: absolute;
         z-index: 2;
-        left: 20vw;
-        top: 10vh;
+        left: 18vw;
+        top: 0vh;
     }
 
     div.infomation-pannel {

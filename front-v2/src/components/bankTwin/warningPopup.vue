@@ -13,7 +13,7 @@
 
         <dv-border-box10 :color="['rgb(84,163,232)', 'rgb(64,150,242)']" v-show="showChart">
             <div class="warning-chart">
-                <div class="tabs">tabs region</div>
+                <!-- <div class="tabs"></div> -->
                 <div class="chart" ref="chartDom"></div>
             </div>
         </dv-border-box10>
@@ -41,8 +41,14 @@ const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 const chartDom = ref()
 const showChart = ref(false)
 const chartDataLoading = ref(true)
+const fakeWarnCodeList = [
+    'MZS120.55327892_32.02707923_1',
+    'MZS120.51967889_32.04004108_4',
+    'MZS120.541648_32.030524_2'
+]
 
 let myChart = undefined
+
 
 const clickHandler = () => {
     /*
@@ -57,11 +63,11 @@ const clickHandler = () => {
     */
     nextTick(() => {
         showChart.value = !showChart.value
-
-        // console.log(props.warningInfo)
         const daviceMap = ["GNSS", "应力桩", "水压力计", "测斜仪"]
-        let deviceType = daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
-        chartConfig(deviceType)
+        if (fakeWarnCodeList.includes(props.warningInfo.deviceId)) {
+            let deviceType = daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
+            chartConfig(deviceType)
+        }
     })
 }
 
@@ -104,6 +110,10 @@ onMounted(() => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
+
+        &:hover {
+            cursor: pointer;
+        }
 
         // background-color: #e1c39b;
 
@@ -156,7 +166,7 @@ onMounted(() => {
 
             .chart {
                 width: 22vw;
-                height: 24vh;
+                height: 27vh;
                 // background-color: antiquewhite;
             }
         }
