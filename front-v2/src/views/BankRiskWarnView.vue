@@ -9,10 +9,21 @@
                     <div class="confirm-button-text">确认选择</div>
                 </div> -->
                 <div class="place selector-content">
-                    <el-select class="side" v-model="placeValue" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
-                        @change="sceneSelectChange" popper-class="risk-popper">
-                        <el-option v-for="item in placeList" :key="item.value" :label="item.label" :value="item.value"
-                            :disabled="item.disabled">
+                    <el-select
+                        class="side"
+                        v-model="placeValue"
+                        placeholder="选择岸段"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="sceneSelectChange"
+                        popper-class="risk-popper"
+                    >
+                        <el-option
+                            v-for="item in placeList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                            :disabled="item.disabled"
+                        >
                             <span class="section-name-text">{{
                                 item.label
                             }}</span>
@@ -87,100 +98,77 @@
                 <!-- </el-select>
                 </div> -->
                 <div class="risk-year-container">
-                    <div class="risk-year-title">
-                        风险评估数据时效：
-                    </div>
-                    <div class="risk-year-content">
-                        2023年汛后
-                    </div>
+                    <div class="risk-year-title">风险评估数据时效：</div>
+                    <div class="risk-year-content">2023年汛后</div>
                 </div>
             </div>
         </div>
 
         <div class="risk-item-container">
-            <div class="risk-item">
-                <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
-                    <div class="risk-item-text">
-                        水流动力因素
-                    </div>
+            <div class="risk-item" :class="{ active: showWaterPower }">
+                <div
+                    class="risk-main-index waterpower"
+                    @click="showWaterPowerFunc"
+                >
+                    <div class="risk-item-text">水流动力因素</div>
                 </div>
                 <div class="risk-sub-index-container">
                     <div class="risk-sub-index waterpower">
-                        <div class="risk-item-text">
-                            造床流量当量指标
-                        </div>
+                        <div class="risk-item-text">造床流量当量指标</div>
                     </div>
                     <div class="risk-sub-index waterpower">
-                        <div class="risk-item-text">
-                            流速指标
-                        </div>
+                        <div class="risk-item-text">流速指标</div>
                     </div>
                     <div class="risk-sub-index waterpower">
-                        <div class="risk-item-text">
-                            水位变幅指标
-                        </div>
+                        <div class="risk-item-text">水位变幅指标</div>
                     </div>
                 </div>
             </div>
-            <div class="risk-item">
+            <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
-                    <div class="risk-item-text">
-                        河床演变因子
-                    </div>
+                    <div class="risk-item-text">河床演变因子</div>
                 </div>
                 <div class="risk-sub-index-container">
                     <div class="risk-sub-index riverbed">
-                        <div class="risk-item-text">
-                            岸坡最大坡比
-                        </div>
+                        <div class="risk-item-text">岸坡最大坡比</div>
                     </div>
                     <div class="risk-sub-index riverbed">
-                        <div class="risk-item-text">
-                            近岸冲刷速率
-                        </div>
+                        <div class="risk-item-text">近岸冲刷速率</div>
                     </div>
                     <div class="risk-sub-index riverbed">
-                        <div class="risk-item-text">
-                            滩槽高程
-                        </div>
+                        <div class="risk-item-text">滩槽高程</div>
                     </div>
                 </div>
             </div>
-            <div class="risk-item">
-                <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
-                    <div class="risk-item-text">
-                        岸坡地质因子
-                    </div>
+            <div class="risk-item" :class="{ active: showGeologyAndProject }">
+                <div
+                    class="risk-main-index bankGeology"
+                    @click="showGeologyAndProjectFunc"
+                >
+                    <div class="risk-item-text">岸坡地质因子</div>
                 </div>
                 <div class="risk-sub-index-container">
                     <div class="risk-sub-index bankGeology">
-                        <div class="risk-item-text">
-                            河岸组成粒径
-                        </div>
+                        <div class="risk-item-text">河岸组成粒径</div>
                     </div>
                     <div class="risk-sub-index bankGeology">
-                        <div class="risk-item-text">
-                            垂向分层结构
-                        </div>
+                        <div class="risk-item-text">垂向分层结构</div>
                     </div>
                 </div>
             </div>
-            <div class="risk-item">
-                <div class="risk-main-index outproject" @click="showGeologyAndProjectFunc">
-                    <div class="risk-item-text">
-                        外部工程因子
-                    </div>
+            <div class="risk-item" :class="{ active: showGeologyAndProject }">
+                <div
+                    class="risk-main-index outproject"
+                    @click="showGeologyAndProjectFunc"
+                >
+                    <div class="risk-item-text">外部工程因子</div>
                 </div>
                 <div class="risk-sub-index-container">
                     <div class="risk-sub-index outproject">
-                        <div class="risk-item-text">
-                            护岸强度
-                        </div>
+                        <div class="risk-item-text">护岸强度</div>
                     </div>
                     <div class="risk-sub-index outproject">
-                        <div class="risk-item-text">
-                            局部突加荷载
-                        </div>
+                        <div class="risk-item-text">局部突加荷载</div>
                     </div>
                 </div>
             </div>
@@ -188,7 +176,11 @@
 
         <div class="raster-control-block">
             <label class="switch">
-                <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
+                <input
+                    type="checkbox"
+                    :checked="showRaster"
+                    @click="RasterControlHandler()"
+                />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -197,19 +189,11 @@
         </div>
 
         <div class="risk-line-container">
-            <div class="risk-line-title">
-                风险等级图例：
-            </div>
+            <div class="risk-line-title">风险等级图例：</div>
             <div class="risk-line"></div>
-            <div class="risk-line-mark low">
-                低风险
-            </div>
-            <div class="risk-line-mark middle">
-                中风险
-            </div>
-            <div class="risk-line-mark high">
-                高风险
-            </div>
+            <div class="risk-line-mark low">低风险</div>
+            <div class="risk-line-mark middle">中风险</div>
+            <div class="risk-line-mark high">高风险</div>
         </div>
 
         <div class="warn-status-container" v-if="showRiskStatus">
@@ -217,14 +201,10 @@
             <!-- <div class="warn-status-content" :class="riskDataAll[riskDataIndex-1].value">
                 {{ riskDataAll[riskDataIndex-1].label }}
             </div> -->
-            <div class="warn-status-content high">
-                高风险
-            </div>
+            <div class="warn-status-content high">高风险</div>
         </div>
         <div v-if="showRiskStatus" class="warn-detail-container high">
-            <div class="warn-detail-title">
-                高风险区域集中在：
-            </div>
+            <div class="warn-detail-title">高风险区域集中在：</div>
             <div class="warn-detail-profile">
                 {{ getRiskAreas('high') }}
             </div>
@@ -241,33 +221,77 @@
             <button @click="showGeologyAndProjectFunc">地质条件</button>
         </div> -->
 
-        <profileInfoVue v-if="showProfileInfo" @profile-value-change="changeProfileValue" :profileData="profileData"
-            :profileList="profileList" :shapeChartLoad="shapeChartLoad" :erosionChartLoad="erosionChartLoad" />
+        <profileInfoVue
+            v-if="showProfileInfo"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
+            :profileList="profileList"
+            :shapeChartLoad="shapeChartLoad"
+            :erosionChartLoad="erosionChartLoad"
+        />
 
-        <profileShapeYearlyVue v-if="showYearlyProfileShape" @profile-value-change="changeProfileValue"
-            :profileData="profileData" :profileList="profileList" :shapeYearlyChartLoad="shapeYearlyChartLoad" />
+        <profileShapeYearlyVue
+            v-if="showYearlyProfileShape"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
+            :profileList="profileList"
+            :shapeYearlyChartLoad="shapeYearlyChartLoad"
+        />
 
-        <profileShapeVue v-if="showProfileShape" @profile-value-change="changeProfileValue" :profileData="profileData"
-            :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
+        <profileShapeVue
+            v-if="showProfileShape"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
+            :profileDataCompare="profileDataCompare"
+            :profileList="profileList"
+            :shapeChartLoad="shapeChartLoad"
+        />
 
         <!-- <div class="drag profileSlope" v-if="showProfileSlope" v-draggable="{ bounds: 'body', cancel: 'div.content' }"> -->
-        <profileSlopeVue v-if="showProfileSlope" @profile-value-change="changeProfileValue" :profileData="profileData"
-            :profileList="profileList" :slopeChartLoad="slopeChartLoad" />
+        <profileSlopeVue
+            v-if="showProfileSlope"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
+            :profileList="profileList"
+            :slopeChartLoad="slopeChartLoad"
+        />
         <!-- </div> -->
 
-        <profileErosionVue v-if="showProfileErosion" @profile-value-change="changeProfileValue"
-            :profileData="profileData" :profileList="profileList" :slopeChartLoad="erosionChartLoad" />
+        <profileErosionVue
+            v-if="showProfileErosion"
+            @profile-value-change="changeProfileValue"
+            :profileData="profileData"
+            :profileList="profileList"
+            :slopeChartLoad="erosionChartLoad"
+        />
 
-        <div v-if="showBedFlowChart"
-            style="position: absolute; top:1vh; right:1vw; width:30.2vw; height: 29vh; z-index: 10;">
+        <div
+            v-if="showBedFlowChart"
+            style="
+                position: absolute;
+                top: 1vh;
+                right: 1vw;
+                width: 30.2vw;
+                height: 29vh;
+                z-index: 10;
+            "
+        >
             <bedFlowChartVue />
         </div>
 
-        <flowspeedInfoVue v-if="showFlowSpeed" :profileList="profileList" :waterCondition="waterCondition"
-            :flowspeedChartLoad="flowspeedChartLoad" />
+        <flowspeedInfoVue
+            v-if="showFlowSpeed"
+            :profileList="profileList"
+            :waterCondition="waterCondition"
+            :flowspeedChartLoad="flowspeedChartLoad"
+        />
         <div v-if="showFlowSpeed" class="flow-control-block">
             <label class="switch">
-                <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
+                <input
+                    type="checkbox"
+                    :checked="showFlow"
+                    @click="flowControlHandler()"
+                />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -275,11 +299,24 @@
             </div>
         </div>
         <div v-if="showFlowSpeed" class="time-shower-block">
-            <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
+            <flowTimeShower
+                :type="'exp'"
+                :time-step="timeStep"
+                :total-count="25"
+            ></flowTimeShower>
         </div>
 
-        <div v-if="showWaterProcessChart"
-            style="position: absolute; top:62vh; right:1vw; width:30.2vw; height: 29vh; z-index: 10;">
+        <div
+            v-if="showWaterProcessChart"
+            style="
+                position: absolute;
+                top: 62vh;
+                right: 1vw;
+                width: 30.2vw;
+                height: 29vh;
+                z-index: 10;
+            "
+        >
             <waterProcessChartVue />
         </div>
 
@@ -290,7 +327,11 @@
             :showRiskResult="showRiskResult"
         /> -->
 
-        <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        <div
+            class="drag riskResult"
+            v-if="showRiskResult"
+            v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+        >
             <riskResultVue :profileList="profileList" />
         </div>
 
@@ -356,10 +397,18 @@
             </div>
         </div> -->
 
-        <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh">
+        <el-dialog
+            v-model="sectionConfirmShow"
+            title="绘制断面确认"
+            width="40vh"
+        >
             <span>确认使用此断面进行计算</span>
-            <el-input v-model="tempProfileName" style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
-                placeholder="请输入断面名称" clearable />
+            <el-input
+                v-model="tempProfileName"
+                style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
+                placeholder="请输入断面名称"
+                clearable
+            />
             <template #footer>
                 <div class="dialog-footer">
                     <div style="text-align: right">
@@ -399,7 +448,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent } from 'vue'
+import {
+    onMounted,
+    ref,
+    reactive,
+    watch,
+    onUnmounted,
+    defineAsyncComponent,
+} from 'vue'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -421,43 +477,52 @@ import { convertToMercator } from '../components/bankRiskWarn/coordConvert.js'
 import { rasterMM } from '../components/bankRiskWarn/rasterMM'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import { connectionExists } from '@vue-flow/core'
-import { defaultWarnLayerDataInput, profileListInput, sceneListInput, placeList, InfoTree, waterCondition } from '../components/bankRiskWarn/data'
+import {
+    defaultWarnLayerDataInput,
+    profileListInput,
+    sceneListInput,
+    placeList,
+    InfoTree,
+    waterCondition,
+} from '../components/bankRiskWarn/data'
 // import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 // import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
 
-const riskResultBarVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/riskResultBar.vue')
+const curActiveIndex = ref(-1)
+
+const riskResultBarVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/riskResultBar.vue'),
 )
-const riskResultVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/riskResult.vue')
-);
-const flowspeedInfoVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/flowspeedInfo.vue')
-);
-const profileInfoVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/profileInfo.vue')
+const riskResultVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/riskResult.vue'),
 )
-const profileShapeYearlyVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/profileShapeYearly.vue')
+const flowspeedInfoVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/flowspeedInfo.vue'),
 )
-const profileShapeVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/profileShapeCompare.vue')
+const profileInfoVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileInfo.vue'),
 )
-const profileSlopeVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/profileSlope.vue')
+const profileShapeYearlyVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileShapeYearly.vue'),
 )
-const profileErosionVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/profileErosion.vue')
+const profileShapeVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileShapeCompare.vue'),
 )
-const bedFlowChartVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/BedFlowChart.vue')
+const profileSlopeVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileSlope.vue'),
 )
-const waterProcessChartVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/WaterProcessChart.vue')
+const profileErosionVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileErosion.vue'),
 )
-const geologyAndProjectVue = defineAsyncComponent(() =>
-    import('../components/bankRiskWarn/GeologyAndProject.vue')
+const bedFlowChartVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/BedFlowChart.vue'),
+)
+const waterProcessChartVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/WaterProcessChart.vue'),
+)
+const geologyAndProjectVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/GeologyAndProject.vue'),
 )
 
 // const activeStatus = ref([true, false, false])
@@ -522,24 +587,23 @@ let defaultWarnLayerData = defaultWarnLayerDataInput
 const riskDataAll = ref([
     {
         value: 'low',
-        label: '低风险'
+        label: '低风险',
     },
     {
         value: 'middle',
-        label: '中风险'
+        label: '中风险',
     },
     {
         value: 'high',
-        label: '高风险'
+        label: '高风险',
     },
 ])
 const placeValue = ref('mzs')
 
-
 // 场景与地形选择
-const sceneBeforeSelectChange = () => { }
+const sceneBeforeSelectChange = () => {}
 
-const sceneNowSelectChange = () => { }
+const sceneNowSelectChange = () => {}
 
 const confirmProfileTime = () => {
     sceneConfirmShow.value = true
@@ -562,7 +626,7 @@ const getProfileTime = () => {
 }
 
 const getRiskAreas = (riskLevel) => {
-    let resultString = ""
+    let resultString = ''
     profileList.value.map((item) => {
         if (item.risk === riskLevel) {
             resultString = resultString + item.nickname + '  '
@@ -572,7 +636,7 @@ const getRiskAreas = (riskLevel) => {
 }
 
 const getRiskAreasAll = () => {
-    let resultString = ""
+    let resultString = ''
     profileList.value.map((item) => {
         resultString + item.nickname + ' '
     })
@@ -618,7 +682,7 @@ const sureSceneRese = async () => {
 const changeProfileValue = (value) => {
     mapInstance.setFilter(
         'mzsBankLineChoosen',
-        profileList.value[value - 1].filter
+        profileList.value[value - 1].filter,
     )
 }
 
@@ -727,7 +791,7 @@ const CalProfile = async (before, now) => {
 const CalProfileById = async (before, now, id) => {
     const taskId = await bankRiskWarn.runProfileModel_long(before, now, id + 1)
     let RunStatus
-    for (; ;) {
+    for (;;) {
         try {
             RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
         } catch (error) {
@@ -750,7 +814,9 @@ const CalProfileById = async (before, now, id) => {
 
 // 获取断面风险和流速信息1-2(2)
 const CalProfileList = (profileData) => {
-    let lowNum = 0, middleNum = 0, highNum = 0
+    let lowNum = 0,
+        middleNum = 0,
+        highNum = 0
     profileData.map((value, index) => {
         const riskLevel = value.risk[2]
         defaultWarnLayerData[index].warnValue = value.risk[2]
@@ -776,7 +842,7 @@ const CalProfileList = (profileData) => {
         }
         try {
             profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) { }
+        } catch (error) {}
     })
     let map = useMapStore().getMap()
     if (map) {
@@ -797,7 +863,7 @@ const CalProfileListForShow = (profileData) => {
         }
         try {
             profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) { }
+        } catch (error) {}
     })
     let map = useMapStore().getMap()
     if (map) {
@@ -807,16 +873,16 @@ const CalProfileListForShow = (profileData) => {
     }
 }
 
-const sceneSelectChange = () => { }
+const sceneSelectChange = () => {}
 
-const onAddOption = () => { }
+const onAddOption = () => {}
 
-const onAddProfileOption = () => { }
+const onAddProfileOption = () => {}
 
-const onAddProfile = () => { }
+const onAddProfile = () => {}
 
 const flowControlHandler = async () => {
-    console.log('!!!!flow  control');
+    console.log('!!!!flow  control')
     showFlow.value = !showFlow.value
     // console.log(showFlow.value);
     if (showFlow.value) {
@@ -937,12 +1003,13 @@ const showFlowSpeedFunc = async () => {
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
 const showWaterPower = ref(false)
 const showWaterPowerFunc = async () => {
+    console.log('213123213', curActiveIndex.value)
+
     if (showRiverBed.value === true) {
         showRiverBedFunc()
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
-
     showWaterPower.value = !showWaterPower.value
     showBedFlowChartFunc()
     showWaterProcessChartFunc()
@@ -951,7 +1018,6 @@ const showWaterPowerFunc = async () => {
 
 const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
-
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
     } else if (showGeologyAndProject.value === true) {
@@ -959,8 +1025,10 @@ const showRiverBedFunc = () => {
     }
 
     showRiverBed.value = !showRiverBed.value
-    if ((showRaster.value === false && showProfileShape.value === true)
-        || (showRaster.value === true && showProfileShape.value === false)) {
+    if (
+        (showRaster.value === false && showProfileShape.value === true) ||
+        (showRaster.value === true && showProfileShape.value === false)
+    ) {
         showProfileShapeFunc()
         showYearlyProfileShapeFunc()
         return
@@ -972,7 +1040,6 @@ const showRiverBedFunc = () => {
 
 const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
-
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
     } else if (showRiverBed.value === true) {
@@ -1131,7 +1198,7 @@ const sureSectionRese = async () => {
         EndPtY,
     )
     let RunStatus = ''
-    for (; ;) {
+    for (;;) {
         try {
             RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
         } catch (error) {
@@ -1508,7 +1575,6 @@ onMounted(async () => {
         // map.addControl(draw)
 
         useMapStore().setMap(map)
-
     })
 
     getProfileTime()
@@ -1529,6 +1595,18 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+$waterOriColor: rgba(33, 100, 182, 0.6);
+$waterEndColor: rgba(0, 65, 145, 0.8);
+
+$bedOriColor: rgba(39, 145, 87, 0.6);
+$bedEndColor: rgba(0, 116, 52, 0.8);
+
+$geoOriColor: rgba(95, 21, 138, 0.6);
+$geoEndColor: rgba(78, 0, 122, 0.8);
+
+$proOriColor: rgba(228, 143, 16, 0.6);
+$proEndColor: rgba(189, 114, 1, 0.6);
+
 div.risk-warn-container {
     position: absolute;
     width: 100vw;
@@ -1895,7 +1973,12 @@ div.risk-warn-container {
             border-radius: 20px;
             // border:#0f1011 2px solid;
             z-index: 5;
-            background-image: linear-gradient(to right, rgb(17, 17, 255), rgb(220, 126, 37), rgb(255, 9, 9));
+            background-image: linear-gradient(
+                to right,
+                rgb(17, 17, 255),
+                rgb(220, 126, 37),
+                rgb(255, 9, 9)
+            );
             box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
         }
 
@@ -2009,11 +2092,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                +.slider {
+                + .slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                +.slider:before {
+                + .slider:before {
                     transform: translateY(-1.5em);
                 }
             }
@@ -2075,7 +2158,7 @@ div.risk-warn-container {
             color-scheme: light;
             font-family: 'Microsoft YaHei';
             font-weight: bolder;
-            font-size: calc(1.0vw + 0.6vh);
+            font-size: calc(1vw + 0.6vh);
         }
     }
 
@@ -2091,79 +2174,146 @@ div.risk-warn-container {
         z-index: 3;
         display: flex;
         flex-direction: column;
+        backdrop-filter: blur(8px);
 
         div.risk-item {
             flex: 1 1 0;
             position: relative;
             display: flex;
-        }
 
-        div.risk-sub-index-container {
-            flex: 1 1 0;
-            display: flex;
-            flex-direction: column;
-
-            div.risk-sub-index {
+            div.risk-sub-index-container {
                 flex: 1 1 0;
-                transition: transform 0.3s ease;
-                position: relative;
                 display: flex;
-                align-items: center;
-                justify-content: center;
+                flex-direction: column;
 
-                &.waterpower {
-                    background-color: rgba(33, 100, 182, 0.4);
-                }
-
-                &.waterpower:nth-child(2n+1) {
-                    background-color: rgba(33, 100, 182, 0.5);
-                }
-
-                &.riverbed {
-                    background-color: rgba(45, 165, 99, 0.4);
-                }
-
-                &.riverbed:nth-child(2n+1) {
-                    background-color: rgba(45, 165, 99, 0.5);
-                }
-
-
-                &.bankGeology {
-                    background-color: rgba(107, 24, 155, 0.4);
-                }
-
-                &.bankGeology:nth-child(2n+1) {
-                    background-color: rgba(107, 24, 155, 0.5);
-                }
-
-                &.outproject {
-                    background-color: rgba(245, 155, 20, 0.4);
-                }
-
-                &.outproject:nth-child(2n+1) {
-                    background-color: rgba(245, 155, 20, 0.5);
-                }
-
-                div.risk-item-text {
+                div.risk-sub-index {
+                    flex: 1 1 0;
+                    transition: transform 0.3s ease;
                     position: relative;
-                    text-align: center;
-                    font-size: calc(0.6vw + 0.6vh);
-                    color: white;
-                    font-family: 'Microsoft YaHei';
-                    font-weight: bolder;
-                    text-shadow:
-                        #101113 2px 2px,
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &.waterpower {
+                        background-color: rgba(33, 100, 182, 0.2);
+                    }
+
+                    &.waterpower:nth-child(2n + 1) {
+                        background-color: rgba(33, 100, 182, 0.3);
+                    }
+
+                    &.riverbed {
+                        background-color: rgba(45, 165, 99, 0.2);
+                    }
+
+                    &.riverbed:nth-child(2n + 1) {
+                        background-color: rgba(45, 165, 99, 0.3);
+                    }
+
+                    &.bankGeology {
+                        background-color: rgba(107, 24, 155, 0.2);
+                    }
+
+                    &.bankGeology:nth-child(2n + 1) {
+                        background-color: rgba(107, 24, 155, 0.3);
+                    }
+
+                    &.outproject {
+                        background-color: rgba(245, 155, 20, 0.2);
+                    }
+
+                    &.outproject:nth-child(2n + 1) {
+                        background-color: rgba(245, 155, 20, 0.3);
+                    }
+
+                    div.risk-item-text {
+                        position: relative;
+                        text-align: center;
+                        font-size: calc(0.6vw + 0.6vh);
+                        color: white;
+                        font-family: 'Microsoft YaHei';
+                        font-weight: bolder;
+                        text-shadow: #101113 2px 2px;
                         // #767779 2px 2px,
                         // #6493ff 3px 3px;
+                    }
+                }
+            }
+
+            @keyframes colorSlide {
+                0% {
+                    background-position: 0% 50%;
+                }
+                // 50% {
+                //     background-position: 200% 50%;
+                // }
+                100% {
+                    background-position: 300% 50%;
+                }
+            }
+
+            &.active {
+                div.risk-main-index {
+                    &.waterpower {
+                        animation: colorSlide ease-in-out 2s;
+                        animation-fill-mode: forwards;
+                    }
+
+                    &.riverbed {
+                        animation: colorSlide ease-in-out 2s;
+                        animation-fill-mode: forwards;
+                    }
+
+                    &.bankGeology {
+                        animation: colorSlide ease-in-out 2s;
+                        animation-fill-mode: forwards;
+                    }
+
+                    &.outproject {
+                        animation: colorSlide ease-in-out 2s;
+                        animation-fill-mode: forwards;
+                    }
+                }
+
+                div.risk-sub-index-container {
+                    div.risk-sub-index {
+                        &.waterpower {
+                            background-color: rgb(15, 116, 199);
+                        }
+
+                        &.waterpower:nth-child(2n + 1) {
+                            background-color: rgb(0, 85, 189);
+                        }
+
+                        &.riverbed {
+                            background-color: rgb(22, 153, 81);
+                        }
+                        &.riverbed:nth-child(2n + 1) {
+                            background-color: rgb(0, 177, 80);
+                        }
+
+                        &.bankGeology {
+                            background-color: rgb(108, 1, 170);
+                        }
+
+                        &.bankGeology:nth-child(2n + 1) {
+                            background-color: rgb(148, 42, 209);
+                        }
+
+                        &.outproject {
+                            background-color: rgb(182, 117, 20);
+                        }
+                        &.outproject:nth-child(2n + 1) {
+                            background-color: rgb(219, 132, 0);
+                        }
+                    }
                 }
             }
         }
 
-
         div.risk-main-index {
             width: 8vw;
             cursor: pointer;
-            transition: transform 0.3s ease;
             position: relative;
             flex: 1 1 0;
             display: flex;
@@ -2174,20 +2324,60 @@ div.risk-warn-container {
             //     transform: scale(1.03);
             // }
 
+            // background-position: 0% 50%;
+
             &.waterpower {
-                background-color: rgba(28, 85, 156, 0.6);
+                // transition: all ease-in-out;
+                background: linear-gradient(
+                    90deg,
+                    rgba(33, 100, 182, 0.4),
+                    // rgba(33, 100, 182, 0.6),
+                    // rgba(0, 34, 215, 1),
+                    // rgba(0, 34, 215, 1),
+                    rgba(0, 34, 215, 1),
+                    rgba(0, 34, 215, 1)
+                );
+                background-size: 400% 100%;
+                // background-color: rgba(28, 85, 156, 0.6);
             }
 
             &.riverbed {
-                background-color: rgba(39, 145, 87, 0.6);
+                background: linear-gradient(
+                    90deg,
+                    rgba(39, 145, 87, 0.4),
+                    // rgba(39, 145, 87, 0.6),
+                    // rgb(0, 121, 16, 1),
+                    // rgba(0, 121, 16, 1),
+                    rgba(0, 121, 16, 1),
+                    rgba(0, 121, 16, 1)
+                );
+                background-size: 400% 100%;
             }
 
             &.bankGeology {
-                background-color: rgba(95, 21, 138, 0.6);
+                background: linear-gradient(
+                    90deg,
+                    rgba(95, 21, 138, 0.4),
+                    // rgba(95, 21, 138, 0.6),
+                    // rgb(63, 0, 121, 1),
+                    // rgba(63, 0, 121, 1),
+                    rgba(63, 0, 121, 1),
+                    rgba(63, 0, 121, 1)
+                );
+                background-size: 400% 100%;
             }
 
             &.outproject {
-                background-color: rgba(228, 143, 16, 0.6);
+                background: linear-gradient(
+                    90deg,
+                    rgba(228, 143, 16, 0.4),
+                    // rgba(228, 143, 16, 0.6),
+                    // rgba(121, 83, 0, 1),
+                    // rgba(121, 83, 0, 1),
+                    rgba(121, 83, 0, 1),
+                    rgba(121, 83, 0, 1)
+                );
+                background-size: 400% 100%;
             }
 
             div.risk-item-text {
@@ -2202,10 +2392,7 @@ div.risk-warn-container {
                     #6493ff 3px 3px;
             }
         }
-
-
     }
-
 
     div.raster-control-block {
         position: absolute;
@@ -2256,11 +2443,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                +.slider {
+                + .slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                +.slider:before {
+                + .slider:before {
                     transform: translateY(-1.5em);
                 }
             }
