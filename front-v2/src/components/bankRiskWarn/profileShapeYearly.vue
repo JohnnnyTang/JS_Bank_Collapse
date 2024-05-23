@@ -1,7 +1,7 @@
 <template>
 <div class="riskInfo-container">
     <div class="riskInfo-title">
-        当前年份断面
+        当前断面形态
     </div>
     <div class="riskInfo-item profileShape">
         <div class="item-title">{{ profileName }}</div>
@@ -45,7 +45,7 @@
     <div class="text-info-container">
         <div class="text-info-item">
             该断面滩槽高差为 <span style="color: red;">{{ gaochaList[profileValue-1]}}</span> m，
-            岸坡坡比为 <span style="color: red;">{{ pobiList[profileValue-1] }}</span>
+            最大岸坡坡比为 <span style="color: red;">{{ pobiList[profileValue-1] }}</span>
         </div>
     </div>
 </div>
@@ -291,16 +291,16 @@ div.riskInfo-container {
 
     div.text-info-container {
         position:absolute;
-        width: 23.15vw;
+        width: 23.8vw;
         height: 5.25vh;
-        left: 0.5vw;
+        left: 0.1vw;
         bottom: 2vh;
         background-color: rgba(7, 24, 182, 0.5);
         border-radius: 5px;
 
         div.text-info-item {
             position: absolute;
-            left: 1.3vw;
+            left: 0.8vw;
             top: 1.3vh;
             color: #f2f4f7;
             font-size: calc(0.7vw + 0.5vh);

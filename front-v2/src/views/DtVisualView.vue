@@ -1,7 +1,7 @@
 <template>
     <div class="data-visual-container">
         <div class="sideBar">
-            <sideBar @detailClick="detailClickHandler4layerGroup"></sideBar>
+            <sideBar @detailClick="detailClickHandler4Feature"></sideBar>
         </div>
         <div class="mapBase">
             <div ref="mapContainer" id="map"></div>
@@ -94,8 +94,9 @@ import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
 import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapUtils';
 import { useMapStore, useNewSceneStore } from '../store/mapStore';
 import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
-import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt } from '../components/dataVisual/js/tilefieldMAP';
+import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt,layerSourceMap } from '../components/dataVisual/js/tilefieldMAP';
 import axios from 'axios';
+import { initSortedLayer } from '../components/dataVisual/layerUtil'
 import { clickOutSide as vClickOutSide } from '@mahdikhashan/vue3-click-outside'
 
 
@@ -106,8 +107,6 @@ const mapStore = useMapStore()
 const sceneStore = useNewSceneStore()
 const activeStatus = ref([false, false])
 const styles = [
-    // { backgroundImage: `url('/icons/searching.png')` },
-    // { backgroundImage: `url('/icons/layers.png')` },
     { backgroundImage: `url('/icons/legend.png')` },
     { backgroundImage: `url('/icons/full.png')` },
 ]
@@ -130,12 +129,17 @@ const baseMapRadio = ref(1)
 
 
 
-const baseMapChangeHandler = () => {
+const baseMapChangeHandler = async() => {
     let map = mapStore.getMap()
+    console.log('base map change', baseMapRadio.value);
     if (baseMapRadio.value == 0) {
         map.setStyle(getImageStyleJson())
+        await initSortedLayer(map)
     } else {
         map.setStyle(getStyleJson4base())
+        await initSortedLayer(map)
+
+
     }
 }
 
@@ -192,7 +196,11 @@ const detailClickHandler4layerGroup = async (lable) => {
     console.log(infoTableHeader.value);
 
 }
-const detailClickHandler4Feature = async (featInfo) => {
+const detailClickHandler4Feature = async (featInfo,lgId) => {
+    console.log(featInfo,lgId);
+    // let nowSource = 'importantBank'
+    let nowSource = layerSourceMap[lgId]
+    console.log(nowSource);
     let newFeatInfomation = {
         ogData: featInfo,
         sourceId: nowSource,
@@ -675,6 +683,4 @@ const FieldMap = {
     text-align: center;
     font-size: calc(0.5vw + 0.5vh);
 }
-
-
 </style>
