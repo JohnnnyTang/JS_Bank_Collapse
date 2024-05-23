@@ -8,7 +8,9 @@
                         {{ fMap[key] }}
                     </div>
                 </template>
-                {{ data[key] }}
+                <el-scrollbar max-height="10vh">
+                    {{ data[key] }}
+                </el-scrollbar>
             </el-descriptions-item>
         </el-descriptions>
     </div>

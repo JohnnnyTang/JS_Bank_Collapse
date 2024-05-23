@@ -113,10 +113,10 @@ const sourceFieldMap = {
             "monitoring_length": '岸段长度',
             "warning_level": "预警等级",
             "description": '简介',
-            "fix_project":'治理工程'
+            "fix_project": '治理工程'
         }
     },
-    'sandBar':{
+    'sandBar': {
         "original": "主要洲滩",
         "fieldMap": {
             "name": "名称",
@@ -172,7 +172,7 @@ const sourceColumnMap = {
     "pumpArea": 2,
     "reservoirArea": 2,
     "sluiceArea": 2,
-    "importantBank": 2,
+    "importantBank": 3,
     'sandBar': 2
 }
 const legendStyleMap = {
@@ -370,29 +370,8 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-color': 'rgb(239,241,241)',
-            'border-color': 'rgb(51, 38, 71)',
-            'border-width': '1px',
-            'border-style': 'solid',
-        },
-        text: '行政区划'
-    },
-    {
-        style: {
-            'height': '80%',
-            'width': '50%',
-            // 'background-image': `url('/legend/湖泊.png')`,
-            'background-color': `rgb(171,225,247)`,
-            'background-size': 'cover',
-        },
-        text: '湖泊/河流/水库'
-    },
-    {
-        style: {
-            'height': '80%',
-            'width': '50%',
             'background-image': `url('/legend/水闸.png')`,
-            'transform': 'translateX(16%)',
+            'transform': 'translateX(10%) scale(0.95)',
         },
         text: '水闸工程'
     },
@@ -407,26 +386,36 @@ const legendListt = [
     },
     {
         style: {
-            'height': '80%',
-            'width': '50%',
-            'background-image': `url('/legend/枢纽.png')`,
-            'transform': 'translateX(25%)',
-        },
-        text: '枢纽工程'
-    },
-    {
-        style: {
             'height': '15%',
             'width': '50%',
             'background-color': '#958E54',
         },
         text: '长江干堤'
     },
-    /*
-    已建--plan==1  #ff7875
-    在建--plan==0  #ffd875
-    规划--plan==-1 #b8ff75
-    */
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': '#ff3d2b',
+        },
+        text: '一级预警岸段'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(27, 74, 245)',
+        },
+        text: '二级预警岸段'
+    },
+    {
+        style: {
+            'height': '15%',
+            'width': '50%',
+            'background-color': 'rgb(127, 113, 143)',
+        },
+        text: '三级预警岸段'
+    },
     {
         style: {
             'height': '15%',
@@ -464,36 +453,11 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('/legend/水库.png')`,
+            'background-color': `rgb(171,225,247)`,
             'background-size': 'cover',
         },
-        text: '水库工程'
+        text: '湖泊/河流/水库'
     },
-    {
-        style: {
-            'height': '15%',
-            'width': '50%',
-            'background-color': 'rgb(247, 21, 0)',
-        },
-        text: '一级预警岸段'
-    },
-    {
-        style: {
-            'height': '15%',
-            'width': '50%',
-            'background-color': 'rgb(222, 106, 4)',
-        },
-        text: '二级预警岸段'
-    },
-    {
-        style: {
-            'height': '15%',
-            'width': '50%',
-            'background-color': 'rgb(173, 162, 5)',
-        },
-        text: '三级预警岸段'
-    },
-
 ]
 
 
@@ -748,7 +712,7 @@ const layerSourceMap = {
     '岸段-注记': 'importantBank',
     '水闸工程': 'sluiceArea',
     '枢纽工程': 'combineProjectPoint',
-    '主要洲滩':'sandBar'
+    '主要洲滩': 'sandBar'
 }
 
 const filterMap = {

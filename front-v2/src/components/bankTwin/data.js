@@ -753,23 +753,27 @@ const getGNSSoption = () => {
     for (let i = xmove.length - 1; i >= 0; i--) {
         timeData.push(nowTime.subtract(i, 'second').format('YYYY-MM-DD HH:mm:ss'))
     }
-    console.log(timeData)
     let xmoveDT = getData(timeData, xmove)
     let ymoveDT = getData(timeData, ymove)
     let zmoveDT = getData(timeData, zmove)
     let mmoveDT = getData(timeData, mmove)
     let option = {
         title: {
-            text: "Stacked Line"
+            text: "土体表面位移现场GNSS测量站监测数据",
+            left: 'center',
+            top: '2%'
         },
         tooltip: {
             trigger: "axis"
         },
-        legend: {},
+        legend: {
+            top: '10%'
+        },
         grid: {
-            left: "3%",
+            left: "7%",
             right: "4%",
             bottom: "3%",
+            top: '20%',
             containLabel: true
         },
         toolbox: {
@@ -782,26 +786,33 @@ const getGNSSoption = () => {
             boundaryGap: false,
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            name: '土体表面累计位移监测(mm)',
+            nameLocation: 'center',
+            nameTextStyle: { // 设置名称的样式
+                rotate: 90 // 将名称旋转 90 度
+            },
+            nameGap: 40,
+
         },
         series: [
             {
-                name: "xmove",
+                name: "累计X向水平位移",
                 type: "line",
                 data: xmoveDT
             },
             {
-                name: "ymove",
+                name: "累计y向水平位移",
                 type: "line",
                 data: ymoveDT
             },
             {
-                name: "zmove",
+                name: "累计z向垂直位移",
                 type: "line",
                 data: zmoveDT
             },
             {
-                name: "mmove",
+                name: "三维累计位移",
                 type: "line",
                 data: mmoveDT
             }
@@ -834,16 +845,21 @@ const getInclineoption = () => {
     const bottommoveDT = getData(timeData, bottommove)
     let option = {
         title: {
-            text: "Stacked Line"
+            text: "土体内部位移现场KX-01测量站监测数据",
+            left: 'center',
+            top: '2%'
         },
         tooltip: {
             trigger: "axis"
         },
-        legend: {},
+        legend: {
+            top: '10%',
+        },
         grid: {
-            left: "3%",
+            left: "8%",
             right: "4%",
             bottom: "3%",
+            top: '20%',
             containLabel: true
         },
         toolbox: {
@@ -856,11 +872,17 @@ const getInclineoption = () => {
             boundaryGap: false,
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            name: '土体内部位移(mm)',
+            nameLocation: 'center',
+            nameTextStyle: { // 设置名称的样式
+                rotate: 90 // 将名称旋转 90 度
+            },
+            nameGap: 40,
         },
         series: [
             {
-                name: "bottomMove",
+                name: "底部位移",
                 type: "line",
                 data: bottommoveDT
             },
@@ -878,16 +900,21 @@ const getStressoption = () => {
     const stressDT = getData(timeData, stressValue)
     let option = {
         title: {
-            text: "Stacked Line"
+            text: "土体内部应力桩现场YL-05测量站主应变监测数据",
+            left: 'center',
+            top: '2%',
         },
         tooltip: {
             trigger: "axis"
         },
-        legend: {},
+        legend: {
+            top: '10%',
+        },
         grid: {
-            left: "3%",
+            left: "8%",
             right: "4%",
             bottom: "3%",
+            top: '20%',
             containLabel: true
         },
         toolbox: {
@@ -900,11 +927,17 @@ const getStressoption = () => {
             boundaryGap: false,
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            name: '土体内部应力桩应变监测值（με)',
+            nameLocation: 'center',
+            nameTextStyle: { // 设置名称的样式
+                rotate: 90 // 将名称旋转 90 度
+            },
+            nameGap: 40,
         },
         series: [
             {
-                name: "stress",
+                name: "上层主应变",
                 type: "line",
                 data: stressDT
             },
