@@ -1,9 +1,7 @@
 <template>
     <div class="flowspeed-content">
         <div class="flowspeed-title">
-            <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
-                流速信息展示
-            </dv-border-box2>
+            流速信息展示
         </div>
         <div class="riskInfo-item flowspeed">
             <div class="item-title">
@@ -89,21 +87,22 @@ watch(props.profileList, () => {
 <style lang="scss" scoped>
 div.flowspeed-content{
     position: absolute;
-    top: 57vh;
-    right: 1vw;
+    top: 31vh;
+    right: 2vw;
     height: 30vh;
     width: 30.2vw;
-    border-radius: 8px;
-    border: #167aec 1px solid;
-    background-color: rgba(179, 201, 228, 0.6);
+    border-radius: 4px;
+    // border: #167aec 1px solid;
+    box-shadow: 12px 12px 20px -10px rgba(0, 0, 0, 0.8);
+    background-color: rgb(208, 236, 255);
     backdrop-filter: blur(5px);
     z-index:2;
 
     div.flowspeed-title {
         position: absolute;
-        left: 9.5vw;
+        padding-left: 0.8vw;
         height: 4.6vh;
-        width: 15vw;
+        width: 29.4vw;
         margin-top: 0.6vh;
         line-height: 4.5vh;
         border-radius: 6px;
@@ -113,16 +112,12 @@ div.flowspeed-content{
         font-weight: bold;
         font-size: calc(0.8vw + 0.8vh);
         color: #0c60af;
+        background-color: #f6f8fa;
         text-shadow:
             #eef3ff 1px 1px,
             #eef3ff 2px 2px,
             #6493ff 3px 3px;
         display: flex;
-
-        :deep(.dv-border-box-2) {
-            width: 10vw;
-            height: 4.6vh;
-        }
     }
 
     div.riskInfo-item {

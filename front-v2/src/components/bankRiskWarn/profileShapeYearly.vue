@@ -201,7 +201,7 @@ div.riskInfo-container {
                 height: 3vh !important;
                 box-shadow:
                     rgba(0, 132, 255, 0.8) 1px 1px,
-                    rgba(0, 119, 255, 0.7) 1px 1px,
+                    rgba(255, 145, 0, 0.7) 1px 1px,
                     rgba(0, 119, 255, 0.6) 2px 2px;
                 border-radius: 6px;
             }
