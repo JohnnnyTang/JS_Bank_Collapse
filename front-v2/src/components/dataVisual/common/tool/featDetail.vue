@@ -9,7 +9,7 @@
                     </div>
                 </template>
                 <el-scrollbar max-height="10vh">
-                    {{ noDataMap(data[key]) }}
+                    <p style="text-align: left; padding-left: 0.1vw;">{{ noDataMap(data[key]) }}</p>
                 </el-scrollbar>
             </el-descriptions-item>
         </el-descriptions>
@@ -36,7 +36,8 @@ watch(props, (V) => {
     console.log(V);
     if (sourceFieldMap[props.sourceId]) {
         fMap.value = sourceFieldMap[props.sourceId]["fieldMap"]
-        title.value = sourceFieldMap[props.sourceId]["original"]
+        console.log(fMap.value, props.ogData,);
+        title.value = props.ogData[sourceFieldMap[props.sourceId]["original"]]
         data.value = props.ogData
     }
 })
@@ -108,11 +109,16 @@ onMounted(() => {
             font-size: calc(0.6vw + 0.3vh);
             border-right: inset 2px rgb(23, 163, 248);
             border-bottom: inset 2px rgb(23, 163, 248);
+            padding: 0.2vh;
 
             .cell-item {
                 height: fit-content;
             }
         }
+
+        // .el-descriptions__cell.el-descriptions__content.is-bordered-content {
+
+        // }
 
         .el-descriptions__label.el-descriptions__cell.is-bordered-label {
             // background-color: rgb(198, 229, 251);

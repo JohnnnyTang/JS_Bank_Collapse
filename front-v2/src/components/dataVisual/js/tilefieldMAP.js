@@ -1,20 +1,20 @@
 const sourceFieldMap = {
     "combineProjectPoint": {
-        "original": "枢纽工程",
+        "original": "name",
         "fieldMap": {
             "id": "编号",
             "name": "名称"
         }
     },
     "dockArea": {
-        "original": "长江码头工程",
+        "original": "project_name",
         "fieldMap": {
             "id": "id",
             "new_id": "编号",
             "city": "所在市",
             "county": "所在区",
             "project_type": "项目类型",
-            "project_name": "项目名称",
+            // "project_name": "项目名称",
             "dock_type": "码头类型",
             "is_production": "是否为生产",
             "start_time": "开工时间",
@@ -23,14 +23,14 @@ const sourceFieldMap = {
         }
     },
     "embankmentLine": {
-        "original": "堤防工程",
+        "original": "sp_name",
         "fieldMap": {
             "id": "id",
             "district": "起点位置地区",
             "county": "起点位置县",
             "class": "堤防类型",
             "class_sub": "堤防型式",
-            "sp_name": "名称",
+            // "sp_name": "名称",
             "length": "长度",
             "height": "堤顶起点高程",
             "bank": "岸别",
@@ -38,16 +38,16 @@ const sourceFieldMap = {
         }
     },
     "hydroStationPoint": {
-        "original": "水文水位站",
+        "original": "sp_name",
         "fieldMap": {
             "id": "编号",
-            "sp_name": "名称",
+            // "sp_name": "名称",
             "begin": "设站日期",
             "place": "测站地点"
         }
     },
     "lakeArea": {
-        "original": "国普湖泊",
+        "original": "name",
         "fieldMap": {
             "id": "id",
             "code": "编号",
@@ -55,23 +55,23 @@ const sourceFieldMap = {
             "water": "水系",
             "area": "水面面积",
             "height": "正常蓄水位",
-            "name": "名称"
+            // "name": "名称"
         }
     },
     "pumpArea": {
-        "original": "泵站工程",
+        "original": "sp_name",
         "fieldMap": {
             "id": "编号",
-            "sp_name": "名称",
+            // "sp_name": "名称",
             "river": "所在河流湖泊水库渠道",
             "level": "级别"
         }
     },
     "reservoirArea": {
-        "original": "水库工程",
+        "original": "sp_name",
         "fieldMap": {
             "id": "id",
-            "sp_name": "名称",
+            // "sp_name": "名称",
             "river": "所在河流湖泊水库渠道",
             "class": "水库类型",
             "area": "坝址控制流域面积",
@@ -82,9 +82,9 @@ const sourceFieldMap = {
         }
     },
     "riverArea": {
-        "original": "国普河流",
+        "original": "name",
         "fieldMap": {
-            "name": "名称",
+            // "name": "名称",
             "code": "编号",
             "basin": "流域",
             "water": "水系",
@@ -93,10 +93,10 @@ const sourceFieldMap = {
         }
     },
     "sluiceArea": {
-        "original": "水闸工程",
+        "original": "sp_name",
         "fieldMap": {
             "id": "id",
-            "sp_name": "名称",
+            // "sp_name": "名称",
             "river": "所在河流湖泊水库渠道",
             "class": "水闸类型",
             "level": "工程等别",
@@ -104,34 +104,31 @@ const sourceFieldMap = {
         }
     },
     "importantBank": {
-        "original": "重点岸段",
+        "original": "bank_name",
         "fieldMap": {
-            "bank_name": "名称",
+            // "bank_name": "名称",
             "city_name": "所属城市",
             "river_name": "所属河段",
             "monitoring_length": '岸段长度',
-            "warning_level": "预警等级",
+            // "warning_level": "预警等级",
             "description": '简介',
             "fix_project": '治理工程'
         }
     },
     'sandBar': {
-        "original": "主要洲滩",
+        "original": "name",
         "fieldMap": {
-            "name": "名称",
+            // "name": "名称",
             "river": "所属河段",
-            // "sortId": '洲滩编号',
-            "0m线内面积(km3)": '面积(km3)',
+            "0m线内面积(km3)": '面积(km²)',
             "洲滩内人口": '人口',
-            "2019年GDP\n（万元）": '2019年GDP(万元)',
-            "岸线功能区名称": '岸线功能区',
             "预案": '防汛预案'
         }
     },
     'channel': {
         "original": "过江通道",
         "fieldMap": {
-            "name": "名称",
+            // "name": "名称",
             "planning":"类型",
             // "river": "所属河段",
             // "0m线内面积(km3)": '面积(km3)',
@@ -512,7 +509,7 @@ const legendListt = [
             'background-color': `rgb(240,239,209)`,
             'background-size': 'cover',
         },
-        text: '主要洲滩'
+        text: '长江沙洲'
     },
 ]
 
@@ -728,7 +725,7 @@ const importantFeature = {
     '市级行政区-注记': [],
     '河道分段': [],
     '河道分段-注记': [],
-    '区域水系': ['滁河', '秦淮河', '内秦淮河', '秦淮新河', '石固河', '长江', '长江岔河', '长江世业洲北汊', '京杭运河白马湖-高宝湖长江区段'],
+    '骨干河道': ['滁河', '秦淮河', '内秦淮河', '秦淮新河', '石固河', '长江', '长江岔河', '长江世业洲北汊', '京杭运河白马湖-高宝湖长江区段'],
     '大型湖泊': ['石臼湖', '固成湖', '太湖'],
     '水文站点': ["南京", "镇江（二）", "三江营", "江阴", "天生港", "青龙港", "三条港(二)"],
     '其他堤防': ["长江堤防太平洲段", "长江港堤三和港西支堤", '长江港堤三和港东支堤', '栏杆圩区', '联丰圩', '联丰港左堤', '联丰港右堤', '长旺港右堤', '长旺港左堤'],
@@ -758,7 +755,7 @@ const importantFeature = {
 const layerSourceMap = {
     '市级行政区': 'cityBoundaryLine',
     '市级行政区-注记': 'cityBoundaryLine',
-    '区域水系': 'riverArea',
+    '骨干河道': 'riverArea',
     '大型湖泊': 'lakeArea',
     '水文站点': 'hydroStationPoint',
     '其他堤防': 'embankmentLine',
@@ -768,7 +765,7 @@ const layerSourceMap = {
     '岸段-注记': 'importantBank',
     '水闸工程': 'sluiceArea',
     '枢纽工程': 'combineProjectPoint',
-    '主要洲滩': 'sandBar',
+    '长江沙洲': 'sandBar',
     '已建通道': 'channel',
     '在建通道': 'channel',
     '规划通道': 'channel'
@@ -780,8 +777,8 @@ const filterMap = {
     '市级行政区-注记': ['in', 'name', ...importantFeature['市级行政区']],
     '河道分段': [],
     '河道分段-注记': [],
-    '区域水系': ['in', 'name', ...importantFeature['区域水系']],
-    '区域水系-注记': ['in', 'name', ...importantFeature['区域水系']],
+    '骨干河道': ['in', 'name', ...importantFeature['骨干河道']],
+    '骨干河道-注记': ['in', 'name', ...importantFeature['骨干河道']],
     '大型湖泊': ['in', 'name', ...importantFeature['大型湖泊']],
     '大型湖泊-注记': ['in', 'name', ...importantFeature['大型湖泊']],
     '水文站点': ['in', 'sp_name', ...importantFeature['水文站点']],
