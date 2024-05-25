@@ -97,7 +97,7 @@ watch(props.profileList, () => {
 div.flowspeed-content{
     position: absolute;
     top: 31vh;
-    right: 1vw;
+    left: 1vw;
     height: 30vh;
     width: 30.2vw;
     border-radius: 4px;

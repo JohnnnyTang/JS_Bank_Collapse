@@ -2,13 +2,13 @@
     <div class="risk-warn-container">
         <div class="map-container" id="map" ref="mapContainer"></div>
         <canvas id="GPUFrame"></canvas>
-        <div class="selector-container">
+        <!-- <div class="selector-container">
             <div class="place-selector-container selector-item-container">
-                <div class="place-title selector-title">岸段选择：</div>
+                <div class="place-title selector-title">岸段选择：</div> -->
                 <!-- <div class="confirm-button" @click="confirmProfileTime">
                     <div class="confirm-button-text">确认选择</div>
                 </div> -->
-                <div class="place selector-content">
+                <!-- <div class="place selector-content">
                     <el-select
                         class="side"
                         v-model="placeValue"
@@ -31,7 +31,7 @@
                     </el-select>
                 </div>
             </div>
-            <div class="scene-selector-container selector-item-container">
+            <div class="scene-selector-container selector-item-container"> -->
                 <!-- 11<div class="scene-title selector-title">评估情景：</div> -->
                 <!-- <div class="before-scene-title selector-title">对比地形:</div>
                 <div class="before-scene selector-content">
@@ -97,12 +97,12 @@
                         </template> -->
                 <!-- </el-select>
                 </div> -->
-                <div class="risk-year-container">
+                <!-- <div class="risk-year-container">
                     <div class="risk-year-title">风险评估数据时效：</div>
                     <div class="risk-year-content">2023年汛后</div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="risk-item-container">
             <div class="risk-item" :class="{ active: showWaterPower }">
@@ -110,34 +110,14 @@
                     class="risk-main-index waterpower"
                     @click="showWaterPowerFunc"
                 >
+                    <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
                     <div class="risk-item-text">水流动力因素</div>
-                </div>
-                <div class="risk-sub-index-container">
-                    <div class="risk-sub-index waterpower">
-                        <div class="risk-item-text">造床流量当量指标</div>
-                    </div>
-                    <div class="risk-sub-index waterpower">
-                        <div class="risk-item-text">流速指标</div>
-                    </div>
-                    <div class="risk-sub-index waterpower">
-                        <div class="risk-item-text">水位变幅指标</div>
-                    </div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
+                    <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
                     <div class="risk-item-text">河床演变因素</div>
-                </div>
-                <div class="risk-sub-index-container">
-                    <div class="risk-sub-index riverbed">
-                        <div class="risk-item-text">岸坡最大坡比</div>
-                    </div>
-                    <div class="risk-sub-index riverbed">
-                        <div class="risk-item-text">近岸冲刷速率</div>
-                    </div>
-                    <div class="risk-sub-index riverbed">
-                        <div class="risk-item-text">滩槽高程</div>
-                    </div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
@@ -145,15 +125,8 @@
                     class="risk-main-index bankGeology"
                     @click="showGeologyAndProjectFunc"
                 >
+                    <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']" v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">岸坡地质因素</div>
-                </div>
-                <div class="risk-sub-index-container">
-                    <div class="risk-sub-index bankGeology">
-                        <div class="risk-item-text">河岸组成粒径</div>
-                    </div>
-                    <div class="risk-sub-index bankGeology">
-                        <div class="risk-item-text">垂向分层结构</div>
-                    </div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
@@ -161,15 +134,8 @@
                     class="risk-main-index outproject"
                     @click="showGeologyAndProjectFunc"
                 >
+                    <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']" v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">外部工程因素</div>
-                </div>
-                <div class="risk-sub-index-container">
-                    <div class="risk-sub-index outproject">
-                        <div class="risk-item-text">护岸强度</div>
-                    </div>
-                    <div class="risk-sub-index outproject">
-                        <div class="risk-item-text">局部突加荷载</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -201,6 +167,12 @@
         <div class="risk-line-container">
             <div class="risk-line-title">风险等级图例：</div>
             <div class="risk-line"></div>
+            <!-- <div class="risk-line-arrow" :class="riskDataAll[riskDataIndex-1].value">
+                <img src="/up_triangle.png" alt="图例标记">
+            </div> -->
+            <div class="risk-line-arrow high">
+                <img src="/warning.png" alt="图例标记">
+            </div>
             <div class="risk-line-mark low">低风险</div>
             <div class="risk-line-mark middle">中风险</div>
             <div class="risk-line-mark high">高风险</div>
@@ -214,9 +186,12 @@
             <div class="warn-status-content high">高风险</div>
         </div>
         <div v-if="showRiskStatus" class="warn-detail-container high">
-            <div class="warn-detail-title">高风险区域集中在：</div>
             <div class="warn-detail-profile">
-                {{ getRiskAreas('high') }}
+                <div class="warn-detail-text">
+                    <span class="warn-detail-span">          </span>
+                    高风险区域集中在：
+                    <span class="warn-detail-span">{{ getRiskAreas('high') }}</span>
+                </div>
             </div>
         </div>
 
@@ -280,7 +255,7 @@
             style="
                 position: absolute;
                 top: 1vh;
-                right: 1vw;
+                left: 1vw;
                 width: 30.2vw;
                 height: 29vh;
                 z-index: 10;
@@ -321,7 +296,7 @@
             style="
                 position: absolute;
                 top: 62vh;
-                right: 1vw;
+                left: 1vw;
                 width: 30.2vw;
                 height: 29vh;
                 z-index: 10;
@@ -1614,6 +1589,8 @@ onMounted(async () => {
     showRiskResult.value = false
     showFlowSpeed.value = false
     await ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompare)
+
+    showWaterPowerFunc()
 })
 
 onUnmounted(() => {
@@ -1873,8 +1850,8 @@ div.risk-warn-container {
 
     div.warn-status-container {
         position: absolute;
-        left: 33vw;
-        top: 80vh;
+        left: 43vw;
+        top: 6vh;
         width: 14vw;
         height: 10vh;
 
@@ -1925,10 +1902,10 @@ div.risk-warn-container {
 
     div.warn-detail-container {
         position: absolute;
-        left: 48vw;
-        top: 80.3vh;
-        width: 20vw;
-        height: 9vh;
+        left: 32.5vw;
+        top: 1vh;
+        width: 35vw;
+        height: 3.8vh;
         border-radius: 6px;
         backdrop-filter: blur(5px);
         background-color: rgba(244, 246, 248, 0.8);
@@ -1946,35 +1923,56 @@ div.risk-warn-container {
             border: #ec250a solid 3px;
         }
 
-        div.warn-detail-title {
-            position: absolute;
-            left: 0.5vw;
-            top: 0.5vh;
-            font-size: calc(0.7vw + 0.4vh);
-            font-weight: bold;
-            text-shadow:
-                #b9bec9 1px 1px,
-                #d7d8dd 1px 1px,
-                #161618 1px 1px;
-        }
-
         div.warn-detail-profile {
             position: absolute;
-            line-height: 2.2vh;
-            top: 3.5vh;
-            left: 0.5vw;
-            color: rgba(43, 46, 49, 0.8);
-            font-size: calc(0.5vw + 0.4vh);
-            font-weight: bold;
+            background-color: rgba(226, 92, 30, 0.15);
+            border-radius: 6px;
+            width: 34.6vw;
+            left: 0.2vw;
+            top: 0.5vh;
+            overflow: hidden;
+
+            div.warn-detail-text {
+                position: relative;
+                width: 100vw;
+                font-size: calc(0.8vw + 0.4vh);
+                white-space: nowrap;
+                overflow: hidden;
+                font-weight: bold;
+                text-shadow:
+                    #b9bec9 1px 1px,
+                    #d7d8dd 1px 1px,
+                    #161618 1px 1px;
+                animation-name: marquee;
+                animation-duration: 50s;
+                animation-timing-function: linear;
+                animation-iteration-count: infinite;
+
+                span.warn-detail-span {
+                    font-size: calc(0.7vw + 0.4vh);
+                    text-shadow: null;
+                    font-weight: 400;
+                }
+            }
         }
+
+        // div.warn-detail-profile {
+        //     position: absolute;
+        //     line-height: 2.2vh;
+        //     top: 3.5vh;
+        //     left: 0.5vw;
+        //     color: rgba(43, 46, 49, 0.8);
+        //     font-size: calc(0.5vw + 0.4vh);
+        //     font-weight: bold;
+        // }
     }
 
     div.risk-line-container {
         position: absolute;
-        left: 35vw;
-        top: 2vh;
+        left: 69vw;
+        top: 83vh;
         width: 30vw;
-        height: 5vh;
+        height: 5.5vh;
         backdrop-filter: blur(2px);
         z-index: 4;
         border: #1313d8 2px solid;
@@ -2008,6 +2006,32 @@ div.risk-warn-container {
                 rgb(255, 9, 9)
             );
             box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+        }
+
+        div.risk-line-arrow {
+            position: absolute;
+            top: 3.3vh;
+            width: 1vw;
+            height: 1.8vh;
+            z-index: 5;
+
+            &.low {
+                left: 9vw;
+            }
+
+            &.middle {
+                left: 17vw;
+            }
+
+            &.high {
+                left: 25vw;
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
         }
 
         div.risk-line-mark {
@@ -2073,8 +2097,8 @@ div.risk-warn-container {
 
     div.flow-control-block {
         position: absolute;
-        top: 39vh;
-        right: 3vw;
+        top: 37.6vh;
+        left: 25vw;
         height: 13vh;
         width: 6vw;
         display: flex;
@@ -2148,6 +2172,12 @@ div.risk-warn-container {
             }
         }
     }
+    
+    div.time-shower-block {
+        position: absolute;
+        top: 48vh;
+        left: 23.5vw;
+    }
 
     div.risk-year-container {
         position: absolute;
@@ -2192,12 +2222,12 @@ div.risk-warn-container {
 
     div.risk-item-container {
         position: absolute;
-        top: 20vh;
-        left: 1vw;
-        height: 67vh;
-        width: 23.9vw;
-        background-color: rgba(197, 211, 228, 0.6);
-        border: rgba(0, 119, 255, 0.6) 2px solid;
+        top: 2vh;
+        right: 1vw;
+        height: 30vh;
+        width: 10vw;
+        // background-color: rgba(197, 211, 228, 0.6);
+        // border: rgba(0, 119, 255, 0.6) 2px solid;
         border-radius: 6px;
         z-index: 3;
         display: flex;
@@ -2208,65 +2238,7 @@ div.risk-warn-container {
             flex: 1 1 0;
             position: relative;
             display: flex;
-
-            div.risk-sub-index-container {
-                flex: 1 1 0;
-                display: flex;
-                flex-direction: column;
-
-                div.risk-sub-index {
-                    flex: 1 1 0;
-                    transition: transform 0.3s ease;
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-
-                    &.waterpower {
-                        background-color: rgba(33, 100, 182, 0.2);
-                    }
-
-                    &.waterpower:nth-child(2n + 1) {
-                        background-color: rgba(33, 100, 182, 0.3);
-                    }
-
-                    &.riverbed {
-                        background-color: rgba(45, 165, 99, 0.2);
-                    }
-
-                    &.riverbed:nth-child(2n + 1) {
-                        background-color: rgba(45, 165, 99, 0.3);
-                    }
-
-                    &.bankGeology {
-                        background-color: rgba(107, 24, 155, 0.2);
-                    }
-
-                    &.bankGeology:nth-child(2n + 1) {
-                        background-color: rgba(107, 24, 155, 0.3);
-                    }
-
-                    &.outproject {
-                        background-color: rgba(245, 155, 20, 0.2);
-                    }
-
-                    &.outproject:nth-child(2n + 1) {
-                        background-color: rgba(245, 155, 20, 0.3);
-                    }
-
-                    div.risk-item-text {
-                        position: relative;
-                        text-align: center;
-                        font-size: calc(0.6vw + 0.6vh);
-                        color: white;
-                        font-family: 'Microsoft YaHei';
-                        font-weight: bolder;
-                        text-shadow: #101113 2px 2px;
-                        // #767779 2px 2px,
-                        // #6493ff 3px 3px;
-                    }
-                }
-            }
+            margin-bottom: 2vh;
 
             @keyframes colorSlide {
                 0% {
@@ -2302,40 +2274,6 @@ div.risk-warn-container {
                         animation-fill-mode: forwards;
                     }
                 }
-
-                div.risk-sub-index-container {
-                    div.risk-sub-index {
-                        &.waterpower {
-                            background-color: rgb(15, 116, 199);
-                        }
-
-                        &.waterpower:nth-child(2n + 1) {
-                            background-color: rgb(0, 85, 189);
-                        }
-
-                        &.riverbed {
-                            background-color: rgb(22, 153, 81);
-                        }
-                        &.riverbed:nth-child(2n + 1) {
-                            background-color: rgb(0, 177, 80);
-                        }
-
-                        &.bankGeology {
-                            background-color: rgb(108, 1, 170);
-                        }
-
-                        &.bankGeology:nth-child(2n + 1) {
-                            background-color: rgb(148, 42, 209);
-                        }
-
-                        &.outproject {
-                            background-color: rgb(182, 117, 20);
-                        }
-                        &.outproject:nth-child(2n + 1) {
-                            background-color: rgb(219, 132, 0);
-                        }
-                    }
-                }
             }
         }
 
@@ -2347,10 +2285,17 @@ div.risk-warn-container {
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: .3s linear;
+            &:hover {
+                transform: scale(1.05);
+                cursor: pointer;
+            }
 
-            // &:hover {
-            //     transform: scale(1.03);
-            // }
+            :deep(.dv-border-box-12) {
+                position: absolute;
+                width: 8vw;
+                height: 80%;
+            }
 
             // background-position: 0% 50%;
 
@@ -2358,8 +2303,8 @@ div.risk-warn-container {
                 // transition: all ease-in-out;
                 background: linear-gradient(
                     90deg,
-                    rgba(33, 100, 182, 0.4),
-                    // rgba(33, 100, 182, 0.6),
+                    rgba(33, 100, 182, 0.35),
+                    // rgba(33, 100, 182, 1),
                     // rgba(0, 34, 215, 1),
                     // rgba(0, 34, 215, 1),
                     rgba(0, 34, 215, 1),
@@ -2372,8 +2317,8 @@ div.risk-warn-container {
             &.riverbed {
                 background: linear-gradient(
                     90deg,
-                    rgba(39, 145, 87, 0.4),
-                    // rgba(39, 145, 87, 0.6),
+                    rgba(39, 145, 87, 0.35),
+                    // rgba(39, 145, 87, 1),
                     // rgb(0, 121, 16, 1),
                     // rgba(0, 121, 16, 1),
                     rgba(0, 121, 16, 1),
@@ -2385,8 +2330,8 @@ div.risk-warn-container {
             &.bankGeology {
                 background: linear-gradient(
                     90deg,
-                    rgba(95, 21, 138, 0.4),
-                    // rgba(95, 21, 138, 0.6),
+                    rgba(95, 21, 138, 0.35),
+                    // rgba(95, 21, 138, 1),
                     // rgb(63, 0, 121, 1),
                     // rgba(63, 0, 121, 1),
                     rgba(63, 0, 121, 1),
@@ -2398,8 +2343,8 @@ div.risk-warn-container {
             &.outproject {
                 background: linear-gradient(
                     90deg,
-                    rgba(228, 143, 16, 0.4),
-                    // rgba(228, 143, 16, 0.6),
+                    rgba(228, 143, 16, 0.35),
+                    // rgba(228, 143, 16, 1),
                     // rgba(121, 83, 0, 1),
                     // rgba(121, 83, 0, 1),
                     rgba(121, 83, 0, 1),
@@ -2410,7 +2355,7 @@ div.risk-warn-container {
 
             div.risk-item-text {
                 text-align: center;
-                font-size: calc(0.6vw + 1.2vh);
+                font-size: calc(0.6vw + 0.8vh);
                 color: white;
                 font-family: 'Microsoft YaHei';
                 font-weight: bolder;
@@ -2422,10 +2367,12 @@ div.risk-warn-container {
         }
     }
 
+
+
     div.raster-control-block {
         position: absolute;
-        top: 0vh;
-        left: 25vw;
+        top: 79vh;
+        left: 63vw;
         height: 13vh;
         width: 6vw;
         display: flex;
@@ -2502,8 +2449,8 @@ div.risk-warn-container {
 
     div.bankLine-control-block {
         position: absolute;
-        top: 0vh;
-        left: 29.7vw;
+        top: 79vh;
+        left: 57vw;
         height: 13vh;
         width: 6vw;
         display: flex;
@@ -2578,18 +2525,13 @@ div.risk-warn-container {
         }
     }
 
-    div.time-shower-block {
-        position: absolute;
-        top: 49.5vh;
-        right: 4.4vw;
-    }
-
     div.raster-legend-container {
         position: absolute;
         top: 12vh;
-        left: 27vw;
+        left: 32.3vw;
         width: 2.9vw;
         height: 32vh;
+        z-index: 2;
 
         img {
             width: 100%;
@@ -2759,6 +2701,15 @@ div.risk-warn-container {
             0 100%,
             0 0,
             100% 100%;
+    }
+}
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+
+    100% {
+        transform: translateX(-50%);
     }
 }
 </style>

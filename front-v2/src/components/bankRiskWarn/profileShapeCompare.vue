@@ -1,7 +1,9 @@
 <template>
 <div class="riskInfo-container">
     <div class="riskInfo-title">
-        历史断面变化
+        <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
+            历史断面变化
+        </dv-border-box2>
     </div>
     <div class="riskInfo-item profileShape">
         <div class="item-title">{{ profileName }}</div>
@@ -145,9 +147,9 @@ watch(()=>props.profileData, ()=>{
 div.riskInfo-container {
     position: absolute;
     top: 46.5vh;
-    right: 2vw;
+    left: 1vw;
     height: 43vh;
-    width: 24vw;
+    width: 30vw;
     border-radius: 8px;
     border: #167aec 1px solid;
     background-color: rgba(179, 201, 228, 0.6);
@@ -156,38 +158,37 @@ div.riskInfo-container {
 
     div.riskInfo-title {
         height: 2vh;
-        width: 8vw;
-        margin-left: 7.5vw;
+        width: 10vw;
+        margin-left: 10vw;
         margin-top: 0.6vh;
-        line-height: 2vh;
+        line-height: 4.3vh;
         border-radius: 6px;
         // background-color: rgba(235, 240, 247, 0.4);
         text-align: center;
         font-family: 'Microsoft YaHei';
         font-weight: bold;
-        font-size: calc(0.8vw + 0.6vh);
+        font-size: calc(0.8vw + 0.7vh);
         color: #0c60af;
         text-shadow:
-            #eef3ff 1px 1px,
+            #f1f1ef 1px 1px,
             #eef3ff 2px 2px,
             #6493ff 3px 3px;
+
+        :deep(.dv-border-box-2) {
+            width: 10vw;
+            height: 4.6vh;
+        }
     }
 
     div.riskInfo-item {
         position: absolute;
-        width: 23vw;
+        width: 28.9vw;
         left: 0.5vw;
         border-radius: 6px;
         border: #3b85e7 2px solid;
 
-        &.profileErosion {
-            top: 47vh;
-            height: 22vh;
-            // background-color: #b6b9eb;
-        }
-
         &.profileShape {
-            top: 3.5vh;
+            top: 5.5vh;
             height: 30vh;
             // background-color: #c9cad4;
         }
@@ -207,7 +208,7 @@ div.riskInfo-container {
             position: absolute;
             width: 10vw;
             height: 4vh;
-            left: 13vw;
+            left: 19vw;
             // background-color: #d1d2db;
 
             :deep(.el-select) {
@@ -258,7 +259,7 @@ div.riskInfo-container {
 
         div.graph-container {
             position: absolute;
-            width: 22.5vw;
+            width: 28.3vw;
             top: 4vh;
             left: 0.25vw;
 
@@ -307,16 +308,16 @@ div.riskInfo-container {
 
     div.text-info-container {
         position:absolute;
-        width: 23.15vw;
+        top: 36.8vh;
+        width: 29vw;
         height: 5.25vh;
         left: 0.5vw;
-        bottom: 2vh;
         background-color: rgba(18, 161, 218, 0.5);
         border-radius: 5px;
 
         div.text-info-item {
             position: absolute;
-            left: 3vw;
+            left: 6vw;
             top: 1.3vh;
             color: #070707;
             font-size: calc(0.7vw + 0.5vh);

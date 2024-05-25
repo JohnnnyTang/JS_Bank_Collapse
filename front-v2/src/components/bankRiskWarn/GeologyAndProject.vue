@@ -6,7 +6,7 @@
     <dv-decoration10
         :Dur="1"
         :color="['rgba(231, 137, 15, 0.7)','rgba(171, 184, 197, 0.8)']"
-        style="position: absolute; height: 8.5vh; width: 21.5vw; left: 0.7vw;"
+        style="position: absolute; height: 8.5vh; width: 28.5vw; left: 0.7vw;"
     />
     <div class="item-container geology">
         <div class="img-container">
@@ -42,8 +42,7 @@
         </div>
         <div class="item-context project">
             2017年 马洲岛外江堤修复加固工程
-        </div>
-        <div class="item-context project">
+            <br>
             2023年 张皋过江通道工程民主沙右缘守护工程
         </div>
     </div>
@@ -62,9 +61,9 @@ const UrlPart2 = "/project_structure.png"
     div.geologyAndProject-container {
         position: absolute;
         top: 2vh;
-        right: 2vw;
+        left: 1vw;
         height: 88vh;
-        width: 23vw;
+        width: 30vw;
         background-color: rgba(238, 235, 205, 0.6);
         border: 2px solid #e0cfcf;
         border-radius: 10px;
@@ -72,7 +71,7 @@ const UrlPart2 = "/project_structure.png"
 
         div.title-context {
             position: absolute;
-            left: 9vw;
+            left: 12.5vw;
             width: 10vw;
             line-height: 4vh;
             font-family: 'Microsoft YaHei';
@@ -88,7 +87,7 @@ const UrlPart2 = "/project_structure.png"
         div.item-container {
             position: absolute;
             left: 0.4vw;
-            width: 22.2vw;
+            width: 29.2vw;
             height: 42vh;
 
             &.geology {
@@ -116,8 +115,9 @@ const UrlPart2 = "/project_structure.png"
         }
 
         div.item-context {
-            top: 0.9vh;
-            left: 1.2vw;
+            position: absolute;
+            top: 34.5vh;
+            left: 1vw;
             font-size: calc(0.6vw + 0.4vh);
             color: rgb(27, 26, 26);
             font-family: 'Microsoft YaHei';

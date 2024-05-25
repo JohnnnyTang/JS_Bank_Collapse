@@ -563,7 +563,7 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
             {
                 top: '20%',
                 height: '70%',
-                width: '78%',
+                width: '80%',
                 show: true,
             },
         ],
@@ -641,7 +641,7 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
                     type: 'text',
                     style: {
                         text: '浏海沙水道右岸',
-                        x: 350,
+                        x: 400,
                         y: 40,
                         textFill: 'black',
                         fontSize: 15,
@@ -662,8 +662,8 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
                     type: 'text',
                     style: {
                         text: '距离(m)',
-                        x: 470,
-                        y: 268,
+                        x: 530,
+                        y: 240,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
@@ -707,7 +707,7 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
             {
                 top: '20%',
                 height: '70%',
-                width: '78%',
+                width: '80%',
                 show: true,
             },
         ],
@@ -810,7 +810,7 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
                     type: 'text',
                     style: {
                         text: '浏海沙水道右岸',
-                        x: 350,
+                        x: 400,
                         y: 40,
                         textFill: 'black',
                         fontSize: 15,
@@ -831,8 +831,8 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
                     type: 'text',
                     style: {
                         text: '距离(m)',
-                        x: 470,
-                        y: 268,
+                        x: 530,
+                        y: 240,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
