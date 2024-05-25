@@ -115,7 +115,9 @@ public class ProcessUtil {
         commands.add("node");
         commands.add(nodeServicePath);
         commands.add(worldTilePath);
+//        String test = "node E://Data//bankProjectData//node//index.js E://Data//bankProjectData//2020-10-planet-14";
         processBuilder.command(commands);
+//        processBuilder.command(test);
         System.out.println(processBuilder);
 
         return processBuilder.start();
