@@ -110,11 +110,13 @@
                     class="risk-main-index waterpower"
                     @click="showWaterPowerFunc"
                 >
+                    <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
                     <div class="risk-item-text">水流动力因素</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
+                    <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
                     <div class="risk-item-text">河床演变因素</div>
                 </div>
             </div>
@@ -123,6 +125,7 @@
                     class="risk-main-index bankGeology"
                     @click="showGeologyAndProjectFunc"
                 >
+                    <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']" v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">岸坡地质因素</div>
                 </div>
             </div>
@@ -131,6 +134,7 @@
                     class="risk-main-index outproject"
                     @click="showGeologyAndProjectFunc"
                 >
+                    <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']" v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">外部工程因素</div>
                 </div>
             </div>
@@ -2287,14 +2291,20 @@ div.risk-warn-container {
                 cursor: pointer;
             }
 
+            :deep(.dv-border-box-12) {
+                position: absolute;
+                width: 8vw;
+                height: 80%;
+            }
+
             // background-position: 0% 50%;
 
             &.waterpower {
                 // transition: all ease-in-out;
                 background: linear-gradient(
                     90deg,
-                    rgba(33, 100, 182, 0.4),
-                    // rgba(33, 100, 182, 0.6),
+                    rgba(33, 100, 182, 0.35),
+                    // rgba(33, 100, 182, 1),
                     // rgba(0, 34, 215, 1),
                     // rgba(0, 34, 215, 1),
                     rgba(0, 34, 215, 1),
@@ -2307,8 +2317,8 @@ div.risk-warn-container {
             &.riverbed {
                 background: linear-gradient(
                     90deg,
-                    rgba(39, 145, 87, 0.4),
-                    // rgba(39, 145, 87, 0.6),
+                    rgba(39, 145, 87, 0.35),
+                    // rgba(39, 145, 87, 1),
                     // rgb(0, 121, 16, 1),
                     // rgba(0, 121, 16, 1),
                     rgba(0, 121, 16, 1),
@@ -2320,8 +2330,8 @@ div.risk-warn-container {
             &.bankGeology {
                 background: linear-gradient(
                     90deg,
-                    rgba(95, 21, 138, 0.4),
-                    // rgba(95, 21, 138, 0.6),
+                    rgba(95, 21, 138, 0.35),
+                    // rgba(95, 21, 138, 1),
                     // rgb(63, 0, 121, 1),
                     // rgba(63, 0, 121, 1),
                     rgba(63, 0, 121, 1),
@@ -2333,8 +2343,8 @@ div.risk-warn-container {
             &.outproject {
                 background: linear-gradient(
                     90deg,
-                    rgba(228, 143, 16, 0.4),
-                    // rgba(228, 143, 16, 0.6),
+                    rgba(228, 143, 16, 0.35),
+                    // rgba(228, 143, 16, 1),
                     // rgba(121, 83, 0, 1),
                     // rgba(121, 83, 0, 1),
                     rgba(121, 83, 0, 1),

@@ -170,7 +170,7 @@ div.riskInfo-container {
         font-size: calc(0.8vw + 0.7vh);
         color: #0c60af;
         text-shadow:
-            #eef3ff 1px 1px,
+            #f1f1ef 1px 1px,
             #eef3ff 2px 2px,
             #6493ff 3px 3px;
 
