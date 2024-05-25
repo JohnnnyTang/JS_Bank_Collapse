@@ -502,7 +502,7 @@ const getSideBarTree = async () => {
         icon: '/icons/warn3.png',
         type: 'title2',
         active: true,
-        children: []
+        children: [],
     }
     for (let i = 0; i < bankData.length; i++) {
         let item = bankData[i]
@@ -547,21 +547,22 @@ const getSideBarTree = async () => {
                 type: 'title2',
                 active: true,
                 filter: true,
-                children: []
+                children: [],
             }, {
                 label: '其他',
                 icon: '/icons/流域水系.png',
                 type: 'title2',
                 active: true,
                 filter: true,
-                children: []
+                children: [],
             }
-        ]
+        ],
+        data: []
     }
-    // let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
-    // dt.forEach((item) => {
-    //     quyushuixi.children.push({ label: item['name'], active: false, type: 'feature', property: item })
-    // })
+    let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
+    dt.forEach((item) => {
+        quyushuixi.data.push({ label: item['name'], active: false, type: 'feature', property: item })
+    })
 
     let sluice = {
         label: '重要水闸',
@@ -583,12 +584,13 @@ const getSideBarTree = async () => {
                 filter: true,
                 children: []
             }
-        ]
+        ],
+        data: []
     }
-    // dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
-    // dt.forEach((item) => {
-    //     sluice.children.push({ label: item['sp_name'], active: false, type: 'feature', property: item })
-    // })
+    dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
+    dt.forEach((item) => {
+        sluice.data.push(item)
+    })
 
     let pump = {
         label: '重要泵站',
@@ -611,12 +613,13 @@ const getSideBarTree = async () => {
                 filter: true,
                 children: []
             }
-        ]
+        ],
+        data: []
     }
-    // dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
-    // dt.forEach((item) => {
-    //     pump.children.push({ label: item['sp_name'], active: false, type: 'feature', property: item })
-    // })
+    dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
+    dt.forEach((item) => {
+        pump.data.push(item)
+    })
     let treeNode1 = {
         label: '已建通道',
         type: 'title2',
@@ -632,33 +635,25 @@ const getSideBarTree = async () => {
         type: 'title2',
         children: []
     }
-    // let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
-    // let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
-    // let res = [...res1, ...res2]
-    // res.forEach(item => {
-    //     if (item.plan === 1) {
-    //         item.planning = '已建通道'
-    //         treeNode1.children.push({
-    //             label: item.name,
-    //             type: 'feature',
-    //             property: item
-    //         })
-    //     } else if (item.plan === 0) {
-    //         item.planning = '在建通道'
-    //         treeNode2.children.push({
-    //             label: item.name,
-    //             type: 'feature',
-    //             property: item
-    //         })
-    //     } else if (item.plan === -1) {
-    //         item.planning = '规划通道'
-    //         treeNode3.children.push({
-    //             label: item.name,
-    //             type: 'feature',
-    //             property: item
-    //         })
-    //     }
-    // })
+    let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+    let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+    let res = [...res1, ...res2]
+    res.forEach(item => {
+        if (item.plan === 1) {
+            item.planning = '已建通道'
+            treeNode1.data.push(item)
+        } else if (item.plan === 0) {
+            item.planning = '在建通道'
+            treeNode2.data.push(
+                item
+            )
+        } else if (item.plan === -1) {
+            item.planning = '规划通道'
+            treeNode3.data.push(
+                item
+            )
+        }
+    })
     console.log(treeNode1);
     let riverPassageLine = {
         label: '过江通道',
@@ -669,7 +664,8 @@ const getSideBarTree = async () => {
             treeNode1,
             treeNode2,
             treeNode3
-        ]
+        ],
+        data: res
     }
 
     let tree = [

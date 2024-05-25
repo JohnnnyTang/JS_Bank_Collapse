@@ -15,7 +15,8 @@
                             <template #default="{ node, data }">
                                 <span class="custom-tree-node">
                                     <div class="scene-card" v-if="data.type == 'title1'">
-                                        <div class="scene-top-section" :class="{ active: data.active }">
+                                        <div class="scene-top-section" :class="{ active: data.active }"
+                                            @click="treeNodeClickHandler(node, data)">
                                             <div class="scene-title">
                                                 <div class="scene-title-text">
                                                     {{ data.label }}
@@ -27,7 +28,7 @@
                                     </div>
                                     <div class="subScene-container" v-else-if="data.type == 'title2'">
                                         <div class="card" :class="{ active: data.active }">
-                                            <div class="top-section">
+                                            <div class="top-section" @click="treeNodeClickHandler(node, data)">
                                                 <div class="title">
                                                     <div class="subScene-title-text">
                                                         {{ data.label }}
@@ -35,13 +36,29 @@
                                                 </div>
                                             </div>
                                             <el-switch v-model="data.active" :active-action-icon="View"
-                                                :inactive-action-icon="Hide" size="small"
+                                                class="subScene-switch" :inactive-action-icon="Hide" size="small"
+                                                style="margin-top: 0.8vh;"
                                                 @change="viewChange(node, data)" />
                                         </div>
                                     </div>
-                                    <div class="feature-container" v-else-if="data.type == 'feature'">
+                                    <div class="feature-container"
+                                        v-else-if="data.type == 'feature' && node.parent.data.label.includes('岸段')"
+                                        @click="featureNodeClick(node, data)">
                                         <div class="feature-content">
                                             {{ data.label }}
+                                        </div>
+                                    </div>
+                                    <div class="feature-container"
+                                        v-else-if="data.type == 'feature' && node.parent.data.label.includes('沙洲')"
+                                        @click="featureNodeClick(node, data)">
+                                        <div class="feature-content">
+                                            <div>{{ data.label }}</div>
+                                            <el-icon v-if="node.data.property['洲滩信息_人口活动'] == '2'" style="margin-left: 0.6vw;">
+                                                <House />
+                                            </el-icon>
+                                            <el-icon v-else-if="node.data.property['洲滩信息_人口活动'] == '1'" style="margin-left: 0.6vw;">
+                                                <UserFilled />
+                                            </el-icon>
                                         </div>
                                     </div>
                                 </span>
@@ -73,13 +90,14 @@
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+            v-click-out-side="() => showDetail = false">
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
                 @close="showDetail = false"></featDetail>
         </div>
 
         <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-            v-loading="pannelLoading" v-click-out-side="() => showInfoPannel = false">
+            v-loading="false" v-click-out-side="() => showInfoPannel = false">
             <div class="close" @click="showInfoPannel = false; showDetail = false"></div>
             <div class="important-feature">
                 <el-table :data="infoTableData" height="30vh" border>
@@ -98,8 +116,13 @@
 
 
         <div class="hydro-pannel">
-            <div class="title"> 实时水文信息</div>
-            <el-table :data="waterTableData" border style="width: 100%">
+            <div class="title"> 实时水文信息
+                <el-icon @click="showHydroPannel = !showHydroPannel">
+                    <More />
+                </el-icon>
+            </div>
+
+            <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
                 <el-table-column prop="station" label="站点" />
                 <el-table-column prop="flow" label="流量" />
                 <el-table-column prop="level" label="水位" />
@@ -146,12 +169,38 @@ const styles = [
 const featureInfo = ref({})
 let nowSource
 const showDetail = ref(false)
+const showHydroPannel = ref(false)
 const showInfoPannel = ref(false)
 const sideBarLoading = ref(true)
 const legendList = ref([])
 const waterTableData = [
     {
         station: '大通站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '南京站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '镇江站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '三江营站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '江阴站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '徐六泾站',
         flow: 'N/A',
         level: 'N/A',
     },
@@ -171,16 +220,6 @@ const viewChange = (node, data) => {
     const map = mapStore.getMap()
     const title2processMap = {
         '一级预警岸段': (active) => {
-            if (active) {
-         
-            }
-            // let filter1 = ['in', 'warning_level', [1, 2, 3]];
-            // map.setFilter('预警岸段', filter1)
-            // map.setFilter('预警岸段', filter1)
-
-            // let filter2 = ['==', 'warning_level', 1];
-            // map.setFilter('预警岸段', filter2)
-            // map.setFilter('预警岸段', filter2)
 
         },
         '二级预警岸段': () => {
@@ -233,23 +272,136 @@ const viewChange = (node, data) => {
 
     console.log(data.label, node.level, ' view status change!! ')
     if (data.type == 'title1') {
-        console.log('these layers::', DICT.T1LayerDict[data.label])
         data.active ? showLayers(map, DICT.T1LayerDict[data.label])
             : hideLayers(map, DICT.T1LayerDict[data.label])
-        // data.active = !data.active
+        let children = node.childNodes
+        for (let i = 0; i < children.length; i++) {
+            children[i].data.active = data.active
+        }
     }
     else if (data.type == 'title2') {
-        console.log('title2 !');
+        data.active ? showLayers(map, DICT.T2LayerDict[data.label])
+            : hideLayers(map, DICT.T2LayerDict[data.label])
     }
 }
+const treeNodeClickHandler = async (node, data) => {
+    if (data.label.includes('岸段') || data.label.includes('沙洲')) {
+        console.log('不处理');
+        return
+    }
+    if (data.label === '其他' || data.label === '长江堤防') {
+        console.log('其他，不处理');
+        return
+    }
+    // showTable
+    // const process = (obj) => {
+    //     let res = []
+    //     let keys = Object.keys(obj)
+    //     keys.forEach(item => {
+    //         res.push({ 'label': obj[item], 'prop': item })
+    //     })
+    //     return res
+    // }
 
+    // if (data.label == '过江通道') {
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+    //         if (item.plan == '1') item.plan == '已建通道'
+    //         else if (item.plan == '0') item.plan == '在建通道'
+    //         else if (item.plan == '-1') item.plan == '规划通道'
+    //     })
+    //     let thData
+    //     thData = {
+    //         'name': '名称',
+    //         'plan': '类型',
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+    // }
+
+    // else if (data.label == '骨干河道') {
+    //     console.log('data', data.data)
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+
+    //     })
+    //     let thData
+    //     thData = {
+    //         'name': '名称',
+    //         "basin": "流域",
+    //         "water": "水系",
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+    // }
+    // else if (data.label == '重要水闸') {
+    //     console.log('data', data.data)
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+
+    //     })
+    //     let thData
+    //     thData = {
+    //         "sp_name": "名称",
+    //         "class": "水闸类型",
+    //         "volume": "过闸流量"
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+
+    // }
+    // else if (data.label == '重要泵站') {
+    //     console.log('data', data.data)
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+
+    //     })
+    //     let thData
+    //     thData = {
+    //         "sp_name": "名称",
+    //         "level": "级别"
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+
+    // }
+
+
+}
 
 
 
 
 const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
-    console.log('base map change', baseMapRadio.value);
     if (baseMapRadio.value == 0) {
         map.setStyle(getImageStyleJson())
         map.addSource('mapRaster22', {
@@ -279,60 +431,57 @@ const baseMapChangeHandler = async () => {
     }
 }
 
-// const detailClickHandler4layerGroup = async (lable) => {
-//     infoTableData.value = []
-//     infoTableHeader.value = []
-//     pannelLoading.value = true
+const detailClickHandler4layerGroup = async (lable) => {
+    infoTableData.value = []
+    infoTableHeader.value = []
+    pannelLoading.value = true
 
-//     // showInfoPannel.value = true
-//     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
-//     let infoLayer = layers.filter((item) => {
-//         if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩') || item.includes('水闸工程-重点')) {
-//             return false
-//         } return true
-//     })
-//     let data
-//     let thData
-//     let map = mapStore.getMap()
-//     for (let i = 0; i < infoLayer.length; i++) {
-//         if (infoLayer[i].includes('过江通道')) {
-//             // let t1 = [] // 已
-//             // let t2 = []  // 在
-//             // let t3 = [] // 规划
-//             let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
-//             let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
-//             data = [...res1, ...res2]
-//             thData = {
-//                 'name': '名称',
-//                 'plan': '类型',
-//             }
-//             break
-//         }
-//         else if (infoLayer[i].includes('长江干堤')) {
-//             console.log('长江干堤  no data')
-//         }
-//         else {
-//             data = await getLayerFeatureArray(map, infoLayer[i])
-//             thData = getTableHeader(map, infoLayer[i])
-//         }
-//     }
-//     const process = (obj) => {
-//         let res = []
-//         let keys = Object.keys(obj)
-//         keys.forEach(item => {
-//             res.push({ 'label': obj[item], 'prop': item })
-//         })
-//         return res
-//     }
+    // showInfoPannel.value = true
+    let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
+    let infoLayer = layers.filter((item) => {
+        if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩') || item.includes('水闸工程-重点')) {
+            return false
+        } return true
+    })
+    let data
+    let thData
+    let map = mapStore.getMap()
+    for (let i = 0; i < infoLayer.length; i++) {
+        if (infoLayer[i].includes('过江通道')) {
+            // let t1 = [] // 已
+            // let t2 = []  // 在
+            // let t3 = [] // 规划
+            let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+            let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+            data = [...res1, ...res2]
+            thData = {
+                'name': '名称',
+                'plan': '类型',
+            }
+            break
+        }
+        else if (infoLayer[i].includes('长江干堤')) {
+        }
+        else {
+            data = await getLayerFeatureArray(map, infoLayer[i])
+            thData = getTableHeader(map, infoLayer[i])
+        }
+    }
+    const process = (obj) => {
+        let res = []
+        let keys = Object.keys(obj)
+        keys.forEach(item => {
+            res.push({ 'label': obj[item], 'prop': item })
+        })
+        return res
+    }
 
-//     infoTableData.value = data
-//     infoTableHeader.value = process(thData)
-//     pannelLoading.value = false
-//     console.log(infoTableHeader.value);
-// }
+    infoTableData.value = data
+    infoTableHeader.value = process(thData)
+    pannelLoading.value = false
+}
 const detailClickHandler4Feature = async (featInfo, lgId) => {
-    console.log(featInfo, lgId)
-    // let nowSource = 'importantBank'
+
     let nowSource = layerSourceMap[lgId]
     let newFeatInfomation = {
         ogData: featInfo,
@@ -351,6 +500,12 @@ const detailClickHandler4Feature = async (featInfo, lgId) => {
             return t;
         }
     })
+}
+
+const featureNodeClick = (node, data) => {
+    showDetail.value = true
+    // console.log(node.data.property['洲滩信息_人口活动']);
+    detailClickHandler4Feature(data.property, data.lgId)
 }
 
 // methods
@@ -449,7 +604,6 @@ const getTableHeader = (mapInstance, layerName) => {
     let sourceId = layer.source
     let source = mapInstance.getSource(sourceId)
     if (!source) return properties
-    console.log(layerName, sourceId)
     let title = FieldMap[sourceId]['fieldMap']
     return title
 }
@@ -673,6 +827,7 @@ onUnmounted(async () => {
                         box-shadow: #cbeafd 10px 7px 20px 0px;
                         display: flex;
                         flex-direction: row;
+                        justify-content: center;
                         transition: transform 0.5s;
                         user-select: none;
                         transition: .3s linear;
@@ -686,7 +841,7 @@ onUnmounted(async () => {
                         .top-section {
                             //   height: 10vh;
                             height: 100%;
-                            width: 70%;
+                            width: 85%;
                             border-radius: 5px;
                             display: flex;
                             flex-direction: row;
@@ -794,6 +949,9 @@ onUnmounted(async () => {
                         margin-left: 0.5vw;
                         line-height: 3vh;
                         font-family: 'Microsoft YaHei';
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
                     }
                 }
             }
@@ -910,7 +1068,7 @@ onUnmounted(async () => {
         position: absolute;
         z-index: 2;
         right: 5vw;
-        bottom: 1vh;
+        bottom: 7vh;
     }
 
     div.featDetail {
@@ -1026,21 +1184,24 @@ onUnmounted(async () => {
         z-index: 2;
         right: 5vw;
         top: 0vh;
+        width: 15vw;
         padding: calc(0.1vw + 0.1vh);
         background-color: aliceblue;
+        user-select: none;
 
         .title {
             border-bottom: rgb(41, 40, 40) 1px solid;
             font-weight: bold;
             font-size: calc(0.7vw + 0.5vh);
             line-height: 3vh;
+            width: 100%;
         }
     }
 
     div.radio-container {
         position: absolute;
-        top: 2vh;
-        right: 20vw;
+        bottom: 2vh;
+        right: 6vw;
     }
 
 }

@@ -109,7 +109,7 @@ const sourceFieldMap = {
             // "bank_name": "名称",
             "city_name": "所属城市",
             "river_name": "所属河段",
-            "monitoring_length": '岸段长度',
+            "monitoring_length": '监测长度',
             // "warning_level": "预警等级",
             "description": '简介',
             "fix_project": '治理工程'
@@ -120,8 +120,8 @@ const sourceFieldMap = {
         "fieldMap": {
             // "name": "名称",
             "river": "所属河段",
-            "0m线内面积(km3)": '面积(km²)',
-            "洲滩内人口": '人口',
+            "洲滩信息_面积": '面积(km²)',
+            "洲滩信息_人口": '人口',
             "预案": '防汛预案'
         }
     },
@@ -198,8 +198,8 @@ const sourceZoomMap = {
     "sluiceArea": 15,
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
-    'importantBank': 12,
-    'sandBar': 12,
+    'importantBank': 12.6,
+    'sandBar': 13,
     'channel': 13,
 }
 
@@ -213,7 +213,7 @@ const sourceColumnMap = {
     "pumpArea": 2,
     "reservoirArea": 2,
     "sluiceArea": 2,
-    "importantBank": 3,
+    "importantBank": 4,
     'sandBar': 2
 }
 const legendStyleMap = {

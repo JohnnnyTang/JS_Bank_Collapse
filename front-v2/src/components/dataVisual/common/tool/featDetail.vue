@@ -1,6 +1,26 @@
 <template>
     <div class="description-container">
         <div class="miniIcon" @click="close"></div>
+
+        <!-- <div class="bankDesc" v-if="props.sourceId === 'importantBank'">
+            <h1>bank</h1>
+            <el-descriptions title="xxx-I级预警">
+                <el-descriptions-item label="所属城市">{{ props.ogData['city_name'] }}</el-descriptions-item>
+                <el-descriptions-item label="所属河段">{{ props.ogData['river_name'] }}</el-descriptions-item>
+                <el-descriptions-item label="监测长度">{{ props.ogData['monitoring_length'] }}</el-descriptions-item>
+                <el-descriptions-item label="岸段简介">{{ props.ogData['description'] }}</el-descriptions-item>
+                <el-descriptions-item label="治理工程">
+                    {{ props.ogData['fix_project'] }}
+                </el-descriptions-item>
+            </el-descriptions>
+        </div>
+
+
+        <div class="sandDesc" v-if="props.sourceId === 'sandBar'">
+            <h1>sand</h1>
+
+        </div> -->
+
         <el-descriptions class="margin-top" :title="title" :column="props.column" border>
             <el-descriptions-item v-for="( key, index ) in  Object.keys(fMap) " :key="index">
                 <template #label>
@@ -32,11 +52,31 @@ const fMap = ref({})
 const title = ref('')
 const data = ref({})
 
+const bankfiledDict = {
+    "importantBank": {
+        "bank_name": "名称",
+        "city_name": "所属城市",
+        "river_name": "所属河段",
+        "monitoring_length": '监测长度',
+        "warning_level": "预警等级",
+        "description": '简介',
+        "fix_project": '治理工程'
+    }
+}
+const sandFieldDict = {
+    "name": "名称",
+    "river": "所属河段",
+    "洲滩信息_面积": '面积(km²)',
+    "洲滩信息_人口": '人口',
+    "预案": '防汛预案'
+}
+
+
 watch(props, (V) => {
     console.log(V);
     if (sourceFieldMap[props.sourceId]) {
         fMap.value = sourceFieldMap[props.sourceId]["fieldMap"]
-        console.log(fMap.value, props.ogData,);
+        // console.log(fMap.value, props.ogData,);
         title.value = props.ogData[sourceFieldMap[props.sourceId]["original"]]
         data.value = props.ogData
     }
@@ -46,7 +86,7 @@ const close = () => {
 }
 const noDataMap = (data) => {
     if (data === '0' || data === '*' || data === '' || data === undefined || data === null) {
-        return '暂无数据'
+        return 'N/A'
     } else {
         return data
     }
@@ -63,6 +103,14 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+// .description-container {
+//     width: 25vw;
+//     height: fit-content;
+//     overflow: hidden;
+//     border: 1px solid #ccc;
+//     border-radius: 3%;
+// }
+
 .description-container {
     width: 25vw;
     // height: 20vh;
