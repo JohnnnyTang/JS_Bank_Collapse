@@ -1,6 +1,6 @@
 <template>
     <div class="bankKnowledge-container" ref="knowledgeContainer">
-        <VerticalNavVue />
+        <!-- <VerticalNavVue /> -->
         <!-- <div class="selector-container"></div> -->
         <router-view />
         <!-- <ScrollHistoryVue :knowledgeContainerWidth="knowledgeContainerWidth" ref="scrollDom"/> -->

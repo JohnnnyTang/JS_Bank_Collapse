@@ -59,8 +59,8 @@ public class GnssWarningJob implements Job {
             }
             double threeDiff = gnssData.getThreeD();
             log.info(gnssId+"-"+gnssData.getMeasureTime()+":"+threeDiff);
-            if(threeDiff > 12) {
-                if(threeDiff > 20) {
+            if(threeDiff > 35) {
+                if(threeDiff > 50) {
                     dangerList.add(gnssData);
                 }
                 else {

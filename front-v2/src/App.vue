@@ -145,6 +145,9 @@ body,
                 background-color: rgb(87, 103, 128);
                 color: rgb(196, 203, 209);
                 filter: grayscale(0.5);
+                width: 4%;
+                padding-left: 48%;
+                padding-right: 48%;
             }
 
             span.level-one {

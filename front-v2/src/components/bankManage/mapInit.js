@@ -546,14 +546,14 @@ const mapInit = async (map, vis) => {
                 ).data
                 let filteredData = filterWarnData(allWarnData)
                 let lastPos
-                filteredData.forEach((item) => {
+                filteredData.forEach((item, index) => {
                     let id = item.deviceId
                     let type = deviceTypeList[id.split('_').pop() - 1]
-                    lastPos = setWarningDeviceStyle(map, type, id, item)
+                    lastPos = setWarningDeviceStyle(map, type, id, item, index+1)
                 })
                 if (filteredData.length != 0) {
                     useWarnInfoStore().warnInfo = filteredData
-                    useWarnInfoStore().warnInfo_history = [...filteredData]
+                    useWarnInfoStore().warnInfo_history = [...allWarnData]
                 }
             } else if (e.key == 'f') {
                 // 11111  clear warnStore and warnLayer
@@ -569,10 +569,10 @@ const mapInit = async (map, vis) => {
                 let allWarnData = fakeWarnInfo
                 let filteredData = filterWarnData(allWarnData)
                 let typeList = ['GNSS', '应力桩', '孔隙水压力计', '测斜仪']
-                filteredData.forEach((item) => {
+                filteredData.forEach((item, index) => {
                     let id = item.deviceId
                     let type = typeList[id.split('_').pop() - 1]
-                    setWarningDeviceStyle(map, type, id, item)
+                    setWarningDeviceStyle(map, type, id, item, index+1)
                 })
                 if (filteredData.length != 0)
                     useWarnInfoStore().warnInfo = filteredData
@@ -583,7 +583,7 @@ const mapInit = async (map, vis) => {
     }
 }
 
-const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
+const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData, index) => {
     // const pulsingCVSMap = {
     //     GNSS: 'point',
     //     测斜仪: 'rectangle',
@@ -623,7 +623,7 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData) => {
     propertyRef.value = property
 
     // warning
-    const popup = createWarningPopup({ warningInfo: warnData })
+    const popup = createWarningPopup({ warningInfo: warnData, index })
     popup.setLngLat([property.longitude, property.latitude]).addTo(map)
     useWarnInfoStore().warnPopupMap[warnData.id] = popup
     return [property.longitude, property.latitude]
@@ -667,6 +667,8 @@ const createWarningPopup = (info) => {
     const popUp = new mapboxgl.Popup({
         maxWidth: '1500px',
         offset: 25,
+        closeOnClick: false,
+        closeButton:true
     }).setDOMContent(domwithComp)
     return popUp
 }
@@ -707,16 +709,17 @@ const warnInterval = async (map, minute) => {
     // let warnType = 'GNSS'
     let filteredData = filterWarnData(allWarnData)
     let lastPos
-    filteredData.forEach((item) => {
+    filteredData.forEach((item, index) => {
         let id = item.deviceId
         let type = 'GNSS'
-        lastPos = setWarningDeviceStyle(map, type, id, item)
+        lastPos = setWarningDeviceStyle(map, type, id, item, index+1)
     })
     console.log('in interval, ', filteredData)
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)
     if (filteredData.length != 0) {
         useWarnInfoStore().warnInfo = filteredData
-        useWarnInfoStore().warnInfo_history = [...filteredData]
+        useWarnInfoStore().warnInfo_history = [...allWarnData]
+        console.log('in interval history warn', useWarnInfoStore().warnInfo_history)
     }
     // console.log('first-warnInterval!', filteredData)
 

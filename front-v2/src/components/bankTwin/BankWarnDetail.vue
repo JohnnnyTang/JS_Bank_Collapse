@@ -4,19 +4,49 @@
         :class="props.warnActive ? 'active' : 'in-active'"
         v-if="props.warnActive"
     >
-        <div class="warn-detail-title">报警信息详情</div>
+        <div class="warn-detail-title">报警处置详情</div>
         <div class="warn-detail-content" v-loading="detailLoading">
             <el-scrollbar class="accordion-scroll">
-                <el-collapse>
+                <el-collapse
+                    v-model="collapseOpenItem"
+                    @change="collapseChange"
+                >
                     <el-collapse-item
-                        :title="
-                            deviceIdMap[warn.deviceId] +
-                            '报警详情-' +
-                            warn.warnTime
-                        "
-                        v-for="warn in warnInfoStore.warnInfo"
+                        v-for="(warn, index) in warnInfoStore.warnInfo"
                         :key="warn.id"
+                        :name="warn.deviceId"
                     >
+                        <template #title>
+                            <div
+                                class="title-warn-index"
+                                style="color: red; margin-left: 1vw"
+                            >
+                                {{
+                                    '报警' +
+                                    (useWarnInfoStore().warnInfo_history.indexOf(
+                                        warn,
+                                    ) +
+                                        1) +
+                                    '-'
+                                }}
+                            </div>
+                            <div class="title-warn-content">
+                                {{
+                                    deviceIdMap[warn.deviceId].replace(
+                                        '-',
+                                        '',
+                                    ) +
+                                    '-' +
+                                    warn.warnTime.replaceAll('-', '')
+                                }}
+                            </div>
+                            <div
+                                class="deal-warn-button"
+                                @click="startDealWithWarn(index)"
+                            >
+                                处置
+                            </div>
+                        </template>
                         <div class="detail-content-container">
                             <el-descriptions
                                 direction="vertical"
@@ -33,49 +63,138 @@
                                 >
                                 <el-descriptions-item
                                     label="报警时间"
-                                    :span="3"
+                                    :span="1"
                                     >{{ warn.warnTime }}</el-descriptions-item
                                 >
                                 <el-descriptions-item
                                     label="风险点责任人"
-                                    :span="2"
+                                    :span="1"
                                     >高卫南</el-descriptions-item
                                 >
                                 <el-descriptions-item
                                     label="责任人联系方式"
-                                    :span="2"
+                                    :span="1"
                                     >15161059955</el-descriptions-item
                                 >
                                 <el-descriptions-item label="巡查队伍" :span="2"
                                     >靖江市西来镇巡堤查险队</el-descriptions-item
                                 >
                                 <el-descriptions-item
-                                    label="巡查队伍责任人"
-                                    :span="2"
+                                    label="巡查队责任人"
+                                    :span="1"
                                     >刘宏江</el-descriptions-item
                                 >
                                 <el-descriptions-item
-                                    label="巡查队伍联系方式"
-                                    :span="2"
+                                    label="巡查队联系方式"
+                                    :span="1"
                                     >13921738638</el-descriptions-item
                                 >
                                 <el-descriptions-item label="抢险队伍" :span="2"
                                     >江苏龙源水利工程有限公司抢险队
                                 </el-descriptions-item>
                                 <el-descriptions-item
-                                    label="抢险队伍责任人"
-                                    :span="2"
+                                    label="抢险队责任人"
+                                    :span="1"
                                     >吴明灿</el-descriptions-item
                                 >
                                 <el-descriptions-item
-                                    label="抢险队伍联系方式"
-                                    :span="2"
+                                    label="抢险队联系方式"
+                                    :span="1"
                                     >13815981186</el-descriptions-item
                                 >
                             </el-descriptions>
+
+                            <div
+                                class="deal-confirm-buttons"
+                                v-if="curDealWith[index]"
+                            >
+                                <div
+                                    class="confirm-deal button"
+                                    @click="confirmDealWithWarn(warn)"
+                                >
+                                    确认处置
+                                </div>
+                                <div
+                                    class="cancel-deal button"
+                                    @click="
+                                        cancelDealWithWarm(index, warn.deviceId)
+                                    "
+                                >
+                                    取消
+                                </div>
+                            </div>
                         </div>
                     </el-collapse-item>
-                    <div v-show="warnInfoStore.warnInfo.length == 0" class="no-data">暂无</div>
+                    <div
+                        v-show="warnInfoStore.warnInfo.length == 0"
+                        class="no-data"
+                    >
+                        暂无未处置报警
+                    </div>
+                    <el-collapse-item style="margin-top: 2vh;">
+                        <template #title>
+                            <div
+                                style="
+                                    margin-left: 1vw;
+                                    font-size: calc(0.8vw + 0.6vh);
+                                    color: rgb(0, 193, 243);
+                                "
+                            >
+                                已处置报警列表
+                            </div>
+                        </template>
+                        <div class="detail-content-container">
+                            <div class="head device-status-row">
+                                <div class="device-id device-item head">
+                                    序号
+                                </div>
+                                <div class="device-time device-item head">
+                                    报警时间
+                                </div>
+                                <div class="device-name device-item head">
+                                    报警设备
+                                </div>
+                                <div class="device-place device-item head">
+                                    报警位置
+                                </div>
+                            </div>
+                            <div
+                                class="device-status-row body"
+                                v-for="(item, index) in dealtWarnList"
+                                :key="index"
+                            >
+                                <div class="device-id device-item body">
+                                    {{ index + 1 }}
+                                </div>
+                                <div class="device-time device-item body">
+                                    <div class="up">
+                                        {{ item.warnTime.split(' ')[0] }}
+                                    </div>
+                                    <div class="down">
+                                        {{ item.warnTime.split(' ')[1] }}
+                                    </div>
+                                </div>
+                                <div class="device-name device-item body">
+                                    {{ deviceIdMap[item.deviceId] }}
+                                </div>
+                                <div class="device-place device-item body">
+                                    {{ deviceIdPlaceMap[item.deviceId] }}
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            style="
+                                text-align: center;
+                                width: 100%;
+                                height: 4vh;
+                                line-height: 4vh;
+                                font-size: calc(0.6vw + 0.8vh);
+                            "
+                            v-if="dealtWarnList.length === 0"
+                        >
+                            暂无已处置报警
+                        </div>
+                    </el-collapse-item>
                 </el-collapse>
             </el-scrollbar>
         </div>
@@ -113,9 +232,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
-import { useWarnInfoStore } from '../../store/mapStore'
+import { useMapStore, useWarnInfoStore } from '../../store/mapStore'
+import { removeWarningDeviceStyle } from '../bankManage/mapInit.js'
 const props = defineProps({
     warnActive: {
         type: Boolean,
@@ -125,6 +245,20 @@ const props = defineProps({
 const detailLoading = ref(false)
 const warnInfoStore = useWarnInfoStore()
 const warnDetailList = ref([])
+const curDealWith = ref(new Array(10).fill(false))
+
+const collapseOpenItem = ref([])
+
+const dealtWarnList = computed(() => {
+    let res = []
+    warnInfoStore.warnInfo_history.map((item) => {
+        if (item.ifDealt !== 0) {
+            res.push(item)
+        }
+    })
+    console.log('computed dealt warn', res)
+    return res
+})
 
 const deviceIdMap = {
     'MZS120.51749289_32.04059243_1': 'CL-01',
@@ -241,11 +375,72 @@ const detailInfo = ref({
     video: '',
 })
 
+const deviceTypeList = ['GNSS', '应力桩', '水压力计', '测斜仪']
+
 const openPlanPdf = (info) => {
     curPage.value = 1
     dialogVisible.value = true
     curPdf.value = info.url
 }
+
+const startDealWithWarn = (index) => {
+    curDealWith.value[index] = true
+}
+
+const cancelDealWithWarm = (index, deviceId) => {
+    curDealWith.value[index] = false
+    if (collapseOpenItem.value.includes(deviceId)) {
+        console.log('id inside......')
+        collapseOpenItem.value.splice(
+            collapseOpenItem.value.indexOf(deviceId),
+            1,
+        )
+    }
+}
+
+const filterDealtWarnInfo = (warnList) => {
+    let res = []
+    warnList.map((item) => {
+        if (item.ifDealt !== 0) {
+            res.push(item)
+        }
+    })
+    console.log('filtered dealt warn', res)
+    return res
+}
+
+const confirmDealWithWarn = (warnItem) => {
+    if (warnItem.id in warnInfoStore.warnPopupMap) {
+        console.log(
+            'dealing with this',
+            warnInfoStore.warnPopupMap[warnItem.id],
+        )
+        warnInfoStore.warnPopupMap[warnItem.id].remove()
+        delete warnInfoStore.warnPopupMap[warnItem.id]
+
+        let id = warnItem.deviceId
+        let type = deviceTypeList[id.split('_').pop() - 1]
+        console.log(type, id)
+        removeWarningDeviceStyle(useMapStore().getMap(), type, id)
+        warnInfoStore.removeInfoItem(warnItem)
+    }
+
+    warnItem.ifDealt = 1
+    // historyRowLoading.value[warnIndex] = false
+}
+
+const collapseChange = (opened) => {
+    console.log('changed collapse', opened)
+}
+
+watch(() => useWarnInfoStore().curDealId, (newVal) => {
+    if(newVal && newVal != '') {
+        // console.log("123123123123", newVal)
+        startDealWithWarn(newVal-1)
+        console.log('21312313123213', (warnInfoStore.warnInfo_history[newVal-1].id))
+        collapseOpenItem.value.push(warnInfoStore.warnInfo_history[newVal-1].deviceId)
+    }
+})
 
 onMounted(() => {
     warnDetailList.value = warnInfoStore.warnInfo
@@ -257,8 +452,8 @@ div.warn-detail-container {
     position: absolute;
     right: 1vw;
     top: 10vh;
-    height: 45vh;
-    width: 24vw;
+    height: 80vh;
+    width: 26vw;
 
     backdrop-filter: blur(12px);
     box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
@@ -287,8 +482,8 @@ div.warn-detail-container {
     }
 
     div.warn-detail-content {
-        height: 35vh;
-        width: 23.5vw;
+        height: 68.5vh;
+        width: 25.5vw;
         margin-left: 0.25vw;
 
         background-color: #6493ff;
@@ -315,13 +510,33 @@ div.warn-detail-container {
             --el-collapse-header-height: 8vh;
             .el-collapse-item__header {
                 background-color: rgb(210, 242, 255);
-                padding-left: 1vw;
+                padding-left: 0vw;
                 font-weight: bold;
                 color: #14129e;
-                font-size: calc(0.7vw + 0.4vh);
+                font-size: calc(0.8vw + 0.4vh);
                 &.is-active {
                     color: rgb(221, 251, 255);
                     background-color: #0019a5;
+                }
+
+                div.deal-warn-button {
+                    position: relative;
+                    right: -3vw;
+                    padding: 0 1vw 0 1vw;
+                    background-color: #8bbcfc;
+                    height: 4vh;
+                    line-height: 4vh;
+                    border-radius: 4px;
+                    font-weight: normal;
+
+                    color: #000f41;
+                    border: 2px solid black;
+
+                    &:hover {
+                        font-weight: bold;
+                        color: #ebf3ff;
+                        background-color: #00328f;
+                    }
                 }
             }
 
@@ -333,9 +548,10 @@ div.warn-detail-container {
             background-color: transparent !important;
         }
         div.detail-content-container {
-            width: 96%;
-            height: 32vh;
-            margin-left: 2%;
+            width: 100%;
+            // height: 32vh;
+            height: fit-content;
+            // margin-left: 1%;
             // padding-left: 2%;
             // padding-right: 2%;
             // background-color: rgb(92, 125, 154);
@@ -350,6 +566,10 @@ div.warn-detail-container {
             //     color: #021e7a;
             // }
 
+            &.dealt {
+                margin-top: 2vh;
+            }
+
             :deep(
                     .el-descriptions__body
                         .el-descriptions__table
@@ -357,25 +577,143 @@ div.warn-detail-container {
                 ) {
                 font-size: calc(0.5vw + 0.3vh);
                 text-align: center;
-                background-color: #0e1c6d;
+                background-color: #0a1e91;
                 color: rgba(246, 250, 255, 1);
                 // box-shadow: 0 0 0 1px #dbedff inset;
 
                 &.is-bordered-content {
                     text-align: center;
-                    font-size: calc(0.6vw + 0.3vh);
+                    font-size: calc(0.5vw + 0.3vh);
                     color: hsl(234, 100%, 15%);
                     box-shadow: 0 0 0 1px #b4a3ff inset;
                     background-color: rgb(238, 248, 255);
                     font-weight: 600;
                 }
             }
+
+            div.deal-confirm-buttons {
+                height: 5vh;
+                width: 100%;
+
+                display: flex;
+                flex-flow: row nowrap;
+
+                justify-content: space-around;
+                align-items: center;
+                margin-top: 1vh;
+                padding-bottom: 1vh;
+
+                div.button {
+                    width: 15%;
+                    height: 4vh;
+                    line-height: 4vh;
+
+                    text-align: center;
+
+                    padding: 0 1vw 0 1vw;
+                    border-radius: 6px;
+                    background-color: #8bbcfc;
+                    color: #000f41;
+                    font-size: calc(0.6vw + 0.6vh);
+                    border: 2px solid black;
+
+                    &:hover {
+                        font-weight: bold;
+                        color: #ebf3ff;
+                        background-color: #00328f;
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            div.device-status-row {
+                height: 4vh;
+                line-height: 4vh;
+                width: 100%;
+                border-radius: 2px;
+
+                // background-color: #2622fd;
+
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-around;
+
+                &.head {
+                    padding-bottom: 4px;
+                }
+
+                div.device-item {
+                    width: 32%;
+                    height: 4vh;
+                    line-height: 4vh;
+                    text-align: center;
+                    font-size: calc(0.5vw + 0.4vh);
+                    border-radius: 2px;
+
+                    background-color: #d2f2ff;
+                    font-weight: bold;
+                    color: #0237b3;
+
+                    &.device-id {
+                        width: 12%;
+                    }
+
+                    &.device-name {
+                        width: 28%;
+
+                        &.body {
+                            font-size: calc(0.5vw + 0.6vh);
+                        }
+                    }
+
+                    &.device-time {
+                        width: 26%;
+                        display: flex;
+                        flex-flow: row wrap;
+                        &.body {
+                            line-height: 2vh;
+                            font-size: calc(0.3vw + 0.6vh);
+
+                            div {
+                                width: 100%;
+
+                                &.up {
+                                    color: #5a8bff;
+                                }
+                            }
+                        }
+                        justify-content: center;
+                    }
+
+                    &.device-place {
+                        &.body {
+                            font-size: calc(0.5vw + 0.6vh);
+                        }
+                    }
+
+                    &.head {
+                        background-color: #2a5fdb;
+                        border: 1px solid #aaffff;
+                        font-weight: bold;
+                        color: #dafdff;
+                        box-shadow:
+                            rgba(208, 252, 255, 0.6) 0px 2px 4px,
+                            rgba(208, 252, 255, 0.4) 0px 7px 13px -3px,
+                            rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
+                    }
+
+                    box-shadow:
+                        rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                        rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                        rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                }
+            }
         }
     }
 
     div.plan-button-group {
-        height: 4.8vh;
-        width: 23vw;
+        height: 5.6vh;
+        width: 25vw;
         margin-left: 0.5vw;
         margin-top: 0.5vh;
 
