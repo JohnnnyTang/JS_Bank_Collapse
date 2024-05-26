@@ -46,7 +46,7 @@
     </div>
     <div class="text-info-container">
         <div class="text-info-item">
-            该断面近岸冲刷速率值为 <span style="color: red;">{{ speedList[profileValue-1]}}</span> m/年，
+            该断面近岸冲刷速率值为 <span style="color: red;">{{ speedList[profileValue-1]}}</span> m/年
         </div>
     </div>
 </div>
@@ -67,7 +67,8 @@ let shapeChart = null
 let section;
 let beforeSection;
 let compareSection;
-let slopeRate;
+let compareBeforeSection;
+
 
 const emit = defineEmits(['profileValueChange'])
 
@@ -106,18 +107,22 @@ const calProfileData = () => {
             return value[2] < -999 ? null : value[2]
         })
         compareSection = profileDataCompareItem
+        .section.map((value) => {
+            return value[2] < -999 ? null : value[2]
+        })
+        compareBeforeSection = profileDataCompareItem
         .beforeSection.map((value) => {
             return value[2] < -999 ? null : value[2]
         })
     } catch (error) {
-        DrawGraph([],[],[],[])
+        DrawGraph([],[],[],[],[])
         shapeGraphNotShow.value = true
         return
     }
-    DrawGraph(section, beforeSection, compareSection)
+    DrawGraph(section, beforeSection, compareSection, compareBeforeSection)
 }
 
-const DrawGraph = (section, beforesection, compareSection) => {
+const DrawGraph = (section, beforesection, compareSection, compareBeforeSection) => {
     // if (shapeChart !== null) {
     //     shapeChart.dispose();
     // }
@@ -130,6 +135,7 @@ const DrawGraph = (section, beforesection, compareSection) => {
         section,
         beforesection,
         compareSection,
+        compareBeforeSection
     )
 }
 
@@ -146,9 +152,9 @@ watch(()=>props.profileData, ()=>{
 <style lang="scss" scoped>
 div.riskInfo-container {
     position: absolute;
-    top: 46.5vh;
+    top: 54.25vh;
     left: 1vw;
-    height: 43vh;
+    height: 37.5vh;
     width: 30vw;
     border-radius: 8px;
     border: #167aec 1px solid;
@@ -189,7 +195,7 @@ div.riskInfo-container {
 
         &.profileShape {
             top: 5.5vh;
-            height: 30vh;
+            height: 27vh;
             // background-color: #c9cad4;
         }
 
@@ -264,7 +270,7 @@ div.riskInfo-container {
             left: 0.25vw;
 
             &.shape {
-                height: 25.5vh;
+                height: 22.5vh;
                 backdrop-filter: blur(5px);
                 // background-color: rgba(220, 250, 248, 0.4);
             }
@@ -308,9 +314,9 @@ div.riskInfo-container {
 
     div.text-info-container {
         position:absolute;
-        top: 36.8vh;
+        top: 33vh;
         width: 29vw;
-        height: 5.25vh;
+        height: 4.25vh;
         left: 0.5vw;
         background-color: rgba(18, 161, 218, 0.5);
         border-radius: 5px;
@@ -318,7 +324,7 @@ div.riskInfo-container {
         div.text-info-item {
             position: absolute;
             left: 6vw;
-            top: 1.3vh;
+            top: 0.7vh;
             color: #070707;
             font-size: calc(0.7vw + 0.5vh);
             font-family: 'Microsoft YaHei';

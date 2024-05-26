@@ -225,8 +225,8 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
         },
         grid: [
             {
-                top: '15%',
-                height: '75%',
+                top: '17%',
+                height: '70%',
                 width: '85%',
                 show: true,
             }
@@ -264,8 +264,36 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
             {
                 name: '流速',
                 type: 'line',
-                data: flowspeed
-            }
+                data: flowspeed,
+                markPoint: {
+                    symbol: 'circle',
+                    symbolSize: 5,
+                    data: [
+                        {
+                            name: '最大流速',
+                            type: 'max',
+                            itemStyle: {
+                                color: 'red',
+                                borderColor: 'black',
+                                borderWidth: 0.5,
+                            },
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: () => {
+                                        return "最大流速: " + Math.max(...flowspeed).toFixed(2)  + ' m/s';
+                                    },
+                                    textStyle: {
+                                        color: 'black',
+                                        fontSize: 13
+                                    }
+                                }
+                            }
+                        },
+                    ]
+                },
+            },
         ],
     }
     echarts.setOption(option)
@@ -663,7 +691,7 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
                     style: {
                         text: '距离(m)',
                         x: 530,
-                        y: 240,
+                        y: 210,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
@@ -680,12 +708,13 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
  * @param {any} echarts
  * @param {number[]} before
  *  @param {number[]} after
- * @param {number[]} compare
+ * @param {number[]} compareBefore
+ * @param {number[]} compareNow
  */
-export const drawShapeCompareGraph = (echarts, after, before, compare) => {
+export const drawShapeCompareGraph = (echarts, after, before, compareBefore, compareNow) => {
     const min = Math.min(...after, ...before)
     const max = Math.max(...after, ...before)
-    const length = Math.min(after.length, before.length, compare.length)
+    const length = Math.min(after.length, before.length, compareBefore.length, compareNow.length)
     const splitPoint = []
     for (let index = 0; index < length; index += 4) {
         splitPoint.push(index)
@@ -712,8 +741,8 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
             },
         ],
         legend: {
-            data: ['2012年地形', '2019年地形', '2023年地形'],
-            right: '20%',
+            data: ['1999年地形','2012年地形', '2019年地形', '2023年地形'],
+            right: '12%',
             top: '2%',
         },
         axisPointer: {
@@ -757,10 +786,23 @@ export const drawShapeCompareGraph = (echarts, after, before, compare) => {
         ],
         series: [
             {
+                name: '1999年地形',
+                type: 'line',
+                smooth: true,
+                data: compareBefore.map((value) => fix2OrNull(value)),
+                lineStyle: {
+                    //16,16,255
+                    color: 'rgb(127, 122, 85)',
+                },
+                itemStyle: {
+                    color: 'rgb(127, 122, 85)',
+                },
+            },
+            {
                 name: '2012年地形',
                 type: 'line',
                 smooth: true,
-                data: compare.map((value) => fix2OrNull(value)),
+                data: compareNow.map((value) => fix2OrNull(value)),
                 lineStyle: {
                     //16,16,255
                     color: 'rgb(16,16,255)',

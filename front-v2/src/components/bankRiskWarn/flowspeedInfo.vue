@@ -96,9 +96,9 @@ watch(props.profileList, () => {
 <style lang="scss" scoped>
 div.flowspeed-content{
     position: absolute;
-    top: 31vh;
+    top: 40.5vh;
     left: 1vw;
-    height: 30vh;
+    height: 25vh;
     width: 30.2vw;
     border-radius: 4px;
     // border: #167aec 1px solid;
@@ -131,7 +131,7 @@ div.flowspeed-content{
 
     div.riskInfo-item {
         position: absolute;
-        height: 23vh;
+        height: 18.5vh;
         top: 6vh;
         border-radius: 6px;
         border: #3b85e7 2px solid;
@@ -218,7 +218,7 @@ div.flowspeed-content{
             left: 0.25vw;
 
             &.flowspeed {
-                height: 18.5vh;
+                height: 14vh;
                 backdrop-filter: blur(5px);
                 // background-color: #00098a;
             }
