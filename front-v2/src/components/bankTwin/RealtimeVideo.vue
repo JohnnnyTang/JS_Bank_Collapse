@@ -25,6 +25,7 @@
             <div class="video-focus" v-if="item.order != 0" @click="focusOn(index)">
                 放大/控制
             </div>
+            <div class="small-pic" v-if="item.order == 0" :id="index"></div>
         </div>
         <div class="video-controller-container">
             <div class="video-controller-title">当前监控云台控制</div>
@@ -329,6 +330,30 @@ div.realtime-video-container {
                 background-color: #0037ad;
                 color: #9df8ff;
                 cursor: pointer;
+            }
+        }
+
+        div.small-pic {
+            width: 8vw;
+            height: 8vh;
+
+            position: relative;
+            top: -32vh;
+            right: -19vw;
+            background-color: #ffffff8e;
+
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+
+            &[id="0"] {
+                background-image: url('/mzsBase-monitor3.png');
+            }
+            &[id="1"] {
+                background-image: url('/mzsBase-monitor2.png');
+            }
+            &[id="2"] {
+                background-image: url('/mzsBase-monitor1.png');
             }
         }
 
