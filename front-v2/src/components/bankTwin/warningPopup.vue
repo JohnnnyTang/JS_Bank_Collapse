@@ -20,6 +20,8 @@
                 <!-- <div class="tabs"></div> -->
                 <div class="chart" ref="chartDom"></div>
             </div>
+            <div class="up-arrow" :id="deviceType">
+            </div>
         </dv-border-box10>
 
         <!-- <div v-show="showFakeStressPic" class="fake-stress-pic"></div> -->
@@ -55,6 +57,7 @@ const fakeWarnCodeList = [
 const warnInfoStore = useWarnInfoStore()
 const deviceTypeList = ['GNSS', '应力桩', '水压力计', '测斜仪']
 let myChart = undefined
+const deviceType = ref('')
 
 const clickHandler = () => {
     /*
@@ -71,10 +74,10 @@ const clickHandler = () => {
         const daviceMap = ['GNSS', '应力桩', '水压力计', '测斜仪']
         if (fakeWarnCodeList.includes(props.warningInfo.deviceId)) {
             showChart.value = !showChart.value
-            let deviceType =
+            deviceType.value =
                 daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
-            chartConfig(deviceType)
-            if (deviceType === '应力桩') {
+            chartConfig(deviceType.value)
+            if (deviceType.value === '应力桩') {
                 showFakeStressPic.value = true
             }
         }
@@ -225,6 +228,28 @@ onMounted(() => {})
                 // background-color: antiquewhite;
             }
             z-index: 2;
+        }
+
+        div.up-arrow {
+            position: absolute;
+            right: 0.5vw;
+            top: 14.5vh;
+
+            width: 3vh;
+            height: 3vh;
+            // background-color: antiquewhite;
+            background-image: url('/arrow-up-red.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 3;
+
+            &[id="应力桩"] {
+                top: 15.4vh;
+            }
+
+            &[id="GNSS"] {
+                top: 11vh;
+            }
         }
     }
 

@@ -326,6 +326,7 @@ const deviceSelectChange = async (deviceName) => {
             deviceTypeTimeMap[selectedDeviceType.value].timeCount,
         )
     ).data
+    console.log('device data', data)
     if (selectedDeviceType.value == '位移测量站') {
         gnssOption = genGnssOptionOfDevice(
             data,
