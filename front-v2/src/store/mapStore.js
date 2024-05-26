@@ -167,6 +167,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const warnPopupMap = ref({})
     const warnWatchTimer = ref(0)
     const fake = ref(false)
+    const curDealId = ref('')
 
     function removeInfoItem(removeItem) {
         warnInfo.value = warnInfo.value.filter(item => item.id !== removeItem.id)
@@ -184,7 +185,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
         warnWatchTimer.value = 0
     }
 
-    return { fake, warnInfo, warnPopupMap, removeInfoItem, resetWarnInfo, warnWatchTimer, warnInfo_history }
+    return { fake, warnInfo, warnPopupMap, removeInfoItem, resetWarnInfo, warnWatchTimer, warnInfo_history, curDealId }
 })
 
 const useHighlightLayerStore = defineStore('highlightLayerStore', () => {

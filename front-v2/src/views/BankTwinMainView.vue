@@ -1,10 +1,10 @@
 <template>
     <div class="twin-main-container" ref="containerDom">
-        <div class="nav-manage-button" @click="navToManage">
+        <!-- <div class="nav-manage-button" @click="navToManage">
             <div class="nav-manage-icon"></div>
             <div class="nav-manage-text">监测详情</div>
             <div class="nav-arrow-icon"></div>
-        </div>
+        </div> -->
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
                 <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
@@ -121,7 +121,7 @@
             </div>
         </div>
         <BanWarnDetail :warnActive="warnActive" v-loading="warnLoading" />
-        <WarnHistoryTable v-show="warnActive" />
+        <!-- <WarnHistoryTable v-show="warnActive" /> -->
 
         <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
 
@@ -163,7 +163,7 @@ const unityCanvaDom = ref()
 const mapDom = ref()
 const warnActive = ref(false)
 const buttonText = computed(() => {
-    return warnActive.value ? '查看现场监控' : '查看预警详情'
+    return '查看处置详情'
 })
 const detailLoading = ref(false)
 const warnLoading = ref(true)
@@ -455,7 +455,7 @@ const updateWarnInfoDesc = async () => {
     warnKeyValList.value[5].val = '是'
 
     warningList.value = WARN_TEXT
-    warnActive.value = true
+    // warnActive.value = true
     // 第一次是没有初始化完的长度 所以很快 实际上很长
     await nextTick()
     console.log('123123 length: ', marqueeBlockDom.value.offsetWidth)
@@ -853,119 +853,6 @@ div.twin-main-container {
         }
     }
 
-    div.warn-detail-container {
-        position: absolute;
-        right: 1vw;
-        top: 10vh;
-        height: 45vh;
-        width: 24vw;
-
-        backdrop-filter: blur(12px);
-        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
-        background-color: rgba(156, 195, 255, 0.8);
-        border-radius: 4px;
-        border: 2px solid rgb(28, 105, 247);
-        z-index: 3;
-        border-radius: 4px;
-        overflow: hidden;
-
-        div.warn-detail-title {
-            height: 4vh;
-            line-height: 4vh;
-            width: 100%;
-            background-color: transparent;
-            text-align: center;
-            font-size: calc(0.8vw + 0.8vh);
-            font-weight: bold;
-            color: #0400fd;
-            text-shadow:
-                #eef3ff 1px 1px,
-                #eef3ff 2px 2px,
-                #6493ff 3px 3px;
-            letter-spacing: 0.4rem;
-            border-bottom: 2px solid #0400fd;
-        }
-
-        div.warn-detail-content {
-            height: 40vh;
-            width: 23vw;
-            margin-left: 0.5vw;
-            // margin-top: 0.5vh;
-
-            // background-color: #6493ff;
-
-            display: flex;
-            flex-flow: row wrap;
-            align-content: flex-start;
-            justify-content: center;
-
-            div.key-val-container {
-                margin-top: 0.6vh;
-                width: 90%;
-                height: 6vh;
-                display: flex;
-                flex-flow: row wrap;
-                justify-content: space-between;
-                // background-color: #0446a8;
-                text-align: center;
-                border-bottom: 2px solid rgb(0, 32, 175);
-
-                &:first-child {
-                    margin-top: 0;
-                }
-
-                div.icon {
-                    width: 20%;
-                    height: 3vh;
-                    background-size: contain;
-                    background-repeat: no-repeat;
-                    background-position: 50% 50%;
-                    background-color: transparent;
-
-                    &#warning-icon {
-                        background-image: url('/warning.png');
-                    }
-
-                    &#length-icon {
-                        background-image: url('/distance.png');
-                    }
-                }
-
-                div.key-text {
-                    width: width;
-                    line-height: 6vh;
-                    background-color: transparent;
-                    font-size: calc(0.7vw + 0.6vh);
-                    color: #0043fd;
-                }
-
-                div.val-text {
-                    line-height: 6vh;
-                    font-size: calc(0.7vw + 0.5vh);
-                    font-weight: bold;
-                    color: #1d00be;
-                    // max-width: 70%;
-                    width: 12vw;
-                    text-align: right;
-                    // text-align: center;
-                }
-
-                // &:nth-child(2n + 1) {
-                //     text-align: left;
-
-                //     // padding-left: 6%;
-                //     // border-right: 2px solid rgb(0, 32, 175);
-                // }
-                // &:nth-child(2n) {
-                //     text-align: right;
-                //     justify-content: flex-end;
-                //     // padding-right: 6%;
-                //     // border-left: 2px solid rgb(0, 32, 175);
-                // }
-            }
-        }
-    }
-
     div.warn-history-container {
         position: absolute;
         right: 1vw;
@@ -1153,10 +1040,11 @@ div.twin-main-container {
 }
 
 :deep(.mapboxgl-popup-close-button) {
-    right: 5px;
-    top: 5px;
-    border: none;
-    display: none;
+    right: 3px;
+    top: 3px;
+    z-index: 3;
+    // border: none;
+    // display: none;
 }
 
 :deep(.el-overlay) {

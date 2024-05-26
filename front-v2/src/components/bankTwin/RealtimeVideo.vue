@@ -9,7 +9,7 @@
             class="video-box"
             v-for="(item, index) in videoList"
             :key="index"
-            :id="index"
+            :id="item.order"
         >
             <div class="video-content">
                 <iframe
@@ -22,7 +22,7 @@
                 </iframe>
             </div>
             <div class="video-title">{{ item.name }}</div>
-            <div class="video-focus" v-if="index != 0" @click="focusOn(index)">
+            <div class="video-focus" v-if="item.order != 0" @click="focusOn(index)">
                 放大/控制
             </div>
         </div>
@@ -83,11 +83,18 @@
 </template>
 
 <script setup>
-import { onMounted, ref, onUnmounted, watch, onBeforeUnmount, onBeforeMount } from 'vue'
+import {
+    onMounted,
+    ref,
+    onUnmounted,
+    watch,
+    onBeforeUnmount,
+    onBeforeMount,
+} from 'vue'
 import axios from 'axios'
 
 const token = ref(
-    'at.8z5xddvs305hvthb5emtqno22k38c3s0-6bgwm8993s-0llo4pp-mc0rbdnna',
+    'at.89iiwo7c5cztq6f30wuai5oy0j3362ow-6m3qlhqadh-1phdss1-rmjo1wuzd',
 )
 
 const props = defineProps({
@@ -119,6 +126,8 @@ let presetParam = {
 
 const functionIndexList = [0, 1, 2, 3, 8, 9, 10, 11]
 
+let curBigVideoIndex = 0
+
 const videoList = ref([
     {
         name: '民主沙海事码头监控',
@@ -126,32 +135,36 @@ const videoList = ref([
         deviceId: 'FB5033035',
         // videoUrl: `https://open.ys7.com/ezopen`,
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        order: 0,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
         deviceId: 'FB5033037',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
+        order: 1
     },
     {
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
         deviceId: 'FB5033036',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
+        order: 2
     },
 ])
 
 const focusOn = (index) => {
-    ;[videoList.value[0], videoList.value[index]] = [
-        videoList.value[index],
-        videoList.value[0],
+    ;[videoList.value[curBigVideoIndex].order, videoList.value[index].order] = [
+        videoList.value[index].order,
+        videoList.value[curBigVideoIndex].order,
     ]
+    curBigVideoIndex = index
 }
 
 const basicVideoFunction = async (functionIndex) => {
-    controlParam.deviceSerial = videoList.value[0].deviceId
+    controlParam.deviceSerial = videoList.value[curBigVideoIndex].deviceId
     controlParam.direction = functionIndexList[functionIndex]
     // console.log('curent func param', controlParam)
     let stRes = await axios.post(
@@ -174,7 +187,7 @@ const basicVideoFunction = async (functionIndex) => {
 }
 
 const move2PresetPoint = async (presetIndex) => {
-    presetParam.deviceSerial = videoList.value[0].deviceId
+    presetParam.deviceSerial = videoList.value[curBigVideoIndex].deviceId
     presetParam.index = presetIndex
     // console.log('preset param', presetParam)
     let stRes = await axios.post(
@@ -200,7 +213,7 @@ const moveBack2Origin = async () => {
                         accessToken: token.value,
                         channelNo: '1',
                         index: '1',
-                        deviceSerial: video.deviceId
+                        deviceSerial: video.deviceId,
                     },
                 },
             ),
@@ -210,7 +223,7 @@ const moveBack2Origin = async () => {
     console.log('back back', res)
 }
 
-onBeforeMount(async() => {
+onBeforeMount(async () => {
     await moveBack2Origin()
 })
 

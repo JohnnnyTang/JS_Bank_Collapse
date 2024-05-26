@@ -793,7 +793,6 @@ const getGNSSoption = () => {
                 rotate: 90 // 将名称旋转 90 度
             },
             nameGap: 40,
-
         },
         graphic: [{
             type: 'text',
@@ -802,11 +801,11 @@ const getGNSSoption = () => {
             top: '100',
             z: 100,
             style: {
-                fill: '#333',
-                width: '30',
-                text: '累积位移变化速率加快\n超过2mm/h，岸坡临界崩塌',
+                fill: 'red',
+                width: '60',
+                text: '报警原因：累积位移变化速率加快\n超过4mm/h,岸坡崩塌风险较高',
                 lineHeight: 20,
-                font: '15px Microsoft YaHei'
+                font: 'bold 20px Microsoft YaHei'
             },
         }],
         series: [
@@ -864,7 +863,7 @@ const getInclineoption = () => {
     const bottommoveDT = getData(timeData, bottommove)
     let option = {
         title: {
-            text: "土体内部位移现场KX-01测量站监测数据",
+            text: "土体内部位移CX-01测量站监测数据",
             left: 'center',
             top: '2%'
         },
@@ -901,15 +900,15 @@ const getInclineoption = () => {
         },
         graphic: [{
             type: 'text',
-            left: 'center',
+            left: '16%',
             top: '100',
             z: 100,
             style: {
-                fill: '#333',
+                fill: 'red',
                 width: '30',
-                text: '内部位移变化速率加快\n超过1mm/h，岸坡临界崩塌',
+                text: '报警原有：内部位移变化速率加快\n超过4mm/h,岸坡崩塌风险较高',
                 lineHeight: 20,
-                font: '15px Microsoft YaHei'
+                font: 'bold 20px Microsoft YaHei'
             },
         }],
         series: [
@@ -937,7 +936,7 @@ const getStressoption = () => {
     const stressDT = getData(timeData, stressValue)
     let option = {
         title: {
-            text: "土体内部应力桩现场YL-05测量站主应变监测数据",
+            text: "土体内部应力桩YL-05测量站主应变监测数据",
             left: 'center',
             top: '2%',
         },
@@ -954,11 +953,11 @@ const getStressoption = () => {
             top: '100',
             z: 100,
             style: {
-                fill: '#333',
+                fill: 'red',
                 width: '30',
-                text: '应力桩应变变形速率加快\n超过15ue/h，岸坡临界崩塌',
+                text: '报警原因：应力桩应变变形速率加快\n超过5ue/h, 岸坡崩塌风险较高',
                 lineHeight: 20,
-                font: '15px Microsoft YaHei'
+                font: 'bold 20px Microsoft YaHei'
             },
         }],
         grid: {

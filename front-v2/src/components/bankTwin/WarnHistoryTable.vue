@@ -1,6 +1,6 @@
 <template>
     <div class="warn-history-container" >
-        <div class="warn-history-title">报警信息列表</div>
+        <div class="warn-history-title">报警信息处置</div>
         <div class="warn-histroy-content" v-loading="historyLoading">
             <div class="device-status-content">
                 <div class="head device-status-row">
@@ -22,7 +22,7 @@
                             <div>{{ warnPosNameMap[item.deviceId] }}</div>
                         </div>
                         <div class="device-time device-item body">
-                            <div :class="item.ifDealt == 1 ? 'yes' : 'no'">
+                            <div :class="item.ifDealt == 1 ? 'yes' : 'no'" v-if="item.ifDealt == 1">
                                 {{ item.ifDealt ? '是' : '否' }}
                             </div>
                             <div class="deal-button" v-if="item.ifDealt == 0" @click="dealWithWarn(index)">

@@ -5,7 +5,7 @@
             :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']"
         >
             <div class="device-info-content">
-                <div class="monitor-title-container">实时监测动态</div>
+                <div class="monitor-title-container">设备状态</div>
                 <div class="monitor-info-splitter">
                     <dv-decoration3
                         style="width: 50%; height: 100%"
@@ -20,17 +20,17 @@
                     <dv-border-box12
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
                     >
-                        <div class="small-title-container">
+                        <!-- <div class="small-title-container">
                             <div class="small-title-icon"></div>
-                            <div class="small-title-text">设备实时监测状态</div>
-                        </div>
+                            <div class="small-title-text">设备状态</div>
+                        </div> -->
                         <div class="device-status-content">
                             <div class="head device-status-row">
                                 <div class="device-name device-item head">
                                     设备
                                 </div>
                                 <div class="device-count device-item head">
-                                    正常数/总数
+                                    报警数/在线数/总数
                                 </div>
                                 <div class="device-time device-item head">
                                     最新更新时间
@@ -44,13 +44,21 @@
                                 v-for="(item, index) in deviceStatusDataList"
                                 :key="index"
                             >
-                                <div class="device-name device-item body">
+                                <div
+                                    class="device-name device-item body"
+                                    @click="changeDeviceType(item.name)"
+                                    :class="{ click: item.name != '视频监控' }"
+                                >
                                     {{ item.name }}
                                 </div>
                                 <div
                                     class="device-count device-item body"
                                     v-loading="deviceStatusLoading"
                                 >
+                                    <div class="warn">
+                                        {{ warnDeviceCount[index] }}
+                                    </div>
+                                    <div>/</div>
                                     <div class="normal">{{ item.count }}</div>
                                     <div>/</div>
                                     <div>{{ item.count }}</div>
@@ -61,9 +69,7 @@
                                 >
                                     {{ item.time }}
                                 </div>
-                                <div
-                                    class="device-freq device-item body"
-                                >
+                                <div class="device-freq device-item body">
                                     {{ item.freq }}
                                 </div>
                             </div>
@@ -75,7 +81,7 @@
                         <el-select
                             v-model="selectedDeviceType"
                             placeholder="选择设备类型"
-                            style="width: 10vw; height: 3.5vh"
+                            style="width: 12vw; height: 3.5vh"
                             @change="deviceTypeSelectChange"
                         >
                             <el-option
@@ -109,9 +115,9 @@
                             </el-option>
                         </el-select>
                     </div>
-                    <div class="nav-data-button" @click="navToMoreData">
+                    <!-- <div class="nav-data-button" @click="navToMoreData">
                         更多数据
-                    </div>
+                    </div> -->
                 </div>
                 <div class="device-chart-container">
                     <dv-border-box10
@@ -130,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
 import * as echarts from 'echarts'
@@ -142,6 +148,7 @@ import {
     genManometerOptionOfDevice,
 } from './dataChartSettings'
 import router from '../../router'
+import { useWarnInfoStore } from '../../store/mapStore'
 
 const chartDom = ref()
 const chartDataLoading = ref(true)
@@ -155,8 +162,10 @@ const deviceStatusDataList = ref([
     { name: '视频监控', count: 3, time: '2024', freq: '实时' },
 ])
 
+const warnDeviceCount = ref([0, 0, 0, 0, '-'])
+
 const deviceListMap = {
-    '位移基准/测量站': [
+    位移测量站: [
         'CL-01',
         'CL-02',
         'CL-03',
@@ -194,14 +203,14 @@ const deviceListMap = {
 }
 
 const deviceTypeNameMap = {
-    '位移基准/测量站': 'gnss',
+    位移测量站: 'gnss',
     测斜仪: 'inclinometer',
     孔隙水压力计: 'manometer',
     应力桩: 'stress',
 }
 
 const deviceTypeErrorMap = {
-    '位移基准/测量站': 5,
+    位移测量站: 5,
     测斜仪: 3,
     孔隙水压力计: 0.2,
     应力桩: 40,
@@ -247,7 +256,7 @@ const deviceIdMap = {
 }
 
 const deviceTypeTimeMap = {
-    '位移基准/测量站': {
+    位移测量站: {
         timeUnit: 'day',
         timeCount: 1,
     },
@@ -265,9 +274,9 @@ const deviceTypeTimeMap = {
     },
 }
 
-const selectedDeviceType = ref('位移基准/测量站')
+const selectedDeviceType = ref('位移测量站')
 
-const deviceList = ref(deviceListMap['位移基准/测量站'])
+const deviceList = ref(deviceListMap['位移测量站'])
 console.log(deviceList)
 const selectedDevice = ref('CL-01')
 
@@ -278,12 +287,7 @@ const sectionClassColorMap = ref({
     普通: 'normal',
     统计: 'all',
 })
-const deviceTypeList = ref([
-    '位移基准/测量站',
-    '测斜仪',
-    '孔隙水压力计',
-    '应力桩',
-])
+const deviceTypeList = ref(['位移测量站', '应力桩', '孔隙水压力计', '测斜仪'])
 
 const navToMoreData = () => {
     router.push(
@@ -296,6 +300,11 @@ let stressOption = {}
 let inclinoOption = {}
 let manoOption = {}
 let echartIns = null
+
+const changeDeviceType = (deviceName) => {
+    selectedDeviceType.value = deviceName
+    deviceTypeSelectChange(deviceName)
+}
 
 const deviceTypeSelectChange = async (deviceType) => {
     console.log(deviceType)
@@ -317,10 +326,10 @@ const deviceSelectChange = async (deviceName) => {
             deviceTypeTimeMap[selectedDeviceType.value].timeCount,
         )
     ).data
-    if (selectedDeviceType.value == '位移基准/测量站') {
+    if (selectedDeviceType.value == '位移测量站') {
         gnssOption = genGnssOptionOfDevice(
             data,
-            deviceTypeErrorMap['位移基准/测量站'],
+            deviceTypeErrorMap['位移测量站'],
         )
         // console.log('option', gnssOption)
         echartIns.setOption(gnssOption)
@@ -368,6 +377,21 @@ async function updateNewestTime() {
     })
 }
 
+watch(
+    () => useWarnInfoStore().warnInfo,
+    (newVal) => {
+        console.log('watching23321!!!!!!!!!!')
+        const warnDataCount = [0, 0, 0, 0, '-']
+        // console.log('warn', warnData)
+        newVal.map((item, index) => {
+            warnDataCount[+(item.deviceId.split('_').pop() - 1)] =
+            warnDataCount[+(item.deviceId.split('_').pop() - 1)] + 1
+        })
+        warnDeviceCount.value = warnDataCount
+        // console.log(warnDeviceCount)
+    },
+)
+
 onMounted(async () => {
     await updateNewestTime()
     let myDate = new Date()
@@ -404,16 +428,19 @@ onMounted(async () => {
     ).data
     gnssOption = genGnssOptionOfDevice(
         initialData,
-        deviceTypeErrorMap['位移基准/测量站'],
+        deviceTypeErrorMap['位移测量站'],
     )
     // console.log('option', gnssOption)
     echartIns.setOption(gnssOption)
     chartDataLoading.value = false
-    setInterval(async () => {
-        chartDataLoading.value = true
-        await deviceSelectChange(selectedDevice.value)
-        chartDataLoading.value = false
-    }, 1000*60*5)
+    setInterval(
+        async () => {
+            chartDataLoading.value = true
+            await deviceSelectChange(selectedDevice.value)
+            chartDataLoading.value = false
+        },
+        1000 * 60 * 5,
+    )
     // console.log('initialData', initialData)
 })
 </script>
@@ -470,9 +497,9 @@ div.device-info-container {
         }
 
         div.device-status-container {
-            width: 95%;
-            margin-top: 0.5vh;
-            margin-left: 2.5%;
+            width: 98%;
+            margin-top: 0.2vh;
+            margin-left: 1%;
             height: 24.2vh;
 
             div.small-title-container {
@@ -510,10 +537,10 @@ div.device-info-container {
 
             div.device-status-content {
                 position: absolute;
-                top: 5vh;
-                width: 95%;
-                margin-left: 2.5%;
-                height: 18vh;
+                top: 1vh;
+                width: 97%;
+                margin-left: 1.5%;
+                height: 22vh;
 
                 // background-color: #c4fbff;
 
@@ -533,7 +560,7 @@ div.device-info-container {
                     }
 
                     div.device-item {
-                        width: 26%;
+                        width: 31%;
                         height: 100%;
                         line-height: 3.2vh;
                         text-align: center;
@@ -545,23 +572,34 @@ div.device-info-container {
                         color: #2a5fdb;
 
                         &.device-name {
-                            width: 27%;
+                            width: 25%;
                         }
 
                         &.device-time {
-                            width: 27%;
+                            width: 25%;
                         }
 
                         &.device-freq {
-                            width: 20%;
+                            width: 19%;
                         }
 
                         &.device-count {
                             display: flex;
                             justify-content: center;
+                            column-gap: 0.2vw;
 
                             div.normal {
                                 color: #00ca22;
+                            }
+
+                            div.warn {
+                                color: rgb(255, 30, 0);
+                            }
+                        }
+
+                        &.click {
+                            &:hover {
+                                cursor: pointer;
                             }
                         }
 
@@ -620,14 +658,14 @@ div.device-info-container {
                     border-radius: 3px;
                     font-family: 'Microsoft YaHei';
                     font-weight: bold;
-                    font-size: calc(0.5vw + 0.6vh);
+                    font-size: calc(0.5vw + 0.7vh);
                     background-color: #e6f7ff;
                 }
 
                 &.type {
-                    width: 10vw;
+                    width: 12vw;
                     :deep(.el-select__wrapper) {
-                        font-size: calc(0.5vw + 0.25vh);
+                        font-size: calc(0.5vw + 0.5vh);
                     }
                 }
 
