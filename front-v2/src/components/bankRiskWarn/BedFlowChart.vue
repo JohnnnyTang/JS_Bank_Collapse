@@ -45,17 +45,17 @@ const option = {
             fontSize: 14,
         },
     },
-    dataZoom: [
-        {
-            type: 'inside',
-        },
-        {},
-    ],
+    // dataZoom: [
+    //     {
+    //         type: 'inside',
+    //     },
+    //     {},
+    // ],
     grid: {
         left: '2%',
         right: '4%',
-        bottom: '14%',
-        top: '14%',
+        bottom: '5%',
+        top: '20%',
         containLabel: true,
     },
     series: [

@@ -47,7 +47,12 @@
     <div class="text-info-container">
         <div class="text-info-item">
             该断面滩槽高差为 <span style="color: red;">{{ gaochaList[profileValue-1]}}</span> m，
-            最大岸坡坡比为 <span style="color: red;">{{ pobiList[profileValue-1] }}</span>
+            <!-- 最大岸坡坡比为 <span style="color: red;">{{ pobiList[profileValue-1] }}</span> -->
+            最大岸坡坡比为 
+            <span v-if="profileValue-1===5" style="color: red;">1 / 1.7</span>
+            <span v-else-if="profileValue-1===6" style="color: red;">1 / 1.8</span>
+            <span v-else-if="profileValue-1===7" style="color: red;">1 / 2.2</span>
+            <span v-else style="color: red;">{{ pobiList[profileValue-1] }}</span>
         </div>
     </div>
 </div>
@@ -130,9 +135,9 @@ watch(()=>props.profileData, ()=>{
 <style lang="scss" scoped>
 div.riskInfo-container {
     position: absolute;
-    top: 2vh;
+    top: 16vh;
     left: 1vw;
-    height: 43vh;
+    height: 38vh;
     width: 30vw;
     border-radius: 8px;
     border: #167aec 1px solid;
@@ -173,7 +178,7 @@ div.riskInfo-container {
 
         &.profileShape {
             top: 5.5vh;
-            height: 30vh;
+            height: 27vh;
             // background-color: #c9cad4;
         }
 
@@ -248,7 +253,7 @@ div.riskInfo-container {
             left: 0.25vw;
 
             &.shape {
-                height: 25.5vh;
+                height: 22.5vh;
                 backdrop-filter: blur(5px);
                 // background-color: rgba(220, 250, 248, 0.4);
             }
@@ -286,9 +291,9 @@ div.riskInfo-container {
 
     div.text-info-container {
         position:absolute;
-        top: 36.8vh;
+        top: 33vh;
         width: 29vw;
-        height: 5.25vh;
+        height: 4.5vh;
         left: 0.5vw;
         bottom: 2vh;
         background-color: rgba(7, 24, 182, 0.5);
@@ -297,7 +302,7 @@ div.riskInfo-container {
         div.text-info-item {
             position: absolute;
             left: 3vw;
-            top: 1.3vh;
+            top: 1vh;
             color: #f2f4f7;
             font-size: calc(0.7vw + 0.5vh);
             font-family: 'Microsoft YaHei';

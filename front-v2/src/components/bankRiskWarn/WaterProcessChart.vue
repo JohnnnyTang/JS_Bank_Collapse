@@ -197,22 +197,72 @@ const option = {
             fontSize: 14,
         },
     },
-    dataZoom: [
-        {
-            type: 'inside',
-        },
-        {},
-    ],
+    // dataZoom: [
+    //     {
+    //         type: 'inside',
+    //     },
+    //     {},
+    // ],
     grid: {
         left: '2%',
         right: '4%',
-        bottom: '14%',
-        top: '14%',
+        bottom: '5%',
+        top: '18%',
         containLabel: true,
     },
     series: [
         {
             name: '洪季潮位过程',
+            markPoint: {
+                symbol: 'circle',
+                symbolSize: 5,
+                data: [
+                    {
+                        name: '最高潮位',
+                        type: 'max',
+                        itemStyle: {
+                            color: 'red',
+                            borderColor: 'black',
+                            borderWidth: 0.5,
+                        },
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top',
+                                formatter: () => {
+                                    return "最高潮位: " + maxVal  + ' 米';
+                                },
+                                textStyle: {
+                                    color: 'black',
+                                    fontSize: 13
+                                }
+                            }
+                        }
+                    },
+                    {
+                        name: '最低潮位',
+                        type: 'min',
+                        itemStyle: {
+                            color: 'green',
+                            borderColor: 'black',
+                            borderWidth: 0.5,
+                        },
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'bottom',
+                                formatter: () => {
+                                    return "最低潮位: " + minVal  + ' 米';
+                                },
+                                textStyle: {
+                                    color: 'black',
+                                    fontSize: 13
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
             type: 'line',
             smooth: true,
             data: waterProcessData['20'],
@@ -226,15 +276,21 @@ const option = {
 }
 
 let chart
+let maxVal
+let minVal
 
 const selectChange = (val) => {
     option.series[0].data = waterProcessData[val]
     option.series[0].name = nameMap[val]
+    maxVal = Math.max(...waterProcessData[val]);
+    minVal = Math.min(...waterProcessData[val]);
     chart.setOption(option)
 }
 
 onMounted(() => {
     chart = echarts.init(chartDom.value)
+    maxVal = Math.max(...waterProcessData['20']);
+    minVal = Math.min(...waterProcessData['20']);
     chart.setOption(option)
 })
 </script>

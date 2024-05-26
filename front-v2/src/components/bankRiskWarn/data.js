@@ -232,6 +232,15 @@ export const profileListInput = [
 ]
 export const sceneListInput = [
     {
+        value: '1999before',
+        name: '1999汛前地形数据',
+        label: '1999汛前',
+        year: '1999',
+        time: '汛前',
+        date: '1999-01-01',
+        dateShort: '9901',
+    },
+    {
         value: '2012after',
         name: '2012汛后地形数据',
         label: '2012汛后',

@@ -104,6 +104,22 @@
             </div>
         </div> -->
 
+        <div class="basic-info-container">
+            <e-border-box-3 text="基本信息" background-color="#0446a8">
+                <div class="basic-info-content">
+                    <div class="title-container">民主沙右缘示范段</div>
+                    <div class="key-val-container">
+                        <div class="key-text">预警级别：</div>
+                        <div class="val-text">Ⅰ级</div>
+                    </div>
+                    <div class="key-val-container">
+                        <div class="key-text">岸段长度：</div>
+                        <div class="val-text">全长7公里</div>
+                    </div>
+                </div>
+            </e-border-box-3>
+        </div>
+
         <div class="risk-item-container">
             <div class="risk-item" :class="{ active: showWaterPower }">
                 <div
@@ -111,13 +127,13 @@
                     @click="showWaterPowerFunc"
                 >
                     <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
-                    <div class="risk-item-text">水流动力因素</div>
+                    <div class="risk-item-text">水流动力分析</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
                     <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
-                    <div class="risk-item-text">河床演变因素</div>
+                    <div class="risk-item-text">河床演变分析</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
@@ -126,7 +142,7 @@
                     @click="showGeologyAndProjectFunc"
                 >
                     <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']" v-if="showGeologyAndProject"></dv-border-box-12>
-                    <div class="risk-item-text">岸坡地质因素</div>
+                    <div class="risk-item-text">岸坡地质分析</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
@@ -135,7 +151,7 @@
                     @click="showGeologyAndProjectFunc"
                 >
                     <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']" v-if="showGeologyAndProject"></dv-border-box-12>
-                    <div class="risk-item-text">外部工程因素</div>
+                    <div class="risk-item-text">外部因素分析</div>
                 </div>
             </div>
         </div>
@@ -171,7 +187,7 @@
                 <img src="/up_triangle.png" alt="图例标记">
             </div> -->
             <div class="risk-line-arrow high">
-                <img src="/warning.png" alt="图例标记">
+                <img src="/down_triangle.png" alt="图例标记">
             </div>
             <div class="risk-line-mark low">低风险</div>
             <div class="risk-line-mark middle">中风险</div>
@@ -254,10 +270,10 @@
             v-if="showBedFlowChart"
             style="
                 position: absolute;
-                top: 1vh;
+                top: 16.25vh;
                 left: 1vw;
                 width: 30.2vw;
-                height: 29vh;
+                height: 23.5vh;
                 z-index: 10;
             "
         >
@@ -295,10 +311,10 @@
             v-if="showWaterProcessChart"
             style="
                 position: absolute;
-                top: 62vh;
+                top: 66vh;
                 left: 1vw;
                 width: 30.2vw;
-                height: 29vh;
+                height: 25vh;
                 z-index: 10;
             "
         >
@@ -603,8 +619,11 @@ const getProfileTime = () => {
     sceneNow = sceneList.value.find(
         (item) => item.value === sceneNowValue.value,
     )
-    sceneCompare = sceneList.value.find(
-        (item) => item.value === sceneCompareValue.value,
+    sceneCompareBefore = sceneList.value.find(
+        (item) => item.value === sceneCompareBeforeValue.value,
+    )
+    sceneCompareNow = sceneList.value.find(
+        (item) => item.value === sceneCompareNowValue.value,
     )
     // tempProfileBefore.value = sceneBefore.label
     // tempProfileNow.value = sceneNow.label
@@ -662,7 +681,7 @@ const sureSceneRese = async () => {
     addRasterLayer(mapInstance, time, 'mapRaster')
     mapInstance.moveLayer('mapRaster', 'mzsLine')
     // 计算各个断面数据
-    ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompare)
+    ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompareBefore, sceneCompareNow)
 }
 
 const changeProfileValue = (value) => {
@@ -673,39 +692,40 @@ const changeProfileValue = (value) => {
 }
 
 // 加载断面数据和图层1
-const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompare) => {
+const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompareBefore, sceneCompareNow) => {
     const before = sceneBefore.date
     const now = sceneNow.date
-    const compare = sceneCompare.date
+    const compareBefore = sceneCompareBefore.date
+    const compareNow = sceneCompareNow.date
     loading_message.value = '确认计算结果是否存在...'
     isRunning.value = true
     let exist
     let existCompare
     exist = await profileDataExist(before, now)
-    existCompare = await profileDataExist(compare, before)
+    existCompare = await profileDataExist(compareBefore, compareNow)
     if (exist && existCompare) {
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compare, before)
+        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
     } else if (exist && !existCompare) {
         loading_message.value = '地形对比结果计算中...'
-        await CalProfile(compare, before)
+        await CalProfile(compareBefore, compareNow)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compare, before)
+        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
     } else if (!exist && existCompare) {
         loading_message.value = '地形对比结果计算中...'
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compare, before)
+        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
     } else {
         loading_message.value = '地形对比结果计算中...'
-        await CalProfile(compare, before)
+        await CalProfile(compareBefore, compareNow)
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compare, before)
+        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
     }
     // loading_message.value = "地形对比结果计算中..."
     // await CalProfile(before, now)
@@ -952,13 +972,17 @@ const BankLineControlHandler = () => {
 // 地形对比变量
 const sceneBeforeValue = ref('2019before')
 const sceneNowValue = ref('2023before1')
-const sceneCompareValue = ref('2012after')
+const sceneCompareBeforeValue = ref('1999before')
+const sceneCompareNowValue = ref('2012after')
 const preSceneBeforeValue = ref('2019before')
 const preSceneNowValue = ref('2023before1')
-const preSceneCompareValue = ref('2012after')
+const preSceneCompareBeforeValue = ref('2012after')
+const presceneCompareNowValue = ref('2012after')
 let sceneBefore
 let sceneNow
-let sceneCompare
+let sceneCompareBefore
+let sceneCompareNow
+
 
 // 窗口显示变量
 const showRiskStatus = ref(false)
@@ -1037,7 +1061,7 @@ const showRiverBedFunc = () => {
     }
     showProfileShapeFunc()
     showYearlyProfileShapeFunc()
-    RasterControlHandler()
+    // RasterControlHandler()
 }
 
 const showGeologyAndProject = ref(false)
@@ -1588,7 +1612,7 @@ onMounted(async () => {
     showProfileErosion.value = false
     showRiskResult.value = false
     showFlowSpeed.value = false
-    await ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompare)
+    await ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompareBefore, sceneCompareNow)
 
     showWaterPowerFunc()
 })
@@ -1970,9 +1994,9 @@ div.risk-warn-container {
     div.risk-line-container {
         position: absolute;
         left: 69vw;
-        top: 83vh;
+        top: 82.5vh;
         width: 30vw;
-        height: 5.5vh;
+        height: 6vh;
         backdrop-filter: blur(2px);
         z-index: 4;
         border: #1313d8 2px solid;
@@ -1980,7 +2004,7 @@ div.risk-warn-container {
 
         div.risk-line-title {
             position: absolute;
-            top: 0.9vh;
+            top: 1vh;
             left: 0.8vw;
             font-size: calc(0.8vw + 0.6vh);
             font-weight: bold;
@@ -1992,7 +2016,7 @@ div.risk-warn-container {
 
         div.risk-line {
             position: absolute;
-            top: 1vh;
+            top: 1.5vh;
             left: 9vw;
             width: 20vw;
             height: 2vh;
@@ -2010,21 +2034,21 @@ div.risk-warn-container {
 
         div.risk-line-arrow {
             position: absolute;
-            top: 3.3vh;
-            width: 1vw;
-            height: 1.8vh;
-            z-index: 5;
+            top: 0.6vh;
+            width: 1.4vw;
+            height: 2vh;
+            z-index: 11;
 
             &.low {
-                left: 9vw;
+                left: 10.3vw;
             }
 
             &.middle {
-                left: 17vw;
+                left: 18.3vw;
             }
 
             &.high {
-                left: 25vw;
+                left: 26.5vw;
             }
 
             img {
@@ -2036,7 +2060,7 @@ div.risk-warn-container {
 
         div.risk-line-mark {
             position: absolute;
-            top: 3.2vh;
+            top: 3.7vh;
             width: 4vw;
             height: 2vh;
             border-radius: 20px;
@@ -2097,8 +2121,8 @@ div.risk-warn-container {
 
     div.flow-control-block {
         position: absolute;
-        top: 37.6vh;
-        left: 25vw;
+        top: 44.3vh;
+        left: 26vw;
         height: 13vh;
         width: 6vw;
         display: flex;
@@ -2156,7 +2180,7 @@ div.risk-warn-container {
 
         .text-block {
             font-size: 20px;
-            width: 3em;
+            width: 1.5em;
             height: 5em;
             display: flex;
             justify-content: center;
@@ -2175,8 +2199,8 @@ div.risk-warn-container {
     
     div.time-shower-block {
         position: absolute;
-        top: 48vh;
-        left: 23.5vw;
+        top: 53.3vh;
+        left: 22.5vw;
     }
 
     div.risk-year-container {
@@ -2222,23 +2246,25 @@ div.risk-warn-container {
 
     div.risk-item-container {
         position: absolute;
-        top: 2vh;
-        right: 1vw;
-        height: 30vh;
-        width: 10vw;
+        top: 10.2vh;
+        left: 0.4vw;
+        height: 4.5vh;
+        width: 20vw;
         // background-color: rgba(197, 211, 228, 0.6);
         // border: rgba(0, 119, 255, 0.6) 2px solid;
         border-radius: 6px;
-        z-index: 3;
+        z-index: 20;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         backdrop-filter: blur(8px);
 
         div.risk-item {
             flex: 1 1 0;
             position: relative;
             display: flex;
-            margin-bottom: 2vh;
+            margin-bottom: 0.5vh;
+            margin-left: 0.5vw;
+            margin-right: 0.5vw;
 
             @keyframes colorSlide {
                 0% {
@@ -2278,13 +2304,14 @@ div.risk-warn-container {
         }
 
         div.risk-main-index {
-            width: 8vw;
+            width: 6.8vw;
             cursor: pointer;
             position: relative;
             flex: 1 1 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 5px;
             transition: .3s linear;
             &:hover {
                 transform: scale(1.05);
@@ -2293,8 +2320,8 @@ div.risk-warn-container {
 
             :deep(.dv-border-box-12) {
                 position: absolute;
-                width: 8vw;
-                height: 80%;
+                width: 7vw;
+                height: 98%;
             }
 
             // background-position: 0% 50%;
@@ -2355,7 +2382,7 @@ div.risk-warn-container {
 
             div.risk-item-text {
                 text-align: center;
-                font-size: calc(0.6vw + 0.8vh);
+                font-size: calc(0.6vw + 0.4vh);
                 color: white;
                 font-family: 'Microsoft YaHei';
                 font-weight: bolder;
@@ -2367,7 +2394,70 @@ div.risk-warn-container {
         }
     }
 
+    div.basic-info-container {
+        position: absolute;
+        z-index: 5;
+        left: 0.3vw;
+        top: 0.5vh;
+        width: 31.2vw;
+        height: 15vh;
+        background-color: rgba(146, 190, 228, 0.5);
+        backdrop-filter: blur(5px);
+        border: #0a59ec 2px solid;
+        border-radius: 6px;
 
+        div.basic-info-content {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            display: flex;
+            flex-flow: row wrap;
+            align-content: flex-start;
+            justify-content: center;
+
+            div.title-container {
+                height: 4vh;
+                line-height: 4vh;
+                width: 100%;
+                background-color: transparent;
+                text-align: center;
+                font-size: calc(0.8vw + 0.8vh);
+                font-weight: bold;
+                color: #0400fd;
+                text-shadow:
+                    #eef3ff 1px 1px,
+                    #eef3ff 2px 2px,
+                    #6493ff 3px 3px;
+                letter-spacing: 0.4rem;
+            }
+
+            div.key-val-container {
+                width: 48%;
+                height: 4vh;
+                display: flex;
+                flex-flow: row wrap;
+                // background-color: #0446a8;
+                text-align: center;
+                border-bottom: 2px solid rgb(0, 32, 175);
+
+                div.key-text {
+                    width: fit-content;
+                    line-height: 3.5vh;
+                    background-color: transparent;
+                    font-size: calc(0.7vw + 0.6vh);
+                    color: #0043fd;
+                }
+
+                div.val-text {
+                    line-height: 3.5vh;
+                    font-size: calc(0.7vw + 0.5vh);
+                    font-weight: bold;
+                    color: #1d00be;
+                    // text-align: center;
+                }
+            }
+        }
+    }
 
     div.raster-control-block {
         position: absolute;
