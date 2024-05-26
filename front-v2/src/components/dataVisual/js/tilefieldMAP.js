@@ -199,7 +199,7 @@ const sourceZoomMap = {
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
     'importantBank': 12.6,
-    'sandBar': 13,
+    'sandBar': 12,
     'channel': 13,
 }
 
@@ -403,7 +403,7 @@ const legendListt = [
             'height': '80%',
             'width': '50%',
             'background-image': `url('/legend/水文站.png')`,
-            'transform': 'translateX(25%)',
+            'transform': 'translateX(28%)',
         },
         text: '水文站点'
     },
@@ -412,7 +412,7 @@ const legendListt = [
             'height': '80%',
             'width': '50%',
             'background-image': `url('/legend/水闸.png')`,
-            'transform': 'translateX(10%) scale(0.8)',
+            'transform': 'translateX(10%) scale(0.75)',
         },
         text: '水闸工程'
     },
@@ -463,27 +463,31 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('/legend/在建通道.png')`,
+            'background-image': `url('/legend/已建通道2.png')`,
             'transform': 'scaleY(0.5) translateX(5%)'
         },
-        text: '过江通道'
+        text: '已建过江通道'
     },
-    // {
-    //     style: {
-    //         'height': '15%',
-    //         'width': '50%',
-    //         'background-color': 'rgb(196, 50, 6)',
-    //     },
-    //     text: '在建通道'
-    // },
-    // {
-    //     style: {
-    //         'height': '15%',
-    //         'width': '50%',
-    //         'background-color': 'rgb(179, 4, 74)',
-    //     },
-    //     text: '规划通道'
-    // },
+    {
+        style: {
+            'height': '50%',
+            'width': '50%',
+            // 'background-color': 'rgb(52, 0, 143)',
+            'background-image': `url('/legend/在建通道1.png')`,
+            'transform': 'scaleY(0.5) translateX(5%)'
+        },
+        text: '在建过江通道'
+    },
+    {
+        style: {
+            'height': '50%',
+            'width': '50%',
+            // 'background-color': 'rgb(52, 0, 143)',
+            'background-image': `url('/legend/规划通道2.png')`,
+            'transform': 'scaleY(0.5) translateX(5%)'
+        },
+        text: '规划过江通道'
+    },
     {//128,128,128
         style: {
             'height': '80%',

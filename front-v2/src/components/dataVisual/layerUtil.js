@@ -783,6 +783,7 @@ const layerAddFunctionMap = {
                         ["get", "name"],
                         'assist',
                         [3, 5, 5, 1],
+                        // [2, 2, 50, 2, 2, 2],
                         [1, 0],
                     ]
                 }
@@ -1513,7 +1514,8 @@ const layerAddFunctionMap = {
                 id: '已建通道',
                 type: 'line',
                 source: 'channelLine',
-                filter: ['==', 'plan', '1'],
+                // filter: ['==', 'plan', '1'],
+                filter: ['==', 'plan', 1],
                 // 'source-layer': 'default',
                 layout: {
                     'line-cap': 'round',
@@ -1523,7 +1525,17 @@ const layerAddFunctionMap = {
                     // 'line-opacity': 1,
                     // 'line-pattern': 'test',
                     'line-pattern': '已建',
-                    'line-width': 6.0,
+                    'line-width': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 1],
+                        10,
+                        ['literal', 5],
+                        13,
+                        ['literal', 7],
+                    ],
 
                 },
             })
@@ -1542,7 +1554,8 @@ const layerAddFunctionMap = {
                 type: 'line',
                 source: 'channelLine',
                 // 'source-layer': 'default',
-                filter: ['==', 'plan', '0'],
+                // filter: ['==', 'plan', '0'],
+                filter: ['==', 'plan', 0],
                 layout: {
                     'line-cap': 'round',
                     'line-join': 'round',
@@ -1552,7 +1565,17 @@ const layerAddFunctionMap = {
                     // 'line-pattern': 'test',
                     'line-pattern':
                         '在建',
-                    'line-width': 6.0,
+                    'line-width': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 1],
+                        10,
+                        ['literal', 5],
+                        13,
+                        ['literal', 7],
+                    ],
 
                 },
             })
@@ -1571,7 +1594,8 @@ const layerAddFunctionMap = {
                 type: 'line',
                 source: 'channelLine',
                 // 'source-layer': 'default',
-                filter: ['==', 'plan', '-1'],
+                // filter: ['==', 'plan', '-1'],
+                filter: ['==', 'plan', -1],
                 layout: {
                     'line-cap': 'round',
                     'line-join': 'round',
@@ -1581,7 +1605,17 @@ const layerAddFunctionMap = {
                     // 'line-pattern': 'test',
                     'line-pattern':
                         '规划',
-                    'line-width': 4.0,
+                    'line-width': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 1],
+                        10,
+                        ['literal', 5],
+                        13,
+                        ['literal', 7],
+                    ],
                 },
             })
     },
@@ -1642,7 +1676,8 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 minzoom: 11,
                 source: 'channelLine',
-                filter: ['==', 'plan', '1'],
+                // filter: ['==', 'plan', '1'],
+                filter: ['==', 'plan', 1],
                 // 'source-layer': 'default',
                 layout: {
                     // 'text-field': ['get', 'name'],
@@ -1651,7 +1686,7 @@ const layerAddFunctionMap = {
                         ["get", "name"], // 首先获取name字段的值
                         ' (已建)',
                     ],
-                    'symbol-placement': 'line',
+                    'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -1680,7 +1715,8 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 minzoom: 11,
                 source: 'channelLine',
-                filter: ['==', 'plan', '0'],
+                // filter: ['==', 'plan', '0'],
+                filter: ['==', 'plan', 0],
                 // 'source-layer': 'default',
                 layout: {
                     // 'text-field': ['get', 'name'],
@@ -1689,7 +1725,8 @@ const layerAddFunctionMap = {
                         ["get", "name"], // 首先获取name字段的值
                         ' (在建)',
                     ],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
+                    'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -1718,7 +1755,8 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 minzoom: 11,
                 source: 'channelLine',
-                filter: ['==', 'plan', '-1'],
+                // filter: ['==', 'plan', '-1'],
+                filter: ['==', 'plan', -1],
                 // 'source-layer': 'default',
                 layout: {
                     // 'text-field': ['get', 'name'],
@@ -1727,7 +1765,9 @@ const layerAddFunctionMap = {
                         ["get", "name"], // 首先获取name字段的值
                         ' (规划)',
                     ],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
+                    'symbol-placement': 'line-center',
+
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -2493,7 +2533,8 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 1],
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
+                    'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -2527,7 +2568,8 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 2],
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
+                    'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -2561,7 +2603,8 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 3],
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line',
+                    'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
@@ -2601,6 +2644,7 @@ const layerAddFunctionMap = {
                     ],
                     'symbol-placement': 'point',
                     // 'symbol-placement': 'line',
+                    // 'symbol-placement': 'line-center',
                     // 'text-offset': [0.0, 1.0],
                     'text-variable-anchor': ["top", "bottom"],
                     'text-size': 13,

@@ -35,10 +35,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <el-switch v-model="data.active" :active-action-icon="View"
+                                            <!-- <el-switch v-model="data.active" :active-action-icon="View"
                                                 class="subScene-switch" :inactive-action-icon="Hide" size="small"
                                                 style="margin-top: 0.8vh;"
-                                                @change="viewChange(node, data)" />
+                                                @change="viewChange(node, data)" /> -->
                                         </div>
                                     </div>
                                     <div class="feature-container"
@@ -53,10 +53,12 @@
                                         @click="featureNodeClick(node, data)">
                                         <div class="feature-content">
                                             <div>{{ data.label }}</div>
-                                            <el-icon v-if="node.data.property['洲滩信息_人口活动'] == '2'" style="margin-left: 0.6vw;">
+                                            <el-icon v-if="node.data.property['洲滩信息_人口活动'] == '2'"
+                                                style="margin-left: 0.6vw;">
                                                 <House />
                                             </el-icon>
-                                            <el-icon v-else-if="node.data.property['洲滩信息_人口活动'] == '1'" style="margin-left: 0.6vw;">
+                                            <el-icon v-else-if="node.data.property['洲滩信息_人口活动'] == '1'"
+                                                style="margin-left: 0.6vw;">
                                                 <UserFilled />
                                             </el-icon>
                                         </div>
@@ -117,7 +119,7 @@
 
         <div class="hydro-pannel">
             <div class="title"> 实时水文信息
-                <el-icon @click="showHydroPannel = !showHydroPannel">
+                <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%;" class="iconn">
                     <More />
                 </el-icon>
             </div>
@@ -285,13 +287,18 @@ const viewChange = (node, data) => {
     }
 }
 const treeNodeClickHandler = async (node, data) => {
-    if (data.label.includes('岸段') || data.label.includes('沙洲')) {
-        console.log('不处理');
-        return
-    }
-    if (data.label === '其他' || data.label === '长江堤防') {
-        console.log('其他，不处理');
-        return
+    // if (data.label.includes('岸段') || data.label.includes('沙洲')) {
+    //     console.log('不处理');
+    //     return
+    // }
+    // if (data.label === '其他' || data.label === '长江堤防') {
+    //     console.log('其他，不处理');
+    //     return
+    // }
+    console.log(node);
+    if (node.level == 2) {
+        data.active = !data.active
+        viewChange(node, data)
     }
     // showTable
     // const process = (obj) => {
@@ -841,7 +848,7 @@ onUnmounted(async () => {
                         .top-section {
                             //   height: 10vh;
                             height: 100%;
-                            width: 85%;
+                            width: 99%;
                             border-radius: 5px;
                             display: flex;
                             flex-direction: row;
@@ -1195,6 +1202,12 @@ onUnmounted(async () => {
             font-size: calc(0.7vw + 0.5vh);
             line-height: 3vh;
             width: 100%;
+
+            .iconn{
+                :hover{
+                    cursor: pointer;
+                }
+            }
         }
     }
 

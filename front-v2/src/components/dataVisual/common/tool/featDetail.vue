@@ -2,26 +2,115 @@
     <div class="description-container">
         <div class="miniIcon" @click="close"></div>
 
-        <!-- <div class="bankDesc" v-if="props.sourceId === 'importantBank'">
-            <h1>bank</h1>
-            <el-descriptions title="xxx-I级预警">
-                <el-descriptions-item label="所属城市">{{ props.ogData['city_name'] }}</el-descriptions-item>
-                <el-descriptions-item label="所属河段">{{ props.ogData['river_name'] }}</el-descriptions-item>
-                <el-descriptions-item label="监测长度">{{ props.ogData['monitoring_length'] }}</el-descriptions-item>
-                <el-descriptions-item label="岸段简介">{{ props.ogData['description'] }}</el-descriptions-item>
-                <el-descriptions-item label="治理工程">
-                    {{ props.ogData['fix_project'] }}
+        <div class="bankDesc" v-if="props.sourceId === 'importantBank'">
+            <el-descriptions class="margin-top" :title="props.ogData['bank_name'] + '--' + level + '级预警'" :column="3"
+                border>
+                <el-descriptions-item align="center">
+                    <template #label>
+                        <div class="cell-item">
+                            所属城市
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: center; padding-left: 0.1vw;">{{ props.ogData['city_name'] }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+
+                <el-descriptions-item align="center">
+                    <template #label>
+                        <div class="cell-item">
+                            所属河段
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: center; padding-left: 0.1vw;">{{ props.ogData['river_name'] }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+
+                <el-descriptions-item align="center">
+                    <template #label>
+                        <div class="cell-item">
+                            监测长度
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: center; padding-left: 0.1vw;">{{ props.ogData['monitoring_length'] + 'km' }}
+                        </p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+                <el-descriptions-item align="left" span="3">
+                    <template #label>
+                        <div class="cell-item">
+                            岸段简介
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: left; padding-left: 0.1vw;">{{ props.ogData['description'] }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+                <el-descriptions-item span="3" align="left">
+                    <template #label>
+                        <div class="cell-item">
+                            治理工程
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: left; padding-left: 0.1vw;">{{ bankFix }}</p>
+                    </el-scrollbar>
                 </el-descriptions-item>
             </el-descriptions>
         </div>
 
 
         <div class="sandDesc" v-if="props.sourceId === 'sandBar'">
-            <h1>sand</h1>
+            <el-descriptions class="margin-top" :title="props.ogData['name']" :column="3" border>
+                <el-descriptions-item align="center">
+                    <template #label>
+                        <div class="cell-item">
+                            面积
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: left; padding-left: 0.1vw;">{{ sandBarArea }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
 
-        </div> -->
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            人口
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: left; padding-left: 0.1vw;">{{ props.ogData['洲滩信息_人口'] }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
 
-        <el-descriptions class="margin-top" :title="title" :column="props.column" border>
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            所属河段
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: left; padding-left: 0.1vw;">{{ props.ogData['river'] }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+                <el-descriptions-item span="3">
+                    <template #label>
+                        <div class="cell-item">
+                            防汛预案
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: left; padding-left: 0.1vw;">{{ sandBarFix }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+
+            </el-descriptions>
+        </div>
+
+        <!-- <el-descriptions class="margin-top" :title="title" :column="props.column" border>
             <el-descriptions-item v-for="( key, index ) in  Object.keys(fMap) " :key="index">
                 <template #label>
                     <div class="cell-item">
@@ -32,12 +121,12 @@
                     <p style="text-align: left; padding-left: 0.1vw;">{{ noDataMap(data[key]) }}</p>
                 </el-scrollbar>
             </el-descriptions-item>
-        </el-descriptions>
+        </el-descriptions> -->
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { sourceFieldMap } from '../../js/tilefieldMAP'
 
 const props = defineProps({
@@ -70,7 +159,22 @@ const sandFieldDict = {
     "洲滩信息_人口": '人口',
     "预案": '防汛预案'
 }
+const level = computed(() => {
+    let romanNumbers = ["I", "II", "III"];
+    return romanNumbers[props.ogData['warning_level'] - 1]
+})
+const bankFix = computed(() => {
+    return (props.ogData['fix_project'] == null || props.ogData['fix_project'] == undefined || props.ogData['fix_project'] == '') ? '暂无信息' : props.ogData['fix_project']
 
+})
+
+const sandBarArea = computed(() => {
+    return props.ogData['洲滩信息_面积'] == 'N/A' ? 'N/A' : props.ogData['洲滩信息_面积'] + 'km²'
+})
+const sandBarFix = computed(() => {
+    console.log(props.ogData['预案'] == null || props.ogData['预案'] == undefined || props.ogData['预案'] == '');
+    return (props.ogData['预案'] == null || props.ogData['预案'] == undefined || props.ogData['预案'] == '') ? '暂无信息' : props.ogData['预案']
+})
 
 watch(props, (V) => {
     console.log(V);
@@ -126,6 +230,7 @@ onMounted(() => {
             padding-top: 1vh;
             padding-bottom: 1vh;
             background-color: rgb(198, 229, 252);
+            font-family: Arial, Helvetica, sans-serif
         }
     }
 
