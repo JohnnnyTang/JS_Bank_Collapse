@@ -86,7 +86,6 @@ const initBaseMap = (ref) => {
             maxZoom: 18,
             zoom: 8,
             projection: 'mercator',
-            GPUFrame: GPUFrame,
             antialias: true,
             useWebGL2: true,
             // minZoom: 8,
