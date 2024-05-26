@@ -939,7 +939,7 @@ const flowControlHandler = () => {
                 )
                 flow.particleNum.n = 2800
                 flow.speedFactor.n = 1.0
-                flow.framesPerPhase = 150
+                // flow.framesPerPhase = 150
                 map.addLayer(flow)
                 watch(
                     () => flow.currentResourcePointer,
