@@ -28,7 +28,7 @@ export default class SteadyFlowLayer {
         this.endPoint = ''
         this.progress = 0.
         this.startPoint = ''
-        this.framesPerPhase = 100
+        this.framesPerPhase = 150
         this.maxSpeed = scr.f32()
         this.maxParticleNum = 10000
         this.progressRate = scr.f32()
