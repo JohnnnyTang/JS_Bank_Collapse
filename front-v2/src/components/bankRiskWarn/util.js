@@ -292,7 +292,7 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
                             }
                         },
                     ]
-                }
+                },
             },
         ],
     }

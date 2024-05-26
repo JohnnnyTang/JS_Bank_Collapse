@@ -230,7 +230,7 @@ const option = {
                                 show: true,
                                 position: 'top',
                                 formatter: () => {
-                                    return "最高潮位: " + maxVal  + ' 米';
+                                    return "最高潮位: " + maxVal.toFixed(3)  + ' 米';
                                 },
                                 textStyle: {
                                     color: 'black',
@@ -243,7 +243,7 @@ const option = {
                         name: '最低潮位',
                         type: 'min',
                         itemStyle: {
-                            color: 'green',
+                            color: 'rgb(94, 208, 251)',
                             borderColor: 'black',
                             borderWidth: 0.5,
                         },
@@ -252,7 +252,7 @@ const option = {
                                 show: true,
                                 position: 'bottom',
                                 formatter: () => {
-                                    return "最低潮位: " + minVal  + ' 米';
+                                    return "最低潮位: " + minVal.toFixed(3)  + ' 米';
                                 },
                                 textStyle: {
                                     color: 'black',

@@ -1467,6 +1467,55 @@ onMounted(async () => {
                 'line-width': 2,
             },
         })
+        map.addSource('fixProjectLineSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
+        })
+        map.addSource('fixProjectAreaLabelSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}'],
+        })
+        map.addLayer({
+            id: 'fjsFixLine',
+            type: 'line',
+            source: 'fixProjectLineSource',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgba(216, 217, 228, 0.5)',
+                'line-width': 4,
+            },
+        })
+        map.addLayer({
+            id: 'fixProjectLayer',
+            type: 'fill',
+            source: 'fixProjectAreaSource',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': 'rgba(220,224,237, 0.8)',
+                'fill-outline-color': 'rgba(220,224,237, 0.8)',
+            },
+        })
+        map.addLayer({
+            id: 'fixProjectAreaLabel',
+            type: 'symbol',
+            source: 'fixProjectAreaLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'layer'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'right',
+                'text-size': 12,
+            },
+            paint: {
+                'text-color': 'rgba(31, 44, 126, 0.6)',
+            },
+        })
         // map.addLayer({
         //     id: 'mzsLabel',
         //     type: 'symbol',
