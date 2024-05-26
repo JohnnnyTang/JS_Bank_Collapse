@@ -1,11 +1,77 @@
 <template>
     <div class="data-visual-container">
         <div class="sideBar">
-            <sideBar @detailClick="detailClickHandler4Feature"></sideBar>
+            <dv-border-box9>
+                <div class="sideBar-container">
+                    <dv-decoration-11 style="width:75%;height: 6.5vh;">
+                        <div class="title-text">
+                            综合数据专题
+                        </div>
+                    </dv-decoration-11>
+                    <hr class="hr_gradient">
+                    <div class="scenes-tree-container" v-loading="sideBarLoading">
+                        <el-tree style="max-width: 400px" :data="dataSource" :expand-on-click-node="false" node-key="label"
+                            :default-expanded-keys="expandKey">
+                            <template #default="{ node, data }">
+                                <span class="custom-tree-node">
+                                    <div class="scene-card" v-if="data.type == 'title1'">
+                                        <div class="scene-top-section" :class="{ active: data.active }"
+                                            @click="treeNodeClickHandler(node, data)">
+                                            <div class="scene-title">
+                                                <div class="scene-title-text">
+                                                    {{ data.label }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <el-switch v-model="data.active" :active-action-icon="View"
+                                            :inactive-action-icon="Hide" size="large" @change="viewChange(node, data)" />
+                                    </div>
+                                    <div class="subScene-container" v-else-if="data.type == 'title2'">
+                                        <div class="card" :class="{ active: data.active }">
+                                            <div class="top-section" @click="treeNodeClickHandler(node, data)">
+                                                <div class="title">
+                                                    <div class="subScene-title-text">
+                                                        {{ data.label }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- <el-switch v-model="data.active" :active-action-icon="View"
+                                                class="subScene-switch" :inactive-action-icon="Hide" size="small"
+                                                style="margin-top: 0.8vh;"
+                                                @change="viewChange(node, data)" /> -->
+                                        </div>
+                                    </div>
+                                    <div class="feature-container"
+                                        v-else-if="data.type == 'feature' && node.parent.data.label.includes('岸段')"
+                                        @click="featureNodeClick(node, data)">
+                                        <div class="feature-content">
+                                            {{ data.label }}
+                                        </div>
+                                    </div>
+                                    <div class="feature-container"
+                                        v-else-if="data.type == 'feature' && node.parent.data.label.includes('沙洲')"
+                                        @click="featureNodeClick(node, data)">
+                                        <div class="feature-content">
+                                            <div>{{ data.label }}</div>
+                                            <el-icon v-if="node.data.property['洲滩信息_人口活动'] == '2'"
+                                                style="margin-left: 0.6vw;">
+                                                <House />
+                                            </el-icon>
+                                            <el-icon v-else-if="node.data.property['洲滩信息_人口活动'] == '1'"
+                                                style="margin-left: 0.6vw;">
+                                                <UserFilled />
+                                            </el-icon>
+                                        </div>
+                                    </div>
+                                </span>
+                            </template>
+                        </el-tree>
+                    </div>
+                </div>
+            </dv-border-box9>
         </div>
         <div class="mapBase">
             <div ref="mapContainer" id="map"></div>
-            <canvas id="GPUFrame"></canvas>
         </div>
         <div class="tools-container">
             <div class="icon-container" v-for="i in 2" :key="i">
@@ -21,50 +87,44 @@
         <!-- <div class="layer-pos" v-show="activeStatus[1]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <layerCtrl @close="closeHandler"></layerCtrl>
         </div> -->
+
         <div class="legend-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+            v-click-out-side="() => showDetail = false">
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
                 @close="showDetail = false"></featDetail>
         </div>
 
-        <!-- <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-            v-loading="pannelLoading" v-click-out-side="() => showInfoPannel = false">
+        <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+            v-loading="false" v-click-out-side="() => showInfoPannel = false">
             <div class="close" @click="showInfoPannel = false; showDetail = false"></div>
-            <el-tabs type="border-card" class="demo-tabs" style="min-width: 12vw;">
-                <el-tab-pane label="重点要素">
-                    <div class="important-feature">
-                        <el-table :data="infoTableData" height="30vh" border>
-                            <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
-                                :label="item.label"></el-table-column>
-                            <el-table-column fixed="right" label="操作" width="80">
-                                <template #default="scope">
-                                    <el-button link type="primary" size="small"
-                                        @click="detailClickHandler4Feature(scope.row)">
-                                        查看详情
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </div>
-                </el-tab-pane>
-                <el-tab-pane label="要素查询">
-                    <div class="feature-search">
-                        <div class="e-input">
-                            <span class="text">要素检索</span>
-                            <el-input v-model="filterText" style="width: 13vw" placeholder="请输入关键词" />
-                        </div>
-                    </div>
-                </el-tab-pane>
-            </el-tabs>
-        </div> -->
+            <div class="important-feature">
+                <el-table :data="infoTableData" height="30vh" border>
+                    <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
+                        :label="item.label"></el-table-column>
+                    <el-table-column fixed="right" label="操作" width="80">
+                        <template #default="scope">
+                            <el-button link type="primary" size="small" @click="detailClickHandler4Feature(scope.row)">
+                                查看详情
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
 
 
         <div class="hydro-pannel">
-            <div class="title"> 实时水文信息</div>
-            <el-table :data="waterTableData" border style="width: 100%">
+            <div class="title"> 实时水文信息
+                <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%;" class="iconn">
+                    <More />
+                </el-icon>
+            </div>
+
+            <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
                 <el-table-column prop="station" label="站点" />
                 <el-table-column prop="flow" label="流量" />
                 <el-table-column prop="level" label="水位" />
@@ -84,27 +144,25 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-
 import { onMounted, ref, watch, onUnmounted } from 'vue';
-import sideBar from '../components/dataVisual/common/sideBar.vue'
-// import layerCtrl from '../components/dataVisual/common/tool/layerCtrl.vue'
-// import featSearch from '../components/dataVisual/common/tool/featSearch.vue'
+import { Hide, View } from '@element-plus/icons-vue'
+import axios from 'axios';
+import { BorderBox9 as DvBorderBox9, Decoration11 as DvDecoration11 } from '@kjgl77/datav-vue3'
+import { clickOutSide as vClickOutSide } from '@mahdikhashan/vue3-click-outside'
 import mapLegend from '../components/dataVisual/common/tool/legend.vue'
 import featDetail from '../components/dataVisual/common/tool/featDetail.vue';
-import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapUtils';
-import { useMapStore, useNewSceneStore } from '../store/mapStore';
-import { scenes, layerGroups } from '../components/dataVisual/js/SCENES';
-import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt,layerSourceMap } from '../components/dataVisual/js/tilefieldMAP';
-import axios from 'axios';
-import { initSortedLayer } from '../components/dataVisual/layerUtil'
-import { clickOutSide as vClickOutSide } from '@mahdikhashan/vue3-click-outside'
 
+import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapUtils';
+import { scenes, layerGroups, LayerGroup, lableLayerMap } from '../components/dataVisual/js/SCENES';
+import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../store/mapStore';
+import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt, layerSourceMap, sourceNameMap } from '../components/dataVisual/js/tilefieldMAP';
+import { initSortedLayer } from '../components/dataVisual/layerUtil'
+import { getSideBarTree, showLayers, hideLayers, DICT } from '../components/dataVisual/js/useful'
 
 // data
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const mapContainer = ref()
 const mapStore = useMapStore()
-const sceneStore = useNewSceneStore()
 const activeStatus = ref([false, false])
 const styles = [
     { backgroundImage: `url('/icons/legend.png')` },
@@ -113,27 +171,264 @@ const styles = [
 const featureInfo = ref({})
 let nowSource
 const showDetail = ref(false)
-// const showInfoPannel = ref(false)
+const showHydroPannel = ref(false)
+const showInfoPannel = ref(false)
+const sideBarLoading = ref(true)
 const legendList = ref([])
 const waterTableData = [
     {
         station: '大通站',
-        flow: '无数据',
-        level: '无数据',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '南京站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '镇江站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '三江营站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '江阴站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '徐六泾站',
+        flow: 'N/A',
+        level: 'N/A',
     },
 ]
 const infoTableData = ref([])
 const infoTableHeader = ref([])
 const pannelLoading = ref(true)
 const baseMapRadio = ref(1)
+const dataSource = ref([])
+const testSwitch = ref(true)
+
+const expandKey = ['重点岸段', '全江概貌']
+
+/////// 
+
+const viewChange = (node, data) => {
+    const map = mapStore.getMap()
+    const title2processMap = {
+        '一级预警岸段': (active) => {
+
+        },
+        '二级预警岸段': () => {
+
+        },
+        '三级预警岸段': () => {
+
+        },
+        '已建通道': () => {
+
+        },
+        '在建通道': () => {
+
+        },
+        '规划通道': () => {
+
+        },
+        '流域性骨干河道': () => {
+
+        },
+        '区域性骨干河道': () => {
+
+        },
+        '重要水闸': () => {
+
+        },
+        '重要泵站': () => {
+
+        },
+        '重要湖泊': () => {
+
+        },
+        '行政区划': () => {
+
+        },
+        '水文站点': () => {
+
+        },
+    }
+
+    const processMap = {
+        'title1': () => {
+            data.active ? showLayers(map, DICT.T1LayerDict[data.label])
+                : hideLayers(map, DICT.T1LayerDict[data.label])
+        },
+        'title2': () => {
+            title2processMap[data.label](data.active)
+        }
+    }
+
+    console.log(data.label, node.level, ' view status change!! ')
+    if (data.type == 'title1') {
+        data.active ? showLayers(map, DICT.T1LayerDict[data.label])
+            : hideLayers(map, DICT.T1LayerDict[data.label])
+        let children = node.childNodes
+        for (let i = 0; i < children.length; i++) {
+            children[i].data.active = data.active
+        }
+    }
+    else if (data.type == 'title2') {
+        data.active ? showLayers(map, DICT.T2LayerDict[data.label])
+            : hideLayers(map, DICT.T2LayerDict[data.label])
+    }
+}
+const treeNodeClickHandler = async (node, data) => {
+    // if (data.label.includes('岸段') || data.label.includes('沙洲')) {
+    //     console.log('不处理');
+    //     return
+    // }
+    // if (data.label === '其他' || data.label === '长江堤防') {
+    //     console.log('其他，不处理');
+    //     return
+    // }
+    console.log(node);
+    if (node.level == 2) {
+        data.active = !data.active
+        viewChange(node, data)
+    }
+    // showTable
+    // const process = (obj) => {
+    //     let res = []
+    //     let keys = Object.keys(obj)
+    //     keys.forEach(item => {
+    //         res.push({ 'label': obj[item], 'prop': item })
+    //     })
+    //     return res
+    // }
+
+    // if (data.label == '过江通道') {
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+    //         if (item.plan == '1') item.plan == '已建通道'
+    //         else if (item.plan == '0') item.plan == '在建通道'
+    //         else if (item.plan == '-1') item.plan == '规划通道'
+    //     })
+    //     let thData
+    //     thData = {
+    //         'name': '名称',
+    //         'plan': '类型',
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+    // }
+
+    // else if (data.label == '骨干河道') {
+    //     console.log('data', data.data)
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+
+    //     })
+    //     let thData
+    //     thData = {
+    //         'name': '名称',
+    //         "basin": "流域",
+    //         "water": "水系",
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+    // }
+    // else if (data.label == '重要水闸') {
+    //     console.log('data', data.data)
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+
+    //     })
+    //     let thData
+    //     thData = {
+    //         "sp_name": "名称",
+    //         "class": "水闸类型",
+    //         "volume": "过闸流量"
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+
+    // }
+    // else if (data.label == '重要泵站') {
+    //     console.log('data', data.data)
+    //     // showInfoPannel.value = true
+    //     infoTableData.value = []
+    //     infoTableHeader.value = []
+    //     pannelLoading.value = true
+    //     console.log('data', data.data);
+    //     let tData = data.data
+    //     tData.map((item) => {
+
+    //     })
+    //     let thData
+    //     thData = {
+    //         "sp_name": "名称",
+    //         "level": "级别"
+    //     }
+    //     infoTableData.value = tData
+    //     infoTableHeader.value = process(thData)
+    //     pannelLoading.value = false
+    //     return
+
+    // }
+
+
+}
 
 
 
-const baseMapChangeHandler = async() => {
+
+const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
-    console.log('base map change', baseMapRadio.value);
     if (baseMapRadio.value == 0) {
         map.setStyle(getImageStyleJson())
+        map.addSource('mapRaster22', {
+            type: 'raster',
+            tiles: [
+                'http://127.0.0.1:8989/api/v1/tile/raster/image/base/{x}/{y}/{z}',
+            ],
+            tileSize: 256,
+            minzoom: 1,
+            maxzoom: 14,
+            bounds: [
+                118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+                32.835981186719593,
+            ],
+        })
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'mapRaster22',
+        })
         await initSortedLayer(map)
     } else {
         map.setStyle(getStyleJson4base())
@@ -147,7 +442,6 @@ const detailClickHandler4layerGroup = async (lable) => {
     infoTableData.value = []
     infoTableHeader.value = []
     pannelLoading.value = true
-
 
     // showInfoPannel.value = true
     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
@@ -174,7 +468,6 @@ const detailClickHandler4layerGroup = async (lable) => {
             break
         }
         else if (infoLayer[i].includes('长江干堤')) {
-            console.log('长江干堤  no data')
         }
         else {
             data = await getLayerFeatureArray(map, infoLayer[i])
@@ -193,12 +486,9 @@ const detailClickHandler4layerGroup = async (lable) => {
     infoTableData.value = data
     infoTableHeader.value = process(thData)
     pannelLoading.value = false
-    console.log(infoTableHeader.value);
-
 }
-const detailClickHandler4Feature = async (featInfo,lgId) => {
-    console.log(featInfo,lgId);
-    // let nowSource = 'importantBank'
+const detailClickHandler4Feature = async (featInfo, lgId) => {
+
     let nowSource = layerSourceMap[lgId]
     let newFeatInfomation = {
         ogData: featInfo,
@@ -217,6 +507,12 @@ const detailClickHandler4Feature = async (featInfo,lgId) => {
             return t;
         }
     })
+}
+
+const featureNodeClick = (node, data) => {
+    showDetail.value = true
+    // console.log(node.data.property['洲滩信息_人口活动']);
+    detailClickHandler4Feature(data.property, data.lgId)
 }
 
 // methods
@@ -239,8 +535,7 @@ const closeHandler = (index) => {
     activeStatus.value[index] = false
 }
 
-onMounted(async () => {
-
+const prepareMap = async () => {
     const mapInstance = await initBaseMap(mapContainer.value)
     mapStore.setMap(mapInstance)
     mapInstance.addControl(new mapboxgl.NavigationControl({
@@ -252,19 +547,19 @@ onMounted(async () => {
     mapInstance.dragRotate.disable();
     mapInstance.touchZoomRotate.disableRotation()
     mapFlyToRiver(mapInstance)
+    await initSortedLayer(mapInstance)
+    return mapInstance
+}
 
+onMounted(async () => {
+    //////////init map
+    let map = await prepareMap()
+
+    //////////add legend
     legendList.value = legendListt
+    dataSource.value = await getSideBarTree()
 
-    sceneStore.SCENEMAP.value = scenes
-    sceneStore.LAYERGROUPMAP.value = layerGroups
-
-    // activeStatus.value[0] = true
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key == 'b') {
-            console.log(mapInstance.getBounds())
-        }
-    })
+    sideBarLoading.value = false
 
 })
 
@@ -316,121 +611,52 @@ const getTableHeader = (mapInstance, layerName) => {
     let sourceId = layer.source
     let source = mapInstance.getSource(sourceId)
     if (!source) return properties
-    console.log(layerName, sourceId)
     let title = FieldMap[sourceId]['fieldMap']
     return title
 }
+const sideBarClickHandler = (node, data) => {
+    if (node.level === 1) {
+        //必然是全体控制
+        if (data.label === '重点岸段') {
 
-onUnmounted(() => {
+        }
+        if (data.type == 'title1' && data.label !== '其他') {
+            let lgId = data.label
+            if (data.active == true) hideLayers(mapStore.getMap(), lableLayerMap[lgId])
+            if (data.active == false) showLayers(mapStore.getMap(), lableLayerMap[lgId])
+            data.active = !data.active
+        }
+    } else if (node.level === 2) {
+        //可能要素,可能图层
+        if (data.type == 'feature') {
+            emit('detailClick', data.property, node.parent.data.label)
+        }
+        if (data.type == 'title2') {
+            let lgId = data.label
+            if (data.active == true) {
+                let lgId = data.label
+                hideLayers(mapStore.getMap(), lableLayerMap[lgId])
+                data.active = false
+            } else {
+                let lgId = data.label
+                showLayers(mapStore.getMap(), lableLayerMap[lgId])
+                data.active = true
+            }
+        }
+
+    } else if (node.level === 3) {
+        //要素
+        if (data.type == 'feature') {
+            emit('detailClick', data.property, node.parent.data.label)
+        }
+    }
+}
+
+onUnmounted(async () => {
     mapStore.getMap().remove()
     mapStore.destroyMap()
 })
 
-const FieldMap = {
-    "combineProjectPoint": {
-        "original": "枢纽工程",
-        "fieldMap": {
-            "id": "编号",
-            "name": "名称"
-        }
-    },
-    "dockArea": {
-        "original": "长江码头工程",
-        "fieldMap": {
-            "new_id": "编号",
-            "project_name": "项目名称",
-            "dock_type": "码头类型",
-            "area_type": "功能区类型",
-        }
-    },
-    "embankmentLine": {
-        "original": "堤防工程",
-        "fieldMap": {
-            "class": "堤防类型",
-            "sp_name": "名称",
-            "length": "长度",
-            "bank": "岸别",
-        }
-    },
-    "hydroStationPoint": {
-        "original": "水文水位站",
-        "fieldMap": {
-            "sp_name": "名称",
-            "begin": "设站日期",
-            "place": "测站地点"
-        }
-    },
-    "lakeArea": {
-        "original": "国普湖泊",
-        "fieldMap": {
-            "name": "名称",
-            "area": "水面面积",
-            "height": "正常蓄水位",
-        }
-    },
-    "pumpArea": {
-        "original": "泵站工程",
-        "fieldMap": {
-            "sp_name": "名称",
-            "river": "所在河流湖泊水库渠道",
-            "level": "级别"
-        }
-    },
-    "reservoirArea": {
-        "original": "水库工程",
-        "fieldMap": {
-            "sp_name": "名称",
-            "class": "水库类型",
-            "area": "坝址控制流域面积",
-            "flow": "坝址多年平均径流量",
-        }
-    },
-    "riverArea": {
-        "original": "国普河流",
-        "fieldMap": {
-            "name": "名称",
-            "area": "水面面积",
-            "basin": "流域",
-            "water": "水系",
-        }
-    },
-    "sluiceArea": {
-        "original": "水闸工程",
-        "fieldMap": {
-            "sp_name": "名称",
-            "river": "所在河流湖泊水库渠道",
-            "class": "水闸类型",
-            "volume": "过闸流量"
-        }
-    },
-    "importantBank": {
-        "original": "重点岸段",
-        "fieldMap": {
-            "bank_name": "名称",
-            "river_name": "所属河段",
-            "monitoring_length": '岸段长度',
-            "warning_level": "预警等级",
-        }
-    },
-    "cityBoundaryLine": {
-        "original": "行政区划",
-        "fieldMap": {
-            'name': '名称',
-        }
-    },
-    "riverPassageLine": {
-        "original": "国普河流",
-        "fieldMap": {
-            'name': '名称',
-        }
-    },
-    "riverPassagePolygon": {
-        "original": "国普河流",
-        "fieldMap": {
-
-        }
-    }
-}
 
 </script>
 
@@ -446,13 +672,337 @@ const FieldMap = {
 
     .sideBar {
         position: relative;
-        width: 18vw;
+        width: 15vw;
         height: 92vh;
+
+        div.sideBar-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+
+            .title-text {
+                position: relative;
+                height: 5vh;
+                line-height: 5vh;
+                border-radius: 6px;
+                font-family: "Microsoft YaHei";
+                font-weight: bold;
+                font-size: calc(0.8vw + 0.8vh);
+                color: #0a72c7;
+                text-shadow: 0 0 10px #72c0ff;
+            }
+
+            .hr_gradient {
+                position: relative;
+                margin-top: 0.5vh;
+                border: 0;
+                height: 0.4vh;
+                width: 90%;
+                background-image: linear-gradient(to right, rgb(167, 233, 255), rgb(14, 155, 219), rgb(167, 233, 255));
+            }
+
+            .scenes-tree-container {
+                position: relative;
+                width: 90%;
+                height: 80vh;
+                background-color: #f1fcff;
+                overflow-y: auto;
+
+                &::-webkit-scrollbar {
+                    width: 3px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background-color: rgba(10, 231, 251, 0.219);
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background-color: #15a1e294;
+                    border-radius: 5px;
+                }
+
+                &::-webkit-scrollbar-thumb:hover {
+                    background-color: #3af0f781;
+                }
+            }
+
+            .custom-tree-node {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 14px;
+                padding-right: 8px;
+                width: 100%;
+                height: 100%;
+
+                &:hover {
+                    cursor: default;
+                }
+
+                .scene-card {
+                    margin: 0.5vh;
+                    width: 90%;
+                    height: 4vh;
+                    border-radius: 5px;
+                    background: rgb(20, 115, 196);
+                    padding: 4px;
+                    overflow: hidden;
+                    box-shadow: #cbeafd 10px 7px 20px 0px;
+                    display: flex;
+                    flex-direction: row;
+                    transition: transform 0.5s;
+                    user-select: none;
+
+                    .scene-top-section {
+                        //   height: 10vh;
+                        border-radius: 5px;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: flex-start;
+                        // background: rgb(234, 244, 252);
+                        position: relative;
+                        width: 70%;
+
+                        .scene-title {
+                            width: 100%;
+                            height: 4vh;
+
+                            .scene-title-text {
+                                color: rgb(234, 244, 252);
+                                font-size: calc(0.8vw + 0.8vh);
+                                font-style: normal;
+                                font-weight: 700;
+                                margin-left: 1vw;
+                                line-height: 4vh;
+                                font-family: 'Microsoft YaHei';
+
+                            }
+                        }
+
+
+                        &:hover {
+                            transform: scale(1.02);
+                            cursor: pointer;
+                        }
+                    }
+
+                    .scene-top-section .active {
+                        background: linear-gradient(45deg, rgb(255, 255, 255), #C9E1F5);
+
+                        .scene-title {
+                            .scene-title-text {
+                                color: rgb(27, 116, 193);
+                            }
+                        }
+
+                    }
+
+
+                    .checkbox {
+                        width: 30%;
+                        height: 4vh;
+                        transform: translateY(20%) translateX(30%);
+
+                    }
+                }
+
+
+                .subScene-container {
+                    // width: 12vw;
+                    // height: 4vh;
+                    width: 100%;
+                    height: 4.5vh;
+                    display: flex;
+                    flex-direction: row;
+                    padding: 4px;
+                    padding-left: 0;
+
+                    .card {
+
+                        width: 88%;
+                        height: 4vh;
+                        border-radius: 5px;
+                        background: rgb(20, 115, 196);
+                        padding: 4px;
+                        overflow: hidden;
+                        box-shadow: #cbeafd 10px 7px 20px 0px;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        transition: transform 0.5s;
+                        user-select: none;
+                        transition: .3s linear;
+
+                        &:hover {
+                            transform: scale(1.02);
+                            cursor: pointer;
+                        }
+
+
+                        .top-section {
+                            //   height: 10vh;
+                            height: 100%;
+                            width: 99%;
+                            border-radius: 5px;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: flex-start;
+                            background: rgb(234, 244, 252);
+                            position: relative;
+                            transition: .3s linear;
+
+                            .icon-container {
+                                position: relative;
+                                width: 4vh;
+                                height: 4vh;
+
+                                .icon {
+                                    top: 0;
+                                    right: 15%;
+                                    transform: translateX(50%) translateY(20%);
+                                    width: 3vh;
+                                    height: 3vh;
+                                    position: absolute;
+                                    background-size: contain;
+                                }
+                            }
+
+                            .title {
+                                position: relative;
+                                width: 70%;
+                                height: 4vh;
+
+                                .subScene-title-text {
+                                    color: rgb(20, 115, 196);
+                                    font-size: calc(0.7vw + 0.6vh);
+                                    font-weight: 600;
+                                    font-style: normal;
+                                    margin-left: 1vw;
+                                    line-height: 4vh;
+                                    font-family: 'Microsoft YaHei';
+                                }
+                            }
+                        }
+                    }
+
+                    .card.active {
+                        // box-shadow: #cbeafd 10px 7px 20px 0px;
+                        border: inset #C9E1F5 3px solid;
+
+                        .top-section {
+                            background: rgb(26, 143, 245);
+
+                            .title {
+                                .subScene-title-text {
+                                    color: rgb(234, 244, 252);
+                                }
+                            }
+                        }
+                    }
+
+
+                    .card.expand {
+                        width: 100%;
+                        height: 4vh;
+                        transition: .3s linear;
+                    }
+
+                    .button-block {
+                        position: relative;
+                        width: 25%;
+                        height: 5vh;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        user-select: none;
+
+                        .btn {
+                            width: 3.8vh;
+                            height: 3.8vh;
+                            background-size: contain;
+                            background-image: url('/detail.png');
+                            transition: .3s linear;
+
+                            &:hover {
+                                cursor: pointer;
+                                transform: scale(1.05);
+                            }
+                        }
+                    }
+                }
+
+                .feature-container {
+                    width: 88%;
+                    height: 3vh;
+                    display: flex;
+                    flex-direction: row;
+                    margin: 0.2vh;
+                    padding-left: 0;
+                    background-color: #C9E1F5;
+                    border-radius: 5%;
+                    border-color: #0a72c7;
+
+                    .feature-content {
+                        color: rgb(20, 115, 196);
+                        font-size: calc(0.5vw + 0.5vh);
+                        font-weight: 600;
+                        font-style: normal;
+                        margin-left: 0.5vw;
+                        line-height: 3vh;
+                        font-family: 'Microsoft YaHei';
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                    }
+                }
+            }
+
+
+        }
+
+        :deep(.el-tree) {
+
+            .el-tree-node__content {
+                height: fit-content;
+                transform: translateX(-1%);
+            }
+
+            .el-tree-node__content>.el-tree-node__expand-icon {
+                padding: 0px;
+            }
+
+            .el-tree-node__expand-icon {
+                font-size: calc(0.8vw + 0.6vh);
+                color: #0a72c7;
+            }
+        }
+
+        :deep(.el-checkbox) {
+            width: fit-content;
+            height: fit-content;
+
+            .el-checkbox__input {
+
+                .el-checkbox__inner {
+                    transform: scale(2.0);
+
+                    &::after {
+                        scale: 1.2;
+                    }
+                }
+            }
+        }
     }
 
     .mapBase {
         position: relative;
-        width: 82vw;
+        width: 85vw;
         height: 92vh;
 
         #map {
@@ -463,13 +1013,6 @@ const FieldMap = {
             background-color: hsl(180, 7%, 94%);
         }
 
-        #GPUFrame {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
     }
 
     div.tools-container {
@@ -532,7 +1075,7 @@ const FieldMap = {
         position: absolute;
         z-index: 2;
         right: 5vw;
-        bottom: 1vh;
+        bottom: 7vh;
     }
 
     div.featDetail {
@@ -648,21 +1191,30 @@ const FieldMap = {
         z-index: 2;
         right: 5vw;
         top: 0vh;
+        width: 15vw;
         padding: calc(0.1vw + 0.1vh);
         background-color: aliceblue;
+        user-select: none;
 
         .title {
             border-bottom: rgb(41, 40, 40) 1px solid;
             font-weight: bold;
             font-size: calc(0.7vw + 0.5vh);
             line-height: 3vh;
+            width: 100%;
+
+            .iconn{
+                :hover{
+                    cursor: pointer;
+                }
+            }
         }
     }
 
     div.radio-container {
         position: absolute;
-        top: 2vh;
-        right: 20vw;
+        bottom: 2vh;
+        right: 6vw;
     }
 
 }

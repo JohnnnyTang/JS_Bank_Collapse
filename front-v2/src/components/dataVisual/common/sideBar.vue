@@ -1,7 +1,7 @@
 <template>
     <dv-border-box9>
         <div class="sideBar-container">
-            <dv-decoration-11 style="width:75%;height: 7vh;">
+            <dv-decoration-11 style="width:75%;height: 6.5vh;">
                 <div class="title-text">
                     综合数据专题
                 </div>
@@ -9,7 +9,7 @@
             <hr class="hr_gradient">
 
             <div class="scenes-tree-container">
-                <el-tree style="max-width: 600px" :data="dataSource" :expand-on-click-node="false" node-key="label"
+                <el-tree style="max-width: 400px" :data="dataSource" :expand-on-click-node="false" node-key="label"
                     :default-expanded-keys="expandKey">
                     <template #default="{ node, data }">
                         <span class="custom-tree-node" @click="sideBarClickHandler(node, data)">
@@ -23,6 +23,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- <div class="checkbox">
+                                    <el-checkbox v-model="data.active" size="large" />
+                                </div> -->
                             </div>
 
                             <div class="subScene-container" v-else-if="data.type == 'title2'">
@@ -75,89 +78,9 @@ import { initSortedLayer } from '../layerUtil'
 const emit = defineEmits(['detailClick'])
 const dataSource = ref([])
 const mapStore = useMapStore()
-const sceneStore = useNewSceneStore()
-const sceneDict = {
-    '重点岸段': 0,
-    '全江概貌': 1,
-    '工程情况': 2,
-}
+
 const expandKey = ['重点岸段', '全江概貌']
-const zoomValue = ref(0)
 
-// const sceneClickHandler = (node, data) => {
-//     if (data.active) {
-//         data.active = false
-//         //移除
-//         let map = mapStore.getMap()
-
-
-//         let selectedSceneID = data.label
-//         sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
-//         sceneStore.SCENEMAP.value[selectedSceneID].hideScene()
-//         sceneStore.SCENEMAP.value[selectedSceneID].active = false
-//         for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-//             dataSource.value[sceneDict[selectedSceneID]].children[i].active = false
-//         }
-
-//         const highlightLayer = useHighlightLayerStore().highlightLayers
-//         for (let i = 0; i < highlightLayer.length; i++) {
-//             map.getLayer(highlightLayer[i]) &&
-//                 map.removeLayer(highlightLayer[i])
-//         }
-//         return
-//     }
-//     else {
-//         data.active = true
-//         // 添加
-//         let map = mapStore.getMap()
-
-//         let selectedSceneID = data.label
-//         sceneStore.SCENEMAP.value[selectedSceneID].setMap(map)
-//         sceneStore.SCENEMAP.value[selectedSceneID].showScene()
-//         sceneStore.SCENEMAP.value[selectedSceneID].active = true
-//         for (let i = 0; i < dataSource.value[sceneDict[selectedSceneID]].children.length; i++) {
-//             dataSource.value[sceneDict[selectedSceneID]].children[i].active = true
-//         }
-//         sceneStore.latestScene = selectedSceneID
-
-//     }
-// }
-// const layerGroupClickHandler = (node, data) => {
-//     if (data.active) {
-//         data.active = false
-//         //移除
-//         let map = mapStore.getMap()
-
-//         let selectedLayerGroupID = data.label
-//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].hideLayer()
-//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = false
-
-//         const highlightLayer = useHighlightLayerStore().highlightLayers
-//         for (let i = 0; i < highlightLayer.length; i++) {
-//             map.getLayer(highlightLayer[i]) &&
-//                 map.removeLayer(highlightLayer[i])
-//         }
-//         return
-//     }
-//     else {
-//         data.active = true
-//         // 添加
-//         let map = mapStore.getMap()
-//         let selectedLayerGroupID = data.label
-//         console.log(selectedLayerGroupID);
-//         console.log(sceneStore.LAYERGROUPMAP.value);
-//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].setMap(map)
-//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].showLayer()
-//         sceneStore.LAYERGROUPMAP.value[selectedLayerGroupID].active = true
-//         sceneStore.latestLayerGroup = selectedLayerGroupID
-
-//     }
-// }
-// const detailClickHandler = (node, data) => {
-//     // console.log(node, data);
-//     emit('detailClick', data.label)
-// }
 
 const sideBarClickHandler = (node, data) => {
     if (node.level === 1) {
@@ -167,13 +90,9 @@ const sideBarClickHandler = (node, data) => {
         }
         if (data.type == 'title1' && data.label !== '其他') {
             let lgId = data.label
-            if (data.active == true) {
-                hideLayers(mapStore.getMap(), lableLayerMap[lgId])
-                data.active = false
-            }else{
-                showLayers(mapStore.getMap(), lableLayerMap[lgId])
-                data.active = true
-            }
+            if (data.active == true) hideLayers(mapStore.getMap(), lableLayerMap[lgId])
+            if (data.active == false) showLayers(mapStore.getMap(), lableLayerMap[lgId])
+            data.active = !data.active
         }
     } else if (node.level === 2) {
         //可能要素,可能图层
@@ -186,7 +105,7 @@ const sideBarClickHandler = (node, data) => {
                 let lgId = data.label
                 hideLayers(mapStore.getMap(), lableLayerMap[lgId])
                 data.active = false
-            }else{
+            } else {
                 let lgId = data.label
                 showLayers(mapStore.getMap(), lableLayerMap[lgId])
                 data.active = true
@@ -203,22 +122,6 @@ const sideBarClickHandler = (node, data) => {
 
 
 
-// const featureClickHandler = (node, data) => {
-//     console.log(node, data);
-// }
-
-// watch(() => mapStore.getMap(), async (newV, oldV) => {
-//     console.log('init map firstly!', newV);
-//     let map = newV
-//     await initSortedLayer(map)
-//     map.on('style.load', async () => {
-//         // console.log('A style load event occurred.');
-//         await initSortedLayer(map)
-//     });
-
-// }, {
-//     once: true
-// })
 
 
 
@@ -245,7 +148,7 @@ onMounted(async () => {
 const dict = {
     '行政区划': ['市级行政区', '市级行政区-注记', '重点行政区边界'],
     // '河道分段': ['河道分段', '河道分段-注记', '河道分段点', '河道分段点-注记'],
-    '区域水系': ['区域水系', '区域水系-注记'],
+    '骨干河道': ['骨干河道', '骨干河道-注记'],
     '重要湖泊': ['大型湖泊', '大型湖泊-注记'],
     '水文站点': ['水文站点', '水文站点-注记'],
     // '过江通道': ['过江通道-桥墩', '过江通道-桥', '过江通道-隧道/通道', '过江通道-隧道/通道-注记', '过江通道-桥-注记'],
@@ -373,6 +276,8 @@ div.sideBar-container {
         justify-content: space-between;
         font-size: 14px;
         padding-right: 8px;
+        width: 100%;
+        height: 100%;
 
         &:hover {
             cursor: default;
@@ -380,7 +285,7 @@ div.sideBar-container {
 
         .scene-card {
             margin: 0.5vh;
-            width: 13vw;
+            width: 90%;
             height: 4vh;
             border-radius: 5px;
             background: rgb(20, 115, 196);
@@ -388,7 +293,7 @@ div.sideBar-container {
             overflow: hidden;
             box-shadow: #cbeafd 10px 7px 20px 0px;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             transition: transform 0.5s;
             user-select: none;
 
@@ -400,9 +305,10 @@ div.sideBar-container {
                 justify-content: flex-start;
                 // background: rgb(234, 244, 252);
                 position: relative;
+                width: 70%;
 
                 .scene-title {
-                    width: 70%;
+                    width: 100%;
                     height: 4vh;
 
                     .scene-title-text {
@@ -416,6 +322,7 @@ div.sideBar-container {
 
                     }
                 }
+
 
                 &:hover {
                     transform: scale(1.02);
@@ -433,14 +340,22 @@ div.sideBar-container {
                 }
 
             }
+
+
+            .checkbox {
+                width: 30%;
+                height: 4vh;
+                transform: translateY(20%) translateX(30%);
+
+            }
         }
 
 
         .subScene-container {
             // width: 12vw;
             // height: 4vh;
-            width: 13vw;
-            height: 5vh;
+            width: 100%;
+            height: 4.5vh;
             display: flex;
             flex-direction: row;
             padding: 4px;
@@ -560,7 +475,7 @@ div.sideBar-container {
         }
 
         .feature-container {
-            width: 10vw;
+            width: 88%;
             height: 3vh;
             display: flex;
             flex-direction: row;
@@ -581,12 +496,15 @@ div.sideBar-container {
             }
         }
     }
+
+
 }
 
 :deep(.el-tree) {
 
     .el-tree-node__content {
         height: fit-content;
+        transform: translateX(-1%);
     }
 
     .el-tree-node__content>.el-tree-node__expand-icon {
@@ -597,8 +515,22 @@ div.sideBar-container {
         font-size: calc(0.8vw + 0.6vh);
         color: #0a72c7;
     }
+}
 
+:deep(.el-checkbox) {
+    width: fit-content;
+    height: fit-content;
 
+    .el-checkbox__input {
+
+        .el-checkbox__inner {
+            transform: scale(2.0);
+
+            &::after {
+                scale: 1.2;
+            }
+        }
+    }
 }
 
 .test-zoom {

@@ -48,9 +48,9 @@ div.legend-container {
     position: relative;
     z-index: 3;
     pointer-events: all;
-
+    height: fit-content;
     width: 12vw;
-    height: 30vh;
+    // height: 30vh;
     background-color: rgb(239, 247, 253);
     border-radius: 1%;
     box-shadow: 0px 0px 10px 1px #b3b2b2ee;
@@ -108,32 +108,32 @@ div.legend-container {
     .content {
         position: relative;
         width: 12vw;
-        height: 24vh;
+        height: fit-content;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
         background-color: rgb(254, 254, 254);
         transform: scale(0.95);
-        overflow-y: scroll;
-        overflow-x: hidden;
+        // overflow-y: hidden;
+        // overflow-x: hidden;
 
-        &::-webkit-scrollbar {
-            width: 5px;
-        }
+        // &::-webkit-scrollbar {
+        //     width: 5px;
+        // }
 
-        &::-webkit-scrollbar-track {
-            background-color: rgba(6, 181, 197, 0.219);
-        }
+        // &::-webkit-scrollbar-track {
+        //     background-color: rgba(6, 181, 197, 0.219);
+        // }
 
-        &::-webkit-scrollbar-thumb {
-            background-color: #15a1e294;
-            border-radius: 5px;
-        }
+        // &::-webkit-scrollbar-thumb {
+        //     background-color: #15a1e294;
+        //     border-radius: 5px;
+        // }
 
-        &::-webkit-scrollbar-thumb:hover {
-            background-color: #3af0f781;
-        }
+        // &::-webkit-scrollbar-thumb:hover {
+        //     background-color: #3af0f781;
+        // }
 
     }
 
