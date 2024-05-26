@@ -258,7 +258,7 @@ const deviceIdMap = {
 const deviceTypeTimeMap = {
     位移测量站: {
         timeUnit: 'day',
-        timeCount: 1,
+        timeCount: 2,
     },
     测斜仪: {
         timeUnit: 'day',

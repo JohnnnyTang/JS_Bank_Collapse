@@ -486,7 +486,7 @@ div.warn-detail-container {
         width: 25.5vw;
         margin-left: 0.25vw;
 
-        background-color: #6493ff;
+        background-color: #acd7ff6b;
 
         div.accordion-scroll {
             height: 100%;
