@@ -508,11 +508,11 @@ onUnmounted(() => {
 })
 
 ///////// DEBUG REGION 
-// const createCompIns = () => {
-//     const bankApp = createApp(threedVue)
-//     let fatherDom = document.querySelector('#DeviceInfoBox')
-//     bankApp.mount(fatherDom)
-// }
+const createCompIns = () => {
+    const bankApp = createApp(threedVue)
+    let fatherDom = document.querySelector('#DeviceInfoBox')
+    bankApp.mount(fatherDom)
+}
 </script>
 
 <style lang="scss" scoped>
