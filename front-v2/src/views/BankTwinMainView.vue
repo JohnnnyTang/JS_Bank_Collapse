@@ -158,7 +158,8 @@ import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 // test bank3d popUP
-import threedVue from '../components/bankTwin/threedPopup.vue'
+// import threedVue from '../components/bankTwin/threedPopup.vue'
+import threeDdevice from '../components/bankTwin/threeDdevice.vue'
 
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
 import * as customLayers from '../utils/WebGL/customLayers'
@@ -552,7 +553,7 @@ onUnmounted(() => {
 
 ///////// DEBUG REGION
 const createCompIns = () => {
-    const bankApp = createApp(threedVue)
+    const bankApp = createApp(threeDdevice)
     let fatherDom = document.querySelector('#DeviceInfoBox')
     bankApp.mount(fatherDom)
 }

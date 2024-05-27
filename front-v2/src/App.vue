@@ -16,16 +16,16 @@ onMounted(async () => {
     const infoBoxDiv = document.createElement('div')
     infoBoxDiv.style.position = 'absolute'
     infoBoxDiv.style.zIndex = '1000'
-    infoBoxDiv.style.backgroundColor = 'red'
-    infoBoxDiv.style.pointerEvents = 'none'
-    infoBoxDiv.style.textAlign = 'center'
-    infoBoxDiv.style.lineHeight = '50px'
-    infoBoxDiv.style.fontSize = '20px'
-    infoBoxDiv.style.display = 'none'
-    infoBoxDiv.style.height = '50px'
-    infoBoxDiv.style.opacity = '0.8'
-    infoBoxDiv.style.color = 'white'
-    infoBoxDiv.style.width = '50px'
+    // infoBoxDiv.style.backgroundColor = 'red'
+    // infoBoxDiv.style.pointerEvents = 'none'
+    // infoBoxDiv.style.textAlign = 'center'
+    // infoBoxDiv.style.lineHeight = '50px'
+    // infoBoxDiv.style.fontSize = '20px'
+    // infoBoxDiv.style.display = 'none'
+    // infoBoxDiv.style.height = '50px'
+    // infoBoxDiv.style.opacity = '0.8'
+    // infoBoxDiv.style.color = 'white'
+    // infoBoxDiv.style.width = '50px'
     infoBoxDiv.id = 'DeviceInfoBox'
     document.body.appendChild(infoBoxDiv)
 
@@ -47,7 +47,7 @@ onMounted(async () => {
          */
         set name(nameStr) {
 
-            pickedObject.infoBox.innerHTML = nameStr
+            // pickedObject.infoBox.innerHTML = nameStr
             // DEVICEName.value = nameStr
             useDeviceNameStore().deviceName = nameStr
             this._name = nameStr
