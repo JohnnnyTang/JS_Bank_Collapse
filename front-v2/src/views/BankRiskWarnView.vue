@@ -352,7 +352,7 @@
             <riskResultVue :profileList="profileList" />
         </div>
 
-        <div class="raster-legend-container" v-if="showRaster">
+        <div class="raster-legend-container" v-if="showRaster && showRasterControl">
             <img src="/rasterLegend1.png" alt="比例尺" />
         </div>
 
@@ -1487,18 +1487,14 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
         })
-<<<<<<< HEAD
         map.addSource('dockAreaLabelSource', {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}'],
         })
-=======
->>>>>>> 13166daff2de1a5dd28672ab9f4f00c71570d3a1
         map.addSource('fixProjectAreaSource', {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}'],
         })
-<<<<<<< HEAD
         map.addSource('fixProjectLineSource', {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
@@ -1512,8 +1508,6 @@ onMounted(async () => {
             tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
         })
 
-=======
->>>>>>> 13166daff2de1a5dd28672ab9f4f00c71570d3a1
         addRasterLayer(map, 23032209, 'mapRaster')
         map.setLayoutProperty('mapRaster', 'visibility', 'none')
         map.addLayer({
@@ -1532,19 +1526,6 @@ onMounted(async () => {
                 'line-width': 2,
             },
         })
-<<<<<<< HEAD
-=======
-        map.addSource('fixProjectLineSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
-        })
-        map.addSource('fixProjectAreaLabelSource', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}',
-            ],
-        })
->>>>>>> 13166daff2de1a5dd28672ab9f4f00c71570d3a1
         map.addLayer({
             id: 'fjsFixLine',
             type: 'line',
@@ -1587,7 +1568,6 @@ onMounted(async () => {
             },
         })
         map.addLayer({
-<<<<<<< HEAD
             id: 'mzsLabel',
             type: 'symbol',
             source: 'mzsPlaceLabelSource',
@@ -1602,32 +1582,6 @@ onMounted(async () => {
                 'text-color': 'rgba(31, 14, 126, 0.75)',
             },
         })
-=======
-            id: 'fixProjectLayer',
-            type: 'fill',
-            source: 'fixProjectAreaSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgba(220,224,237, 0.8)',
-                'fill-outline-color': 'rgba(220,224,237, 0.8)',
-            },
-        })
-        // map.addLayer({
-        //     id: 'mzsLabel',
-        //     type: 'symbol',
-        //     source: 'mzsPlaceLabelSource',
-        //     'source-layer': 'default',
-        //     layout: {
-        //         'text-field': ['get', 'label'],
-        //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-        //         // 'text-offset': [0, 1.25],
-        //         'text-anchor': 'left',
-        //     },
-        //     paint: {
-        //         'text-color': 'rgba(31, 14, 126, 0.75)',
-        //     },
-        // })
->>>>>>> 13166daff2de1a5dd28672ab9f4f00c71570d3a1
         map.addLayer({
             id: 'dockArea',
             type: 'fill',
@@ -1788,10 +1742,7 @@ onMounted(async () => {
             type: 'line',
             source: 'zjgLine',
             'source-layer': 'default',
-<<<<<<< HEAD
             filter: profileList.value[0].filter,
-=======
->>>>>>> 13166daff2de1a5dd28672ab9f4f00c71570d3a1
             layout: {
                 'line-cap': 'round',
                 'line-join': 'round',
