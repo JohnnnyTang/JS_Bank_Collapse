@@ -737,7 +737,7 @@ const ProfileLoadingProcess = async (
             compareNow,
         )
     } else if (exist && !existCompare) {
-        loading_message.value = '地形对比结果计算中...'
+        loading_message.value = '地形对比数据加载中...'
         await CalProfile(compareBefore, compareNow)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
@@ -746,7 +746,7 @@ const ProfileLoadingProcess = async (
             compareNow,
         )
     } else if (!exist && existCompare) {
-        loading_message.value = '地形对比结果计算中...'
+        loading_message.value = '地形对比数据加载中...'
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
@@ -755,7 +755,7 @@ const ProfileLoadingProcess = async (
             compareNow,
         )
     } else {
-        loading_message.value = '地形对比结果计算中...'
+        loading_message.value = '地形对比数据加载中...'
         await CalProfile(compareBefore, compareNow)
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'

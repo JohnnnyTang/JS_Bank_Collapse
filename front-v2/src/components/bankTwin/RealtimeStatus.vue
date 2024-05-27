@@ -127,6 +127,7 @@
                             class="device-chart-dom"
                             ref="chartDom"
                             v-loading="chartDataLoading"
+                            @dblclick="navToMoreData"
                         ></div>
                     </dv-border-box10>
                 </div>
@@ -258,7 +259,7 @@ const deviceIdMap = {
 const deviceTypeTimeMap = {
     位移测量站: {
         timeUnit: 'day',
-        timeCount: 2,
+        timeCount: 1,
     },
     测斜仪: {
         timeUnit: 'day',

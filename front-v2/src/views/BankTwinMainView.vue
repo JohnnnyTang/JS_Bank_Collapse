@@ -63,9 +63,13 @@
                     </div>
                 </div>
             </DvBorderBox12>
-            <div class="button-block" @click="warnActive = !warnActive">
-                {{ buttonText }}
-            </div>
+        </div>
+        <div
+            class="button-block"
+            @click="warnActive = !warnActive"
+            :class="{ active: warnActive }"
+        >
+            {{ buttonText }}
         </div>
 
         <div class="monitor-legend-container">
@@ -231,7 +235,7 @@ const unityCanvaDom = ref()
 const mapDom = ref()
 const warnActive = ref(false)
 const buttonText = computed(() => {
-    return '查看处置详情'
+    return warnActive.value?'更多':'▼'
 })
 const detailLoading = ref(false)
 const warnLoading = ref(true)
@@ -518,9 +522,9 @@ const updateWarnInfoDesc = async () => {
 
         let warnTime = dayjs(warnInfo[i].warnTime).format('M月D日H时m分s秒')
         let threeDiff = warnInfo[i].threeDiff.toFixed(3)
-
+        // (${buildLocStr(deviceId)})
         let warnString = `
-            警告：于${warnTime}，${gnssIdSectionMap[deviceId]}断面(${buildLocStr(deviceId)})的 \
+            警告：于${warnTime}，${gnssIdSectionMap[deviceId]}断面的 \
             ${deviceName}(${deviceNameMap[deviceName][deviceId]})周围区域即将发生崩岸险情 \
             请注意防汛处置！
         `
@@ -532,12 +536,15 @@ const updateWarnInfoDesc = async () => {
     warnKeyValList.value[5].val = '是'
 
     warningList.value = WARN_TEXT
-    // warnActive.value = true
+    warnActive.value = true
     // 第一次是没有初始化完的长度 所以很快 实际上很长
     await nextTick()
     console.log('123123 length: ', marqueeBlockDom.value.offsetWidth)
     const marqueeBlockWidth = marqueeBlockDom.value.offsetWidth
-    animateTime.value = `${marqueeBlockWidth / warnInfo.length / 10}s`
+    animateTime.value = `${marqueeBlockWidth / warnInfo.length / 24}s`
+    if (warnInfo.length == 0) {
+        animateTime.value = 0
+    }
 }
 
 onMounted(async () => {
@@ -770,7 +777,7 @@ div.twin-main-container {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 84%;
+                width: 96%;
                 margin-left: 2%;
                 overflow: hidden;
                 height: 7vh;
@@ -808,36 +815,39 @@ div.twin-main-container {
                 }
             }
         }
+    }
+    div.button-block {
+        position: absolute;
+        background-color: rgb(193, 230, 255);
+        border-radius: 7px;
+        right: 1vw;
+        width: fit-content;
+        height: 3vh;
+        top: 9.5vh;
+        padding: 0 0.4vw 0 0.4vw;
+        line-height: 3vh;
+        text-align: center;
+        border-right: #a4bfff 2px solid;
+        border-bottom: #a4bfff 4px solid;
+        font-weight: bolder;
+        color: #1d00be;
+        z-index: 4;
+        font-size: calc(1vw + 1vh);
+        transform: scaleX(1.4) translateX(-20%);
 
-        div.button-block {
-            position: absolute;
-            background-color: rgb(122, 227, 248);
-            border-radius: 7px;
-            right: 1%;
-            width: 6vw;
-            height: 4vh;
-            line-height: 4vh;
-            text-align: center;
-            border-right: #a4bfff 2px solid;
-            border-bottom: #a4bfff 4px solid;
+        /* 初始阴影 */
+        &:hover {
+            background-color: #0400fd;
+            color: #aaffff;
+            cursor: pointer;
             font-weight: bold;
-            color: #1d00be;
-            font-size: calc(0.6vw + 0.3vh);
+        }
 
-            /* 初始阴影 */
-            &:hover {
-                cursor: pointer;
-                border-right: #a4bfff 2px solid;
-                border-bottom: #a4bfff 4px solid;
-                transition: 0.3s;
-            }
-
-            &:active {
-                cursor: pointer;
-                border-right: #a4bfff 1px solid;
-                border-bottom: #a4bfff 1px solid;
-                transition: 0.3s;
-            }
+        &.active {
+            top: 54.5vh;
+            font-weight: normal;
+            font-size: calc(0.5vw + 0.5vh);
+            transform: none;
         }
     }
 
