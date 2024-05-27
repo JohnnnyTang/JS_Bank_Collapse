@@ -164,7 +164,7 @@
             </div>
         </div>
 
-        <div class="raster-control-block">
+        <div class="raster-control-block" v-if="showRasterControl">
             <label class="switch">
                 <input
                     type="checkbox"
@@ -332,7 +332,9 @@
                 z-index: 10;
             "
         >
-            <waterProcessChartVue />
+            <waterProcessChartVue
+                :timeStep="timeStep"    
+            />
         </div>
 
         <geologyAndProjectVue v-if="showGeologyAndProject" />
@@ -552,19 +554,6 @@ const showRaster = ref(false)
 const showBankLine = ref(true)
 const infoTreeData = ref(InfoTree)
 
-// let flowSrc = []
-// for (let i = 0; i < 26; i++) {
-//     flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-// }
-// let flow = reactive(
-//     new SteadyFlowLayer(
-//         '近岸流场',
-//         '/scratchSomething/terrain_flow/json/station.bin',
-//         flowSrc,
-//         (url) => url.match(/uv_(\d+)\.bin/)[1],
-//         '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
-//     ),
-// )
 let flow = null
 
 const mapFlyToRiver = (mapIns) => {
@@ -1061,6 +1050,15 @@ const showFlowSpeedFunc = async () => {
     showFlowSpeed.value = !showFlowSpeed.value
     await flowControlHandler()
 }
+const showRasterControl = ref(false)
+const showRasterControlFunc = () => {
+    if (showRasterControl.value === true && showRiverBed.value === true) {
+        showRasterControl.value = !showRasterControl.value
+        RasterControlHandler()
+        return
+    }
+    showRasterControl.value = !showRasterControl.value
+}
 
 // 展示水动力因素指标，包括:
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
@@ -1073,10 +1071,10 @@ const showWaterPowerFunc = async () => {
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
-    showWaterPower.value = !showWaterPower.value
     showBedFlowChartFunc()
     showWaterProcessChartFunc()
     await showFlowSpeedFunc()
+    showWaterPower.value = !showWaterPower.value
 }
 
 const showRiverBed = ref(false)
@@ -1087,17 +1085,20 @@ const showRiverBedFunc = () => {
         showGeologyAndProjectFunc()
     }
 
-    showRiverBed.value = !showRiverBed.value
     if (
         (showRaster.value === false && showProfileShape.value === true) ||
         (showRaster.value === true && showProfileShape.value === false)
     ) {
         showProfileShapeFunc()
         showYearlyProfileShapeFunc()
+        showRasterControlFunc()
+        showRiverBed.value = !showRiverBed.value
         return
     }
     showProfileShapeFunc()
     showYearlyProfileShapeFunc()
+    showRasterControlFunc()
+    showRiverBed.value = !showRiverBed.value
     // RasterControlHandler()
 }
 
@@ -1438,29 +1439,29 @@ const addBankLineRiskLayer = (map, profileList) => {
 onMounted(async () => {
     await initScratchMap(mapContainer.value).then(async (map) => {
         mapInstance = map
-        map.on('draw.create', function (e) {
-            sectionConfirmShow.value = true
-            let lineFeature = e.features[0]
-            sectionLineLabel.value =
-                lineFeature.geometry.coordinates[0][0].toFixed(6) +
-                ',' +
-                lineFeature.geometry.coordinates[0][1].toFixed(6)
-            sectionLineLabelSec.value =
-                lineFeature.geometry.coordinates[1][0].toFixed(6) +
-                ',' +
-                lineFeature.geometry.coordinates[1][1].toFixed(6)
-            let startWebMerCoord = convertToMercator(
-                lineFeature.geometry.coordinates[0],
-            )
-            let endWebMerCoord = convertToMercator(
-                lineFeature.geometry.coordinates[1],
-            )
-            StartPtX = startWebMerCoord[0]
-            StartPtY = startWebMerCoord[1]
-            EndPtX = endWebMerCoord[0]
-            EndPtY = endWebMerCoord[1]
-            return
-        })
+        // map.on('draw.create', function (e) {
+        //     sectionConfirmShow.value = true
+        //     let lineFeature = e.features[0]
+        //     sectionLineLabel.value =
+        //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
+        //         ',' +
+        //         lineFeature.geometry.coordinates[0][1].toFixed(6)
+        //     sectionLineLabelSec.value =
+        //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
+        //         ',' +
+        //         lineFeature.geometry.coordinates[1][1].toFixed(6)
+        //     let startWebMerCoord = convertToMercator(
+        //         lineFeature.geometry.coordinates[0],
+        //     )
+        //     let endWebMerCoord = convertToMercator(
+        //         lineFeature.geometry.coordinates[1],
+        //     )
+        //     StartPtX = startWebMerCoord[0]
+        //     StartPtY = startWebMerCoord[1]
+        //     EndPtX = endWebMerCoord[0]
+        //     EndPtY = endWebMerCoord[1]
+        //     return
+        // })
 
         // map.addControl(new mapboxgl.NavigationControl(), 'top-left')
         // mapJumpToRiver(map)
@@ -1591,6 +1592,38 @@ onMounted(async () => {
             'source-layer': 'default',
             paint: {
                 'fill-color': '#18b915',
+            },
+        })
+        map.addLayer({
+            id: 'dockAreaLabel',
+            type: 'symbol',
+            source: 'dockAreaLabelSource',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'project_name'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'bottom',
+                'text-size': 12,
+            },
+            paint: {
+                'text-color': 'rgba(31, 44, 126, 0.6)',
+            },
+        })
+        map.addLayer({
+            id: 'riverPlaceLabel',
+            type: 'symbol',
+            source: 'riverPlaceLabel',
+            'source-layer': 'default',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                // 'text-offset': [0, 1.25],
+                'text-anchor': 'left',
+                'text-size': 18,
+            },
+            paint: {
+                'text-color': 'rgba(31, 44, 226, 1)',
             },
         })
         // map.addLayer({
@@ -2252,7 +2285,7 @@ div.risk-warn-container {
 
     div.flow-control-block {
         position: absolute;
-        top: 44.3vh;
+        top: 43.5vh;
         left: 26vw;
         height: 13vh;
         width: 6vw;
@@ -2330,7 +2363,7 @@ div.risk-warn-container {
 
     div.time-shower-block {
         position: absolute;
-        top: 53.3vh;
+        top: 52.8vh;
         left: 22.5vw;
     }
 
@@ -2613,7 +2646,7 @@ div.risk-warn-container {
     div.raster-control-block {
         position: absolute;
         top: 79vh;
-        left: 63vw;
+        left: 57vw;
         height: 13vh;
         width: 6vw;
         display: flex;
@@ -2691,7 +2724,7 @@ div.risk-warn-container {
     div.bankLine-control-block {
         position: absolute;
         top: 79vh;
-        left: 57vw;
+        left: 63vw;
         height: 13vh;
         width: 6vw;
         display: flex;

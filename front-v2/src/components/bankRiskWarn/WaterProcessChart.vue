@@ -2,7 +2,7 @@
     <div class="water-chart-container">
         <div class="water-chart-title">潮位过程</div>
         <div class="water-chart-content" ref="chartDom"></div>
-        <div class="selector-container">
+        <!-- <div class="selector-container">
             <el-select
                 v-model="value"
                 size="large"
@@ -16,13 +16,23 @@
                     :value="item.value"
                 />
             </el-select>
+        </div> -->
+        <div class="profile-condition-container">
+            <div class="profile-condition-text">
+                当前使用条件：洪季
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
+
+const props = defineProps({
+    timeStep: Number
+})
+
 
 const chartDom = ref()
 
@@ -263,9 +273,43 @@ const option = {
                     }
                 ]
             },
+            markLine: {
+                symbolSize: 5,
+                itemStyle: {
+                    normal: {
+                        color: 'rgb(94, 208, 251)',
+                        borderColor: 'black',
+                        borderWidth: 0.5,
+                    }
+                },
+                lineStyle: {
+                    color: 'rgb(94, 208, 251)',
+                    opacity: 0.8,
+                    width: 3,
+                },
+                data: [
+                    {
+                        name: '0小时',
+                        xAxis: `${props.timeStep}`,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'left',
+                                formatter: () => {
+                                    return "0小时";
+                                },
+                                textStyle: {
+                                    color: 'black',
+                                    fontSize: 13
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
             type: 'line',
             smooth: true,
-            data: waterProcessData['20'],
+            data: waterProcessData['flood'],
             lineStyle: {
                 color: 'rgb(12, 22, 226)',
                 opacity: 1,
@@ -289,10 +333,24 @@ const selectChange = (val) => {
 
 onMounted(() => {
     chart = echarts.init(chartDom.value)
-    maxVal = Math.max(...waterProcessData['20']);
-    minVal = Math.min(...waterProcessData['20']);
+    maxVal = Math.max(...waterProcessData['flood']);
+    minVal = Math.min(...waterProcessData['flood']);
     chart.setOption(option)
 })
+
+watch(
+    // 监视timeStep变量移动
+    () => props.timeStep, (newVal) => {
+        option.series[0].markLine.data[0].xAxis = newVal;
+        chart.setOption(option);
+    }
+)
+
+// setInterval(() => {
+//     option.series[0].markLine.data[0].xAxis = Math.floor(Math.random() * 24);
+//     chart.setOption(option);
+// }, 1000);
+
 </script>
 
 <style lang="scss" scoped>
@@ -325,40 +383,61 @@ div.water-chart-container {
         background-color: rgb(208, 236, 255);
     }
 
-    div.selector-container {
-        position: absolute;
-        top: 0.2vh;
-        right: 1vw;
-        width: 30%;
+    div.profile-condition-container {
+        position:absolute;
+        width: 7.2vw;
+        height: 3vh;
+        left: 22vw;
+        top: 0.5vh;
+        background-color: rgba(208, 236, 255, 1);
+        border-radius: 4px;
 
-        :deep(.el-select) {
-            width: 100% !important;
-            // height: 3.3vh;
-            box-shadow:
-                rgba(0, 132, 255, 0.8) 1px 1px,
-                rgba(0, 119, 255, 0.7) 2px 2px,
-                rgba(0, 119, 255, 0.6) 3px 4px;
-            border-radius: 4px;
-        }
-
-        :deep(.el-select__wrapper) {
-            // height: 3.3vh;
-            // line-height: 3.3vh;
-            border-radius: 4px;
+        div.profile-condition-text {
+            position:absolute;
+            left: 0.4vw;
+            top: 0.6vh;
+            width: 8vw;
+            height: 2vh;
+            font-size: calc(0.6vh + 0.4vw);
+            font-weight: 600;
             font-family: 'Microsoft YaHei';
-            font-weight: bold;
-            font-size: calc(0.4vw + 0.3vh);
-            background-color: #e6f7ff;
-        }
-
-        :deep(.el-select__placeholder) {
-            color: #738ab6;
-        }
-
-        :deep(.el-select__tags-text) {
-            color: #2b61f7;
-            font-size: calc(0.4vw + 0.2vh);
         }
     }
+
+    // div.selector-container {
+    //     position: absolute;
+    //     top: 0.2vh;
+    //     right: 1vw;
+    //     width: 30%;
+
+    //     :deep(.el-select) {
+    //         width: 100% !important;
+    //         // height: 3.3vh;
+    //         box-shadow:
+    //             rgba(0, 132, 255, 0.8) 1px 1px,
+    //             rgba(0, 119, 255, 0.7) 2px 2px,
+    //             rgba(0, 119, 255, 0.6) 3px 4px;
+    //         border-radius: 4px;
+    //     }
+
+    //     :deep(.el-select__wrapper) {
+    //         // height: 3.3vh;
+    //         // line-height: 3.3vh;
+    //         border-radius: 4px;
+    //         font-family: 'Microsoft YaHei';
+    //         font-weight: bold;
+    //         font-size: calc(0.4vw + 0.3vh);
+    //         background-color: #e6f7ff;
+    //     }
+
+    //     :deep(.el-select__placeholder) {
+    //         color: #738ab6;
+    //     }
+
+    //     :deep(.el-select__tags-text) {
+    //         color: #2b61f7;
+    //         font-size: calc(0.4vw + 0.2vh);
+    //     }
+    // }
 }
 </style>
