@@ -18,6 +18,7 @@ import { ElMessageBox, ElMessage, dayjs } from 'element-plus'
 const propertyRef = ref({})
 const zoomRef = ref()
 const deviceTypeList = ['GNSS', '应力桩', '水压力计', '', '测斜仪']
+let typeList = ['GNSS', '应力桩', '孔隙水压力计', '测斜仪']
 
 const filterWarnData = (warnDataList) => {
     let filterMap = {}
@@ -71,7 +72,7 @@ const mapInit = async (map, vis) => {
     })
     map.addSource('mzsSectionLabel', {
         type: 'vector',
-        tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+        tiles: [tileServer + '/tile/vector/geomCenter/mzsBankLine/{x}/{y}/{z}'],
     })
     map.addSource('riverPlaceLabel', {
         type: 'vector',
@@ -91,10 +92,10 @@ const mapInit = async (map, vis) => {
     //         tileServer + '/tile/vector/mzsSectionLine/{x}/{y}/{z}',
     //     ],
     // })
-    map.addSource('mzsSectionLineLabelSource', {
-        type: 'vector',
-        tiles: [tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}'],
-    })
+    // map.addSource('mzsSectionLineLabelSource', {
+    //     type: 'vector',
+    //     tiles: [tileServer + '/tile/vector/mzsSectionLineLabel/{x}/{y}/{z}'],
+    // })
     // map.addSource('mzsBankAreaWSource', {
     //     type: 'vector',
     //     tiles: [
@@ -583,7 +584,6 @@ const mapInit = async (map, vis) => {
                 useWarnInfoStore().resetWarnInfo()
                 let allWarnData = JSON.parse(JSON.stringify(fakeWarnInfo))
                 let filteredData = filterWarnData(allWarnData)
-                let typeList = ['GNSS', '应力桩', '孔隙水压力计', '测斜仪']
                 filteredData.forEach((item, index) => {
                     let id = item.deviceId
                     let type = typeList[id.split('_').pop() - 1]
@@ -916,11 +916,11 @@ const deviceNameMap = {
 
 const fakeWarnInfo = [
     {
-        deviceCode: 'DVI3010425438293',
-        deviceId: 'MZS120.55327892_32.02707923_1',
+        deviceCode: 'DVI9432973031240',
+        deviceId: 'MZS120.54599538_32.02837993_1',
         id: 'c6ae8d58-a506-4acc-ad86-998db55195a3',
         ifDealt: 0,
-        threeDiff: 31.4255215,
+        threeDiff: 51.4255215,
         warnTime: dayjs().subtract(3, 'minute').format('YYYY-MM-DD HH:mm:ss'),
     },
     // {
@@ -941,4 +941,4 @@ const fakeWarnInfo = [
     // },
 ]
 
-export { mapInit, removeWarningDeviceStyle }
+export { mapInit, removeWarningDeviceStyle, setWarningDeviceStyle, typeList }

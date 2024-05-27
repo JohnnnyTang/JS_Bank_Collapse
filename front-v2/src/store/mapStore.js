@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, reactive, ref } from 'vue'
 import { Scene } from '../components/dataVisual/Scene'
-
+import { setWarningDeviceStyle, typeList } from '../components/bankManage/mapInit.js'
 const useMapStore = defineStore('mapStore', () => {
     const map = ref(null)
 
@@ -168,6 +168,7 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
     }
 })
 
+
 const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const warnInfo = ref([])
     const warnInfo_history = ref([])
@@ -197,6 +198,15 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
         warnWatchTimer.value = 0
     }
 
+    function restoreWarn(restoreItem) {
+        restoreItem.ifDealt = 0
+        warnInfo.value.push(restoreItem)
+        let id = restoreItem.deviceId
+        let type = typeList[id.split('_').pop() - 1]
+        setWarningDeviceStyle(useMapStore().getMap(),type, id, restoreItem, warnInfo.value.indexOf(restoreItem)+1)
+        console.log('after restore', warnInfo.value)
+    }
+
     return {
         fake,
         warnInfo,
@@ -207,6 +217,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
         warnInfo_history,
         curDealId,
         videoActive,
+        restoreWarn,
     }
 })
 

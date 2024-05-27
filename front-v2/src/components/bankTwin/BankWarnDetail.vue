@@ -23,7 +23,7 @@
                             >
                                 {{
                                     '报警' +
-                                    (useWarnInfoStore().warnInfo_history.indexOf(
+                                    (warnInfoStore.warnInfo_history.indexOf(
                                         warn,
                                     ) +
                                         1) +
@@ -184,7 +184,12 @@
                                     {{ deviceIdPlaceMap[item.deviceId] }}
                                 </div>
                                 <div class="device-deal device-item body">
-                                    <div class="withdraw-button" @click="withdrawDeal(item.id)">撤回处置</div>
+                                    <div
+                                        class="withdraw-button"
+                                        @click="withdrawDeal(item)"
+                                    >
+                                        撤回处置
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -432,10 +437,10 @@ const confirmDealWithWarn = async (warnItem) => {
         let type = deviceTypeList[id.split('_').pop() - 1]
         console.log(type, id)
         removeWarningDeviceStyle(useMapStore().getMap(), type, id)
-        warnInfoStore.removeInfoItem(warnItem)
-        warnInfoStore.videoActive = [null, null]
     }
-
+    warnInfoStore.removeInfoItem(warnItem)
+    warnInfoStore.videoActive = [null, null]
+    console.log('dealing', warnItem)
     warnItem.ifDealt = 1
     // historyRowLoading.value[warnIndex] = false
 }
@@ -444,12 +449,12 @@ const collapseChange = (opened) => {
     console.log('changed collapse', opened)
 }
 
-const withdrawDeal = async (warnId) => {
+const withdrawDeal = async (warnItem) => {
     if (!warnInfoStore.fake) {
         await BackEndRequest.updateWarnDealtStatus(warnItem.id, 0)
     }
 
-    warnItem.ifDealt = 0
+    warnInfoStore.restoreWarn(warnItem)
     warnInfoStore.videoActive = [0, 2]
 }
 
