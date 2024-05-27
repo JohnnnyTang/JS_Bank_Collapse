@@ -225,16 +225,17 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
         },
         grid: [
             {
-                top: '17%',
+                top: '17.5%',
+                left: '10%',
                 height: '70%',
-                width: '85%',
+                width: '87%',
                 show: true,
             }
         ],
         legend: {
             data: ['流速'],
             right: '10%',
-            top: '4%',
+            top: '-3%',
         },
         xAxis: [
             {

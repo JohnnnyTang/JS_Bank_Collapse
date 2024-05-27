@@ -7,7 +7,7 @@
             <div class="item-title">
                 沿岸流速分布：
             </div>
-            <div class="profile-selector-container">
+            <!-- <div class="profile-selector-container">
                 <el-select
                     v-model="waterConditionValue"
                     placeholder="选择水文条件"
@@ -26,6 +26,11 @@
                         </span>
                     </el-option>
                 </el-select>
+            </div> -->
+            <div class="profile-condition-container">
+                <div class="profile-condition-text">
+                    当前使用条件：洪季
+                </div>
             </div>
             <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
             <div class="graph-container flowspeed">
@@ -109,30 +114,26 @@ div.flowspeed-content{
 
     div.flowspeed-title {
         position: absolute;
-        padding-left: 0.8vw;
-        height: 4.6vh;
-        width: 29.4vw;
-        margin-top: 0.6vh;
+        padding-left: 1vw;
+        height: 4.2vh;
+        width: 29.2vw;
         line-height: 4.5vh;
         border-radius: 6px;
         // background-color: rgba(235, 240, 247, 0.4);
         text-align: center;
         font-family: 'Microsoft YaHei';
         font-weight: bold;
-        font-size: calc(0.8vw + 0.8vh);
-        color: #0c60af;
-        background-color: #f6f8fa;
-        text-shadow:
-            #eef3ff 1px 1px,
-            #eef3ff 2px 2px,
-            #6493ff 3px 3px;
+        font-size: calc(0.6vw + 0.6vh);
+        box-shadow: 0px 3px rgb(49, 121, 255);
+        color: rgb(0, 138, 218);
+        background-color: rgb(240, 248, 255);
         display: flex;
     }
 
     div.riskInfo-item {
         position: absolute;
-        height: 18.5vh;
-        top: 6vh;
+        height: 19.3vh;
+        top: 5vh;
         border-radius: 6px;
         border: #3b85e7 2px solid;
 
@@ -158,58 +159,79 @@ div.flowspeed-content{
             // text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
         }
 
-        div.profile-selector-container {
-                position: absolute;
-                width: 10vw;
-                height: 4vh;
-                left: 9.2vw;
-                // background-color: #d1d2db;
+        // div.profile-selector-container {
+        //         position: absolute;
+        //         width: 10vw;
+        //         height: 4vh;
+        //         left: 9.2vw;
+        //         // background-color: #d1d2db;
     
-                :deep(.el-select) {
-                    left: 4vw;
-                    top: 0.4vh;
-                    width: 6.5vw !important;
-                    height: 3vh !important;
-                    box-shadow:
-                        rgba(248, 248, 248, 0.3) 1px 1px,
-                        rgba(171, 184, 211, 0.7) 1px 1px,
-                        rgba(243, 244, 245, 0.6) 2px 2px;
-                    border-radius: 6px;
-                }
+        //         :deep(.el-select) {
+        //             left: 4vw;
+        //             top: 0.4vh;
+        //             width: 6.5vw !important;
+        //             height: 3vh !important;
+        //             box-shadow:
+        //                 rgba(248, 248, 248, 0.3) 1px 1px,
+        //                 rgba(171, 184, 211, 0.7) 1px 1px,
+        //                 rgba(243, 244, 245, 0.6) 2px 2px;
+        //             border-radius: 6px;
+        //         }
     
-                :deep(.el-select__wrapper) {
-                    height: 3vh;
-                    line-height: 3vh;
-                    border-radius: 6px;
-                    font-family: 'Microsoft YaHei';
-                    font-weight: bold;
-                    font-size: calc(0.4vw + 0.5vh);
-                    background-color: rgba(20, 64, 211, 0.7);
-                }
+        //         :deep(.el-select__wrapper) {
+        //             height: 3vh;
+        //             line-height: 3vh;
+        //             border-radius: 6px;
+        //             font-family: 'Microsoft YaHei';
+        //             font-weight: bold;
+        //             font-size: calc(0.4vw + 0.5vh);
+        //             background-color: rgba(20, 64, 211, 0.7);
+        //         }
     
-                :deep(.el-select__placeholder) {
-                    color: #f6f8fa;
-                }
+        //         :deep(.el-select__placeholder) {
+        //             color: #f6f8fa;
+        //         }
     
-                :deep(.el-icon) {
-                    width: 0.8vw;
-                    height: 0.8vw;
+        //         :deep(.el-icon) {
+        //             width: 0.8vw;
+        //             height: 0.8vw;
     
-                    svg {
-                        width: 0.8vw;
-                        height: 0.8vw;
+        //             svg {
+        //                 width: 0.8vw;
+        //                 height: 0.8vw;
     
-                        path {
-                            fill: #00098a;
-                        }
-                    }
-                }
+        //                 path {
+        //                     fill: #00098a;
+        //                 }
+        //             }
+        //         }
     
-                :deep(.el-select__tags-text) {
-                    color: #2b61f7;
-                    font-size: calc(0.4vw + 0.4vh);
-                }
+        //         :deep(.el-select__tags-text) {
+        //             color: #2b61f7;
+        //             font-size: calc(0.4vw + 0.4vh);
+        //         }
+        //     }
+
+        div.profile-condition-container {
+            position:absolute;
+            width: 7.2vw;
+            height: 3vh;
+            left: 12.6vw;
+            top: 0.3vh;
+            background-color: rgba(143, 161, 219, 0.4);
+            border-radius: 4px;
+
+            div.profile-condition-text {
+                position:absolute;
+                left: 0.4vw;
+                top: 0.5vh;
+                width: 8vw;
+                height: 2vh;
+                font-size: calc(0.6vh + 0.4vw);
+                font-weight: 600;
+                font-family: 'Microsoft YaHei';
             }
+        }
 
         div.graph-container {
             position: absolute;
@@ -218,7 +240,7 @@ div.flowspeed-content{
             left: 0.25vw;
 
             &.flowspeed {
-                height: 14vh;
+                height: 15vh;
                 backdrop-filter: blur(5px);
                 // background-color: #00098a;
             }
