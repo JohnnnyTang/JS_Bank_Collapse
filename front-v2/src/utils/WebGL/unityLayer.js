@@ -188,7 +188,7 @@ class UnityLayer {
 
         const center = this.worldToModel(xCamera.center.x, xCamera.center.y, xCamera.center.z, 25.0, 0.0, -10.0)
         const position = this.worldToModel(xCamera.position.x, xCamera.position.y, xCamera.position.z, 25.0, 0.0, -10.0)
-        console.log(xCamera.fov)
+        // console.log(xCamera.fov)
         const up = xCamera.up;
         this.dispatchMessage({
             Method: 'Tick',

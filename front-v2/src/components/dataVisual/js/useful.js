@@ -1,4 +1,3 @@
-import { itemIntersectByLine } from '@antv/g6-core/lib/util/math'
 import {
     i_gov_bounds,
     river_division_point,
@@ -15,14 +14,14 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 ////////////////  DICT
 const Title1dict = {
-    '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '一级岸段-注记', '二级岸段-注记', '三级岸段-注记','一级预警岸段-注记'],
+    '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '一级岸段-注记', '二级岸段-注记', '三级岸段-注记', '一级预警岸段-注记'],
     '长江沙洲': ['洲滩', '洲滩-注记'],
     '过江通道': ['已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
-    '骨干河道': ['骨干河道', '骨干河道-注记'],
-    '重要水闸': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
-    '重要泵站': ['泵站工程', '泵站工程-注记'],
+    '骨干河道': ['区域性骨干河道', '流域性河道', '其他河道', '区域性骨干河道-注记', '流域性河道-注记', '其他河道-注记'],
+    '重要水闸': ['大中型水闸', '其他水闸', '大中型水闸-注记', '其他水闸-注记', '水闸工程-重点'],
+    '重要泵站': ['大中型泵站', '其他泵站', '大中型泵站-注记', '其他泵站-注记'],
     '长江堤防': ['长江干堤', '里程桩'],
-    '其他': ['市级行政区', '市级行政区-注记', '重点行政区边界', '水文站点', '水文站点-注记', '水库大坝', '水库大坝-注记']
+    '其他': ['市级行政区', '市级行政区-注记', '重点行政区边界', '水文站点', '水文站点-注记', '水库大坝', '水库大坝-注记', '大型湖泊', '大型湖泊-注记']
 }
 const Title2dict = {
     '一级预警岸段': ['一级预警岸段', '一级岸段-注记'],
@@ -31,121 +30,43 @@ const Title2dict = {
     '已建通道': ['已建通道', '已建通道-注记'],
     '在建通道': ['在建通道', '在建通道-注记'],
     '规划通道': ['规划通道', '规划通道-注记'],
-    '流域性骨干河道': ['骨干河道', '骨干河道-注记'],
-    '区域性骨干河道': ['骨干河道', '骨干河道-注记'],
-    '重要水闸': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
-    '重要泵站': ['泵站工程', '泵站工程-注记'],
-    '重要湖泊': ['大型湖泊', '大型湖泊-注记'],
+    '区域性骨干河道': ['区域性骨干河道', '区域性骨干河道-注记'],
+    '区域性骨干河道': ['流域性河道', '流域性河道-注记'],
+    '大中型水闸': ['大中型水闸', '大中型水闸-注记', '水闸工程-重点'],
+    '其他水闸': ['其他水闸', '其他水闸-注记'],
+    '大中型泵站': ['大中型泵站', '大中型泵站-注记'],
+    '其他泵站': ['其他泵站', '其他泵站-注记'],
+    '湖泊水库': ['水库大坝', '水库大坝-注记', '大型湖泊', '大型湖泊-注记'],
     '行政区划': ['市级行政区', '市级行政区-注记', '重点行政区边界'],
     '水文站点': ['水文站点', '水文站点-注记'],
 }
 
-const tableFieldMap = {
-    "combineProjectPoint": {
-        "original": "枢纽工程",
-        "fieldMap": {
-            "id": "编号",
-            "name": "名称"
-        }
-    },
-    "dockArea": {
-        "original": "长江码头工程",
-        "fieldMap": {
-            "new_id": "编号",
-            "project_name": "项目名称",
-            "dock_type": "码头类型",
-            "area_type": "功能区类型",
-        }
-    },
-    "embankmentLine": {
-        "original": "堤防工程",
-        "fieldMap": {
-            "class": "堤防类型",
-            "sp_name": "名称",
-            "length": "长度",
-            "bank": "岸别",
-        }
-    },
-    "hydroStationPoint": {
-        "original": "水文水位站",
-        "fieldMap": {
-            "sp_name": "名称",
-            "begin": "设站日期",
-            "place": "测站地点"
-        }
-    },
-    "lakeArea": {
-        "original": "国普湖泊",
-        "fieldMap": {
-            "name": "名称",
-            "area": "水面面积",
-            "height": "正常蓄水位",
-        }
-    },
-    "pumpArea": {
-        "original": "泵站工程",
-        "fieldMap": {
-            "sp_name": "名称",
-            "river": "所在河流湖泊水库渠道",
-            "level": "级别"
-        }
-    },
-    "reservoirArea": {
-        "original": "水库工程",
-        "fieldMap": {
-            "sp_name": "名称",
-            "class": "水库类型",
-            "area": "坝址控制流域面积",
-            "flow": "坝址多年平均径流量",
-        }
-    },
-    "riverArea": {
-        "original": "国普河流",
-        "fieldMap": {
-            "name": "名称",
-            "area": "水面面积",
-            "basin": "流域",
-            "water": "水系",
-        }
-    },
-    "sluiceArea": {
-        "original": "水闸工程",
-        "fieldMap": {
-            "sp_name": "名称",
-            "river": "所在河流湖泊水库渠道",
-            "class": "水闸类型",
-            "volume": "过闸流量"
-        }
-    },
-    "importantBank": {
-        "original": "重点岸段",
-        "fieldMap": {
-            "bank_name": "名称",
-            "river_name": "所属河段",
-            "monitoring_length": '岸段长度',
-            "warning_level": "预警等级",
-        }
-    },
-    "cityBoundaryLine": {
-        "original": "行政区划",
-        "fieldMap": {
-            'name': '名称',
-        }
-    },
-    "riverPassageLine": {
-        "original": "国普河流",
-        "fieldMap": {
-            'name': '名称',
-        }
-    },
-    "riverPassagePolygon": {
-        "original": "国普河流",
-        "fieldMap": {
-
-        }
-    }
+const LGIDSourceMap = {
+    // '重点岸段':'',
+    // '长江沙洲':'',
+    '过江通道': 'channel',
+    '骨干河道': 'riverArea',
+    '重要水闸': 'sluiceArea',
+    '重要泵站': 'pumpArea',
+    // '长江堤防':'',
+    // '其他':''
 }
 
+const sourceColumnMap = {
+    "riverArea": 2,
+    "pumpArea": 2,
+    "sluiceArea": 2,
+    "importantBank": 4,
+    'sandBar': 2,
+    'channel': 1,
+}
+const sourceZoomMap = {
+
+    "riverArea": 13,
+    "pumpArea": 15.5,
+    "sluiceArea": 15,
+    'channel': 13,
+}
 
 
 
@@ -156,7 +77,8 @@ const DICT = {
     T1LayerDict: Title1dict,
     T2LayerDict: Title2dict,
     // T2LayerFunction: t,
-    LayerGroupTableDict: tableFieldMap
+    sourceColumnMap,
+    LGIDSourceMap,
 }
 
 
@@ -312,7 +234,7 @@ const getSideBarTree = async () => {
 
 
     let zt = []
-    let features = sandbar.features
+    let features = (await axios.get(tileServer + `/tile/vector/riverBeach/info`)).data
     for (let i = 0; i < features.length; i++) {
         zt.push(features[i])
     }
@@ -324,10 +246,7 @@ const getSideBarTree = async () => {
         children: []
     }
     zt.forEach((item) => {
-        let firstCoord = item.geometry.coordinates[0][0][0]
-        item.properties.center_x = firstCoord[0]
-        item.properties.center_y = firstCoord[1]
-        mainZt.children.push({ label: item.properties.name, active: false, type: 'feature', property: item.properties, 'lgId': '长江沙洲' })
+        mainZt.children.push({ label: item.name, active: false, type: 'feature', property: item, 'lgId': '长江沙洲' })
     })
     // let quyushuixi = []
 
@@ -338,21 +257,21 @@ const getSideBarTree = async () => {
         active: true,
         filter: true,
         test: 1,
-        // children: [
-        //     {
-        //         label: '流域性骨干河道',
-        //         icon: '/icons/流域水系.png',
-        //         type: 'title2',
-        //         active: true,
-        //         filter: true,
-        //     }, {
-        //         label: '区域性骨干河道',
-        //         icon: '/icons/流域水系.png',
-        //         type: 'title2',
-        //         active: true,
-        //         filter: true,
-        //     }
-        // ],
+        children: [
+            {
+                label: '流域性骨干河道',
+                icon: '/icons/流域水系.png',
+                type: 'title2',
+                active: true,
+                filter: true,
+            }, {
+                label: '区域性骨干河道',
+                icon: '/icons/流域水系.png',
+                type: 'title2',
+                active: true,
+                filter: true,
+            }
+        ],
         data: []
     }
     let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
@@ -365,21 +284,21 @@ const getSideBarTree = async () => {
         type: 'title1',
         active: false,
         filter: true,
-        // children: [
-        //     {
-        //         label: '大中型水闸',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     }, {
-        //         label: '其他水闸',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     }
-        // ],
+        children: [
+            {
+                label: '大中型水闸',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            }, {
+                label: '其他水闸',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            }
+        ],
         data: []
     }
     dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
@@ -392,22 +311,22 @@ const getSideBarTree = async () => {
         type: 'title1',
         active: false,
         filter: true,
-        // children: [
-        //     {
-        //         label: '大中型泵站',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     },
-        //     {
-        //         label: '其他泵站',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     }
-        // ],
+        children: [
+            {
+                label: '大中型泵站',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            },
+            {
+                label: '其他泵站',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            }
+        ],
         data: []
     }
     dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
@@ -444,13 +363,11 @@ const getSideBarTree = async () => {
         ],
         data: []
     }
-    zt = channel_line.features
+    zt = (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
     zt.forEach((item) => {
-        let firstCoord = item.geometry.coordinates[0][0]
-        item.properties.center_x = firstCoord[0]
-        item.properties.center_y = firstCoord[1]
-        riverPassageLine.data.push(item.properties)
+        riverPassageLine.data.push(item)
     })
+
 
     let tree = [
         {
@@ -488,7 +405,7 @@ const getSideBarTree = async () => {
                     filter: true
                 },
                 {
-                    label: '重要湖泊',
+                    label: '湖泊水库',
                     icon: '/icons/湖泊河流.png',
                     type: 'title2',
                     active: true,

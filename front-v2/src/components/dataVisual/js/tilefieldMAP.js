@@ -61,9 +61,9 @@ const sourceFieldMap = {
     "pumpArea": {
         "original": "sp_name",
         "fieldMap": {
-            "id": "编号",
+            // "id": "编号",
             // "sp_name": "名称",
-            "river": "所在河流湖泊水库渠道",
+            "river": "所在区域",
             "level": "级别"
         }
     },
@@ -85,7 +85,7 @@ const sourceFieldMap = {
         "original": "name",
         "fieldMap": {
             // "name": "名称",
-            "code": "编号",
+            // "code": "编号",
             "basin": "流域",
             "water": "水系",
             "area": "水面面积",
@@ -95,9 +95,9 @@ const sourceFieldMap = {
     "sluiceArea": {
         "original": "sp_name",
         "fieldMap": {
-            "id": "id",
+            // "id": "id",
             // "sp_name": "名称",
-            "river": "所在河流湖泊水库渠道",
+            "river": "所在区域",
             "class": "水闸类型",
             "level": "工程等别",
             "volume": "过闸流量"
@@ -126,45 +126,14 @@ const sourceFieldMap = {
         }
     },
     'channel': {
-        "original": "过江通道",
+        "original": "name",
         "fieldMap": {
-            // "name": "名称",
-            "planning":"类型",
-            // "river": "所属河段",
-            // "0m线内面积(km3)": '面积(km3)',
-            // "洲滩内人口": '人口',
-            // "2019年GDP\n（万元）": '2019年GDP(万元)',
-            // "岸线功能区名称": '岸线功能区',
-            // "预案": '防汛预案'
+            // "plan":"类型",
+            'construct_date': '建设时间',
+            'bridge_type': '桥型',
         }
     }
 }
-/*
-{
-    "name": "炮子洲",
-    "id": 1,
-    "region": "扬中市",
-    "river": "扬中河段",
-    "sortId": 18,
-    "所属河道": "长江",
-    "市（地）级行政区": "镇江",
-    "县级行政区": "扬中市",
-    "位置坐标": "492094.966,3545126.220",
-    "是否圈围出水（全部/部分/无圈围）": "是",
-    "主江防洪水位(85基面，m)": 6.03,
-    "防洪设计水位": null,
-    "0m线内面积(km3)": "0",
-    "洲滩内人口": "16484（居民）",
-    "洲滩内耕地面积(m2)": "5399142.8555100001",
-    "洲滩内耕地占比": "0.3194759086100592",
-    "2019年GDP\n（万元）": "236600",
-    "岸线功能区名称": "保留区/控制利用区",
-    "功能岸线长度(km)": "10.09/9.17",
-    "预案": "沙家港站水位达8.05m，全部撤离",
-    "center_x": 119.906304863248,
-    "center_y": 32.05590864640032
-}
-*/
 
 
 const sourceNameMap = {
@@ -193,9 +162,9 @@ const sourceZoomMap = {
     "combineProjectPoint": 13,
     "dockArea": 13.5,
     "embankmentLine": 13,
-    "pumpArea": 15.5,
+    "pumpArea": 16,
     "reservoirArea": 14,
-    "sluiceArea": 15,
+    "sluiceArea": 16,
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
     'importantBank': 12.6,
@@ -212,9 +181,10 @@ const sourceColumnMap = {
     "embankmentLine": 2,
     "pumpArea": 2,
     "reservoirArea": 2,
-    "sluiceArea": 2,
+    "sluiceArea": 3,
     "importantBank": 4,
-    'sandBar': 2
+    'sandBar': 2,
+    'channel': 1,
 }
 const legendStyleMap = {
     '全江概貌': {

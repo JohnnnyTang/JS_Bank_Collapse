@@ -6,13 +6,13 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import HeaderComp from './components/layout/HeaderComp.vue'
 import router from './router/index'
+import { useDeviceNameStore } from './store/mapStore';
 
 onMounted(async () => {
     // await Scratch.StartDash()
-
     const infoBoxDiv = document.createElement('div')
     infoBoxDiv.style.position = 'absolute'
     infoBoxDiv.style.zIndex = '1000'
@@ -28,7 +28,8 @@ onMounted(async () => {
     infoBoxDiv.style.width = '50px'
     infoBoxDiv.id = 'DeviceInfoBox'
     document.body.appendChild(infoBoxDiv)
-    
+
+    // window.DEVICEName = DEVICEName
     window.pickedObject = {
 
         /** @type { string } */ _name: '',
@@ -47,7 +48,8 @@ onMounted(async () => {
         set name(nameStr) {
 
             pickedObject.infoBox.innerHTML = nameStr
-
+            // DEVICEName.value = nameStr
+            useDeviceNameStore().deviceName = nameStr
             this._name = nameStr
         },
 
@@ -65,13 +67,13 @@ onMounted(async () => {
 
             if (x === -1 && y === -1) {
 
-            this.infoBox.style.display = 'none'
+                this.infoBox.style.display = 'none'
 
             } else {
 
-            this.infoBox.style.display = 'block'
-            this.infoBox.style.bottom = `${y / this.pixelRation}px`
-            this.infoBox.style.left = `${x / this.pixelRation - this.boxSize[0] / 2}px`
+                this.infoBox.style.display = 'block'
+                this.infoBox.style.bottom = `${y / this.pixelRation}px`
+                this.infoBox.style.left = `${x / this.pixelRation - this.boxSize[0] / 2}px`
 
             }
 
@@ -85,9 +87,9 @@ onMounted(async () => {
     }
 
     window.pickUp = (name) => {
-      pickedObject.name = name;
-      pickedObject.infoBox.style.width = `${pickedObject.boxSize[0]}px`;
-      pickedObject.infoBox.style.height = `${pickedObject.boxSize[1]}px`;
+        pickedObject.name = name;
+        pickedObject.infoBox.style.width = `${pickedObject.boxSize[0]}px`;
+        pickedObject.infoBox.style.height = `${pickedObject.boxSize[1]}px`;
     }
     window.consoleLogMessageFromUnity = (message) => {
 
@@ -95,7 +97,7 @@ onMounted(async () => {
     }
 
     window.pickScreenPos = (x, y) => {
-        
+
         pickedObject.position = [x, y]
     }
 
@@ -381,7 +383,7 @@ body,
 
 .el-message-box.choice-box.el-message-box--center {
     width: 10vw;
-    background-color: rgb(215,243,254);
+    background-color: rgb(215, 243, 254);
     backdrop-filter: blur(16px);
     border: #b2c6f3 2px solid;
     padding: 0;
@@ -404,6 +406,7 @@ body,
                     flex-direction: column;
                     justify-content: center;
                     align-items: center;
+
                     .title {
                         height: 3vh;
                         line-height: 3vh;
@@ -450,7 +453,7 @@ body,
         .el-button {
             width: 2.5vw;
             height: 2.8vh;
-            
+
         }
 
         .el-button.el-button--primary {
@@ -459,4 +462,5 @@ body,
         }
     }
 
-}</style>
+}
+</style>
