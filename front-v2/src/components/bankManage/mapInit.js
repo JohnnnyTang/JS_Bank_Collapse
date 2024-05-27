@@ -840,8 +840,11 @@ function generateCircleLineString(x, y, radius, numPoints = 24) {
         type: 'FeatureCollection',
         features: [
             {
-                type: 'Polygon',
-                coordinates: points,
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [points],
+                }
             },
         ],
     }
@@ -884,7 +887,7 @@ const setWarningDeviceStyle = (
             const circleJson = generateCircleLineString(
                 property.longitude,
                 property.latitude,
-                0.5,
+                0.002,
             )
             console.log('circle circle', circleJson)
             map.addSource(`${deviceLayer}-${deviceCode}-source`, {
