@@ -151,6 +151,7 @@ const sourceNameMap = {
     "riverPassageLine": 'name',
     "riverPassagePolygon": 'name',
     "importantBank": 'bank_name',
+    'channel': 'name'
 }
 
 const sourceZoomMap = {
@@ -162,9 +163,9 @@ const sourceZoomMap = {
     "combineProjectPoint": 13,
     "dockArea": 13.5,
     "embankmentLine": 13,
-    "pumpArea": 16,
+    "pumpArea": 17.5,
     "reservoirArea": 14,
-    "sluiceArea": 16,
+    "sluiceArea": 17.5,
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
     'importantBank': 12.6,

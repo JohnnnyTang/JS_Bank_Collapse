@@ -2863,7 +2863,7 @@ const layerAddFunctionMap = {
                     'text-variable-anchor': ["top", "bottom","center"],
                     'text-size': 22,
                     // 'text-padding': 0.0,
-                    'text-writing-mode': ['vertical', 'horizontal'],
+                    // 'text-writing-mode': ['vertical', 'horizontal'],
                     "text-allow-overlap": false,
                     'text-ignore-placement': true
                 },

@@ -549,7 +549,7 @@ const mapInit = async (map, vis) => {
                 filteredData.forEach((item, index) => {
                     let id = item.deviceId
                     let type = deviceTypeList[id.split('_').pop() - 1]
-                    lastPos = setWarningDeviceStyle(map, type, id, item, index+1)
+                    lastPos = setWarningDeviceStyle(map, type, id, item, index + 1)
                 })
                 if (filteredData.length != 0) {
                     useWarnInfoStore().warnInfo = filteredData
@@ -572,7 +572,7 @@ const mapInit = async (map, vis) => {
                 filteredData.forEach((item, index) => {
                     let id = item.deviceId
                     let type = typeList[id.split('_').pop() - 1]
-                    setWarningDeviceStyle(map, type, id, item, index+1)
+                    setWarningDeviceStyle(map, type, id, item, index + 1)
                 })
                 if (filteredData.length != 0)
                     useWarnInfoStore().warnInfo = filteredData
@@ -607,12 +607,17 @@ const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData, index) =>
     if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
         map.addLayer({
             id: `${deviceLayer}-${deviceCode}`,
-            type: 'symbol',
+            // type: 'symbol',
+            type: 'circle',
             source: sourceMap[deviceLayer],
             layout: {
-                'icon-image': pulsingImageId,
-                'icon-size': 1,
-                'icon-allow-overlap': true,
+                // 'icon-image': pulsingImageId,
+                // 'icon-size': 1,
+                // 'icon-allow-overlap': true,
+            },
+            paint:{
+                'circle-radius': 10.0,
+                'circle-pitch-alignment': 'map',
             },
             filter: ['all', ['==', 'code', deviceCode]],
         })
@@ -668,7 +673,7 @@ const createWarningPopup = (info) => {
         maxWidth: '1500px',
         offset: 25,
         closeOnClick: false,
-        closeButton:true
+        closeButton: true
     }).setDOMContent(domwithComp)
     return popUp
 }
@@ -712,7 +717,7 @@ const warnInterval = async (map, minute) => {
     filteredData.forEach((item, index) => {
         let id = item.deviceId
         let type = 'GNSS'
-        lastPos = setWarningDeviceStyle(map, type, id, item, index+1)
+        lastPos = setWarningDeviceStyle(map, type, id, item, index + 1)
     })
     console.log('in interval, ', filteredData)
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)

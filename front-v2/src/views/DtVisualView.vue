@@ -109,10 +109,14 @@
             </div>
             <!-- <div class="close" @click="showInfoPannel = false; showDetail = false"></div> -->
             <div class="important-feature">
-                <el-table :data="infoTableData" height="30vh" stripe border class="infomation-table">
+                <el-table :data="infoTableData_filtered" height="30vh" stripe border class="infomation-table">
                     <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
                         :label="item.label"></el-table-column>
-                    <el-table-column fixed="right" label="操作" width="80">
+
+                    <el-table-column align="right">
+                        <template #header>
+                            <el-input v-model="search" size="small" placeholder="输入关键字搜索" />
+                        </template>
                         <template #default="scope">
                             <el-button link type="primary" size="small" @click="detailClickHandler4Feature(scope.row)">
                                 查看详情
@@ -182,6 +186,7 @@ const showInfoPannel = ref(false)
 const sideBarLoading = ref(true)
 const legendList = ref([])
 const infoPannelTitle = ref('')
+const search = ref('')
 var latestLGID = ''
 const waterTableData = [
     {
@@ -223,6 +228,22 @@ const baseMapRadio = ref(1)
 const dataSource = ref([])
 
 const expandKey = ['重点岸段', '全江概貌']
+const infoTableData_filtered = computed(() => {
+    // return infoTableData.value.filter((item) => {
+    //     let nameField = sourceNameMap[nowSource]
+    //     return item['' + nameField].includes(search.value)
+    // })
+    if (nowSource == null || nowSource == undefined || nowSource == '') {
+        return infoTableData.value
+    }else{
+
+        // return infoTableData.value
+        let nameField = sourceNameMap[nowSource]
+        return infoTableData.value.filter((item) => {
+            return item['' + nameField].includes(search.value)
+        })
+    }
+})
 
 /////// 
 
@@ -590,6 +611,8 @@ onMounted(async () => {
             showDetail.value = true
         } else if (e.key === '2') {
             showDetail.value = false
+        } else if (e.key === '3') {
+            console.log(nowSource, sourceNameMap[nowSource])
         }
     })
 
@@ -1125,7 +1148,8 @@ onUnmounted(async () => {
         z-index: 2;
         left: 20vw;
         top: 20vh;
-        background-color: rgb(20,115,196);
+        width: 13vw;
+        background-color: rgb(20, 115, 196);
         backdrop-filter: blur(5px);
         border: solid 3px #6990c4;
         border-radius: 2%;
@@ -1155,7 +1179,7 @@ onUnmounted(async () => {
         div.important-feature {
             // width: 20vw;
             // height: 30vh;
-            width: fit-content;
+            width: 13vw;
             height: 30vh;
         }
 
