@@ -253,7 +253,19 @@ const mapInit = async (map, vis) => {
             // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
             'text-offset': [-1.0, 1.15],
             'text-anchor': 'top',
-            'text-size': 16,
+            'text-size': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                2,
+                ['literal', 6],
+                10,
+                ['literal', 10],
+                18,
+                ['literal', 24],
+                22,
+                ['literal', 32],
+            ],
             'text-allow-overlap': true,
         },
         paint: {
@@ -365,7 +377,7 @@ const mapInit = async (map, vis) => {
 
         //////////////monitor device////////////
         let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
-        let monitorDevice = DataPioneer.generateGeoJson(
+        let monitorDevice = DataPioneer.generateDeviceGeoJson(
             monitorInfo,
             (element) => {
                 return [element['longitude'], element['latitude']]
@@ -374,6 +386,7 @@ const mapInit = async (map, vis) => {
         )
         const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
+        console.log('res geojson', gnss)
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',
@@ -455,6 +468,8 @@ const mapInit = async (map, vis) => {
         //     }
         // });
 
+        let minzoom = 16
+
         map.addLayer({
             id: 'GNSS基准站',
             type: 'symbol',
@@ -463,6 +478,40 @@ const mapInit = async (map, vis) => {
                 'icon-image': 'gnss-jz-static',
                 'icon-size': 0.2,
                 'icon-allow-overlap': true,
+            },
+        })
+        map.addLayer({
+            id: 'GNSS基准站-标注',
+            type: 'symbol',
+            source: 'gnss-jz-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1
+            },
+            paint: {
+                'text-color': 'rgba(255,127, 0, 0.75)',
             },
         })
         map.addLayer({
@@ -476,6 +525,40 @@ const mapInit = async (map, vis) => {
             },
         })
         map.addLayer({
+            id: 'GNSS-标注',
+            type: 'symbol',
+            source: 'gnss-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1
+            },
+            paint: {
+                'text-color': 'rgba(255,127, 0, 0.9)',
+            },
+        })
+        map.addLayer({
             id: '测斜仪',
             type: 'symbol',
             source: 'incline-source',
@@ -483,6 +566,41 @@ const mapInit = async (map, vis) => {
                 'icon-image': 'incline-static',
                 'icon-size': 0.2,
                 'icon-allow-overlap': true,
+            },
+        })
+        
+        map.addLayer({
+            id: '测斜仪-标注',
+            type: 'symbol',
+            source: 'incline-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1
+            },
+            paint: {
+                'text-color': 'rgba(127,0,255, 0.9)',
             },
         })
         map.addLayer({
@@ -496,6 +614,40 @@ const mapInit = async (map, vis) => {
             },
         })
         map.addLayer({
+            id: '孔隙水压力计-标注',
+            type: 'symbol',
+            source: 'manometer-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1
+            },
+            paint: {
+                'text-color': 'rgba(14,242,30, 0.9)',
+            },
+        })
+        map.addLayer({
             id: '应力桩',
             type: 'symbol',
             source: 'stress-source',
@@ -506,6 +658,40 @@ const mapInit = async (map, vis) => {
             },
         })
         map.addLayer({
+            id: '应力桩-标注',
+            type: 'symbol',
+            source: 'stress-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1
+            },
+            paint: {
+                'text-color': 'rgba(255,0,255, 0.9)',
+            },
+        })
+        map.addLayer({
             id: '监控摄像头',
             type: 'symbol',
             source: 'camera-source',
@@ -513,6 +699,40 @@ const mapInit = async (map, vis) => {
                 'icon-image': 'camera-static',
                 'icon-size': 0.2,
                 'icon-allow-overlap': true,
+            },
+        })
+        map.addLayer({
+            id: '监控摄像头-标注',
+            type: 'symbol',
+            source: 'camera-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1
+            },
+            paint: {
+                'text-color': 'rgba(3,5,255, 0.9)',
             },
         })
 
@@ -592,9 +812,7 @@ const mapInit = async (map, vis) => {
                 if (filteredData.length != 0)
                     useWarnInfoStore().warnInfo = filteredData
                 // 22222 set fake data
-                useWarnInfoStore().warnInfo_history = [
-                    ...filteredData,
-                ]
+                useWarnInfoStore().warnInfo_history = [...filteredData]
                 useWarnInfoStore().fake = true
                 useWarnInfoStore().videoActive = [0, 2]
             } else if (e.key == 'a') {
@@ -731,8 +949,9 @@ const warnInterval = async (map, minute) => {
         }
     })
 
-    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`))
-        .data
+    let allWarnData = (
+        await axios.get(`/api/data/deviceWarn/danger/minute/${minute}`)
+    ).data
     // let warnType = 'GNSS'
     let filteredData = filterWarnData(allWarnData)
     let lastPos

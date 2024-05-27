@@ -547,6 +547,16 @@ const updateWarnInfoDesc = async () => {
     }
 }
 
+watch(
+    () => warnInfoStore.curDealId,
+    (newVal) => {
+        if (newVal && newVal != '') {
+            // console.log("123123123123", newVal)
+            warnActive.value = true
+        }
+    },
+)
+
 onMounted(async () => {
     // setTimeout(() => {
     //     warnActive.value = true

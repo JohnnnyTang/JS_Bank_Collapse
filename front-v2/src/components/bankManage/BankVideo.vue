@@ -105,7 +105,7 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 // import { videoPlay } from 'viplayer'
 // const token = 'at.2q8ej4p4114dtudb20awr9763vfz1f6o-5j403u7nkd-1ya7mgb-wv9z5z55f'
 const token = ref(
-    'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
+    'at.89iiwo7c5cztq6f30wuai5oy0j3362ow-6m3qlhqadh-1phdss1-rmjo1wuzd',
 )
 const defaultVal = [
     {

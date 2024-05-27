@@ -98,7 +98,7 @@ import { useWarnInfoStore } from '../../store/mapStore'
 const warnInfoStore = useWarnInfoStore()
 
 const token = ref(
-    'at.89iiwo7c5cztq6f30wuai5oy0j3362ow-6m3qlhqadh-1phdss1-rmjo1wuzd',
+    'at.2kbb6yrsd376lwxrcd7r1mj610ud6kgw-3go8r4ejzs-0i8d8co-ubpipy04n',
 )
 
 const props = defineProps({
@@ -156,10 +156,10 @@ const videoList = ref([
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
         order: 1,
         presetPt: [
-            {name: '上游岸段', status: 'normal'},
             {name: '下游岸段', status: 'normal'},
-            {name: '设备3', status: 'normal'},
-            {name: '设备4', status: 'normal'},
+            {name: '上游岸段', status: 'normal'},
+            {name: 'CL-04', status: 'normal'},
+            {name: '小港池', status: 'normal'},
         ], 
         warn: false
     },
@@ -228,7 +228,7 @@ const move2PresetPoint = async (presetIndex) => {
 const moveBack2Origin = async () => {
     const moveBackPost = []
     for (let video of videoList.value) {
-        console.log(video)
+        // console.log(video)
         moveBackPost.push(
             axios.post(
                 'https://open.ys7.com/api/lapp/device/preset/move',
@@ -265,6 +265,9 @@ watch(() => warnInfoStore.videoActive, (newVal, oldVal) => {
             videoList.value[newVal[0]].presetPt[newVal[1]].status = 'warn'
             move2PresetPoint(newVal[1]+1)
         }
+    }
+    else {
+        move2PresetPoint(1)
     }
 })
 
@@ -639,6 +642,21 @@ div.realtime-video-container {
                     &.warn {
                         color: #eef3ff;
                         background-color: red;
+                        animation: breathing 1s linear infinite;
+                        font-weight: bold;
+                        @keyframes breathing {
+                            0% {
+                                transform: scale(1);
+                            }
+
+                            50% {
+                                transform: scale(0.95);
+                            }
+
+                            100% {
+                                transform: scale(1);
+                            }
+                        }
                     }
                 }
             }
