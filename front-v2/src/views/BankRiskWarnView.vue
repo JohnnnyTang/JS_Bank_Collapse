@@ -1432,7 +1432,7 @@ const addBankLineRiskLayer = (map, profileList) => {
             ],
             'line-width': 3,
         },
-    })
+    }, 'mzsSectionLabelLayer')
 }
 
 onMounted(async () => {
@@ -1615,7 +1615,6 @@ onMounted(async () => {
         //     },
         // })
         // const jsonUrl = '/bankWarn/bankWarn.json'
-        map.addLayer(new BankWarnLayer(defaultWarnLayerData))
         // map.addLayer({
         //     id: 'mzsBankLine',
         //     type: 'line',
@@ -1638,10 +1637,29 @@ onMounted(async () => {
 
         map.addSource('mzsSectionLabel', {
             type: 'vector',
-            tiles: [tileServer + '/tile/vector/center/mzsBankLine/{x}/{y}/{z}'],
+            tiles: [tileServer + '/tile/vector/geomCenter/mzsBankLine/{x}/{y}/{z}'],
+        })
+
+        map.addLayer(new BankWarnLayer(defaultWarnLayerData))
+
+        map.addLayer({
+            id: 'mzsBankLineChoosen',
+            type: 'line',
+            source: 'mzsBankLineSource',
+            'source-layer': 'default',
+            filter: profileList.value[1].filter,
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 1,
+                'line-color': 'rgb(134, 245, 230)',
+                'line-width': 10,
+            },
         })
         map.addLayer({
-            id: '点2',
+            id: 'mzsSectionLabelLayer',
             type: 'symbol',
             source: 'mzsSectionLabel',
             'source-layer': 'default',
@@ -1651,7 +1669,7 @@ onMounted(async () => {
                 // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
                 'text-offset': [-1.0, 1.15],
                 'text-anchor': 'top',
-                'text-size': 16,
+                'text-size': 18,
                 'text-allow-overlap': true,
             },
             paint: {
@@ -1684,23 +1702,6 @@ onMounted(async () => {
         //         },
         //     })
 
-        map.addLayer({
-            id: 'mzsBankLineChoosen',
-            type: 'line',
-            source: 'mzsBankLineSource',
-            'source-layer': 'default',
-            filter: profileList.value[1].filter,
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                'line-color': 'rgb(134, 245, 230)',
-                'line-width': 10,
-            },
-        })
-
         map.addSource('zjgLine', {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
@@ -1722,6 +1723,7 @@ onMounted(async () => {
                 'line-width': 2.0,
             },
         })
+
 
         // map.addControl(draw)
 

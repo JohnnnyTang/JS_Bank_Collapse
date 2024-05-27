@@ -61,6 +61,13 @@ public class MapTileController {
         sendVectorTileResponse(tileRes, response);
     }
 
+    @CrossOrigin
+    @RequestMapping(value = "/vector/geomCenter/{layerName}/{x}/{y}/{z}", method = RequestMethod.GET)
+    public void getCommonVectorGeomCenterPtTiles(@PathVariable String layerName,@PathVariable int x, @PathVariable int y, @PathVariable int z, HttpServletResponse response) throws Exception {
+        byte[] tileRes = vectorTileService.getVectorGeomCenterPtTiles(layerName, x, y, z);
+        sendVectorTileResponse(tileRes, response);
+    }
+
     private void sendVectorTileResponse(byte[] tileRes, HttpServletResponse response) {
         if(tileRes == null) {
             return;

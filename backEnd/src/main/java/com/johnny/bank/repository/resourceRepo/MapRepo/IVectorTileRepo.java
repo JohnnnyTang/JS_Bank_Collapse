@@ -20,6 +20,7 @@ import java.util.Map;
 public interface IVectorTileRepo {
     Object getVectorTile(TileBox tileBox);
     Object getVectorCenterPtTile(TileBox tileBox);
+    Object getVectorGeomCenterPtTile(TileBox tileBox);
 
     Object getContourVectorTile(ContourTileBox contourTileBox);
 

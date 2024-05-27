@@ -126,7 +126,7 @@ let presetParam = {
 
 const functionIndexList = [0, 1, 2, 3, 8, 9, 10, 11]
 
-let curBigVideoIndex = 0
+let curBigVideoIndex = ref(0)
 
 const videoList = ref([
     {
@@ -156,15 +156,15 @@ const videoList = ref([
 ])
 
 const focusOn = (index) => {
-    ;[videoList.value[curBigVideoIndex].order, videoList.value[index].order] = [
+    ;[videoList.value[curBigVideoIndex.value].order, videoList.value[index].order] = [
         videoList.value[index].order,
-        videoList.value[curBigVideoIndex].order,
+        videoList.value[curBigVideoIndex.value].order,
     ]
-    curBigVideoIndex = index
+    curBigVideoIndex.value = index
 }
 
 const basicVideoFunction = async (functionIndex) => {
-    controlParam.deviceSerial = videoList.value[curBigVideoIndex].deviceId
+    controlParam.deviceSerial = videoList.value[curBigVideoIndex.value].deviceId
     controlParam.direction = functionIndexList[functionIndex]
     // console.log('curent func param', controlParam)
     let stRes = await axios.post(
@@ -187,7 +187,7 @@ const basicVideoFunction = async (functionIndex) => {
 }
 
 const move2PresetPoint = async (presetIndex) => {
-    presetParam.deviceSerial = videoList.value[curBigVideoIndex].deviceId
+    presetParam.deviceSerial = videoList.value[curBigVideoIndex.value].deviceId
     presetParam.index = presetIndex
     // console.log('preset param', presetParam)
     let stRes = await axios.post(

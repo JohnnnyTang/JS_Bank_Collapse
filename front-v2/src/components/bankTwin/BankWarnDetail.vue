@@ -131,7 +131,7 @@
                     >
                         暂无未处置报警
                     </div>
-                    <el-collapse-item style="margin-top: 2vh;">
+                    <el-collapse-item style="margin-top: 2vh">
                         <template #title>
                             <div
                                 style="
@@ -240,6 +240,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
+import BackEndRequest from '../../api/backend'
 import { useMapStore, useWarnInfoStore } from '../../store/mapStore'
 import { removeWarningDeviceStyle } from '../bankManage/mapInit.js'
 const props = defineProps({
@@ -415,7 +416,13 @@ const filterDealtWarnInfo = (warnList) => {
     return res
 }
 
-const confirmDealWithWarn = (warnItem) => {
+const confirmDealWithWarn = async (warnItem) => {
+    if (!warnInfoStore.fake) {
+        await BackEndRequest.updateWarnDealtStatus(
+            warnItem.id,
+            1,
+        )
+    }
     if (warnItem.id in warnInfoStore.warnPopupMap) {
         console.log(
             'dealing with this',
@@ -439,14 +446,22 @@ const collapseChange = (opened) => {
     console.log('changed collapse', opened)
 }
 
-watch(() => useWarnInfoStore().curDealId, (newVal) => {
-    if(newVal && newVal != '') {
-        // console.log("123123123123", newVal)
-        startDealWithWarn(newVal-1)
-        console.log('21312313123213', (warnInfoStore.warnInfo_history[newVal-1].id))
-        collapseOpenItem.value.push(warnInfoStore.warnInfo_history[newVal-1].deviceId)
-    }
-})
+watch(
+    () => useWarnInfoStore().curDealId,
+    (newVal) => {
+        if (newVal && newVal != '') {
+            // console.log("123123123123", newVal)
+            startDealWithWarn(newVal - 1)
+            console.log(
+                '21312313123213',
+                warnInfoStore.warnInfo_history[newVal - 1].id,
+            )
+            collapseOpenItem.value.push(
+                warnInfoStore.warnInfo_history[newVal - 1].deviceId,
+            )
+        }
+    },
+)
 
 onMounted(() => {
     warnDetailList.value = warnInfoStore.warnInfo

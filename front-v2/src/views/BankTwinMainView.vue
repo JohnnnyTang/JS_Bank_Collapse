@@ -531,9 +531,9 @@ const updateWarnInfoDesc = async () => {
         WARN_TEXT.push(warnString)
     }
     warnLoading.value = false
-    warnKeyValList.value[2].val = deviceNameList.join(',')
-    warnKeyValList.value[1].val = warnTimeList.join(',')
-    warnKeyValList.value[5].val = '是'
+    // warnKeyValList.value[2].val = deviceNameList.join(',')
+    // warnKeyValList.value[1].val = warnTimeList.join(',')
+    // warnKeyValList.value[5].val = '是'
 
     warningList.value = WARN_TEXT
     warnActive.value = true

@@ -73,6 +73,18 @@ public class VectorTileService implements IVectorTileService {
         return (byte[]) IVectorTileRepo.getVectorCenterPtTile(tileBox);
     }
 
+    public byte[] getVectorGeomCenterPtTiles(String visualId, int x, int y, int z) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(visualId);
+        if(vectorTileSource == null) return null;
+//        if(!tableNameMap.containsKey(visualId)) return null;
+
+        TileBox tileBox = TileUtil.tile2boundingBox(
+                x, y, z,
+                vectorTileSource.getTableName(), vectorTileSource.getFieldList()
+        );
+        return (byte[]) IVectorTileRepo.getVectorGeomCenterPtTile(tileBox);
+    }
+
     @Override
     public byte[] getContourVectorTiles(int x, int y, int z, String year, String tide) {
         ContourTileBox tileBox = new ContourTileBox(TileUtil.tile2boundingBox(x, y, z, "mzs_contour"), year, tide);
