@@ -131,7 +131,7 @@
                     >
                         暂无未处置报警
                     </div>
-                    <el-collapse-item style="margin-top: 2vh;">
+                    <el-collapse-item style="margin-top: 2vh">
                         <template #title>
                             <div
                                 style="
@@ -157,6 +157,9 @@
                                 <div class="device-place device-item head">
                                     报警位置
                                 </div>
+                                <div class="device-deal device-item head">
+                                    处置
+                                </div>
                             </div>
                             <div
                                 class="device-status-row body"
@@ -179,6 +182,9 @@
                                 </div>
                                 <div class="device-place device-item body">
                                     {{ deviceIdPlaceMap[item.deviceId] }}
+                                </div>
+                                <div class="device-deal device-item body">
+                                    <div class="withdraw-button">撤回处置</div>
                                 </div>
                             </div>
                         </div>
@@ -234,6 +240,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
+import BackEndRequest from '../../api/backend'
 import { useMapStore, useWarnInfoStore } from '../../store/mapStore'
 import { removeWarningDeviceStyle } from '../bankManage/mapInit.js'
 const props = defineProps({
@@ -409,7 +416,13 @@ const filterDealtWarnInfo = (warnList) => {
     return res
 }
 
-const confirmDealWithWarn = (warnItem) => {
+const confirmDealWithWarn = async (warnItem) => {
+    if (!warnInfoStore.fake) {
+        await BackEndRequest.updateWarnDealtStatus(
+            warnItem.id,
+            1,
+        )
+    }
     if (warnItem.id in warnInfoStore.warnPopupMap) {
         console.log(
             'dealing with this',
@@ -433,14 +446,22 @@ const collapseChange = (opened) => {
     console.log('changed collapse', opened)
 }
 
-watch(() => useWarnInfoStore().curDealId, (newVal) => {
-    if(newVal && newVal != '') {
-        // console.log("123123123123", newVal)
-        startDealWithWarn(newVal-1)
-        console.log('21312313123213', (warnInfoStore.warnInfo_history[newVal-1].id))
-        collapseOpenItem.value.push(warnInfoStore.warnInfo_history[newVal-1].deviceId)
-    }
-})
+watch(
+    () => useWarnInfoStore().curDealId,
+    (newVal) => {
+        if (newVal && newVal != '') {
+            // console.log("123123123123", newVal)
+            startDealWithWarn(newVal - 1)
+            console.log(
+                '21312313123213',
+                warnInfoStore.warnInfo_history[newVal - 1].id,
+            )
+            collapseOpenItem.value.push(
+                warnInfoStore.warnInfo_history[newVal - 1].deviceId,
+            )
+        }
+    },
+)
 
 onMounted(() => {
     warnDetailList.value = warnInfoStore.warnInfo
@@ -450,10 +471,10 @@ onMounted(() => {
 <style lang="scss" scoped>
 div.warn-detail-container {
     position: absolute;
-    right: 1vw;
+    right: 0.5vw;
     top: 10vh;
-    height: 80vh;
-    width: 26vw;
+    height: 43vh;
+    width: 27.5vw;
 
     backdrop-filter: blur(12px);
     box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
@@ -482,11 +503,11 @@ div.warn-detail-container {
     }
 
     div.warn-detail-content {
-        height: 68.5vh;
-        width: 25.5vw;
+        height: 32vh;
+        width: 27vw;
         margin-left: 0.25vw;
 
-        background-color: #6493ff;
+        background-color: #acd7ff6b;
 
         div.accordion-scroll {
             height: 100%;
@@ -643,7 +664,7 @@ div.warn-detail-container {
                 }
 
                 div.device-item {
-                    width: 32%;
+                    width: 28%;
                     height: 4vh;
                     line-height: 4vh;
                     text-align: center;
@@ -655,11 +676,11 @@ div.warn-detail-container {
                     color: #0237b3;
 
                     &.device-id {
-                        width: 12%;
+                        width: 10%;
                     }
 
                     &.device-name {
-                        width: 28%;
+                        width: 24%;
 
                         &.body {
                             font-size: calc(0.5vw + 0.6vh);
@@ -667,7 +688,7 @@ div.warn-detail-container {
                     }
 
                     &.device-time {
-                        width: 26%;
+                        width: 24%;
                         display: flex;
                         flex-flow: row wrap;
                         &.body {
@@ -686,9 +707,13 @@ div.warn-detail-container {
                     }
 
                     &.device-place {
+                        width: 24%;
                         &.body {
-                            font-size: calc(0.5vw + 0.6vh);
+                            font-size: calc(0.4vw + 0.6vh);
                         }
+                    }
+                    &.device-deal {
+                        width: 18%;
                     }
 
                     &.head {
@@ -713,7 +738,7 @@ div.warn-detail-container {
 
     div.plan-button-group {
         height: 5.6vh;
-        width: 25vw;
+        width: 26.5vw;
         margin-left: 0.5vw;
         margin-top: 0.5vh;
 

@@ -81,6 +81,10 @@ const mapInit = async (map, vis) => {
         type: 'vector',
         tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
     })
+    map.addSource('riverBeachSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+    })
     // map.addSource('mzsSectionLineSource', {
     //     type: 'vector',
     //     tiles: [
@@ -100,6 +104,16 @@ const mapInit = async (map, vis) => {
     map.addSource('mzsBankAreaSSource', {
         type: 'vector',
         tiles: [tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}'],
+    })
+
+    map.addLayer({
+        id: 'riverBeachArea',
+        type: 'fill',
+        source: 'riverBeachSource',
+        'source-layer': 'default',
+        paint: {
+            'fill-color': 'rgba(210,244,247, 1)',
+        },
     })
 
     map.addLayer({
@@ -549,7 +563,13 @@ const mapInit = async (map, vis) => {
                 filteredData.forEach((item, index) => {
                     let id = item.deviceId
                     let type = deviceTypeList[id.split('_').pop() - 1]
-                    lastPos = setWarningDeviceStyle(map, type, id, item, index+1)
+                    lastPos = setWarningDeviceStyle(
+                        map,
+                        type,
+                        id,
+                        item,
+                        index + 1,
+                    )
                 })
                 if (filteredData.length != 0) {
                     useWarnInfoStore().warnInfo = filteredData
@@ -572,7 +592,7 @@ const mapInit = async (map, vis) => {
                 filteredData.forEach((item, index) => {
                     let id = item.deviceId
                     let type = typeList[id.split('_').pop() - 1]
-                    setWarningDeviceStyle(map, type, id, item, index+1)
+                    setWarningDeviceStyle(map, type, id, item, index + 1)
                 })
                 if (filteredData.length != 0)
                     useWarnInfoStore().warnInfo = filteredData
@@ -583,7 +603,13 @@ const mapInit = async (map, vis) => {
     }
 }
 
-const setWarningDeviceStyle = (map, deviceLayer, deviceCode, warnData, index) => {
+const setWarningDeviceStyle = (
+    map,
+    deviceLayer,
+    deviceCode,
+    warnData,
+    index,
+) => {
     // const pulsingCVSMap = {
     //     GNSS: 'point',
     //     测斜仪: 'rectangle',
@@ -668,7 +694,7 @@ const createWarningPopup = (info) => {
         maxWidth: '1500px',
         offset: 25,
         closeOnClick: false,
-        closeButton:true
+        closeButton: true,
     }).setDOMContent(domwithComp)
     return popUp
 }
@@ -712,14 +738,17 @@ const warnInterval = async (map, minute) => {
     filteredData.forEach((item, index) => {
         let id = item.deviceId
         let type = 'GNSS'
-        lastPos = setWarningDeviceStyle(map, type, id, item, index+1)
+        lastPos = setWarningDeviceStyle(map, type, id, item, index + 1)
     })
     console.log('in interval, ', filteredData)
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)
     if (filteredData.length != 0) {
         useWarnInfoStore().warnInfo = filteredData
         useWarnInfoStore().warnInfo_history = [...allWarnData]
-        console.log('in interval history warn', useWarnInfoStore().warnInfo_history)
+        console.log(
+            'in interval history warn',
+            useWarnInfoStore().warnInfo_history,
+        )
     }
     // console.log('first-warnInterval!', filteredData)
 

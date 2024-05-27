@@ -15,11 +15,22 @@
     <select id="getVectorCenterPtTile" resultType="java.lang.Object"  parameterType="com.johnny.bank.model.common.TileBox">
         select st_asmvt(result, #{visualId}) tile
         from(
-            select st_asmvtgeom(ST_Centroid(geom), ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
+            select st_asmvtgeom(ST_PointOnSurface(geom), ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
             <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
                 ${field}
             </foreach>
             from ${name}
+        ) as result
+    </select>
+
+    <select id="getVectorGeomCenterPtTile" resultType="java.lang.Object"  parameterType="com.johnny.bank.model.common.TileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+        select st_asmvtgeom(ST_Centroid(geom), ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from ${name}
         ) as result
     </select>
 

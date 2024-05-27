@@ -2,7 +2,6 @@
     <div
         class="realtime-video-container"
         :class="props.active ? 'active' : 'in-active'"
-        v-if="props.active"
     >
         <div class="realtime-video-title">实时视频监控</div>
         <div
@@ -25,6 +24,7 @@
             <div class="video-focus" v-if="item.order != 0" @click="focusOn(index)">
                 放大/控制
             </div>
+            <div class="small-pic" v-if="item.order == 0" :id="index"></div>
         </div>
         <div class="video-controller-container">
             <div class="video-controller-title">当前监控云台控制</div>
@@ -126,7 +126,7 @@ let presetParam = {
 
 const functionIndexList = [0, 1, 2, 3, 8, 9, 10, 11]
 
-let curBigVideoIndex = 0
+let curBigVideoIndex = ref(0)
 
 const videoList = ref([
     {
@@ -156,15 +156,15 @@ const videoList = ref([
 ])
 
 const focusOn = (index) => {
-    ;[videoList.value[curBigVideoIndex].order, videoList.value[index].order] = [
+    ;[videoList.value[curBigVideoIndex.value].order, videoList.value[index].order] = [
         videoList.value[index].order,
-        videoList.value[curBigVideoIndex].order,
+        videoList.value[curBigVideoIndex.value].order,
     ]
-    curBigVideoIndex = index
+    curBigVideoIndex.value = index
 }
 
 const basicVideoFunction = async (functionIndex) => {
-    controlParam.deviceSerial = videoList.value[curBigVideoIndex].deviceId
+    controlParam.deviceSerial = videoList.value[curBigVideoIndex.value].deviceId
     controlParam.direction = functionIndexList[functionIndex]
     // console.log('curent func param', controlParam)
     let stRes = await axios.post(
@@ -187,7 +187,7 @@ const basicVideoFunction = async (functionIndex) => {
 }
 
 const move2PresetPoint = async (presetIndex) => {
-    presetParam.deviceSerial = videoList.value[curBigVideoIndex].deviceId
+    presetParam.deviceSerial = videoList.value[curBigVideoIndex.value].deviceId
     presetParam.index = presetIndex
     // console.log('preset param', presetParam)
     let stRes = await axios.post(
@@ -264,6 +264,12 @@ div.realtime-video-container {
     background-color: rgba(156, 195, 255, 0.4);
     border-radius: 4px;
     border: 2px solid rgb(28, 105, 247);
+    overflow: hidden;
+    
+
+    &.in-active {
+        height: 37.5vh;
+    }
 
     div.realtime-video-title {
         height: 4vh;
@@ -329,6 +335,30 @@ div.realtime-video-container {
                 background-color: #0037ad;
                 color: #9df8ff;
                 cursor: pointer;
+            }
+        }
+
+        div.small-pic {
+            width: 8vw;
+            height: 8vh;
+
+            position: relative;
+            top: -32vh;
+            right: -19vw;
+            background-color: #ffffff8e;
+
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+
+            &[id="0"] {
+                background-image: url('/mzsBase-monitor3.png');
+            }
+            &[id="1"] {
+                background-image: url('/mzsBase-monitor2.png');
+            }
+            &[id="2"] {
+                background-image: url('/mzsBase-monitor1.png');
             }
         }
 
@@ -566,7 +596,7 @@ div.realtime-video-container {
 
     transition: transform 0.2s ease-in-out;
     &.in-active {
-        transform: translateX(30vw);
+        top: 54vh;
     }
 }
 </style>

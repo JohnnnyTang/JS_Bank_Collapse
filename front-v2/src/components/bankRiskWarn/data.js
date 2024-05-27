@@ -100,7 +100,7 @@ export const profileListInput = [
     {
         value: 1,
         id: 'JC01',
-        label: '断面 JC01',
+        label: 'MZ01围堤',
         name: 'MZ01围堤',
         nickname: '围堤',
         filter: ['==', 'name', 'JC01'],
@@ -111,7 +111,7 @@ export const profileListInput = [
     {
         value: 2,
         id: 'JC02',
-        label: '断面 JC02',
+        label: 'MZ02顺堤',
         name: 'MZ02顺堤',
         nickname: '顺堤',
         filter: ['==', 'name', 'JC02'],
@@ -122,7 +122,7 @@ export const profileListInput = [
     {
         value: 3,
         id: 'JC03',
-        label: '断面 JC03',
+        label: 'MZ03顺堤尾',
         name: 'MZ03顺堤尾',
         nickname: '顺堤尾',
         filter: ['==', 'name', 'JC03'],
@@ -133,7 +133,7 @@ export const profileListInput = [
     {
         value: 4,
         id: 'JC04',
-        label: '断面 JC04',
+        label: 'MZ04江滩办',
         name: 'MZ04江滩办',
         nickname: '江滩办',
         filter: ['==', 'name', 'JC04'],
@@ -144,7 +144,7 @@ export const profileListInput = [
     {
         value: 5,
         id: 'JC05',
-        label: '断面 JC05',
+        label: 'MZ05小港池',
         name: 'MZ05小港池',
         nickname: '小港池',
         filter: ['==', 'name', 'JC05'],
@@ -155,7 +155,7 @@ export const profileListInput = [
     {
         value: 6,
         id: 'JC06',
-        label: '断面 JC06',
+        label: 'MZ06张靖皋桥位',
         name: 'MZ06张靖皋桥位',
         nickname: '张靖皋桥位',
         filter: ['==', 'name', 'JC06'],
@@ -166,7 +166,7 @@ export const profileListInput = [
     {
         value: 7,
         id: 'JC07',
-        label: '断面 JC07',
+        label: 'MZ07桥位下游',
         name: 'MZ07桥位下游',
         nickname: '桥位下游',
         filter: ['==', 'name', 'JC07'],
@@ -177,7 +177,7 @@ export const profileListInput = [
     {
         value: 8,
         id: 'JC08',
-        label: '断面 JC08',
+        label: 'MZ08海事码头',
         name: 'MZ08海事码头',
         nickname: '海事码头',
         filter: ['==', 'name', 'JC08'],
@@ -188,7 +188,7 @@ export const profileListInput = [
     {
         value: 9,
         id: 'JC09',
-        label: '断面 JC09',
+        label: 'MZ09码头下游',
         name: 'MZ09码头下游',
         nickname: '码头下游',
         filter: ['==', 'name', 'JC09'],
@@ -199,7 +199,7 @@ export const profileListInput = [
     {
         value: 10,
         id: 'JC10',
-        label: '断面 JC10',
+        label: 'MZ10雷达站',
         name: 'MZ10雷达站',
         nickname: '雷达站',
         filter: ['==', 'name', 'JC10'],
@@ -210,7 +210,7 @@ export const profileListInput = [
     {
         value: 11,
         id: 'JC11',
-        label: '断面 JC11',
+        label: 'MZ11主路',
         name: 'MZ11主路',
         nickname: '主路',
         filter: ['==', 'name', 'JC11'],
@@ -221,7 +221,7 @@ export const profileListInput = [
     {
         value: 12,
         id: 'JC12',
-        label: '断面 JC12',
+        label: 'MZ12沙尾',
         name: 'MZ12沙尾',
         nickname: '沙尾',
         filter: ['==', 'name', 'JC12'],
