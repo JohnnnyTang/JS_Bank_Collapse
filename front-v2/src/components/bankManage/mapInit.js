@@ -508,7 +508,7 @@ const mapInit = async (map, vis) => {
                     'bottom-left',
                     'bottom-right',
                 ],
-                'text-radial-offset': 1
+                'text-radial-offset': 1,
             },
             paint: {
                 'text-color': 'rgba(255,127, 0, 0.75)',
@@ -552,7 +552,7 @@ const mapInit = async (map, vis) => {
                     'bottom-left',
                     'bottom-right',
                 ],
-                'text-radial-offset': 1
+                'text-radial-offset': 1,
             },
             paint: {
                 'text-color': 'rgba(255,127, 0, 0.9)',
@@ -568,7 +568,7 @@ const mapInit = async (map, vis) => {
                 'icon-allow-overlap': true,
             },
         })
-        
+
         map.addLayer({
             id: '测斜仪-标注',
             type: 'symbol',
@@ -597,7 +597,7 @@ const mapInit = async (map, vis) => {
                     'bottom-left',
                     'bottom-right',
                 ],
-                'text-radial-offset': 1
+                'text-radial-offset': 1,
             },
             paint: {
                 'text-color': 'rgba(127,0,255, 0.9)',
@@ -641,7 +641,7 @@ const mapInit = async (map, vis) => {
                     'bottom-left',
                     'bottom-right',
                 ],
-                'text-radial-offset': 1
+                'text-radial-offset': 1,
             },
             paint: {
                 'text-color': 'rgba(14,242,30, 0.9)',
@@ -685,7 +685,7 @@ const mapInit = async (map, vis) => {
                     'bottom-left',
                     'bottom-right',
                 ],
-                'text-radial-offset': 1
+                'text-radial-offset': 1,
             },
             paint: {
                 'text-color': 'rgba(255,0,255, 0.9)',
@@ -729,7 +729,7 @@ const mapInit = async (map, vis) => {
                     'bottom-left',
                     'bottom-right',
                 ],
-                'text-radial-offset': 1
+                'text-radial-offset': 1,
             },
             paint: {
                 'text-color': 'rgba(3,5,255, 0.9)',
@@ -822,6 +822,31 @@ const mapInit = async (map, vis) => {
     }
 }
 
+function generateCircleLineString(x, y, radius, numPoints = 24) {
+    const points = []
+    const angleStep = (2 * Math.PI) / numPoints
+
+    for (let i = 0; i < numPoints; i++) {
+        const angle = i * angleStep
+        const pointX = x + radius * Math.cos(angle)
+        const pointY = y + radius * Math.sin(angle)
+        points.push([pointX, pointY])
+    }
+
+    // Close the circle by adding the first point at the end
+    points.push(points[0])
+
+    return {
+        type: 'FeatureCollection',
+        features: [
+            {
+                type: 'Polygon',
+                coordinates: points,
+            },
+        ],
+    }
+}
+
 const setWarningDeviceStyle = (
     map,
     deviceLayer,
@@ -841,36 +866,55 @@ const setWarningDeviceStyle = (
     //     孔隙水压力计: 'manometer-dot-pulsing',
     //     应力桩: 'stress-dot-pulsing',
     // }
-    const pulsingImageId = 'gnss-dot-pulsing' //only one style
+    // const pulsingImageId = 'gnss-dot-pulsing' //only one style
     const sourceMap = {
         GNSS: 'gnss-source',
         测斜仪: 'incline-source',
         孔隙水压力计: 'manometer-source',
         应力桩: 'stress-source',
     }
-
-    if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
-        map.addLayer({
-            id: `${deviceLayer}-${deviceCode}`,
-            // type: 'symbol',
-            type: 'circle',
-            source: sourceMap[deviceLayer],
-            layout: {
-                // 'icon-image': pulsingImageId,
-                // 'icon-size': 1,
-                // 'icon-allow-overlap': true,
-            },
-            paint:{
-                'circle-radius': 10.0,
-                'circle-pitch-alignment': 'map',
-            },
-            filter: ['all', ['==', 'code', deviceCode]],
-        })
-    }
     let json = map.getSource(sourceMap[deviceLayer])['_data']
 
     let property = findProptyFromJson(json, deviceCode)
     propertyRef.value = property
+
+
+    if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
+        if (!map.getSource(`${deviceLayer}-${deviceCode}-source`)) {
+            const circleJson = generateCircleLineString(
+                property.longitude,
+                property.latitude,
+                0.5,
+            )
+            console.log('circle circle', circleJson)
+            map.addSource(`${deviceLayer}-${deviceCode}-source`, {
+                type: 'geojson',
+                data: circleJson,
+            })
+        }
+        map.addLayer(
+            {
+                id: `${deviceLayer}-${deviceCode}`,
+                // type: 'symbol',
+                type: 'fill',
+                source: `${deviceLayer}-${deviceCode}-source`,
+                layout: {
+                    // 'icon-image': pulsingImageId,
+                    // 'icon-size': 1,
+                    // 'icon-allow-overlap': true,
+                },
+                paint: {
+                    'fill-color': 'rgba(233, 0, 0, 0.6)',
+                    // 'circle-blur': 20
+                },
+            },
+            'mzsBankLine',
+        )
+    }
+    // let json = map.getSource(sourceMap[deviceLayer])['_data']
+
+    // let property = findProptyFromJson(json, deviceCode)
+    // propertyRef.value = property
 
     // warning
     const popup = createWarningPopup({ warningInfo: warnData, index })
