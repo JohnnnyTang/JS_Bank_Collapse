@@ -76,53 +76,54 @@
                         </div>
                     </dv-border-box12>
                 </div>
-                <div class="section-selector">
-                    <div class="section-selectior-item type">
-                        <el-select
-                            v-model="selectedDeviceType"
-                            placeholder="选择设备类型"
-                            style="width: 12vw; height: 3.5vh"
-                            @change="deviceTypeSelectChange"
-                        >
-                            <el-option
-                                v-for="item in deviceTypeList"
-                                :key="item"
-                                :label="'设备类型：' + item"
-                                :value="item"
-                            >
-                                <span class="section-name-text">{{
-                                    item
-                                }}</span>
-                            </el-option>
-                        </el-select>
-                    </div>
-                    <div class="section-selectior-item">
-                        <el-select
-                            v-model="selectedDevice"
-                            placeholder="选择具体设备"
-                            style="width: 6vw; height: 3.5vh"
-                            @change="deviceSelectChange"
-                        >
-                            <el-option
-                                v-for="item in deviceList"
-                                :key="item"
-                                :label="item"
-                                :value="item"
-                            >
-                                <span class="section-name-text">{{
-                                    item
-                                }}</span>
-                            </el-option>
-                        </el-select>
-                    </div>
-                    <!-- <div class="nav-data-button" @click="navToMoreData">
-                        更多数据
-                    </div> -->
-                </div>
+
                 <div class="device-chart-container">
                     <dv-border-box10
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
                     >
+                        <div class="section-selector">
+                            <div class="section-selectior-item type">
+                                <el-select
+                                    v-model="selectedDeviceType"
+                                    placeholder="选择设备类型"
+                                    style="width: 12vw; height: 3.5vh"
+                                    @change="deviceTypeSelectChange"
+                                >
+                                    <el-option
+                                        v-for="item in deviceTypeList"
+                                        :key="item"
+                                        :label="'设备类型：' + item"
+                                        :value="item"
+                                    >
+                                        <span class="section-name-text">{{
+                                            item
+                                        }}</span>
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <div class="section-selectior-item">
+                                <el-select
+                                    v-model="selectedDevice"
+                                    placeholder="选择具体设备"
+                                    style="width: 6vw; height: 3.5vh"
+                                    @change="deviceSelectChange"
+                                >
+                                    <el-option
+                                        v-for="item in deviceList"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item"
+                                    >
+                                        <span class="section-name-text">{{
+                                            item
+                                        }}</span>
+                                    </el-option>
+                                </el-select>
+                            </div>
+                            <!-- <div class="nav-data-button" @click="navToMoreData">
+                        更多数据
+                    </div> -->
+                        </div>
                         <div
                             class="device-chart-dom"
                             ref="chartDom"
@@ -387,7 +388,7 @@ watch(
         // console.log('warn', warnData)
         newVal.map((item, index) => {
             warnDataCount[+(item.deviceId.split('_').pop() - 1)] =
-            warnDataCount[+(item.deviceId.split('_').pop() - 1)] + 1
+                warnDataCount[+(item.deviceId.split('_').pop() - 1)] + 1
         })
         warnDeviceCount.value = warnDataCount
         // console.log(warnDeviceCount)
@@ -626,102 +627,11 @@ div.device-info-container {
             // background-color: #2622fd;
         }
 
-        div.section-selector {
-            height: 3.5vh;
-            width: 21vw;
-            margin-left: 1vw;
-
-            // background-color: #6493ff;
-            display: flex;
-            flex-flow: row nowrap;
-            justify-content: center;
-            column-gap: 0.25vw;
-
-            div.section-selectior-item {
-                width: 6vw;
-                height: 3.3vh;
-
-                line-height: 3.3vh;
-                text-align: center;
-
-                // background-color: #eef3ff;
-                :deep(.el-select) {
-                    height: 3.3vh;
-                    box-shadow:
-                        rgba(0, 132, 255, 0.8) 1px 1px,
-                        rgba(0, 119, 255, 0.7) 2px 2px,
-                        rgba(0, 119, 255, 0.6) 3px 4px;
-                    border-radius: 3px;
-                }
-
-                :deep(.el-select__wrapper) {
-                    height: 3.3vh;
-                    line-height: 3.3vh;
-                    border-radius: 3px;
-                    font-family: 'Microsoft YaHei';
-                    font-weight: bold;
-                    font-size: calc(0.5vw + 0.7vh);
-                    background-color: #e6f7ff;
-                }
-
-                &.type {
-                    width: 12vw;
-                    :deep(.el-select__wrapper) {
-                        font-size: calc(0.5vw + 0.5vh);
-                    }
-                }
-
-                :deep(.el-select__placeholder) {
-                    color: #1267c9;
-                }
-
-                :deep(.el-icon) {
-                    width: 0.5vw;
-                    height: 0.5vw;
-
-                    svg {
-                        width: 0.5vw;
-                        height: 0.5vw;
-
-                        path {
-                            fill: #001cb8;
-                        }
-                    }
-                }
-            }
-
-            div.nav-data-button {
-                width: 4vw;
-                height: 3.5vh;
-
-                background-color: #0748aa;
-
-                box-shadow:
-                    rgba(0, 132, 255, 0.8) 1px 1px,
-                    rgba(0, 119, 255, 0.7) 2px 2px,
-                    rgba(0, 119, 255, 0.6) 3px 3px;
-                border-radius: 6px;
-
-                line-height: 3.5vh;
-                text-align: center;
-                color: #c4fbff;
-                font-size: calc(0.5vw + 0.4vh);
-                transition: all 0.1s ease-in-out;
-
-                &:hover {
-                    cursor: pointer;
-                    transform: translate3d(2px, 2px, 2px);
-                    font-weight: bold;
-                    box-shadow: rgba(0, 132, 255, 0.8) 1px 1px;
-                }
-            }
-        }
-
         div.device-chart-container {
             width: 95%;
             margin-left: 2.5%;
-            height: 30vh;
-            margin-top: 1vh;
+            height: 34vh;
+            margin-top: 0.5vh;
             border-radius: 10px;
 
             // background-color: #6493ff;
@@ -729,11 +639,104 @@ div.device-info-container {
             div.device-chart-dom {
                 width: 96%;
                 margin-left: 2%;
-                height: 96%;
+                height: 85%;
                 padding-top: 2%;
                 padding-bottom: 2%;
 
                 // background-color: #2a5fdb;
+            }
+
+            div.section-selector {
+                height: 3.5vh;
+                width: 21vw;
+                margin-left: 1vw;
+                padding-top: 0.5vh;
+                // margin-top: 0.5vh;
+
+                // background-color: #6493ff;
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: center;
+                column-gap: 0.25vw;
+
+                div.section-selectior-item {
+                    width: 6vw;
+                    height: 3.3vh;
+
+                    line-height: 3.3vh;
+                    text-align: center;
+
+                    // background-color: #eef3ff;
+                    :deep(.el-select) {
+                        height: 3.3vh;
+                        box-shadow:
+                            rgba(0, 132, 255, 0.8) 1px 1px,
+                            rgba(0, 119, 255, 0.7) 2px 2px,
+                            rgba(0, 119, 255, 0.6) 3px 4px;
+                        border-radius: 3px;
+                    }
+
+                    :deep(.el-select__wrapper) {
+                        height: 3.3vh;
+                        line-height: 3.3vh;
+                        border-radius: 3px;
+                        font-family: 'Microsoft YaHei';
+                        font-weight: bold;
+                        font-size: calc(0.5vw + 0.7vh);
+                        background-color: #e6f7ff;
+                    }
+
+                    &.type {
+                        width: 12vw;
+                        :deep(.el-select__wrapper) {
+                            font-size: calc(0.5vw + 0.5vh);
+                        }
+                    }
+
+                    :deep(.el-select__placeholder) {
+                        color: #1267c9;
+                    }
+
+                    :deep(.el-icon) {
+                        width: 0.5vw;
+                        height: 0.5vw;
+
+                        svg {
+                            width: 0.5vw;
+                            height: 0.5vw;
+
+                            path {
+                                fill: #001cb8;
+                            }
+                        }
+                    }
+                }
+
+                div.nav-data-button {
+                    width: 4vw;
+                    height: 3.5vh;
+
+                    background-color: #0748aa;
+
+                    box-shadow:
+                        rgba(0, 132, 255, 0.8) 1px 1px,
+                        rgba(0, 119, 255, 0.7) 2px 2px,
+                        rgba(0, 119, 255, 0.6) 3px 3px;
+                    border-radius: 6px;
+
+                    line-height: 3.5vh;
+                    text-align: center;
+                    color: #c4fbff;
+                    font-size: calc(0.5vw + 0.4vh);
+                    transition: all 0.1s ease-in-out;
+
+                    &:hover {
+                        cursor: pointer;
+                        transform: translate3d(2px, 2px, 2px);
+                        font-weight: bold;
+                        box-shadow: rgba(0, 132, 255, 0.8) 1px 1px;
+                    }
+                }
             }
         }
     }

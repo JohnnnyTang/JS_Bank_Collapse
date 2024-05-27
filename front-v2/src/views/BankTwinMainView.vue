@@ -741,7 +741,7 @@ div.twin-main-container {
     div.visual-tab-container {
         position: absolute;
         top: 2vh;
-        right: 15vw;
+        right: 1vw;
 
         width: 10vw;
         height: 6vh;
@@ -810,7 +810,7 @@ div.twin-main-container {
                         justify-content: flex-start;
                         align-items: center;
                         width: fit-content;
-                        transform: translateX(4vw);
+                        transform: translateX(0.6vw);
                     }
                 }
             }
