@@ -29,7 +29,7 @@
             </div> -->
             <div class="profile-condition-container">
                 <div class="profile-condition-text">
-                    当前使用条件：洪季
+                    当前水文条件：洪季
                 </div>
             </div>
             <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>

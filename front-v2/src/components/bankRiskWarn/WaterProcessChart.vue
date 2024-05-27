@@ -19,7 +19,7 @@
         </div> -->
         <div class="profile-condition-container">
             <div class="profile-condition-text">
-                当前使用条件：洪季
+                当前水文条件：洪季
             </div>
         </div>
     </div>
@@ -289,20 +289,15 @@ const option = {
                 },
                 data: [
                     {
-                        name: '0小时',
+                        name: "timeStep",
                         xAxis: `${props.timeStep}`,
                         label: {
-                            normal: {
-                                show: true,
-                                position: 'left',
-                                formatter: () => {
-                                    return "0小时";
-                                },
-                                textStyle: {
-                                    color: 'black',
-                                    fontSize: 13
-                                }
-                            }
+                            formatter: `${props.timeStep}小时`,
+                            backgroundColor: 'rgb(208, 236, 255)',
+                            color: '#0091FF',
+                            fontSize: '15px',
+                            position: 'end',
+                            offset: [0, 10],
                         }
                     }
                 ]
@@ -342,6 +337,7 @@ watch(
     // 监视timeStep变量移动
     () => props.timeStep, (newVal) => {
         option.series[0].markLine.data[0].xAxis = newVal;
+        option.series[0].markLine.data[0].label.formatter = `${newVal}小时`;
         chart.setOption(option);
     }
 )
