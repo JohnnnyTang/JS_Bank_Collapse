@@ -83,7 +83,7 @@ const initBaseMap = (ref) => {
             // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
             style: getStyleJson4base(),
             center: [120.312, 31.917], // starting position [lng, lat]
-            maxZoom: 18,
+            maxZoom: 14,
             zoom: 8,
             projection: 'mercator',
             antialias: true,

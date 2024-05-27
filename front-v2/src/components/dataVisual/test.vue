@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import { initMap, initScratchMap, loadImage, initPureScratchMap } from '../../utils/mapUtils'
+import { initMap, initScratchMap, loadImage, initPureScratchMap,initBaseMap } from '../../utils/mapUtils'
 import { onMounted, watch, ref } from 'vue'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
@@ -39,40 +39,53 @@ const mapFlyToRiver = (mapIns) => {
 
 onMounted(async () => {
 
-    const map = await initPureScratchMap(mapDom.value)
+    const map = await initBaseMap(mapDom.value)
 
     mapFlyToRiver(map)
 
-    // map.addSource('channelLine', {
-    //     type: 'vector',
-    //     tiles: [
-    //         tileServer + '/tile/vector/riverBridge/{x}/{y}/{z}',
-    //     ],
-    // })
-    map.addSource('channelLine', {
-        type: 'vector',
-        tiles: [
-            // tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
-            tileServer + '/tile/vector/riverBridge/{x}/{y}/{z}',
-        ],
+    await layerAddFunction(map, '已建通道')
+    await layerAddFunction(map, '在建通道')
+    await layerAddFunction(map, '规划通道')
+    // await layerAddFunction(map,'已建通道-注记')
+    // await layerAddFunction(map,'在建通道-注记')
+    // await layerAddFunction(map,'规划通道-注记')
+
+    // await layerAddFunction(map, '洲滩')
+    // await layerAddFunction(map, '洲滩-注记')
+
+    // await layerAddFunction(map, '大中型泵站')
+    // await layerAddFunction(map, '其他泵站')
+   
+    // await layerAddFunction(map, '大中型水闸')
+    // await layerAddFunction(map, '水闸工程-重点')
+    // await layerAddFunction(map, '其他水闸')
+
+    // await layerAddFunction(map, '其他泵站-注记')
+    // await layerAddFunction(map, '大中型泵站-注记')
+    // await layerAddFunction(map, '大中型水闸-注记')
+    // await layerAddFunction(map, '其他水闸-注记')
+
+    // await layerAddFunction(map, '区域性骨干河道')
+    // await layerAddFunction(map, '流域性河道')
+    // await layerAddFunction(map, '其他河道')
+    // await layerAddFunction(map, '区域性骨干河道-注记')
+    // await layerAddFunction(map, '流域性河道-注记')
+    // await layerAddFunction(map, '其他河道-注记')
+
+    // await layerAddFunction(map, '水文站点')
+    // await layerAddFunction(map, '水文站点-注记')
+    // await layerAddFunction(map, '大型湖泊')
+    // await layerAddFunction(map, '大型湖泊-注记')
+
+
+    map.on('click', ['区域性骨干河道'],(e) => {
+        console.log(e.features[0]);
     })
-    !map.getLayer('已建通道') &&
-        map.addLayer({
-            id: '已建通道',
-            type: 'line',
-            source: 'channelLine',
-            'source-layer': 'default',
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                // 'line-pattern': '已建',
-                'line-width': 13,
 
-            },
-        })
-
+    window.addEventListener('keydown',()=>{
+        console.log(map.getZoom());
+    })
+   
 
     // const scriptInteract = document.createElement('script')
     // scriptInteract.src = './src/utils/unityInteraction.js'

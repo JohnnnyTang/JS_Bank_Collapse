@@ -5,10 +5,10 @@
         <!-- <div class="selector-container">
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div> -->
-                <!-- <div class="confirm-button" @click="confirmProfileTime">
+        <!-- <div class="confirm-button" @click="confirmProfileTime">
                     <div class="confirm-button-text">确认选择</div>
                 </div> -->
-                <!-- <div class="place selector-content">
+        <!-- <div class="place selector-content">
                     <el-select
                         class="side"
                         v-model="placeValue"
@@ -32,8 +32,8 @@
                 </div>
             </div>
             <div class="scene-selector-container selector-item-container"> -->
-                <!-- 11<div class="scene-title selector-title">评估情景：</div> -->
-                <!-- <div class="before-scene-title selector-title">对比地形:</div>
+        <!-- 11<div class="scene-title selector-title">评估情景：</div> -->
+        <!-- <div class="before-scene-title selector-title">对比地形:</div>
                 <div class="before-scene selector-content">
                     <el-select
                         class="before"
@@ -60,10 +60,10 @@
                                 >{{ item.time }}</span
                             >
                         </el-option> -->
-                <!-- 11<template #footer>
+        <!-- 11<template #footer>
                             <div class="add-select-button">新增评估情景</div>
                         </template> -->
-                <!-- </el-select>
+        <!-- </el-select>
                 </div>
                 <div class="now-scene-title selector-title">当前地形:</div>
                 <div class="now-scene selector-content">
@@ -92,12 +92,12 @@
                                 >{{ item.time }}</span
                             >
                         </el-option> -->
-                <!-- 11<template #footer>
+        <!-- 11<template #footer>
                             <div class="add-select-button">新增评估情景</div>
                         </template> -->
-                <!-- </el-select>
+        <!-- </el-select>
                 </div> -->
-                <!-- <div class="risk-year-container">
+        <!-- <div class="risk-year-container">
                     <div class="risk-year-title">风险评估数据时效：</div>
                     <div class="risk-year-content">2023年汛后</div>
                 </div>
@@ -105,20 +105,19 @@
         </div> -->
 
         <div class="basic-info-container">
-            <e-border-box-3 text="基本信息" background-color="#0446a8">
                 <div class="basic-info-content">
                     <div class="title-container">民主沙右缘示范段</div>
                     <div class="key-val-container">
                         <div class="key-text">预警级别：</div>
                         <div class="val-text">Ⅰ级</div>
                     </div>
-                    <div class="key-val-container">
+                    <div class="key-val-container right">
                         <div class="key-text">岸段长度：</div>
                         <div class="val-text">全长7公里</div>
                     </div>
                 </div>
-            </e-border-box-3>
         </div>
+        <div class="risk-item-title">崩岸风险因素分析</div>
 
         <div class="risk-item-container">
             <div class="risk-item" :class="{ active: showWaterPower }">
@@ -132,7 +131,10 @@
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
-                    <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
+                    <dv-border-box-12
+                        :color="['rgb(73, 164, 101)', '#9cf3e0']"
+                        v-if="showRiverBed"
+                    ></dv-border-box-12>
                     <div class="risk-item-text">河床演变分析</div>
                 </div>
             </div>
@@ -141,7 +143,10 @@
                     class="risk-main-index bankGeology"
                     @click="showGeologyAndProjectFunc"
                 >
-                    <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']" v-if="showGeologyAndProject"></dv-border-box-12>
+                    <dv-border-box-12
+                        :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
+                        v-if="showGeologyAndProject"
+                    ></dv-border-box-12>
                     <div class="risk-item-text">岸坡地质分析</div>
                 </div>
             </div>
@@ -150,7 +155,10 @@
                     class="risk-main-index outproject"
                     @click="showGeologyAndProjectFunc"
                 >
-                    <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']" v-if="showGeologyAndProject"></dv-border-box-12>
+                    <dv-border-box-12
+                        :color="['rgb(165, 142, 78)', '#e5ee98']"
+                        v-if="showGeologyAndProject"
+                    ></dv-border-box-12>
                     <div class="risk-item-text">外部因素分析</div>
                 </div>
             </div>
@@ -172,7 +180,11 @@
 
         <div class="bankLine-control-block">
             <label class="switch">
-                <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
+                <input
+                    type="checkbox"
+                    :checked="showBankLine"
+                    @click="BankLineControlHandler()"
+                />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -187,7 +199,7 @@
                 <img src="/up_triangle.png" alt="图例标记">
             </div> -->
             <div class="risk-line-arrow high">
-                <img src="/down_triangle.png" alt="图例标记">
+                <img src="/down_triangle.png" alt="图例标记" />
             </div>
             <div class="risk-line-mark low">低风险</div>
             <div class="risk-line-mark middle">中风险</div>
@@ -204,9 +216,11 @@
         <div v-if="showRiskStatus" class="warn-detail-container high">
             <div class="warn-detail-profile">
                 <div class="warn-detail-text">
-                    <span class="warn-detail-span">          </span>
+                    <span class="warn-detail-span"> </span>
                     高风险区域集中在：
-                    <span class="warn-detail-span">{{ getRiskAreas('high') }}</span>
+                    <span class="warn-detail-span">{{
+                        getRiskAreas('high')
+                    }}</span>
                 </div>
             </div>
         </div>
@@ -457,6 +471,7 @@ import {
     onUnmounted,
     defineAsyncComponent,
 } from 'vue'
+import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -486,6 +501,7 @@ import {
     InfoTree,
     waterCondition,
 } from '../components/bankRiskWarn/data'
+import { loadImage } from '../utils/mapUtils'
 // import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 // import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
@@ -681,7 +697,12 @@ const sureSceneRese = async () => {
     addRasterLayer(mapInstance, time, 'mapRaster')
     mapInstance.moveLayer('mapRaster', 'mzsLine')
     // 计算各个断面数据
-    ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompareBefore, sceneCompareNow)
+    ProfileLoadingProcess(
+        sceneBefore,
+        sceneNow,
+        sceneCompareBefore,
+        sceneCompareNow,
+    )
 }
 
 const changeProfileValue = (value) => {
@@ -692,7 +713,12 @@ const changeProfileValue = (value) => {
 }
 
 // 加载断面数据和图层1
-const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompareBefore, sceneCompareNow) => {
+const ProfileLoadingProcess = async (
+    sceneBefore,
+    sceneNow,
+    sceneCompareBefore,
+    sceneCompareNow,
+) => {
     const before = sceneBefore.date
     const now = sceneNow.date
     const compareBefore = sceneCompareBefore.date
@@ -706,26 +732,38 @@ const ProfileLoadingProcess = async (sceneBefore, sceneNow, sceneCompareBefore, 
     if (exist && existCompare) {
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
+        profileDataCompare.value = await getProfileData(
+            compareBefore,
+            compareNow,
+        )
     } else if (exist && !existCompare) {
-        loading_message.value = '地形对比结果计算中...'
+        loading_message.value = '地形对比数据加载中...'
         await CalProfile(compareBefore, compareNow)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
+        profileDataCompare.value = await getProfileData(
+            compareBefore,
+            compareNow,
+        )
     } else if (!exist && existCompare) {
-        loading_message.value = '地形对比结果计算中...'
+        loading_message.value = '地形对比数据加载中...'
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
+        profileDataCompare.value = await getProfileData(
+            compareBefore,
+            compareNow,
+        )
     } else {
-        loading_message.value = '地形对比结果计算中...'
+        loading_message.value = '地形对比数据加载中...'
         await CalProfile(compareBefore, compareNow)
         await CalProfile(before, now)
         loading_message.value = '地形对比数据加载中...'
         profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(compareBefore, compareNow)
+        profileDataCompare.value = await getProfileData(
+            compareBefore,
+            compareNow,
+        )
     }
     // loading_message.value = "地形对比结果计算中..."
     // await CalProfile(before, now)
@@ -982,7 +1020,6 @@ let sceneBefore
 let sceneNow
 let sceneCompareBefore
 let sceneCompareNow
-
 
 // 窗口显示变量
 const showRiskStatus = ref(false)
@@ -1399,7 +1436,7 @@ const addBankLineRiskLayer = (map, profileList) => {
 }
 
 onMounted(async () => {
-    await initScratchMap(mapContainer.value).then((map) => {
+    await initScratchMap(mapContainer.value).then(async (map) => {
         mapInstance = map
         map.on('draw.create', function (e) {
             sectionConfirmShow.value = true
@@ -1449,6 +1486,10 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
         })
+        map.addSource('fixProjectAreaSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}'],
+        })
         addRasterLayer(map, 23032209, 'mapRaster')
         map.setLayoutProperty('mapRaster', 'visibility', 'none')
         map.addLayer({
@@ -1473,7 +1514,9 @@ onMounted(async () => {
         })
         map.addSource('fixProjectAreaLabelSource', {
             type: 'vector',
-            tiles: [tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}'],
+            tiles: [
+                tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}',
+            ],
         })
         map.addLayer({
             id: 'fjsFixLine',
@@ -1491,7 +1534,7 @@ onMounted(async () => {
             },
         })
         map.addLayer({
-            id: 'fixProjectLayer',
+            id: 'fixProjectFillLayer',
             type: 'fill',
             source: 'fixProjectAreaSource',
             'source-layer': 'default',
@@ -1514,6 +1557,16 @@ onMounted(async () => {
             },
             paint: {
                 'text-color': 'rgba(31, 44, 126, 0.6)',
+            },
+        })
+        map.addLayer({
+            id: 'fixProjectLayer',
+            type: 'fill',
+            source: 'fixProjectAreaSource',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': 'rgba(220,224,237, 0.8)',
+                'fill-outline-color': 'rgba(220,224,237, 0.8)',
             },
         })
         // map.addLayer({
@@ -1648,6 +1701,28 @@ onMounted(async () => {
             },
         })
 
+        map.addSource('zjgLine', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
+        })
+
+        map.addLayer({
+            id: 'zjgBridge',
+            type: 'line',
+            source: 'zjgLine',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 0.8,
+                // 'line-pattern': 'test',
+                'line-color': 'rgb(133, 139, 133)',
+                'line-width': 2.0,
+            },
+        })
+
         // map.addControl(draw)
 
         useMapStore().setMap(map)
@@ -1661,7 +1736,12 @@ onMounted(async () => {
     showProfileErosion.value = false
     showRiskResult.value = false
     showFlowSpeed.value = false
-    await ProfileLoadingProcess(sceneBefore, sceneNow, sceneCompareBefore, sceneCompareNow)
+    await ProfileLoadingProcess(
+        sceneBefore,
+        sceneNow,
+        sceneCompareBefore,
+        sceneCompareNow,
+    )
 
     showWaterPowerFunc()
 })
@@ -2245,7 +2325,7 @@ div.risk-warn-container {
             }
         }
     }
-    
+
     div.time-shower-block {
         position: absolute;
         top: 53.3vh;
@@ -2293,9 +2373,25 @@ div.risk-warn-container {
         }
     }
 
+    div.risk-item-title {
+        position: absolute;
+        top: 8vh;
+        height: 2.6vh;
+        line-height: 2.6vh;
+        left: 0.4vw;
+        z-index: 8;
+        width: 31.2vw;
+        font-weight: bold;
+        font-size: calc(0.6vw + 0.8vh);
+        text-shadow: #eef3ff 1px 1px;
+        // box-shadow: 0px 2px rgb(0, 26, 255);
+        color: #0011ff;
+        text-align: center;
+    }
+
     div.risk-item-container {
         position: absolute;
-        top: 10.2vh;
+        top: 11.2vh;
         left: 0.4vw;
         height: 4.5vh;
         width: 20vw;
@@ -2361,7 +2457,7 @@ div.risk-warn-container {
             align-items: center;
             justify-content: center;
             border-radius: 5px;
-            transition: .3s linear;
+            transition: 0.3s linear;
             &:hover {
                 transform: scale(1.05);
                 cursor: pointer;
@@ -2465,14 +2561,14 @@ div.risk-warn-container {
             justify-content: center;
 
             div.title-container {
-                height: 4vh;
-                line-height: 4vh;
+                height: 3vh;
+                line-height: 3vh;
                 width: 100%;
                 background-color: transparent;
                 text-align: center;
                 font-size: calc(0.8vw + 0.8vh);
                 font-weight: bold;
-                color: #0400fd;
+                color: #003bfd;
                 text-shadow:
                     #eef3ff 1px 1px,
                     #eef3ff 2px 2px,
@@ -2488,6 +2584,10 @@ div.risk-warn-container {
                 // background-color: #0446a8;
                 text-align: center;
                 border-bottom: 2px solid rgb(0, 32, 175);
+
+                &.right {
+                    justify-content: flex-end;
+                }
 
                 div.key-text {
                     width: fit-content;
@@ -2557,11 +2657,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                +.slider {
+                + .slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                +.slider:before {
+                + .slider:before {
                     transform: translateY(-1.5em);
                 }
             }

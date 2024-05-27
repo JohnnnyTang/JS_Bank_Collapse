@@ -561,6 +561,10 @@ onMounted(async () => {
 
     sideBarLoading.value = false
 
+    map.on('click', ['water_polygon'], (e) => {
+        console.log(e.features[0])
+    })
+
 })
 
 //////////// DEBUG FUNCTIONS
@@ -1204,8 +1208,8 @@ onUnmounted(async () => {
             line-height: 3vh;
             width: 100%;
 
-            .iconn{
-                :hover{
+            .iconn {
+                :hover {
                     cursor: pointer;
                 }
             }

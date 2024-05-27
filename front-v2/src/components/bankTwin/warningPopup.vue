@@ -20,7 +20,7 @@
                 <!-- <div class="tabs"></div> -->
                 <div class="chart" ref="chartDom"></div>
             </div>
-            <div class="up-arrow" :id="deviceType">
+            <div class="up-arrow" :id="deviceType" :class="{'active': arrowActive}">
             </div>
         </dv-border-box10>
 
@@ -58,6 +58,7 @@ const warnInfoStore = useWarnInfoStore()
 const deviceTypeList = ['GNSS', '应力桩', '水压力计', '测斜仪']
 let myChart = undefined
 const deviceType = ref('')
+const arrowActive = ref(false)
 
 const clickHandler = () => {
     /*
@@ -80,6 +81,9 @@ const clickHandler = () => {
             if (deviceType.value === '应力桩') {
                 showFakeStressPic.value = true
             }
+            setTimeout(() => {
+                arrowActive.value = true
+            }, 800)
         }
     })
 }
@@ -92,6 +96,7 @@ const chartConfig = (deviceType) => {
     }
 
     myChart = echarts.init(chartDom.value)
+    myChart.clear()
     myChart.setOption(optionMap[deviceType]())
     chartDataLoading.value = false
 }
@@ -103,7 +108,9 @@ const confrmDealWithWarn = (index) => {
     // historyRowLoading.value[warnIndex] = false
 }
 
-onMounted(() => {})
+onMounted(() => {
+
+})
 </script>
 
 <style lang="scss" scoped>
@@ -242,6 +249,8 @@ onMounted(() => {})
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 3;
+            opacity: 0;
+            transition: all 0.8s ease-in;
 
             &[id="应力桩"] {
                 top: 15.4vh;
@@ -249,6 +258,10 @@ onMounted(() => {})
 
             &[id="GNSS"] {
                 top: 11vh;
+            }
+
+            &.active {
+                opacity: 1;
             }
         }
     }

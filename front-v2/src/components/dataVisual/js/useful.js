@@ -15,14 +15,14 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 ////////////////  DICT
 const Title1dict = {
-    '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '一级岸段-注记', '二级岸段-注记', '三级岸段-注记','一级预警岸段-注记'],
+    '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '一级岸段-注记', '二级岸段-注记', '三级岸段-注记', '一级预警岸段-注记'],
     '长江沙洲': ['洲滩', '洲滩-注记'],
     '过江通道': ['已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
-    '骨干河道': ['骨干河道', '骨干河道-注记'],
-    '重要水闸': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
-    '重要泵站': ['泵站工程', '泵站工程-注记'],
+    '骨干河道': ['区域性骨干河道', '流域性河道', '其他河道', '区域性骨干河道-注记', '流域性河道-注记', '其他河道-注记'],
+    '重要水闸': ['大中型水闸', '其他水闸', '大中型水闸-注记', '其他水闸-注记', '水闸工程-重点'],
+    '重要泵站': ['大中型泵站', '其他泵站', '大中型泵站-注记', '其他泵站-注记'],
     '长江堤防': ['长江干堤', '里程桩'],
-    '其他': ['市级行政区', '市级行政区-注记', '重点行政区边界', '水文站点', '水文站点-注记', '水库大坝', '水库大坝-注记']
+    '其他': ['市级行政区', '市级行政区-注记', '重点行政区边界', '水文站点', '水文站点-注记', '水库大坝', '水库大坝-注记', '大型湖泊', '大型湖泊-注记']
 }
 const Title2dict = {
     '一级预警岸段': ['一级预警岸段', '一级岸段-注记'],
@@ -31,11 +31,13 @@ const Title2dict = {
     '已建通道': ['已建通道', '已建通道-注记'],
     '在建通道': ['在建通道', '在建通道-注记'],
     '规划通道': ['规划通道', '规划通道-注记'],
-    '流域性骨干河道': ['骨干河道', '骨干河道-注记'],
-    '区域性骨干河道': ['骨干河道', '骨干河道-注记'],
-    '重要水闸': ['水闸工程', '水闸工程-注记', '水闸工程-重点'],
-    '重要泵站': ['泵站工程', '泵站工程-注记'],
-    '重要湖泊': ['大型湖泊', '大型湖泊-注记'],
+    '区域性骨干河道': ['区域性骨干河道', '区域性骨干河道-注记'],
+    '区域性骨干河道': ['流域性河道', '流域性河道-注记'],
+    '大中型水闸': ['大中型水闸', '大中型水闸-注记', '水闸工程-重点'],
+    '其他水闸': ['其他水闸', '其他水闸-注记'],
+    '大中型泵站': ['大中型泵站', '大中型泵站-注记'],
+    '其他泵站': ['其他泵站', '其他泵站-注记'],
+    '湖泊水库': ['水库大坝', '水库大坝-注记', '大型湖泊', '大型湖泊-注记'],
     '行政区划': ['市级行政区', '市级行政区-注记', '重点行政区边界'],
     '水文站点': ['水文站点', '水文站点-注记'],
 }
@@ -312,7 +314,7 @@ const getSideBarTree = async () => {
 
 
     let zt = []
-    let features = sandbar.features
+    let features = (await axios.get(tileServer + `/tile/vector/riverBeach/info`)).data
     for (let i = 0; i < features.length; i++) {
         zt.push(features[i])
     }
@@ -324,10 +326,7 @@ const getSideBarTree = async () => {
         children: []
     }
     zt.forEach((item) => {
-        let firstCoord = item.geometry.coordinates[0][0][0]
-        item.properties.center_x = firstCoord[0]
-        item.properties.center_y = firstCoord[1]
-        mainZt.children.push({ label: item.properties.name, active: false, type: 'feature', property: item.properties, 'lgId': '长江沙洲' })
+        mainZt.children.push({ label: item.name, active: false, type: 'feature', property: item, 'lgId': '长江沙洲' })
     })
     // let quyushuixi = []
 
@@ -338,21 +337,21 @@ const getSideBarTree = async () => {
         active: true,
         filter: true,
         test: 1,
-        // children: [
-        //     {
-        //         label: '流域性骨干河道',
-        //         icon: '/icons/流域水系.png',
-        //         type: 'title2',
-        //         active: true,
-        //         filter: true,
-        //     }, {
-        //         label: '区域性骨干河道',
-        //         icon: '/icons/流域水系.png',
-        //         type: 'title2',
-        //         active: true,
-        //         filter: true,
-        //     }
-        // ],
+        children: [
+            {
+                label: '流域性骨干河道',
+                icon: '/icons/流域水系.png',
+                type: 'title2',
+                active: true,
+                filter: true,
+            }, {
+                label: '区域性骨干河道',
+                icon: '/icons/流域水系.png',
+                type: 'title2',
+                active: true,
+                filter: true,
+            }
+        ],
         data: []
     }
     let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
@@ -365,21 +364,21 @@ const getSideBarTree = async () => {
         type: 'title1',
         active: false,
         filter: true,
-        // children: [
-        //     {
-        //         label: '大中型水闸',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     }, {
-        //         label: '其他水闸',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     }
-        // ],
+        children: [
+            {
+                label: '大中型水闸',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            }, {
+                label: '其他水闸',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            }
+        ],
         data: []
     }
     dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
@@ -392,22 +391,22 @@ const getSideBarTree = async () => {
         type: 'title1',
         active: false,
         filter: true,
-        // children: [
-        //     {
-        //         label: '大中型泵站',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     },
-        //     {
-        //         label: '其他泵站',
-        //         type: 'title2',
-        //         active: false,
-        //         filter: true,
-        //         children: []
-        //     }
-        // ],
+        children: [
+            {
+                label: '大中型泵站',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            },
+            {
+                label: '其他泵站',
+                type: 'title2',
+                active: false,
+                filter: true,
+                children: []
+            }
+        ],
         data: []
     }
     dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
@@ -444,13 +443,11 @@ const getSideBarTree = async () => {
         ],
         data: []
     }
-    zt = channel_line.features
+    zt = (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
     zt.forEach((item) => {
-        let firstCoord = item.geometry.coordinates[0][0]
-        item.properties.center_x = firstCoord[0]
-        item.properties.center_y = firstCoord[1]
-        riverPassageLine.data.push(item.properties)
+        riverPassageLine.data.push(item)
     })
+
 
     let tree = [
         {
@@ -488,7 +485,7 @@ const getSideBarTree = async () => {
                     filter: true
                 },
                 {
-                    label: '重要湖泊',
+                    label: '湖泊水库',
                     icon: '/icons/湖泊河流.png',
                     type: 'title2',
                     active: true,

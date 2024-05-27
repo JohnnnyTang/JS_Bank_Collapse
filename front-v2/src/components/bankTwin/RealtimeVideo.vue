@@ -2,7 +2,6 @@
     <div
         class="realtime-video-container"
         :class="props.active ? 'active' : 'in-active'"
-        v-if="props.active"
     >
         <div class="realtime-video-title">实时视频监控</div>
         <div
@@ -265,6 +264,12 @@ div.realtime-video-container {
     background-color: rgba(156, 195, 255, 0.4);
     border-radius: 4px;
     border: 2px solid rgb(28, 105, 247);
+    overflow: hidden;
+    
+
+    &.in-active {
+        height: 37.5vh;
+    }
 
     div.realtime-video-title {
         height: 4vh;
@@ -591,7 +596,7 @@ div.realtime-video-container {
 
     transition: transform 0.2s ease-in-out;
     &.in-active {
-        transform: translateX(30vw);
+        top: 54vh;
     }
 }
 </style>
