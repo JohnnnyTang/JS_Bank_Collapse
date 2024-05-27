@@ -525,8 +525,8 @@ const updateWarnInfoDesc = async () => {
         // (${buildLocStr(deviceId)})
         let warnString = `
             警告：于${warnTime}，${gnssIdSectionMap[deviceId]}断面的 \
-            ${deviceName}(${deviceNameMap[deviceName][deviceId]})周围区域即将发生崩岸险情 \
-            请注意防汛处置！
+            ${deviceName}(${deviceNameMap[deviceName][deviceId]})报警， \
+            请及时处置！
         `
         WARN_TEXT.push(warnString)
     }
@@ -818,7 +818,7 @@ div.twin-main-container {
     }
     div.button-block {
         position: absolute;
-        background-color: rgb(193, 230, 255);
+        background-color: rgb(151, 248, 248);
         border-radius: 7px;
         right: 1vw;
         width: fit-content;

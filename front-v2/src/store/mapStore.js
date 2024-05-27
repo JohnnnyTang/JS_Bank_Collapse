@@ -63,8 +63,6 @@ const useLayerStore = defineStore('layerStore', () => {
     }
 })
 
-
-
 const useNewSceneStore = defineStore('newSceneStore', () => {
     const SCENEMAP = ref({})
     const LAYERGROUPMAP = ref({})
@@ -111,8 +109,8 @@ const totalLayer = [
     '历史崩岸',
     '近岸地形',
     '沙洲',
-    '全江注记'
-];
+    '全江注记',
+]
 
 const layerStates = {}
 for (let i = 0; i < totalLayer.length; i++) {
@@ -122,14 +120,13 @@ for (let i = 0; i < totalLayer.length; i++) {
     }
 }
 const useMapLayerStore = defineStore('mapLayerStore', () => {
-
     const layerState = ref(layerStates)
 
     function layerAdded(id) {
         layerState.value[id].added = true
     }
     function layesrAdded(ids) {
-        ids.forEach(id => {
+        ids.forEach((id) => {
             layerState.value[id].added = true
         })
     }
@@ -137,7 +134,7 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
         layerState.value[id].showing = true
     }
     function layersShowing(ids) {
-        ids.forEach(id => {
+        ids.forEach((id) => {
             layerState.value[id].showing = true
         })
     }
@@ -146,7 +143,7 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
     }
 
     function layersRemove(ids) {
-        ids.forEach(id => {
+        ids.forEach((id) => {
             layerState.value[id].added = false
         })
     }
@@ -154,11 +151,21 @@ const useMapLayerStore = defineStore('mapLayerStore', () => {
         layerState.value[id].showing = false
     }
     function layersHide(ids) {
-        ids.forEach(id => {
+        ids.forEach((id) => {
             layerState.value[id].showing = false
         })
     }
-    return { layerAdded, layesrAdded, layerRemove, layerHide, layerShowing, layersHide, layersShowing, layersRemove, layerState }
+    return {
+        layerAdded,
+        layesrAdded,
+        layerRemove,
+        layerHide,
+        layerShowing,
+        layersHide,
+        layersShowing,
+        layersRemove,
+        layerState,
+    }
 })
 
 const useWarnInfoStore = defineStore('WarnInfoStore', () => {
@@ -168,24 +175,39 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const warnWatchTimer = ref(0)
     const fake = ref(false)
     const curDealId = ref('')
+    const videoActive = ref([null, null])
 
     function removeInfoItem(removeItem) {
-        warnInfo.value = warnInfo.value.filter(item => item.id !== removeItem.id)
+        warnInfo.value = warnInfo.value.filter(
+            (item) => item.id !== removeItem.id,
+        )
     }
     function resetWarnInfo() {
         //clear warn infomation
         warnInfo.value.forEach((item) => {
-            warnPopupMap.value["" + item.id].remove()
+            warnPopupMap.value['' + item.id].remove()
         })
         //stop watch
         clearInterval(warnWatchTimer.value)
         //reset value
         warnInfo.value = []
+        warnInfo_history.value = []
+        fake.value = false
         warnPopupMap.value = {}
         warnWatchTimer.value = 0
     }
 
-    return { fake, warnInfo, warnPopupMap, removeInfoItem, resetWarnInfo, warnWatchTimer, warnInfo_history, curDealId }
+    return {
+        fake,
+        warnInfo,
+        warnPopupMap,
+        removeInfoItem,
+        resetWarnInfo,
+        warnWatchTimer,
+        warnInfo_history,
+        curDealId,
+        videoActive,
+    }
 })
 
 const useHighlightLayerStore = defineStore('highlightLayerStore', () => {
@@ -193,4 +215,12 @@ const useHighlightLayerStore = defineStore('highlightLayerStore', () => {
     return { highlightLayers }
 })
 
-export { useWarnInfoStore, useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore, useHighlightLayerStore }
+export {
+    useWarnInfoStore,
+    useMapStore,
+    useSceneStore,
+    useLayerStore,
+    useMapLayerStore,
+    useNewSceneStore,
+    useHighlightLayerStore,
+}

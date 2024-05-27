@@ -20,7 +20,7 @@
                 >
                 </iframe>
             </div>
-            <div class="video-title">{{ item.name }}</div>
+            <div class="video-title" :class="videoList[index].warn?'warn':'normal'">{{ item.name }}</div>
             <div class="video-focus" v-if="item.order != 0" @click="focusOn(index)">
                 放大/控制
             </div>
@@ -62,8 +62,9 @@
                         v-for="i in 4"
                         :key="i"
                         @click="move2PresetPoint(i)"
+                        :class="videoList[curBigVideoIndex].presetPt[i-1].status"
                     >
-                        {{ '预设点-' + i }}
+                        {{ videoList[curBigVideoIndex].presetPt[i-1].name }}
                     </div>
                 </div>
                 <div class="zoom button-title">视角缩放</div>
@@ -92,6 +93,9 @@ import {
     onBeforeMount,
 } from 'vue'
 import axios from 'axios'
+import { useWarnInfoStore } from '../../store/mapStore'
+
+const warnInfoStore = useWarnInfoStore()
 
 const token = ref(
     'at.89iiwo7c5cztq6f30wuai5oy0j3362ow-6m3qlhqadh-1phdss1-rmjo1wuzd',
@@ -136,6 +140,13 @@ const videoList = ref([
         // videoUrl: `https://open.ys7.com/ezopen`,
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
         order: 0,
+        presetPt: [
+            {name: '上游岸段', status: 'normal'},
+            {name: '下游岸段', status: 'normal'},
+            {name: '设备1', status: 'normal'},
+            {name: '设备2', status: 'normal'},
+        ], 
+        warn: false
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
@@ -143,7 +154,14 @@ const videoList = ref([
         deviceId: 'FB5033037',
         // videoUrl: `https://open.ys7.com/ezopen`,
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
-        order: 1
+        order: 1,
+        presetPt: [
+            {name: '上游岸段', status: 'normal'},
+            {name: '下游岸段', status: 'normal'},
+            {name: '设备3', status: 'normal'},
+            {name: '设备4', status: 'normal'},
+        ], 
+        warn: false
     },
     {
         name: '民主沙上游围堤监控',
@@ -151,7 +169,14 @@ const videoList = ref([
         deviceId: 'FB5033036',
         // videoUrl: `https://open.ys7.com/ezopen`,
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
-        order: 2
+        order: 2,
+        presetPt: [
+            {name: '上游岸段', status: 'normal'},
+            {name: '下游岸段', status: 'normal'},
+            {name: '设备5', status: 'normal'},
+            {name: '设备6', status: 'normal'},
+        ], 
+        warn: false
     },
 ])
 
@@ -225,6 +250,21 @@ const moveBack2Origin = async () => {
 
 onBeforeMount(async () => {
     await moveBack2Origin()
+})
+
+watch(() => warnInfoStore.videoActive, (newVal, oldVal) => {
+    if(oldVal[0] != null) {
+        videoList.value[oldVal[0]].warn = false
+        if(oldVal[1] != null) {
+            videoList.value[oldVal[0]].presetPt[oldVal[1]].status = 'normal'
+        }
+    }
+    if(newVal[0] != null) {
+        videoList.value[newVal[0]].warn = true
+        if(newVal[1] != null) {
+            videoList.value[newVal[0]].presetPt[newVal[1]].status = 'warn'
+        }
+    }
 })
 
 onMounted(() => {
@@ -311,6 +351,11 @@ div.realtime-video-container {
             font-weight: bold;
             font-size: calc(0.4vw + 0.4vh);
             color: #eef3ff;
+
+            &.warn {
+                background-color: red;
+                color: #eef3ff;
+            }
         }
 
         div.video-focus {
@@ -588,6 +633,11 @@ div.realtime-video-container {
                         cursor: pointer;
                         font-weight: bold;
                         color: #9df8ff;
+                    }
+
+                    &.warn {
+                        color: #eef3ff;
+                        background-color: red;
                     }
                 }
             }

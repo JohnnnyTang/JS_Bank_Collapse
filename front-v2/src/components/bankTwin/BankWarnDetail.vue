@@ -131,7 +131,7 @@
                     >
                         暂无未处置报警
                     </div>
-                    <el-collapse-item style="margin-top: 2vh">
+                    <el-collapse-item style="margin-top: 0.5vh">
                         <template #title>
                             <div
                                 style="
@@ -184,7 +184,7 @@
                                     {{ deviceIdPlaceMap[item.deviceId] }}
                                 </div>
                                 <div class="device-deal device-item body">
-                                    <div class="withdraw-button">撤回处置</div>
+                                    <div class="withdraw-button" @click="withdrawDeal(item.id)">撤回处置</div>
                                 </div>
                             </div>
                         </div>
@@ -418,10 +418,7 @@ const filterDealtWarnInfo = (warnList) => {
 
 const confirmDealWithWarn = async (warnItem) => {
     if (!warnInfoStore.fake) {
-        await BackEndRequest.updateWarnDealtStatus(
-            warnItem.id,
-            1,
-        )
+        await BackEndRequest.updateWarnDealtStatus(warnItem.id, 1)
     }
     if (warnItem.id in warnInfoStore.warnPopupMap) {
         console.log(
@@ -436,6 +433,7 @@ const confirmDealWithWarn = async (warnItem) => {
         console.log(type, id)
         removeWarningDeviceStyle(useMapStore().getMap(), type, id)
         warnInfoStore.removeInfoItem(warnItem)
+        warnInfoStore.videoActive = [null, null]
     }
 
     warnItem.ifDealt = 1
@@ -446,8 +444,17 @@ const collapseChange = (opened) => {
     console.log('changed collapse', opened)
 }
 
+const withdrawDeal = async (warnId) => {
+    if (!warnInfoStore.fake) {
+        await BackEndRequest.updateWarnDealtStatus(warnItem.id, 0)
+    }
+
+    warnItem.ifDealt = 0
+    warnInfoStore.videoActive = [0, 2]
+}
+
 watch(
-    () => useWarnInfoStore().curDealId,
+    () => warnInfoStore.curDealId,
     (newVal) => {
         if (newVal && newVal != '') {
             // console.log("123123123123", newVal)
@@ -714,6 +721,25 @@ div.warn-detail-container {
                     }
                     &.device-deal {
                         width: 18%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        div.withdraw-button {
+                            height: 3vh;
+                            line-height: 3vh;
+                            width: fit-content;
+                            padding: 0 10% 0 10%;
+                            background-color: #0019a5;
+                            color: rgb(230, 242, 255);
+                            font-weight: normal;
+                            border-radius: 4px;
+
+                            &:hover {
+                                font-weight: bold;
+                                cursor: pointer;
+                                color: #75faff;
+                            }
+                        }
                     }
 
                     &.head {

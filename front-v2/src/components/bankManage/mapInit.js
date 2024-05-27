@@ -541,11 +541,11 @@ const mapInit = async (map, vis) => {
         })
 
         setTimeout(() => {
-            warnInterval(map, 60)
+            warnInterval(map, 20)
         }, 500)
         useWarnInfoStore().warnWatchTimer = setInterval(
             () => {
-                warnInterval(map, 60)
+                warnInterval(map, 20)
             },
             60 * 1000 * 20,
         )
@@ -581,12 +581,7 @@ const mapInit = async (map, vis) => {
                     removeWarningDeviceStyle2(map, item.deviceId)
                 })
                 useWarnInfoStore().resetWarnInfo()
-                // 22222 set fake data
-                useWarnInfoStore().warnInfo = fakeWarnInfo
-                useWarnInfoStore().warnInfo_history = [...fakeWarnInfo]
-                useWarnInfoStore().fake = true
-
-                let allWarnData = fakeWarnInfo
+                let allWarnData = JSON.parse(JSON.stringify(fakeWarnInfo))
                 let filteredData = filterWarnData(allWarnData)
                 let typeList = ['GNSS', '应力桩', '孔隙水压力计', '测斜仪']
                 filteredData.forEach((item, index) => {
@@ -596,6 +591,12 @@ const mapInit = async (map, vis) => {
                 })
                 if (filteredData.length != 0)
                     useWarnInfoStore().warnInfo = filteredData
+                // 22222 set fake data
+                useWarnInfoStore().warnInfo_history = [
+                    ...filteredData,
+                ]
+                useWarnInfoStore().fake = true
+                useWarnInfoStore().videoActive = [0, 2]
             } else if (e.key == 'a') {
                 useWarnInfoStore().warnInfo_history = []
             }
@@ -922,22 +923,22 @@ const fakeWarnInfo = [
         threeDiff: 31.4255215,
         warnTime: dayjs().subtract(3, 'minute').format('YYYY-MM-DD HH:mm:ss'),
     },
-    {
-        deviceCode: 'DVI3010425438293',
-        deviceId: 'MZS120.51967889_32.04004108_4',
-        id: 'c6ae8d58-a506-4acc-ad86-998db55195a4',
-        ifDealt: 0,
-        threeDiff: 31.4255215,
-        warnTime: dayjs().subtract(38, 'second').format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-        deviceCode: 'DVI3010425438293',
-        deviceId: 'MZS120.541648_32.030524_2',
-        id: 'c6ae8d58-a506-4acc-ad86-998db55195a5',
-        ifDealt: 0,
-        threeDiff: 31.4255215,
-        warnTime: dayjs().subtract(1, 'minute').format('YYYY-MM-DD HH:mm:ss'),
-    },
+    // {
+    //     deviceCode: 'DVI3010425438293',
+    //     deviceId: 'MZS120.51967889_32.04004108_4',
+    //     id: 'c6ae8d58-a506-4acc-ad86-998db55195a4',
+    //     ifDealt: 0,
+    //     threeDiff: 31.4255215,
+    //     warnTime: dayjs().subtract(38, 'second').format('YYYY-MM-DD HH:mm:ss'),
+    // },
+    // {
+    //     deviceCode: 'DVI3010425438293',
+    //     deviceId: 'MZS120.541648_32.030524_2',
+    //     id: 'c6ae8d58-a506-4acc-ad86-998db55195a5',
+    //     ifDealt: 0,
+    //     threeDiff: 31.4255215,
+    //     warnTime: dayjs().subtract(1, 'minute').format('YYYY-MM-DD HH:mm:ss'),
+    // },
 ]
 
 export { mapInit, removeWarningDeviceStyle }
