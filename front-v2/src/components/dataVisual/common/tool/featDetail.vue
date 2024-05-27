@@ -62,7 +62,7 @@
         </div>
 
 
-        <div class="sandDesc" v-if="props.sourceId === 'sandBar'">
+        <div class="sandDesc" v-else-if="props.sourceId === 'sandBar'">
             <el-descriptions class="margin-top" :title="props.ogData['name']" :column="3" border>
                 <el-descriptions-item align="center">
                     <template #label>
@@ -110,18 +110,58 @@
             </el-descriptions>
         </div>
 
-        <!-- <el-descriptions class="margin-top" :title="title" :column="props.column" border>
-            <el-descriptions-item v-for="( key, index ) in  Object.keys(fMap) " :key="index">
-                <template #label>
-                    <div class="cell-item">
-                        {{ fMap[key] }}
-                    </div>
-                </template>
-                <el-scrollbar max-height="10vh">
-                    <p style="text-align: left; padding-left: 0.1vw;">{{ noDataMap(data[key]) }}</p>
-                </el-scrollbar>
-            </el-descriptions-item>
-        </el-descriptions> -->
+        <div class="channelDesc" v-else-if="props.sourceId === 'channel'">
+            <el-descriptions class="margin-top" :title="title" :column="1" border >
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            建设时间
+                        </div>
+                    </template>
+                    <p style="text-align: center; padding-left: 0.1vw;">{{ noDataMap(data['construct_date']) }}</p>
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <div class="cell-item">
+                            桥型简介
+                        </div>
+                    </template>
+                    <p style="text-align: left; padding-left: 0.1vw;">{{ noDataMap(data['bridge_type']) }}</p>
+                </el-descriptions-item>
+            </el-descriptions>
+        </div>
+        <div class="waterDesc" v-else-if="props.sourceId === 'riverArea'">
+            <el-descriptions class="margin-top" :title="title" :column="props.column" border>
+                <el-descriptions-item v-for="( key, index ) in  Object.keys(fMap) " :key="index">
+                    <template #label>
+                        <div class="cell-item" >
+                            {{ fMap[key] }}
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: center; padding-left: 0.1vw;">{{ noDataMap(data[key]) }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+            </el-descriptions>
+        </div>
+
+
+        <div class="normal" v-else>
+            <el-descriptions class="margin-top" :title="title" :column="props.column" border>
+                <h1>111</h1>
+                <el-descriptions-item v-for="( key, index ) in  Object.keys(fMap) " :key="index">
+                    <template #label>
+                        <div class="cell-item">
+                            {{ fMap[key] }}
+                        </div>
+                    </template>
+                    <el-scrollbar max-height="10vh">
+                        <p style="text-align: left; padding-left: 0.1vw;">{{ noDataMap(data[key]) }}</p>
+                    </el-scrollbar>
+                </el-descriptions-item>
+            </el-descriptions>
+        </div>
+
     </div>
 </template>
 
@@ -177,12 +217,12 @@ const sandBarFix = computed(() => {
 })
 
 watch(props, (V) => {
-    console.log(V);
+    console.log(V, 'hello');
     if (sourceFieldMap[props.sourceId]) {
         fMap.value = sourceFieldMap[props.sourceId]["fieldMap"]
-        // console.log(fMap.value, props.ogData,);
         title.value = props.ogData[sourceFieldMap[props.sourceId]["original"]]
         data.value = props.ogData
+        console.log(fMap.value, title.value, data.value);
     }
 })
 const close = () => {
@@ -216,7 +256,8 @@ onMounted(() => {
 // }
 
 .description-container {
-    width: 25vw;
+    // width: 25vw;
+    width: 20vw;
     // height: 20vh;
     overflow: hidden;
     border: 1px solid #ccc;
@@ -241,15 +282,14 @@ onMounted(() => {
 
         .el-descriptions__title {
             position: relative;
-            height: 3vh;
-            line-height: 3vh;
+            width: fit-content;
+            height: 4vh;
+            line-height: 4vh;
+            text-align: center;
+            font-size: calc(1vw + 0.3vh);
             font-weight: 600;
-            font-size: calc(0.7vw + 0.6vh);
-            background: #0237bd;
-            text-shadow: 2px 8px 6px rgba(5, 2, 95, 0.207), 0px -5px 35px rgba(255, 255, 255, 0.167);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: rgb(2,55,189);
+            text-shadow: #ececec 1px 1px, #8b8b8b 2px 2px, #ffffff 3px 3px;
         }
     }
 
@@ -266,6 +306,9 @@ onMounted(() => {
 
             .cell-item {
                 height: fit-content;
+            }
+            .cell-item.lable{
+                width: 3vw;
             }
         }
 

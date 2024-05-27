@@ -2723,7 +2723,17 @@ const layerAddFunctionMap = {
                     ],
                     'text-offset': [0, 0],
                     'text-anchor': 'bottom',
-                    'text-size': 16,
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 15],
+                        10,
+                        ['literal', 20],
+                        13,
+                        ['literal', 25],
+                    ],
                     'text-allow-overlap': true,
 
                 },
@@ -2758,7 +2768,17 @@ const layerAddFunctionMap = {
                     ],
                     'text-offset': [0, 0],
                     'text-anchor': 'bottom',
-                    'text-size': 16,
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 15],
+                        10,
+                        ['literal', 20],
+                        13,
+                        ['literal', 25],
+                    ],
 
                     'text-allow-overlap': true,
 
@@ -2794,7 +2814,17 @@ const layerAddFunctionMap = {
                     ],
                     'text-offset': [0, 0],
                     'text-anchor': 'bottom',
-                    'text-size': 16,
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 15],
+                        10,
+                        ['literal', 20],
+                        13,
+                        ['literal', 25],
+                    ],
 
                     'text-allow-overlap': true,
 
@@ -2817,6 +2847,7 @@ const layerAddFunctionMap = {
                 id: '一级预警岸段-注记',
                 type: 'symbol',
                 source: 'importantBank',
+                minzoom: 8,
                 maxzoom: 12,
                 'source-layer': 'default',
                 filter: ['==', 'warning_level', 1],
@@ -2829,11 +2860,11 @@ const layerAddFunctionMap = {
                     'symbol-placement': 'point',
                     // 'symbol-placement': 'line-center',
                     // 'text-offset': [0.0, 1.0],
-                    'text-variable-anchor': ["center", "top", "bottom"],
-                    'text-size': 18,
+                    'text-variable-anchor': ["top", "bottom","center"],
+                    'text-size': 22,
                     // 'text-padding': 0.0,
-                    // 'text-writing-mode': ['vertical', 'horizontal'],
-                    "text-allow-overlap": true,
+                    'text-writing-mode': ['vertical', 'horizontal'],
+                    "text-allow-overlap": false,
                     'text-ignore-placement': true
                 },
                 paint: {
@@ -3295,7 +3326,7 @@ const initSortedLayer = async (map) => {
     await layerInitFunction(map, '在建通道-注记')
     await layerInitFunction(map, '规划通道-注记')
     await layerInitFunction(map, '水文站点-注记')
-   await layerInitFunction(map, '大中型水闸-注记')
+    await layerInitFunction(map, '大中型水闸-注记')
     await layerInitFunction(map, '其他水闸-注记')
     // await layerInitFunction(map, '大中型水闸-注记')
     // await layerInitFunction(map, '其他水闸-注记')

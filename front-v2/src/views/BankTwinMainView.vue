@@ -611,21 +611,12 @@ onUnmounted(() => {
     useMapStore().destroyMap()
 })
 
-<<<<<<< HEAD
-///////// DEBUG REGION 
-const createCompIns = () => {
-    const bankApp = createApp(threedVue)
-    let fatherDom = document.querySelector('#DeviceInfoBox')
-    bankApp.mount(fatherDom)
-}
-=======
 ///////// DEBUG REGION
 // const createCompIns = () => {
 //     const bankApp = createApp(threedVue)
 //     let fatherDom = document.querySelector('#DeviceInfoBox')
 //     bankApp.mount(fatherDom)
 // }
->>>>>>> master
 </script>
 
 <style lang="scss" scoped>
