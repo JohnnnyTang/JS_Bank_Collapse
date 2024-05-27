@@ -756,6 +756,7 @@ onUnmounted(async () => {
                     box-shadow: #cbeafd 10px 7px 20px 0px;
                     display: flex;
                     flex-direction: row;
+                    align-items: center;
                     transition: transform 0.5s;
                     user-select: none;
 

@@ -1,13 +1,13 @@
 <template>
     <div class="main">
         <div class="map" ref="mapDom" id="map"></div>
-        <!-- <canvas id="GPUFrame" class="GPU"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas> -->
+        <canvas id="GPUFrame" class="GPU"></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas>
     </div>
 </template>
 
 <script setup>
-import { initMap, initScratchMap, loadImage } from '../../utils/mapUtils'
+import { initMap, initScratchMap, loadImage, initPureScratchMap } from '../../utils/mapUtils'
 import { onMounted, watch, ref } from 'vue'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
@@ -39,29 +39,49 @@ const mapFlyToRiver = (mapIns) => {
 
 onMounted(async () => {
 
-    // const map = await initScratchMap(mapDom.value)
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: getStyleJson4base(),
-        // style: baseImageStyle,
-        accessToken:
-            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-        center: [120.312, 31.917], // starting position [lng, lat]
-        maxZoom: 18,
-        zoom: 8,
-        projection: 'mercator',
-        antialias: true,
-        useWebGL2: true,
-    });
+    const map = await initPureScratchMap(mapDom.value)
 
     mapFlyToRiver(map)
 
-    const scriptInteract = document.createElement('script')
-    scriptInteract.src = './src/utils/unityInteraction.js'
-    scriptInteract.onload = async () => {
-        console.log('unityInteraction   文件执行完毕');
-    }
-    document.body.appendChild(scriptInteract)
+    // map.addSource('channelLine', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/riverBridge/{x}/{y}/{z}',
+    //     ],
+    // })
+    map.addSource('channelLine', {
+        type: 'vector',
+        tiles: [
+            // tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
+            tileServer + '/tile/vector/riverBridge/{x}/{y}/{z}',
+        ],
+    })
+    !map.getLayer('已建通道') &&
+        map.addLayer({
+            id: '已建通道',
+            type: 'line',
+            source: 'channelLine',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                // 'line-pattern': '已建',
+                'line-width': 13,
+
+            },
+        })
+
+
+    // const scriptInteract = document.createElement('script')
+    // scriptInteract.src = './src/utils/unityInteraction.js'
+    // scriptInteract.onload = async () => {
+    //     console.log('unityInteraction   文件执行完毕');
+    // }
+    // document.body.appendChild(scriptInteract)
+
+
 
 
     // const jsonUrl = '/bankWarn/bankWarn.json'

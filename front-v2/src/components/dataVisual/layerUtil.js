@@ -745,6 +745,7 @@ const layerAddFunctionMap = {
     /////// 河道分段
     河道分段: async (map) => {
         let nameLists = ['南京河段', '镇扬河段', '澄通河段', '扬中河段', '河口段',]
+        let boldLineLists = ['assist2', ...nameLists]
         !map.getSource('river_division_line') &&
             map.addSource('river_division_line', {
                 type: 'geojson',
@@ -754,36 +755,28 @@ const layerAddFunctionMap = {
             map.addLayer({
                 id: 'river_division_line',
                 type: 'line',
+                minzoom: 8,
+                maxzoom: 13,
                 source: 'river_division_line',
                 paint: {
                     'line-color': 'rgb(110, 107, 106)',
-                    'line-width': 2.0,
+                    'line-width': [
+                        'case',
+                        ["in", ["get", "name"], ["literal", boldLineLists]],
+                        4.0,
+                        2.0
+                    ],
                     'line-blur': [
                         'case',
                         ["in", ["get", "name"], ["literal", nameLists]],
                         0.0,
                         1.0
                     ],
-                    'line-opacity': [
-                        // 'case',
-                        // ["==", ["get", "name"], ["literal", 'assist']],
-                        // 0.8,
-                        // 1.0
-                        "step",
-                        ["zoom"],
-                        1,// zoom 0-9 value 1
-                        9,
-                        0,// zoom 9-13 value 0
-                        13,
-                        0,// zoom >13 value 1
-                    ],
-
                     "line-dasharray": [
                         'match',
                         ["get", "name"],
                         'assist',
-                        [3, 5, 5, 1],
-                        // [2, 2, 50, 2, 2, 2],
+                        [3, 1],
                         [1, 0],
                     ]
                 }
@@ -800,13 +793,13 @@ const layerAddFunctionMap = {
                 id: '河道分段-注记',
                 type: 'symbol',
                 source: 'river_division_line',
-                maxzoom: 9,
+                maxzoom: 10,
                 layout: {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     'symbol-placement': "line-center",
-                    'text-size': 15,
-                    'text-offset': [0, 1.0],
+                    'text-size': 30,
+                    'text-offset': [0, 0.2],
                     'text-anchor': 'top',
                     'text-allow-overlap': true,
                 },
@@ -840,7 +833,7 @@ const layerAddFunctionMap = {
                 maxzoom: 14,
                 paint: {
                     'circle-color': 'rgb(35,46,71)',
-                    'circle-radius': 5.0,
+                    'circle-radius': 7.0,
                 }
             })
     },
@@ -859,7 +852,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     'symbol-placement': 'point',
-                    'text-size': 13,
+                    'text-size': 15,
                     'text-offset': [0.0, 0.2],
                     'text-anchor': 'top'
                 },
@@ -943,7 +936,8 @@ const layerAddFunctionMap = {
             map.addSource('riverArea-lable', {
                 type: 'vector',
                 tiles: [
-                    tileServer + '/tile/vector/center/riverArea/{x}/{y}/{z}',
+                    // tileServer + '/tile/vector/center/riverArea/{x}/{y}/{z}',
+                    tileServer + '/tile/vector/riverArea/{x}/{y}/{z}',
                 ],
             })
         }
@@ -961,6 +955,7 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
+                    'symbol-placement': 'point',
                     'text-variable-anchor': ["center", "top", "bottom", "left", "right"],
                     'text-size': 12,
                     'text-allow-overlap': false,
@@ -1501,10 +1496,25 @@ const layerAddFunctionMap = {
             })
     },
     '已建通道': async (map) => {
+        // !map.getSource('channelLine') &&
+        //     map.addSource('channelLine', {
+        //         type: 'geojson',
+        //         data: channel_line
+        //     })
+        console.log('addddd')
+
+        // map.addSource('riverPassageLine', {
+        //     type: 'vector',
+        //     tiles: [
+        //         tileServer + '/tile/vector/riverPassageLine/{x}/{y}/{z}',
+        //     ],
+        // })
         !map.getSource('channelLine') &&
             map.addSource('channelLine', {
-                type: 'geojson',
-                data: channel_line
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverBridge/{x}/{y}/{z}',
+                ],
             })
         await loadImage(map, '/legend/已建通道2.png', '已建')
         // await loadImage(map, '/legend/在建通道1.png', '在建')
@@ -1515,8 +1525,8 @@ const layerAddFunctionMap = {
                 type: 'line',
                 source: 'channelLine',
                 // filter: ['==', 'plan', '1'],
-                filter: ['==', 'plan', 1],
-                // 'source-layer': 'default',
+                // filter: ['==', 'plan', 1],
+                'source-layer': 'default',
                 layout: {
                     'line-cap': 'round',
                     'line-join': 'round',
@@ -1532,9 +1542,9 @@ const layerAddFunctionMap = {
                         7,
                         ['literal', 1],
                         10,
-                        ['literal', 5],
+                        ['literal', 6],
                         13,
-                        ['literal', 7],
+                        ['literal', 10],
                     ],
 
                 },
@@ -1572,9 +1582,9 @@ const layerAddFunctionMap = {
                         7,
                         ['literal', 1],
                         10,
-                        ['literal', 5],
+                        ['literal', 6],
                         13,
-                        ['literal', 7],
+                        ['literal', 10],
                     ],
 
                 },
@@ -1612,9 +1622,9 @@ const layerAddFunctionMap = {
                         7,
                         ['literal', 1],
                         10,
-                        ['literal', 5],
+                        ['literal', 6],
                         13,
-                        ['literal', 7],
+                        ['literal', 10],
                     ],
                 },
             })
@@ -1958,13 +1968,13 @@ const layerAddFunctionMap = {
                     'text-font': [
                         'Open Sans Semibold',
                     ],
-                    'text-offset': [0.0, 2.0],
-                    'text-anchor': 'top',
+                    'text-offset': [0.0, 0.5],
+                    'text-anchor': 'center',
                     'text-size': [
                         "case",
                         ["==", ["get", "if_important"], 1], // 如果if_important字段为1
-                        13,                    // 则文本颜色为rgb(86, 39, 242)
-                        12                       // 否则文本颜色为rgb(26, 11, 74)
+                        16,                    // 则文本颜色为rgb(86, 39, 242)
+                        14                       // 否则文本颜色为rgb(26, 11, 74)
                     ],
                     'text-allow-overlap': false,
 
@@ -1989,11 +1999,11 @@ const layerAddFunctionMap = {
                             1,
                             0,
                         ],
-                        13,
+                        12,
                         1,
                     ],
-                    // 'text-halo-color': "rgba(255, 255, 255, 1.0)",
-                    // 'text-halo-width': 2.0,
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 2.0,
                 },
             })
     },
@@ -2643,11 +2653,10 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     'symbol-placement': 'point',
-                    // 'symbol-placement': 'line',
                     // 'symbol-placement': 'line-center',
                     // 'text-offset': [0.0, 1.0],
-                    'text-variable-anchor': ["top", "bottom"],
-                    'text-size': 13,
+                    'text-variable-anchor': ["center", "top", "bottom"],
+                    'text-size': 18,
                     // 'text-padding': 0.0,
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                     "text-allow-overlap": true,
@@ -2720,7 +2729,7 @@ const layerAddFunctionMap = {
                 },
                 filter: ['==', 'warning_level', 1],
                 paint: {
-                    'line-color': '#ff3d2b',
+                    'line-color': '#ff0303',
                     'line-width': [
                         'interpolate',
                         ['linear'],
@@ -2753,7 +2762,7 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 2],
                 paint: {
                     // 'line-opacity': 1,
-                    'line-color': 'rgb(27, 74, 245)',
+                    'line-color': 'rgb(255, 120, 3)',
                     'line-width': [
                         'interpolate',
                         ['linear'],
@@ -2787,7 +2796,7 @@ const layerAddFunctionMap = {
                 filter: ['==', 'warning_level', 3],
                 paint: {
                     // 'line-opacity': 1,=
-                    'line-color': 'rgb(127, 113, 143)',
+                    'line-color': 'rgb(245, 231, 32)',
                     'line-width': [
                         'interpolate',
                         ['linear'],
@@ -2882,6 +2891,7 @@ const layerAddFunctionMap = {
                 type: 'geojson',
                 data: sandbar
             })
+
         !map.getLayer('洲滩-注记') &&
             map.addLayer({
                 id: '洲滩-注记',
@@ -2910,10 +2920,12 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     // 'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
+                    'symbol-placement': "point",
+                    // 'text-anchor': 'center',
                     'text-size': 13,
                     'text-padding': 0,
                     'text-ignore-placement': true,
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                 },
                 paint: {
                     'text-color': 'rgb(111, 111, 111)',
@@ -2942,9 +2954,9 @@ const layerAddFunctionMap = {
                     // 'circle-blur': 0.5,
                     'circle-radius': [
                         "case",
-                        ["==", ["get", "Level"], 1], // 如果if_important字段为1
-                        5.5,                    // 则文本颜色为rgb(86, 39, 242)
-                        3.5                      // 否则文本颜色为rgb(26, 11, 74)
+                        ["==", ["get", "Level"], 1],
+                        8,
+                        6,
                     ],
                     'circle-opacity': 0.8
                 },
@@ -2974,15 +2986,15 @@ const layerAddFunctionMap = {
                     'text-size': [
                         "case",
                         ["==", ["get", "Level"], 1],
-                        14,
-                        11
+                        23,
+                        19
                     ],
                     'text-padding': 0,
                     'text-ignore-placement': true,
                     'text-allow-overlap': true,
                 },
                 paint: {
-                    'text-color': 'rgb(135, 135, 135)',
+                    'text-color': 'rgb(110, 110, 110)',
                     'text-halo-color': "rgba(255, 255, 255, 1.0)",
                     'text-halo-width': 2.0,
                 },
