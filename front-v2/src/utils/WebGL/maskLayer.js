@@ -74,7 +74,7 @@ export default class MaskLayer {
         // No render condition
         if (!this.isInitialized) return
 
-        const minZoom = 12
+        const minZoom = 14
         const maxZoom = 16
         const currentZoom = Math.min(maxZoom, Math.max(minZoom, this.map.getZoom()))
         const opacity = lerp(1, 0, (currentZoom - minZoom) / (maxZoom - minZoom))

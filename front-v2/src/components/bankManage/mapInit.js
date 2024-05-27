@@ -634,12 +634,17 @@ const setWarningDeviceStyle = (
     if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
         map.addLayer({
             id: `${deviceLayer}-${deviceCode}`,
-            type: 'symbol',
+            // type: 'symbol',
+            type: 'circle',
             source: sourceMap[deviceLayer],
             layout: {
-                'icon-image': pulsingImageId,
-                'icon-size': 1,
-                'icon-allow-overlap': true,
+                // 'icon-image': pulsingImageId,
+                // 'icon-size': 1,
+                // 'icon-allow-overlap': true,
+            },
+            paint:{
+                'circle-radius': 10.0,
+                'circle-pitch-alignment': 'map',
             },
             filter: ['all', ['==', 'code', deviceCode]],
         })

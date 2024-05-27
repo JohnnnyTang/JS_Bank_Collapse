@@ -16,7 +16,13 @@ const deviceCode = ref('')
 //     console.log(' i am mounted ', newVal);
 // })
 watch(() => useDeviceNameStore().deviceName, (newVal) => {
-    console.log(' new pick up device ', newVal);
+    console.log(' new pick up device ', newVal)
+    const deviceMap = {
+        '视频': 'camera',
+        '应力桩': 'stress',
+        '测斜': 'incline',
+        'GNSS': 'gnss',
+    }
     deviceCode.value = nameMap[newVal]
 })
 
