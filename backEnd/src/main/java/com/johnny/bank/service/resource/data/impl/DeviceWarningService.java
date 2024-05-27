@@ -68,6 +68,16 @@ public class DeviceWarningService implements IDeviceWarningService {
         return iDeviceWarningRepo.findDataByTime(TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutes), current);
     }
 
+    public List<DeviceWarning> getWarnDataByMin(Integer minutes) {
+        Timestamp current = new Timestamp(System.currentTimeMillis());
+        return iDeviceWarningRepo.findWarnDataByTime(TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutes), current);
+    }
+
+    public List<DeviceWarning> getDangerDataByMin(Integer minutes) {
+        Timestamp current = new Timestamp(System.currentTimeMillis());
+        return iDeviceWarningRepo.findDangerDataByTime(TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutes), current);
+    }
+
     public Integer getCountByMin(Integer minutes) {
         Timestamp current = new Timestamp(System.currentTimeMillis());
         return iDeviceWarningRepo.getTotalCountByTime(TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, minutes), current);

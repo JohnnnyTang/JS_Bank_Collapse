@@ -53,6 +53,7 @@ const fakeWarnCodeList = [
     'MZS120.55327892_32.02707923_1',
     'MZS120.51967889_32.04004108_4',
     'MZS120.541648_32.030524_2',
+    'MZS120.54599538_32.02837993_1'
 ]
 const warnInfoStore = useWarnInfoStore()
 const deviceTypeList = ['GNSS', '应力桩', '水压力计', '测斜仪']
@@ -78,9 +79,9 @@ const clickHandler = () => {
             deviceType.value =
                 daviceMap[props.warningInfo.deviceId.split('_').pop() - 1]
             chartConfig(deviceType.value)
-            if (deviceType.value === '应力桩') {
-                showFakeStressPic.value = true
-            }
+            // if (deviceType.value === '应力桩') {
+            //     showFakeStressPic.value = true
+            // }
             setTimeout(() => {
                 arrowActive.value = true
             }, 800)

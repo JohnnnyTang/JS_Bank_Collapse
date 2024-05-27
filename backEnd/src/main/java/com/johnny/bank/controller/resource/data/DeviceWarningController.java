@@ -33,6 +33,14 @@ public class DeviceWarningController {
     public ResponseEntity<List<DeviceWarning>> getDataByMin(@PathVariable int minutes) {
         return ResponseEntity.ok(deviceWarningService.getDataByMin(minutes));
     }
+    @GetMapping("/warn/minute/{minutes}")
+    public ResponseEntity<List<DeviceWarning>> getWarnDataByMin(@PathVariable int minutes) {
+        return ResponseEntity.ok(deviceWarningService.getWarnDataByMin(minutes));
+    }
+    @GetMapping("/danger/minute/{minutes}")
+    public ResponseEntity<List<DeviceWarning>> getDangerDataByMin(@PathVariable int minutes) {
+        return ResponseEntity.ok(deviceWarningService.getDangerDataByMin(minutes));
+    }
     @GetMapping("/hour/{hours}")
     public ResponseEntity<List<DeviceWarning>> getDataByHour(@PathVariable int hours) {
         return ResponseEntity.ok(deviceWarningService.getDataByHour(hours));

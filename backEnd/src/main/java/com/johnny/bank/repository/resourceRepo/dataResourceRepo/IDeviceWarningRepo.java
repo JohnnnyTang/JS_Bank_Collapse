@@ -8,7 +8,10 @@ import java.util.List;
 
 @Repository("DeviceWarningRepo")
 public interface IDeviceWarningRepo {
+
     List<DeviceWarning> findDataByTime(Timestamp begTime, Timestamp endTime);
+    List<DeviceWarning> findWarnDataByTime(Timestamp begTime, Timestamp endTime);
+    List<DeviceWarning> findDangerDataByTime(Timestamp begTime, Timestamp endTime);
 
     List<DeviceWarning> findDataByTimeOfDevice(Timestamp begTime, Timestamp endTime, String deviceId);
 
