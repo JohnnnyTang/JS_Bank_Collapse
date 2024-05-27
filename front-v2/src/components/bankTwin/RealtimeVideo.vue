@@ -59,12 +59,12 @@
                 <div class="preset button-column">
                     <div
                         class="preset button-item"
-                        v-for="i in 4"
+                        v-for="(item, i) in videoList[curBigVideoIndex].presetPt"
                         :key="i"
-                        @click="move2PresetPoint(i)"
-                        :class="videoList[curBigVideoIndex].presetPt[i-1].status"
+                        @click="move2PresetPoint(i+1)"
+                        :class="item.status"
                     >
-                        {{ videoList[curBigVideoIndex].presetPt[i-1].name }}
+                        {{ item.name }}
                     </div>
                 </div>
                 <div class="zoom button-title">视角缩放</div>
@@ -119,7 +119,7 @@ let controlParam = {
     deviceSerial: 'FB5033035',
     channelNo: '1',
     direction: '9',
-    speed: 2,
+    speed: 1,
 }
 
 let presetParam = {
@@ -143,8 +143,8 @@ const videoList = ref([
         presetPt: [
             {name: '上游岸段', status: 'normal'},
             {name: '下游岸段', status: 'normal'},
-            {name: '设备1', status: 'normal'},
-            {name: '设备2', status: 'normal'},
+            {name: 'CL-06', status: 'normal'},
+            {name: '海事码头', status: 'normal'},
         ], 
         warn: false
     },
@@ -263,6 +263,7 @@ watch(() => warnInfoStore.videoActive, (newVal, oldVal) => {
         videoList.value[newVal[0]].warn = true
         if(newVal[1] != null) {
             videoList.value[newVal[0]].presetPt[newVal[1]].status = 'warn'
+            move2PresetPoint(newVal[1]+1)
         }
     }
 })
