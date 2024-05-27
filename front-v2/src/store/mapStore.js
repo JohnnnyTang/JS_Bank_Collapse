@@ -226,12 +226,9 @@ const useHighlightLayerStore = defineStore('highlightLayerStore', () => {
     return { highlightLayers }
 })
 
-export {
-    useWarnInfoStore,
-    useMapStore,
-    useSceneStore,
-    useLayerStore,
-    useMapLayerStore,
-    useNewSceneStore,
-    useHighlightLayerStore,
-}
+const useDeviceNameStore = defineStore('deviceNameStore', () => {
+    const deviceName = ref('')
+    return { deviceName }
+})
+
+export { useDeviceNameStore, useWarnInfoStore, useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore, useHighlightLayerStore }

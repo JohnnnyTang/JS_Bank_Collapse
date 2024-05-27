@@ -40,6 +40,10 @@
                                                 style="margin-top: 0.8vh;"
                                                 @change="viewChange(node, data)" /> -->
                                         </div>
+                                        <el-button type="info" :icon="List" circle size="large"
+                                            @click="layerGroupClickHandler(node, data)"
+                                            v-show="!(node.parent.data.label.includes('岸段') || node.parent.data.label.includes('其他'))" />
+
                                     </div>
                                     <div class="feature-container"
                                         v-else-if="data.type == 'feature' && node.parent.data.label.includes('岸段')"
@@ -92,20 +96,27 @@
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-            v-click-out-side="() => showDetail = false">
+        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+            <!-- v-click-out-side="() => showDetail = false" -->
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
                 @close="showDetail = false"></featDetail>
         </div>
 
         <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
             v-loading="false" v-click-out-side="() => showInfoPannel = false">
-            <div class="close" @click="showInfoPannel = false; showDetail = false"></div>
+            <div class="title-block">
+                <div class="title">{{ infoPannelTitle }}</div>
+            </div>
+            <!-- <div class="close" @click="showInfoPannel = false; showDetail = false"></div> -->
             <div class="important-feature">
-                <el-table :data="infoTableData" height="30vh" border>
+                <el-table :data="infoTableData_filtered" height="30vh" stripe border class="infomation-table">
                     <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
                         :label="item.label"></el-table-column>
-                    <el-table-column fixed="right" label="操作" width="80">
+
+                    <el-table-column align="right">
+                        <template #header>
+                            <el-input v-model="search" size="small" placeholder="输入关键字搜索" />
+                        </template>
                         <template #default="scope">
                             <el-button link type="primary" size="small" @click="detailClickHandler4Feature(scope.row)">
                                 查看详情
@@ -144,8 +155,8 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import "mapbox-gl/dist/mapbox-gl.css"
-import { onMounted, ref, watch, onUnmounted } from 'vue';
-import { Hide, View } from '@element-plus/icons-vue'
+import { onMounted, ref, watch, onUnmounted, computed } from 'vue';
+import { Hide, View, List } from '@element-plus/icons-vue'
 import axios from 'axios';
 import { BorderBox9 as DvBorderBox9, Decoration11 as DvDecoration11 } from '@kjgl77/datav-vue3'
 import { clickOutSide as vClickOutSide } from '@mahdikhashan/vue3-click-outside'
@@ -169,12 +180,14 @@ const styles = [
     { backgroundImage: `url('/icons/full.png')` },
 ]
 const featureInfo = ref({})
-let nowSource
 const showDetail = ref(false)
 const showHydroPannel = ref(false)
 const showInfoPannel = ref(false)
 const sideBarLoading = ref(true)
 const legendList = ref([])
+const infoPannelTitle = ref('')
+const search = ref('')
+var latestLGID = ''
 const waterTableData = [
     {
         station: '大通站',
@@ -209,59 +222,33 @@ const waterTableData = [
 ]
 const infoTableData = ref([])
 const infoTableHeader = ref([])
+let nowSource
 const pannelLoading = ref(true)
 const baseMapRadio = ref(1)
 const dataSource = ref([])
-const testSwitch = ref(true)
 
 const expandKey = ['重点岸段', '全江概貌']
+const infoTableData_filtered = computed(() => {
+    // return infoTableData.value.filter((item) => {
+    //     let nameField = sourceNameMap[nowSource]
+    //     return item['' + nameField].includes(search.value)
+    // })
+    if (nowSource == null || nowSource == undefined || nowSource == '') {
+        return infoTableData.value
+    }else{
+
+        // return infoTableData.value
+        let nameField = sourceNameMap[nowSource]
+        return infoTableData.value.filter((item) => {
+            return item['' + nameField].includes(search.value)
+        })
+    }
+})
 
 /////// 
 
 const viewChange = (node, data) => {
     const map = mapStore.getMap()
-    const title2processMap = {
-        '一级预警岸段': (active) => {
-
-        },
-        '二级预警岸段': () => {
-
-        },
-        '三级预警岸段': () => {
-
-        },
-        '已建通道': () => {
-
-        },
-        '在建通道': () => {
-
-        },
-        '规划通道': () => {
-
-        },
-        '流域性骨干河道': () => {
-
-        },
-        '区域性骨干河道': () => {
-
-        },
-        '重要水闸': () => {
-
-        },
-        '重要泵站': () => {
-
-        },
-        '重要湖泊': () => {
-
-        },
-        '行政区划': () => {
-
-        },
-        '水文站点': () => {
-
-        },
-    }
-
     const processMap = {
         'title1': () => {
             data.active ? showLayers(map, DICT.T1LayerDict[data.label])
@@ -287,124 +274,159 @@ const viewChange = (node, data) => {
     }
 }
 const treeNodeClickHandler = async (node, data) => {
-    // if (data.label.includes('岸段') || data.label.includes('沙洲')) {
-    //     console.log('不处理');
-    //     return
-    // }
-    // if (data.label === '其他' || data.label === '长江堤防') {
-    //     console.log('其他，不处理');
-    //     return
-    // }
-    console.log(node);
+
     if (node.level == 2) {
         data.active = !data.active
         viewChange(node, data)
     }
     // showTable
-    // const process = (obj) => {
-    //     let res = []
-    //     let keys = Object.keys(obj)
-    //     keys.forEach(item => {
-    //         res.push({ 'label': obj[item], 'prop': item })
-    //     })
-    //     return res
-    // }
-
-    // if (data.label == '过江通道') {
-    //     // showInfoPannel.value = true
-    //     infoTableData.value = []
-    //     infoTableHeader.value = []
-    //     pannelLoading.value = true
-    //     console.log('data', data.data);
-    //     let tData = data.data
-    //     tData.map((item) => {
-    //         if (item.plan == '1') item.plan == '已建通道'
-    //         else if (item.plan == '0') item.plan == '在建通道'
-    //         else if (item.plan == '-1') item.plan == '规划通道'
-    //     })
-    //     let thData
-    //     thData = {
-    //         'name': '名称',
-    //         'plan': '类型',
-    //     }
-    //     infoTableData.value = tData
-    //     infoTableHeader.value = process(thData)
-    //     pannelLoading.value = false
-    //     return
-    // }
-
-    // else if (data.label == '骨干河道') {
-    //     console.log('data', data.data)
-    //     // showInfoPannel.value = true
-    //     infoTableData.value = []
-    //     infoTableHeader.value = []
-    //     pannelLoading.value = true
-    //     console.log('data', data.data);
-    //     let tData = data.data
-    //     tData.map((item) => {
-
-    //     })
-    //     let thData
-    //     thData = {
-    //         'name': '名称',
-    //         "basin": "流域",
-    //         "water": "水系",
-    //     }
-    //     infoTableData.value = tData
-    //     infoTableHeader.value = process(thData)
-    //     pannelLoading.value = false
-    //     return
-    // }
-    // else if (data.label == '重要水闸') {
-    //     console.log('data', data.data)
-    //     // showInfoPannel.value = true
-    //     infoTableData.value = []
-    //     infoTableHeader.value = []
-    //     pannelLoading.value = true
-    //     console.log('data', data.data);
-    //     let tData = data.data
-    //     tData.map((item) => {
-
-    //     })
-    //     let thData
-    //     thData = {
-    //         "sp_name": "名称",
-    //         "class": "水闸类型",
-    //         "volume": "过闸流量"
-    //     }
-    //     infoTableData.value = tData
-    //     infoTableHeader.value = process(thData)
-    //     pannelLoading.value = false
-    //     return
-
-    // }
-    // else if (data.label == '重要泵站') {
-    //     console.log('data', data.data)
-    //     // showInfoPannel.value = true
-    //     infoTableData.value = []
-    //     infoTableHeader.value = []
-    //     pannelLoading.value = true
-    //     console.log('data', data.data);
-    //     let tData = data.data
-    //     tData.map((item) => {
-
-    //     })
-    //     let thData
-    //     thData = {
-    //         "sp_name": "名称",
-    //         "level": "级别"
-    //     }
-    //     infoTableData.value = tData
-    //     infoTableHeader.value = process(thData)
-    //     pannelLoading.value = false
-    //     return
-
-    // }
-
 
 }
 
+const layerGroupClickHandler = (node, data) => {
+    const parentLabel = node.parent.data.label
+    const totalData = node.parent.data.data
+    infoPannelTitle.value = data.label
+    const process = (obj) => {
+        let res = []
+        let keys = Object.keys(obj)
+        keys.forEach(item => {
+            res.push({ 'label': obj[item], 'prop': item })
+        })
+        return res
+    }
+    // data filter
 
+    if (parentLabel === '过江通道') {
+        showInfoPannel.value = true
+        infoTableData.value = []
+        infoTableHeader.value = []
+        nowSource = ''
+        pannelLoading.value = true
+        const filterFlag = {
+            '已建通道': 1,
+            '在建通道': 0,
+            '规划通道': -1,
+        }
+        const planText = {
+            '1': '已建通道',
+            '0': '在建通道',
+            '-1': '规划通道',
+        }
+        let tableData = totalData.filter((item) => {
+            return item.plan == filterFlag[data.label]
+        })
+        for (let i = 0; i < tableData.length; i++) {
+            tableData[i].typeText = planText['' + tableData[i].plan]
+        }
+        let tableHeadData = {
+            'name': '名称',
+            // 'typeText': '类型',
+        }
+        infoTableData.value = tableData
+        infoTableHeader.value = { ...process(tableHeadData) }
+        nowSource = DICT.LGIDSourceMap['过江通道']
+        pannelLoading.value = false
+        return
+    }
+    else if (parentLabel === '骨干河道') {
+        showInfoPannel.value = true
+        infoTableData.value = []
+        infoTableHeader.value = []
+        nowSource = ''
+        pannelLoading.value = true
+
+        const filterFlag = {
+            '流域性骨干河道': '流域性河道',
+            '区域性骨干河道': '区域性骨干河道',
+        }
+        const typeText = {
+            '流域性河道': '流域性骨干河道',
+            '区域性骨干河道': '区域性骨干河道',
+        }
+
+        let tableData = totalData.filter((item) => {
+            return item.kind == filterFlag[data.label]
+        })
+        for (let i = 0; i < tableData.length; i++) {
+            tableData[i].typeText = typeText['' + tableData[i].kind]
+        }
+        // console.log(tableData);
+        let tableHeadData = {
+            'name': '名称',
+            // 'typeText': '类型',
+        }
+        infoTableData.value = tableData
+        infoTableHeader.value = { ...process(tableHeadData) }
+        nowSource = DICT.LGIDSourceMap['骨干河道']
+        pannelLoading.value = false
+        return
+    }
+    else if (parentLabel === '重要水闸') {
+        showInfoPannel.value = true
+        infoTableData.value = []
+        infoTableHeader.value = []
+        nowSource = ''
+        pannelLoading.value = true
+
+        const filterFlag = {
+            '大中型水闸': 1,
+            '其他水闸': 0,
+        }
+        const typeText = {
+            '0': '其他水闸',
+            '1': '大中型水闸',
+        }
+
+        let tableData = totalData.filter((item) => {
+            return item['if_important'] == filterFlag[data.label]
+        })
+        for (let i = 0; i < tableData.length; i++) {
+            tableData[i].typeText = typeText['' + tableData[i]['if_important']]
+        }
+        let tableHeadData = {
+            'sp_name': '名称',
+            // 'typeText': '类型',
+        }
+        infoTableData.value = tableData
+        infoTableHeader.value = { ...process(tableHeadData) }
+        nowSource = DICT.LGIDSourceMap['重要水闸']
+        pannelLoading.value = false
+        return
+    }
+    else if (parentLabel === '重要泵站') {
+        showInfoPannel.value = true
+        infoTableData.value = []
+        infoTableHeader.value = []
+        nowSource = ''
+        pannelLoading.value = true
+
+        const filterFlag = {
+            '大中型泵站': 1,
+            '其他泵站': 0,
+        }
+        const typeText = {
+            '0': '其他泵站',
+            '1': '大中型泵站',
+        }
+
+        let tableData = totalData.filter((item) => {
+            return item['if_important'] == filterFlag[data.label]
+        })
+        for (let i = 0; i < tableData.length; i++) {
+            tableData[i].typeText = typeText['' + tableData[i]['if_important']]
+        }
+        let tableHeadData = {
+            'sp_name': '名称',
+            // 'typeText': '类型',
+        }
+        infoTableData.value = tableData
+        infoTableHeader.value = { ...process(tableHeadData) }
+        nowSource = DICT.LGIDSourceMap['重要泵站']
+        pannelLoading.value = false
+        return
+    }
+}
 
 
 const baseMapChangeHandler = async () => {
@@ -438,57 +460,82 @@ const baseMapChangeHandler = async () => {
     }
 }
 
-const detailClickHandler4layerGroup = async (lable) => {
-    infoTableData.value = []
-    infoTableHeader.value = []
-    pannelLoading.value = true
+// const detailClickHandler4layerGroup = async (lable) => {
+//     infoTableData.value = []
+//     infoTableHeader.value = []
+//     pannelLoading.value = true
 
-    // showInfoPannel.value = true
-    let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
-    let infoLayer = layers.filter((item) => {
-        if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩') || item.includes('水闸工程-重点')) {
-            return false
-        } return true
-    })
-    let data
-    let thData
+//     // showInfoPannel.value = true
+//     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
+//     let infoLayer = layers.filter((item) => {
+//         if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩') || item.includes('水闸工程-重点')) {
+//             return false
+//         } return true
+//     })
+//     let data
+//     let thData
+//     let map = mapStore.getMap()
+//     for (let i = 0; i < infoLayer.length; i++) {
+//         if (infoLayer[i].includes('过江通道')) {
+//             // let t1 = [] // 已
+//             // let t2 = []  // 在
+//             // let t3 = [] // 规划
+//             let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+//             let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+//             data = [...res1, ...res2]
+//             thData = {
+//                 'name': '名称',
+//                 'plan': '类型',
+//             }
+//             break
+//         }
+//         else if (infoLayer[i].includes('长江干堤')) {
+//         }
+//         else {
+//             data = await getLayerFeatureArray(map, infoLayer[i])
+//             thData = getTableHeader(map, infoLayer[i])
+//         }
+//     }
+//     const process = (obj) => {
+//         let res = []
+//         let keys = Object.keys(obj)
+//         keys.forEach(item => {
+//             res.push({ 'label': obj[item], 'prop': item })
+//         })
+//         return res
+//     }
+
+//     infoTableData.value = data
+//     infoTableHeader.value = process(thData)
+//     pannelLoading.value = false
+// }
+const detailClickHandler4Feature = async (a) => {
+    let featInfo = a
+    // let nowSource = DICT.LGIDSourceMap[infoTableHeader.value.LGID]
+    let newFeatInfomation = {
+        ogData: featInfo,
+        sourceId: nowSource,
+        column: DICT.sourceColumnMap[nowSource],
+    }
+    featureInfo.value = newFeatInfomation
+    showDetail.value = true
     let map = mapStore.getMap()
-    for (let i = 0; i < infoLayer.length; i++) {
-        if (infoLayer[i].includes('过江通道')) {
-            // let t1 = [] // 已
-            // let t2 = []  // 在
-            // let t3 = [] // 规划
-            let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
-            let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
-            data = [...res1, ...res2]
-            thData = {
-                'name': '名称',
-                'plan': '类型',
-            }
-            break
+    console.log(nowSource, newFeatInfomation, sourceZoomMap[nowSource]);
+    map.flyTo({
+        center: [featInfo.center_x, featInfo.center_y],
+        zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
+        speed: 1.0,
+        curve: 1,
+        easing(t) {
+            return t;
         }
-        else if (infoLayer[i].includes('长江干堤')) {
-        }
-        else {
-            data = await getLayerFeatureArray(map, infoLayer[i])
-            thData = getTableHeader(map, infoLayer[i])
-        }
-    }
-    const process = (obj) => {
-        let res = []
-        let keys = Object.keys(obj)
-        keys.forEach(item => {
-            res.push({ 'label': obj[item], 'prop': item })
-        })
-        return res
-    }
-
-    infoTableData.value = data
-    infoTableHeader.value = process(thData)
-    pannelLoading.value = false
+    })
 }
-const detailClickHandler4Feature = async (featInfo, lgId) => {
 
+const featureNodeClick = (node, data) => {
+
+    let featInfo = data.property
+    let lgId = data.lgId
     let nowSource = layerSourceMap[lgId]
     let newFeatInfomation = {
         ogData: featInfo,
@@ -507,12 +554,6 @@ const detailClickHandler4Feature = async (featInfo, lgId) => {
             return t;
         }
     })
-}
-
-const featureNodeClick = (node, data) => {
-    showDetail.value = true
-    // console.log(node.data.property['洲滩信息_人口活动']);
-    detailClickHandler4Feature(data.property, data.lgId)
 }
 
 // methods
@@ -560,6 +601,20 @@ onMounted(async () => {
     dataSource.value = await getSideBarTree()
 
     sideBarLoading.value = false
+
+    map.on('click', ['water_polygon'], (e) => {
+        console.log(e.features[0])
+    })
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === '1') {
+            showDetail.value = true
+        } else if (e.key === '2') {
+            showDetail.value = false
+        } else if (e.key === '3') {
+            console.log(nowSource, sourceNameMap[nowSource])
+        }
+    })
 
 })
 
@@ -656,7 +711,6 @@ onUnmounted(async () => {
     mapStore.getMap().remove()
     mapStore.destroyMap()
 })
-
 
 </script>
 
@@ -756,6 +810,7 @@ onUnmounted(async () => {
                     box-shadow: #cbeafd 10px 7px 20px 0px;
                     display: flex;
                     flex-direction: row;
+                    align-items: center;
                     transition: transform 0.5s;
                     user-select: none;
 
@@ -816,17 +871,19 @@ onUnmounted(async () => {
                 .subScene-container {
                     // width: 12vw;
                     // height: 4vh;
-                    width: 100%;
+                    width: 98%;
                     height: 4.5vh;
                     display: flex;
                     flex-direction: row;
+                    align-items: center;
                     padding: 4px;
                     padding-left: 0;
 
                     .card {
-
-                        width: 88%;
+                        flex-grow: 1;
+                        width: 75%;
                         height: 4vh;
+                        margin-right: 5%;
                         border-radius: 5px;
                         background: rgb(20, 115, 196);
                         padding: 4px;
@@ -835,6 +892,7 @@ onUnmounted(async () => {
                         display: flex;
                         flex-direction: row;
                         justify-content: center;
+                        align-items: center;
                         transition: transform 0.5s;
                         user-select: none;
                         transition: .3s linear;
@@ -848,7 +906,7 @@ onUnmounted(async () => {
                         .top-section {
                             //   height: 10vh;
                             height: 100%;
-                            width: 99%;
+                            width: 100%;
                             border-radius: 5px;
                             display: flex;
                             flex-direction: row;
@@ -1090,22 +1148,38 @@ onUnmounted(async () => {
         z-index: 2;
         left: 20vw;
         top: 20vh;
+        width: 13vw;
+        background-color: rgb(20, 115, 196);
+        backdrop-filter: blur(5px);
+        border: solid 3px #6990c4;
+        border-radius: 2%;
+        overflow: hidden;
 
-        div.close {
-            position: absolute;
-            right: 1vw;
-            top: 1vh;
-            width: 2.2vh;
-            height: 2.2vh;
-            background-size: contain;
-            background-image: url('/icons/minimize.png');
-            z-index: 2;
+        div.title-block {
+            width: 100%;
+            height: 4vh;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+
+            div.title {
+                // font-size: calc(0.4vw + 0.8vh);
+                width: fit-content;
+                height: 4vh;
+                line-height: 4vh;
+                text-align: center;
+                font-size: calc(0.8vw + 0.3vh);
+                font-weight: 600;
+                color: #e3f4ff;
+                text-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
+            }
         }
 
         div.important-feature {
             // width: 20vw;
             // height: 30vh;
-            width: fit-content;
+            width: 13vw;
             height: 30vh;
         }
 
@@ -1203,8 +1277,8 @@ onUnmounted(async () => {
             line-height: 3vh;
             width: 100%;
 
-            .iconn{
-                :hover{
+            .iconn {
+                :hover {
                     cursor: pointer;
                 }
             }
@@ -1232,5 +1306,90 @@ onUnmounted(async () => {
 :deep(.mapboxgl-ctrl.mapboxgl-ctrl-scale) {
     text-align: center;
     font-size: calc(0.5vw + 0.5vh);
+}
+
+:deep(.el-scrollbar__wrap) {
+    scroll-behavior: smooth;
+}
+
+:deep(.el-table__inner-wrapper::before) {
+    background: hsl(210, 70%, 30%);
+}
+
+:deep(.el-table__border-left-patch) {
+    background: transparent;
+}
+
+:deep(.el-table .el-table__cell) {
+    border: 1px solid #c6e7f0;
+}
+
+:deep(.el-table thead th.el-table__cell) {
+    color: #173eaa;
+    background: rgba(238, 244, 255, 0.6);
+    font-size: calc(0.6vw + 0.3vh);
+    height: 2vh;
+
+    div.cell {
+        height: 2vh;
+        line-height: 2vh;
+    }
+}
+
+:deep(.el-table tbody tr) {
+    transition: all 0.6s cubic-bezier(0.68, -0.15, 0.265, 1.15);
+    height: fit-content;
+
+    div.cell {
+        height: fit-content;
+        line-height: 2vh;
+        width: fit-content;
+        font-size: calc(0.6vw + 0.2vh);
+    }
+}
+
+:deep(.el-table tbody tr:nth-child(2n)) {
+    &.even-state {
+        color: hsl(209, 58%, 39%);
+        background: rgb(235, 242, 255);
+        font-weight: 600;
+    }
+
+    &.odd-state {
+        color: rgba(230, 243, 255, 0.9);
+        background: rgb(45, 87, 177);
+        font-weight: 600;
+    }
+}
+
+// :deep(.el-table__body tr:nth-child(2n):hover > td) {
+//     background: hsl(210, 70%, 32%);
+// }
+
+:deep(.el-table tbody tr:nth-child(2n + 1)) {
+    &.even-state {
+        color: rgba(230, 243, 255, 0.9);
+        background: rgb(45, 87, 177);
+        font-weight: 600;
+    }
+
+    &.odd-state {
+        color: hsl(209, 58%, 39%);
+        background: rgb(235, 242, 255);
+        font-weight: 600;
+    }
+}
+
+// :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
+//     background: hsl(210, 70%, 32%);
+// }
+
+:deep(.el-table tbody tr.highLight-row) {
+    background: hsl(210, 70%, 16%);
+    animation: shine 2.4s infinite;
+}
+
+:deep(.el-table tbody tr.highLight-row:hover > td) {
+    cursor: pointer;
 }
 </style>
