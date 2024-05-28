@@ -39,6 +39,9 @@ class UnityLayer {
 
     onAdd(map, gl) {
 
+        let dom = document.querySelector('#DeviceInfoBox')
+        dom.style.display = 'block'
+
         // Set Unity instance configuration
         const buildUrl = "/scratchSomething/unity/collapseBank/build"
         const config = {
