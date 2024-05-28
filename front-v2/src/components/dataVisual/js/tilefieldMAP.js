@@ -168,7 +168,7 @@ const sourceZoomMap = {
     "sluiceArea": 17.5,
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
-    'importantBank': 12.6,
+    'importantBank': 13,
     'sandBar': 12,
     'channel': 13,
 }
