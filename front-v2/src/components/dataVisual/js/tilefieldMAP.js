@@ -417,7 +417,7 @@ const legendListt = [
         style: {
             'height': '15%',
             'width': '50%',
-            'background-color': 'rgb(27, 74, 245)',
+            'background-color': 'rgb(255,120,3)',
         },
         text: '二级预警岸段'
     },
@@ -425,7 +425,7 @@ const legendListt = [
         style: {
             'height': '15%',
             'width': '50%',
-            'background-color': 'rgb(127, 113, 143)',
+            'background-color': 'rgb(245,231,32)',
         },
         text: '三级预警岸段'
     },

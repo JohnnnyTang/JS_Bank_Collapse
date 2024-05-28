@@ -16,15 +16,15 @@ export class FlowFieldController{
     platform: string;
 
     constructor(){
-        this.lineNum = 50000;
+        this.lineNum = 65535;
         this.segmentNum = 8;
         this.fullLife = this.segmentNum * 10;
         this.progressRate = 0.0;
         this.speedFactor = 2.0;
         this.dropRate = 0.005;
         this.dropRateBump = 0.001;
-        this.fillWidth = 1.0;
-        this.aaWidth = 2.0;
+        this.fillWidth = 1.5;
+        this.aaWidth = 2.2;
         this.colorScheme = 0;
         this.isUnsteady = true;
         this.content = "none";

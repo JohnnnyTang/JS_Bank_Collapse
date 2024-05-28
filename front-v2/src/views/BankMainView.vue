@@ -31,8 +31,8 @@ import BankTableVue from '../components/bankMain/BankTable.vue'
 import WarnNoticeVue from '../components/bankMain/WarnNotice.vue'
 import WaterProcessChart from '../components/bankRiskWarn/WaterProcessChart.vue'
 
-mapboxgl.accessToken =
-    'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
+// mapboxgl.accessToken =
+//     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 
 const containerDom = ref(null)
 let map = null

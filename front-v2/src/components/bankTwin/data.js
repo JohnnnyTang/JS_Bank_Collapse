@@ -534,7 +534,7 @@ const getGNSSoption = () => {
     const growthDT = getData(timeData, growthLine)
     let option = {
         title: {
-            text: 'MZ09码头下游-土体表面位移测量站CL-07监测数据',
+            text: 'MZ08海事码头-土体表面位移测量站CL-06监测数据',
             left: 'center',
             top: '2%',
         },

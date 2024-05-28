@@ -932,12 +932,14 @@ const setWarningDeviceStyle = (
         let i = 0
         let interval = [0.2, 0.3, 0.4, 0.5, 0.4, 0.3]
         let intv = setInterval(() => {
-            i = (i + 1) % 6
-            map.setPaintProperty(
-                `${deviceLayer}-${deviceCode}`,
-                'fill-opacity',
-                0.3 + interval[i],
-            )
+            if (map.getLayer(`${deviceLayer}-${deviceCode}`)) {
+                i = (i + 1) % 6
+                map.setPaintProperty(
+                    `${deviceLayer}-${deviceCode}`,
+                    'fill-opacity',
+                    0.3 + interval[i],
+                )
+            }
         }, 200)
         useWarnInfoStore().areaBreatheInterval[warnData.id] = intv
     }
