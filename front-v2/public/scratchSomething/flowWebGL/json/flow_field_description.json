@@ -1,0 +1,97 @@
+{
+    "area_masks": [
+        "/scratchSomething/flowWebGL/images/mask_100.png",
+        "/scratchSomething/flowWebGL/images/mask_101.png",
+        "/scratchSomething/flowWebGL/images/mask_102.png",
+        "/scratchSomething/flowWebGL/images/mask_103.png",
+        "/scratchSomething/flowWebGL/images/mask_104.png",
+        "/scratchSomething/flowWebGL/images/mask_105.png",
+        "/scratchSomething/flowWebGL/images/mask_106.png",
+        "/scratchSomething/flowWebGL/images/mask_107.png",
+        "/scratchSomething/flowWebGL/images/mask_108.png",
+        "/scratchSomething/flowWebGL/images/mask_109.png",
+        "/scratchSomething/flowWebGL/images/mask_110.png",
+        "/scratchSomething/flowWebGL/images/mask_111.png",
+        "/scratchSomething/flowWebGL/images/mask_112.png",
+        "/scratchSomething/flowWebGL/images/mask_113.png",
+        "/scratchSomething/flowWebGL/images/mask_114.png",
+        "/scratchSomething/flowWebGL/images/mask_115.png",
+        "/scratchSomething/flowWebGL/images/mask_116.png",
+        "/scratchSomething/flowWebGL/images/mask_117.png",
+        "/scratchSomething/flowWebGL/images/mask_118.png",
+        "/scratchSomething/flowWebGL/images/mask_119.png",
+        "/scratchSomething/flowWebGL/images/mask_120.png",
+        "/scratchSomething/flowWebGL/images/mask_121.png",
+        "/scratchSomething/flowWebGL/images/mask_122.png",
+        "/scratchSomething/flowWebGL/images/mask_123.png",
+        "/scratchSomething/flowWebGL/images/mask_124.png",
+        "/scratchSomething/flowWebGL/images/mask_125.png",
+        "/scratchSomething/flowWebGL/images/mask_126.png"
+    ],
+    "constraints": {
+        "max_drop_rate": 0.1,
+        "max_drop_rate_bump": 0.2,
+        "max_segment_num": 16,
+        "max_streamline_num": 1048576,
+        "max_texture_size": 4096
+    },
+    "extent": [
+        0.8334519409367115,
+        0.4087464036632672,
+        0.8388303296774701,
+        0.40586521884815613
+    ],
+    "flow_boundary": {
+        "u_max": 2.3461,
+        "u_min": -2.1176,
+        "v_max": 2.0175,
+        "v_min": -1.8959
+    },
+    "flow_fields": [
+        "/scratchSomething/flowWebGL/images/uv_100.png",
+        "/scratchSomething/flowWebGL/images/uv_101.png",
+        "/scratchSomething/flowWebGL/images/uv_102.png",
+        "/scratchSomething/flowWebGL/images/uv_103.png",
+        "/scratchSomething/flowWebGL/images/uv_104.png",
+        "/scratchSomething/flowWebGL/images/uv_105.png",
+        "/scratchSomething/flowWebGL/images/uv_106.png",
+        "/scratchSomething/flowWebGL/images/uv_107.png",
+        "/scratchSomething/flowWebGL/images/uv_108.png",
+        "/scratchSomething/flowWebGL/images/uv_109.png",
+        "/scratchSomething/flowWebGL/images/uv_110.png",
+        "/scratchSomething/flowWebGL/images/uv_111.png",
+        "/scratchSomething/flowWebGL/images/uv_112.png",
+        "/scratchSomething/flowWebGL/images/uv_113.png",
+        "/scratchSomething/flowWebGL/images/uv_114.png",
+        "/scratchSomething/flowWebGL/images/uv_115.png",
+        "/scratchSomething/flowWebGL/images/uv_116.png",
+        "/scratchSomething/flowWebGL/images/uv_117.png",
+        "/scratchSomething/flowWebGL/images/uv_118.png",
+        "/scratchSomething/flowWebGL/images/uv_119.png",
+        "/scratchSomething/flowWebGL/images/uv_120.png",
+        "/scratchSomething/flowWebGL/images/uv_121.png",
+        "/scratchSomething/flowWebGL/images/uv_122.png",
+        "/scratchSomething/flowWebGL/images/uv_123.png",
+        "/scratchSomething/flowWebGL/images/uv_124.png",
+        "/scratchSomething/flowWebGL/images/uv_125.png",
+        "/scratchSomething/flowWebGL/images/uv_126.png"
+    ],
+    "projection": {
+        "2D": "/scratchSomething/flowWebGL/images/projection.png",
+        "3D": "/scratchSomething/flowWebGL/images/projection_3D.png"
+    },
+    "texture_size": {
+        "area_mask": [
+            1024,
+            558
+        ],
+        "flow_field": [
+            1024,
+            558
+        ],
+        "projection": [
+            1024,
+            2048
+        ]
+    }
+}
