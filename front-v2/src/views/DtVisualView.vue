@@ -93,7 +93,7 @@
         </div> -->
 
         <div class="legend-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
-            <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
+            <mapLegend @close="closeHandler(0)" :legendList="legendList" ></mapLegend>
         </div>
 
         <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
