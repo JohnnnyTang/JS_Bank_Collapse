@@ -153,7 +153,7 @@ const videoList = ref([
         position: '32.0381061, 120.5263473',
         deviceId: 'FB5033037',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
         order: 1,
         presetPt: [
             {name: '下游岸段', status: 'normal'},
@@ -168,7 +168,7 @@ const videoList = ref([
         position: '32.0432963, 120.5122242',
         deviceId: 'FB5033036',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
         order: 2,
         presetPt: [
             {name: '上游岸段', status: 'normal'},
