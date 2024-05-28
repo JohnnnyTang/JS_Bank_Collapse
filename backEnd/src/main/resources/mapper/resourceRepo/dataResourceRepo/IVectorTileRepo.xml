@@ -67,6 +67,21 @@
         ) as res
     </select>
 
+    <select id="getLayerWholeInfo" resultType="java.util.Map">
+        select ST_X(ST_Centroid(geom)) as center_x, ST_Y(ST_Centroid(geom)) as center_Y, ARRAY[ST_XMin(geom), ST_YMin(geom), ST_XMax(geom), ST_YMax(geom)] as bbox, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from (
+        select ST_Transform(geom, 4326) as geom, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from ${tableName}
+        order by if_important DESC
+        ) as res
+    </select>
+
     <select id="selectSectionLineInfo" resultType="com.johnny.bank.model.resource.dataResource.SectionLineInfo">
         select id, ST_X(stend.stp) as st_x, ST_Y(stend.stp) as st_x, ST_X(stend.endp) as end_x, ST_Y(stend.endp) as end_x, name, label
         from (
