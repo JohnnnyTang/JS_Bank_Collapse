@@ -3264,9 +3264,9 @@ const layerRemoveFunction = (map, layerID) => {
 const initSortedLayer = async (map) => {
     // 面
     await layerAddFunction(map, '大型湖泊')
-    await layerAddFunction(map, '洲滩')
     await layerAddFunction(map, '区域性骨干河道')
     await layerAddFunction(map, '流域性河道')
+    await layerAddFunction(map, '洲滩')
     await layerAddFunction(map, '其他河道')
     await layerAddFunction(map, '市级行政区')
     await layerAddFunction(map, '沿江码头')
