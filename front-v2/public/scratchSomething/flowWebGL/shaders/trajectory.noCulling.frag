@@ -33,31 +33,15 @@ int rampColors0[8] = int[](
     // 0xfee08b,
     // 0xfdae61,
     // 0xf46d43,
-    // 0xd53e4f
-    // 0x293eff,
-    // 0x2838f9,
-    // 0x2631f2,
-    // 0x242aec,
-    // 0x2322e6,
-    // 0x211ae0,
-    // 0x1f0fd9,
-    // 0x1d01d3
-    0x6272ff,
-    0x5b69ff,
-    0x535fff,
-    0x4d56ff,
-    0x464bff,
-    0x4040ff,
-    0x3b33ff,
-    0x3624ff
-    // 0x5768ff,
-    // 0x4e5cf8,
-    // 0x4651f0,
-    // 0x3d44e9,
-    // 0x3438e1,
-    // 0x2b2bd9,
-    // 0x211bd0,
-    // 0x1404c8 
+    // 0xd53e4f#45a4fc
+    0x45a4fc,
+    0x3392f6,
+    0x2680f0,
+    0x226de7,
+    0x2859dd,
+    0x3144d1,
+    0x3b2cc3,
+    0x4401b2
 );
 
 int rampColors1[8] = int[](
@@ -83,13 +67,12 @@ int rampColors2[8] = int[](
 
 int[8] rampColors()
 {
-    // if (colorScheme == 0.0)
-    //     return rampColors0;
-    // if (colorScheme == 1.0)
-    //     return rampColors1;
-    // if (colorScheme == 2.0)
-    //     return rampColors2;
-    return rampColors0;
+    if (colorScheme == 0.0)
+        return rampColors0;
+    if (colorScheme == 1.0)
+        return rampColors1;
+    if (colorScheme == 2.0)
+        return rampColors2;
 } 
 
 vec3 colorFromInt(int color)
@@ -123,7 +106,7 @@ float getAlpha(float param)
 void main() 
 {
     if (sls.isDiscarded >= fullLife) discard; 
-    float alpha = getAlpha(abs(sls.edgeParam)) * 0.5;
+    float alpha = getAlpha(abs(sls.edgeParam));
 
     // vec3 color = mix(colorFromInt(rampColors[int(sls.velocity * 7.0)]), colorFromInt(rampColors[int(sls.velocity * 7.0 + 0.5)]), fract(sls.velocity * 7.0));
     vec3 color = velocityColor(sls.velocity);

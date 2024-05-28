@@ -16,7 +16,7 @@ export class FlowFieldController{
     platform: string;
 
     constructor(){
-        this.lineNum = 131071;
+        this.lineNum = 65535;
         this.segmentNum = 8;
         this.fullLife = this.segmentNum * 10;
         this.progressRate = 0.0;

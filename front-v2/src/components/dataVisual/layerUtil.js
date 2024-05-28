@@ -798,7 +798,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     'symbol-placement': "line-center",
-                    'text-size': 25,
+                    'text-size': 26,
                     'text-offset': [0, 0.2],
                     'text-anchor': 'top',
                     'text-allow-overlap': true,
