@@ -100,6 +100,13 @@ watch(() => useDeviceNameStore().deviceName, async (newVal) => {
     // }
     deviceCode.value = nameCodeMap[newVal]
     deviceInfo.value = (await axios.get('/api/data/monitorInfo/code/' + deviceCode.value)).data
+
+    if (deviceInfo.value.type === '6') {
+        buttonShow.value = false
+    } else {
+        buttonShow.value = true
+    }
+
 })
 
 onMounted(() => {
