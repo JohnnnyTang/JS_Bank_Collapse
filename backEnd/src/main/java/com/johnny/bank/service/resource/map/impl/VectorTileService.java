@@ -102,4 +102,9 @@ public class VectorTileService implements IVectorTileService {
         VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
         return IVectorTileRepo.getLayerBasicInfo(vectorTileSource.getTableName(), vectorTileSource.getFieldList());
     }
+
+    public List<Map<String, Object>> getLayerWholeInfo(String tileName) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
+        return IVectorTileRepo.getLayerWholeInfo(vectorTileSource.getTableName(), vectorTileSource.getFieldList());
+    }
 }
