@@ -91,5 +91,10 @@
             1024,
             2048
         ]
-    }
+    },
+    "valid_address": [
+        "/scratchSomething/flowWebGL/images/valid_100.png",
+        "/scratchSomething/flowWebGL/images/valid_101.png",
+        "/scratchSomething/flowWebGL/images/valid_102.png"
+    ]
 }
