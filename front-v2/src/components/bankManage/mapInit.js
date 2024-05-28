@@ -8,7 +8,8 @@ import monitorDetailV2 from '../dataVisual/featureDetails/monitorDetailV2.vue'
 // import warningPop from '../bankTwin/warningPop.vue'
 import warningPopup from '../bankTwin/warningPopup.vue'
 import { useWarnInfoStore } from '../../store/mapStore'
-
+import { convertToMercator } from '../modelStore/riskCalc/coordConvert'
+import proj4 from 'proj4'
 import { ref, createApp, h } from 'vue'
 import axios from 'axios'
 import { useSceneStore } from '../../store/mapStore'
@@ -830,11 +831,27 @@ function generateCircleLineString(x, y, radius, numPoints = 24) {
         const angle = i * angleStep
         const pointX = x + radius * Math.cos(angle)
         const pointY = y + radius * Math.sin(angle)
-        points.push([pointX, pointY])
+        points.push(proj4('EPSG:3857', 'EPSG:4326', [pointX, pointY]))
     }
 
     // Close the circle by adding the first point at the end
     points.push(points[0])
+
+    return points
+}
+
+function buildCircleWithMeters(x, y, radius, numPoints = 24) {
+    const xy = convertToMercator([x, y])
+
+    console.log('gen xy', xy)
+
+    const circlePoints = generateCircleLineString(
+        xy[0],
+        xy[1],
+        radius,
+        numPoints,
+    )
+    console.log('circles back', circlePoints)
 
     return {
         type: 'FeatureCollection',
@@ -843,8 +860,8 @@ function generateCircleLineString(x, y, radius, numPoints = 24) {
                 type: 'Feature',
                 geometry: {
                     type: 'Polygon',
-                    coordinates: [points],
-                }
+                    coordinates: [circlePoints],
+                },
             },
         ],
     }
@@ -881,13 +898,12 @@ const setWarningDeviceStyle = (
     let property = findProptyFromJson(json, deviceCode)
     propertyRef.value = property
 
-
     if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
         if (!map.getSource(`${deviceLayer}-${deviceCode}-source`)) {
-            const circleJson = generateCircleLineString(
+            const circleJson = buildCircleWithMeters(
                 property.longitude,
                 property.latitude,
-                0.002,
+                220,
             )
             console.log('circle circle', circleJson)
             map.addSource(`${deviceLayer}-${deviceCode}-source`, {
@@ -907,12 +923,23 @@ const setWarningDeviceStyle = (
                     // 'icon-allow-overlap': true,
                 },
                 paint: {
-                    'fill-color': 'rgba(233, 0, 0, 0.6)',
-                    // 'circle-blur': 20
+                    'fill-color': '#E05F2D',
+                    'fill-opacity': 0.3,
                 },
             },
             'mzsBankLine',
         )
+        let i = 0
+        let interval = [0.2, 0.3, 0.4, 0.5, 0.4, 0.3]
+        let intv = setInterval(() => {
+            i = (i + 1) % 6
+            map.setPaintProperty(
+                `${deviceLayer}-${deviceCode}`,
+                'fill-opacity',
+                0.3 + interval[i],
+            )
+        }, 200)
+        useWarnInfoStore().areaBreatheInterval[warnData.id] = intv
     }
     // let json = map.getSource(sourceMap[deviceLayer])['_data']
 

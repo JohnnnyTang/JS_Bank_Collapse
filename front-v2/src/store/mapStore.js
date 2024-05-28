@@ -177,6 +177,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const fake = ref(false)
     const curDealId = ref('')
     const videoActive = ref([null, null])
+    const areaBreatheInterval = ref({})
 
     function removeInfoItem(removeItem) {
         warnInfo.value = warnInfo.value.filter(
@@ -218,6 +219,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
         curDealId,
         videoActive,
         restoreWarn,
+        areaBreatheInterval
     }
 })
 

@@ -33,4 +33,12 @@ export default defineConfig({
         //     cert: fs.readFileSync('cert/192.168.1.107.pem'),
         // }
     },
+    optimizeDeps: {
+        include: ['pdfjs-dist'], // optionally specify dependency name
+        esbuildOptions: {
+            supported: {
+                'top-level-await': true,
+            },
+        },
+    },
 })

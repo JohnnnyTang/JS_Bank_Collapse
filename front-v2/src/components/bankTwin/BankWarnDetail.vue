@@ -268,7 +268,7 @@ const dealtWarnList = computed(() => {
             res.push(item)
         }
     })
-    console.log('computed dealt warn', res)
+    // console.log('computed dealt warn', res)
     return res
 })
 
@@ -417,7 +417,7 @@ const filterDealtWarnInfo = (warnList) => {
             res.push(item)
         }
     })
-    console.log('filtered dealt warn', res)
+    // console.log('filtered dealt warn', res)
     return res
 }
 
@@ -426,10 +426,10 @@ const confirmDealWithWarn = async (warnItem) => {
         await BackEndRequest.updateWarnDealtStatus(warnItem.id, 1)
     }
     if (warnItem.id in warnInfoStore.warnPopupMap) {
-        console.log(
-            'dealing with this',
-            warnInfoStore.warnPopupMap[warnItem.id],
-        )
+        // console.log(
+        //     'dealing with this',
+        //     warnInfoStore.warnPopupMap[warnItem.id],
+        // )
         warnInfoStore.warnPopupMap[warnItem.id].remove()
         delete warnInfoStore.warnPopupMap[warnItem.id]
 
@@ -438,9 +438,13 @@ const confirmDealWithWarn = async (warnItem) => {
         console.log(type, id)
         removeWarningDeviceStyle(useMapStore().getMap(), type, id)
     }
+    if (warnItem.id in warnInfoStore.areaBreatheInterval) {
+        clearInterval(warnInfoStore.areaBreatheInterval[warnItem.id])
+        delete warnInfoStore.areaBreatheInterval[warnItem.id]
+    }
     warnInfoStore.removeInfoItem(warnItem)
     warnInfoStore.videoActive = [null, null]
-    console.log('dealing', warnItem)
+    // console.log('dealing', warnItem)
     warnItem.ifDealt = 1
     // historyRowLoading.value[warnIndex] = false
 }
@@ -464,10 +468,10 @@ watch(
         if (newVal && newVal != '') {
             // console.log("123123123123", newVal)
             startDealWithWarn(newVal - 1)
-            console.log(
-                '21312313123213',
-                warnInfoStore.warnInfo_history[newVal - 1].id,
-            )
+            // console.log(
+            //     '21312313123213',
+            //     warnInfoStore.warnInfo_history[newVal - 1].id,
+            // )
             collapseOpenItem.value.push(
                 warnInfoStore.warnInfo_history[newVal - 1].deviceId,
             )

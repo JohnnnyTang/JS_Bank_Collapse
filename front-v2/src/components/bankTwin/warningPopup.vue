@@ -2,11 +2,16 @@
     <div class="warning-card">
         <div class="main">
             <div class="icon"></div>
-            <div class="text title-text">{{props.index}}</div>
+            <div class="text title-text">{{ props.index }}</div>
             <div class="text time-text">{{ props.warningInfo.warnTime }}</div>
             <div class="button-group">
                 <div class="data button-item" @click="clickHandler">数据</div>
-                <div class="deat button-item" @click="confrmDealWithWarn(props.index)">处置</div>
+                <div
+                    class="deat button-item"
+                    @click="confrmDealWithWarn(props.index)"
+                >
+                    处置
+                </div>
             </div>
         </div>
 
@@ -20,8 +25,11 @@
                 <!-- <div class="tabs"></div> -->
                 <div class="chart" ref="chartDom"></div>
             </div>
-            <div class="up-arrow" :id="deviceType" :class="{'active': arrowActive}">
-            </div>
+            <div
+                class="up-arrow"
+                :id="deviceType"
+                :class="{ active: arrowActive }"
+            ></div>
         </dv-border-box10>
 
         <!-- <div v-show="showFakeStressPic" class="fake-stress-pic"></div> -->
@@ -41,8 +49,8 @@ const props = defineProps({
         type: Object,
     },
     index: {
-        type: Number
-    }
+        type: Number,
+    },
 })
 const DEVICETYPEMAP = ['GNSS', '测斜仪', '水压力计', '应力桩']
 const chartDom = ref()
@@ -53,7 +61,7 @@ const fakeWarnCodeList = [
     'MZS120.55327892_32.02707923_1',
     'MZS120.51967889_32.04004108_4',
     'MZS120.541648_32.030524_2',
-    'MZS120.54599538_32.02837993_1'
+    'MZS120.54599538_32.02837993_1',
 ]
 const warnInfoStore = useWarnInfoStore()
 const deviceTypeList = ['GNSS', '应力桩', '水压力计', '测斜仪']
@@ -109,9 +117,7 @@ const confrmDealWithWarn = (index) => {
     // historyRowLoading.value[warnIndex] = false
 }
 
-onMounted(() => {
-
-})
+onMounted(() => {})
 </script>
 
 <style lang="scss" scoped>
@@ -205,7 +211,6 @@ onMounted(() => {
                     background-color: rgb(255, 61, 61);
                     color: rgb(248, 252, 255);
                 }
-                
             }
         }
     }
@@ -253,11 +258,11 @@ onMounted(() => {
             opacity: 0;
             transition: all 0.8s ease-in;
 
-            &[id="应力桩"] {
+            &[id='应力桩'] {
                 top: 15.4vh;
             }
 
-            &[id="GNSS"] {
+            &[id='GNSS'] {
                 top: 11vh;
             }
 
@@ -269,13 +274,19 @@ onMounted(() => {
 
     div.arrow {
         position: absolute;
-        left: 45%;
-        bottom: -0.5vh;
-        // width: 1vh;
-        // height: 1vh;
-        border-left: calc(0.1vw + 0.3vh) solid transparent;
-        border-right: calc(0.1vw + 0.3vh) solid transparent;
-        border-top: calc(0.2vw + 0.3vh) solid rgb(252, 0, 0);
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -1.6vh;
+        // width: 2.5vh;
+        // height: 2.5vh;
+        // background-image: url('/placeholder-128.png');
+        // background-size: contain;
+        // background-repeat: no-repeat;
+        animation: upDown 1s linear infinite;
+
+        border-left: calc(0.4vw + 0.5vh) solid transparent;
+        border-right: calc(0.4vw + 0.5vh) solid transparent;
+        border-top: calc(0.8vw + 1vh) solid rgba(255, 0, 0, 0.85);
     }
 }
 
@@ -301,6 +312,19 @@ div.fake-stress-pic {
     50% {
         // margin-top: 0.3vh;
         transform: scale(0.9);
+    }
+}
+
+@keyframes upDown {
+    0%,
+    100% {
+        // margin-top: 0.5vh;
+        transform: translateY(15%) translateX(-50%);
+    }
+
+    50% {
+        // margin-top: 0.3vh;
+        transform: translateY(0) translateX(-50%);
     }
 }
 </style>

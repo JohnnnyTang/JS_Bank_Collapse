@@ -178,7 +178,7 @@ class DataPioneer {
         let manometer = [] //压力计
         let stress = [] // 应力桩
         let camera = []
-        console.log('geojson...', features)
+        // console.log('geojson...', features)
         features.forEach((feat) => {
             switch (feat['properties']['type']) {
                 case '1':
