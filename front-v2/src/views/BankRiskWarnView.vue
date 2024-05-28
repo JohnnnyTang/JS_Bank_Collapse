@@ -105,60 +105,44 @@
         </div> -->
 
         <div class="basic-info-container">
-                <div class="basic-info-content">
-                    <div class="title-container">民主沙右缘示范段</div>
-                    <div class="key-val-container">
-                        <div class="key-text">预警级别：</div>
-                        <div class="val-text">Ⅰ级</div>
-                    </div>
-                    <div class="key-val-container right">
-                        <div class="key-text">岸段长度：</div>
-                        <div class="val-text">全长7公里</div>
-                    </div>
+            <div class="basic-info-content">
+                <div class="title-container">民主沙右缘示范段</div>
+                <div class="key-val-container">
+                    <div class="key-text">预警级别：</div>
+                    <div class="val-text">Ⅰ级</div>
                 </div>
+                <div class="key-val-container right">
+                    <div class="key-text">岸段长度：</div>
+                    <div class="val-text">全长7公里</div>
+                </div>
+            </div>
         </div>
         <div class="risk-item-title">崩岸风险因素分析</div>
 
         <div class="risk-item-container">
             <div class="risk-item" :class="{ active: showWaterPower }">
-                <div
-                    class="risk-main-index waterpower"
-                    @click="showWaterPowerFunc"
-                >
+                <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
                     <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
                     <div class="risk-item-text">水流动力分析</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
-                    <dv-border-box-12
-                        :color="['rgb(73, 164, 101)', '#9cf3e0']"
-                        v-if="showRiverBed"
-                    ></dv-border-box-12>
+                    <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
                     <div class="risk-item-text">河床演变分析</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
-                <div
-                    class="risk-main-index bankGeology"
-                    @click="showGeologyAndProjectFunc"
-                >
-                    <dv-border-box-12
-                        :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
-                        v-if="showGeologyAndProject"
-                    ></dv-border-box-12>
+                <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
+                    <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
+                        v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">岸坡地质分析</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
-                <div
-                    class="risk-main-index outproject"
-                    @click="showGeologyAndProjectFunc"
-                >
-                    <dv-border-box-12
-                        :color="['rgb(165, 142, 78)', '#e5ee98']"
-                        v-if="showGeologyAndProject"
-                    ></dv-border-box-12>
+                <div class="risk-main-index outproject" @click="showGeologyAndProjectFunc">
+                    <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']"
+                        v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">外部因素分析</div>
                 </div>
             </div>
@@ -166,11 +150,7 @@
 
         <div class="raster-control-block" v-if="showRasterControl">
             <label class="switch">
-                <input
-                    type="checkbox"
-                    :checked="showRaster"
-                    @click="RasterControlHandler()"
-                />
+                <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -180,11 +160,7 @@
 
         <div class="bankLine-control-block">
             <label class="switch">
-                <input
-                    type="checkbox"
-                    :checked="showBankLine"
-                    @click="BankLineControlHandler()"
-                />
+                <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -236,77 +212,39 @@
             <button @click="showGeologyAndProjectFunc">地质条件</button>
         </div> -->
 
-        <profileInfoVue
-            v-if="showProfileInfo"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :shapeChartLoad="shapeChartLoad"
-            :erosionChartLoad="erosionChartLoad"
-        />
+        <profileInfoVue v-if="showProfileInfo" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :shapeChartLoad="shapeChartLoad" :erosionChartLoad="erosionChartLoad" />
 
-        <profileShapeYearlyVue
-            v-if="showYearlyProfileShape"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :shapeYearlyChartLoad="shapeYearlyChartLoad"
-        />
+        <profileShapeYearlyVue v-if="showYearlyProfileShape" @profile-value-change="changeProfileValue"
+            :profileData="profileData" :profileList="profileList" :shapeYearlyChartLoad="shapeYearlyChartLoad" />
 
-        <profileShapeVue
-            v-if="showProfileShape"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileDataCompare="profileDataCompare"
-            :profileList="profileList"
-            :shapeChartLoad="shapeChartLoad"
-        />
+        <profileShapeVue v-if="showProfileShape" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
 
         <!-- <div class="drag profileSlope" v-if="showProfileSlope" v-draggable="{ bounds: 'body', cancel: 'div.content' }"> -->
-        <profileSlopeVue
-            v-if="showProfileSlope"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :slopeChartLoad="slopeChartLoad"
-        />
+        <profileSlopeVue v-if="showProfileSlope" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :slopeChartLoad="slopeChartLoad" />
         <!-- </div> -->
 
-        <profileErosionVue
-            v-if="showProfileErosion"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :slopeChartLoad="erosionChartLoad"
-        />
+        <profileErosionVue v-if="showProfileErosion" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :slopeChartLoad="erosionChartLoad" />
 
-        <div
-            v-if="showBedFlowChart"
-            style="
+        <div v-if="showBedFlowChart" style="
                 position: absolute;
                 top: 16.25vh;
                 left: 1vw;
                 width: 30.2vw;
                 height: 23.5vh;
                 z-index: 10;
-            "
-        >
+            ">
             <bedFlowChartVue />
         </div>
 
-        <flowspeedInfoVue
-            v-if="showFlowSpeed"
-            :profileList="profileList"
-            :waterCondition="waterCondition"
-            :flowspeedChartLoad="flowspeedChartLoad"
-        />
+        <flowspeedInfoVue v-if="showFlowSpeed" :profileList="profileList" :waterCondition="waterCondition"
+            :flowspeedChartLoad="flowspeedChartLoad" />
         <div v-if="showFlowSpeed" class="flow-control-block">
             <label class="switch">
-                <input
-                    type="checkbox"
-                    :checked="showFlow"
-                    @click="flowControlHandler()"
-                />
+                <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -314,27 +252,18 @@
             </div>
         </div>
         <div v-if="showFlowSpeed" class="time-shower-block">
-            <flowTimeShower
-                :type="'exp'"
-                :time-step="timeStep"
-                :total-count="25"
-            ></flowTimeShower>
+            <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
         </div>
 
-        <div
-            v-if="showWaterProcessChart"
-            style="
+        <div v-if="showWaterProcessChart" style="
                 position: absolute;
                 top: 66vh;
                 left: 1vw;
                 width: 30.2vw;
                 height: 25vh;
                 z-index: 10;
-            "
-        >
-            <waterProcessChartVue
-                :timeStep="timeStep"    
-            />
+            ">
+            <waterProcessChartVue :timeStep="timeStep" />
         </div>
 
         <geologyAndProjectVue v-if="showGeologyAndProject" />
@@ -344,11 +273,7 @@
             :showRiskResult="showRiskResult"
         /> -->
 
-        <div
-            class="drag riskResult"
-            v-if="showRiskResult"
-            v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-        >
+        <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <riskResultVue :profileList="profileList" />
         </div>
 
@@ -414,18 +339,10 @@
             </div>
         </div> -->
 
-        <el-dialog
-            v-model="sectionConfirmShow"
-            title="绘制断面确认"
-            width="40vh"
-        >
+        <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh">
             <span>确认使用此断面进行计算</span>
-            <el-input
-                v-model="tempProfileName"
-                style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
-                placeholder="请输入断面名称"
-                clearable
-            />
+            <el-input v-model="tempProfileName" style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
+                placeholder="请输入断面名称" clearable />
             <template #footer>
                 <div class="dialog-footer">
                     <div style="text-align: right">
@@ -609,9 +526,9 @@ const riskDataAll = ref([
 const placeValue = ref('mzs')
 
 // 场景与地形选择
-const sceneBeforeSelectChange = () => {}
+const sceneBeforeSelectChange = () => { }
 
-const sceneNowSelectChange = () => {}
+const sceneNowSelectChange = () => { }
 
 const confirmProfileTime = () => {
     sceneConfirmShow.value = true
@@ -832,7 +749,7 @@ const CalProfile = async (before, now) => {
 const CalProfileById = async (before, now, id) => {
     const taskId = await bankRiskWarn.runProfileModel_long(before, now, id + 1)
     let RunStatus
-    for (;;) {
+    for (; ;) {
         try {
             RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
         } catch (error) {
@@ -883,7 +800,7 @@ const CalProfileList = (profileData) => {
         }
         try {
             profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) {}
+        } catch (error) { }
     })
     // let map = useMapStore().getMap()
     // if (map) {
@@ -904,7 +821,7 @@ const CalProfileListForShow = (profileData) => {
         }
         try {
             profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) {}
+        } catch (error) { }
     })
     let map = useMapStore().getMap()
     if (map) {
@@ -914,13 +831,13 @@ const CalProfileListForShow = (profileData) => {
     }
 }
 
-const sceneSelectChange = () => {}
+const sceneSelectChange = () => { }
 
-const onAddOption = () => {}
+const onAddOption = () => { }
 
-const onAddProfileOption = () => {}
+const onAddProfileOption = () => { }
 
-const onAddProfile = () => {}
+const onAddProfile = () => { }
 
 const flowControlHandler = async () => {
     console.log('!!!!flow  control')
@@ -1249,7 +1166,7 @@ const sureSectionRese = async () => {
         EndPtY,
     )
     let RunStatus = ''
-    for (;;) {
+    for (; ;) {
         try {
             RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
         } catch (error) {
@@ -1494,9 +1411,22 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
         })
+        map.addSource('riverBeachSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+        })
 
         addRasterLayer(map, 23032209, 'mapRaster')
         map.setLayoutProperty('mapRaster', 'visibility', 'none')
+        map.addLayer({
+            id: 'riverBeachArea',
+            type: 'fill',
+            source: 'riverBeachSource',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': 'rgba(210,244,247, 1)',
+            },
+        })
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -2172,12 +2102,10 @@ div.risk-warn-container {
             border-radius: 20px;
             // border:#0f1011 2px solid;
             z-index: 5;
-            background-image: linear-gradient(
-                to right,
-                rgb(17, 17, 255),
-                rgb(220, 126, 37),
-                rgb(255, 9, 9)
-            );
+            background-image: linear-gradient(to right,
+                    rgb(17, 17, 255),
+                    rgb(220, 126, 37),
+                    rgb(255, 9, 9));
             box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
         }
 
@@ -2317,11 +2245,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                + .slider {
+                +.slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                + .slider:before {
+                +.slider:before {
                     transform: translateY(-1.5em);
                 }
             }
@@ -2435,6 +2363,7 @@ div.risk-warn-container {
                 0% {
                     background-position: 0% 50%;
                 }
+
                 // 50% {
                 //     background-position: 200% 50%;
                 // }
@@ -2478,6 +2407,7 @@ div.risk-warn-container {
             justify-content: center;
             border-radius: 5px;
             transition: 0.3s linear;
+
             &:hover {
                 transform: scale(1.05);
                 cursor: pointer;
@@ -2493,55 +2423,47 @@ div.risk-warn-container {
 
             &.waterpower {
                 // transition: all ease-in-out;
-                background: linear-gradient(
-                    90deg,
-                    rgba(33, 100, 182, 0.35),
-                    // rgba(33, 100, 182, 1),
-                    // rgba(0, 34, 215, 1),
-                    // rgba(0, 34, 215, 1),
-                    rgba(0, 34, 215, 1),
-                    rgba(0, 34, 215, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(33, 100, 182, 0.35),
+                        // rgba(33, 100, 182, 1),
+                        // rgba(0, 34, 215, 1),
+                        // rgba(0, 34, 215, 1),
+                        rgba(0, 34, 215, 1),
+                        rgba(0, 34, 215, 1));
                 background-size: 400% 100%;
                 // background-color: rgba(28, 85, 156, 0.6);
             }
 
             &.riverbed {
-                background: linear-gradient(
-                    90deg,
-                    rgba(39, 145, 87, 0.35),
-                    // rgba(39, 145, 87, 1),
-                    // rgb(0, 121, 16, 1),
-                    // rgba(0, 121, 16, 1),
-                    rgba(0, 121, 16, 1),
-                    rgba(0, 121, 16, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(39, 145, 87, 0.35),
+                        // rgba(39, 145, 87, 1),
+                        // rgb(0, 121, 16, 1),
+                        // rgba(0, 121, 16, 1),
+                        rgba(0, 121, 16, 1),
+                        rgba(0, 121, 16, 1));
                 background-size: 400% 100%;
             }
 
             &.bankGeology {
-                background: linear-gradient(
-                    90deg,
-                    rgba(95, 21, 138, 0.35),
-                    // rgba(95, 21, 138, 1),
-                    // rgb(63, 0, 121, 1),
-                    // rgba(63, 0, 121, 1),
-                    rgba(63, 0, 121, 1),
-                    rgba(63, 0, 121, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(95, 21, 138, 0.35),
+                        // rgba(95, 21, 138, 1),
+                        // rgb(63, 0, 121, 1),
+                        // rgba(63, 0, 121, 1),
+                        rgba(63, 0, 121, 1),
+                        rgba(63, 0, 121, 1));
                 background-size: 400% 100%;
             }
 
             &.outproject {
-                background: linear-gradient(
-                    90deg,
-                    rgba(228, 143, 16, 0.35),
-                    // rgba(228, 143, 16, 1),
-                    // rgba(121, 83, 0, 1),
-                    // rgba(121, 83, 0, 1),
-                    rgba(121, 83, 0, 1),
-                    rgba(121, 83, 0, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(228, 143, 16, 0.35),
+                        // rgba(228, 143, 16, 1),
+                        // rgba(121, 83, 0, 1),
+                        // rgba(121, 83, 0, 1),
+                        rgba(121, 83, 0, 1),
+                        rgba(121, 83, 0, 1));
                 background-size: 400% 100%;
             }
 
@@ -2677,11 +2599,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                + .slider {
+                +.slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                + .slider:before {
+                +.slider:before {
                     transform: translateY(-1.5em);
                 }
             }
@@ -2755,11 +2677,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                + .slider {
+                +.slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                + .slider:before {
+                +.slider:before {
                     transform: translateY(-1.5em);
                 }
             }
@@ -2962,6 +2884,7 @@ div.risk-warn-container {
             100% 100%;
     }
 }
+
 @keyframes marquee {
     0% {
         transform: translateX(0%);
