@@ -47,12 +47,16 @@ tile:
   mzsTilePath: E:\bankAppData\rasterTile\
   worldTilePath: E:\bankAppData\baseMap
   nodeServicePath: E:\bankAppData\baseMapService\index.js
+  riverTilePath: E:\bankAppData\riverRasterTile\
+  riverImagePath: E:\bankAppData\imageTiles\tiles\
 
 video:
   yangzhong: E:\bankAppData\video\125_1711267167.mp4
 
 multiIndex:
+  condaEnv: Env1
   dataPath: E:\bankAppData\modelData
+  wholeDataPath: E:\bankAppData\dataWhole
   resPath: E:\bankAppData\modelRes
 
 sms:

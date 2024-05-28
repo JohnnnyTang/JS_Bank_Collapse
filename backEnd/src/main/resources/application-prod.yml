@@ -1,0 +1,40 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: bank
+      authentication-database: admin
+      uri: mongodb://localhost:27017/bank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+      #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
+    default:
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: 123456
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+multiIndex:
+  condaEnv: Env1
+  dataPath: E:\Data\bankProjectData\modelData
+  wholeDataPath: E:\Data\bankProjectData\dataWhole
+  resPath: E:\Data\bankProjectData\modelRes\
+
+tile:
+  mzsTilePath: E:/Data/bankProjectData/mzsTile/
+  worldTilePath: E://Data//bankProjectData//2020-10-planet-14
+  nodeServicePath: E://Data//bankProjectData//node//index.js
+
