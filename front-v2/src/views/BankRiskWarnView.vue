@@ -481,8 +481,9 @@ import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
-import { initScratchMap } from '../utils/mapUtils'
-import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask'
+import { initPureScratchMap } from '../utils/mapUtils'
+// import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask'
+import FlowFieldLayer from '../utils/WebGL/notSimpleLayer'
 // import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
 import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer'
 import { useMapStore } from '../store/mapStore'
@@ -924,31 +925,16 @@ const onAddProfile = () => {}
 const flowControlHandler = async () => {
     console.log('!!!!flow  control')
     showFlow.value = !showFlow.value
+    let map = useMapStore().getMap()
     // console.log(showFlow.value);
     if (showFlow.value) {
-        let map = useMapStore().getMap()
         if (map) {
-            if (map.getLayer('近岸流场')) {
-                flow.show()
+            if (map.getLayer('FlowLayer')) {
+                // flow.show()
+                map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
                 // mapFlyToRiver(map)
             } else {
-                let flowSrc = []
-                for (let i = 0; i < 26; i++) {
-                    flowSrc.push(
-                        `/scratchSomething/terrain_flow/json/uv_${i}.bin`,
-                    )
-                }
-                flow = reactive(
-                    new SteadyFlowLayer(
-                        '近岸流场',
-                        '/scratchSomething/terrain_flow/json/station.bin',
-                        flowSrc,
-                        (url) => url.match(/uv_(\d+)\.bin/)[1],
-                        '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
-                    ),
-                )
-                flow.particleNum.n = 2800
-                flow.speedFactor.n = 1.0
+                flow = reactive(new FlowFieldLayer('/scratchSomething/flowWebGL/json/flow_field_description.json'))
                 map.addLayer(flow)
                 watch(
                     () => flow.currentResourcePointer,
@@ -966,7 +952,8 @@ const flowControlHandler = async () => {
             })
         }
     } else {
-        flow.hide()
+        // flow.hide()
+        map.setLayoutProperty('FlowLayer', 'visibility', 'none');
     }
 }
 
@@ -1437,7 +1424,7 @@ const addBankLineRiskLayer = (map, profileList) => {
 }
 
 onMounted(async () => {
-    await initScratchMap(mapContainer.value).then(async (map) => {
+    await initPureScratchMap(mapContainer.value).then(async (map) => {
         mapInstance = map
         // map.on('draw.create', function (e) {
         //     sectionConfirmShow.value = true

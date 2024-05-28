@@ -7,14 +7,15 @@
 </template>
 
 <script setup>
-import { initMap, initScratchMap, loadImage, initPureScratchMap,initBaseMap } from '../../utils/mapUtils'
-import { onMounted, watch, ref } from 'vue'
+import { initMap, initScratchMap, loadImage, initPureScratchMap, initBaseMap } from '../../utils/mapUtils'
+import { onMounted, watch, ref, reactive } from 'vue'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { getStyleJson4base } from '../../utils/mapUtils'
 import BankWarnLayer from './js/bankWarnLayer'
 import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
+import FlowFieldLayer from '../../utils/WebGL/notSimpleLayer'
 import { layerAddFunction, layerRemoveFunction } from './layerUtil'
 import * as customLayers from '../../utils/WebGL/customLayers'
 
@@ -39,13 +40,24 @@ const mapFlyToRiver = (mapIns) => {
 
 onMounted(async () => {
 
-    const map = await initBaseMap(mapDom.value)
+    const map = await initMap(mapDom.value)
 
     mapFlyToRiver(map)
+    // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
+    const jsonUrl = '/scratchSomething/flowWebGL/json/flow_field_description.json'
 
-    await layerAddFunction(map, '已建通道')
-    await layerAddFunction(map, '在建通道')
-    await layerAddFunction(map, '规划通道')
+    let flowFieldLayer = reactive(new FlowFieldLayer(jsonUrl))
+    map.addLayer(flowFieldLayer)
+
+
+    watch(() => flowFieldLayer.currentResourcePointer, (v) => {
+        console.log(v);
+    })
+
+
+    // await layerAddFunction(map, '已建通道')
+    // await layerAddFunction(map, '在建通道')
+    // await layerAddFunction(map, '规划通道')
     // await layerAddFunction(map,'已建通道-注记')
     // await layerAddFunction(map,'在建通道-注记')
     // await layerAddFunction(map,'规划通道-注记')
@@ -55,7 +67,7 @@ onMounted(async () => {
 
     // await layerAddFunction(map, '大中型泵站')
     // await layerAddFunction(map, '其他泵站')
-   
+
     // await layerAddFunction(map, '大中型水闸')
     // await layerAddFunction(map, '水闸工程-重点')
     // await layerAddFunction(map, '其他水闸')
@@ -78,14 +90,22 @@ onMounted(async () => {
     // await layerAddFunction(map, '大型湖泊-注记')
 
 
-    map.on('click', ['区域性骨干河道'],(e) => {
-        console.log(e.features[0]);
+    // map.on('click', ['区域性骨干河道'],(e) => {
+    //     console.log(e.features[0]);
+    // })
+
+    window.addEventListener('keydown', (e) => {
+        if(e.key == 'q'){
+            console.log('qqqqqqq');
+            
+            map.setLayoutProperty('FlowLayer', 'visibility', 'none');
+        }else if (e.key == 'w'){
+            console.log('wwwwwww');
+            map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
+        }
+        
     })
 
-    window.addEventListener('keydown',()=>{
-        console.log(map.getZoom());
-    })
-   
 
     // const scriptInteract = document.createElement('script')
     // scriptInteract.src = './src/utils/unityInteraction.js'
