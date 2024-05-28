@@ -171,10 +171,10 @@ const videoList = ref([
         videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
         order: 2,
         presetPt: [
-            {name: '上游岸段', status: 'normal'},
             {name: '下游岸段', status: 'normal'},
-            {name: '设备5', status: 'normal'},
-            {name: '设备6', status: 'normal'},
+            {name: '上游岸段', status: 'normal'},
+            {name: 'CL-02', status: 'normal'},
+            {name: 'JZ-01', status: 'normal'},
         ], 
         warn: false
     },
