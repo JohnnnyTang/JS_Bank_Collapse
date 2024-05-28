@@ -113,6 +113,7 @@ body,
     width: 100vw;
     margin: 0 0 0 0;
     padding: 0 0 0 0;
+    overflow: hidden;
 }
 
 .nav-popper {
