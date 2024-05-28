@@ -8,7 +8,8 @@ import monitorDetailV2 from '../dataVisual/featureDetails/monitorDetailV2.vue'
 // import warningPop from '../bankTwin/warningPop.vue'
 import warningPopup from '../bankTwin/warningPopup.vue'
 import { useWarnInfoStore } from '../../store/mapStore'
-
+import { convertToMercator } from '../modelStore/riskCalc/coordConvert'
+import proj4 from 'proj4'
 import { ref, createApp, h } from 'vue'
 import axios from 'axios'
 import { useSceneStore } from '../../store/mapStore'
@@ -253,7 +254,19 @@ const mapInit = async (map, vis) => {
             // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
             'text-offset': [-1.0, 1.15],
             'text-anchor': 'top',
-            'text-size': 16,
+            'text-size': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                2,
+                ['literal', 6],
+                10,
+                ['literal', 10],
+                18,
+                ['literal', 24],
+                22,
+                ['literal', 32],
+            ],
             'text-allow-overlap': true,
         },
         paint: {
@@ -365,7 +378,7 @@ const mapInit = async (map, vis) => {
 
         //////////////monitor device////////////
         let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
-        let monitorDevice = DataPioneer.generateGeoJson(
+        let monitorDevice = DataPioneer.generateDeviceGeoJson(
             monitorInfo,
             (element) => {
                 return [element['longitude'], element['latitude']]
@@ -374,6 +387,7 @@ const mapInit = async (map, vis) => {
         )
         const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
+        console.log('res geojson', gnss)
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',
@@ -455,6 +469,8 @@ const mapInit = async (map, vis) => {
         //     }
         // });
 
+        let minzoom = 16
+
         map.addLayer({
             id: 'GNSS基准站',
             type: 'symbol',
@@ -463,6 +479,40 @@ const mapInit = async (map, vis) => {
                 'icon-image': 'gnss-jz-static',
                 'icon-size': 0.2,
                 'icon-allow-overlap': true,
+            },
+        })
+        map.addLayer({
+            id: 'GNSS基准站-标注',
+            type: 'symbol',
+            source: 'gnss-jz-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1,
+            },
+            paint: {
+                'text-color': 'rgba(255,127, 0, 0.75)',
             },
         })
         map.addLayer({
@@ -476,6 +526,40 @@ const mapInit = async (map, vis) => {
             },
         })
         map.addLayer({
+            id: 'GNSS-标注',
+            type: 'symbol',
+            source: 'gnss-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1,
+            },
+            paint: {
+                'text-color': 'rgba(255,127, 0, 0.9)',
+            },
+        })
+        map.addLayer({
             id: '测斜仪',
             type: 'symbol',
             source: 'incline-source',
@@ -483,6 +567,41 @@ const mapInit = async (map, vis) => {
                 'icon-image': 'incline-static',
                 'icon-size': 0.2,
                 'icon-allow-overlap': true,
+            },
+        })
+
+        map.addLayer({
+            id: '测斜仪-标注',
+            type: 'symbol',
+            source: 'incline-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1,
+            },
+            paint: {
+                'text-color': 'rgba(127,0,255, 0.9)',
             },
         })
         map.addLayer({
@@ -496,6 +615,40 @@ const mapInit = async (map, vis) => {
             },
         })
         map.addLayer({
+            id: '孔隙水压力计-标注',
+            type: 'symbol',
+            source: 'manometer-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1,
+            },
+            paint: {
+                'text-color': 'rgba(14,242,30, 0.9)',
+            },
+        })
+        map.addLayer({
             id: '应力桩',
             type: 'symbol',
             source: 'stress-source',
@@ -506,6 +659,40 @@ const mapInit = async (map, vis) => {
             },
         })
         map.addLayer({
+            id: '应力桩-标注',
+            type: 'symbol',
+            source: 'stress-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1,
+            },
+            paint: {
+                'text-color': 'rgba(255,0,255, 0.9)',
+            },
+        })
+        map.addLayer({
             id: '监控摄像头',
             type: 'symbol',
             source: 'camera-source',
@@ -513,6 +700,40 @@ const mapInit = async (map, vis) => {
                 'icon-image': 'camera-static',
                 'icon-size': 0.2,
                 'icon-allow-overlap': true,
+            },
+        })
+        map.addLayer({
+            id: '监控摄像头-标注',
+            type: 'symbol',
+            source: 'camera-source',
+            minzoom,
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-size': [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    14,
+                    ['literal', 20],
+                    18,
+                    ['literal', 26],
+                    20,
+                    ['literal', 32],
+                ],
+                'text-allow-overlap': true,
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-variable-anchor': [
+                    'top',
+                    'bottom',
+                    'top-left',
+                    'top-right',
+                    'bottom-left',
+                    'bottom-right',
+                ],
+                'text-radial-offset': 1,
+            },
+            paint: {
+                'text-color': 'rgba(3,5,255, 0.9)',
             },
         })
 
@@ -592,15 +813,57 @@ const mapInit = async (map, vis) => {
                 if (filteredData.length != 0)
                     useWarnInfoStore().warnInfo = filteredData
                 // 22222 set fake data
-                useWarnInfoStore().warnInfo_history = [
-                    ...filteredData,
-                ]
+                useWarnInfoStore().warnInfo_history = [...filteredData]
                 useWarnInfoStore().fake = true
                 useWarnInfoStore().videoActive = [0, 2]
             } else if (e.key == 'a') {
                 useWarnInfoStore().warnInfo_history = []
             }
         })
+    }
+}
+
+function generateCircleLineString(x, y, radius, numPoints = 24) {
+    const points = []
+    const angleStep = (2 * Math.PI) / numPoints
+
+    for (let i = 0; i < numPoints; i++) {
+        const angle = i * angleStep
+        const pointX = x + radius * Math.cos(angle)
+        const pointY = y + radius * Math.sin(angle)
+        points.push(proj4('EPSG:3857', 'EPSG:4326', [pointX, pointY]))
+    }
+
+    // Close the circle by adding the first point at the end
+    points.push(points[0])
+
+    return points
+}
+
+function buildCircleWithMeters(x, y, radius, numPoints = 24) {
+    const xy = convertToMercator([x, y])
+
+    console.log('gen xy', xy)
+
+    const circlePoints = generateCircleLineString(
+        xy[0],
+        xy[1],
+        radius,
+        numPoints,
+    )
+    console.log('circles back', circlePoints)
+
+    return {
+        type: 'FeatureCollection',
+        features: [
+            {
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [circlePoints],
+                },
+            },
+        ],
     }
 }
 
@@ -623,31 +886,65 @@ const setWarningDeviceStyle = (
     //     孔隙水压力计: 'manometer-dot-pulsing',
     //     应力桩: 'stress-dot-pulsing',
     // }
-    const pulsingImageId = 'gnss-dot-pulsing' //only one style
+    // const pulsingImageId = 'gnss-dot-pulsing' //only one style
     const sourceMap = {
         GNSS: 'gnss-source',
         测斜仪: 'incline-source',
         孔隙水压力计: 'manometer-source',
         应力桩: 'stress-source',
     }
-
-    if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
-        map.addLayer({
-            id: `${deviceLayer}-${deviceCode}`,
-            type: 'symbol',
-            source: sourceMap[deviceLayer],
-            layout: {
-                'icon-image': pulsingImageId,
-                'icon-size': 1,
-                'icon-allow-overlap': true,
-            },
-            filter: ['all', ['==', 'code', deviceCode]],
-        })
-    }
     let json = map.getSource(sourceMap[deviceLayer])['_data']
 
     let property = findProptyFromJson(json, deviceCode)
     propertyRef.value = property
+
+    if (!map.getLayer(`${deviceLayer}-${deviceCode}`)) {
+        if (!map.getSource(`${deviceLayer}-${deviceCode}-source`)) {
+            const circleJson = buildCircleWithMeters(
+                property.longitude,
+                property.latitude,
+                220,
+            )
+            console.log('circle circle', circleJson)
+            map.addSource(`${deviceLayer}-${deviceCode}-source`, {
+                type: 'geojson',
+                data: circleJson,
+            })
+        }
+        map.addLayer(
+            {
+                id: `${deviceLayer}-${deviceCode}`,
+                // type: 'symbol',
+                type: 'fill',
+                source: `${deviceLayer}-${deviceCode}-source`,
+                layout: {
+                    // 'icon-image': pulsingImageId,
+                    // 'icon-size': 1,
+                    // 'icon-allow-overlap': true,
+                },
+                paint: {
+                    'fill-color': '#E05F2D',
+                    'fill-opacity': 0.3,
+                },
+            },
+            'mzsBankLine',
+        )
+        let i = 0
+        let interval = [0.2, 0.3, 0.4, 0.5, 0.4, 0.3]
+        let intv = setInterval(() => {
+            i = (i + 1) % 6
+            map.setPaintProperty(
+                `${deviceLayer}-${deviceCode}`,
+                'fill-opacity',
+                0.3 + interval[i],
+            )
+        }, 200)
+        useWarnInfoStore().areaBreatheInterval[warnData.id] = intv
+    }
+    // let json = map.getSource(sourceMap[deviceLayer])['_data']
+
+    // let property = findProptyFromJson(json, deviceCode)
+    // propertyRef.value = property
 
     // warning
     const popup = createWarningPopup({ warningInfo: warnData, index })
@@ -731,8 +1028,9 @@ const warnInterval = async (map, minute) => {
         }
     })
 
-    let allWarnData = (await axios.get(`/api/data/deviceWarn/minute/${minute}`))
-        .data
+    let allWarnData = (
+        await axios.get(`/api/data/deviceWarn/danger/minute/${minute}`)
+    ).data
     // let warnType = 'GNSS'
     let filteredData = filterWarnData(allWarnData)
     let lastPos

@@ -20,7 +20,49 @@ let refHeight = ref('')
 let sectionName = ref('')
 const propertyRef = ref({})
 const zoomRef = ref()
-
+const deviceIdMap = {
+    'MZS120.51749289_32.04059243_1': 'CL-01',
+    'MZS120.51977143_32.04001152_1': 'CL-02',
+    'MZS120.52557975_32.03825056_1': 'CL-03',
+    'MZS120.52660704_32.03676583_1': 'CL-04',
+    'MZS120.53334877_32.03227055_1': 'CL-05',
+    'MZS120.54599538_32.02837993_1': 'CL-06',
+    'MZS120.55327892_32.02707923_1': 'CL-07',
+    'MZS120.55649757_32.02592404_1': 'CL-08',
+    'MZS120.56334257_32.02298144_1': 'CL-09',
+    'MZS120.56944728_32.02070961_1': 'CL-10',
+    'MZS120.51494347_32.04269763_1': 'JZ-01',
+    'MZS120.54184889_32.0309461_1': 'JZ-02',
+    'MZS120.5592327_32.025761_1': 'JZ-03',
+    'MZS120.51726088_32.04054582_3': 'KX-01',
+    'MZS120.51738292_32.04054923_3': 'KX-02',
+    'MZS120.51749021_32.04053105_3': 'KX-03',
+    'MZS120.51957026_32.04008655_3': 'KX-04',
+    'MZS120.51967889_32.04004108_3': 'KX-05',
+    'MZS120.51986665_32.03998992_3': 'KX-06',
+    'MZS120.52557975_32.03825056_3': 'KX-07',
+    'MZS120.52565217_32.03813574_3': 'KX-08',
+    'MZS120.52566826_32.03799363_3': 'KX-09',
+    'MZS120.513203_32.042733_2': 'YL-01',
+    'MZS120.515433_32.04231_2': 'YL-02',
+    'MZS120.521221_32.040331_2': 'YL-03',
+    'MZS120.529078_32.034385_2': 'YL-04',
+    'MZS120.541648_32.030524_2': 'YL-05',
+    'MZS120.548925_32.029361_2': 'YL-06',
+    'MZS120.552209_32.028149_2': 'YL-07',
+    'MZS120.51967889_32.04004108_4': 'CX-01',
+    'MZS120.51986665_32.03998992_4': 'CX-02',
+    'MZS120.52557975_32.03825056_4': 'CX-03',
+    'MZS120.52565217_32.03813574_4': 'CX-04',
+    'MZS120.52566826_32.03799363_4': 'CX-05',
+    'MZS120.51726088_32.04054582_4': 'CX-06',
+    'MZS120.51738292_32.04054923_4': 'CX-07',
+    'MZS120.51749021_32.04053105_4': 'CX-08',
+    'MZS120.51957026_32.04008655_4': 'CX-09',
+    'MZS120.54224179_32.03077085_6': 'SP-03',
+    'MZS120.5155315_32.04267723_6': 'SP-02',
+    'MZS120.52240697_32.03941692_6': 'SP-01',
+}
 
 // Data Prepare
 class DataPioneer {
@@ -136,6 +178,7 @@ class DataPioneer {
         let manometer = [] //压力计
         let stress = [] // 应力桩
         let camera = []
+        // console.log('geojson...', features)
         features.forEach((feat) => {
             switch (feat['properties']['type']) {
                 case '1':
@@ -193,6 +236,28 @@ class DataPioneer {
             let feature = {
                 type: 'Feature',
                 properties: element,
+                geometry: {
+                    coordinates: coords,
+                    type: type,
+                },
+            }
+            features.push(feature)
+        })
+        const geojson = {
+            type: 'FeatureCollection',
+            features: features,
+        }
+        return geojson
+    }
+
+    static generateDeviceGeoJson(itemArr, getCoords, type) {
+        const features = []
+        itemArr.forEach((element) => {
+            let coords = getCoords(element)
+            // console.log(element)
+            let feature = {
+                type: 'Feature',
+                properties: {...element, label: deviceIdMap[element.code]},
                 geometry: {
                     coordinates: coords,
                     type: type,

@@ -177,6 +177,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
     const fake = ref(false)
     const curDealId = ref('')
     const videoActive = ref([null, null])
+    const areaBreatheInterval = ref({})
 
     function removeInfoItem(removeItem) {
         warnInfo.value = warnInfo.value.filter(
@@ -218,6 +219,7 @@ const useWarnInfoStore = defineStore('WarnInfoStore', () => {
         curDealId,
         videoActive,
         restoreWarn,
+        areaBreatheInterval
     }
 })
 
@@ -226,12 +228,9 @@ const useHighlightLayerStore = defineStore('highlightLayerStore', () => {
     return { highlightLayers }
 })
 
-export {
-    useWarnInfoStore,
-    useMapStore,
-    useSceneStore,
-    useLayerStore,
-    useMapLayerStore,
-    useNewSceneStore,
-    useHighlightLayerStore,
-}
+const useDeviceNameStore = defineStore('deviceNameStore', () => {
+    const deviceName = ref('')
+    return { deviceName }
+})
+
+export { useDeviceNameStore, useWarnInfoStore, useMapStore, useSceneStore, useLayerStore, useMapLayerStore, useNewSceneStore, useHighlightLayerStore }

@@ -489,7 +489,7 @@ div.main-header-container {
             height: 4vh;
             width: 4vh;
             // background-color: antiquewhite;
-            background-image: url('/user.png');
+            // background-image: url('/user.png');
             background-repeat: no-repeat;
             background-size: contain;
             &:hover {
@@ -501,7 +501,7 @@ div.main-header-container {
             height: 1.6vh;
             width: 1.6vh;
             // background-color: #8a9a9e;
-            background-image: url('/down-arrow.png');
+            // background-image: url('/down-arrow.png');
             background-repeat: no-repeat;
             background-size: contain;
             &:hover {

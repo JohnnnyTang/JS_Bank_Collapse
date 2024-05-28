@@ -10,8 +10,10 @@ export default class MaskLayer {
         this.map = undefined
         this.id = 'Mask-Layer'
         this.renderingMode = '3d'
+        // this.minzoom = 18
+        // this.maxzoom = 22
 
-        this.bbox = [ 120.4787, 120.6014, 31.9742, 32.0934 ]
+        this.bbox = [120.4787, 120.6014, 31.9742, 32.0934]
     }
 
     onAdd(map, gl) {
@@ -32,10 +34,10 @@ export default class MaskLayer {
         // this.offScreenShader = await createShader(gl, '/shaders/examples/webgl/triangle.glsl')
         this.shader = await createShader(gl, '/scratchSomething/terrainWebGL/shader/quad.glsl')
 
-        const tl = fromLonLat([ this.bbox[0], this.bbox[3] ])
-        const tr = fromLonLat([ this.bbox[1], this.bbox[3] ])
-        const bl = fromLonLat([ this.bbox[0], this.bbox[2] ])
-        const br = fromLonLat([ this.bbox[1], this.bbox[2] ])
+        const tl = fromLonLat([this.bbox[0], this.bbox[3]])
+        const tr = fromLonLat([this.bbox[1], this.bbox[3]])
+        const bl = fromLonLat([this.bbox[0], this.bbox[2]])
+        const br = fromLonLat([this.bbox[1], this.bbox[2]])
         const boxArray1 = [
             ...encodeFloatToDouble(tl[0]),
             ...encodeFloatToDouble(tl[1]),
@@ -51,7 +53,7 @@ export default class MaskLayer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer)
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxArray1), gl.STATIC_DRAW)
         gl.bindBuffer(gl.ARRAY_BUFFER, null)
-    
+
         this.VAO = gl.createVertexArray()
         gl.bindVertexArray(this.VAO)
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
@@ -72,8 +74,8 @@ export default class MaskLayer {
         // No render condition
         if (!this.isInitialized) return
 
-        const minZoom = 9
-        const maxZoom = 12
+        const minZoom = 14
+        const maxZoom = 16
         const currentZoom = Math.min(maxZoom, Math.max(minZoom, this.map.getZoom()))
         const opacity = lerp(1, 0, (currentZoom - minZoom) / (maxZoom - minZoom))
 
@@ -84,7 +86,7 @@ export default class MaskLayer {
         const blendDstRgb = gl.getParameter(gl.BLEND_DST_RGB)
         const blendSrcAlpha = gl.getParameter(gl.BLEND_SRC_ALPHA)
         const blendDstAlpha = gl.getParameter(gl.BLEND_DST_ALPHA)
-        
+
         if (!isBlendingEnabled) gl.enable(gl.BLEND)
 
         gl.blendFunc(gl.ZERO, gl.SRC_COLOR)
@@ -112,7 +114,7 @@ function encodeFloatToDouble(value) {
 
     const result = new Float32Array(2);
     result[0] = value;
-    
+
     const delta = value - result[0];
     result[1] = delta;
     return result;
@@ -138,7 +140,7 @@ async function createShader(gl, url) {
 
     let shaderCode = ''
     await axios.get(url)
-    .then(response => shaderCode += response.data)
+        .then(response => shaderCode += response.data)
     const vertexShaderStage = compileShader(gl, shaderCode, gl.VERTEX_SHADER)
     const fragmentShaderStage = compileShader(gl, shaderCode, gl.FRAGMENT_SHADER)
 
@@ -154,12 +156,12 @@ async function createShader(gl, url) {
     return shader
 
     function compileShader(gl, source, type) {
-    
+
         const versionDefinition = '#version 300 es\n'
         const module = gl.createShader(type)
         if (type === gl.VERTEX_SHADER) source = versionDefinition + '#define VERTEX_SHADER\n' + source
         else if (type === gl.FRAGMENT_SHADER) source = versionDefinition + '#define FRAGMENT_SHADER\n' + source
-    
+
         gl.shaderSource(module, source)
         gl.compileShader(module)
         if (!gl.getShaderParameter(module, gl.COMPILE_STATUS)) {
@@ -167,7 +169,7 @@ async function createShader(gl, url) {
             gl.deleteShader(module)
             return null
         }
-    
+
         return module
     }
 }
@@ -211,7 +213,7 @@ function createFrameBuffer(gl, textures, renderBuffer) {
  * @param { number } type 
  */
 function createTexture2D(gl, width, height, internalFormat, format, type) {
-    
+
     const texture = gl.createTexture()
     gl.bindTexture(gl.TEXTURE_2D, texture)
 
@@ -243,7 +245,7 @@ function createRenderBuffer(gl, width, height) {
 }
 
 function mercatorXfromLon(lon) {
-    
+
     return (180. + lon) / 360.
 }
 
@@ -257,15 +259,15 @@ function fromLonLat(lonLat) {
     const x = mercatorXfromLon(lonLat[0])
     const y = mercatorYfromLat(lonLat[1])
 
-    return [ x, y ]
+    return [x, y]
 }
 
-        
+
 function lerp(a, b, t) {
 
     return (1 - t) * a + t * b
 }
 
-export{
+export {
     MaskLayer
 }
