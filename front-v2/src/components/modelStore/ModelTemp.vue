@@ -1,7 +1,7 @@
 <template>
     <div class="model-temp-container">
         <div class="bg-img"></div>
-        <BottomWaveVue/>
+        <!-- <BottomWaveVue/> -->
     </div>
 </template>
 
@@ -20,7 +20,7 @@ div.model-temp-container {
     width: 100vw;
     height: 92vh;
     overflow: hidden;
-    // background: linear-gradient(to bottom right, #b4c5fc, #e0f0ff, #7486a1);
+    background: linear-gradient(to bottom right, #b4d9fc, #e0f0ff, #b4cff8);
     background-color: aliceblue;
     background-size: 100% 100%;
     animation: slideBackgroundColor 4s ease infinite;

@@ -4,7 +4,7 @@
         <!-- <div class="selector-container"></div> -->
         <router-view />
         <!-- <ScrollHistoryVue :knowledgeContainerWidth="knowledgeContainerWidth" ref="scrollDom"/> -->
-        <bottomWaveVue />
+        <!-- <bottomWaveVue /> -->
     </div>
 </template>
 
@@ -32,8 +32,8 @@ div.bankKnowledge-container {
     // background-color: rgb(129, 143, 156);
     background: linear-gradient(
         60deg,
-        rgb(45, 30, 109) 0%,
-        rgb(5, 80, 165) 100%
+        rgb(63, 132, 223) 0%,
+        rgb(37, 135, 247) 100%
     );
 
     div.selector-container {
