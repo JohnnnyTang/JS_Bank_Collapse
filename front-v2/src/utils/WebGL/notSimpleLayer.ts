@@ -14,6 +14,7 @@ export default class FlowFieldLayer{
     // ffManager:FlowFieldManager;
     parser: JsonFileParser;
     controller: FlowFieldController;
+    resourcePrefix: string;
     map:mapboxgl.Map | null = null;
     GL:WebGL2RenderingContext | null = null;
 
@@ -70,12 +71,13 @@ export default class FlowFieldLayer{
     //     this.renderingMode = '2d';
     //     this.ffManager = ffManager;
     // }
-    constructor(jsonUrl:string) {
-        this.id = 'FlowLayer';
+    constructor(layerID:string,jsonUrl:string,resourcePrefix:string) {
+        this.id = layerID;
         this.type = 'custom';
         this.renderingMode = '2d';
         // this.ffManager = ffManager;
         this.parser = new JsonFileParser(jsonUrl);
+        this.resourcePrefix = resourcePrefix;
         this.controller = new FlowFieldController();
     }
 
@@ -103,6 +105,7 @@ export default class FlowFieldLayer{
 
         if(currentPhase != lastPhase){
             this.currentResourcePointer = (this.currentResourcePointer+1) % this.phaseCount;
+            console.log('now time step :: ', this.currentResourcePointer)
             //checkout new texture
             let index = nextPhase % this.textureArraySize;
             let gl:WebGL2RenderingContext = this.GL!;
@@ -176,11 +179,12 @@ export default class FlowFieldLayer{
 
     async FillTextureByImage(gl:WebGL2RenderingContext,Tex:WebGLTexture,format:number,filter:number,width:number,height:number,imgSrc:string,type:string){
 
-
+        let imgSrc_backEnd = this.resourcePrefix + imgSrc
         //reparsing 
         if(type === 'Float'){
             
-            axios.get(imgSrc,{responseType:'blob'})
+            // axios.get(imgSrc,{responseType:'blob'})
+            axios.get(imgSrc_backEnd,{responseType:'blob'})
             .then((response)=>{
                 createImageBitmap(response.data,{imageOrientation:'flipY',
                     premultiplyAlpha:'none',colorSpaceConversion:'default'})
@@ -232,7 +236,8 @@ export default class FlowFieldLayer{
         }
         else {
 
-            await axios.get(imgSrc,{responseType:'blob'})
+            // await axios.get(imgSrc,{responseType:'blob'})
+            await axios.get(imgSrc_backEnd,{responseType:'blob'})
             .then((response)=>{
                 createImageBitmap(response.data,{imageOrientation: "flipY", premultiplyAlpha: "none", colorSpaceConversion: "default"})
                 .then((bitmap)=>{

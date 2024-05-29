@@ -50,7 +50,7 @@
 
         <div class="monitor-legend-container">
             <div class="monitor-legend-title" @click="deviceShowControl(-1)">
-                监测设备图例
+                监测设备
             </div>
             <div class="monitor-legend-block">
                 <!-- GNSS only -->
@@ -63,7 +63,7 @@
                         <span>{{ gnssLegendInfo.text2 }}</span>
                     </div>
                     <div style="display: flex; flex-direction: row">
-                        <div class="legend-block" @click="deviceShowControl(0)">
+                        <div class="legend-block" style="margin-right: 0.5vw;">
                             <div class="icon-block GNSS-icon" :style="{
                                 backgroundImage: `url(${gnssLegendInfo.icon1})`,
                             }"></div>
@@ -76,8 +76,13 @@
                                     text-shadow: #7388c148 1px 1px 0;
                                 ">
                                 {{ gnssLegendInfo.device1 }}</span>
+
+                            <label class="device-check-container" @click="deviceShowControl(0)">
+                                <input type="checkbox" class="input" disabled v-model="deviceShowing[0]">
+                                <span class="custom-checkbox"></span>
+                            </label>
                         </div>
-                        <div class="legend-block" @click="deviceShowControl(1)">
+                        <div class="legend-block">
                             <div class="icon-block GNSS-icon" :style="{
                                 backgroundImage: `url(${gnssLegendInfo.icon2})`,
                             }"></div>
@@ -90,6 +95,10 @@
                                     text-shadow: #7388c148 1px 1px 0;
                                 ">
                                 {{ gnssLegendInfo.device2 }}</span>
+                            <label class="device-check-container" @click="deviceShowControl(1)">
+                                <input type="checkbox" class="input" disabled v-model="deviceShowing[1]">
+                                <span class="custom-checkbox"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -100,7 +109,7 @@
                         <span style="font-weight: bold">{{ item.strong }}</span>
                         <span>{{ item.text2 }}</span>
                     </div>
-                    <div class="legend-block" @click="deviceShowControl(index + 2)">
+                    <div class="legend-block">
                         <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
                         <span style="
                                 text-align: center;
@@ -111,6 +120,10 @@
                                 text-shadow: #7388c148 1px 1px 0;
                             ">
                             {{ item.device }}</span>
+                        <label class="device-check-container" @click="deviceShowControl(index + 2)">
+                            <input type="checkbox" class="input" disabled v-model="deviceShowing[index + 2]">
+                            <span class="custom-checkbox"></span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -177,10 +190,21 @@ const warnActive = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
+const test = ref(false)
+window.addEventListener('keydown', (e) => {
+    if (e.key == '1') {
+        test.value = true
+    } else if (e.key == '2') {
+        test.value = false
+    }
+})
+
 const detailLoading = ref(false)
 const warnLoading = ref(true)
 const activeView = ref('tab1')
 const threeDLoading = ref(false)
+const deviceShowing = ref([true, true, true, true, true, true])
+
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
@@ -352,6 +376,14 @@ const gnssShow = true
 //     // map.
 // }
 const deviceShowControl = (index) => {
+
+    if (index == -1) {
+        deviceShowing.value = [true, true, true, true, true, true]
+    } else {
+        deviceShowing.value = [false, false, false, false, false, false]
+        deviceShowing.value[index] = true
+    }
+    console.log(deviceShowing.value, '11111');
     let layerNameList = [
         'GNSS',
         'GNSS基准站',
@@ -361,21 +393,12 @@ const deviceShowControl = (index) => {
         '监控摄像头',
     ]
     let map = useMapStore().getMap()
-    if (index == -1) {
-        layerNameList.forEach((item) => {
-            map.getLayer(item) &&
-                map.setLayoutProperty(item, 'visibility', 'visible')
-        })
-        return
-    }
-    let layerName = layerNameList[index]
-    layerNameList.forEach((item) => {
-        map.getLayer(item) && map.setLayoutProperty(item, 'visibility', 'none')
+    deviceShowing.value.forEach((item, index) => {
+        item ? map.setLayoutProperty(layerNameList[index], 'visibility', 'visible')
+            : map.setLayoutProperty(layerNameList[index], 'visibility', 'none')
     })
-    map.getLayer(layerName) &&
-        map.setLayoutProperty(layerName, 'visibility', 'visible')
-}
 
+}
 const viewChangeClick = (value) => {
     // console.log('view Change!', value)
     let map = useMapStore().getMap()
@@ -810,7 +833,7 @@ div.twin-main-container {
         left: 28vw;
         width: 43vw;
         height: 10vh;
-
+        user-select: none;
         z-index: 4;
         display: flex;
         flex-flow: column nowrap;
@@ -837,8 +860,8 @@ div.twin-main-container {
             font-size: calc(0.8vw + 0.8vh);
             font-weight: bold;
             letter-spacing: 0.2rem;
-            padding-left: 0.5vw;
-            padding-right: 0.5vw;
+            padding-left: 0.8vw;
+            padding-right: 0.8vw;
 
             &:hover {
                 cursor: pointer;
@@ -883,6 +906,11 @@ div.twin-main-container {
                     justify-content: center;
                     align-items: center;
 
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+
                     div.icon-block {
                         position: relative;
                         width: 2vh;
@@ -899,6 +927,58 @@ div.twin-main-container {
                         // height: 2.5vh;
                         // transform: translateY(16%);
                     }
+
+                    .device-check-container {
+                        margin-top: 0.3vh;
+
+                        // font-size: 40px;
+                        .input[type="checkbox"] {
+                            display: none;
+                        }
+
+                        .custom-checkbox {
+                            display: inline-block;
+                            width: calc(0.4vw + 0.4vh);
+                            height: calc(0.4vw + 0.4vh);
+                            // background-color: #0400fc;
+                            border: 2px solid rgb(0, 24, 133);
+                            border-radius: 20%;
+                            position: relative;
+                            cursor: pointer;
+
+                        }
+
+                        /* Style for the custom checkmark */
+                        .custom-checkbox::after {
+                            // content: "";
+                            // position: absolute;
+                            // top: 50%;
+                            // left: 50%;
+                            // transform: translate(-50%, -50%);
+                            // width: calc(0.3vw + 0.3vh);
+                            // height: calc(0.3vw + 0.3vh);
+                            // background-color: #0400fc;
+                            // border-radius: 10%;
+                            // opacity: 0;
+                            content: "";
+                            position: absolute;
+                            top: 10%;
+                            left: 25%;
+                            // transform: translate(-50%, -50%);
+                            width: 5px;
+                            height: 10px;
+                            border: solid #000;
+                            border-width: 0 2px 2px 0;
+                            opacity: 0;
+                            transform: rotate(45deg);
+                        }
+
+                        /* Show the checkmark when checkbox is checked */
+                        .input[type="checkbox"]:checked+.custom-checkbox::after {
+                            opacity: 1;
+                        }
+
+                    }
                 }
             }
 
@@ -906,9 +986,7 @@ div.twin-main-container {
                 width: 14vw;
             }
 
-            &:hover {
-                cursor: pointer;
-            }
+
         }
     }
 
