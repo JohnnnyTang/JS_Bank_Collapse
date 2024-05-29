@@ -27,8 +27,7 @@ const routes = [
             {
                 path: 'history',
                 component: () =>
-                    import('../components/knowStore/views/ScrollHistory.vue'),
-                    props: true
+                    import('../components/knowStore/views/ScrollHistory.vue')
             },
             {
                 path: 'plan',

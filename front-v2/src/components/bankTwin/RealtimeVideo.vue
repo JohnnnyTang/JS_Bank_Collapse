@@ -1,7 +1,7 @@
 <template>
     <div
         class="realtime-video-container"
-        :class="props.active ? 'active' : 'in-active'"
+        :class="[props.active ? 'active' : 'in-active', {'hide-right': props.domHide}]"
     >
         <div class="realtime-video-title">实时视频监控</div>
         <div
@@ -243,6 +243,8 @@ const warnInfoStore = useWarnInfoStore()
 
 const videoControlOpen = ref(false)
 
+const domHide = ref(true)
+
 const dealtWarnList = computed(() => {
     let res = []
     warnInfoStore.warnInfo_history.map((item) => {
@@ -260,6 +262,10 @@ const token = ref(
 
 const props = defineProps({
     active: {
+        type: Boolean,
+        default: false,
+    },
+    domHide: {
         type: Boolean,
         default: false,
     },
@@ -484,6 +490,8 @@ div.realtime-video-container {
     border-radius: 4px;
     border: 2px solid rgb(28, 105, 247);
     overflow: hidden;
+
+    // transition: all 0.2s ease-in-out;
 
     &.in-active {
         height: 37.5vh;
