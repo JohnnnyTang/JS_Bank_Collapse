@@ -29,12 +29,16 @@ springfox:
 
 multiIndex:
   condaEnv: Env1
-  dataPath: E:\Data\bankProjectData\modelData
-  wholeDataPath: E:\Data\bankProjectData\dataWhole
-  resPath: E:\Data\bankProjectData\modelRes\
+  dataPath: C:/Project/Bank/data/modelData
+  wholeDataPath: C:/Project/Bank/data/dataWhole
+  resPath: C:/Project/Bank/data/modelRes/
 
 tile:
-  mzsTilePath: E:/Data/bankProjectData/mzsTile/
-  worldTilePath: E://Data//bankProjectData//2020-10-planet-14
-  nodeServicePath: E://Data//bankProjectData//node//index.js
+  mzsTilePath: C:/Project/Bank/data/bank_collapse/rasterTile/
+  worldTilePath: C:/Project/Bank/data/bank_collapse/baseMap
+  nodeServicePath: C:/Project/Bank/data/node/index.js
+  riverTilePath: C:/Project/Bank/data/bank_collapse/riverRasterTile/
+  riverImagePath: C:/Project/Bank/data/bank_collapse/imageTiles/tiles/
 
+video:
+  yangzhong: C:/Project/Bank/data/video/125_1711267167.mp4

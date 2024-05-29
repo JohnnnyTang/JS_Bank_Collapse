@@ -966,12 +966,18 @@ const flowControlHandler = async () => {
 // )
 
 const RasterControlHandler = () => {
-    if (showRaster.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-    } else {
+    if (showRaster.value && showRasterControl.value ) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
+        showRaster.value = !showRaster.value
+    } else if ( !showRaster.value && showRasterControl.value) {
+        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
+        showRaster.value = !showRaster.value
+    } else if ( showRaster.value && !showRasterControl.value ) {
+        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
+        showRaster.value = !showRaster.value
+    } else {
+        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
     }
-    showRaster.value = !showRaster.value
 }
 
 const BankLineControlHandler = () => {
@@ -1039,11 +1045,7 @@ const showFlowSpeedFunc = async () => {
 }
 const showRasterControl = ref(false)
 const showRasterControlFunc = () => {
-    if (showRasterControl.value === true && showRiverBed.value === true) {
-        showRasterControl.value = !showRasterControl.value
-        RasterControlHandler()
-        return
-    }
+    RasterControlHandler()
     showRasterControl.value = !showRasterControl.value
 }
 
@@ -1494,8 +1496,42 @@ onMounted(async () => {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
         })
+        map.addSource('riverBeachSource', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+        })
+        map.addSource('zjgLine', {
+            type: 'vector',
+            tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
+        })
+        map.addLayer({
+            id: 'riverBeachArea',
+            type: 'fill',
+            source: 'riverBeachSource',
+            'source-layer': 'default',
+            paint: {
+                'fill-color': 'rgba(210,244,247, 1)',
+            },
+        })
+        map.addLayer({
+            id: 'zjgBridge',
+            type: 'line',
+            source: 'zjgLine',
+            'source-layer': 'default',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+            },
+            paint: {
+                'line-opacity': 0.6,
+                // 'line-pattern': 'test',
+                'line-color': 'rgb(183, 189, 183)',
+                'line-width': 2.0,
+            },
+        })
 
         addRasterLayer(map, 23032209, 'mapRaster')
+        
         map.setLayoutProperty('mapRaster', 'visibility', 'none')
         map.addLayer({
             id: 'mzsLine',
@@ -1718,30 +1754,6 @@ onMounted(async () => {
         //             'text-color': 'rgb(28,13,106)',
         //         },
         //     })
-
-        map.addSource('zjgLine', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
-        })
-
-        map.addLayer({
-            id: 'zjgBridge',
-            type: 'line',
-            source: 'zjgLine',
-            'source-layer': 'default',
-            filter: profileList.value[0].filter,
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 0.8,
-                // 'line-pattern': 'test',
-                'line-color': 'rgb(133, 139, 133)',
-                'line-width': 2.0,
-            },
-        })
-
 
         // map.addControl(draw)
 

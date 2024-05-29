@@ -57,7 +57,7 @@ multiIndex:
   condaEnv: Env1
   dataPath: E:\bankAppData\modelData
   wholeDataPath: E:\bankAppData\dataWhole
-  resPath: E:\bankAppData\modelRes
+  resPath: E:/bankAppData/modelRes/
 
 sms:
   accessTokenLoc: E:\bankAppData\AccessKey.json

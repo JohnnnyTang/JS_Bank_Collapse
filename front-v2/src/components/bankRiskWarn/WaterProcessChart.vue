@@ -283,7 +283,7 @@ const option = {
                     }
                 },
                 lineStyle: {
-                    color: 'rgb(94, 208, 251)',
+                    color: 'red',
                     opacity: 0.8,
                     width: 3,
                 },
@@ -294,7 +294,7 @@ const option = {
                         label: {
                             formatter: `${props.timeStep}小时`,
                             backgroundColor: 'rgb(208, 236, 255)',
-                            color: '#0091FF',
+                            color: 'red',
                             fontSize: '15px',
                             position: 'end',
                             offset: [0, 10],
