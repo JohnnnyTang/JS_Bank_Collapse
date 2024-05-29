@@ -1,7 +1,3 @@
 spring:
   profiles:
-<<<<<<< HEAD
       active: lhy
-=======
-      active: tzh
->>>>>>> 7b3afb37c0dbf6b2c3082aa4a9724c5657ced798
