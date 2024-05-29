@@ -1,5 +1,5 @@
 <template>
-    <div class="device-info-container">
+    <div class="device-info-container" :class="{'hide-left': props.domHide}">
         <dv-border-box12
             :dur="5"
             :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']"
@@ -152,6 +152,14 @@ import {
 import router from '../../router'
 import { useWarnInfoStore } from '../../store/mapStore'
 
+const props = defineProps({
+    domHide: {
+        type: Boolean,
+        default: false,
+    },
+})
+
+
 const chartDom = ref()
 const chartDataLoading = ref(true)
 const deviceStatusLoading = ref(true)
@@ -165,6 +173,8 @@ const deviceStatusDataList = ref([
 ])
 
 const warnDeviceCount = ref([0, 0, 0, 0, '-'])
+
+const domHide = ref(true)
 
 const deviceListMap = {
     位移测量站: [
@@ -259,15 +269,15 @@ const deviceIdMap = {
 const deviceTypeTimeMap = {
     位移测量站: {
         timeUnit: 'day',
-        timeCount: 1,
+        timeCount: 3,
     },
     测斜仪: {
         timeUnit: 'day',
-        timeCount: 1,
+        timeCount: 3,
     },
     孔隙水压力计: {
         timeUnit: 'day',
-        timeCount: 1,
+        timeCount: 3,
     },
     应力桩: {
         timeUnit: 'hour',
@@ -463,6 +473,8 @@ div.device-info-container {
     top: 25vh;
     width: 24vw;
     height: 66vh;
+
+    transition: all ease-in-out 0.2s;
 
     div.device-info-content {
         width: 23vw;

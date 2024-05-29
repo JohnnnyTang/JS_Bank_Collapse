@@ -7,44 +7,69 @@
         </div> -->
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
-                    @change="viewChangeClick"></e-tab>
+                <e-tab
+                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
+                    :items="items"
+                    :columns="2"
+                    @change="viewChangeClick"
+                ></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
-        <RealtimeStatusVue />
-        <RealtimeVideoVue :active="!warnActive" />
+        <RealtimeStatusVue :domHide="domHideMap.status" />
+        <RealtimeVideoVue :active="!warnActive" :domHide="domHideMap.video" />
         <!-- <SectionRisk />
         <DeviceWarn /> -->
 
         <div class="marquee-container" v-loading="warnLoading">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 140)">
-                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }"
-                    style="animation-iteration-count: infinite">
-                    <div class="no-warn-block" v-if="warningList.length == 0"
-                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
+                <div
+                    class="marquee-block"
+                    ref="marqueeBlockDom"
+                    :style="{ animationDuration: animateTime }"
+                    style="animation-iteration-count: infinite"
+                >
+                    <div
+                        class="no-warn-block"
+                        v-if="warningList.length == 0"
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff"
+                    >
                         {{ `暂无报警信息` }}
                     </div>
-                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
-                        <div style="
+                    <div
+                        v-else
+                        class="warn-block"
+                        v-for="(warningString, index) in warningList"
+                        :key="index"
+                    >
+                        <div
+                            style="
                                 background-size: contain;
                                 background-image: url('/icons/warning.png');
                                 width: 3vh;
                                 height: 3vh;
-                            "></div>
-                        <div style="
+                            "
+                        ></div>
+                        <div
+                            style="
                                 font-size: calc(0.7vw + 1vh);
                                 color: rgb(254, 14, 11);
                                 margin-left: 0.5vw;
                                 font-weight: bold;
-                            ">
+                            "
+                        >
                             {{ warningString }}
                         </div>
                     </div>
                 </div>
             </DvBorderBox12>
         </div>
-        <div class="button-block" @click="warnActive = !warnActive" :class="{ active: warnActive }">
+        <div
+            class="button-block"
+            @click="warnActive = !warnActive"
+            :class="{ active: warnActive }"
+            v-if="!domHideMap.video"
+        >
             {{ buttonText }}
         </div>
 
@@ -64,53 +89,78 @@
                     </div>
                     <div style="display: flex; flex-direction: row">
                         <div class="legend-block" @click="deviceShowControl(0)">
-                            <div class="icon-block GNSS-icon" :style="{
-                                backgroundImage: `url(${gnssLegendInfo.icon1})`,
-                            }"></div>
-                            <span style="
+                            <div
+                                class="icon-block GNSS-icon"
+                                :style="{
+                                    backgroundImage: `url(${gnssLegendInfo.icon1})`,
+                                }"
+                            ></div>
+                            <span
+                                style="
                                     text-align: center;
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
                                     color: rgb(16, 71, 165);
                                     text-shadow: #7388c148 1px 1px 0;
-                                ">
-                                {{ gnssLegendInfo.device1 }}</span>
+                                "
+                            >
+                                {{ gnssLegendInfo.device1 }}</span
+                            >
                         </div>
                         <div class="legend-block" @click="deviceShowControl(1)">
-                            <div class="icon-block GNSS-icon" :style="{
-                                backgroundImage: `url(${gnssLegendInfo.icon2})`,
-                            }"></div>
-                            <span style="
+                            <div
+                                class="icon-block GNSS-icon"
+                                :style="{
+                                    backgroundImage: `url(${gnssLegendInfo.icon2})`,
+                                }"
+                            ></div>
+                            <span
+                                style="
                                     text-align: center;
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
                                     color: rgb(16, 71, 165);
                                     text-shadow: #7388c148 1px 1px 0;
-                                ">
-                                {{ gnssLegendInfo.device2 }}</span>
+                                "
+                            >
+                                {{ gnssLegendInfo.device2 }}</span
+                            >
                         </div>
                     </div>
                 </div>
                 <!-- others -->
-                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
+                <div
+                    v-for="(item, index) in legendList"
+                    :key="index"
+                    class="monitor-legend-item"
+                >
                     <div class="item-title">
                         <span>{{ item.text1 }}</span>
                         <span style="font-weight: bold">{{ item.strong }}</span>
                         <span>{{ item.text2 }}</span>
                     </div>
-                    <div class="legend-block" @click="deviceShowControl(index + 2)">
-                        <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
-                        <span style="
+                    <div
+                        class="legend-block"
+                        @click="deviceShowControl(index + 2)"
+                    >
+                        <div
+                            class="icon-block"
+                            :style="{ backgroundImage: `url(${item.icon})` }"
+                        ></div>
+                        <span
+                            style="
                                 text-align: center;
                                 width: 100%;
                                 display: block;
                                 line-height: 2.5vh;
                                 color: rgb(16, 71, 165);
                                 text-shadow: #7388c148 1px 1px 0;
-                            ">
-                            {{ item.device }}</span>
+                            "
+                        >
+                            {{ item.device }}</span
+                        >
                     </div>
                 </div>
             </div>
@@ -118,28 +168,70 @@
 
         <div class="warn-status-container" v-loading="warnLoading">
             <div class="warn-status-title">民主沙右缘状态</div>
-            <div class="warn-status-content" :class="statusText == '正常' ? 'normal' : 'warn'">
+            <div
+                class="warn-status-content"
+                :class="statusText == '正常' ? 'normal' : 'warn'"
+            >
                 {{ statusText }}
             </div>
         </div>
-        <BanWarnDetail :warnActive="warnActive" v-loading="warnLoading" />
+        <BanWarnDetail
+            :warnActive="warnActive"
+            v-loading="warnLoading"
+            :domHide="domHideMap.warn"
+        />
         <!-- <WarnHistoryTable v-show="warnActive" /> -->
 
-        <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
+        <div
+            class="map-container"
+            id="map"
+            style="z-index: 2"
+            ref="mapDom"
+        ></div>
 
         <!-- BANK3D -->
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 1"></canvas>
+        <canvas
+            id="UnityCanvas"
+            class="GPU"
+            ref="unityCanvaDom"
+            style="z-index: 1"
+        ></canvas>
         <div class="loading-container" v-show="threeDLoading">
             <dv-loading class="loading-icon">
                 <div class="loading-message">三维视图资源加载中</div>
             </dv-loading>
         </div>
+        <div
+            class="hide-status-button left"
+            :class="{ 'in-active': domHideMap.status }"
+            @click="hideDom('status')"
+        >
+            <HideDomButtom :direction="domHideMap.status ? 'right' : 'left'" />
+        </div>
+        <div
+            class="hide-status-button right"
+            :class="{
+                'in-active': domHideMap.video,
+                'warn-active': warnActive,
+            }"
+            @click="hideDom('video')"
+        >
+            <HideDomButtom :direction="domHideMap.video ? 'left' : 'right'" />
+        </div>
+        <div
+            class="hide-status-button right warn"
+            :class="{ 'in-active': domHideMap.warn, 'warn-active': warnActive }"
+            @click="hideDom('warn')"
+            v-if="warnActive"
+        >
+            <HideDomButtom :direction="domHideMap.warn ? 'left' : 'right'" />
+        </div>
     </div>
 </template>
 
 <script setup>
-import router from '../router'
+// import router from '../router'
 import {
     onMounted,
     ref,
@@ -153,9 +245,10 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
-import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
+// import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
+import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 // test bank3d popUP
 // import threedVue from '../components/bankTwin/threedPopup.vue'
@@ -165,8 +258,8 @@ import { useMapStore, useWarnInfoStore } from '../store/mapStore'
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
-import { initScratchMap, initPureScratchMap, initBaseMap } from '../utils/mapUtils'
-import { init } from 'echarts'
+import { initPureScratchMap } from '../utils/mapUtils'
+// import { init } from 'echarts'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 const animateTime = ref('0s')
@@ -177,19 +270,25 @@ const warnActive = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
-const detailLoading = ref(false)
+// const detailLoading = ref(false)
 const warnLoading = ref(true)
-const activeView = ref('tab1')
+// const activeView = ref('tab1')
 const threeDLoading = ref(false)
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 let map = null
 const warnInfoStore = useWarnInfoStore()
-const token = ref(
-    'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
-)
+// const token = ref(
+//     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
+// )
 const statusText = ref('正常')
+
+const domHideMap = ref({
+    video: false,
+    status: false,
+    warn: false,
+})
 
 // custome layer
 /**
@@ -207,6 +306,8 @@ const items = ref([
 ])
 
 const warningList = ref([])
+
+// const showDom = ref([false, false])
 /*
     {
         icon: '/icons/GNSS测量站.png',
@@ -320,15 +421,6 @@ const gnssIdSectionMap = {
     'MZS120.541648_32.030524_2': 'MZ08海事码头',
 }
 
-const warnKeyValList = ref([
-    { key: '报警区域', val: '暂无' },
-    { key: '出险时间', val: '暂无' },
-    { key: '设备信息', val: '暂无' },
-    { key: '管理单位', val: '江苏省水利厅' },
-    { key: '联系方式', val: '025-85829326；18860847206' },
-    { key: '是否发送通知', val: '暂无' },
-])
-
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
@@ -344,7 +436,11 @@ const mapFlyToRiver = (mapIns) => {
     )
 }
 
-const gnssShow = true
+const hideDom = (domName) => {
+    domHideMap.value[domName] = !domHideMap.value[domName]
+}
+
+// const gnssShow = true
 
 // const GNSSShow = () => {
 //     let map = useMapStore().getMap()
@@ -425,18 +521,6 @@ watch(
     },
 )
 
-function unique(arr) {
-    return Array.from(new Set(arr))
-}
-
-const navToManage = () => {
-    router.push('/bankManage')
-}
-const buildLocStr = (deviceId) => {
-    deviceId = deviceId.replace('MZS', '')
-    let str = deviceId.split('_').slice(0, 2).join(',')
-    return str
-}
 const updateWarnInfoDesc = async () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
@@ -447,6 +531,7 @@ const updateWarnInfoDesc = async () => {
     // console.log('print warn info', warnInfo)
     if (warnInfo.length == 0) {
         statusText.value = '正常'
+        return
     } else {
         statusText.value = '报警'
     }
@@ -477,6 +562,9 @@ const updateWarnInfoDesc = async () => {
 
     warningList.value = WARN_TEXT
     warnActive.value = true
+    domHideMap.value.video = false
+    domHideMap.value.warn = false
+
     // 第一次是没有初始化完的长度 所以很快 实际上很长
     await nextTick()
     console.log('123123 length: ', marqueeBlockDom.value.offsetWidth)
@@ -555,7 +643,6 @@ onMounted(async () => {
     setTimeout(() => {
         warnLoading.value = false
     }, 1000)
-
 })
 
 onUnmounted(() => {
@@ -693,7 +780,7 @@ div.twin-main-container {
     div.visual-tab-container {
         position: absolute;
         top: 10vh;
-        right: 28.6vw;
+        right: 29.6vw;
 
         width: 10vw;
         height: 6vh;
@@ -894,11 +981,11 @@ div.twin-main-container {
                         transform: translateY(16%);
                     }
 
-                    div.GNSS-icon {
-                        // width: 2.5vh;
-                        // height: 2.5vh;
-                        // transform: translateY(16%);
-                    }
+                    // div.GNSS-icon {
+                    //     // width: 2.5vh;
+                    //     // height: 2.5vh;
+                    //     // transform: translateY(16%);
+                    // }
                 }
             }
 
@@ -1071,7 +1158,62 @@ div.twin-main-container {
         }
     }
 
-    /* 根据需要调整动画的持续时间 */
+    div.hide-status-button {
+        position: absolute;
+        left: 25vw;
+        top: 26vh;
+
+        width: 1.4vw;
+        height: 2vw;
+
+        background-color: #e5f0ffc4;
+        backdrop-filter: blur(8px);
+        z-index: 3;
+
+        transition: all ease-in-out 0.2s;
+
+        &.left {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+
+            &.in-active {
+                left: 0vw;
+            }
+        }
+
+        &.right {
+            left: 72vw;
+            top: 3.2vh;
+            z-index: 4;
+            transition: none;
+
+            &.warn-active {
+                top: 54.2vh;
+            }
+
+            &.in-active {
+                left: 98.6vw;
+            }
+
+            &.warn {
+                top: 10.2vh;
+            }
+        }
+
+        &:hover {
+            cursor: pointer;
+            transform: scale(1.05);
+            filter: drop-shadow(2px 2px 1px rgb(73, 182, 255));
+        }
+    }
+}
+
+.hide-left {
+    transform: translateX(calc(-100% - 1vw));
+}
+
+.hide-right {
+    transform: translateX(calc(100% + 1vw));
 }
 
 :deep(.iEdpB) {
