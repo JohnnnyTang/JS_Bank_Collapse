@@ -2,7 +2,7 @@
 // import {FlowFieldManager} from './FlowFieldManager';
 import { FlowFieldController } from './FlowFieldController'
 import { JsonFileParser } from './JsonFileParser'
-import mapboxgl from 'mapbox-gl'
+import mapboxgl from 'mapbox-gl' 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import axios from 'axios'
 

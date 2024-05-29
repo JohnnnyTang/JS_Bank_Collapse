@@ -111,7 +111,7 @@
         </div>
 
         <div class="channelDesc" v-else-if="props.sourceId === 'channel'">
-            <el-descriptions class="margin-top" :title="title" :column="1" border >
+            <el-descriptions class="margin-top" :title="title" :column="1" border>
                 <el-descriptions-item>
                     <template #label>
                         <div class="cell-item">
@@ -134,7 +134,7 @@
             <el-descriptions class="margin-top" :title="title" :column="props.column" border>
                 <el-descriptions-item v-for="( key, index ) in  Object.keys(fMap) " :key="index">
                     <template #label>
-                        <div class="cell-item" >
+                        <div class="cell-item">
                             {{ fMap[key] }}
                         </div>
                     </template>
@@ -261,23 +261,26 @@ onMounted(() => {
     // height: 20vh;
     overflow: hidden;
     border: 1px solid #ccc;
-    border-radius: 3%;
+    border-radius: 2%;
 
     .margin-top {
-
+        box-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
         :deep(.el-descriptions__header) {
             justify-content: center;
             margin: 0;
             padding-top: 1vh;
             padding-bottom: 1vh;
-            background-color: rgb(198, 229, 252);
+            background-color: rgb(20, 115, 196);
             font-family: Arial, Helvetica, sans-serif
         }
     }
 
     :deep(.el-descriptions__header) {
         height: 3vh;
-        border-bottom: inset 3px #4f81ff;
+        border:  #4f81ff solid 1px;
+        &:hover{
+            cursor: move;
+        }
 
 
         .el-descriptions__title {
@@ -287,15 +290,16 @@ onMounted(() => {
             line-height: 4vh;
             text-align: center;
             font-size: calc(1vw + 0.3vh);
-            font-weight: 600;
-            color: rgb(2,55,189);
-            text-shadow: #ececec 1px 1px, #8b8b8b 2px 2px, #ffffff 3px 3px;
+            font-family: "Microsoft YaHei";
+            font-weight: bold;
+            color: #e3f4ff;
+            text-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
         }
     }
 
     :deep(.el-descriptions__body) {
 
-
+        border:  #60c0ff solid 1px;
         .el-descriptions__cell.el-descriptions__content.is-bordered-content {
             background-color: #ffffff;
             text-align: center;
@@ -307,7 +311,8 @@ onMounted(() => {
             .cell-item {
                 height: fit-content;
             }
-            .cell-item.lable{
+
+            .cell-item.lable {
                 width: 3vw;
             }
         }
@@ -318,8 +323,8 @@ onMounted(() => {
 
         .el-descriptions__label.el-descriptions__cell.is-bordered-label {
             // background-color: rgb(198, 229, 251);
-            color: #0237bd;
-            background: rgb(197, 225, 244);
+            color: rgb(20, 115, 196);
+            background: rgb(237, 248, 250);
             font-size: calc(0.7vw + 0.4vh);
             height: 3vh;
             border-right: inset 2px #157acc;
@@ -335,8 +340,8 @@ onMounted(() => {
         position: absolute;
         right: 0.5vw;
         top: 1vh;
-        width: 2.5vh;
-        height: 2.5vh;
+        width: 2.3vh;
+        height: 2.3vh;
         background-image: url('/icons/minimize.png');
         background-size: contain;
         background-repeat: no-repeat;

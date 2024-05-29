@@ -712,7 +712,7 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
  * @param {number[]} compareBefore
  * @param {number[]} compareNow
  */
-export const drawShapeCompareGraph = (echarts, after, before, compareBefore, compareNow) => {
+export const drawShapeCompareGraph = (echarts, after, before, compareNow, compareBefore) => {
     const min = Math.min(...after, ...before)
     const max = Math.max(...after, ...before)
     const length = Math.min(after.length, before.length, compareBefore.length, compareNow.length)
