@@ -146,8 +146,8 @@ const cancelClick = () => {
 }
 
 const containerDom = ref(null)
-// mapboxgl.accessToken =
-//     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
+mapboxgl.accessToken =
+    'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 
 let map = null
 
