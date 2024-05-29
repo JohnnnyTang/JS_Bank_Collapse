@@ -165,7 +165,8 @@ import { useMapStore, useWarnInfoStore } from '../store/mapStore'
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
-import { initScratchMap, initPureScratchMap } from '../utils/mapUtils'
+import { initScratchMap, initPureScratchMap, initBaseMap } from '../utils/mapUtils'
+import { init } from 'echarts'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 const animateTime = ref('0s')
@@ -514,6 +515,7 @@ onMounted(async () => {
     // })
     //////////return loaded Map
     map = await initPureScratchMap(mapDom.value)
+    // map = await initBaseMap(mapDom.value)
     map.on('render', () => {
         map.triggerRepaint()
     })

@@ -235,7 +235,7 @@ const infoTableData_filtered = computed(() => {
     // })
     if (nowSource == null || nowSource == undefined || nowSource == '') {
         return infoTableData.value
-    }else{
+    } else {
 
         // return infoTableData.value
         let nameField = sourceNameMap[nowSource]
@@ -1162,6 +1162,10 @@ onUnmounted(async () => {
             flex-direction: row;
             align-items: center;
             justify-content: center;
+
+            &:hover {
+                cursor: move;
+            }
 
             div.title {
                 // font-size: calc(0.4vw + 0.8vh);

@@ -25,27 +25,26 @@
         "/scratchSomething/flowWebGL/images/mask_122.png",
         "/scratchSomething/flowWebGL/images/mask_123.png",
         "/scratchSomething/flowWebGL/images/mask_124.png",
-        "/scratchSomething/flowWebGL/images/mask_125.png",
-        "/scratchSomething/flowWebGL/images/mask_126.png"
+        "/scratchSomething/flowWebGL/images/mask_125.png"
     ],
     "constraints": {
         "max_drop_rate": 0.1,
         "max_drop_rate_bump": 0.2,
-        "max_segment_num": 16,
-        "max_streamline_num": 1048576,
+        "max_segment_num": 64,
+        "max_streamline_num": 65536,
         "max_texture_size": 4096
     },
     "extent": [
-        0.8334519409367115,
-        0.4087464036632672,
-        0.8388303296774701,
-        0.40586521884815613
+        0.8334555812208145,
+        0.40688111574202596,
+        0.8361227715252713,
+        0.40583148000181013
     ],
     "flow_boundary": {
-        "u_max": 2.3461,
-        "u_min": -2.1176,
-        "v_max": 2.0175,
-        "v_min": -1.8959
+        "u_max": 2.3263,
+        "u_min": -2.009,
+        "v_max": 1.9086,
+        "v_min": -1.8627
     },
     "flow_fields": [
         "/scratchSomething/flowWebGL/images/uv_100.png",
@@ -73,21 +72,20 @@
         "/scratchSomething/flowWebGL/images/uv_122.png",
         "/scratchSomething/flowWebGL/images/uv_123.png",
         "/scratchSomething/flowWebGL/images/uv_124.png",
-        "/scratchSomething/flowWebGL/images/uv_125.png",
-        "/scratchSomething/flowWebGL/images/uv_126.png"
+        "/scratchSomething/flowWebGL/images/uv_125.png"
     ],
     "projection": {
-        "2D": "/scratchSomething/flowWebGL/images/projection.png",
-        "3D": "/scratchSomething/flowWebGL/images/projection_3D.png"
+        "2D": "/scratchSomething/flowWebGL/images/projection_mapbox.png",
+        "3D": "/images/projection_3D.png"
     },
     "texture_size": {
         "area_mask": [
             1024,
-            558
+            405
         ],
         "flow_field": [
             1024,
-            558
+            405
         ],
         "projection": [
             1024,

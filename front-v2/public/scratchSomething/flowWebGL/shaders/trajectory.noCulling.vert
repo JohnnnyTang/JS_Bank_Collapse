@@ -33,11 +33,16 @@ out struct Stream_line_setting
     float isDiscarded;
 } sls;
 
-
+vec2 uvCorrection(vec2 uv, vec2 dim) {
+    return clamp(uv, vec2(0.0f), dim - vec2(1.0f));
+}
 vec4 ReCoordinate(vec2 pos) {
+    // vec2 dim = vec2(textureSize(sFlowField, 0));
+    // vec2 speed_tl = texture(sFlowField, uvCorrection(uv, dim)).rg;
 
     vec3 geoPos;
-    geoPos = texture(projectionTexture, pos).xyz;
+    vec2 dim = vec2(textureSize(projectionTexture, 0));
+    geoPos = texture(projectionTexture, uvCorrection(pos, dim)).xyz;
     vec4 res = u_matrix * vec4(geoPos, 1.0);
     return res;
 }

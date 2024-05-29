@@ -28,6 +28,8 @@ public interface IVectorTileRepo {
 
     @MapKey("id")
     List<Map<String, Object>> getLayerBasicInfo(@Param("tableName") String tableName, @Param("fieldList") List<String> fieldList);
+    @MapKey("id")
+    List<Map<String, Object>> getLayerWholeInfo(@Param("tableName") String tableName, @Param("fieldList") List<String> fieldList);
 
     List<SectionLineInfo> selectSectionLineInfo();
 

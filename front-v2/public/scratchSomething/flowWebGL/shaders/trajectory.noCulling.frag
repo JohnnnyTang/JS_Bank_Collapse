@@ -33,15 +33,23 @@ int rampColors0[8] = int[](
     // 0xfee08b,
     // 0xfdae61,
     // 0xf46d43,
-    // 0xd53e4f
-    0x8affe4,
-    0x24e3e0,
-    0x00c3dc,
-    0x00a1cb,
-    0x0083b3,
-    0x006799,
-    0x004c86,
-    0x1500a0
+    // 0xd53e4f#45a4fc
+    // 0x45a4fc,
+    // 0x3392f6,
+    // 0x2680f0,
+    // 0x226de7,
+    // 0x2859dd,
+    // 0x3144d1,
+    // 0x3b2cc3,
+    // 0x4401b2
+    0x0084ff,
+    0x0074f5,
+    0x0065ea,
+    0x0055de,
+    0x0844d2,
+    0x1433c5,
+    0x1c1fb7,
+    0x200a8e
 );
 
 int rampColors1[8] = int[](
@@ -67,13 +75,12 @@ int rampColors2[8] = int[](
 
 int[8] rampColors()
 {
-    // if (colorScheme == 0.0)
-    //     return rampColors0;
-    // if (colorScheme == 1.0)
-    //     return rampColors1;
-    // if (colorScheme == 2.0)
-    //     return rampColors2;
-    return rampColors0;
+    if (colorScheme == 0.0)
+        return rampColors0;
+    if (colorScheme == 1.0)
+        return rampColors1;
+    if (colorScheme == 2.0)
+        return rampColors2;
 } 
 
 vec3 colorFromInt(int color)

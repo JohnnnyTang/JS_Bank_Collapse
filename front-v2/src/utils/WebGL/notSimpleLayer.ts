@@ -2,7 +2,7 @@
 // import {FlowFieldManager} from './FlowFieldManager';
 import { FlowFieldController } from './FlowFieldController'
 import { JsonFileParser } from './JsonFileParser'
-import mapboxgl from 'mapbox-gl'
+import mapboxgl from 'mapbox-gl' 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import axios from 'axios'
 
@@ -304,7 +304,7 @@ export default class FlowFieldLayer{
         // why?
         // the last one is a phase from the end to the head
         this.phaseCount = this.parser.flowFieldResourceArr.length;
-        this.timeLast = this.phaseCount * 150; // 150 frame per timePoint
+        this.timeLast = this.phaseCount * 80; // 150 frame per timePoint
 
         // why 3?
         this.textureArraySize = 3;

@@ -39,6 +39,9 @@ class UnityLayer {
 
     onAdd(map, gl) {
 
+        let dom = document.querySelector('#DeviceInfoBox')
+        dom.style.display = 'block'
+
         // Set Unity instance configuration
         const buildUrl = "/scratchSomething/unity/collapseBank/build"
         const config = {
@@ -181,13 +184,13 @@ class UnityLayer {
             0.0, 0.0, 0.0, 1.0,
         )
 
-        const xModel = new THREE.Matrix4().multiply(new THREE.Matrix4().makeTranslation(this.op_world[0] - 25.0, this.op_world[1], 10.0))
+        const xModel = new THREE.Matrix4().multiply(new THREE.Matrix4().makeTranslation(this.op_world[0], this.op_world[1], 0.0))
         const xView = xCamera.view
         const xProjection = this.tb.utils.makePerspectiveMatrix(xCamera.fov, xCamera.aspect, xCamera.nearZ, xCamera.farZ)
         const xMVP = xProjection.multiply(xView).multiply(xModel).multiply(flip)
 
-        const center = this.worldToModel(xCamera.center.x, xCamera.center.y, xCamera.center.z, 25.0, 0.0, -10.0)
-        const position = this.worldToModel(xCamera.position.x, xCamera.position.y, xCamera.position.z, 25.0, 0.0, -10.0)
+        const center = this.worldToModel(xCamera.center.x, xCamera.center.y, xCamera.center.z, .0, 0.0, 0.0)
+        const position = this.worldToModel(xCamera.position.x, xCamera.position.y, xCamera.position.z, .0, 0.0, 0.0)
         // console.log(xCamera.fov)
         const up = xCamera.up;
         this.dispatchMessage({

@@ -92,6 +92,11 @@ public class MapTileController {
         return ResponseEntity.ok(vectorTileService.getLayerInfo(tileName));
     }
 
+    @GetMapping("/vector/{tileName}/info/bbox")
+    public ResponseEntity<List<Map<String, Object>>> getVectorTileBboxInfo(@PathVariable String tileName) {
+        return ResponseEntity.ok(vectorTileService.getLayerWholeInfo(tileName));
+    }
+
     @CrossOrigin
     @RequestMapping(
             value = "/raster/mzs/{year}/{tide}/{x}/{y}/{z}",
