@@ -2,7 +2,8 @@
     <div class="timestep-shower">
         <el-progress type="dashboard" :percentage="percentage">
             <template #default="{ percentage }">
-                <span class="percentage-value">{{ hour + '时' }}</span>
+                <!-- <span class="percentage-value">{{ hour + '时' }}</span> -->
+                <span class="percentage-value">{{ props.timeStep + '时' }}</span>
                 <!-- <span class="percentage-label">{{ day }}</span> -->
             </template>
         </el-progress>

@@ -64,11 +64,11 @@ onMounted(async () => {
 
     //////// this!
 
-    let backEndJsonUrl1 = '/scratchSomething/flowWebGL/json3/desc3.json'
-    let imageSrcPrefix1 = '/scratchSomething/flowWebGL/images3/'
+    let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
+    let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
     let flowLayer1 = reactive(new FlowFieldLayer('流场1', backEndJsonUrl1, imageSrcPrefix1))
-    let backEndJsonUrl2 = '/scratchSomething/flowWebGL/json2/desc2.json'
-    let imageSrcPrefix2 = '/scratchSomething/flowWebGL/images2/'
+    let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
+    let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
     let flowLayer2 = reactive(new FlowFieldLayer('流场2', backEndJsonUrl2, imageSrcPrefix2))
     window.addEventListener('keydown', (e) => {
         if (e.key === '1') {

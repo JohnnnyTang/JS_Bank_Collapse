@@ -6,7 +6,7 @@
     <dv-decoration10
         :Dur="1"
         :color="['rgba(231, 137, 15, 0.7)','rgba(171, 184, 197, 0.8)']"
-        style="position: absolute; height: 8.5vh; width: 28.5vw; left: 0.7vw;"
+        style="position: absolute; height: 8.5vh; width: 25vw; left: 0.7vw;"
     />
     <div class="item-container geology">
         <div class="img-container geology">
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="item-context geology">
-            右缘地表土层从上到下依次分为粉砂、淤泥质粉质黏土、粉质黏土、粉砂和粉质黏土层，总体呈现黏土-粉砂二元结构，下层易冲刷
+            右缘地表土层从上到下依次分为粉质黏土、粉砂、淤泥质粉质黏士、粉砂层，总体呈现黏土-粉砂二元结构，下层易冲刷
         </div>
     </div>
     <div class="title-context project">
@@ -38,7 +38,7 @@
     <dv-decoration10
         :Dur="1"
         :color="['rgba(231, 137, 15, 0.7)','rgba(171, 184, 197, 0.8)']"
-        style="position: absolute; height: 86vh; width: 28.5vw; left: 0.7vw;"
+        style="position: absolute; height: 86vh; width: 25vw; left: 0.7vw;"
     />
     <div class="item-container project">
         <div class="img-container project">
@@ -66,7 +66,7 @@
 import { ElImage } from 'element-plus';
 const srcList1 = ["/geology_structure.png"]
 const UrlPart1 = "/geology_structure.png"
-const srcList2 = ["/project_structure.png"]
+const srcList2 = ["/project_structure.png", "/geoStruct/民主沙右缘守护工程09.jpg", "/geoStruct/民主沙右缘守护工程12.jpg", "/geoStruct/民主沙右缘守护工程18.jpg"]
 const UrlPart2 = "/project_structure.png"
 </script>
 
@@ -74,9 +74,9 @@ const UrlPart2 = "/project_structure.png"
     div.geologyAndProject-container {
         position: absolute;
         top: 16.25vh;
-        left: 1vw;
+        left: 0.3vw;
         height: 75.25vh;
-        width: 30vw;
+        width: 26vw;
         background-color: rgba(238, 235, 205, 0.6);
         border: 2px solid #e0cfcf;
         border-radius: 10px;
@@ -84,7 +84,8 @@ const UrlPart2 = "/project_structure.png"
 
         div.title-context {
             position: absolute;
-            left: 12.5vw;
+            left: 10vw;
+            letter-spacing: 0.1vw;
             width: 10vw;
             line-height: 4vh;
             font-family: 'Microsoft YaHei';
@@ -108,7 +109,7 @@ const UrlPart2 = "/project_structure.png"
         div.item-container {
             position: absolute;
             left: 0.4vw;
-            width: 29.2vw;
+            width: 25vw;
             height: 30vh;
 
             &.geology {

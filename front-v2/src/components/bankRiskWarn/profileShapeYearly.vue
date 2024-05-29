@@ -1,61 +1,43 @@
 <template>
-<div class="riskInfo-container">
-    <div class="riskInfo-title">
-        <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
-            当前断面形态
-        </dv-border-box2>
-    </div>
-    <div class="riskInfo-item profileShape">
-        <div class="item-title">{{ profileName }}</div>
-        <div class="profile-selector-container">
-            <el-select
-                v-model="profileValue"
-                placeholder="选择断面"
-                style="width: 10vw; height: 3.5vh"
-                @change="calProfileData"
-                popper-class="profile-popper"
-            >
-                <el-option
-                    v-for="item in props.profileList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                >
-                    <span class="profile-name-text">
-                        {{ item.label }}
-                    </span>
-                </el-option>
-            </el-select>
+    <div class="riskInfo-container">
+        <div class="riskInfo-title">
+            <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
+                当前断面形态
+            </dv-border-box2>
         </div>
-        <div
-            ref="shapeYearlyGraphRef"
-            class="shape graph"
-            element-loading-background="rgba(214, 235, 255,0.8)"
-        ></div>
-        <div class="graph-container shape">
-            <div
-                ref="shapeYearlyGraphRef"
-                class="shape graph"
-                v-loading="props.shapeYearlyChartLoad"
-                element-loading-background="rgba(255, 255, 255, 0.4)"
-            ></div>
-            <div v-if="shapeYearlyGraphNotShow" class="empty-graph">
-                当前暂无地形数据
+        <div class="riskInfo-item profileShape">
+            <div class="item-title">{{ profileName }}</div>
+            <div class="profile-selector-container">
+                <el-select v-model="profileValue" placeholder="选择断面" style="width: 10vw; height: 3.5vh"
+                    @change="calProfileData" popper-class="profile-popper">
+                    <el-option v-for="item in props.profileList" :key="item.value" :label="item.label" :value="item.value">
+                        <span class="profile-name-text">
+                            {{ item.label }}
+                        </span>
+                    </el-option>
+                </el-select>
+            </div>
+            <div ref="shapeYearlyGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+            <div class="graph-container shape">
+                <div ref="shapeYearlyGraphRef" class="shape graph" v-loading="props.shapeYearlyChartLoad"
+                    element-loading-background="rgba(255, 255, 255, 0.4)"></div>
+                <div v-if="shapeYearlyGraphNotShow" class="empty-graph">
+                    当前暂无地形数据
+                </div>
+            </div>
+        </div>
+        <div class="text-info-container">
+            <div class="text-info-item">
+                该断面滩槽高差为 <span style="color: red;">{{ gaochaList[profileValue - 1] }}</span> m，
+                <!-- 最大岸坡坡比为 <span style="color: red;">{{ pobiList[profileValue-1] }}</span> -->
+                最大岸坡坡比为
+                <span v-if="profileValue - 1 === 5" style="color: red;">1 / 1.7</span>
+                <span v-else-if="profileValue - 1 === 6" style="color: red;">1 / 1.8</span>
+                <span v-else-if="profileValue - 1 === 7" style="color: red;">1 / 2.2</span>
+                <span v-else style="color: red;">{{ pobiList[profileValue - 1] }}</span>
             </div>
         </div>
     </div>
-    <div class="text-info-container">
-        <div class="text-info-item">
-            该断面滩槽高差为 <span style="color: red;">{{ gaochaList[profileValue-1]}}</span> m，
-            <!-- 最大岸坡坡比为 <span style="color: red;">{{ pobiList[profileValue-1] }}</span> -->
-            最大岸坡坡比为 
-            <span v-if="profileValue-1===5" style="color: red;">1 / 1.7</span>
-            <span v-else-if="profileValue-1===6" style="color: red;">1 / 1.8</span>
-            <span v-else-if="profileValue-1===7" style="color: red;">1 / 2.2</span>
-            <span v-else style="color: red;">{{ pobiList[profileValue-1] }}</span>
-        </div>
-    </div>
-</div>
 </template>
 
 <script setup>
@@ -68,13 +50,13 @@ const shapeYearlyGraphRef = ref(null)
 let shapeYearlyChart = null
 let section;
 
-const gaochaList = ref([38.27, 32.72, 33.56, 30.84, 34.94, 32.88, 
-33.65, 31.45, 28.53, 27.61, 27.01, 25.73])
-const pobiList = ref(["1/4.1","1/3.9","1/4.0","1/6.3","1/3.9","1/3.3","1/3.1","1/3.1","1/6.5","1/7.9","1/11.3","1/11.0"])
+const gaochaList = ref([38.27, 32.72, 33.56, 30.84, 34.94, 32.88,
+    33.65, 31.45, 28.53, 27.61, 27.01, 25.73])
+const pobiList = ref(["1/4.1", "1/3.9", "1/4.0", "1/6.3", "1/3.9", "1/3.3", "1/3.1", "1/3.1", "1/6.5", "1/7.9", "1/11.3", "1/11.0"])
 
 const emit = defineEmits(['profileValueChange'])
 
-const profileValue = ref(1)
+const profileValue = ref(3)
 const profileName = ref('')
 
 const props = defineProps({
@@ -92,14 +74,14 @@ const props = defineProps({
 const calProfileData = () => {
     emit('profileValueChange', profileValue.value)
     shapeYearlyGraphNotShow.value = false
-    const profileDataItem = props.profileData[profileValue.value-1]
-    const profileInfoItem = props.profileList[profileValue.value-1]
+    const profileDataItem = props.profileData[profileValue.value - 1]
+    const profileInfoItem = props.profileList[profileValue.value - 1]
     profileName.value = profileInfoItem.name
     try {
         section = profileDataItem
-        .section.map((value) => {
-            return value[2] < -999 ? null : value[2]
-        })
+            .section.map((value) => {
+                return value[2] < -999 ? null : value[2]
+            })
     } catch (error) {
         DrawGraph([])
         shapeYearlyGraphNotShow.value = true
@@ -126,7 +108,7 @@ onMounted(() => {
     calProfileData()
 })
 
-watch(()=>props.profileData, ()=>{
+watch(() => props.profileData, () => {
     calProfileData()
 })
 
@@ -136,9 +118,9 @@ watch(()=>props.profileData, ()=>{
 div.riskInfo-container {
     position: absolute;
     top: 16vh;
-    left: 1vw;
+    left: 0.3vw;
     height: 38vh;
-    width: 30vw;
+    width: 26vw;
     border-radius: 8px;
     border: #167aec 1px solid;
     background-color: rgba(179, 201, 228, 0.6);
@@ -148,7 +130,7 @@ div.riskInfo-container {
     div.riskInfo-title {
         height: 2vh;
         width: 10vw;
-        margin-left: 10vw;
+        margin-left: 7.5vw;
         margin-top: 0.6vh;
         line-height: 4.3vh;
         border-radius: 6px;
@@ -171,7 +153,7 @@ div.riskInfo-container {
 
     div.riskInfo-item {
         position: absolute;
-        width: 28.9vw;
+        width: 25vw;
         left: 0.5vw;
         border-radius: 6px;
         border: #3b85e7 2px solid;
@@ -197,7 +179,7 @@ div.riskInfo-container {
             position: absolute;
             width: 10vw;
             height: 4vh;
-            left: 19vw;
+            left: 15vw;
             // background-color: #d1d2db;
 
             :deep(.el-select) {
@@ -248,7 +230,7 @@ div.riskInfo-container {
 
         div.graph-container {
             position: absolute;
-            width: 28.3vw;
+            width: 24vw;
             top: 4vh;
             left: 0.25vw;
 
@@ -272,13 +254,14 @@ div.riskInfo-container {
                     // height: 17vh;
                     // background-color: #00098a;
                 }
+
                 z-index: 99;
             }
 
             div.empty-graph {
                 position: absolute;
-                left: 7vw;
-                top: 18vh;
+                left: 6vw;
+                top: 17vh;
                 display: flex;
                 align-items: center;
                 color: #1c68cc;
@@ -290,9 +273,9 @@ div.riskInfo-container {
     }
 
     div.text-info-container {
-        position:absolute;
+        position: absolute;
         top: 33vh;
-        width: 29vw;
+        width: 25vw;
         height: 4.5vh;
         left: 0.5vw;
         bottom: 2vh;
@@ -301,10 +284,10 @@ div.riskInfo-container {
 
         div.text-info-item {
             position: absolute;
-            left: 3vw;
+            left: 2vw;
             top: 1vh;
             color: #f2f4f7;
-            font-size: calc(0.7vw + 0.5vh);
+            font-size: calc(0.6vw + 0.6vh);
             font-family: 'Microsoft YaHei';
             font-weight: bold;
         }
