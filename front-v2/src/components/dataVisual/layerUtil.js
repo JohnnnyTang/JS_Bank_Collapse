@@ -1863,7 +1863,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-offset': [0, 1.0],
                     // 'text-anchor': 'center',
-                    'text-size': 16,
+                    'text-size': 17,
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                 },
                 paint: {
@@ -1906,7 +1906,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-offset': [0, 1.0],
                     // 'text-anchor': 'bottom',
-                    'text-size': 16,
+                    'text-size': 17,
 
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                 },
@@ -1950,7 +1950,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-offset': [0, 1],
                     // 'text-anchor': 'bottom',
-                    'text-size': 16,
+                    'text-size': 17,
 
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                 },
@@ -2107,7 +2107,6 @@ const layerAddFunctionMap = {
                     'icon-image': '水闸',
                     "icon-size": 0.2,
                     'icon-allow-overlap': true,
-                    'offset': [0.0, 0.5],
                 },
                 paint: {
                     'icon-opacity': 1.0,
@@ -2221,7 +2220,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-anchor': 'top',
                     'text-offset': [0, 0.5],
-                    'text-size': 16,
+                    'text-size': 17,
                     'text-allow-overlap': true,
                 },
                 paint: {
@@ -2246,7 +2245,7 @@ const layerAddFunctionMap = {
                 source: 'sluiceArea',
                 'source-layer': 'default',
                 filter: ['==', 'if_important', 0],
-                minzoom: 12,
+                minzoom: 11,
                 maxzoom: 22,
                 layout: {
                 },
@@ -2270,7 +2269,7 @@ const layerAddFunctionMap = {
                 source: 'sluiceArea',
                 filter: ['==', 'if_important', 0],
                 'source-layer': 'default',
-                minzoom: 12,
+                minzoom: 11,
                 maxzoom: 22,
                 layout: {
                     'text-field': ['get', 'sp_name'],
@@ -2279,7 +2278,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-anchor': 'top',
                     'text-offset': [0, 0.5],
-                    'text-size': 15,
+                    'text-size': 16,
                     'text-allow-overlap': false,
                 },
                 paint: {
@@ -2445,7 +2444,7 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 source: 'pumpArea',
                 'source-layer': 'default',
-                minzoom: 13,
+                minzoom: 11,
                 layout: {
                     'icon-image': '泵站',
                     'icon-size': 0.9,
@@ -2470,7 +2469,7 @@ const layerAddFunctionMap = {
                 source: 'pumpArea',
                 'source-layer': 'default',
                 filter: ["==", "if_important", 0],
-                minzoom: 13,
+                minzoom: 11,
                 layout: {
                     'text-field': ['get', 'sp_name'],
                     'text-font': [
@@ -3078,7 +3077,6 @@ const layerAddFunctionMap = {
         //         type: 'geojson',
         //         data: sandbar
         //     })
-        console.log('111');
 
         !map.getSource('sandBar') &&
             map.addSource('sandBar', {
@@ -3099,7 +3097,6 @@ const layerAddFunctionMap = {
             })
     },
     '洲滩-注记': async (map) => {
-        console.log('111');
         !map.getSource('sandBarcenter') &&
             map.addSource('sandBarcenter', {
                 type: 'vector',
