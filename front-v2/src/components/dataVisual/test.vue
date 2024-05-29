@@ -44,7 +44,7 @@ onMounted(async () => {
 
     mapFlyToRiver(map)
     // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
-    const jsonUrl = '/scratchSomething/flowWebGL/json/flow_field_description.json'
+    const jsonUrl = '/scratchSomething/flowWebGL/json2/flow_field_description.json'
 
     let flowFieldLayer = reactive(new FlowFieldLayer(jsonUrl))
     map.addLayer(flowFieldLayer)

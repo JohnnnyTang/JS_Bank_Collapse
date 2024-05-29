@@ -31,20 +31,20 @@
         "max_drop_rate": 0.1,
         "max_drop_rate_bump": 0.2,
         "max_segment_num": 64,
-        "max_streamline_num": 65536,
+        "max_streamline_num": 65535,
         "max_texture_size": 4096
     },
     "extent": [
-        0.8334555812208145,
-        0.40688111574202596,
+        0.8334555829659476,
+        0.4068767558906962,
         0.8361227715252713,
         0.40583148000181013
     ],
     "flow_boundary": {
-        "u_max": 2.3263,
-        "u_min": -2.009,
-        "v_max": 1.9086,
-        "v_min": -1.8627
+        "u_max": 2.203,
+        "u_min": -2.855,
+        "v_max": 2.312,
+        "v_min": -2.098
     },
     "flow_fields": [
         "/scratchSomething/flowWebGL/images/uv_100.png",
@@ -76,7 +76,7 @@
     ],
     "projection": {
         "2D": "/scratchSomething/flowWebGL/images/projection_mapbox.png",
-        "3D": "/images/projection_3D.png"
+        "3D": ""
     },
     "texture_size": {
         "area_mask": [
