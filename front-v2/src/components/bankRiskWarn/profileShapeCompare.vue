@@ -72,7 +72,7 @@ let compareBeforeSection;
 
 const emit = defineEmits(['profileValueChange'])
 
-const profileValue = ref(1)
+const profileValue = ref(8)
 const profileName = ref('')
 
 const props = defineProps({
@@ -153,9 +153,9 @@ watch(()=>props.profileData, ()=>{
 div.riskInfo-container {
     position: absolute;
     top: 54.25vh;
-    left: 1vw;
+    left:0.3vw;
     height: 37.5vh;
-    width: 30vw;
+    width: 26vw;
     border-radius: 8px;
     border: #167aec 1px solid;
     background-color: rgba(179, 201, 228, 0.6);
@@ -165,7 +165,7 @@ div.riskInfo-container {
     div.riskInfo-title {
         height: 2vh;
         width: 10vw;
-        margin-left: 10vw;
+        margin-left: 7.5vw;
         margin-top: 0.6vh;
         line-height: 4.3vh;
         border-radius: 6px;
@@ -188,7 +188,7 @@ div.riskInfo-container {
 
     div.riskInfo-item {
         position: absolute;
-        width: 28.9vw;
+        width: 25vw;
         left: 0.5vw;
         border-radius: 6px;
         border: #3b85e7 2px solid;
@@ -214,7 +214,7 @@ div.riskInfo-container {
             position: absolute;
             width: 10vw;
             height: 4vh;
-            left: 19vw;
+            left: 15vw;
             // background-color: #d1d2db;
 
             :deep(.el-select) {
@@ -265,7 +265,7 @@ div.riskInfo-container {
 
         div.graph-container {
             position: absolute;
-            width: 28.3vw;
+            width: 24vw;
             top: 4vh;
             left: 0.25vw;
 
@@ -300,8 +300,8 @@ div.riskInfo-container {
 
             div.empty-graph {
                 position: absolute;
-                left: 7vw;
-                top: 18vh;
+                left: 6vw;
+                top: 17vh;
                 display: flex;
                 align-items: center;
                 color: #1c68cc;
@@ -315,7 +315,7 @@ div.riskInfo-container {
     div.text-info-container {
         position:absolute;
         top: 33vh;
-        width: 29vw;
+        width: 25vw;
         height: 4.25vh;
         left: 0.5vw;
         background-color: rgba(18, 161, 218, 0.5);
@@ -323,7 +323,7 @@ div.riskInfo-container {
 
         div.text-info-item {
             position: absolute;
-            left: 6vw;
+            left: 4vw;
             top: 0.7vh;
             color: #070707;
             font-size: calc(0.7vw + 0.5vh);

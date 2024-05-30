@@ -39,8 +39,17 @@ float drop(float velocity, vec2 uv) {
     return step(drop_rate, rand(seed));
 }
 
+ivec2 MakeCoordValid(ivec2 texcoords, vec2 resolution){
+    ivec2 resol = ivec2(resolution);
+    resol.x = resol.x - 1;
+    resol.y = resol.y - 1;
+    ivec2 validCoord = clamp(texcoords, ivec2(0), resol);
+    return validCoord;
+}
+
 float is_in_flow_progress(vec2 resolution, vec2 uv) {
     ivec2 texcoords = ivec2(uv * resolution);//这里的uv是归一的坐标
+
     vec4 color1 = texelFetch(mask[0], texcoords, 0);//这里的color存的是4326下的归一坐标，mapbox用的归一化墨卡托
     vec4 color2 = texelFetch(mask[1], texcoords, 0);
 
@@ -96,8 +105,9 @@ void simulation(vec2 resolution) {
     float speedRate = speed_rate(speed);
 
     vec2 nPos = vec2(particleInfo.xy + speed * speedFactor / resolution);
-    nPos = clamp(nPos, vec2(0.01f), vec2(0.99f));
-    float dropped = drop(speedRate, uv) * is_in_flow_progress(resolution, nPos);
+    nPos = clamp(nPos, vec2(0.001f), vec2(0.999f));
+    // float dropped = drop(speedRate, uv) * is_in_flow_progress(resolution, nPos);
+    float dropped = is_in_flow_progress(resolution, nPos);
 
     newInfo = mix(particleInfo, vec3(nPos, speedRate), dropped);
     aliveTime = mix(fullLife - segmentNum, age + 1.0f, dropped);

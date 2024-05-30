@@ -212,17 +212,17 @@ const sandBarArea = computed(() => {
     return props.ogData['洲滩信息_面积'] == 'N/A' ? 'N/A' : props.ogData['洲滩信息_面积'] + 'km²'
 })
 const sandBarFix = computed(() => {
-    console.log(props.ogData['预案'] == null || props.ogData['预案'] == undefined || props.ogData['预案'] == '');
+    // console.log(props.ogData['预案'] == null || props.ogData['预案'] == undefined || props.ogData['预案'] == '');
     return (props.ogData['预案'] == null || props.ogData['预案'] == undefined || props.ogData['预案'] == '') ? '暂无信息' : props.ogData['预案']
 })
 
 watch(props, (V) => {
-    console.log(V, 'hello');
+    // console.log(V, 'hello');
     if (sourceFieldMap[props.sourceId]) {
         fMap.value = sourceFieldMap[props.sourceId]["fieldMap"]
         title.value = props.ogData[sourceFieldMap[props.sourceId]["original"]]
         data.value = props.ogData
-        console.log(fMap.value, title.value, data.value);
+        // console.log(fMap.value, title.value, data.value);
     }
 })
 const close = () => {

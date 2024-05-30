@@ -44,15 +44,50 @@ onMounted(async () => {
 
     mapFlyToRiver(map)
     // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
-    const jsonUrl = '/scratchSomething/flowWebGL/json/flow_field_description.json'
 
-    let flowFieldLayer = reactive(new FlowFieldLayer(jsonUrl))
-    map.addLayer(flowFieldLayer)
+    // const jsonUrl1 = '/scratchSomething/flowWebGL/json2/flow_field_description.json'//洪季
+    // const jsonUrl2 = '/scratchSomething/flowWebGL/json3/flow_field_description.json'//枯季
+    // let flowFieldLayer1 = reactive(new FlowFieldLayer('洪季流场', jsonUrl1))
+    // let flowFieldLayer2 = reactive(new FlowFieldLayer('枯季流场', jsonUrl2))
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key === '1') {
+    //         map.addLayer(flowFieldLayer1)
+    //     } else if (e.key === '2') {
+    //         map.removeLayer('洪季流场')
+    //     } else if (e.key === '3') {
+    //         map.addLayer(flowFieldLayer2)
+    //     } else if (e.key === '4') {
+    //         map.removeLayer('枯季流场')
+    //     }
+    // })
 
 
-    watch(() => flowFieldLayer.currentResourcePointer, (v) => {
-        console.log(v);
+    //////// this!
+
+    let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
+    let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
+    let flowLayer1 = reactive(new FlowFieldLayer('流场1', backEndJsonUrl1, imageSrcPrefix1))
+    let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
+    let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
+    let flowLayer2 = reactive(new FlowFieldLayer('流场2', backEndJsonUrl2, imageSrcPrefix2))
+    window.addEventListener('keydown', (e) => {
+        if (e.key === '1') {
+            map.addLayer(flowLayer1)
+        } else if (e.key === '2') {
+            map.removeLayer('流场1')
+        } else if (e.key === '3') {
+            map.addLayer(flowLayer2)
+        } else if (e.key === '4') {
+            map.removeLayer('流场2')
+        }
     })
+
+
+
+
+    // watch(() => flowFieldLayer.currentResourcePointer, (v) => {
+    //     console.log(v);
+    // })
 
 
     // await layerAddFunction(map, '已建通道')
@@ -95,15 +130,15 @@ onMounted(async () => {
     // })
 
     window.addEventListener('keydown', (e) => {
-        if(e.key == 'q'){
+        if (e.key == 'q') {
             console.log('qqqqqqq');
-            
+
             map.setLayoutProperty('FlowLayer', 'visibility', 'none');
-        }else if (e.key == 'w'){
+        } else if (e.key == 'w') {
             console.log('wwwwwww');
             map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
         }
-        
+
     })
 
 

@@ -259,7 +259,7 @@ const viewChange = (node, data) => {
         }
     }
 
-    console.log(data.label, node.level, ' view status change!! ')
+    // console.log(data.label, node.level, ' view status change!! ')
     if (data.type == 'title1') {
         data.active ? showLayers(map, DICT.T1LayerDict[data.label])
             : hideLayers(map, DICT.T1LayerDict[data.label])
@@ -520,7 +520,7 @@ const detailClickHandler4Feature = async (a) => {
     featureInfo.value = newFeatInfomation
     showDetail.value = true
     let map = mapStore.getMap()
-    console.log(nowSource, newFeatInfomation, sourceZoomMap[nowSource]);
+    // console.log(nowSource, newFeatInfomation, sourceZoomMap[nowSource]);
     map.flyTo({
         center: [featInfo.center_x, featInfo.center_y],
         zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
@@ -602,19 +602,21 @@ onMounted(async () => {
 
     sideBarLoading.value = false
 
-    map.on('click', ['water_polygon'], (e) => {
-        console.log(e.features[0])
-    })
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '1') {
-            showDetail.value = true
-        } else if (e.key === '2') {
-            showDetail.value = false
-        } else if (e.key === '3') {
-            console.log(nowSource, sourceNameMap[nowSource])
-        }
-    })
+
+    ///////////DEBUG
+    // map.on('click', ['water_polygon'], (e) => {
+    //     console.log(e.features[0])
+    // })
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key === '1') {
+    //         showDetail.value = true
+    //     } else if (e.key === '2') {
+    //         showDetail.value = false
+    //     } else if (e.key === '3') {
+    //         console.log(nowSource, sourceNameMap[nowSource])
+    //     }
+    // })
 
 })
 
