@@ -50,6 +50,7 @@ onMounted(async () => {
             // pickedObject.infoBox.innerHTML = nameStr
             // DEVICEName.value = nameStr
             useDeviceNameStore().deviceName = nameStr
+            console.log('device name ', nameStr)
             this._name = nameStr
         },
 

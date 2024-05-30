@@ -433,6 +433,7 @@ const viewChangeClick = (value) => {
                 threeDLoading.value = false
                 createCompIns()
             }, 3000)
+
             // map.addLayer(maskLayer)
         }
     }

@@ -106,8 +106,8 @@ void simulation(vec2 resolution) {
 
     vec2 nPos = vec2(particleInfo.xy + speed * speedFactor / resolution);
     nPos = clamp(nPos, vec2(0.001f), vec2(0.999f));
-    // float dropped = drop(speedRate, uv) * is_in_flow_progress(resolution, nPos);
-    float dropped = is_in_flow_progress(resolution, nPos);
+    float dropped = drop(speedRate, uv) * is_in_flow_progress(resolution, nPos);
+    // float dropped = is_in_flow_progress(resolution, nPos);
 
     newInfo = mix(particleInfo, vec3(nPos, speedRate), dropped);
     aliveTime = mix(fullLife - segmentNum, age + 1.0f, dropped);
