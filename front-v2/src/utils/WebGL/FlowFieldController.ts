@@ -21,8 +21,8 @@ export class FlowFieldController{
         this.fullLife = this.segmentNum * 10;
         this.progressRate = 0.0;
         this.speedFactor = 2.0;
-        this.dropRate = 0.005;
-        this.dropRateBump = 0.001;
+        this.dropRate = 0.01;
+        this.dropRateBump = 0.005;
         this.fillWidth = 2;
         this.aaWidth = 3;
         this.colorScheme = 0;
