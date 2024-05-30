@@ -1450,15 +1450,15 @@ onMounted(async () => {
         addRasterLayer(map, 23032209, 'mapRaster')
         
         map.setLayoutProperty('mapRaster', 'visibility', 'none')
-        map.addLayer({
-            id: 'riverBeachArea',
-            type: 'fill',
-            source: 'riverBeachSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgba(210,244,247, 1)',
-            },
-        })
+        // map.addLayer({
+        //     id: 'riverBeachArea',
+        //     type: 'fill',
+        //     source: 'riverBeachSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': 'rgba(210,244,247, 1)',
+        //     },
+        // })
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
