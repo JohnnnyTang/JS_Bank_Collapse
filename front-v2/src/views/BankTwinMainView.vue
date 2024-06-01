@@ -7,50 +7,75 @@
         </div> -->
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
-                    @change="viewChangeClick"></e-tab>
+                <e-tab
+                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
+                    :items="items"
+                    :columns="2"
+                    @change="viewChangeClick"
+                ></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
-        <RealtimeStatusVue />
-        <RealtimeVideoVue :active="!warnActive" />
+        <RealtimeStatusVue :domHide="domHideMap.status" />
+        <RealtimeVideoVue :active="!warnActive" :domHide="domHideMap.video" />
         <!-- <SectionRisk />
         <DeviceWarn /> -->
 
         <div class="marquee-container" v-loading="warnLoading">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 140)">
-                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }"
-                    style="animation-iteration-count: infinite">
-                    <div class="no-warn-block" v-if="warningList.length == 0"
-                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
+                <div
+                    class="marquee-block"
+                    ref="marqueeBlockDom"
+                    :style="{ animationDuration: animateTime }"
+                    style="animation-iteration-count: infinite"
+                >
+                    <div
+                        class="no-warn-block"
+                        v-if="warningList.length == 0"
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff"
+                    >
                         {{ `暂无报警信息` }}
                     </div>
-                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
-                        <div style="
+                    <div
+                        v-else
+                        class="warn-block"
+                        v-for="(warningString, index) in warningList"
+                        :key="index"
+                    >
+                        <div
+                            style="
                                 background-size: contain;
                                 background-image: url('/icons/warning.png');
                                 width: 3vh;
                                 height: 3vh;
-                            "></div>
-                        <div style="
+                            "
+                        ></div>
+                        <div
+                            style="
                                 font-size: calc(0.7vw + 1vh);
                                 color: rgb(254, 14, 11);
                                 margin-left: 0.5vw;
                                 font-weight: bold;
-                            ">
+                            "
+                        >
                             {{ warningString }}
                         </div>
                     </div>
                 </div>
             </DvBorderBox12>
         </div>
-        <div class="button-block" @click="warnActive = !warnActive" :class="{ active: warnActive }">
+        <div
+            class="button-block"
+            @click="warnActive = !warnActive"
+            :class="{ active: warnActive }"
+            v-if="!domHideMap.video"
+        >
             {{ buttonText }}
         </div>
 
         <div class="monitor-legend-container">
             <div class="monitor-legend-title" @click="deviceShowControl(-1)">
-                监测设备图例
+                监测设备
             </div>
             <div class="monitor-legend-block">
                 <!-- GNSS only -->
@@ -63,7 +88,7 @@
                         <span>{{ gnssLegendInfo.text2 }}</span>
                     </div>
                     <div style="display: flex; flex-direction: row">
-                        <div class="legend-block" @click="deviceShowControl(0)">
+                        <div class="legend-block" style="margin-right: 0.5vw;">
                             <div class="icon-block GNSS-icon" :style="{
                                 backgroundImage: `url(${gnssLegendInfo.icon1})`,
                             }"></div>
@@ -76,8 +101,13 @@
                                     text-shadow: #7388c148 1px 1px 0;
                                 ">
                                 {{ gnssLegendInfo.device1 }}</span>
+
+                            <label class="device-check-container" @click="deviceShowControl(0)">
+                                <input type="checkbox" class="input" disabled v-model="deviceShowing[0]">
+                                <span class="custom-checkbox"></span>
+                            </label>
                         </div>
-                        <div class="legend-block" @click="deviceShowControl(1)">
+                        <div class="legend-block">
                             <div class="icon-block GNSS-icon" :style="{
                                 backgroundImage: `url(${gnssLegendInfo.icon2})`,
                             }"></div>
@@ -90,17 +120,25 @@
                                     text-shadow: #7388c148 1px 1px 0;
                                 ">
                                 {{ gnssLegendInfo.device2 }}</span>
+                            <label class="device-check-container" @click="deviceShowControl(1)">
+                                <input type="checkbox" class="input" disabled v-model="deviceShowing[1]">
+                                <span class="custom-checkbox"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
                 <!-- others -->
-                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
+                <div
+                    v-for="(item, index) in legendList"
+                    :key="index"
+                    class="monitor-legend-item"
+                >
                     <div class="item-title">
                         <span>{{ item.text1 }}</span>
                         <span style="font-weight: bold">{{ item.strong }}</span>
                         <span>{{ item.text2 }}</span>
                     </div>
-                    <div class="legend-block" @click="deviceShowControl(index + 2)">
+                    <div class="legend-block">
                         <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
                         <span style="
                                 text-align: center;
@@ -111,6 +149,10 @@
                                 text-shadow: #7388c148 1px 1px 0;
                             ">
                             {{ item.device }}</span>
+                        <label class="device-check-container" @click="deviceShowControl(index + 2)">
+                            <input type="checkbox" class="input" disabled v-model="deviceShowing[index + 2]">
+                            <span class="custom-checkbox"></span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -118,28 +160,70 @@
 
         <div class="warn-status-container" v-loading="warnLoading">
             <div class="warn-status-title">民主沙右缘状态</div>
-            <div class="warn-status-content" :class="statusText == '正常' ? 'normal' : 'warn'">
+            <div
+                class="warn-status-content"
+                :class="statusText == '正常' ? 'normal' : 'warn'"
+            >
                 {{ statusText }}
             </div>
         </div>
-        <BanWarnDetail :warnActive="warnActive" v-loading="warnLoading" />
+        <BanWarnDetail
+            :warnActive="warnActive"
+            v-loading="warnLoading"
+            :domHide="domHideMap.warn"
+        />
         <!-- <WarnHistoryTable v-show="warnActive" /> -->
 
-        <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
+        <div
+            class="map-container"
+            id="map"
+            style="z-index: 2"
+            ref="mapDom"
+        ></div>
 
         <!-- BANK3D -->
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 1"></canvas>
+        <canvas
+            id="UnityCanvas"
+            class="GPU"
+            ref="unityCanvaDom"
+            style="z-index: 1"
+        ></canvas>
         <div class="loading-container" v-show="threeDLoading">
             <dv-loading class="loading-icon">
                 <div class="loading-message">三维视图资源加载中</div>
             </dv-loading>
         </div>
+        <div
+            class="hide-status-button left"
+            :class="{ 'in-active': domHideMap.status }"
+            @click="hideDom('status')"
+        >
+            <HideDomButtom :direction="domHideMap.status ? 'right' : 'left'" />
+        </div>
+        <div
+            class="hide-status-button right"
+            :class="{
+                'in-active': domHideMap.video,
+                'warn-active': warnActive,
+            }"
+            @click="hideDom('video')"
+        >
+            <HideDomButtom :direction="domHideMap.video ? 'left' : 'right'" />
+        </div>
+        <div
+            class="hide-status-button right warn"
+            :class="{ 'in-active': domHideMap.warn, 'warn-active': warnActive }"
+            @click="hideDom('warn')"
+            v-if="warnActive"
+        >
+            <HideDomButtom :direction="domHideMap.warn ? 'left' : 'right'" />
+        </div>
     </div>
 </template>
 
 <script setup>
-import router from '../router'
+// import router from '../router'
 import {
     onMounted,
     ref,
@@ -153,9 +237,10 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
-import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
+// import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
+import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
 import { mapInit } from '../components/bankManage/mapInit'
 // test bank3d popUP
 // import threedVue from '../components/bankTwin/threedPopup.vue'
@@ -165,8 +250,8 @@ import { useMapStore, useWarnInfoStore } from '../store/mapStore'
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
-import { initScratchMap, initPureScratchMap, initBaseMap } from '../utils/mapUtils'
-import { init } from 'echarts'
+import { initPureScratchMap } from '../utils/mapUtils'
+// import { init } from 'echarts'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const containerDom = ref(null)
 const animateTime = ref('0s')
@@ -177,19 +262,36 @@ const warnActive = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
+const test = ref(false)
+window.addEventListener('keydown', (e) => {
+    if (e.key == '1') {
+        test.value = true
+    } else if (e.key == '2') {
+        test.value = false
+    }
+})
+
 const detailLoading = ref(false)
 const warnLoading = ref(true)
-const activeView = ref('tab1')
+// const activeView = ref('tab1')
 const threeDLoading = ref(false)
+const deviceShowing = ref([true, true, true, true, true, true])
+
 
 // mapboxgl.accessToken =
 //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 let map = null
 const warnInfoStore = useWarnInfoStore()
-const token = ref(
-    'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
-)
+// const token = ref(
+//     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
+// )
 const statusText = ref('正常')
+
+const domHideMap = ref({
+    video: false,
+    status: false,
+    warn: false,
+})
 
 // custome layer
 /**
@@ -207,6 +309,8 @@ const items = ref([
 ])
 
 const warningList = ref([])
+
+// const showDom = ref([false, false])
 /*
     {
         icon: '/icons/GNSS测量站.png',
@@ -320,15 +424,6 @@ const gnssIdSectionMap = {
     'MZS120.541648_32.030524_2': 'MZ08海事码头',
 }
 
-const warnKeyValList = ref([
-    { key: '报警区域', val: '暂无' },
-    { key: '出险时间', val: '暂无' },
-    { key: '设备信息', val: '暂无' },
-    { key: '管理单位', val: '江苏省水利厅' },
-    { key: '联系方式', val: '025-85829326；18860847206' },
-    { key: '是否发送通知', val: '暂无' },
-])
-
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
@@ -344,7 +439,11 @@ const mapFlyToRiver = (mapIns) => {
     )
 }
 
-const gnssShow = true
+const hideDom = (domName) => {
+    domHideMap.value[domName] = !domHideMap.value[domName]
+}
+
+// const gnssShow = true
 
 // const GNSSShow = () => {
 //     let map = useMapStore().getMap()
@@ -352,6 +451,14 @@ const gnssShow = true
 //     // map.
 // }
 const deviceShowControl = (index) => {
+
+    if (index == -1) {
+        deviceShowing.value = [true, true, true, true, true, true]
+    } else {
+        deviceShowing.value = [false, false, false, false, false, false]
+        deviceShowing.value[index] = true
+    }
+    console.log(deviceShowing.value, '11111');
     let layerNameList = [
         'GNSS',
         'GNSS基准站',
@@ -361,21 +468,12 @@ const deviceShowControl = (index) => {
         '监控摄像头',
     ]
     let map = useMapStore().getMap()
-    if (index == -1) {
-        layerNameList.forEach((item) => {
-            map.getLayer(item) &&
-                map.setLayoutProperty(item, 'visibility', 'visible')
-        })
-        return
-    }
-    let layerName = layerNameList[index]
-    layerNameList.forEach((item) => {
-        map.getLayer(item) && map.setLayoutProperty(item, 'visibility', 'none')
+    deviceShowing.value.forEach((item, index) => {
+        item ? map.setLayoutProperty(layerNameList[index], 'visibility', 'visible')
+            : map.setLayoutProperty(layerNameList[index], 'visibility', 'none')
     })
-    map.getLayer(layerName) &&
-        map.setLayoutProperty(layerName, 'visibility', 'visible')
-}
 
+}
 const viewChangeClick = (value) => {
     // console.log('view Change!', value)
     let map = useMapStore().getMap()
@@ -410,6 +508,7 @@ const viewChangeClick = (value) => {
                 threeDLoading.value = false
                 createCompIns()
             }, 3000)
+
             // map.addLayer(maskLayer)
         }
     }
@@ -425,18 +524,6 @@ watch(
     },
 )
 
-function unique(arr) {
-    return Array.from(new Set(arr))
-}
-
-const navToManage = () => {
-    router.push('/bankManage')
-}
-const buildLocStr = (deviceId) => {
-    deviceId = deviceId.replace('MZS', '')
-    let str = deviceId.split('_').slice(0, 2).join(',')
-    return str
-}
 const updateWarnInfoDesc = async () => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
     let warnInfo = warnInfoStore.warnInfo
@@ -447,6 +534,7 @@ const updateWarnInfoDesc = async () => {
     // console.log('print warn info', warnInfo)
     if (warnInfo.length == 0) {
         statusText.value = '正常'
+        return
     } else {
         statusText.value = '报警'
     }
@@ -477,6 +565,9 @@ const updateWarnInfoDesc = async () => {
 
     warningList.value = WARN_TEXT
     warnActive.value = true
+    domHideMap.value.video = false
+    domHideMap.value.warn = false
+
     // 第一次是没有初始化完的长度 所以很快 实际上很长
     await nextTick()
     console.log('123123 length: ', marqueeBlockDom.value.offsetWidth)
@@ -555,7 +646,6 @@ onMounted(async () => {
     setTimeout(() => {
         warnLoading.value = false
     }, 1000)
-
 })
 
 onUnmounted(() => {
@@ -692,8 +782,8 @@ div.twin-main-container {
 
     div.visual-tab-container {
         position: absolute;
-        top: 2vh;
-        right: 1vw;
+        top: 10vh;
+        right: 29.6vw;
 
         width: 10vw;
         height: 6vh;
@@ -708,7 +798,7 @@ div.twin-main-container {
 
     div.marquee-container {
         position: absolute;
-        left: 28vw;
+        left: 26.4vw;
         top: 2vh;
         width: 44vw;
         height: 7vh;
@@ -776,7 +866,7 @@ div.twin-main-container {
         right: 1vw;
         width: fit-content;
         height: 3vh;
-        top: 9.5vh;
+        top: 3.5vh;
         padding: 0 0.4vw 0 0.4vw;
         line-height: 3vh;
         text-align: center;
@@ -810,7 +900,7 @@ div.twin-main-container {
         left: 28vw;
         width: 43vw;
         height: 10vh;
-
+        user-select: none;
         z-index: 4;
         display: flex;
         flex-flow: column nowrap;
@@ -837,8 +927,8 @@ div.twin-main-container {
             font-size: calc(0.8vw + 0.8vh);
             font-weight: bold;
             letter-spacing: 0.2rem;
-            padding-left: 0.5vw;
-            padding-right: 0.5vw;
+            padding-left: 0.8vw;
+            padding-right: 0.8vw;
 
             &:hover {
                 cursor: pointer;
@@ -883,6 +973,11 @@ div.twin-main-container {
                     justify-content: center;
                     align-items: center;
 
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+
                     div.icon-block {
                         position: relative;
                         width: 2vh;
@@ -899,6 +994,58 @@ div.twin-main-container {
                         // height: 2.5vh;
                         // transform: translateY(16%);
                     }
+
+                    .device-check-container {
+                        margin-top: 0.3vh;
+
+                        // font-size: 40px;
+                        .input[type="checkbox"] {
+                            display: none;
+                        }
+
+                        .custom-checkbox {
+                            display: inline-block;
+                            width: calc(0.4vw + 0.4vh);
+                            height: calc(0.4vw + 0.4vh);
+                            // background-color: #0400fc;
+                            border: 2px solid rgb(0, 24, 133);
+                            border-radius: 20%;
+                            position: relative;
+                            cursor: pointer;
+
+                        }
+
+                        /* Style for the custom checkmark */
+                        .custom-checkbox::after {
+                            // content: "";
+                            // position: absolute;
+                            // top: 50%;
+                            // left: 50%;
+                            // transform: translate(-50%, -50%);
+                            // width: calc(0.3vw + 0.3vh);
+                            // height: calc(0.3vw + 0.3vh);
+                            // background-color: #0400fc;
+                            // border-radius: 10%;
+                            // opacity: 0;
+                            content: "";
+                            position: absolute;
+                            top: 10%;
+                            left: 25%;
+                            // transform: translate(-50%, -50%);
+                            width: 5px;
+                            height: 10px;
+                            border: solid #000;
+                            border-width: 0 2px 2px 0;
+                            opacity: 0;
+                            transform: rotate(45deg);
+                        }
+
+                        /* Show the checkmark when checkbox is checked */
+                        .input[type="checkbox"]:checked+.custom-checkbox::after {
+                            opacity: 1;
+                        }
+
+                    }
                 }
             }
 
@@ -906,122 +1053,120 @@ div.twin-main-container {
                 width: 14vw;
             }
 
-            &:hover {
-                cursor: pointer;
-            }
+
         }
     }
 
-    div.warn-history-container {
-        position: absolute;
-        right: 1vw;
-        bottom: 1vh;
-        height: 34vh;
-        width: 24vw;
+    // div.warn-history-container {
+    //     position: absolute;
+    //     right: 1vw;
+    //     bottom: 1vh;
+    //     height: 34vh;
+    //     width: 24vw;
 
-        backdrop-filter: blur(16px);
-        box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
-        background-color: rgba(156, 195, 255, 0.4);
-        border-radius: 4px;
-        border: 2px solid rgb(28, 105, 247);
-        z-index: 3;
-        border-radius: 4px;
-        overflow: hidden;
+    //     backdrop-filter: blur(16px);
+    //     box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
+    //     background-color: rgba(156, 195, 255, 0.4);
+    //     border-radius: 4px;
+    //     border: 2px solid rgb(28, 105, 247);
+    //     z-index: 3;
+    //     border-radius: 4px;
+    //     overflow: hidden;
 
-        div.warn-history-title {
-            height: 4vh;
-            line-height: 4vh;
-            width: 100%;
-            background-color: transparent;
-            text-align: center;
-            font-size: calc(0.8vw + 0.8vh);
-            font-weight: bold;
-            color: #0400fd;
-            text-shadow:
-                #eef3ff 1px 1px,
-                #eef3ff 2px 2px,
-                #6493ff 3px 3px;
-            letter-spacing: 0.4rem;
-            border-bottom: 2px solid #0400fd;
-        }
+    //     div.warn-history-title {
+    //         height: 4vh;
+    //         line-height: 4vh;
+    //         width: 100%;
+    //         background-color: transparent;
+    //         text-align: center;
+    //         font-size: calc(0.8vw + 0.8vh);
+    //         font-weight: bold;
+    //         color: #0400fd;
+    //         text-shadow:
+    //             #eef3ff 1px 1px,
+    //             #eef3ff 2px 2px,
+    //             #6493ff 3px 3px;
+    //         letter-spacing: 0.4rem;
+    //         border-bottom: 2px solid #0400fd;
+    //     }
 
-        div.warn-histroy-content {
-            height: 30vh;
-            width: 23vw;
-            margin-left: 0.5vw;
+    //     div.warn-histroy-content {
+    //         height: 30vh;
+    //         width: 23vw;
+    //         margin-left: 0.5vw;
 
-            div.device-status-content {
-                // position: absolute;
-                // top: 5vh;
-                width: 100%;
-                // margin-left: 2.5%;
-                height: 30vh;
+    //         div.device-status-content {
+    //             // position: absolute;
+    //             // top: 5vh;
+    //             width: 100%;
+    //             // margin-left: 2.5%;
+    //             height: 30vh;
 
-                // background-color: #c4fbff;
+    //             // background-color: #c4fbff;
 
-                div.device-status-row {
-                    height: 4vh;
-                    width: 100%;
-                    border-radius: 2px;
+    //             div.device-status-row {
+    //                 height: 4vh;
+    //                 width: 100%;
+    //                 border-radius: 2px;
 
-                    // background-color: #2622fd;
+    //                 // background-color: #2622fd;
 
-                    display: flex;
-                    flex-flow: row nowrap;
-                    justify-content: space-around;
+    //                 display: flex;
+    //                 flex-flow: row nowrap;
+    //                 justify-content: space-around;
 
-                    &.head {
-                        padding-bottom: 4px;
-                    }
+    //                 &.head {
+    //                     padding-bottom: 4px;
+    //                 }
 
-                    div.device-item {
-                        width: 28%;
-                        height: 100%;
-                        line-height: 3.2vh;
-                        text-align: center;
-                        font-size: calc(0.5vw + 0.4vh);
-                        border-radius: 2px;
+    //                 div.device-item {
+    //                     width: 28%;
+    //                     height: 100%;
+    //                     line-height: 3.2vh;
+    //                     text-align: center;
+    //                     font-size: calc(0.5vw + 0.4vh);
+    //                     border-radius: 2px;
 
-                        background-color: #d2f2ff;
-                        font-weight: bold;
-                        color: #2a5fdb;
+    //                     background-color: #d2f2ff;
+    //                     font-weight: bold;
+    //                     color: #2a5fdb;
 
-                        &.device-name {
-                            width: 40%;
-                        }
+    //                     &.device-name {
+    //                         width: 40%;
+    //                     }
 
-                        &.device-time {
-                            width: 32%;
-                        }
+    //                     &.device-time {
+    //                         width: 32%;
+    //                     }
 
-                        &.device-count {
-                            display: flex;
-                            justify-content: center;
+    //                     &.device-count {
+    //                         display: flex;
+    //                         justify-content: center;
 
-                            div.normal {
-                                color: #00ca22;
-                            }
-                        }
+    //                         div.normal {
+    //                             color: #00ca22;
+    //                         }
+    //                     }
 
-                        &.head {
-                            background-color: #2a5fdb;
-                            border: 1px solid #aaffff;
-                            font-weight: bold;
-                            color: #dafdff;
-                            box-shadow:
-                                rgba(208, 252, 255, 0.6) 0px 2px 4px,
-                                rgba(208, 252, 255, 0.4) 0px 7px 13px -3px,
-                                rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
-                        }
+    //                     &.head {
+    //                         background-color: #2a5fdb;
+    //                         border: 1px solid #aaffff;
+    //                         font-weight: bold;
+    //                         color: #dafdff;
+    //                         box-shadow:
+    //                             rgba(208, 252, 255, 0.6) 0px 2px 4px,
+    //                             rgba(208, 252, 255, 0.4) 0px 7px 13px -3px,
+    //                             rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
+    //                     }
 
-                        box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
-                        rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
-                        rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
-                    }
-                }
-            }
-        }
-    }
+    //                     box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
+    //                     rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+    //                     rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     div.warn-status-container {
         position: absolute;
@@ -1071,7 +1216,62 @@ div.twin-main-container {
         }
     }
 
-    /* 根据需要调整动画的持续时间 */
+    div.hide-status-button {
+        position: absolute;
+        left: 25vw;
+        top: 26vh;
+
+        width: 1.4vw;
+        height: 2vw;
+
+        background-color: #e5f0ffc4;
+        backdrop-filter: blur(8px);
+        z-index: 3;
+
+        transition: all ease-in-out 0.2s;
+
+        &.left {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+
+            &.in-active {
+                left: 0vw;
+            }
+        }
+
+        &.right {
+            left: 72vw;
+            top: 3.2vh;
+            z-index: 4;
+            transition: none;
+
+            &.warn-active {
+                top: 54.2vh;
+            }
+
+            &.in-active {
+                left: 98.6vw;
+            }
+
+            &.warn {
+                top: 10.2vh;
+            }
+        }
+
+        &:hover {
+            cursor: pointer;
+            transform: scale(1.05);
+            filter: drop-shadow(2px 2px 1px rgb(73, 182, 255));
+        }
+    }
+}
+
+.hide-left {
+    transform: translateX(calc(-100% - 1vw));
+}
+
+.hide-right {
+    transform: translateX(calc(100% + 1vw));
 }
 
 :deep(.iEdpB) {

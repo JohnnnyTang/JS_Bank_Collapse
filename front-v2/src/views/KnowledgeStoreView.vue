@@ -2,7 +2,7 @@
     <div class="bankKnowledge-container" ref="knowledgeContainer">
         <!-- <VerticalNavVue /> -->
         <!-- <div class="selector-container"></div> -->
-        <router-view />
+        <router-view></router-view>
         <!-- <ScrollHistoryVue :knowledgeContainerWidth="knowledgeContainerWidth" ref="scrollDom"/> -->
         <!-- <bottomWaveVue /> -->
     </div>

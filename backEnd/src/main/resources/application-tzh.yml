@@ -46,7 +46,7 @@ springfox:
 tile:
   mzsTilePath: D:/2024-work/shore_collapse/data/DEM/rasterTIle/
   worldTilePath: D:/2024-work/shore_collapse/data/mbtiles/data
-  nodeServicePath: D:\2024-work\shore_collapse\code\project\backEnd\src\main\resources\node\index.js
+  nodeServicePath: D:\2024-work\shore_collapse\code\node\index.js
   riverTilePath: D:/2024-work/shore_collapse/data/riverRasterTile/
   riverImagePath: D:/2024-work/shore_collapse/tiles/worldImage/tiles/
 
@@ -63,3 +63,6 @@ sms:
   accessTokenLoc: D:\2024-work\AccessKey.json
   signName: 江苏长江崩岸监测预警系统
   verifyTemplateCode: SMS_465975002
+
+flowData:
+  texturePath: D:/2024-work/shore_collapse/data/flowData/flowFieldResourceArchive/

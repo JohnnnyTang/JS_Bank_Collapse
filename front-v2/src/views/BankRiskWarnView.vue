@@ -136,16 +136,16 @@
                 <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
                     <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
                         v-if="showGeologyAndProject"></dv-border-box-12>
-                    <div class="risk-item-text">岸坡地质</div>
+                    <div class="risk-item-text">地质与工程治理</div>
                 </div>
             </div>
-            <div class="risk-item" :class="{ active: showGeologyAndProject }">
+            <!-- <div class="risk-item" :class="{ active: showGeologyAndProject }">
                 <div class="risk-main-index outproject" @click="showGeologyAndProjectFunc">
                     <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']"
                         v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">外部因素</div>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <div class="raster-control-block" v-if="showRasterControl">
@@ -232,18 +232,18 @@
         <div v-if="showBedFlowChart" style="
                 position: absolute;
                 top: 16.25vh;
-                left: 1vw;
-                width: 30.2vw;
+                left: 0.3vw;
+                width: 26vw;
                 height: 23.5vh;
                 z-index: 10;
             ">
             <bedFlowChartVue />
         </div>
 
-        <flowspeedInfoVue v-if="showFlowSpeed" :profileList="profileList" :waterCondition="waterCondition"
-            :flowspeedChartLoad="flowspeedChartLoad" />
+        <flowspeedInfoVue v-if="showFlowSpeed" :profileList="profileList" :flowspeedChartLoad="flowspeedChartLoad"
+            :type="nowWaterConditionType" @condition-change="conditionChangeHandler" />
         <div v-if="showFlowSpeed" class="flow-control-block">
-            <label class="switch">
+            <label class="switch" style="transform: rotateZ(90deg);">
                 <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
                 <span class="slider"></span>
             </label>
@@ -258,12 +258,12 @@
         <div v-if="showWaterProcessChart" style="
                 position: absolute;
                 top: 66vh;
-                left: 1vw;
-                width: 30.2vw;
+                left: 0.3vw;
+                width: 26vw;
                 height: 25vh;
                 z-index: 10;
             ">
-            <waterProcessChartVue :timeStep="timeStep" />
+            <waterProcessChartVue :timeStep="timeStep" :type="nowWaterConditionType" />
         </div>
 
         <geologyAndProjectVue v-if="showGeologyAndProject" />
@@ -471,8 +471,46 @@ const showFlow = ref(false)
 const showRaster = ref(false)
 const showBankLine = ref(true)
 const infoTreeData = ref(InfoTree)
+const nowWaterConditionType = ref('洪季')
+let DryflowLayer
+let FloodflowLayer
+let dryflow = {
+    layer: null,
+    layerId: null,
+    currentResourcePointer: 0,
+    watcher: null,
+}
+let floodflow = {
+    layer: null,
+    layerId: null,
+    currentResourcePointer: 0,
+    watcher: null,
+}
 
-let flow = null
+const conditionChangeHandler = (lable) => {
+    nowWaterConditionType.value = lable
+    console.log(nowWaterConditionType.value);
+    showFlow.value = false
+    timeStep.value = 0
+    // remove layer
+    let map = useMapStore().getMap()
+    if (map.getLayer('floodFlow')) {
+        map.removeLayer('floodFlow')
+        if (floodWatcher) {
+            floodWatcher()
+            floodWatcher = null
+        }
+    }
+
+    if (map.getLayer('dryFlow')) {
+        map.removeLayer('dryFlow')
+        if (dryWatcher) {
+            dryWatcher()
+            dryWatcher = null
+        }
+    }
+
+}
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -839,39 +877,91 @@ const onAddProfileOption = () => { }
 
 const onAddProfile = () => { }
 
+
+let floodWatcher = null
+let dryWatcher = null
 const flowControlHandler = async () => {
-    console.log('!!!!flow  control')
     showFlow.value = !showFlow.value
     let map = useMapStore().getMap()
     // console.log(showFlow.value);
+    timeStep.value = 0
     if (showFlow.value) {
-        if (map) {
-            if (map.getLayer('FlowLayer')) {
-                // flow.show()
-                map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
-                // mapFlyToRiver(map)
-            } else {
-                flow = reactive(new FlowFieldLayer('/scratchSomething/flowWebGL/json/flow_field_description.json'))
-                map.addLayer(flow)
-                watch(
-                    () => flow.currentResourcePointer,
-                    (v) => {
-                        // console.log(flow.currentResourcePointer)
-                        timeStep.value = flow.currentResourcePointer
-                    },
-                )
-                // mapFlyToRiver(map)
-            }
-        } else {
-            ElMessage({
-                type: 'warning',
-                message: '地图尚未加载，请等待',
-            })
+        if (nowWaterConditionType.value == '洪季') {
+            let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
+            let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
+            let floodFlow = reactive(new FlowFieldLayer('floodFlow', backEndJsonUrl2, imageSrcPrefix2))
+            map.addLayer(floodFlow)
+
+            floodWatcher = watch(
+                () => floodFlow.currentResourcePointer,
+                (v) => {
+                    timeStep.value = floodFlow.currentResourcePointer
+                },
+            )
+
+            console.log('add 洪季');
+        } else if (nowWaterConditionType.value == '枯季') {
+
+            let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
+            let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
+            let dryFlow = reactive(new FlowFieldLayer('dryFlow', backEndJsonUrl1, imageSrcPrefix1))
+            map.addLayer(dryFlow)
+
+            dryWatcher = watch(
+                () => dryFlow.currentResourcePointer,
+                (v) => {
+                    timeStep.value = dryFlow.currentResourcePointer
+                },
+            )
+            console.log('add 枯季');
         }
+
     } else {
-        // flow.hide()
-        map.setLayoutProperty('FlowLayer', 'visibility', 'none');
+        if (nowWaterConditionType.value == '洪季') {
+            if (map.getLayer('floodFlow')) {
+                map.removeLayer('floodFlow')
+                floodWatcher()
+                floodWatcher = null
+            }
+        } else if (nowWaterConditionType.value == '枯季') {
+            if (map.getLayer('dryFlow')) {
+                map.removeLayer('dryFlow')
+                dryWatcher()
+                dryWatcher = null
+            }
+        }
+
     }
+
+
+
+    // if (showFlow.value) {
+    //     if (map) {
+    //         if (map.getLayer('FlowLayer')) {
+    //             // flow.show()
+    //             map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
+    //         } else {
+    //             // flow = reactive(new FlowFieldLayer('/scratchSomething/flowWebGL/json/flow_field_description.json'))
+    //             // flow = reactive(new )
+    //             map.addLayer(flow)
+    //             watch(
+    //                 () => flow.currentResourcePointer,
+    //                 (v) => {
+    //                     // console.log(flow.currentResourcePointer)
+    //                     timeStep.value = flow.currentResourcePointer
+    //                 },
+    //             )
+    //         }
+    //     } else {
+    //         ElMessage({
+    //             type: 'warning',
+    //             message: '地图尚未加载，请等待',
+    //         })
+    //     }
+    // } else {
+    //     // flow.hide()
+    //     map.setLayoutProperty('FlowLayer', 'visibility', 'none');
+    // }
 }
 
 // watch(
@@ -883,13 +973,13 @@ const flowControlHandler = async () => {
 // )
 
 const RasterControlHandler = () => {
-    if (showRaster.value && showRasterControl.value ) {
+    if (showRaster.value && showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
         showRaster.value = !showRaster.value
-    } else if ( !showRaster.value && showRasterControl.value) {
+    } else if (!showRaster.value && showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
         showRaster.value = !showRaster.value
-    } else if ( showRaster.value && !showRasterControl.value ) {
+    } else if (showRaster.value && !showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
         showRaster.value = !showRaster.value
     } else {
@@ -958,6 +1048,7 @@ const showFlowSpeedFunc = async () => {
         return
     }
     showFlowSpeed.value = !showFlowSpeed.value
+    timeStep.value = 0
     await flowControlHandler()
 }
 const showRasterControl = ref(false)
@@ -1448,17 +1539,17 @@ onMounted(async () => {
         })
 
         addRasterLayer(map, 23032209, 'mapRaster')
-        
+
         map.setLayoutProperty('mapRaster', 'visibility', 'none')
-        map.addLayer({
-            id: 'riverBeachArea',
-            type: 'fill',
-            source: 'riverBeachSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgba(210,244,247, 1)',
-            },
-        })
+        // map.addLayer({
+        //     id: 'riverBeachArea',
+        //     type: 'fill',
+        //     source: 'riverBeachSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': 'rgba(210,244,247, 1)',
+        //     },
+        // })
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -1702,6 +1793,8 @@ onMounted(async () => {
     )
 
     showWaterPowerFunc()
+
+
 })
 
 onUnmounted(() => {
@@ -2206,10 +2299,10 @@ div.risk-warn-container {
 
     div.flow-control-block {
         position: absolute;
-        top: 43.5vh;
-        left: 26vw;
-        height: 13vh;
-        width: 6vw;
+        top: 46.5vh;
+        left: 20.5vw;
+        height: 10vh;
+        width: 5vw;
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -2272,20 +2365,21 @@ div.risk-warn-container {
             align-items: center;
 
             .text {
-                writing-mode: vertical-lr;
+                // writing-mode: vertical-lr;
                 color: rgb(0, 80, 166);
                 color-scheme: light;
                 font-family: 'Microsoft YaHei';
                 font-weight: 700;
                 user-select: none;
+                margin-left: 2vw;
             }
         }
     }
 
     div.time-shower-block {
         position: absolute;
-        top: 52.8vh;
-        left: 22.5vw;
+        top: 55vh;
+        left: 20vw;
     }
 
     div.risk-year-container {
@@ -2336,7 +2430,7 @@ div.risk-warn-container {
         line-height: 2.6vh;
         left: 0.4vw;
         z-index: 8;
-        width: 31.2vw;
+        width: 26vw;
         font-weight: bold;
         font-size: calc(0.6vw + 0.8vh);
         text-shadow: #eef3ff 1px 1px;
@@ -2350,13 +2444,15 @@ div.risk-warn-container {
         top: 11.2vh;
         left: 0.4vw;
         height: 4.5vh;
-        width: 20vw;
+        width: 26vw;
         // background-color: rgba(197, 211, 228, 0.6);
         // border: rgba(0, 119, 255, 0.6) 2px solid;
         border-radius: 6px;
         z-index: 20;
         display: flex;
         flex-direction: row;
+        justify-content: space-evenly;
+        // background-color: red;
         backdrop-filter: blur(8px);
 
         div.risk-item {
@@ -2494,7 +2590,8 @@ div.risk-warn-container {
         z-index: 5;
         left: 0.3vw;
         top: 0.5vh;
-        width: 31.2vw;
+        // width: 31.2vw;
+        width: 26vw;
         height: 15vh;
         background-color: rgba(146, 190, 228, 0.5);
         backdrop-filter: blur(5px);

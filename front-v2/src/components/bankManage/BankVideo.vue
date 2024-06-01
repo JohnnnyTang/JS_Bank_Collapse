@@ -19,14 +19,14 @@
                                 class="video-js vjs-default-skin"
                             ><source :src="item.videoUrl" /></video> -->
                             <!-- <videoPlay :src="item.videoUrl" autoPlay :type="m3u8"/> -->
-                            <!-- <iframe
+                            <iframe
                                 :src="item.videoUrl + token"
                                 width="100%"
                                 height="100%"
                                 :id="item.name"
                                 allowfullscreen
                             >
-                            </iframe> -->
+                            </iframe>
                         </div>
                         <div class="video-title">{{ item.name }}</div>
                     </div>
@@ -105,26 +105,26 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 // import { videoPlay } from 'viplayer'
 // const token = 'at.2q8ej4p4114dtudb20awr9763vfz1f6o-5j403u7nkd-1ya7mgb-wv9z5z55f'
 const token = ref(
-    'at.89iiwo7c5cztq6f30wuai5oy0j3362ow-6m3qlhqadh-1phdss1-rmjo1wuzd',
+    'at.2kbb6yrsd376lwxrcd7r1mj610ud6kgw-3go8r4ejzs-0i8d8co-ubpipy04n',
 )
 const defaultVal = [
     {
         name: '民主沙上游围堤监控',
         code: 'FB5033036',
         position: '32.04023206, 120.51992163',
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         code: 'FB5033037',
         position: '32.03683063, 120.52666202',
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙海事码头监控',
         position: '32.02839471, 120.54611474',
         code: 'FB5033035',
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
     },
 ]
 
@@ -134,21 +134,21 @@ const videoList = ref([
         code: 'FB5033036',
         position: '32.0432963, 120.5122242',
         // videoUrl: `https://open.ys7.com/ezopen/h5/`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.hd.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         code: 'FB5033037',
         position: '32.0381061, 120.5263473',
         // videoUrl: `https://open.ys7.com/ezopen/h5/`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.hd.live&autoplay=1&accessToken=`,
     },
     {
         name: '民主沙海事码头监控',
         code: 'FB5033035',
         position: '32.0316674, 120.5402574',
         // videoUrl: `https://open.ys7.com/ezopen/h5/`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
     },
 ])
 
@@ -202,8 +202,8 @@ let map
 onMounted(() => {
     map = new mapboxgl.Map({
         container: 'map', // container ID
-        // accessToken:
-        //     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+        accessToken:
+            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
         center: [120.542, 32.036], // starting position [lng, lat]
         zoom: 8, // starting zoom

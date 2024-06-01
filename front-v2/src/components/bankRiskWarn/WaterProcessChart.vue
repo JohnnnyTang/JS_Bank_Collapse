@@ -19,7 +19,7 @@
         </div> -->
         <div class="profile-condition-container">
             <div class="profile-condition-text">
-                当前水文条件：洪季
+                当前水文条件：{{ props.type }}
             </div>
         </div>
     </div>
@@ -30,7 +30,8 @@ import { onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 
 const props = defineProps({
-    timeStep: Number
+    timeStep: Number,
+    type: String
 })
 
 
@@ -47,14 +48,14 @@ const options = [
         value: 'dry',
         label: '枯季潮位过程',
     },
-    {
-        value: '20',
-        label: '20年一遇潮位过程',
-    },
+    // {
+    //     value: '20',
+    //     label: '20年一遇潮位过程',
+    // },
 ]
 
 const nameMap = {
-    '20': '20年一遇潮位过程',
+    // '20': '20年一遇潮位过程',
     'dry': '枯季潮位过程',
     'flood': '洪季潮位过程'
 }
@@ -90,60 +91,18 @@ const hour = [
 
 const waterProcessData = {
     flood: [
-        '1.687756028',
-        '1.403791161',
-        '1.153940074',
-        '0.92732185',
-        '0.826905988',
-        '1.583252162',
-        '2.747398922',
-        '3.221304463',
-        '3.180745574',
-        '2.743348652',
-        '2.264949734',
-        '1.89491576',
-        '1.658672306',
-        '1.39994264',
-        '1.160212943',
-        '0.939572993',
-        '0.836240868',
-        '1.557370359',
-        '2.845002378',
-        '3.421596391',
-        '3.44471478',
-        '3.000204964',
-        '2.496461676',
-        '2.072330987',
-        '1.81079441',
-        '1.531233169',
+        1.001212989, 1.430690559, 2.648638297, 3.300017806, 3.213175523,
+        2.918089003, 2.496403935, 2.090084439, 1.859772776, 1.617136188,
+        1.365625119, 1.157432056, 1.009660696, 1.41224009, 2.708514216,
+        3.495363234, 3.470646204, 3.163897401, 2.728182249, 2.274461078,
+        2.015482879, 1.751219417, 1.5, 1.34, 1.11, 1
     ],
     dry: [
-        '1.106195237',
-        '0.706215671',
-        '0.358130906',
-        '0.055177195',
-        '-0.208548689',
-        '-0.333371308',
-        '0.171433644',
-        '1.216706321',
-        '1.767564546',
-        '1.751372008',
-        '1.319272777',
-        '0.92601579',
-        '0.60374053',
-        '0.28991355',
-        '-0.050594428',
-        '-0.380382074',
-        '-0.549582882',
-        '-0.552715338',
-        '-0.046699077',
-        '1.166519982',
-        '2.024183722',
-        '2.428786547',
-        '2.384532782',
-        '2.170962186',
-        '1.605904582',
-        '1.100772415',
+        -0.214262749, 0.053376691, 1.065463233, 1.781469026, 1.742719443,
+        1.390190431, 1.065970551, 0.737822597, 0.439561516, 0.131296197,
+        -0.205708982, -0.416403164, -0.47198395, -0.156388136, 0.955877257,
+        1.978015881, 2.400498593, 2.367688689, 2.274287718, 1.749563449,
+        1.184670123, 0.866449375, 0.535891809, 0.212956376, 0, -0.2
     ],
     20: [
         '2.718320324',
@@ -240,7 +199,7 @@ const option = {
                                 show: true,
                                 position: 'top',
                                 formatter: () => {
-                                    return "最高潮位: " + maxVal.toFixed(3)  + ' 米';
+                                    return "最高潮位: " + maxVal.toFixed(3) + ' 米';
                                 },
                                 textStyle: {
                                     color: 'black',
@@ -262,7 +221,7 @@ const option = {
                                 show: true,
                                 position: 'bottom',
                                 formatter: () => {
-                                    return "最低潮位: " + minVal.toFixed(3)  + ' 米';
+                                    return "最低潮位: " + minVal.toFixed(3) + ' 米';
                                 },
                                 textStyle: {
                                     color: 'black',
@@ -317,6 +276,14 @@ const option = {
 let chart
 let maxVal
 let minVal
+
+watch(() => props.type, (val) => {
+    const dict = {
+        '洪季': 'flood',
+        '枯季': 'dry'
+    }
+    selectChange(dict[val])
+})
 
 const selectChange = (val) => {
     option.series[0].data = waterProcessData[val]
@@ -380,16 +347,16 @@ div.water-chart-container {
     }
 
     div.profile-condition-container {
-        position:absolute;
+        position: absolute;
         width: 7.2vw;
         height: 3vh;
-        left: 22vw;
+        left: 17vw;
         top: 0.5vh;
         background-color: rgba(208, 236, 255, 1);
         border-radius: 4px;
 
         div.profile-condition-text {
-            position:absolute;
+            position: absolute;
             left: 0.4vw;
             top: 0.6vh;
             width: 8vw;
@@ -400,40 +367,40 @@ div.water-chart-container {
         }
     }
 
-    // div.selector-container {
-    //     position: absolute;
-    //     top: 0.2vh;
-    //     right: 1vw;
-    //     width: 30%;
+    div.selector-container {
+        position: absolute;
+        top: 0.2vh;
+        right: 1vw;
+        width: 30%;
 
-    //     :deep(.el-select) {
-    //         width: 100% !important;
-    //         // height: 3.3vh;
-    //         box-shadow:
-    //             rgba(0, 132, 255, 0.8) 1px 1px,
-    //             rgba(0, 119, 255, 0.7) 2px 2px,
-    //             rgba(0, 119, 255, 0.6) 3px 4px;
-    //         border-radius: 4px;
-    //     }
+        :deep(.el-select) {
+            width: 100% !important;
+            // height: 3.3vh;
+            box-shadow:
+                rgba(0, 132, 255, 0.8) 1px 1px,
+                rgba(0, 119, 255, 0.7) 2px 2px,
+                rgba(0, 119, 255, 0.6) 3px 4px;
+            border-radius: 4px;
+        }
 
-    //     :deep(.el-select__wrapper) {
-    //         // height: 3.3vh;
-    //         // line-height: 3.3vh;
-    //         border-radius: 4px;
-    //         font-family: 'Microsoft YaHei';
-    //         font-weight: bold;
-    //         font-size: calc(0.4vw + 0.3vh);
-    //         background-color: #e6f7ff;
-    //     }
+        :deep(.el-select__wrapper) {
+            // height: 3.3vh;
+            // line-height: 3.3vh;
+            border-radius: 4px;
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+            font-size: calc(0.4vw + 0.3vh);
+            background-color: #e6f7ff;
+        }
 
-    //     :deep(.el-select__placeholder) {
-    //         color: #738ab6;
-    //     }
+        :deep(.el-select__placeholder) {
+            color: #738ab6;
+        }
 
-    //     :deep(.el-select__tags-text) {
-    //         color: #2b61f7;
-    //         font-size: calc(0.4vw + 0.2vh);
-    //     }
-    // }
+        :deep(.el-select__tags-text) {
+            color: #2b61f7;
+            font-size: calc(0.4vw + 0.2vh);
+        }
+    }
 }
 </style>

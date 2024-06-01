@@ -53,16 +53,16 @@
                         <el-menu-item index="warn/risk">实时风险</el-menu-item>
                         <el-menu-item index="warn/stable">岸坡稳定</el-menu-item>
                     </el-sub-menu>
-                    <el-sub-menu index="3-2">
+                    <!-- <el-sub-menu index="3-2">
                         <template #title>报警记录</template>
                         <el-menu-item index="3-2-1">断面</el-menu-item>
                         <el-menu-item index="3-2-2">GNSS</el-menu-item>
                         <el-menu-item index="3-2-3">测斜仪</el-menu-item>
                         <el-menu-item index="3-2-4">孔隙水压力计</el-menu-item>
                         <el-menu-item index="3-2-5">应力桩</el-menu-item>
-                    </el-sub-menu>
+                    </el-sub-menu> -->
                 </el-sub-menu>
-                <el-sub-menu index="4">
+                <!-- <el-sub-menu index="4">
                     <template #title>
                         <el-icon><Document /></el-icon>
                         <span>报表管理</span>
@@ -70,7 +70,7 @@
                     <el-menu-item index="4-1">日报</el-menu-item>
                     <el-menu-item index="report/week">周报</el-menu-item>
                     <el-menu-item index="4-3">月报</el-menu-item>
-                </el-sub-menu>
+                </el-sub-menu> -->
             </el-menu>
         </el-scrollbar>
         <div class="placement-container down"></div>

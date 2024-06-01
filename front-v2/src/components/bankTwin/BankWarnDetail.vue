@@ -1,7 +1,7 @@
 <template>
     <div
         class="warn-detail-container"
-        :class="props.warnActive ? 'active' : 'in-active'"
+        :class="[props.warnActive ? 'active' : 'in-active', {'hide-right': props.domHide}]"
         v-if="props.warnActive"
     >
         <div class="warn-detail-title">报警处置详情</div>
@@ -252,6 +252,10 @@ const props = defineProps({
     warnActive: {
         type: Boolean,
         default: true,
+    },
+    domHide: {
+        type: Boolean,
+        default: false,
     },
 })
 const detailLoading = ref(false)

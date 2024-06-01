@@ -283,7 +283,7 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
                                     show: true,
                                     position: 'top',
                                     formatter: () => {
-                                        return "最大流速: " + Math.max(...flowspeed).toFixed(2)  + ' m/s';
+                                        return "最大流速: " + Math.max(...flowspeed).toFixed(2) + ' m/s';
                                     },
                                     textStyle: {
                                         color: 'black',
@@ -600,6 +600,13 @@ export const drawShapeYearlyGraph = (echarts, yearly) => {
             data: ['2023年地形'],
             right: '40%',
             top: '2%',
+            inactiveColor: 'rgb(86,88,93)',
+            inactiveBorderColor: 'rgb(86,88,93)',
+            inactiveBorderWidth: 2,
+            lineStyle: {
+                inactiveColor: 'rgb(86,88,93)',
+                inactiveWidth: 1,
+            }
         },
         axisPointer: {
             link: [
@@ -742,9 +749,16 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
             },
         ],
         legend: {
-            data: ['1999年地形','2012年地形', '2019年地形', '2023年地形'],
+            data: ['1999年地形', '2012年地形', '2019年地形', '2023年地形'],
             right: '12%',
             top: '2%',
+            inactiveColor: 'rgb(86,88,93)',
+            inactiveBorderColor: 'rgb(86,88,93)',
+            inactiveBorderWidth: 2,
+            lineStyle: {
+                inactiveColor: 'rgb(86,88,93)',
+                inactiveWidth: 1,
+            }
         },
         axisPointer: {
             link: [
@@ -793,10 +807,10 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
                 data: compareBefore.map((value) => fix2OrNull(value)),
                 lineStyle: {
                     //16,16,255
-                    color: 'rgb(127, 122, 85)',
+                    color: 'rgb(243,156,67)',
                 },
                 itemStyle: {
-                    color: 'rgb(127, 122, 85)',
+                    color: 'rgb(243,156,67)',
                 },
             },
             {
