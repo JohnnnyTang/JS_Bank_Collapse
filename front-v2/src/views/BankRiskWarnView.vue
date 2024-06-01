@@ -25,7 +25,7 @@
                             :disabled="item.disabled"
                         >
                             <span class="section-name-text">{{
-                                item.label
+                            -    item.label
                             }}</span>
                         </el-option>
                     </el-select>
@@ -123,27 +123,27 @@
             <div class="risk-item" :class="{ active: showWaterPower }">
                 <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
                     <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
-                    <div class="risk-item-text">水流动力分析</div>
+                    <div class="risk-item-text">水流动力</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
                     <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
-                    <div class="risk-item-text">河床演变分析</div>
+                    <div class="risk-item-text">河床演变</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
                 <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
                     <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
                         v-if="showGeologyAndProject"></dv-border-box-12>
-                    <div class="risk-item-text">岸坡地质分析</div>
+                    <div class="risk-item-text">岸坡地质</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
                 <div class="risk-main-index outproject" @click="showGeologyAndProjectFunc">
                     <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']"
                         v-if="showGeologyAndProject"></dv-border-box-12>
-                    <div class="risk-item-text">外部因素分析</div>
+                    <div class="risk-item-text">外部因素</div>
                 </div>
             </div>
         </div>

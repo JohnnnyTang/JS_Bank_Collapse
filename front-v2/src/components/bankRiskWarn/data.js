@@ -5,7 +5,7 @@ export const defaultWarnLayerDataInput = [
             [120.49989610501109, 32.044845778820694],
             [120.49965852902085, 32.043054010465546],
         ],
-        warnValue: 0.32,
+        warnValue: 0.49,
     },
     {
         name: 'JC02',
@@ -13,7 +13,7 @@ export const defaultWarnLayerDataInput = [
             [120.51211644811006, 32.04310480824947],
             [120.51157809855385, 32.04135665004222],
         ],
-        warnValue: 0.45,
+        warnValue: 0.59,
     },
     {
         name: 'JC03',
@@ -21,7 +21,7 @@ export const defaultWarnLayerDataInput = [
             [120.51598399026375, 32.04244111945512],
             [120.51554162835052, 32.04064910386879],
         ],
-        warnValue: 0.53,
+        warnValue: 0.64,
     },
     {
         name: 'JC04',
@@ -29,7 +29,7 @@ export const defaultWarnLayerDataInput = [
             [120.52163733002358, 32.040317481106044],
             [120.52010747944439, 32.03901766791365],
         ],
-        warnValue: 0.58,
+        warnValue: 0.67,
     },
     {
         name: 'JC05',
