@@ -7,7 +7,7 @@ import monitorDetailV2 from '../dataVisual/featureDetails/monitorDetailV2.vue'
 // import monitorDetailV22 from '../dataVisual/featureDetails/monitorDetailV22.vue'
 // import warningPop from '../bankTwin/warningPop.vue'
 import warningPopup from '../bankTwin/warningPopup.vue'
-import { useWarnInfoStore } from '../../store/mapStore'
+import { useMapStore, useWarnInfoStore } from '../../store/mapStore'
 import { convertToMercator } from '../modelStore/riskCalc/coordConvert'
 import proj4 from 'proj4'
 import { ref, createApp, h } from 'vue'
@@ -737,30 +737,31 @@ const mapInit = async (map, vis) => {
             },
         })
 
-        let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
 
-        map.on('click', deviceLayers, (e) => {
-            // if (e.features.length > 1) {
-            //     console.log('click features!', e.features)
-            //     open(e.features, map)
-            // } else if (e.features.length === 1) {
-            let p = e.features[0].properties
-            const property = e.features[0].properties
-            useSceneStore().setSelectedFeature(property)
-            propertyRef.value = property
-            const popUp = createPopUp(propertyRef, zoomRef)
-            popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
-            // }
-        })
-        map.on('mousemove', deviceLayers, (e) => {
-            map.getCanvas().style.cursor = 'pointer'
-        })
-        map.on('mouseleave', deviceLayers, (e) => {
-            map.getCanvas().style.cursor = ''
-        })
-        map.on('zoom', () => {
-            zoomRef.value = map.getZoom()
-        })
+        // map.on('click', deviceLayers, (e) => {
+        //     // if (e.features.length > 1) {
+        //     //     console.log('click features!', e.features)
+        //     //     open(e.features, map)
+        //     // } else if (e.features.length === 1) {
+        //     let p = e.features[0].properties
+        //     const property = e.features[0].properties
+        //     useSceneStore().setSelectedFeature(property)
+        //     propertyRef.value = property
+        //     const popUp = createPopUp(propertyRef)
+        //     popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+        //     // }
+        // })
+        // map.on('click', deviceLayers, (e) => deviceOnClick(e))
+        // map.on('mousemove', deviceLayers, (e) => {
+        //     map.getCanvas().style.cursor = 'pointer'
+        // })
+        // map.on('mouseleave', deviceLayers, (e) => {
+        //     map.getCanvas().style.cursor = ''
+        // })
+        addDeviceClickEvent(map)
+        // map.on('zoom', () => {
+        //     zoomRef.value = map.getZoom()
+        // })
 
         setTimeout(() => {
             warnInterval(map, 20)
@@ -1074,7 +1075,7 @@ const open = (features, map) => {
 
     useSceneStore().setSelectedFeature(items[0].properties)
     propertyRef.value = items[0].properties
-    const popUp = createPopUp(propertyRef, zoomRef)
+    const popUp = createPopUp(propertyRef)
     popUp
         .setOffset(0)
         .setLngLat([
@@ -1241,4 +1242,29 @@ const fakeWarnInfo = [
     // },
 ]
 
-export { mapInit, removeWarningDeviceStyle, setWarningDeviceStyle, typeList }
+const deviceOnClick = (e) => {
+    let p = e.features[0].properties
+    const property = e.features[0].properties
+    let map = useMapStore().getMap()
+    useSceneStore().setSelectedFeature(property)
+    let prepertyRef = ref(property)
+    const popUp = createPopUp(prepertyRef)
+    popUp.setOffset(0).setLngLat([p.longitude, p.latitude]).addTo(map)
+}
+const addDeviceClickEvent = (map) => {
+    let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
+    map.on('click', deviceLayers, deviceOnClick)
+    // map.on('mousemove', deviceLayers, (e) => {
+    //     map.getCanvas().style.cursor = 'pointer'
+    // })
+    // map.on('mouseleave', deviceLayers, (e) => {
+    //     map.getCanvas().style.cursor = ''
+    // })
+}
+const removeDeviceClickEvent = (map) => {
+    let deviceLayers = ['GNSS', '测斜仪', '孔隙水压力计', '应力桩']
+    map.off('click', deviceLayers, deviceOnClick)
+
+}
+
+export { mapInit, removeWarningDeviceStyle, setWarningDeviceStyle, typeList, deviceOnClick, addDeviceClickEvent, removeDeviceClickEvent }

@@ -99,6 +99,7 @@ watch(() => useDeviceNameStore().deviceName, async (newVal) => {
     //     'GNSS': 'gnss',
     // }
     deviceCode.value = nameCodeMap[newVal]
+    if (deviceCode.value === '') return
     deviceInfo.value = (await axios.get('/api/data/monitorInfo/code/' + deviceCode.value)).data
 
     if (deviceInfo.value.type === '6') {
@@ -234,12 +235,14 @@ const deviceIdPlaceMap = {
 
 <style lang="scss" scoped>
 .container {
-    position: relative;
+    position: absolute;
+    left: -10vw;
+    top: -34vh;
     display: block;
     // width: 25vw;
     width: 32vw;
     height: 38vh;
-    transform: scale(0.6) translateY(20%);
+    transform: scale(0.6);
     z-index: 1000;
 }
 
