@@ -7,12 +7,8 @@
         </div> -->
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab
-                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
-                    :items="items"
-                    :columns="2"
-                    @change="viewChangeClick"
-                ></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
+                    @change="viewChangeClick"></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -23,53 +19,33 @@
 
         <div class="marquee-container" v-loading="warnLoading">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 140)">
-                <div
-                    class="marquee-block"
-                    ref="marqueeBlockDom"
-                    :style="{ animationDuration: animateTime }"
-                    style="animation-iteration-count: infinite"
-                >
-                    <div
-                        class="no-warn-block"
-                        v-if="warningList.length == 0"
-                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff"
-                    >
+                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }"
+                    style="animation-iteration-count: infinite">
+                    <div class="no-warn-block" v-if="warningList.length == 0"
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
                         {{ `暂无报警信息` }}
                     </div>
-                    <div
-                        v-else
-                        class="warn-block"
-                        v-for="(warningString, index) in warningList"
-                        :key="index"
-                    >
-                        <div
-                            style="
+                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
+                        <div style="
                                 background-size: contain;
                                 background-image: url('/icons/warning.png');
                                 width: 3vh;
                                 height: 3vh;
-                            "
-                        ></div>
-                        <div
-                            style="
+                            "></div>
+                        <div style="
                                 font-size: calc(0.7vw + 1vh);
                                 color: rgb(254, 14, 11);
                                 margin-left: 0.5vw;
                                 font-weight: bold;
-                            "
-                        >
+                            ">
                             {{ warningString }}
                         </div>
                     </div>
                 </div>
             </DvBorderBox12>
         </div>
-        <div
-            class="button-block"
-            @click="warnActive = !warnActive"
-            :class="{ active: warnActive }"
-            v-if="!domHideMap.video"
-        >
+        <div class="button-block" @click="warnActive = !warnActive" :class="{ active: warnActive }"
+            v-if="!domHideMap.video">
             {{ buttonText }}
         </div>
 
@@ -128,11 +104,7 @@
                     </div>
                 </div>
                 <!-- others -->
-                <div
-                    v-for="(item, index) in legendList"
-                    :key="index"
-                    class="monitor-legend-item"
-                >
+                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
                     <div class="item-title">
                         <span>{{ item.text1 }}</span>
                         <span style="font-weight: bold">{{ item.strong }}</span>
@@ -160,63 +132,34 @@
 
         <div class="warn-status-container" v-loading="warnLoading">
             <div class="warn-status-title">民主沙右缘状态</div>
-            <div
-                class="warn-status-content"
-                :class="statusText == '正常' ? 'normal' : 'warn'"
-            >
+            <div class="warn-status-content" :class="statusText == '正常' ? 'normal' : 'warn'">
                 {{ statusText }}
             </div>
         </div>
-        <BanWarnDetail
-            :warnActive="warnActive"
-            v-loading="warnLoading"
-            :domHide="domHideMap.warn"
-        />
+        <BanWarnDetail :warnActive="warnActive" v-loading="warnLoading" :domHide="domHideMap.warn" />
         <!-- <WarnHistoryTable v-show="warnActive" /> -->
 
-        <div
-            class="map-container"
-            id="map"
-            style="z-index: 2"
-            ref="mapDom"
-        ></div>
+        <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
 
         <!-- BANK3D -->
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
-        <canvas
-            id="UnityCanvas"
-            class="GPU"
-            ref="unityCanvaDom"
-            style="z-index: 1"
-        ></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 1"></canvas>
         <div class="loading-container" v-show="threeDLoading">
             <dv-loading class="loading-icon">
                 <div class="loading-message">三维视图资源加载中</div>
             </dv-loading>
         </div>
-        <div
-            class="hide-status-button left"
-            :class="{ 'in-active': domHideMap.status }"
-            @click="hideDom('status')"
-        >
+        <div class="hide-status-button left" :class="{ 'in-active': domHideMap.status }" @click="hideDom('status')">
             <HideDomButtom :direction="domHideMap.status ? 'right' : 'left'" />
         </div>
-        <div
-            class="hide-status-button right"
-            :class="{
-                'in-active': domHideMap.video,
-                'warn-active': warnActive,
-            }"
-            @click="hideDom('video')"
-        >
+        <div class="hide-status-button right" :class="{
+            'in-active': domHideMap.video,
+            'warn-active': warnActive,
+        }" @click="hideDom('video')">
             <HideDomButtom :direction="domHideMap.video ? 'left' : 'right'" />
         </div>
-        <div
-            class="hide-status-button right warn"
-            :class="{ 'in-active': domHideMap.warn, 'warn-active': warnActive }"
-            @click="hideDom('warn')"
-            v-if="warnActive"
-        >
+        <div class="hide-status-button right warn" :class="{ 'in-active': domHideMap.warn, 'warn-active': warnActive }"
+            @click="hideDom('warn')" v-if="warnActive">
             <HideDomButtom :direction="domHideMap.warn ? 'left' : 'right'" />
         </div>
     </div>
@@ -241,7 +184,7 @@ import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
 import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
-import { mapInit } from '../components/bankManage/mapInit'
+import { mapInit, addDeviceClickEvent, removeDeviceClickEvent, deviceOnClick } from '../components/bankManage/mapInit'
 // test bank3d popUP
 // import threedVue from '../components/bankTwin/threedPopup.vue'
 import threeDdevice from '../components/bankTwin/threeDdevice.vue'
@@ -265,9 +208,13 @@ const buttonText = computed(() => {
 const test = ref(false)
 window.addEventListener('keydown', (e) => {
     if (e.key == '1') {
-        test.value = true
+        let map = useMapStore().getMap()
+        console.log('on');
+        map.on('click', ['GNSS', '测斜仪', '孔隙水压力计', '应力桩'], deviceOnClick)
     } else if (e.key == '2') {
-        test.value = false
+        let map = useMapStore().getMap()
+        console.log('off');
+        map.off('click', ['GNSS', '测斜仪', '孔隙水压力计', '应力桩'], deviceOnClick)
     }
 })
 
@@ -482,15 +429,22 @@ const viewChangeClick = (value) => {
             type: 'warning',
             message: '请等待地图加载后重试',
         })
+    let dom = document.getElementById('map')
+
     if (value == '2d') {
+        // dom.style.pointerEvents = 'auto'
+        map.on('click', ['GNSS', '测斜仪', '孔隙水压力计', '应力桩'], deviceOnClick)
         unityLayer && unityLayer.remove()
         map.getLayer('Mask-Layer') && map.removeLayer('Mask-Layer')
         map.getLayer('Unity-Layer') && map.removeLayer('Unity-Layer')
         mapFlyToRiver(map)
+        let fatherDom = document.querySelector('#DeviceInfoBox')
+        // fatherDom.innerHTML = ''
+        clearDom(fatherDom)
     } else if (value == '3d') {
+        map.off('click', ['GNSS', '测斜仪', '孔隙水压力计', '应力桩'], deviceOnClick)
         threeDLoading.value = true
         console.log('pickUp')
-        console.log(pickUp)
         const script = document.createElement('script')
         script.src =
             '/scratchSomething/unity/collapseBank/build/output.loader.js'
@@ -656,7 +610,19 @@ onUnmounted(() => {
 const createCompIns = () => {
     const bankApp = createApp(threeDdevice)
     let fatherDom = document.querySelector('#DeviceInfoBox')
-    bankApp.mount(fatherDom)    
+
+    let tempDiv = document.createElement('div')
+    tempDiv.id = 'tempDiv'
+    tempDiv.style.position = 'absolute'
+    bankApp.mount(tempDiv)
+    fatherDom.appendChild(tempDiv)
+}
+const clearDom = (dom) => {
+    var children = dom.childNodes
+    for (var i = children.length - 1; i >= 0; i--) {
+        dom.removeChild(children[i])
+        
+    }
 }
 </script>
 

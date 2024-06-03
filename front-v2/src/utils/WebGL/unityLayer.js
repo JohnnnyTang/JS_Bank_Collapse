@@ -19,7 +19,7 @@ class UnityLayer {
     constructor(originPosition, visibleZoom, unityCanvas) {
 
         this.type = 'custom'
-        this.id = 'UnityLayer'
+        this.id = 'Unity-Layer'
         this.renderingMode = '3d'
         this.unityProjName = 'output'
         this.visibleZoom = visibleZoom
@@ -38,9 +38,6 @@ class UnityLayer {
     }
 
     onAdd(map, gl) {
-
-        let dom = document.querySelector('#DeviceInfoBox')
-        dom.style.display = 'block'
 
         // Set Unity instance configuration
         const buildUrl = "/scratchSomething/unity/collapseBank/build"

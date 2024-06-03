@@ -16,6 +16,7 @@ import { getStyleJson4base } from '../../utils/mapUtils'
 import BankWarnLayer from './js/bankWarnLayer'
 import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
 import FlowFieldLayer from '../../utils/WebGL/notSimpleLayer'
+import { importantSluice } from './js/tempData'
 import { layerAddFunction, layerRemoveFunction } from './layerUtil'
 import * as customLayers from '../../utils/WebGL/customLayers'
 
@@ -45,6 +46,119 @@ onMounted(async () => {
     mapFlyToRiver(map)
     // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
 
+
+    // !map.getSource('sluiceArea-center') &&
+    //     map.addSource('sluiceArea-center', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // loadImage(map, '/legend/水闸.png', '水闸')
+
+    // map.addLayer({
+    //     id: '水闸工程-重点',
+    //     type: 'symbol',
+    //     'source-layer': 'default',
+    //     source: 'sluiceArea-center',
+    //     filter: ['==', 'if_important', 1],
+    //     layout: {
+    //         'icon-image': '水闸',
+    //         "icon-size": 0.2,
+    //         'icon-allow-overlap': true,
+    //         'icon-rotate': ['get', 'rotation_angle']
+    //     },
+    //     paint: {
+    //         'icon-opacity': 1.0,
+    //     },
+    // })
+
+    // map.addLayer({
+    //     id: '大中型水闸-注记',
+    //     type: 'symbol',
+    //     source: 'sluiceArea-center',
+    //     'source-layer': 'default',
+    //     filter: ['==', 'if_important', 1],
+    //     minzoom: 8,
+    //     layout: {
+    //         'text-field': ['get', 'sp_name'],
+    //         'text-font': [
+    //             'Open Sans Semibold',
+    //         ],
+    //         // 'text-anchor': 'top',
+    //         'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
+    //         'text-offset': [0, 0.5],
+    //         'text-size': 17,
+    //         'text-allow-overlap': false,
+    //     },
+    //     paint: {
+    //         "text-color": "rgba(73, 83, 92,1.0)",
+    //         'text-halo-color': "rgba(255, 255, 255, 1.0)",
+    //         'text-halo-width': 2.0,
+    //     },
+    // })
+
+    !map.getSource('pumpArea') &&
+        map.addSource('pumpArea', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
+            ],
+        })
+    !map.getSource('pumpArea') &&
+        map.addSource('pumpArea', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
+            ],
+        })
+    await loadImage(map, '/legend/泵站.png', '泵站')
+    !map.getLayer('大中型泵站') &&
+        map.addLayer({
+            id: '大中型泵站',
+            type: 'symbol',
+            source: 'pumpArea',
+            filter: ["==", "if_important", '1'],
+            'source-layer': 'default',
+            minzoom: 8,
+
+            maxzoom: 22,
+            layout: {
+                'icon-image': '泵站',
+                'icon-size': 1.1,
+                'icon-allow-overlap': true,
+            },
+            paint: {
+            },
+        })
+
+    !map.getLayer('大中型泵站-注记') &&
+        map.addLayer({
+            id: '大中型泵站-注记',
+            type: 'symbol',
+            source: 'pumpArea',
+            filter: ["==", "if_important", '1'],
+            'source-layer': 'default',
+            minzoom: 8,
+
+            layout: {
+                'text-field': ['get', 'sp_name'],
+                'text-font': [
+                    'Open Sans Semibold',
+                    'Arial Unicode MS Bold',
+                ],
+                'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
+                'text-offset': [0, -1.0],
+                'text-allow-overlap': false,
+                'text-size': 16,
+            },
+            paint: {
+                'text-color': 'rgba(0,54,134,0.8)',
+            },
+        })
+
+
+
     // const jsonUrl1 = '/scratchSomething/flowWebGL/json2/flow_field_description.json'//洪季
     // const jsonUrl2 = '/scratchSomething/flowWebGL/json3/flow_field_description.json'//枯季
     // let flowFieldLayer1 = reactive(new FlowFieldLayer('洪季流场', jsonUrl1))
@@ -64,23 +178,23 @@ onMounted(async () => {
 
     //////// this!
 
-    let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
-    let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
-    let flowLayer1 = reactive(new FlowFieldLayer('流场1', backEndJsonUrl1, imageSrcPrefix1))
-    let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
-    let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
-    let flowLayer2 = reactive(new FlowFieldLayer('流场2', backEndJsonUrl2, imageSrcPrefix2))
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '1') {
-            map.addLayer(flowLayer1)
-        } else if (e.key === '2') {
-            map.removeLayer('流场1')
-        } else if (e.key === '3') {
-            map.addLayer(flowLayer2)
-        } else if (e.key === '4') {
-            map.removeLayer('流场2')
-        }
-    })
+    // let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
+    // let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
+    // let flowLayer1 = reactive(new FlowFieldLayer('流场1', backEndJsonUrl1, imageSrcPrefix1))
+    // let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
+    // let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
+    // let flowLayer2 = reactive(new FlowFieldLayer('流场2', backEndJsonUrl2, imageSrcPrefix2))
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key === '1') {
+    //         map.addLayer(flowLayer1)
+    //     } else if (e.key === '2') {
+    //         map.removeLayer('流场1')
+    //     } else if (e.key === '3') {
+    //         map.addLayer(flowLayer2)
+    //     } else if (e.key === '4') {
+    //         map.removeLayer('流场2')
+    //     }
+    // })
 
 
 
