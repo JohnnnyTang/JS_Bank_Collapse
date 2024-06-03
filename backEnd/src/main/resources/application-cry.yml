@@ -38,3 +38,5 @@ tile:
   worldTilePath: E://Data//bankProjectData//2020-10-planet-14
   nodeServicePath: E://Data//bankProjectData//node//index.js
 
+flowData:
+  texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/
