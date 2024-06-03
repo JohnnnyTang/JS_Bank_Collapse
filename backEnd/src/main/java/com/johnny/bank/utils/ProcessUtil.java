@@ -1,6 +1,5 @@
 package com.johnny.bank.utils;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.ProcessCmdOutput;
 import com.johnny.bank.model.node.ModelNode;
@@ -8,7 +7,10 @@ import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,12 @@ public class ProcessUtil {
 
 //    static String condaStr = "conda activate multiIndex &&";
     static String condaStr = "conda activate ";
+
+    static Boolean ifSystemWin = System.getProperties().getProperty("os.name").toLowerCase().contains("win");
+
+    static String sysCmdExeStr = (System.getProperties().getProperty("os.name").toLowerCase().contains("win"))? "cmd.exe":"bash";
+    static String sysLinkStr = (System.getProperties().getProperty("os.name").toLowerCase().contains("win"))? "/c":"-c";
+
 
 //    static String pythonStr = "python3";
 
@@ -81,7 +89,7 @@ public class ProcessUtil {
         commands.add(multiIndexResPath);
         String pyCmdStr = String.join(" ", commands);
         System.out.printf(pyCmdStr);
-        processBuilder.command("cmd.exe", "/c", pyCmdStr);
+        processBuilder.command(sysCmdExeStr, sysLinkStr, pyCmdStr);
         return processBuilder.start();
     }
 
@@ -105,7 +113,7 @@ public class ProcessUtil {
         }
         String cmdStr = String.join(" ", commands);
         log.info(cmdStr);
-        processBuilder.command("cmd", "/c", cmdStr);
+        processBuilder.command(sysCmdExeStr, sysLinkStr, cmdStr);
         return processBuilder.start();
     }
 
@@ -163,138 +171,5 @@ public class ProcessUtil {
                 log.info(e.getMessage(), e.toString());
             }
         }
-    }
-
-    public static Process saveSectionValue(String tempPath, String rasterPath, JSONArray jsonArray, String resultPath) throws IOException {
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(tempPath));
-            out.write(rasterPath + "\n");
-            out.write(resultPath + "\n");
-            out.write(jsonArray.size() + "\n");
-            for(int i = 0; i < jsonArray.size(); i++) {
-                out.write(jsonArray.getObject(i, JSONArray.class).getString(0) + "," + jsonArray.getObject(i, JSONArray.class).getString(1) + "\n");
-            }
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        log.info(pythonStr + " " + outsideModelDir + "section.py " + tempPath);
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        List<String> commands = new ArrayList<>();
-        commands.add(pythonStr);
-        commands.add(outsideModelDir + "section.py");
-        commands.add(tempPath);
-        processBuilder.command(commands);
-        return processBuilder.start();
-    }
-
-    public static Process savaSectionContrast(String tempPath, List<String> rasterPathList, JSONArray jsonArray, String resultPath) throws IOException {
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(tempPath));
-            out.write(rasterPathList.size() + "\n");
-            for(String path : rasterPathList) {
-                out.write(path + "\n");
-            }
-            out.write(resultPath + "\n");
-            out.write(jsonArray.size() + "\n");
-            for(int i = 0; i < jsonArray.size(); i++) {
-                out.write(jsonArray.getObject(i, JSONArray.class).getString(0) + "," + jsonArray.getObject(i, JSONArray.class).getString(1) + "\n");
-            }
-            out.close();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        List<String> commands = new ArrayList<>();
-        commands.add(pythonStr);
-        commands.add(outsideModelDir + "SectionContrast.py");
-        commands.add(tempPath);
-        processBuilder.command(commands);
-        return processBuilder.start();
-    }
-
-    public static Process sectionFlush(String tempPath, String benchmarkPath, String referPath, String demPath, JSONArray jsonArray, String resultPath) throws IOException {
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(tempPath));
-            out.write(benchmarkPath + "\n");
-            out.write(referPath + "\n");
-            out.write(demPath + "\n");
-            out.write(resultPath + "\n");
-            out.write(jsonArray.size() + "\n");
-            for(int i = 0; i < jsonArray.size(); i++) {
-                out.write(jsonArray.getObject(i, JSONArray.class).getString(0) + "," + jsonArray.getObject(i, JSONArray.class).getString(1) + "\n");
-            }
-            out.close();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-
-        }
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        List<String> commands = new ArrayList<>();
-        commands.add(pythonStr);
-        commands.add(outsideModelDir + "section_flush.py");
-        commands.add(tempPath);
-        processBuilder.command(commands);
-        return processBuilder.start();
-    }
-
-    public static Process computeVolume(String tempPath, double deep, String rasterPath, String resultPath, String visualPath, JSONArray jsonArray, String volumePath, String coorPath) throws IOException {
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(tempPath));
-            out.write(deep + "\n");
-            out.write(jsonArray.getJSONArray(0).size() - 1 + "\n");
-            for(int i = 0; i < jsonArray.getJSONArray(0).size() - 1; i++) {
-                out.write(jsonArray.getJSONArray(0).getJSONArray(i).getString(0) + "," + jsonArray.getJSONArray(0).getJSONArray(i).getString(1) + "\n");
-            }
-            out.write(rasterPath + "\n");
-            out.write(resultPath + "\n");
-            out.write(visualPath + "\n");
-            out.write(volumePath + "\n");
-            out.write(coorPath + "\n");
-            out.close();
-
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        List<String> commands = new ArrayList<>();
-        commands.add(pythonStr);
-        commands.add(outsideModelDir + "compute_volume.py");
-        commands.add(tempPath);
-        processBuilder.command(commands);
-        return processBuilder.start();
-    }
-
-    public static Process rasterCrop(String tempPath, String rasterPath, String outputPng, String outputTif, String outputJson, JSONArray jsonArray) throws IOException {
-        BufferedWriter out = null;
-        try {
-            out = new BufferedWriter(new FileWriter(tempPath));
-            out.write(rasterPath + "\n");
-            out.write(outputPng + "\n");
-            out.write(outputJson + "\n");
-            out.write(outputTif + "\n");
-            out.write(jsonArray.getJSONArray(0).size() - 1 + "\n");
-            for(int i = 0; i < jsonArray.getJSONArray(0).size() - 1; i++) {
-                out.write(jsonArray.getJSONArray(0).getJSONArray(i).getString(0) + "," + jsonArray.getJSONArray(0).getJSONArray(i).getString(1) + "\n");
-            }
-            out.close();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-
-        }
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        List<String> commands = new ArrayList<>();
-        commands.add(pythonStr);
-        commands.add(outsideModelDir + "raster_clip.py");
-        commands.add(tempPath);
-        processBuilder.command(commands);
-        return processBuilder.start();
-
     }
 }

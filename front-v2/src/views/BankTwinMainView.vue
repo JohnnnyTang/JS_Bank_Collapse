@@ -508,7 +508,6 @@ const viewChangeClick = (value) => {
                 threeDLoading.value = false
                 createCompIns()
             }, 3000)
-
             // map.addLayer(maskLayer)
         }
     }
@@ -657,7 +656,7 @@ onUnmounted(() => {
 const createCompIns = () => {
     const bankApp = createApp(threeDdevice)
     let fatherDom = document.querySelector('#DeviceInfoBox')
-    bankApp.mount(fatherDom)
+    bankApp.mount(fatherDom)    
 }
 </script>
 

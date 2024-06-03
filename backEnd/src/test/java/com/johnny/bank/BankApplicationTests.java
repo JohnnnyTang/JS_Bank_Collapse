@@ -81,8 +81,13 @@ class BankApplicationTests {
     }
 
 //    @Test
-    void testUpdateDeviceWarn() {
-        deviceWarningRepo.updateWarnDealtStatus("125a3b38-a602-45c3-b747-54504ef186c4", 1);
+void testUpdateDeviceWarn() {
+    deviceWarningRepo.updateWarnDealtStatus("125a3b38-a602-45c3-b747-54504ef186c4", 1);
+}
+
+//    @Test
+    void testSystemName() {
+        System.out.println("system ... " + System.getProperties().getProperty("os.name"));
     }
 
 }
