@@ -791,7 +791,7 @@ const layerAddFunctionMap = {
                 minzoom: 8,
                 maxzoom: 11,
                 source: 'river_division_line',
-                'source-layer':'default',
+                'source-layer': 'default',
                 paint: {
                     'line-color': 'rgb(110, 107, 106)',
                     'line-width': [
@@ -832,7 +832,7 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 source: 'river_division_line',
                 maxzoom: 11,
-                'source-layer':'default',
+                'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
@@ -2335,7 +2335,8 @@ const layerAddFunctionMap = {
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, 0.5],
                     'text-size': 16,
-                    'text-allow-overlap': true,
+                    // 'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                 },
                 paint: {
                     "text-color": "rgba(73, 83, 92,0.8)",
@@ -2533,8 +2534,8 @@ const layerAddFunctionMap = {
                     ],
                     'text-anchor': 'bottom',
                     'text-offset': [0, -1.0],
-                    // 'text-allow-overlap': false,
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
+                    // 'text-allow-overlap': true,
                     'text-size': 15,
                 },
                 paint: {
