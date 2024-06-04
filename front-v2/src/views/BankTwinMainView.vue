@@ -470,21 +470,23 @@ const viewChangeClick = (value) => {
 //     mapFlyToRiver(map)
 // })
 
-watch(
-    () => warnInfoStore.warnInfo,
-    (newV, oldV) => {
-        updateWarnInfoDesc()
-    },
-)
 
-const updateWarnInfoDesc = async () => {
+
+// const subscribe = warnInfoStore.$subscribe((mutaton, state) => {
+//     if(mutaton.events.key === "_transitioningPaint") {
+//         return
+//     }
+//     console.log('in sub', mutaton.events.key)
+//     updateWarnInfoDesc(state.warnInfo)
+// }, { detached: false })
+
+const updateWarnInfoDesc = async (warnInfo) => {
     const DEVICETYPEMAP = ['GNSS', '应力桩', '水压力计', '测斜仪']
-    let warnInfo = warnInfoStore.warnInfo
     let WARN_TEXT = []
     // console.log('warnInfo! ', warnInfo)
     let deviceNameList = []
     let warnTimeList = []
-    // console.log('print warn info', warnInfo)
+    // console.log('print warn info', warnInfoStore.warnInfo)
     if (warnInfo.length == 0) {
         statusText.value = '正常'
     } else {
@@ -522,13 +524,21 @@ const updateWarnInfoDesc = async () => {
 
     // 第一次是没有初始化完的长度 所以很快 实际上很长
     await nextTick()
-    console.log('123123 length: ', marqueeBlockDom.value.offsetWidth)
+    // console.log('123123 length: ', marqueeBlockDom.value.offsetWidth)
     const marqueeBlockWidth = marqueeBlockDom.value.offsetWidth
-    animateTime.value = `${marqueeBlockWidth / warnInfo.length / 24}s`
+    animateTime.value = `${marqueeBlockWidth / warnInfo.length / 36}s`
     if (warnInfo.length == 0) {
         animateTime.value = 0
     }
 }
+
+watch(
+    () => warnInfoStore.warnInfo,
+    (newV, oldV) => {
+        console.log('new val warn', newV)
+        updateWarnInfoDesc(newV)
+    }, { immediate: true, deep: true, flush: 'sync' }
+)
 
 watch(
     () => warnInfoStore.curDealId,
