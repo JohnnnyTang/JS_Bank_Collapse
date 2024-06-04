@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import MaskLayer from './maskLayer'
+import { GUI } from 'dat.gui'
 
+let tickCount = 0
 const WORLD_SIZE = 1024000 //TILE_SIZE * 2000
 
 // const unityCanvas = document.createElement('canvas')
@@ -35,6 +37,17 @@ class UnityLayer {
         this.unityCanvas = unityCanvas
         unityCanvas.style.width = unityCanvas.clientWidth
         unityCanvas.style.height = unityCanvas.clientHeight
+
+        this.movable = false
+        this.pX = -2.0591
+        this.pY = 0.00
+        this.pZ = -4.45
+        this.rX = 0.0
+        this.rY = 0.0
+        this.rZ = 0.0
+        this.sX = 0.927
+        this.sY = 1.0
+        this.sZ = 0.927
     }
 
     onAdd(map, gl) {
@@ -125,9 +138,10 @@ class UnityLayer {
             this.init()
             this.keep(this.zoom >= this.visibleZoom)
 
-            stopWebCam()
+            // stopWebCam()
 
-            const offset = 0.001
+            const offset = 0.0
+            /*
             const devices = [
                 0, 120.5289404, 32.03504751,
                 0, 120.5222438, 32.03900986,
@@ -171,16 +185,10 @@ class UnityLayer {
                 // 3, 120.5209528, 32.04067285, 
                 // 3, 120.5103731, 32.04268722, 
             ]
-            // for (let i = 0; i < devices.length / 3; i++) {
-            //     this.addDevice(`${i}`, devices[i * 3 + 0], devices[i * 3 + 1], devices[i * 3 + 2])
-            // }
 
-            /*
-            0 gnss测量
-            1 gnss基准
-            2 应力
-            3 测斜水压
-            4 视频
+            for (let i = 0; i < devices.length / 3; i++) {
+                this.addDevice(`${i}`, devices[i * 3 + 0], devices[i * 3 + 1], devices[i * 3 + 2])
+            }
             */
 
             const DEVICECES = [
@@ -220,12 +228,31 @@ class UnityLayer {
                 '02', 4, 120.5155315, 32.04267723 + offset,
                 '01', 4, 120.522407, 32.03941692,
                 '03', 4, 120.5422418, 32.03077085,
-
             ]
             for (let i = 0; i < DEVICECES.length / 4; i++) {
                 this.addDevice(DEVICECES[i * 4 + 0], DEVICECES[i * 4 + 1], DEVICECES[i * 4 + 2], DEVICECES[i * 4 + 3])
             }
 
+
+            // dat.GUI
+            if (this.movable) {
+                const gui = new GUI()
+                const positionFolder = gui.addFolder('Position')
+                positionFolder.add(this, 'pX', -100.0, 100.0, 0.0001)
+                positionFolder.add(this, 'pY', -100.0, 100.0, 0.0001)
+                positionFolder.add(this, 'pZ', -100.0, 100.0, 0.0001)
+                positionFolder.open()
+                const rotationFolder = gui.addFolder('Rotation')
+                rotationFolder.add(this, 'rX', -180.0, 180.0, 0.0001)
+                rotationFolder.add(this, 'rY', -180.0, 180.0, 0.0001)
+                rotationFolder.add(this, 'rZ', -180.0, 180.0, 0.0001)
+                rotationFolder.open()
+                const scaleFolder = gui.addFolder('Scale')
+                scaleFolder.add(this, 'sX', 0.0, 10.0, 0.0001)
+                scaleFolder.add(this, 'sY', 0.0, 10.0, 0.0001)
+                scaleFolder.add(this, 'sZ', 0.0, 10.0, 0.0001)
+                scaleFolder.open()
+            }
 
 
         }).catch((message) => {
@@ -239,6 +266,7 @@ class UnityLayer {
         if (!this.unity) return
 
         this.tick()
+
         this.map.triggerRepaint()
     }
 
@@ -257,6 +285,20 @@ class UnityLayer {
             F32Array: [
                 2.0 * x / this.unityCanvas.clientWidth - 1.0,
                 2.0 * (this.unityCanvas.clientHeight - y) / this.unityCanvas.clientHeight - 1.0
+            ]
+        })
+    }
+
+    move() {
+
+        this.movable = true
+
+        this.dispatchMessage({
+            Method: 'Translate',
+            F32Array: [
+                /* 0 - 2: position  */      this.pX, this.pY, this.pZ,
+                /* 3 - 5: rotation  */      this.rX, this.rY, this.rZ,
+                /* 6 - 8: scale     */      this.sX, this.sY, this.sZ,
             ]
         })
     }
@@ -291,6 +333,9 @@ class UnityLayer {
                 /* 23 - 25 */   center[0], center[2], center[1],
                 /* 26      */   xCamera.nearZ,
                 /* 27      */   xCamera.farZ,
+                this.pX, this.pY, this.pZ,
+                this.rX, this.rY, this.rZ,
+                this.sX, this.sY, this.sZ,
             ]
         })
     }
@@ -347,7 +392,6 @@ class UnityLayer {
             z + offsetZ,
         ]
     }
-
     remove() {
         if (this.unity) {
             console.log('unityLayer removing')
@@ -463,15 +507,15 @@ function makePerspectiveMatrix(fovy, aspect, near, far) {
     return out
 }
 
-function stopWebCam() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-            stream.getTracks().forEach(track => track.stop())
-        }).catch(function (error) {
-            console.log("Error stopping the webcam: ", error)
-        })
-    }
-}
+// function stopWebCam() {
+//     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+//         navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+//             stream.getTracks().forEach(track => track.stop())
+//         }).catch(function(error) {
+//             console.log("Error stopping the webcam: ", error)
+//         })
+//     }
+// }
 
 export {
     UnityLayer
