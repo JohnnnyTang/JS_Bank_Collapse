@@ -66,12 +66,13 @@
 <script setup>
 import { BorderBox9 as DvBorderBox9, Decoration11 as DvDecoration11 } from '@kjgl77/datav-vue3'
 import { onMounted, ref, watch, computed } from 'vue';
-import { getSideBarTree, LayerGroup, lableLayerMap } from '../js/SCENES'
+// import { getSideBarTree, LayerGroup, lableLayerMap } from '../js/SCENES'
+import { LayerGroup, lableLayerMap } from '../js/SCENES'
+
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../../../store/mapStore';
 import { sourceNameMap, sourceZoomMap, sourceColumnMap } from '../js/tilefieldMAP'
 
 // test 
-// import { i_gov_bounds, river_division_point, river_division_line } from '../js/tempData'
 // import { loadImage } from '../../../utils/mapUtils';
 import { initSortedLayer } from '../layerUtil'
 

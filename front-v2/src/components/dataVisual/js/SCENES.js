@@ -1,7 +1,6 @@
 import { layerAddFunction, layerRemoveFunction, layerShowFunction, layerHideFunction } from "../layerUtil"
 import { useMapLayerStore } from "../../../store/mapStore"
 import { filterMap } from "./tilefieldMAP"
-import { sandbar } from "./tempData"
 import axios from "axios"
 
 
@@ -481,249 +480,267 @@ const layerTree = [
     }
 ];
 
-const getSideBarTree = async () => {
-    let bankData = (await axios.get(tileServer + `/tile/vector/importantBank/info`)).data
-    let warning1 = {
-        label: '一级预警岸段',
-        active: true,
-        icon: '/icons/warn1.png',
-        type: 'title2',
-        children: []
-    }
-    let warning2 = {
-        label: '二级预警岸段',
-        icon: '/icons/warn2.png',
-        type: 'title2',
-        active: true,
-        children: []
-    }
-    let warning3 = {
-        label: '三级预警岸段',
-        icon: '/icons/warn3.png',
-        type: 'title2',
-        active: true,
-        children: [],
-    }
-    for (let i = 0; i < bankData.length; i++) {
-        let item = bankData[i]
-        if (item['warning_level'] == 1) {
-            warning1.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
-        } else if (item['warning_level'] == 2) {
-            warning2.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
-        } else if (item['warning_level'] == 3) {
-            warning3.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
-        }
-    }
-    let zt = []
-    let features = sandbar.features
-    for (let i = 0; i < features.length; i++) {
-        zt.push(features[i])
-    }
-    let mainZt = {
-        label: '长江沙洲',
-        active: true,
-        // icon: '/icons/洲滩.png',
-        type: 'title1',
-        children: []
-    }
-    zt.forEach((item) => {
-        let firstCoord = item.geometry.coordinates[0][0][0]
-        item.properties.center_x = firstCoord[0]
-        item.properties.center_y = firstCoord[1]
-        mainZt.children.push({ label: item.properties.name, active: false, type: 'feature', property: item.properties })
-    })
-    // let quyushuixi = []
+// const getSideBarTree = async () => {
+//     let bankData = (await axios.get(tileServer + `/tile/vector/importantBank/info`)).data
+//     let warning1 = {
+//         label: '一级预警岸段',
+//         active: true,
+//         icon: '/icons/warn1.png',
+//         type: 'title2',
+//         children: []
+//     }
+//     let warning2 = {
+//         label: '二级预警岸段',
+//         icon: '/icons/warn2.png',
+//         type: 'title2',
+//         active: true,
+//         children: []
+//     }
+//     let warning3 = {
+//         label: '三级预警岸段',
+//         icon: '/icons/warn3.png',
+//         type: 'title2',
+//         active: true,
+//         children: [],
+//     }
+//     for (let i = 0; i < bankData.length; i++) {
+//         let item = bankData[i]
+//         if (item['warning_level'] == 1) {
+//             warning1.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
+//         } else if (item['warning_level'] == 2) {
+//             warning2.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
+//         } else if (item['warning_level'] == 3) {
+//             warning3.children.push({ label: item['bank_name'], active: false, type: 'feature', property: item })
+//         }
+//     }
+//     let zt = []
+//     let features = sandbar.features
+//     for (let i = 0; i < features.length; i++) {
+//         zt.push(features[i])
+//     }
+//     let mainZt = {
+//         label: '长江沙洲',
+//         active: true,
+//         // icon: '/icons/洲滩.png',
+//         type: 'title1',
+//         children: []
+//     }
+//     zt.forEach((item) => {
+//         let firstCoord = item.geometry.coordinates[0][0][0]
+//         item.properties.center_x = firstCoord[0]
+//         item.properties.center_y = firstCoord[1]
+//         mainZt.children.push({ label: item.properties.name, active: false, type: 'feature', property: item.properties })
+//     })
+//     console.log(mainZt)
 
-    let quyushuixi = {
-        label: '骨干河道',
-        icon: '/icons/流域水系.png',
-        type: 'title1',
-        active: true,
-        filter: true,
-        children: [
-            {
-                label: '骨干河道',
-                icon: '/icons/流域水系.png',
-                type: 'title2',
-                active: true,
-                filter: true,
-                children: [],
-            }, {
-                label: '其他',
-                icon: '/icons/流域水系.png',
-                type: 'title2',
-                active: true,
-                filter: true,
-                children: [],
-            }
-        ],
-        data: []
-    }
-    let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
-    dt.forEach((item) => {
-        quyushuixi.data.push({ label: item['name'], active: false, type: 'feature', property: item })
-    })
+//     let zt2 = (await axios.get(tileServer + `/tile/vector/riverBeach/info`)).data
+//     let mainZt2 = {
+//         label: '长江沙洲',
+//         active: true,
+//         // icon: '/icons/洲滩.png',
+//         type: 'title1',
+//         children: []
+//     }
+//     zt2.forEach((item) => {
+//         let firstCoord = item.geometry.coordinates[0][0][0]
+//         item.properties.center_x = firstCoord[0]
+//         item.properties.center_y = firstCoord[1]
+//         mainZt2.children.push({ label: item.properties.name, active: false, type: 'feature', property: item.properties })
+//     })
+//     console.log(mainZt2);
 
-    let sluice = {
-        label: '重要水闸',
-        icon: '/icons/水闸工程.png',
-        type: 'title1',
-        active: true,
-        filter: true,
-        children: [
-            {
-                label: '大中型水闸',
-                type: 'title2',
-                active: true,
-                filter: true,
-                children: []
-            }, {
-                label: '其他水闸',
-                type: 'title2',
-                active: true,
-                filter: true,
-                children: []
-            }
-        ],
-        data: []
-    }
-    dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
-    dt.forEach((item) => {
-        sluice.data.push(item)
-    })
+//     // let quyushuixi = []
 
-    let pump = {
-        label: '重要泵站',
-        icon: '/icons/泵站工程.png',
-        type: 'title1',
-        active: false,
-        filter: true,
-        children: [
-            {
-                label: '大中型泵站',
-                type: 'title2',
-                active: true,
-                filter: true,
-                children: []
-            },
-            {
-                label: '骨干河道',
-                type: 'title2',
-                active: true,
-                filter: true,
-                children: []
-            }
-        ],
-        data: []
-    }
-    dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
-    dt.forEach((item) => {
-        pump.data.push(item)
-    })
-    let treeNode1 = {
-        label: '已建通道',
-        type: 'title2',
-        children: []
-    }
-    let treeNode2 = {
-        label: '在建通道',
-        type: 'title2',
-        children: []
-    }
-    let treeNode3 = {
-        label: '规划通道',
-        type: 'title2',
-        children: []
-    }
-    let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
-    let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
-    let res = [...res1, ...res2]
-    res.forEach(item => {
-        if (item.plan === 1) {
-            item.planning = '已建通道'
-            treeNode1.data.push(item)
-        } else if (item.plan === 0) {
-            item.planning = '在建通道'
-            treeNode2.data.push(
-                item
-            )
-        } else if (item.plan === -1) {
-            item.planning = '规划通道'
-            treeNode3.data.push(
-                item
-            )
-        }
-    })
-    console.log(treeNode1);
-    let riverPassageLine = {
-        label: '过江通道',
-        type: 'title1',
-        active: false,
-        filter: true,
-        children: [
-            treeNode1,
-            treeNode2,
-            treeNode3
-        ],
-        data: res
-    }
+//     let quyushuixi = {
+//         label: '骨干河道',
+//         icon: '/icons/流域水系.png',
+//         type: 'title1',
+//         active: true,
+//         filter: true,
+//         children: [
+//             {
+//                 label: '骨干河道',
+//                 icon: '/icons/流域水系.png',
+//                 type: 'title2',
+//                 active: true,
+//                 filter: true,
+//                 children: [],
+//             }, {
+//                 label: '其他',
+//                 icon: '/icons/流域水系.png',
+//                 type: 'title2',
+//                 active: true,
+//                 filter: true,
+//                 children: [],
+//             }
+//         ],
+//         data: []
+//     }
+//     let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
+//     dt.forEach((item) => {
+//         quyushuixi.data.push({ label: item['name'], active: false, type: 'feature', property: item })
+//     })
 
-    let tree = [
-        {
-            label: '重点岸段',
-            active: true,
-            type: 'title1',
-            children: [
-                warning1,
-                warning2,
-                warning3
-            ]
-        },
-        mainZt,
-        quyushuixi,
-        sluice,
-        pump,
-        riverPassageLine,
-        {
-            label: '长江堤防',
-            icon: '/icons/江堤港堤.png',
-            type: 'title1',
-            active: true,
-            filter: true
-        },
-        {
-            label: '其他',
-            active: false,
-            type: 'title1',
-            children: [
-                {
-                    label: '行政区划',
-                    icon: '/icons/行政区划.png',
-                    type: 'title2',
-                    active: true,
-                    filter: true
-                },
+//     let sluice = {
+//         label: '重要水闸',
+//         icon: '/icons/水闸工程.png',
+//         type: 'title1',
+//         active: true,
+//         filter: true,
+//         children: [
+//             {
+//                 label: '大中型水闸',
+//                 type: 'title2',
+//                 active: true,
+//                 filter: true,
+//                 children: []
+//             }, {
+//                 label: '其他水闸',
+//                 type: 'title2',
+//                 active: true,
+//                 filter: true,
+//                 children: []
+//             }
+//         ],
+//         data: []
+//     }
+//     dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
+//     dt.forEach((item) => {
+//         sluice.data.push(item)
+//     })
 
-                {
-                    label: '重要湖泊',
-                    icon: '/icons/湖泊河流.png',
-                    type: 'title2',
-                    active: true,
-                    filter: true
-                },
-                {
-                    label: '水文站点',
-                    icon: '/icons/水文站点.png',
-                    type: 'title2',
-                    active: false,
-                    filter: true
-                }
-            ]
-        }
-    ]
+//     let pump = {
+//         label: '重要泵站',
+//         icon: '/icons/泵站工程.png',
+//         type: 'title1',
+//         active: false,
+//         filter: true,
+//         children: [
+//             {
+//                 label: '大中型泵站',
+//                 type: 'title2',
+//                 active: true,
+//                 filter: true,
+//                 children: []
+//             },
+//             {
+//                 label: '骨干河道',
+//                 type: 'title2',
+//                 active: true,
+//                 filter: true,
+//                 children: []
+//             }
+//         ],
+//         data: []
+//     }
+//     dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
+//     dt.forEach((item) => {
+//         pump.data.push(item)
+//     })
+//     let treeNode1 = {
+//         label: '已建通道',
+//         type: 'title2',
+//         children: []
+//     }
+//     let treeNode2 = {
+//         label: '在建通道',
+//         type: 'title2',
+//         children: []
+//     }
+//     let treeNode3 = {
+//         label: '规划通道',
+//         type: 'title2',
+//         children: []
+//     }
+//     let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
+//     let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
+//     let res = [...res1, ...res2]
+//     res.forEach(item => {
+//         if (item.plan === 1) {
+//             item.planning = '已建通道'
+//             treeNode1.data.push(item)
+//         } else if (item.plan === 0) {
+//             item.planning = '在建通道'
+//             treeNode2.data.push(
+//                 item
+//             )
+//         } else if (item.plan === -1) {
+//             item.planning = '规划通道'
+//             treeNode3.data.push(
+//                 item
+//             )
+//         }
+//     })
+//     console.log(treeNode1);
+//     let riverPassageLine = {
+//         label: '过江通道',
+//         type: 'title1',
+//         active: false,
+//         filter: true,
+//         children: [
+//             treeNode1,
+//             treeNode2,
+//             treeNode3
+//         ],
+//         data: res
+//     }
 
-    return tree
-}
+//     let tree = [
+//         {
+//             label: '重点岸段',
+//             active: true,
+//             type: 'title1',
+//             children: [
+//                 warning1,
+//                 warning2,
+//                 warning3
+//             ]
+//         },
+//         mainZt,
+//         quyushuixi,
+//         sluice,
+//         pump,
+//         riverPassageLine,
+//         {
+//             label: '长江堤防',
+//             icon: '/icons/江堤港堤.png',
+//             type: 'title1',
+//             active: true,
+//             filter: true
+//         },
+//         {
+//             label: '其他',
+//             active: false,
+//             type: 'title1',
+//             children: [
+//                 {
+//                     label: '行政区划',
+//                     icon: '/icons/行政区划.png',
+//                     type: 'title2',
+//                     active: true,
+//                     filter: true
+//                 },
+
+//                 {
+//                     label: '重要湖泊',
+//                     icon: '/icons/湖泊河流.png',
+//                     type: 'title2',
+//                     active: true,
+//                     filter: true
+//                 },
+//                 {
+//                     label: '水文站点',
+//                     icon: '/icons/水文站点.png',
+//                     type: 'title2',
+//                     active: false,
+//                     filter: true
+//                 }
+//             ]
+//         }
+//     ]
+
+//     return tree
+// }
 
 const lableLayerMap = {
     '一级预警岸段': ['一级预警岸段', '岸段-注记'],
@@ -748,7 +765,7 @@ export {
     initLayerGroups,
     tree,
     layerTree,
-    getSideBarTree,
+    // getSideBarTree,
     totalLayer,
     lableLayerMap,
 }
