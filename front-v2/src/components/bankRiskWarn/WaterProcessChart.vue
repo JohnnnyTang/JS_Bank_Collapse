@@ -31,9 +31,8 @@ import * as echarts from 'echarts'
 
 const props = defineProps({
     timeStep: Number,
-    type: String
+    type: String,
 })
-
 
 const chartDom = ref()
 
@@ -56,8 +55,8 @@ const options = [
 
 const nameMap = {
     // '20': '20年一遇潮位过程',
-    'dry': '枯季潮位过程',
-    'flood': '洪季潮位过程'
+    dry: '枯季潮位过程',
+    flood: '洪季潮位过程',
 }
 
 const hour = [
@@ -91,18 +90,20 @@ const hour = [
 
 const waterProcessData = {
     flood: [
-        1.001212989, 1.430690559, 2.648638297, 3.300017806, 3.213175523,
-        2.918089003, 2.496403935, 2.090084439, 1.859772776, 1.617136188,
-        1.365625119, 1.157432056, 1.009660696, 1.41224009, 2.708514216,
-        3.495363234, 3.470646204, 3.163897401, 2.728182249, 2.274461078,
-        2.015482879, 1.751219417, 1.5, 1.34, 1.11, 1
+        1.90906518, 1.625544928, 1.361989229, 1.15482551, 1.002231171,
+        1.430845246, 2.648756158, 3.300643076, 3.213302443, 2.918754921,
+        2.497299605, 2.090891478, 1.860660024, 1.618100393, 1.366590593,
+        1.15848487, 1.010662534, 1.412416559, 2.708489015, 3.495843863,
+        3.470899626, 3.164357677, 2.729099025, 2.275285539, 2.016365196,
+        1.75218237,
     ],
     dry: [
-        -0.214262749, 0.053376691, 1.065463233, 1.781469026, 1.742719443,
-        1.390190431, 1.065970551, 0.737822597, 0.439561516, 0.131296197,
-        -0.205708982, -0.416403164, -0.47198395, -0.156388136, 0.955877257,
-        1.978015881, 2.400498593, 2.367688689, 2.274287718, 1.749563449,
-        1.184670123, 0.866449375, 0.535891809, 0.212956376, 0, -0.2
+        1.186513249, 0.867004195, 0.536603072, 0.213683936, -0.037491099,
+        -0.213509241, 0.053436696, 1.065266977, 1.781537597, 1.742699741,
+        1.390458846, 1.066486912, 0.738369155, 0.440214079, 0.132082845,
+        -0.204865766, -0.41561528, -0.471333948, -0.156295014, 0.955454428,
+        1.977743514, 2.400311668, 2.367541318, 2.274514032, 1.749968685,
+        1.184949338,
     ],
     20: [
         '2.718320324',
@@ -199,14 +200,16 @@ const option = {
                                 show: true,
                                 position: 'top',
                                 formatter: () => {
-                                    return "最高潮位: " + maxVal.toFixed(3) + ' 米';
+                                    return (
+                                        '最高潮位: ' + maxVal.toFixed(3) + ' 米'
+                                    )
                                 },
                                 textStyle: {
                                     color: 'black',
-                                    fontSize: 13
-                                }
-                            }
-                        }
+                                    fontSize: 13,
+                                },
+                            },
+                        },
                     },
                     {
                         name: '最低潮位',
@@ -221,16 +224,18 @@ const option = {
                                 show: true,
                                 position: 'bottom',
                                 formatter: () => {
-                                    return "最低潮位: " + minVal.toFixed(3) + ' 米';
+                                    return (
+                                        '最低潮位: ' + minVal.toFixed(3) + ' 米'
+                                    )
                                 },
                                 textStyle: {
                                     color: 'black',
-                                    fontSize: 13
-                                }
-                            }
-                        }
-                    }
-                ]
+                                    fontSize: 13,
+                                },
+                            },
+                        },
+                    },
+                ],
             },
             markLine: {
                 symbolSize: 5,
@@ -239,7 +244,7 @@ const option = {
                         color: 'rgb(94, 208, 251)',
                         borderColor: 'black',
                         borderWidth: 0.5,
-                    }
+                    },
                 },
                 lineStyle: {
                     color: 'red',
@@ -248,7 +253,7 @@ const option = {
                 },
                 data: [
                     {
-                        name: "timeStep",
+                        name: 'timeStep',
                         xAxis: `${props.timeStep}`,
                         label: {
                             formatter: `${props.timeStep}小时`,
@@ -257,9 +262,9 @@ const option = {
                             fontSize: '15px',
                             position: 'end',
                             offset: [0, 10],
-                        }
-                    }
-                ]
+                        },
+                    },
+                ],
             },
             type: 'line',
             smooth: true,
@@ -277,43 +282,46 @@ let chart
 let maxVal
 let minVal
 
-watch(() => props.type, (val) => {
-    const dict = {
-        '洪季': 'flood',
-        '枯季': 'dry'
-    }
-    selectChange(dict[val])
-})
+watch(
+    () => props.type,
+    (val) => {
+        const dict = {
+            洪季: 'flood',
+            枯季: 'dry',
+        }
+        selectChange(dict[val])
+    },
+)
 
 const selectChange = (val) => {
     option.series[0].data = waterProcessData[val]
     option.series[0].name = nameMap[val]
-    maxVal = Math.max(...waterProcessData[val]);
-    minVal = Math.min(...waterProcessData[val]);
+    maxVal = Math.max(...waterProcessData[val])
+    minVal = Math.min(...waterProcessData[val])
     chart.setOption(option)
 }
 
 onMounted(() => {
     chart = echarts.init(chartDom.value)
-    maxVal = Math.max(...waterProcessData['flood']);
-    minVal = Math.min(...waterProcessData['flood']);
+    maxVal = Math.max(...waterProcessData['flood'])
+    minVal = Math.min(...waterProcessData['flood'])
     chart.setOption(option)
 })
 
 watch(
     // 监视timeStep变量移动
-    () => props.timeStep, (newVal) => {
-        option.series[0].markLine.data[0].xAxis = newVal;
-        option.series[0].markLine.data[0].label.formatter = `${newVal}小时`;
-        chart.setOption(option);
-    }
+    () => props.timeStep,
+    (newVal) => {
+        option.series[0].markLine.data[0].xAxis = newVal
+        option.series[0].markLine.data[0].label.formatter = `${newVal}小时`
+        chart.setOption(option)
+    },
 )
 
 // setInterval(() => {
 //     option.series[0].markLine.data[0].xAxis = Math.floor(Math.random() * 24);
 //     chart.setOption(option);
 // }, 1000);
-
 </script>
 
 <style lang="scss" scoped>

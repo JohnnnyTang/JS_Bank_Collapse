@@ -5,5 +5,38 @@ const bedFlowValue = [ '9440', '8990', '8740', '9330', '9550', '9880', '10000', 
 ]
 
 
+function getTimeIntervals(startTime, intervalHours, numIntervals) {
+    const result = [];
+    let currentDate = new Date(startTime);
+
+    for (let i = 0; i < numIntervals; i++) {
+        // Format the current date to "YYYY/MM/DD HH:MM"
+        let year = currentDate.getFullYear();
+        let month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month starts from 0
+        let day = String(currentDate.getDate()).padStart(2, '0');
+        let hours = String(currentDate.getHours()).padStart(2, '0');
+        let minutes = String(currentDate.getMinutes()).padStart(2, '0');
+        
+        let formattedDate = `${year}/${month}/${day} ${hours}:${minutes}`;
+        result.push(formattedDate);
+        
+        // Subtract the interval in hours from the current date
+        currentDate.setHours(currentDate.getHours() - intervalHours);
+    }
+
+    return result;
+}
+
+// Example usage
+let startTime = "2023-03-01T00:00"; // Start time in ISO format
+let intervalHours = 1; // Interval in hours
+let numIntervals = 493; // Number of intervals to trace back
+// '2023-03-17T00:00'
+'2023-03-01T00:00'
+let timeIntervals = getTimeIntervals(startTime, intervalHours, numIntervals).reverse();
+console.log('test time interval', bedFlowTime.indexOf('2023/3/1 0:00'), timeIntervals); // Output the array of time strings
+
+
+
 export { bedFlowTime, bedFlowValue
 }
