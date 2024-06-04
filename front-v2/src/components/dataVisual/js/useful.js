@@ -1,11 +1,3 @@
-import {
-    i_gov_bounds,
-    river_division_point,
-    river_division_line,
-    sandbar,
-    district_point,
-    channel_line
-} from './tempData'
 import axios from 'axios'
 
 

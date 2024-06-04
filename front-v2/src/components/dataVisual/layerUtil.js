@@ -1,14 +1,8 @@
-import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
-import TerrainLayer from '../../utils/m_demLayer/terrainLayer'
 import { useLayerStore } from '../../store/mapStore'
 import BackEndRequest from '../../api/backend'
 import { DataPioneer } from './Scene'
 import axios from 'axios'
 import { loadImage } from '../../utils/mapUtils'
-import {
-    i_gov_bounds, river_division_point, river_division_line,
-    district_point, sandbar, channel_line, warn1Point
-} from './js/tempData.js'
 
 
 ///// const
@@ -637,41 +631,41 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    近岸流场: async (map) => {
-        if (map.getLayer('近岸流场')) {
-            useLayerStore().flowLayer.show()
-            let center = map.getCenter()
-            map.flyTo({
-                center: center,
-            })
-        } else {
-            let flowSrc = []
-            for (let i = 0; i < 26; i++) {
-                flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-            }
+    // 近岸流场: async (map) => {
+    //     if (map.getLayer('近岸流场')) {
+    //         useLayerStore().flowLayer.show()
+    //         let center = map.getCenter()
+    //         map.flyTo({
+    //             center: center,
+    //         })
+    //     } else {
+    //         let flowSrc = []
+    //         for (let i = 0; i < 26; i++) {
+    //             flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+    //         }
 
-            let flow = new SteadyFlowLayer(
-                '近岸流场',
-                '/scratchSomething/terrain_flow/json/station.bin',
-                flowSrc,
-                (url) => url.match(/uv_(\d+)\.bin/)[1],
-                '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
-            )
-            flow.particleNum.n = 2800
-            flow.speedFactor.n = 1.8
+    //         let flow = new SteadyFlowLayer(
+    //             '近岸流场',
+    //             '/scratchSomething/terrain_flow/json/station.bin',
+    //             flowSrc,
+    //             (url) => url.match(/uv_(\d+)\.bin/)[1],
+    //             '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
+    //         )
+    //         flow.particleNum.n = 2800
+    //         flow.speedFactor.n = 1.8
 
-            map.addLayer(flow)
-            useLayerStore().setFlowLayer(flow)
-        }
-    },
-    三维地形: async (map) => {
-        if (map.getLayer('三维地形')) useLayerStore().terrainLayer.show()
-        else {
-            let terrainLayer = new TerrainLayer(14)
-            map.addLayer(terrainLayer)
-            useLayerStore().setTerrainLayer(terrainLayer)
-        }
-    },
+    //         map.addLayer(flow)
+    //         useLayerStore().setFlowLayer(flow)
+    //     }
+    // },
+    // 三维地形: async (map) => {
+    //     if (map.getLayer('三维地形')) useLayerStore().terrainLayer.show()
+    //     else {
+    //         let terrainLayer = new TerrainLayer(14)
+    //         map.addLayer(terrainLayer)
+    //         useLayerStore().setTerrainLayer(terrainLayer)
+    //     }
+    // },
 
     ///////////////全江概貌
     /////// 行政区划
@@ -783,8 +777,12 @@ const layerAddFunctionMap = {
         let boldLineLists = ['assist2', ...nameLists]
         !map.getSource('river_division_line') &&
             map.addSource('river_division_line', {
-                type: 'geojson',
-                data: river_division_line
+                // type: 'geojson',
+                // data: river_division_line
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverSplitLine/{x}/{y}/{z}',
+                ],
             })
         !map.getLayer('river_division_line') &&
             map.addLayer({
@@ -793,6 +791,7 @@ const layerAddFunctionMap = {
                 minzoom: 8,
                 maxzoom: 11,
                 source: 'river_division_line',
+                'source-layer':'default',
                 paint: {
                     'line-color': 'rgb(110, 107, 106)',
                     'line-width': [
@@ -820,8 +819,12 @@ const layerAddFunctionMap = {
     '河道分段-注记': async (map) => {
         !map.getSource('river_division_line') &&
             map.addSource('river_division_line', {
-                type: 'geojson',
-                data: river_division_line
+                // type: 'geojson',
+                // data: river_division_line
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverSplitLine/{x}/{y}/{z}',
+                ],
             })
         !map.getLayer('河道分段-注记') &&
             map.addLayer({
@@ -829,6 +832,7 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 source: 'river_division_line',
                 maxzoom: 11,
+                'source-layer':'default',
                 layout: {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
@@ -856,14 +860,19 @@ const layerAddFunctionMap = {
     河道分段点: async (map) => {
         !map.getSource('river_division_point') &&
             map.addSource('river_division_point', {
-                type: 'geojson',
-                data: river_division_point
+                // type: 'geojson',
+                // data: river_division_point
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/center/riverSplitPoint/{x}/{y}/{z}',
+                ],
             })
         !map.getLayer('河道分段点') &&
             map.addLayer({
                 id: '河道分段点',
                 type: 'circle',
                 source: 'river_division_point',
+                'source-layer': 'default',
                 minzoom: 7,
                 maxzoom: 14,
                 paint: {
@@ -875,14 +884,19 @@ const layerAddFunctionMap = {
     '河道分段点-注记': async (map) => {
         !map.getSource('river_division_point') &&
             map.addSource('river_division_point', {
-                type: 'geojson',
-                data: river_division_point
+                // type: 'geojson',
+                // data: river_division_point
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/center/riverSplitPoint/{x}/{y}/{z}',
+                ],
             })
         !map.getLayer('河道分段点-注记') &&
             map.addLayer({
                 id: '河道分段点-注记',
                 type: 'symbol',
                 source: 'river_division_point',
+                'source-layer': 'default',
                 layout: {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
@@ -2224,7 +2238,7 @@ const layerAddFunctionMap = {
             'source-layer': 'default',
             source: 'sluiceArea-center',
             filter: ['==', 'if_important', 1],
-            minzoom: 8 ,
+            minzoom: 8,
             layout: {
                 'icon-image': '水闸',
                 "icon-size": 0.2,
@@ -2251,7 +2265,7 @@ const layerAddFunctionMap = {
                 source: 'sluiceArea',
                 'source-layer': 'default',
                 filter: ['==', 'if_important', 1],
-                minzoom: 10 ,
+                minzoom: 10,
                 layout: {
                     'text-field': ['get', 'sp_name'],
                     'text-font': [
@@ -2284,7 +2298,7 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 source: 'sluiceArea-center',
                 filter: ['==', 'if_important', 0],
-                minzoom: 10,
+                minzoom: 11,
                 layout: {
                     'icon-image': '水闸',
                     "icon-size": 0.18,
@@ -2481,11 +2495,11 @@ const layerAddFunctionMap = {
         !map.getLayer('其他泵站') &&
             map.addLayer({
                 id: '其他泵站',
-                filter: ["==", "if_important",'0'],
+                filter: ["==", "if_important", '0'],
                 type: 'symbol',
                 source: 'pumpArea',
                 'source-layer': 'default',
-                minzoom: 10,
+                minzoom: 11,
                 layout: {
                     'icon-image': '泵站',
                     'icon-size': 0.9,
@@ -2638,8 +2652,8 @@ const layerAddFunctionMap = {
     重点行政区边界: async (map) => {
         !map.getSource('igov-bound') &&
             map.addSource('igov-bound', {
-                type: 'geojson',
-                data: i_gov_bounds
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverCityBoundary/{x}/{y}/{z}'],
             })
         await loadImage(map, '/icons/市界.png', '市界')
         await loadImage(map, '/legend/省界.png', '省界')
@@ -2649,6 +2663,7 @@ const layerAddFunctionMap = {
                 id: '重点行政区边界',
                 type: 'line',
                 source: 'igov-bound',
+                'source-layer': 'default',
                 layout: {
                     'line-join': 'round',
                 },
@@ -3181,8 +3196,8 @@ const layerAddFunctionMap = {
     行政点: async (map) => {
         !map.getSource('DistrictPoint') &&
             map.addSource('DistrictPoint', {
-                type: 'geojson',
-                data: district_point
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverCityPoint/{x}/{y}/{z}'],
             })
         !map.getLayer('行政点') &&
             map.addLayer({
@@ -3191,7 +3206,7 @@ const layerAddFunctionMap = {
                 source: 'DistrictPoint',
                 minzoom: 7,
                 maxzoom: 14,
-                // 'source-layer': 'default',
+                'source-layer': 'default',
                 layout: {},
                 paint: {
                     'circle-color': 'rgb(222,34,1)',
@@ -3209,18 +3224,18 @@ const layerAddFunctionMap = {
     '行政点-注记': async (map) => {
         !map.getSource('DistrictPoint') &&
             map.addSource('DistrictPoint', {
-                type: 'geojson',
-                data: district_point
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverCityPoint/{x}/{y}/{z}'],
             })
         !map.getLayer('行政点-注记') &&
             map.addLayer({
                 id: '行政点-注记',
                 type: 'symbol',
                 source: 'DistrictPoint',
-                // 'source-layer': 'default',
+                'source-layer': 'default',
                 // minzoom: 10,
                 layout: {
-                    'text-field': ['get', 'City'],
+                    'text-field': ['get', 'city'],
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
