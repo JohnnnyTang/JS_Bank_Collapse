@@ -22,6 +22,7 @@
     "axios": "^1.6.7",
     "d3-delaunay": "^6.0.4",
     "d3-voronoi": "^1.1.4",
+    "dat.gui": "^0.7.9",
     "dayjs": "^1.11.10",
     "e-datav-vue3": "^0.10.0",
     "earcut": "^2.2.4",
