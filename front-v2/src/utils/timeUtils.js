@@ -173,8 +173,8 @@ function getDatesBefore(n, days) {
 }
 
 // 测试函数
-let numberOfDates = 5
-let fifteenDaysBeforeDates = getNDateBefore(numberOfDates)
-console.log('test...', fifteenDaysBeforeDates)
+// let numberOfDates = 5
+// let fifteenDaysBeforeDates = getNDateBefore(numberOfDates)
+// console.log('test...', fifteenDaysBeforeDates)
 
 export { updateTime, getHoursBackIn, getDatesBefore }

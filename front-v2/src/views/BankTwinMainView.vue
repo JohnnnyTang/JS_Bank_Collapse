@@ -487,7 +487,6 @@ const updateWarnInfoDesc = async () => {
     // console.log('print warn info', warnInfo)
     if (warnInfo.length == 0) {
         statusText.value = '正常'
-        return
     } else {
         statusText.value = '报警'
     }
