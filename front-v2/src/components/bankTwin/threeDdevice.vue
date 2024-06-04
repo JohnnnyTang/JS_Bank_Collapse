@@ -2,7 +2,7 @@
     <!-- <div class="test" id="test" style="width: 200px;height: 200px;">
         {{ deviceCode }}
     </div> -->
-    <div class="container" v-show="true">
+    <div class="container" v-show="showPopup">
         <div class="info-content-container">
             <div class="device-detail-container">
                 <div class="device-name-text">{{ DEVICETYPEMAP[(+deviceInfo.type) - 1] }}</div>
@@ -66,7 +66,7 @@ import axios from 'axios';
 import pureChart from '../dataVisual/monitorDevice/pureChartV2.vue'
 
 const deviceCode = ref('')
-
+const showPopup = ref(false)
 
 
 const showChart = ref(false)
@@ -99,7 +99,11 @@ watch(() => useDeviceNameStore().deviceName, async (newVal) => {
     //     'GNSS': 'gnss',
     // }
     deviceCode.value = nameCodeMap[newVal]
-    if (deviceCode.value === '') return
+    if (deviceCode.value === '') {
+        showPopup.value = false
+        return
+    }
+    showPopup.value = true
     deviceInfo.value = (await axios.get('/api/data/monitorInfo/code/' + deviceCode.value)).data
 
     if (deviceInfo.value.type === '6') {

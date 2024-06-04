@@ -1,5 +1,3 @@
-import SteadyFlowLayer from '../../utils/m_demLayer/newFlow_mask'
-import TerrainLayer from '../../utils/m_demLayer/terrainLayer'
 import { useLayerStore } from '../../store/mapStore'
 import BackEndRequest from '../../api/backend'
 import { DataPioneer } from './Scene'
@@ -633,41 +631,41 @@ const layerAddFunctionMap = {
                 },
             })
     },
-    近岸流场: async (map) => {
-        if (map.getLayer('近岸流场')) {
-            useLayerStore().flowLayer.show()
-            let center = map.getCenter()
-            map.flyTo({
-                center: center,
-            })
-        } else {
-            let flowSrc = []
-            for (let i = 0; i < 26; i++) {
-                flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-            }
+    // 近岸流场: async (map) => {
+    //     if (map.getLayer('近岸流场')) {
+    //         useLayerStore().flowLayer.show()
+    //         let center = map.getCenter()
+    //         map.flyTo({
+    //             center: center,
+    //         })
+    //     } else {
+    //         let flowSrc = []
+    //         for (let i = 0; i < 26; i++) {
+    //             flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
+    //         }
 
-            let flow = new SteadyFlowLayer(
-                '近岸流场',
-                '/scratchSomething/terrain_flow/json/station.bin',
-                flowSrc,
-                (url) => url.match(/uv_(\d+)\.bin/)[1],
-                '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
-            )
-            flow.particleNum.n = 2800
-            flow.speedFactor.n = 1.8
+    //         let flow = new SteadyFlowLayer(
+    //             '近岸流场',
+    //             '/scratchSomething/terrain_flow/json/station.bin',
+    //             flowSrc,
+    //             (url) => url.match(/uv_(\d+)\.bin/)[1],
+    //             '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
+    //         )
+    //         flow.particleNum.n = 2800
+    //         flow.speedFactor.n = 1.8
 
-            map.addLayer(flow)
-            useLayerStore().setFlowLayer(flow)
-        }
-    },
-    三维地形: async (map) => {
-        if (map.getLayer('三维地形')) useLayerStore().terrainLayer.show()
-        else {
-            let terrainLayer = new TerrainLayer(14)
-            map.addLayer(terrainLayer)
-            useLayerStore().setTerrainLayer(terrainLayer)
-        }
-    },
+    //         map.addLayer(flow)
+    //         useLayerStore().setFlowLayer(flow)
+    //     }
+    // },
+    // 三维地形: async (map) => {
+    //     if (map.getLayer('三维地形')) useLayerStore().terrainLayer.show()
+    //     else {
+    //         let terrainLayer = new TerrainLayer(14)
+    //         map.addLayer(terrainLayer)
+    //         useLayerStore().setTerrainLayer(terrainLayer)
+    //     }
+    // },
 
     ///////////////全江概貌
     /////// 行政区划
