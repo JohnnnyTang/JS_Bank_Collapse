@@ -406,7 +406,7 @@ const startDealWithWarn = (index) => {
 const cancelDealWithWarm = (index, deviceId) => {
     curDealWith.value[index] = false
     if (collapseOpenItem.value.includes(deviceId)) {
-        console.log('id inside......')
+        // console.log('id inside......')
         collapseOpenItem.value.splice(
             collapseOpenItem.value.indexOf(deviceId),
             1,
@@ -439,7 +439,7 @@ const confirmDealWithWarn = async (warnItem) => {
 
         let id = warnItem.deviceId
         let type = deviceTypeList[id.split('_').pop() - 1]
-        console.log(type, id)
+        // console.log(type, id)
         removeWarningDeviceStyle(useMapStore().getMap(), type, id)
     }
     if (warnItem.id in warnInfoStore.areaBreatheInterval) {
@@ -454,7 +454,7 @@ const confirmDealWithWarn = async (warnItem) => {
 }
 
 const collapseChange = (opened) => {
-    console.log('changed collapse', opened)
+    // console.log('changed collapse', opened)
 }
 
 const withdrawDeal = async (warnItem) => {

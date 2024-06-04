@@ -49,8 +49,8 @@
                                     effect="light"
                                     content="点击查看数据"
                                     placement="right"
-                                    offset="-6"
-                                    hide-after="50"
+                                    :offset="-6"
+                                    :hide-after="50"
                                     v-if="item.name != '视频监控'"
                                 >
                                     <div
@@ -305,7 +305,7 @@ const deviceTypeTimeMap = {
 const selectedDeviceType = ref('位移测量站')
 
 const deviceList = ref(deviceListMap['位移测量站'])
-console.log(deviceList)
+// console.log(deviceList)
 const selectedDevice = ref('CL-01')
 
 const sectionClassColorMap = ref({
@@ -409,7 +409,7 @@ async function updateNewestTime() {
 watch(
     () => useWarnInfoStore().warnInfo,
     (newVal) => {
-        console.log('watching23321!!!!!!!!!!')
+        // console.log('watching23321!!!!!!!!!!')
         const warnDataCount = [0, 0, 0, 0, '-']
         // console.log('warn', warnData)
         newVal.map((item, index) => {

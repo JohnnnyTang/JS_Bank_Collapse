@@ -844,7 +844,7 @@ function generateCircleLineString(x, y, radius, numPoints = 24) {
 function buildCircleWithMeters(x, y, radius, numPoints = 24) {
     const xy = convertToMercator([x, y])
 
-    console.log('gen xy', xy)
+    // console.log('gen xy', xy)
 
     const circlePoints = generateCircleLineString(
         xy[0],
@@ -852,7 +852,7 @@ function buildCircleWithMeters(x, y, radius, numPoints = 24) {
         radius,
         numPoints,
     )
-    console.log('circles back', circlePoints)
+    // console.log('circles back', circlePoints)
 
     return {
         type: 'FeatureCollection',
@@ -906,7 +906,7 @@ const setWarningDeviceStyle = (
                 property.latitude,
                 220,
             )
-            console.log('circle circle', circleJson)
+            // console.log('circle circle', circleJson)
             map.addSource(`${deviceLayer}-${deviceCode}-source`, {
                 type: 'geojson',
                 data: circleJson,
