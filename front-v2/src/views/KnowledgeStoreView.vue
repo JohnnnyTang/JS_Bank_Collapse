@@ -32,8 +32,8 @@ div.bankKnowledge-container {
     // background-color: rgb(129, 143, 156);
     background: linear-gradient(
         60deg,
-        rgb(63, 132, 223) 0%,
-        rgb(37, 135, 247) 100%
+        rgb(216, 233, 255) 0%,
+        rgb(208, 230, 255) 100%
     );
 
     div.selector-container {
