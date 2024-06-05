@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import MaskLayer from './maskLayer'
+import { GUI } from 'dat.gui'
 
+let tickCount = 0
 const WORLD_SIZE = 1024000 //TILE_SIZE * 2000
 
 // const unityCanvas = document.createElement('canvas')
@@ -14,12 +16,12 @@ const WORLD_SIZE = 1024000 //TILE_SIZE * 2000
 // unityCanvas.style.background = 'transparent !important'
 // document.body.appendChild(unityCanvas)
 
-class UnityLayer{
+class UnityLayer {
 
     constructor(originPosition, visibleZoom, unityCanvas) {
 
         this.type = 'custom'
-        this.id = 'UnityLayer'
+        this.id = 'Unity-Layer'
         this.renderingMode = '3d'
         this.unityProjName = 'output'
         this.visibleZoom = visibleZoom
@@ -35,12 +37,20 @@ class UnityLayer{
         this.unityCanvas = unityCanvas
         unityCanvas.style.width = unityCanvas.clientWidth
         unityCanvas.style.height = unityCanvas.clientHeight
+
+        this.movable = false
+        this.pX = -2.0591
+        this.pY = 0.00
+        this.pZ = -4.45
+        this.rX = 0.0
+        this.rY = 0.0
+        this.rZ = 0.0
+        this.sX = 0.927
+        this.sY = 1.0
+        this.sZ = 0.927
     }
 
     onAdd(map, gl) {
-
-        let dom = document.querySelector('#DeviceInfoBox')
-        dom.style.display = 'block'
 
         // Set Unity instance configuration
         const buildUrl = "/scratchSomething/unity/collapseBank/build"
@@ -64,7 +74,7 @@ class UnityLayer{
 
             if (this.zoom >= this.visibleZoom) this.pick(e.point.x, e.point.y)
         })
-        
+
         // Set origin point
         this.op_world = this.wgs84ToWorld(this.originPosition[0], this.originPosition[1])
         //     120.51988006, 32.04023661,
@@ -113,7 +123,7 @@ class UnityLayer{
 
         // Init Unity insatnce
         createUnityInstance(this.unityCanvas, config, (progress) => {
-        
+
         }).then((unityInstance) => {
 
             this.map.addLayer(new MaskLayer())
@@ -128,55 +138,122 @@ class UnityLayer{
             this.init()
             this.keep(this.zoom >= this.visibleZoom)
 
-            stopWebCam()
+            // stopWebCam()
 
+            const offset = 0.0
+            /*
             const devices = [
-                0, 120.5289404,32.03504751,
-                0, 120.5222438, 32.03900986, 
-                0, 120.5212035, 32.04098681, 
-                3, 120.515163, 32.04214443, 
-                3, 120.5209528, 32.04067285, 
-                3, 120.5108725, 32.04263819, 
-                3, 120.5113986, 32.04257987, 
-                3, 120.5210704, 32.0403478, 
-                3, 120.5156746, 32.04204412, 
-                0, 120.515204, 32.04180251, 
-                3, 120.5210704, 32.0403478, 
-                3, 120.5103731, 32.04268722, 
-                3, 120.5146732, 32.04226309, 
-                0, 120.547948, 32.02945642, 
-                3, 120.5113986, 32.04257987, 
-                0, 120.5643912, 32.02367567, 
-                0, 120.5587575, 32.02524072, 
-                3, 120.5108725, 32.04263819, 
-                0, 120.51129, 32.0429479, 
-                3, 120.5208149, 32.04101417, 
-                3, 120.5146732, 32.04226309, 
-                3, 120.5208149, 32.04101417, 
-                3, 120.515163, 32.04214443, 
-                3, 120.5156746, 32.04204412, 
-                3, 120.5209528, 32.04067285, 
-                3, 120.5103731, 32.04268722, 
-                0, 120.5511673, 32.02840145, 
-                0, 120.5414619, 32.03076972, 
-                4, 120.5422418, 32.03077085, 
-                4, 120.5155315, 32.04267723, 
-                4, 120.522407, 32.03941692, 
-                1, 120.5149435, 32.04269763, 
-                1, 120.5418489, 32.0309461, 
-                1, 120.5592327, 32.025761, 
-                2, 120.5410243, 32.03071962, 
-                2, 120.551624, 32.02829712, 
-                2, 120.5286929, 32.03476855, 
-                2, 120.5108859, 32.04228621, 
-                2, 120.5205948, 32.04056061, 
-                2, 120.5474064, 32.02961633, 
-                2, 120.5147123, 32.0417763, 
+                0, 120.5289404, 32.03504751,
+                0, 120.5222438, 32.03900986,
+                0, 120.5212035, 32.04098681,
+                3, 120.515163, 32.04214443 + offset,     //  3
+                3, 120.5209528, 32.04067285,
+                3, 120.5108725, 32.04263819 + offset,    //  5
+                3, 120.5113986, 32.04257987 + offset,    //  6
+                3, 120.5210704, 32.0403478,
+                3, 120.5156746, 32.04204412 + offset,    //  8
+                0, 120.515204, 32.04180251 + offset,     //  9
+                3, 120.5103731, 32.04268722 + offset,    // 10
+                3, 120.5146732, 32.04226309 + offset,    // 11
+                0, 120.547948, 32.02945642,
+                0, 120.5643912, 32.02367567,
+                0, 120.5587575, 32.02524072 + offset * 0.2,    // 14 
+                0, 120.51129, 32.0429479 + offset,       // 15
+                3, 120.5208149, 32.04101417,
+                0, 120.5511673, 32.02840145,
+                0, 120.5414619, 32.03076972,
+                4, 120.5422418, 32.03077085,
+                4, 120.5155315, 32.04267723 + offset,    // 20
+                4, 120.522407, 32.03941692,
+                1, 120.5149435, 32.04269763 + offset,    // 22
+                1, 120.5418489, 32.0309461,
+                1, 120.5592327, 32.025761,
+                2, 120.5410243, 32.03071962,
+                2, 120.551624, 32.02829712,
+                2, 120.5286929, 32.03476855,
+                2, 120.5108859, 32.04228621 + offset + 0.0002,    // 28
+                2, 120.5205948, 32.04056061,
+                2, 120.5474064, 32.02961633,
+                2, 120.5147123, 32.0417763 + offset,     // 31
+                // 3, 120.5210704, 32.0403478, 
+                // 3, 120.5113986, 32.04257987, 
+                // 3, 120.5108725, 32.04263819, 
+                // 3, 120.5146732, 32.04226309, 
+                // 3, 120.5208149, 32.04101417, 
+                // 3, 120.515163, 32.04214443, 
+                // 3, 120.5156746, 32.04204412, 
+                // 3, 120.5209528, 32.04067285, 
+                // 3, 120.5103731, 32.04268722, 
             ]
 
             for (let i = 0; i < devices.length / 3; i++) {
-                this.addDevice('', devices[i * 3 + 0], devices[i * 3 + 1], devices[i * 3 + 2])
+                this.addDevice(`${i}`, devices[i * 3 + 0], devices[i * 3 + 1], devices[i * 3 + 2])
             }
+            */
+
+            const DEVICECES = [
+                '01', 0, 120.51129, 32.0429479 + offset,
+                '02', 0, 120.515204, 32.04180251 + offset,
+                '03', 0, 120.5212035, 32.04098681,
+                '04', 0, 120.5222438, 32.03900986,
+                '05', 0, 120.5289404, 32.03504751,
+                '06', 0, 120.5414619, 32.03076972,
+                '07', 0, 120.547948, 32.02945642,
+                '08', 0, 120.5511673, 32.02840145,
+                '09', 0, 120.5587575, 32.02524072 + offset * 0.2,
+                '10', 0, 120.5643912, 32.02367567,
+
+                '01', 1, 120.5149435, 32.04269763 + offset,
+                '02', 1, 120.5418489, 32.0309461,
+                '03', 1, 120.5592327, 32.025761,
+
+                '01', 2, 120.5108859, 32.04228621 + offset + 0.0002,
+                '02', 2, 120.5147123, 32.0417763 + offset,
+                '03', 2, 120.5205948, 32.04056061,
+                '04', 2, 120.5286929, 32.03476855,
+                '05', 2, 120.5410243, 32.03071962,
+                '06', 2, 120.5474064, 32.02961633,
+                '07', 2, 120.551624, 32.02829712,
+
+                '06', 3, 120.5103731, 32.04268722 + offset,
+                '07', 3, 120.5108725, 32.04263819 + offset,
+                '08', 3, 120.5113986, 32.04257987 + offset,
+                '09', 3, 120.5146732, 32.04226309 + offset,
+                '01', 3, 120.515163, 32.04214443 + offset,
+                '02', 3, 120.5156746, 32.04204412 + offset,
+                '03', 3, 120.5208149, 32.04101417,
+                '04', 3, 120.5209528, 32.04067285,
+                '05', 3, 120.5210704, 32.0403478,
+
+                '02', 4, 120.5155315, 32.04267723 + offset,
+                '01', 4, 120.522407, 32.03941692,
+                '03', 4, 120.5422418, 32.03077085,
+            ]
+            for (let i = 0; i < DEVICECES.length / 4; i++) {
+                this.addDevice(DEVICECES[i * 4 + 0], DEVICECES[i * 4 + 1], DEVICECES[i * 4 + 2], DEVICECES[i * 4 + 3])
+            }
+
+
+            // dat.GUI
+            if (this.movable) {
+                const gui = new GUI()
+                const positionFolder = gui.addFolder('Position')
+                positionFolder.add(this, 'pX', -100.0, 100.0, 0.0001)
+                positionFolder.add(this, 'pY', -100.0, 100.0, 0.0001)
+                positionFolder.add(this, 'pZ', -100.0, 100.0, 0.0001)
+                positionFolder.open()
+                const rotationFolder = gui.addFolder('Rotation')
+                rotationFolder.add(this, 'rX', -180.0, 180.0, 0.0001)
+                rotationFolder.add(this, 'rY', -180.0, 180.0, 0.0001)
+                rotationFolder.add(this, 'rZ', -180.0, 180.0, 0.0001)
+                rotationFolder.open()
+                const scaleFolder = gui.addFolder('Scale')
+                scaleFolder.add(this, 'sX', 0.0, 10.0, 0.0001)
+                scaleFolder.add(this, 'sY', 0.0, 10.0, 0.0001)
+                scaleFolder.add(this, 'sZ', 0.0, 10.0, 0.0001)
+                scaleFolder.open()
+            }
+
 
         }).catch((message) => {
 
@@ -189,6 +266,7 @@ class UnityLayer{
         if (!this.unity) return
 
         this.tick()
+
         this.map.triggerRepaint()
     }
 
@@ -207,6 +285,20 @@ class UnityLayer{
             F32Array: [
                 2.0 * x / this.unityCanvas.clientWidth - 1.0,
                 2.0 * (this.unityCanvas.clientHeight - y) / this.unityCanvas.clientHeight - 1.0
+            ]
+        })
+    }
+
+    move() {
+
+        this.movable = true
+
+        this.dispatchMessage({
+            Method: 'Translate',
+            F32Array: [
+                /* 0 - 2: position  */      this.pX, this.pY, this.pZ,
+                /* 3 - 5: rotation  */      this.rX, this.rY, this.rZ,
+                /* 6 - 8: scale     */      this.sX, this.sY, this.sZ,
             ]
         })
     }
@@ -233,14 +325,17 @@ class UnityLayer{
 
         this.dispatchMessage({
             Method: 'Tick',
-            F32Array: [ 
-                /* 0 - 15  */   ...xMVP.elements, 
-                /* 16 - 18 */   position[0], position[2], position[1], 
+            F32Array: [
+                /* 0 - 15  */   ...xMVP.elements,
+                /* 16 - 18 */   position[0], position[2], position[1],
                 /* 19 - 21 */   up.x, up.z, up.y,
                 /* 22      */   xCamera.fov * 180.0 / Math.PI,
                 /* 23 - 25 */   center[0], center[2], center[1],
                 /* 26      */   xCamera.nearZ,
                 /* 27      */   xCamera.farZ,
+                this.pX, this.pY, this.pZ,
+                this.rX, this.rY, this.rZ,
+                this.sX, this.sY, this.sZ,
             ]
         })
     }
@@ -251,7 +346,7 @@ class UnityLayer{
 
         this.dispatchMessage({
             Method: 'Keep',
-            BoolArray: [ tof ]
+            BoolArray: [tof]
         })
     }
 
@@ -262,12 +357,12 @@ class UnityLayer{
 
         this.dispatchMessage({
             Method: 'AddDevice',
-            StrArray: [ name ],
+            StrArray: [name],
             F32Array: [
-                /* 0 */   type, 
-                /* 1 */   coord[0], 
-                /* 2 */   coord[2], 
-                /* 3 */   coord[1], 
+                /* 0 */   type,
+                /* 1 */   coord[0],
+                /* 2 */   coord[2],
+                /* 3 */   coord[1],
             ]
         })
     }
@@ -282,7 +377,7 @@ class UnityLayer{
     wgs84ToWorld(lon, lat) {
 
         const worldSize = WORLD_SIZE
-        const WMC = fromLonLat([ lon, lat ])
+        const WMC = fromLonLat([lon, lat])
         return [
             (WMC[0] - 0.5) * worldSize,
             (0.5 - WMC[1]) * worldSize
@@ -297,7 +392,6 @@ class UnityLayer{
             z + offsetZ,
         ]
     }
-
     remove() {
         if (this.unity) {
             console.log('unityLayer removing')
@@ -329,7 +423,7 @@ class UnityLayer{
 
 // Helpers //////////////////////////////////////////////////////////////////////////////////////////////////////
 function mercatorXfromLon(lon) {
-        
+
     return (180. + lon) / 360.
 }
 
@@ -343,11 +437,11 @@ function fromLonLat(lonLat) {
     const x = mercatorXfromLon(lonLat[0])
     const y = mercatorYfromLat(lonLat[1])
 
-    return [ x, y ]
+    return [x, y]
 }
 
 
-function updateWorldCamera (transform, mercatorWorldSize, minElevation = 0.0) {
+function updateWorldCamera(transform, mercatorWorldSize, minElevation = 0.0) {
 
     const fov = transform._fov
     const halfFov = transform._fov / 2
@@ -367,7 +461,7 @@ function updateWorldCamera (transform, mercatorWorldSize, minElevation = 0.0) {
     const pitchMatrix = new THREE.Matrix4().makeRotationX(pitch)
     const angleMatrix = new THREE.Matrix4().makeRotationZ(angle)
     const worldToCamera = pitchMatrix.premultiply(angleMatrix)
-    
+
     const x = transform.pointMerc.x
     const y = transform.pointMerc.y
     const centerX = (x - 0.5) * mercatorWorldSize
@@ -375,12 +469,12 @@ function updateWorldCamera (transform, mercatorWorldSize, minElevation = 0.0) {
     const center = new THREE.Vector3(centerX, centerY, 0)
 
     const up = new THREE.Vector3(0, 1, 0)
-    .applyMatrix4(angleMatrix)
+        .applyMatrix4(angleMatrix)
 
     const position = new THREE.Vector3(0, 0, 1)
-    .applyMatrix4(worldToCamera)
-    .multiplyScalar(cameraToCenterDistance)
-    .add(center)
+        .applyMatrix4(worldToCamera)
+        .multiplyScalar(cameraToCenterDistance)
+        .add(center)
 
     const view = new THREE.Matrix4().makeTranslation(position.x, position.y, position.z).multiply(worldToCamera).invert()
 
@@ -413,15 +507,16 @@ function makePerspectiveMatrix(fovy, aspect, near, far) {
     return out
 }
 
-function stopWebCam() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-            stream.getTracks().forEach(track => track.stop())
-        }).catch(function(error) {
-            console.log("Error stopping the webcam: ", error)
-        })
-    }
-}
+// function stopWebCam() {
+//     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+//         navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+//             stream.getTracks().forEach(track => track.stop())
+//         }).catch(function(error) {
+//             console.log("Error stopping the webcam: ", error)
+//         })
+//     }
+// }
+
 export {
     UnityLayer
 }

@@ -252,12 +252,12 @@ const dealtWarnList = computed(() => {
             res.push(item)
         }
     })
-    console.log('computed dealt warn', res)
+    // console.log('computed dealt warn', res)
     return res
 })
 
 const token = ref(
-    'at.2kbb6yrsd376lwxrcd7r1mj610ud6kgw-3go8r4ejzs-0i8d8co-ubpipy04n',
+    'at.5cxvxrig152g1ybj4b67hk5ucv11if4w-7i08g7dedf-1c4h1rt-ns5tf5u9m',
 )
 
 const props = defineProps({
@@ -411,7 +411,7 @@ const moveBack2Origin = async () => {
         )
     }
     const res = await axios.all(moveBackPost)
-    console.log('back back', res)
+    // console.log('back back', res)
 }
 
 const toggleVideoControl = () => {

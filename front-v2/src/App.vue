@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, createApp } from 'vue'
 import HeaderComp from './components/layout/HeaderComp.vue'
 import router from './router/index'
 import { useDeviceNameStore } from './store/mapStore';
@@ -15,7 +15,7 @@ onMounted(async () => {
     // await Scratch.StartDash()
     const infoBoxDiv = document.createElement('div')
     infoBoxDiv.style.position = 'absolute'
-    infoBoxDiv.style.zIndex = '1000'
+    infoBoxDiv.style.zIndex = '999'
     // infoBoxDiv.style.backgroundColor = 'red'
     // infoBoxDiv.style.pointerEvents = 'none'
     // infoBoxDiv.style.textAlign = 'center'
@@ -89,8 +89,14 @@ onMounted(async () => {
 
     window.pickUp = (name) => {
         pickedObject.name = name;
-        pickedObject.infoBox.style.width = `${pickedObject.boxSize[0]}px`;
-        pickedObject.infoBox.style.height = `${pickedObject.boxSize[1]}px`;
+        // pickedObject.infoBox.style.width = `${pickedObject.boxSize[0]}px`;
+        // pickedObject.infoBox.style.height = `${pickedObject.boxSize[1]}px`;
+        pickedObject.infoBox.style.width = `5px`;
+        pickedObject.infoBox.style.height = `5px`;
+
+        // test
+        // createCompIns(pickedObject.infoBox)
+
     }
     window.consoleLogMessageFromUnity = (message) => {
 
@@ -102,8 +108,14 @@ onMounted(async () => {
         pickedObject.position = [x, y]
     }
 
-
 })
+
+// const createCompIns = (fatherDom) => {
+//     // let fatherDom = document.querySelector('#DeviceInfoBox')
+//     fatherDom.innerHTML = ''
+//     const bankApp = createApp(threeDdevice)
+//     bankApp.mount(fatherDom)
+// }
 </script>
 
 <style lang="scss">

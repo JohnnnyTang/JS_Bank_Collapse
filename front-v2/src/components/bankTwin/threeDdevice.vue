@@ -2,7 +2,7 @@
     <!-- <div class="test" id="test" style="width: 200px;height: 200px;">
         {{ deviceCode }}
     </div> -->
-    <div class="container" v-show="true">
+    <div class="container" v-show="showPopup">
         <div class="info-content-container">
             <div class="device-detail-container">
                 <div class="device-name-text">{{ DEVICETYPEMAP[(+deviceInfo.type) - 1] }}</div>
@@ -66,7 +66,7 @@ import axios from 'axios';
 import pureChart from '../dataVisual/monitorDevice/pureChartV2.vue'
 
 const deviceCode = ref('')
-
+const showPopup = ref(false)
 
 
 const showChart = ref(false)
@@ -99,6 +99,11 @@ watch(() => useDeviceNameStore().deviceName, async (newVal) => {
     //     'GNSS': 'gnss',
     // }
     deviceCode.value = nameCodeMap[newVal]
+    if (deviceCode.value === '') {
+        showPopup.value = false
+        return
+    }
+    showPopup.value = true
     deviceInfo.value = (await axios.get('/api/data/monitorInfo/code/' + deviceCode.value)).data
 
     if (deviceInfo.value.type === '6') {
@@ -171,7 +176,6 @@ const deviceIdMap = {
     'MZS120.52557975_32.03825056_3': 'KX-07',
     'MZS120.52565217_32.03813574_3': 'KX-08',
     'MZS120.52566826_32.03799363_3': 'KX-09',
-    'MZS120.56944728_32.02070961_1': 'KX-10',
     'MZS120.513203_32.042733_2': 'YL-01',
     'MZS120.515433_32.04231_2': 'YL-02',
     'MZS120.521221_32.040331_2': 'YL-03',
@@ -234,12 +238,14 @@ const deviceIdPlaceMap = {
 
 <style lang="scss" scoped>
 .container {
-    position: relative;
+    position: absolute;
+    left: -10vw;
+    top: -34vh;
     display: block;
     // width: 25vw;
     width: 32vw;
     height: 38vh;
-    transform: scale(0.6) translateY(20%);
+    transform: scale(0.6);
     z-index: 1000;
 }
 

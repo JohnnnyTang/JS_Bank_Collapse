@@ -1,5 +1,5 @@
 <template>
-    <div class="device-info-container" :class="{'hide-left': props.domHide}">
+    <div class="device-info-container" :class="{ 'hide-left': props.domHide }">
         <dv-border-box12
             :dur="5"
             :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']"
@@ -44,10 +44,28 @@
                                 v-for="(item, index) in deviceStatusDataList"
                                 :key="index"
                             >
+                                <el-tooltip
+                                    class="box-item"
+                                    effect="light"
+                                    content="点击查看数据"
+                                    placement="right"
+                                    :offset="-6"
+                                    :hide-after="50"
+                                    v-if="item.name != '视频监控'"
+                                >
+                                    <div
+                                        class="device-name device-item body"
+                                        @click="changeDeviceType(item.name)"
+                                        :class="{
+                                            click: item.name != '视频监控',
+                                        }"
+                                    >
+                                        {{ item.name }}
+                                    </div>
+                                </el-tooltip>
                                 <div
                                     class="device-name device-item body"
-                                    @click="changeDeviceType(item.name)"
-                                    :class="{ click: item.name != '视频监控' }"
+                                    v-else
                                 >
                                     {{ item.name }}
                                 </div>
@@ -158,7 +176,6 @@ const props = defineProps({
         default: false,
     },
 })
-
 
 const chartDom = ref()
 const chartDataLoading = ref(true)
@@ -288,7 +305,7 @@ const deviceTypeTimeMap = {
 const selectedDeviceType = ref('位移测量站')
 
 const deviceList = ref(deviceListMap['位移测量站'])
-console.log(deviceList)
+// console.log(deviceList)
 const selectedDevice = ref('CL-01')
 
 const sectionClassColorMap = ref({
@@ -392,7 +409,7 @@ async function updateNewestTime() {
 watch(
     () => useWarnInfoStore().warnInfo,
     (newVal) => {
-        console.log('watching23321!!!!!!!!!!')
+        // console.log('watching23321!!!!!!!!!!')
         const warnDataCount = [0, 0, 0, 0, '-']
         // console.log('warn', warnData)
         newVal.map((item, index) => {
@@ -614,6 +631,7 @@ div.device-info-container {
                         &.click {
                             &:hover {
                                 cursor: pointer;
+                                color: rgb(88, 223, 228);
                             }
                         }
 
