@@ -355,6 +355,8 @@ const calcModel = async () => {
     }
 }
 
+
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 onMounted(() => {
     sectionChart = echarts.init(sectionChartDom.value)
     map = new mapboxgl.Map({
@@ -376,31 +378,31 @@ onMounted(() => {
         map.addSource('mzsOverWaterSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsUnderWaterSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsPlaceLabelSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsPlaceLineSource', {
             type: 'vector',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+                tileServer+'/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
             ],
         })
         map.addSource('mapRaster2020', {
             type: 'raster',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
+                tileServer+'/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
@@ -410,7 +412,7 @@ onMounted(() => {
         map.addSource('mapRaster2021', {
             type: 'raster',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2021/Before/{x}/{y}/{z}',
+                tileServer+'/tile/raster/mzs/2021/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
@@ -420,7 +422,7 @@ onMounted(() => {
         map.addSource('mapRaster2022', {
             type: 'raster',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2022/Before/{x}/{y}/{z}',
+                tileServer+'/tile/raster/mzs/2022/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
@@ -430,7 +432,7 @@ onMounted(() => {
         map.addSource('mapRaster2023', {
             type: 'raster',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
+                tileServer+'/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
