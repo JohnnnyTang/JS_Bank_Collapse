@@ -431,12 +431,13 @@ const layerGroupClickHandler = (node, data) => {
 
 const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
+    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
     if (baseMapRadio.value == 0) {
         map.setStyle(getImageStyleJson())
         map.addSource('mapRaster22', {
             type: 'raster',
             tiles: [
-                'http://127.0.0.1:8989/api/v1/tile/raster/image/base/{x}/{y}/{z}',
+                tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
             ],
             tileSize: 256,
             minzoom: 1,

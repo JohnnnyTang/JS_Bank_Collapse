@@ -18,10 +18,9 @@ mapDiv.style.zIndex = '500 !important'
 mapDiv.style.background = 'transparent !important'
 mapDiv.id = 'map'
 document.body.appendChild(mapDiv)
-
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 scr.StartDash().then(() => {
-    const tileServer = 'http://127.0.0.1:8989/api/v1'
 
     const geojson = {
         type: 'FeatureCollection',
