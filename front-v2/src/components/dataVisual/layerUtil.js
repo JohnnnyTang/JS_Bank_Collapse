@@ -837,7 +837,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     'symbol-placement': "line-center",
-                    'text-size': 26,
+                    'text-size': 29,
                     'text-offset': [0, 0.2],
                     'text-anchor': 'top',
                     'text-allow-overlap': true,
@@ -901,7 +901,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     'symbol-placement': 'point',
-                    'text-size': 18,
+                    'text-size': 22,
                     'text-offset': [0.0, 0.2],
                     'text-anchor': 'top'
                 },
@@ -1071,7 +1071,7 @@ const layerAddFunctionMap = {
                     ],
                     'symbol-placement': 'point',
                     'text-variable-anchor': ["center", "top", "bottom", "left", "right"],
-                    'text-size': 17,
+                    'text-size': 18,
                     'text-allow-overlap': false,
                 },
                 paint: {
@@ -1126,7 +1126,7 @@ const layerAddFunctionMap = {
                     ],
                     'symbol-placement': 'point',
                     'text-variable-anchor': ["center", "top", "bottom", "left", "right"],
-                    'text-size': 17,
+                    'text-size': 18,
                     'text-allow-overlap': false,
                 },
                 paint: {
@@ -1235,7 +1235,7 @@ const layerAddFunctionMap = {
                         'Arial Unicode MS Bold',
                     ],
                     'text-variable-anchor': ["center", "top", "bottom", "left", "right"],
-                    'text-size': 16,
+                    'text-size': 17,
                     'text-allow-overlap': false,
                 },
                 paint: {
@@ -1282,8 +1282,8 @@ const layerAddFunctionMap = {
                     "icon-size": [
                         "case",
                         ["==", ["get", "if_important"], 1], // 如果if_important字段为1
-                        1.3,                                  // 则图标大小为0.6
-                        1.0                                   // 否则图标大小为0.4
+                        1.5,                                  // 则图标大小为0.6
+                        1.1                                   // 否则图标大小为0.4
                     ],
                     'icon-anchor': 'center',
                     'icon-allow-overlap': true,
@@ -1336,9 +1336,8 @@ const layerAddFunctionMap = {
                     'text-offset': [0.4, 0.8],
                     'text-anchor': 'top',
                     'text-variable-anchor': ["top", "bottom", "left", "right"],
-                    'text-size': 16,
-                    'text-allow-overlap': true,
-                    'text-ignore-placement': true,
+                    'text-size': 19,
+                    'text-allow-overlap': false,
                 },
                 paint: {
                     "text-color": [
@@ -2101,7 +2100,7 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                     ],
                     'text-variable-anchor': ["center", "top", "bottom", "left", "right"],
-                    'text-size': 14,
+                    'text-size': 16,
                     'text-allow-overlap': false,
 
                 },
@@ -2273,7 +2272,7 @@ const layerAddFunctionMap = {
                     ],
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, 0.5],
-                    'text-size': 17,
+                    'text-size': 21,
                     'text-allow-overlap': true,
                 },
                 paint: {
@@ -2334,9 +2333,8 @@ const layerAddFunctionMap = {
                     ],
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, 0.5],
-                    'text-size': 16,
-                    // 'text-allow-overlap': true,
-                    'text-allow-overlap': false,
+                    'text-size': 18,
+                    'text-allow-overlap': true,
                 },
                 paint: {
                     "text-color": "rgba(73, 83, 92,0.8)",
@@ -2476,7 +2474,7 @@ const layerAddFunctionMap = {
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, -1.0],
                     'text-allow-overlap': true,
-                    'text-size': 16,
+                    'text-size': 21,
                 },
                 paint: {
                     'text-color': 'rgba(0,54,134,0.8)',
@@ -2534,9 +2532,9 @@ const layerAddFunctionMap = {
                     ],
                     'text-anchor': 'bottom',
                     'text-offset': [0, -1.0],
-                    'text-allow-overlap': false,
-                    // 'text-allow-overlap': true,
-                    'text-size': 15,
+                    // 'text-allow-overlap': false,
+                    'text-allow-overlap': true,
+                    'text-size': 18,
                 },
                 paint: {
                     'text-color': 'rgb(26, 50, 71)',
@@ -2917,8 +2915,8 @@ const layerAddFunctionMap = {
                     'symbol-placement': 'point',
                     // 'symbol-placement': 'line-center',
                     // 'text-offset': [0.0, 1.0],
-                    'text-variable-anchor': ["top", "bottom", "center"],
-                    'text-size': 20,
+                    'text-variable-anchor': ["top", "bottom", "center","left","right"],
+                    'text-size': 21,
                     // 'text-padding': 0.0,
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                     "text-allow-overlap": false,
@@ -3179,11 +3177,18 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    // 'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
+                    'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
                     'symbol-placement': "point",
                     // 'text-anchor': 'center',
-                    'text-size': 13,
+                    'text-size': 17,
                     'text-padding': 0,
+                    'text-offset': [
+                        'match',
+                        ['get', 'name'],
+                        '太平州',
+                        [4.0, 2.0],
+                        [0, 0.0],
+                    ],
                     'text-ignore-placement': true,
                     'text-allow-overlap': false,
                 },
@@ -3246,8 +3251,8 @@ const layerAddFunctionMap = {
                     'text-size': [
                         "case",
                         ["==", ["get", "Level"], 1],
-                        23,
-                        19
+                        26,
+                        23
                     ],
                     'text-padding': 0,
                     'text-ignore-placement': true,
