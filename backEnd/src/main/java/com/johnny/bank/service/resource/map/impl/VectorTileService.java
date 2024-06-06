@@ -2,6 +2,7 @@ package com.johnny.bank.service.resource.map.impl;
 
 import com.johnny.bank.model.common.ContourTileBox;
 import com.johnny.bank.model.common.DepthLineTileBox;
+import com.johnny.bank.model.common.SimpleBboxInfo;
 import com.johnny.bank.model.common.TileBox;
 import com.johnny.bank.model.resource.dataResource.VectorTileSource;
 import com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo;
@@ -56,7 +57,7 @@ public class VectorTileService implements IVectorTileService {
 
         TileBox tileBox = TileUtil.tile2boundingBox(
                 x, y, z,
-                vectorTileSource.getTableName(), vectorTileSource.getFieldList()
+                vectorTileSource.getTableName(), vectorTileSource.getMapField()
         );
         return (byte[]) IVectorTileRepo.getVectorTile(tileBox);
     }
@@ -68,7 +69,7 @@ public class VectorTileService implements IVectorTileService {
 
         TileBox tileBox = TileUtil.tile2boundingBox(
                 x, y, z,
-                vectorTileSource.getTableName(), vectorTileSource.getFieldList()
+                vectorTileSource.getTableName(), vectorTileSource.getMapField()
         );
         return (byte[]) IVectorTileRepo.getVectorCenterPtTile(tileBox);
     }
@@ -80,7 +81,7 @@ public class VectorTileService implements IVectorTileService {
 
         TileBox tileBox = TileUtil.tile2boundingBox(
                 x, y, z,
-                vectorTileSource.getTableName(), vectorTileSource.getFieldList()
+                vectorTileSource.getTableName(), vectorTileSource.getMapField()
         );
         return (byte[]) IVectorTileRepo.getVectorGeomCenterPtTile(tileBox);
     }
@@ -97,14 +98,38 @@ public class VectorTileService implements IVectorTileService {
         return (byte[]) IVectorTileRepo.getDepthLineVectorTile(depthLineTileBox);
     }
 
-
     public List<Map<String, Object>> getLayerInfo(String tileName) {
         VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
-        return IVectorTileRepo.getLayerBasicInfo(vectorTileSource.getTableName(), vectorTileSource.getFieldList());
+        return IVectorTileRepo.getLayerBasicInfo(vectorTileSource.getTableName(), vectorTileSource.getBasicField());
     }
 
     public List<Map<String, Object>> getLayerWholeInfo(String tileName) {
         VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
-        return IVectorTileRepo.getLayerWholeInfo(vectorTileSource.getTableName(), vectorTileSource.getFieldList());
+        return IVectorTileRepo.getLayerWholeInfo(vectorTileSource.getTableName(), vectorTileSource.getDetailField());
+    }
+
+    public Object getLayerBboxInfoById(String tileName, String id) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
+        return IVectorTileRepo.getLayerBboxInfoById(vectorTileSource.getTableName(), vectorTileSource.getDetailField(), id);
+    }
+
+    public List<Map<String, Object>> getLinkedRiverLayerBboxInfo(String tileName) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
+        return IVectorTileRepo.getRiverLinkedLayerWholeInfo(vectorTileSource.getTableName());
+    }
+
+    public Map<String, Object> getLinkedRiverLayerBboxInfoById(String tileName, String id) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
+        return IVectorTileRepo.getRiverLinkedLayerWholeInfoById(vectorTileSource.getTableName(), id);
+    }
+
+    public SimpleBboxInfo getLinkedRiverLayerBboxInfoByIdWithBuffer(String tileName, String id, Integer bufferRad) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
+        return IVectorTileRepo.getRiverLinkedLayerWholeInfoByIdWithRad(vectorTileSource.getTableName(), id, bufferRad);
+    }
+
+    public SimpleBboxInfo getRiverLayerBboxInfoByIdWithBuffer(String tileName, String id, Integer bufferRad) {
+        VectorTileSource vectorTileSource = tileSourceRepo.getSourceByTileName(tileName);
+        return IVectorTileRepo.getRiverLayerWholeInfoByIdWithRad(vectorTileSource.getTableName(), id, bufferRad);
     }
 }
