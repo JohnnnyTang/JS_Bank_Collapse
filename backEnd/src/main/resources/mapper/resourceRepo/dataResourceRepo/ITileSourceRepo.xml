@@ -7,6 +7,9 @@
         <result property="fieldList" column="field_list" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
         <result property="activeStatus" column="active_status"/>
         <result property="memo" column="memo"/>
+        <result property="mapField" column="map_field" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
+        <result property="detailField" column="detail_field" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
+        <result property="basicField" column="basic_field" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
     </resultMap>
     <parameterMap id="vectorSourceParameterMap" type="com.johnny.bank.model.resource.dataResource.VectorTileSource">
         <parameter property="tileName"/>
@@ -14,6 +17,9 @@
         <parameter property="fieldList" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
         <parameter property="activeStatus" />
         <parameter property="memo" />
+        <parameter property="mapField" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
+        <parameter property="detailField" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
+        <parameter property="basicField" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.StringListArrayTypeHandler"/>
     </parameterMap>
     <select id="getAllTileSource" resultMap="vectorSourceMap">
         select * from vector_tile;
@@ -23,7 +29,9 @@
         where tile_name = #{tileName}
     </select>
     <insert id="insertTileSource" parameterType="com.johnny.bank.model.resource.dataResource.VectorTileSource">
-        INSERT INTO vector_tile (tile_name, table_name, field_list, active_status, memo)
-        VALUES (#{tileName}, #{tableName}, #{fieldList,typeHandler=com.johnny.bank.config.StringListArrayTypeHandler}, #{activeStatus}, #{memo});
+        INSERT INTO vector_tile (tile_name, table_name, field_list, active_status, memo, mapField, detailField, basicField)
+        VALUES (#{tileName}, #{tableName}, #{fieldList,typeHandler=com.johnny.bank.config.StringListArrayTypeHandler},
+                #{activeStatus}, #{memo}, #{mapField,typeHandler=com.johnny.bank.config.StringListArrayTypeHandler},
+                #{detailField,typeHandler=com.johnny.bank.config.StringListArrayTypeHandler}, #{basicField,typeHandler=com.johnny.bank.config.StringListArrayTypeHandler});
     </insert>
 </mapper>

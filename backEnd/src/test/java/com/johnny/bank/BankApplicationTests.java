@@ -11,9 +11,12 @@ import com.johnny.bank.utils.MailUtil;
 import com.johnny.bank.utils.SMSUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +37,8 @@ class BankApplicationTests {
     @Qualifier("DeviceWarningRepo")
     @Autowired
     IDeviceWarningRepo deviceWarningRepo;
+    @Value("${server.port}")
+    int localServerPort;
 
 //    @Test
     void testStation() {
@@ -88,6 +93,12 @@ void testUpdateDeviceWarn() {
 //    @Test
     void testSystemName() {
         System.out.println("system ... " + System.getProperties().getProperty("os.name"));
+    }
+
+//    @Test
+    void testIpAndPort() throws UnknownHostException {
+        System.out.println("ip: " + InetAddress.getLocalHost().getHostAddress());
+        System.out.println("port: " + localServerPort);
     }
 
 }

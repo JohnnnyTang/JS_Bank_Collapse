@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo">
+    <resultMap id="simpleBboxMap" type="com.johnny.bank.model.common.SimpleBboxInfo">
+        <result property="bbox" column="bbox" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.ArrayTypeHandler"/>
+        <result property="id" column="id"/>
+    </resultMap>
     <select id="getVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.TileBox">
         select st_asmvt(result, #{visualId}) tile
         from(
@@ -80,6 +84,119 @@
         from ${tableName}
         order by if_important DESC
         ) as res
+    </select>
+
+    <select id="getLayerBboxInfoById" resultType="java.util.Map">
+        select ST_X(ST_Centroid(geom)) as center_x, ST_Y(ST_Centroid(geom)) as center_Y, ARRAY[ST_XMin(geom), ST_YMin(geom), ST_XMax(geom), ST_YMax(geom)] as bbox, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from (
+        select ST_Transform(geom, 4326) as geom, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from ${tableName}
+        where id = #{id}
+        ) as res
+    </select>
+
+    <select id="getRiverLinkedLayerWholeInfo" resultType="java.util.Map">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Transform(ST_Buffer(ST_ShortestLine(p.geom, r.geom), 500), 4326) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.if_important = '1'
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(shortest_line),ST_YMin(shortest_line),ST_XMax(shortest_line),ST_YMax(shortest_line)] AS bbox
+        FROM
+            shortest_lines;
+    </select>
+
+    <select id="getRiverLinkedLayerWholeInfoById" resultType="java.util.Map">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Transform(ST_Buffer(ST_ShortestLine(p.geom, r.geom), 500), 4326) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.id = #{id}
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(shortest_line),ST_YMin(shortest_line),ST_XMax(shortest_line),ST_YMax(shortest_line)] AS bbox
+        FROM
+            shortest_lines;
+    </select>
+
+    <select id="getRiverLinkedLayerWholeInfoByIdWithRad" resultMap="simpleBboxMap">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Transform(ST_Buffer(ST_ShortestLine(p.geom, r.geom), ${bufferRad}), 4326) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.id = #{id}
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(shortest_line),ST_YMin(shortest_line),ST_XMax(shortest_line),ST_YMax(shortest_line)] AS bbox
+        FROM
+            shortest_lines;
+    </select>
+
+    <select id="getRiverLayerWholeInfoByIdWithRad" resultMap="simpleBboxMap">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Envelope(p.geom) AS river_geom,
+                     ST_ShortestLine(p.geom, r.geom) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.id = #{id}
+             ),
+             unions AS (
+                 SELECT
+                     id,
+                     river_geom,
+                     shortest_line,
+                     ST_Transform(ST_Buffer(ST_Union(river_geom, shortest_line), 500), 4326) AS union_geom
+                 FROM
+                     shortest_lines
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(union_geom),ST_YMin(union_geom),ST_XMax(union_geom),ST_YMax(union_geom)] AS bbox
+        FROM
+            unions;
     </select>
 
     <select id="selectSectionLineInfo" resultType="com.johnny.bank.model.resource.dataResource.SectionLineInfo">

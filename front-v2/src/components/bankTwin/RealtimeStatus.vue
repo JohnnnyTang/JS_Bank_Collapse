@@ -419,6 +419,7 @@ watch(
         warnDeviceCount.value = warnDataCount
         // console.log(warnDeviceCount)
     },
+    { immediate: true, deep: true, flush: 'sync' },
 )
 
 onMounted(async () => {
