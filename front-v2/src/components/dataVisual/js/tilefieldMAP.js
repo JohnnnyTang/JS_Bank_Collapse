@@ -163,14 +163,14 @@ const sourceZoomMap = {
     "combineProjectPoint": 13,
     "dockArea": 13.5,
     "embankmentLine": 13,
-    "pumpArea": 17.5,
+    "pumpArea": 12.5,
     "reservoirArea": 14,
-    "sluiceArea": 17.5,
+    "sluiceArea": 13,
     "riverPassageLine": 13,
     "riverPassagePolygon": 13,
-    'importantBank': 13,
+    'importantBank': 12,
     'sandBar': 12,
-    'channel': 13,
+    'channel': 12.5,
 }
 
 const sourceColumnMap = {

@@ -8,7 +8,8 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const Title1dict = {
     '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '一级岸段-注记', '二级岸段-注记', '三级岸段-注记', '一级预警岸段-注记'],
     '长江沙洲': ['洲滩', '洲滩-注记'],
-    '过江通道': ['已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
+    '交通设施': ['沿江码头', '沿江码头-注记', '已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
+    // '过江通道': ['已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
     '骨干河道': ['区域性骨干河道', '流域性河道', '其他河道', '区域性骨干河道-注记', '流域性河道-注记', '其他河道-注记'],
     '重要水闸': ['大中型水闸', '其他水闸', '大中型水闸-注记', '其他水闸-注记'],
     '重要泵站': ['大中型泵站', '其他泵站', '大中型泵站-注记', '其他泵站-注记'],
@@ -19,9 +20,9 @@ const Title2dict = {
     '一级预警岸段': ['一级预警岸段', '一级岸段-注记', '一级预警岸段-注记'],
     '二级预警岸段': ['二级预警岸段', '二级岸段-注记'],
     '三级预警岸段': ['三级预警岸段', '三级岸段-注记'],
-    '已建通道': ['已建通道', '已建通道-注记'],
-    '在建通道': ['在建通道', '在建通道-注记'],
-    '规划通道': ['规划通道', '规划通道-注记'],
+
+    '过江通道': ['已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
+    '沿江码头': ['沿江码头', '沿江码头-注记'],
     '区域性骨干河道': ['区域性骨干河道', '区域性骨干河道-注记'],
     '流域性骨干河道': ['流域性河道', '流域性河道-注记'],
     '大中型水闸': ['大中型水闸', '大中型水闸-注记', '水闸工程-重点'],
@@ -31,6 +32,12 @@ const Title2dict = {
     '湖泊水库': ['水库大坝', '水库大坝-注记', '大型湖泊', '大型湖泊-注记'],
     '行政区划': ['市级行政区', '市级行政区-注记', '重点行政区边界'],
     '水文站点': ['水文站点', '水文站点-注记'],
+}
+
+const Title3dict = {
+    '已建通道': ['已建通道', '已建通道-注记'],
+    '在建通道': ['在建通道', '在建通道-注记'],
+    '规划通道': ['规划通道', '规划通道-注记'],
 }
 
 const LGIDSourceMap = {
@@ -68,6 +75,7 @@ const sourceZoomMap = {
 const DICT = {
     T1LayerDict: Title1dict,
     T2LayerDict: Title2dict,
+    T3LayerDict: Title3dict,
     // T2LayerFunction: t,
     sourceColumnMap,
     LGIDSourceMap,
@@ -240,7 +248,6 @@ const getSideBarTree = async () => {
     zt.forEach((item) => {
         mainZt.children.push({ label: item.name, active: false, type: 'feature', property: item, 'lgId': '长江沙洲' })
     })
-    // let quyushuixi = []
 
     let quyushuixi = {
         label: '骨干河道',
@@ -264,12 +271,8 @@ const getSideBarTree = async () => {
                 filter: true,
             }
         ],
-        data: []
+        data: (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
     }
-    let dt = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
-    dt.forEach((item) => {
-        quyushuixi.data.push(item)
-    })
     let sluice = {
         label: '重要水闸',
         icon: '/icons/水闸工程.png',
@@ -291,12 +294,8 @@ const getSideBarTree = async () => {
                 children: []
             }
         ],
-        data: []
+        data: (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
     }
-    dt = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
-    dt.forEach((item) => {
-        sluice.data.push(item)
-    })
     let pump = {
         label: '重要泵站',
         icon: '/icons/泵站工程.png',
@@ -319,33 +318,29 @@ const getSideBarTree = async () => {
                 children: []
             }
         ],
-        data: []
+        data: (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
     }
-    dt = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
-    dt.forEach((item) => {
-        pump.data.push(item)
-    })
     let treeNode1 = {
         label: '已建通道',
-        type: 'title2',
+        type: 'title3',
         active: false,
         children: []
     }
     let treeNode2 = {
         label: '在建通道',
-        type: 'title2',
+        type: 'title3',
         active: false,
         children: []
     }
     let treeNode3 = {
         label: '规划通道',
-        type: 'title2',
+        type: 'title3',
         active: false,
         children: []
     }
     let riverPassageLine = {
         label: '过江通道',
-        type: 'title1',
+        type: 'title2',
         active: false,
         filter: true,
         children: [
@@ -353,12 +348,27 @@ const getSideBarTree = async () => {
             treeNode2,
             treeNode3
         ],
-        data: []
+        data: (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
     }
-    zt = (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
-    zt.forEach((item) => {
-        riverPassageLine.data.push(item)
-    })
+    let dock = {
+        label: '沿江码头',
+        type: 'title2',
+        active: false,
+        filter: true,
+        children: [
+        ],
+        data: (await axios.get(tileServer + `/tile/vector/dockArea/info`)).data
+    }
+    let transport = {
+        label: '交通设施',
+        type: 'title1',
+        active: false,
+        filter: true,
+        children: [
+            riverPassageLine,
+            dock,
+        ],
+    }
 
 
     let tree = [
@@ -373,7 +383,8 @@ const getSideBarTree = async () => {
             ]
         },
         mainZt,
-        riverPassageLine,
+        // riverPassageLine,
+        transport,
         quyushuixi,
         sluice,
         pump,

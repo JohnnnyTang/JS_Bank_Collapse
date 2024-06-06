@@ -1,6 +1,6 @@
 <template>
     <div class="description-container">
-        <div class="miniIcon" @click="close"></div>
+        <div class="miniIcon" @click="pinIt"></div>
 
         <div class="bankDesc" v-if="props.sourceId === 'importantBank'">
             <el-descriptions class="margin-top" :title="props.ogData['bank_name'] + '--' + level + '级预警'" :column="3"
@@ -174,7 +174,7 @@ const props = defineProps({
     sourceId: String,
     column: Number,
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'pin'])
 
 
 const fMap = ref({})
@@ -225,9 +225,14 @@ watch(props, (V) => {
         // console.log(fMap.value, title.value, data.value);
     }
 })
-const close = () => {
-    emit('close')
+// const close = () => {
+//     emit('close')
+// }
+
+const pinIt = () => {
+    emit('pin')
 }
+
 const noDataMap = (data) => {
     if (data === '0' || data === '*' || data === '' || data === undefined || data === null) {
         return 'N/A'
@@ -265,6 +270,7 @@ onMounted(() => {
 
     .margin-top {
         box-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
+
         :deep(.el-descriptions__header) {
             justify-content: center;
             margin: 0;
@@ -277,8 +283,9 @@ onMounted(() => {
 
     :deep(.el-descriptions__header) {
         height: 3vh;
-        border:  #4f81ff solid 1px;
-        &:hover{
+        border: #4f81ff solid 1px;
+
+        &:hover {
             cursor: move;
         }
 
@@ -299,7 +306,8 @@ onMounted(() => {
 
     :deep(.el-descriptions__body) {
 
-        border:  #60c0ff solid 1px;
+        border: #60c0ff solid 1px;
+
         .el-descriptions__cell.el-descriptions__content.is-bordered-content {
             background-color: #ffffff;
             text-align: center;
@@ -342,7 +350,7 @@ onMounted(() => {
         top: 1vh;
         width: 2.3vh;
         height: 2.3vh;
-        background-image: url('/icons/minimize.png');
+        background-image: url('/icons/pin.png');
         background-size: contain;
         background-repeat: no-repeat;
 
@@ -350,5 +358,4 @@ onMounted(() => {
             cursor: pointer;
         }
     }
-}
-</style>
+}</style>

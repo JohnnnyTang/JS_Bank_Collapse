@@ -55,6 +55,193 @@ onMounted(async () => {
     // loadImage(map, '/legend/水闸.png', '水闸')
 
     // map.addLayer({
+    //     id: '大中型水闸',
+    //     type: 'symbol',
+    //     'source-layer': 'default',
+    //     source: 'sluiceArea-center',
+    //     filter: ['==', 'if_important', 1],
+    //     minzoom: 8,
+    //     layout: {
+    //         'icon-image': '水闸',
+    //         "icon-size": 0.2,
+    //         'icon-allow-overlap': true,
+    //         'icon-rotate': ['get', 'rotation_angle']
+    //     },
+    //     paint: {
+    //         'icon-opacity': 1.0,
+    //     },
+    // })
+    !map.getSource('sluiceArea') &&
+        map.addSource('sluiceArea', {
+            type: 'vector',
+            tiles: [
+                tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
+            ],
+        })
+    !map.getLayer('大中型水闸-注记') &&
+        map.addLayer({
+            id: '大中型水闸-注记',
+            type: 'symbol',
+            source: 'sluiceArea',
+            'source-layer': 'default',
+            filter: ['==', 'if_important', 1],
+            minzoom: 10,
+            layout: {
+                'text-field': ['get', 'sp_name'],
+                'text-font': [
+                    'Open Sans Semibold',
+                ],
+                'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
+                'text-offset': [0, 0.5],
+                'text-size': 21,
+                'text-allow-overlap': true,
+            },
+            paint: {
+                "text-color": "rgba(73, 83, 92,1.0)",
+                'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                'text-halo-width': 2.0,
+            },
+        })
+
+    // map.addSource('portEmbankmentPoint', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/portEmbankmentPoint/{x}/{y}/{z}',
+    //     ],
+    // })
+
+    // map.addLayer({
+    //     id: '里程桩',
+    //     type: 'circle',
+    //     source: 'portEmbankmentPoint',
+    //     'source-layer': 'default',
+    //     filter: ['==', 'if_important', 1],
+    //     layout: {},
+    //     paint: {
+    //         'circle-color': 'rgb(222,1,1)',
+    //         'circle-radius': [
+    //             'interpolate',
+    //             ['linear'],
+    //             ['zoom'],
+    //             7,
+    //             ['literal', 1],
+    //             10,
+    //             ['literal', 3],
+    //             12,
+    //             ['literal', 5],
+    //         ],
+    //     },
+    // })
+    // map.addLayer({
+    //     id: '里程桩-注记',
+    //     type: 'symbol',
+    //     source: 'portEmbankmentPoint',
+    //     'source-layer': 'default',
+    //     minzoom: 11,
+    //     filter: ['==', 'if_important', 1],
+    //     layout: {
+    //         'text-field': ['get', 'name2'],
+    //         'text-font': [
+    //             'Open Sans Semibold',
+    //             'Arial Unicode MS Bold',
+    //         ],
+    //         'text-variable-anchor': ["left", "right", "top", "bottom", "center"],
+    //         'text-allow-overlap': false,
+    //         'text-size': 15,
+    //         'text-offset': [0.3, 0]
+    //     },
+    //     paint: {
+    //         'text-color': 'rgb(88,88,88)',
+    //         'text-halo-color': "rgba(255, 255, 255, 1.0)",
+    //         'text-halo-width': 0.5,
+    //     },
+    // })
+
+
+
+    // 岸段注记的显示问题！
+    // map.addSource('test', {
+    //     type: 'geojson',
+    //     data: gj
+    // })
+    // // map.addSource('test', {
+    // //     type: 'vector',
+    // //     tiles: [tileServer + '/tile/vector/importantBank/{x}/{y}/{z}'],
+    // // })
+    // map.addLayer({
+    //     id: '二级预警岸段',
+    //     type: 'line',
+    //     source: 'test',
+    //     filter: ['==', 'bank_name', '江宁河'],
+    //     // 'source-layer': 'default',
+    //     layout: {
+    //         // 'line-join': 'round',
+    //     },
+    //     paint: {
+    //         // 'line-opacity': 1,
+    //         'line-color': 'rgb(255, 120, 3)',
+    //         'line-width': [
+    //             'interpolate',
+    //             ['linear'],
+    //             ['zoom'],
+    //             7,
+    //             ['literal', 2],
+    //             10,
+    //             ['literal', 5],
+    //             13,
+    //             ['literal', 7],
+    //         ],
+    //     },
+    // })
+
+    // map.addLayer({
+    //     id: '二级岸段-注记',
+    //     type: 'symbol',
+    //     source: 'test',
+    //     filter: ['==', 'bank_name', '江宁河'],
+    //     // 'source-layer': 'default',
+    //     layout: {
+    //         'text-field': ['get', 'bank_name'],
+    //         // 'symbol-placement': 'line',
+    //         'symbol-placement': 'line-center',
+    //         'text-font': [
+    //             'Open Sans Semibold',
+    //             'Arial Unicode MS Bold',
+    //         ],
+    //         // 'text-offset': [0, 0],
+    //         // 'text-anchor': 'bottom',
+    //         // 'text-size': [
+    //         //     'interpolate',
+    //         //     ['linear'],
+    //         //     ['zoom'],
+    //         //     7,
+    //         //     ['literal', 15],
+    //         //     10,
+    //         //     ['literal', 20],
+    //         //     13,
+    //         //     ['literal', 25],
+    //         // ],
+
+    //         // 'text-allow-overlap': true,
+
+    //     },
+    //     paint: {
+    //         'text-color': '#2e0201',
+    //         'text-halo-color': "rgba(255, 255, 255, 1.0)",
+    //         'text-halo-width': 3.0,
+    //     },
+    // })
+
+    // !map.getSource('sluiceArea-center') &&
+    //     map.addSource('sluiceArea-center', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // loadImage(map, '/legend/水闸.png', '水闸')
+
+    // map.addLayer({
     //     id: '水闸工程-重点',
     //     type: 'symbol',
     //     'source-layer': 'default',
@@ -96,64 +283,64 @@ onMounted(async () => {
     //     },
     // })
 
-    !map.getSource('pumpArea') &&
-        map.addSource('pumpArea', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
-            ],
-        })
-    !map.getSource('pumpArea') &&
-        map.addSource('pumpArea', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
-            ],
-        })
-    await loadImage(map, '/legend/泵站.png', '泵站')
-    !map.getLayer('大中型泵站') &&
-        map.addLayer({
-            id: '大中型泵站',
-            type: 'symbol',
-            source: 'pumpArea',
-            filter: ["==", "if_important", '1'],
-            'source-layer': 'default',
-            minzoom: 8,
+    // !map.getSource('pumpArea') &&
+    //     map.addSource('pumpArea', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // !map.getSource('pumpArea') &&
+    //     map.addSource('pumpArea', {
+    //         type: 'vector',
+    //         tiles: [
+    //             tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
+    //         ],
+    //     })
+    // await loadImage(map, '/legend/泵站.png', '泵站')
+    // !map.getLayer('大中型泵站') &&
+    //     map.addLayer({
+    //         id: '大中型泵站',
+    //         type: 'symbol',
+    //         source: 'pumpArea',
+    //         filter: ["==", "if_important", '1'],
+    //         'source-layer': 'default',
+    //         minzoom: 8,
 
-            maxzoom: 22,
-            layout: {
-                'icon-image': '泵站',
-                'icon-size': 1.1,
-                'icon-allow-overlap': true,
-            },
-            paint: {
-            },
-        })
+    //         maxzoom: 22,
+    //         layout: {
+    //             'icon-image': '泵站',
+    //             'icon-size': 1.1,
+    //             'icon-allow-overlap': true,
+    //         },
+    //         paint: {
+    //         },
+    //     })
 
-    !map.getLayer('大中型泵站-注记') &&
-        map.addLayer({
-            id: '大中型泵站-注记',
-            type: 'symbol',
-            source: 'pumpArea',
-            filter: ["==", "if_important", '1'],
-            'source-layer': 'default',
-            minzoom: 8,
+    // !map.getLayer('大中型泵站-注记') &&
+    //     map.addLayer({
+    //         id: '大中型泵站-注记',
+    //         type: 'symbol',
+    //         source: 'pumpArea',
+    //         filter: ["==", "if_important", '1'],
+    //         'source-layer': 'default',
+    //         minzoom: 8,
 
-            layout: {
-                'text-field': ['get', 'sp_name'],
-                'text-font': [
-                    'Open Sans Semibold',
-                    'Arial Unicode MS Bold',
-                ],
-                'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
-                'text-offset': [0, -1.0],
-                'text-allow-overlap': false,
-                'text-size': 16,
-            },
-            paint: {
-                'text-color': 'rgba(0,54,134,0.8)',
-            },
-        })
+    //         layout: {
+    //             'text-field': ['get', 'sp_name'],
+    //             'text-font': [
+    //                 'Open Sans Semibold',
+    //                 'Arial Unicode MS Bold',
+    //             ],
+    //             'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
+    //             'text-offset': [0, -1.0],
+    //             'text-allow-overlap': false,
+    //             'text-size': 16,
+    //         },
+    //         paint: {
+    //             'text-color': 'rgba(0,54,134,0.8)',
+    //         },
+    //     })
 
 
 
@@ -344,6 +531,17 @@ onMounted(async () => {
     //     }
     // })
 })
+
+const gj = {
+    "type": "FeatureCollection",
+    "name": "1",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { "type": "Feature", "properties": { "id": 5, "city_name": "南京市", "river_name": "南京河段", "bank_name": "江宁河", "warning_level": 2, "monitoring_length": 3.7, "memo": null, "description": "江宁河岸段属Ⅱ级崩岸预警段，监测长度3.7km，沿江岸线分布着汪海集团码头、三山码头、华江船厂、梅山钢铁公司取水口等1个取水口、4个码头及2个船厂。", "state": "active", "create_time": "2024-01-25T14:05:12", "update_time": "2024-01-25T14:05:12", "if_important": 0, "fix_project": "2015年实施长江南京新济洲河段河道整治工程新潜洲右汊右岸护岸工程（江宁河口岸段），长度3.31km，水下抛石30.18万m3。" }, "geometry": { "type": "LineString", "coordinates": [[118.579409292162637, 31.898463281200133], [118.583546918781565, 31.90235235781017], [118.583634642314138, 31.902176910745062], [118.585272148255186, 31.903916760807448], [118.586120142403232, 31.90458930789038], [118.586397933589666, 31.905071787319443], [118.587128963027624, 31.905861299112455], [118.589219707220238, 31.907264875633366], [118.595594283919425, 31.91527695827358], [118.595418836854293, 31.915715575936357], [118.595828213339544, 31.918259558380512], [118.59695399867401, 31.919092931939801], [118.59708558397287, 31.920087131975457], [118.597597304579452, 31.920364923161888], [118.598094404597262, 31.921066711422341], [118.600068184079788, 31.923215937969999], [118.600726110573959, 31.923800761520365], [118.600594525275127, 31.924049311529281], [118.600726110573959, 31.924180896828116], [118.60126707235807, 31.923903105641685], [118.601749551787151, 31.923771520342846], [118.601749551787151, 31.92403469094052], [118.601471760600717, 31.924400205659513], [118.601515622366989, 31.924809582144775], [118.601939619440998, 31.925292061573835], [118.602685269467742, 31.925628335115309]] } }
+    ]
+}
+
+
 
 
 const baseImageStyle = {

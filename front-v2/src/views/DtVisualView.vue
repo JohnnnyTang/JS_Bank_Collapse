@@ -3,12 +3,12 @@
         <div class="sideBar">
             <dv-border-box9>
                 <div class="sideBar-container">
-                    <dv-decoration-11 style="width:75%;height: 6.5vh;">
+                    <!-- <dv-decoration-11 style="width:75%;height: 6.5vh;">
                         <div class="title-text">
                             综合数据专题
                         </div>
                     </dv-decoration-11>
-                    <hr class="hr_gradient">
+                    <hr class="hr_gradient"> -->
                     <div class="scenes-tree-container" v-loading="sideBarLoading">
                         <el-tree style="max-width: 400px" :data="dataSource" :expand-on-click-node="false" node-key="label"
                             :default-expanded-keys="expandKey">
@@ -26,7 +26,10 @@
                                         <el-switch v-model="data.active" :active-action-icon="View"
                                             :inactive-action-icon="Hide" size="large" @change="viewChange(node, data)" />
                                     </div>
-                                    <div class="subScene-container" v-else-if="data.type == 'title2'">
+
+
+                                    <div class="subScene-container"
+                                        v-else-if="data.type == 'title2' || data.type == 'title3'">
                                         <div class="card" :class="{ active: data.active }">
                                             <div class="top-section" @click="treeNodeClickHandler(node, data)">
                                                 <div class="title">
@@ -35,14 +38,16 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- <el-switch v-model="data.active" :active-action-icon="View"
-                                                class="subScene-switch" :inactive-action-icon="Hide" size="small"
-                                                style="margin-top: 0.8vh;"
-                                                @change="viewChange(node, data)" /> -->
+                                            <div class="detail-icon">
+                                                <el-button type="info" :icon="List" circle size="large"
+                                                    @click="layerGroupClickHandler(node, data)" v-show="!(node.parent.data.label.includes('岸段') ||
+                                                        node.parent.data.label.includes('其他') ||
+                                                        data.label.includes('其他') ||
+                                                        data.label.includes('过江通道') ||
+                                                        data.label.includes('沿江码头'))" />
+                                            </div>
                                         </div>
-                                        <el-button type="info" :icon="List" circle size="large"
-                                            @click="layerGroupClickHandler(node, data)"
-                                            v-show="!(node.parent.data.label.includes('岸段') || node.parent.data.label.includes('其他'))" />
+
 
                                     </div>
                                     <div class="feature-container"
@@ -96,10 +101,10 @@
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"  v-click-out-side="detailClickOutSideHandler">
             <!-- v-click-out-side="() => showDetail = false" -->
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
-                @close="showDetail = false"></featDetail>
+                @close="showDetail = false" @pin="pinHandler"></featDetail>
         </div>
 
         <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
@@ -149,6 +154,11 @@
                 <el-radio-button label="影像底图" value=0 />
             </el-radio-group>
         </div>
+
+        <!-- <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
+        opacity: 0.5; width: 8vw; height: 4vh;">
+            <span style="font-weight: 600;">{{ realtimeZoom }}</span>
+        </div> -->
     </div>
 </template>
 
@@ -167,7 +177,7 @@ import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapU
 import { scenes, layerGroups, LayerGroup, lableLayerMap } from '../components/dataVisual/js/SCENES';
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../store/mapStore';
 import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt, layerSourceMap, sourceNameMap } from '../components/dataVisual/js/tilefieldMAP';
-import { initSortedLayer } from '../components/dataVisual/layerUtil'
+import { initSortedLayer, initTextLayer } from '../components/dataVisual/layerUtil'
 import { getSideBarTree, showLayers, hideLayers, DICT } from '../components/dataVisual/js/useful'
 
 // data
@@ -187,6 +197,7 @@ const sideBarLoading = ref(true)
 const legendList = ref([])
 const infoPannelTitle = ref('')
 const search = ref('')
+const realtimeZoom = ref(0)
 var latestLGID = ''
 const waterTableData = [
     {
@@ -226,6 +237,7 @@ let nowSource
 const pannelLoading = ref(true)
 const baseMapRadio = ref(1)
 const dataSource = ref([])
+const detailPinState = ref(false)
 
 const expandKey = ['重点岸段', '全江概貌']
 const infoTableData_filtered = computed(() => {
@@ -246,6 +258,15 @@ const infoTableData_filtered = computed(() => {
 })
 
 /////// 
+const pinHandler = ()=>{
+    console.log('PIN IT');
+}
+const detailClickOutSideHandler = ()=>{
+    if(detailPinState.value){
+        console.log('PIN IT');
+    
+    }
+}
 
 const viewChange = (node, data) => {
     const map = mapStore.getMap()
@@ -266,11 +287,22 @@ const viewChange = (node, data) => {
         let children = node.childNodes
         for (let i = 0; i < children.length; i++) {
             children[i].data.active = data.active
+            for (let j = 0; j < children[i].childNodes.length; j++) {
+                children[i].childNodes[j].data.active = data.active
+            }
         }
     }
     else if (data.type == 'title2') {
         data.active ? showLayers(map, DICT.T2LayerDict[data.label])
             : hideLayers(map, DICT.T2LayerDict[data.label])
+        let children = node.childNodes
+        for (let i = 0; i < children.length; i++) {
+            children[i].data.active = data.active
+        }
+    }
+    else if (data.type == 'title3') {
+        data.active ? showLayers(map, DICT.T3LayerDict[data.label])
+            : hideLayers(map, DICT.T3LayerDict[data.label])
     }
 }
 const treeNodeClickHandler = async (node, data) => {
@@ -279,8 +311,11 @@ const treeNodeClickHandler = async (node, data) => {
         data.active = !data.active
         viewChange(node, data)
     }
+    if (node.level == 3) {
+        data.active = !data.active
+        viewChange(node, data)
+    }
     // showTable
-
 }
 
 const layerGroupClickHandler = (node, data) => {
@@ -452,7 +487,8 @@ const baseMapChangeHandler = async () => {
             type: 'raster',
             source: 'mapRaster22',
         })
-        await initSortedLayer(map)
+        // await initSortedLayer(map)
+        await initTextLayer(map)
     } else {
         map.setStyle(getStyleJson4base())
         await initSortedLayer(map)
@@ -519,13 +555,13 @@ const detailClickHandler4Feature = async (a) => {
         column: DICT.sourceColumnMap[nowSource],
     }
     featureInfo.value = newFeatInfomation
-    showDetail.value = true
+    // showDetail.value = true
     let map = mapStore.getMap()
     // console.log(nowSource, newFeatInfomation, sourceZoomMap[nowSource]);
     map.flyTo({
         center: [featInfo.center_x, featInfo.center_y],
         zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
-        speed: 1.0,
+        speed: 1.5,
         curve: 1,
         easing(t) {
             return t;
@@ -544,7 +580,11 @@ const featureNodeClick = (node, data) => {
         column: sourceColumnMap[nowSource],
     }
     featureInfo.value = newFeatInfomation
-    showDetail.value = true
+    if (node.parent.data.label.includes('岸段')) {
+        console.log('hello');
+        showDetail.value = true
+    }
+
     let map = mapStore.getMap()
     map.flyTo({
         center: [featInfo.center_x, featInfo.center_y],
@@ -590,6 +630,13 @@ const prepareMap = async () => {
     mapInstance.touchZoomRotate.disableRotation()
     mapFlyToRiver(mapInstance)
     await initSortedLayer(mapInstance)
+
+
+    mapInstance.on('zoom', () => {
+        console.log('A zoom event occurred.');
+        realtimeZoom.value = mapInstance.getZoom()
+    });
+
     return mapInstance
 }
 
@@ -766,7 +813,8 @@ onUnmounted(async () => {
             .scenes-tree-container {
                 position: relative;
                 width: 90%;
-                height: 80vh;
+                // height: 80vh;
+                height: 95%;
                 background-color: #f1fcff;
                 overflow-y: auto;
 
@@ -901,7 +949,7 @@ onUnmounted(async () => {
                         transition: .3s linear;
 
                         &:hover {
-                            transform: scale(1.02);
+                            // transform: scale(1.02);
                             cursor: pointer;
                         }
 
@@ -963,8 +1011,18 @@ onUnmounted(async () => {
                                 .subScene-title-text {
                                     color: rgb(234, 244, 252);
                                 }
+
+
                             }
                         }
+
+                        .detail-icon {
+                            position: absolute;
+                            right: 1.5vw;
+                            top: 0.9vh;
+                            z-index: 100;
+                        }
+
                     }
 
 
@@ -992,7 +1050,7 @@ onUnmounted(async () => {
 
                             &:hover {
                                 cursor: pointer;
-                                transform: scale(1.05);
+                                // transform: scale(1.05);
                             }
                         }
                     }
