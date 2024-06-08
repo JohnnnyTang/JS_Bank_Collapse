@@ -1,6 +1,6 @@
 <template>
     <div class="description-container">
-        <div class="miniIcon" @click="pinIt"></div>
+        <div class="miniIcon" :style="iconBackStyle" @click="pinIt"></div>
 
         <div class="bankDesc" v-if="props.sourceId === 'importantBank'">
             <el-descriptions class="margin-top" :title="props.ogData['bank_name'] + '--' + level + '级预警'" :column="3"
@@ -180,6 +180,10 @@ const emit = defineEmits(['close', 'pin'])
 const fMap = ref({})
 const title = ref('')
 const data = ref({})
+const pinState = ref(false)
+const iconBackStyle = computed(() => {
+    return pinState.value ? { backgroundImage: `url('/icons/pin.png')` } : { backgroundImage: `url('/icons/notPin.png')` }
+})
 
 const bankfiledDict = {
     "importantBank": {
@@ -230,7 +234,8 @@ watch(props, (V) => {
 // }
 
 const pinIt = () => {
-    emit('pin')
+    pinState.value = !pinState.value
+    emit('pin', pinState.value)
 }
 
 const noDataMap = (data) => {
@@ -350,7 +355,7 @@ onMounted(() => {
         top: 1vh;
         width: 2.3vh;
         height: 2.3vh;
-        background-image: url('/icons/pin.png');
+        // background-image: url('/icons/pin.png');
         background-size: contain;
         background-repeat: no-repeat;
 
@@ -358,4 +363,5 @@ onMounted(() => {
             cursor: pointer;
         }
     }
-}</style>
+}
+</style>

@@ -151,7 +151,8 @@ const sourceNameMap = {
     "riverPassageLine": 'name',
     "riverPassagePolygon": 'name',
     "importantBank": 'bank_name',
-    'channel': 'name'
+    'channel': 'name',
+    'riverBridge': 'name',
 }
 
 const sourceZoomMap = {
@@ -740,7 +741,7 @@ const layerSourceMap = {
     '岸段-注记': 'importantBank',
     '水闸工程': 'sluiceArea',
     '枢纽工程': 'combineProjectPoint',
-    '长江沙洲': 'sandBar',
+    '长江沙洲': 'riverBeach',
     '已建通道': 'channel',
     '在建通道': 'channel',
     '规划通道': 'channel'

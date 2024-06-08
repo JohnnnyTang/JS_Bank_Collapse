@@ -6,6 +6,14 @@ import { loadImage } from '../../utils/mapUtils'
 
 
 ///// const
+const riverBridgeAssist = {
+    "type": "FeatureCollection",
+    "name": "过江通道辅助线",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { "type": "Feature", "properties": { "id": 43, "plan": 0, "name": "北沿江过江通道-虚线", "if_important": 1, "fid": null, "bridge_type": null, "construct_date": null }, "geometry": { "type": "MultiLineString", "coordinates": [[[121.495151599315932, 31.74474021579098, 0.0], [121.493928810374456, 31.742840513250599, 0.0], [121.492181847135569, 31.73979025997599, 0.0], [121.490268506445332, 31.736712277126131, 0.0], [121.487994681277257, 31.733190621072691, 0.0], [121.487329171471941, 31.732469652116922, 0.0], [121.48583177441003, 31.730473122700829, 0.0], [121.484417566073731, 31.72855978201039, 0.0], [121.483225194339269, 31.726979196222654, 0.0], [121.481866445153429, 31.725121314682667, 0.0], [121.480285859365864, 31.723013866965683, 0.0], [121.478594355277338, 31.720629123496447, 0.0], [121.476764203312811, 31.71802254342542, 0.0], [121.47515588795001, 31.715998284434139, 0.0], [121.473381195135815, 31.713447163513546, 0.0], [121.47202244594996, 31.71164474112399, 0.0], [121.470247753135865, 31.709315456805228, 0.0], [121.468694896923466, 31.707235738663464, 0.0], [121.46766890264027, 31.705766071176598, 0.0], [121.466670637932339, 31.704435051565866, 0.0], [121.465478266197863, 31.703048572804704, 0.0], [121.461152452463196, 31.700996584238272, 0.0], [121.452944498197425, 31.69711444370725, 0.0], [121.428542472001965, 31.685357103813217, 0.0], [121.40608151607195, 31.674542569476724, 0.0], [121.38140219412422, 31.662618852131359, 0.0], [121.37768643104441, 31.660733241016281, 0.0], [121.374968932672658, 31.659845894609219, 0.0], [121.372374711548176, 31.65878363561816, 0.0]]] } }
+    ]
+}
 const layers = [
     '地形瓦片',
     '河段划分',
@@ -1307,8 +1315,6 @@ const layerAddFunctionMap = {
                         13,
                         1,
                     ],
-                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
-                    'text-halo-width': 5.0,
                 },
             })
     },
@@ -1839,6 +1845,25 @@ const layerAddFunctionMap = {
                 },
             })
     },
+    '过江通道辅助线': async (map) => {
+        !map.getSource('riverBridgeAssist') &&
+            map.addSource('riverBridgeAssist', {
+                type: 'geojson',
+                data: riverBridgeAssist,
+            })
+        !map.getLayer('riverBridgeAssist') &&
+            map.addLayer({
+                id: 'riverBridgeAssist',
+                type: 'line',
+                source: 'riverBridgeAssist',
+                layout: {
+                },
+                paint: {
+                    'line-color': '#ff0303',
+                    'line-dasharray': [4, 10],
+                }
+            })
+    },
     // '过江通道-注记': async (map) => {
     //     !map.getSource('channelLine') &&
     //         map.addSource('channelLine', {
@@ -1913,8 +1938,7 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    'text-offset': [0, 1.0],
-                    // 'text-anchor': 'center',
+                    'text-variable-anchor': ["bottom", "top", "left", "right"],
                     'text-size': 18,
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                 },
@@ -1956,7 +1980,7 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    'text-offset': [0, 1.0],
+                    'text-variable-anchor': ["bottom", "top", "left", "right"],
                     // 'text-anchor': 'bottom',
                     'text-size': 18,
 
@@ -2000,7 +2024,7 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    'text-offset': [0, 1],
+                    'text-variable-anchor': ["bottom", "top", "left", "right"],
                     // 'text-anchor': 'bottom',
                     'text-size': 17,
 
@@ -2242,6 +2266,7 @@ const layerAddFunctionMap = {
             source: 'sluiceArea-center',
             filter: ['==', 'if_important', 1],
             minzoom: 8,
+            maxzoom: 14,
             layout: {
                 'icon-image': '水闸',
                 "icon-size": 0.2,
@@ -2277,7 +2302,7 @@ const layerAddFunctionMap = {
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, 0.5],
                     'text-size': 21,
-                    'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                 },
                 paint: {
                     "text-color": "rgba(73, 83, 92,1.0)",
@@ -2302,6 +2327,7 @@ const layerAddFunctionMap = {
                 source: 'sluiceArea-center',
                 filter: ['==', 'if_important', 0],
                 minzoom: 11,
+                maxzoom: 14,
                 layout: {
                     'icon-image': '水闸',
                     "icon-size": 0.18,
@@ -2348,22 +2374,21 @@ const layerAddFunctionMap = {
             })
     },
 
-    '水闸工程-面': async (map) => {
+    '大中型水闸-面': async (map) => {
         !map.getSource('sluiceArea') &&
             map.addSource('sluiceArea', {
                 type: 'vector',
                 tiles: [
-                    tileServer + '/tile/vector/sluiceArea/{x}/{y}/{z}',
+                    tileServer + '/tile/vector/sluiceArea/{x}/{y}/{z}'
                 ],
             })
-        !map.getLayer('水闸工程-面') &&
+        !map.getLayer('大中型水闸-面') &&
             map.addLayer({
-                id: '水闸工程-面',
+                id: '大中型水闸-面',
                 type: 'fill',
+                filter: ['==', 'if_important', 1],
                 source: 'sluiceArea',
                 'source-layer': 'default',
-                minzoom: 12,
-                maxzoom: 22,
                 layout: {
                 },
                 paint: {
@@ -2371,7 +2396,28 @@ const layerAddFunctionMap = {
                 },
             })
     },
-
+    '其他水闸-面': async (map) => {
+        !map.getSource('sluiceArea') &&
+            map.addSource('sluiceArea', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/sluiceArea/{x}/{y}/{z}'
+                ],
+            })
+        !map.getLayer('其他水闸-面') &&
+            map.addLayer({
+                id: '其他水闸-面',
+                type: 'fill',
+                filter: ['==', 'if_important', 0],
+                source: 'sluiceArea',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': 'rgb(255,0,0)',
+                },
+            })
+    },
 
 
     泵站工程: async (map) => {
@@ -2472,7 +2518,17 @@ const layerAddFunctionMap = {
                 maxzoom: 22,
                 layout: {
                     'icon-image': '泵站',
-                    'icon-size': 1.1,
+                    'icon-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 1.0],
+                        10,
+                        ['literal', 1.2],
+                        13,
+                        ['literal', 1.8],
+                    ],
                     'icon-allow-overlap': true,
                 },
                 paint: {
@@ -2531,7 +2587,7 @@ const layerAddFunctionMap = {
                 minzoom: 11,
                 layout: {
                     'icon-image': '泵站',
-                    'icon-size': 0.9,
+                    'icon-size': 1.5,
                     'icon-allow-overlap': true,
                 },
                 paint: {
@@ -2716,6 +2772,8 @@ const layerAddFunctionMap = {
     },
 
     里程桩: async (map) => {
+        console.log('add 里程桩');
+
         !map.getSource('portEmbankmentPoint') &&
             map.addSource('portEmbankmentPoint', {
                 type: 'vector',
@@ -2731,18 +2789,18 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {},
                 paint: {
-                    'circle-color': 'rgb(222,222,1)',
+                    'circle-color': 'rgb(34,38,42)',
                     'circle-blur': 0.5,
                     'circle-radius': [
                         'interpolate',
                         ['linear'],
                         ['zoom'],
                         7,
-                        ['literal', 0.5],
-                        10,
                         ['literal', 1],
-                        13,
-                        ['literal', 1.5],
+                        10,
+                        ['literal', 3],
+                        12,
+                        ['literal', 5],
                     ],
                     'circle-opacity': 0.5
                 },
@@ -3398,6 +3456,8 @@ const initSortedLayer = async (map) => {
     await layerAddFunction(map, '市级行政区')// 全程展示
     await layerAddFunction(map, '沿江码头')// 全程展示
     await layerAddFunction(map, '水库大坝')// 全程展示
+    await layerInitFunction(map, '大中型水闸-面')
+    await layerInitFunction(map, '其他水闸-面')
 
     // 线
     await layerAddFunction(map, '长江干堤')// 全程
@@ -3412,6 +3472,7 @@ const initSortedLayer = async (map) => {
     await layerAddFunction(map, '重点行政区边界')// 全程
 
     // 点
+    await layerAddFunction(map, '里程桩')
     await layerInitFunction(map, '水文站点')// 分类
     await layerInitFunction(map, '大中型水闸')// 全程展示
     await layerInitFunction(map, '其他水闸')// 缩放展示  level2 
@@ -3421,6 +3482,7 @@ const initSortedLayer = async (map) => {
     await layerAddFunction(map, '行政点')
 
     // 注记
+    await layerAddFunction(map, '里程桩-注记')
     await layerAddFunction(map, '大型湖泊-注记')
     await layerAddFunction(map, '区域性骨干河道-注记')
     await layerAddFunction(map, '流域性河道-注记')
@@ -3450,14 +3512,14 @@ const initSortedLayer = async (map) => {
 }
 
 const initTextLayer = async (map) => {
-    await layerInitFunction(map, '大型湖泊')// 全程展示
-    await layerInitFunction(map, '区域性骨干河道')// 全程展示
-    await layerInitFunction(map, '流域性河道')// 全程展
-    await layerInitFunction(map, '洲滩')// 全程展示
-    await layerInitFunction(map, '其他河道')// 缩放展示  level2 
-    await layerInitFunction(map, '市级行政区')// 全程展示
-    await layerInitFunction(map, '沿江码头')// 全程展示
-    await layerInitFunction(map, '水库大坝')// 全程展示
+    // await layerInitFunction(map, '大型湖泊')// 全程展示
+    // await layerInitFunction(map, '区域性骨干河道')// 全程展示
+    // await layerInitFunction(map, '流域性河道')// 全程展
+    // await layerInitFunction(map, '洲滩')// 全程展示
+    // await layerInitFunction(map, '其他河道')// 缩放展示  level2 
+    // await layerInitFunction(map, '市级行政区')// 全程展示
+    // await layerInitFunction(map, '沿江码头')// 全程展示
+    // await layerInitFunction(map, '水库大坝')// 全程展示
 
     // 线
     await layerAddFunction(map, '长江干堤')// 全程
@@ -3471,7 +3533,8 @@ const initTextLayer = async (map) => {
     await layerInitFunction(map, '规划通道')// 缩放
     await layerAddFunction(map, '重点行政区边界')// 全程
 
-    // 点
+    // 点 
+    // await layerAddFunction(map, '里程桩')
     await layerInitFunction(map, '水文站点')// 分类
     await layerInitFunction(map, '大中型水闸')// 全程展示
     await layerInitFunction(map, '其他水闸')// 缩放展示  level2 
@@ -3481,6 +3544,7 @@ const initTextLayer = async (map) => {
     await layerAddFunction(map, '行政点')
 
     // 注记
+    // await layerAddFunction(map, '里程桩-注记')
     await layerAddFunction(map, '大型湖泊-注记')
     await layerAddFunction(map, '区域性骨干河道-注记')
     await layerAddFunction(map, '流域性河道-注记')

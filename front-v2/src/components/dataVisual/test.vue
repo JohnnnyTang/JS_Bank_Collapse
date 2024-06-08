@@ -3,6 +3,11 @@
         <div class="map" ref="mapDom" id="map"></div>
         <canvas id="GPUFrame" class="GPU"></canvas>
         <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas>
+
+        <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
+        opacity: 0.9; width: 8vw; height: 4vh; z-index: 999; color: aliceblue;">
+            <span style="font-weight: 600;">{{ realtimeZoom }}</span>
+        </div>
     </div>
 </template>
 
@@ -22,7 +27,7 @@ import * as customLayers from '../../utils/WebGL/customLayers'
 const mapDom = ref()
 const unityCanvaDom = ref()
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
-
+const realtimeZoom = ref(0)
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
@@ -44,64 +49,89 @@ onMounted(async () => {
     mapFlyToRiver(map)
     // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
 
+    map.on('zoom', () => {
+        realtimeZoom.value = map.getZoom()
+    });
 
-    // !map.getSource('sluiceArea-center') &&
-    //     map.addSource('sluiceArea-center', {
-    //         type: 'vector',
-    //         tiles: [
-    //             tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
-    //         ],
-    //     })
-    // loadImage(map, '/legend/水闸.png', '水闸')
 
-    // map.addLayer({
-    //     id: '大中型水闸',
-    //     type: 'symbol',
-    //     'source-layer': 'default',
-    //     source: 'sluiceArea-center',
-    //     filter: ['==', 'if_important', 1],
-    //     minzoom: 8,
-    //     layout: {
-    //         'icon-image': '水闸',
-    //         "icon-size": 0.2,
-    //         'icon-allow-overlap': true,
-    //         'icon-rotate': ['get', 'rotation_angle']
-    //     },
-    //     paint: {
-    //         'icon-opacity': 1.0,
-    //     },
-    // })
-    !map.getSource('sluiceArea') &&
-        map.addSource('sluiceArea', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
+
+    ///////////  BANK TEST
+    map.addSource('bank-test', {
+        type: 'geojson',
+        data: banktest
+    })
+    map.addLayer({
+        id: '一级预警岸段',
+        type: 'line',
+        source: 'bank-test',
+        layout: {
+            'line-join': 'round',
+        },
+        filter: ['==', 'warning_level', 1],
+        paint: {
+            'line-color': '#ff0303',
+            'line-width': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                7,
+                ['literal', 2],
+                10,
+                ['literal', 5],
+                13,
+                ['literal', 7],
             ],
-        })
-    !map.getLayer('大中型水闸-注记') &&
-        map.addLayer({
-            id: '大中型水闸-注记',
-            type: 'symbol',
-            source: 'sluiceArea',
-            'source-layer': 'default',
-            filter: ['==', 'if_important', 1],
-            minzoom: 10,
-            layout: {
-                'text-field': ['get', 'sp_name'],
-                'text-font': [
-                    'Open Sans Semibold',
-                ],
-                'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
-                'text-offset': [0, 0.5],
-                'text-size': 21,
-                'text-allow-overlap': true,
-            },
-            paint: {
-                "text-color": "rgba(73, 83, 92,1.0)",
-                'text-halo-color': "rgba(255, 255, 255, 1.0)",
-                'text-halo-width': 2.0,
-            },
-        })
+        },
+    })
+    map.addLayer({
+        id: '一级预警岸段-注记',
+        type: 'symbol',
+        source: 'bank-test',
+        filter: ['==', 'warning_level', 1],
+        layout: {
+            'text-field': ['get', 'bank_name'],
+            'text-font': [
+                'Open Sans Semibold',
+                'Arial Unicode MS Bold',
+            ],
+            // 'symbol-placement': 'point',
+            'symbol-placement': 'line-center',
+            // 'text-offset': [0.0, 1.0],
+            'text-variable-anchor': ["top", "bottom", "center", "left", "right"],
+            'text-size': 21,
+            // 'text-padding': 0.0,
+            // 'text-writing-mode': ['vertical', 'horizontal'],
+            "text-allow-overlap": false,
+            'text-ignore-placement': true
+        },
+        paint: {
+            'text-color': '#2e0201',
+            'text-halo-color': "rgba(255, 255, 255, 1.0)",
+            'text-halo-width': 3.0,
+        },
+    })
+
+
+
+    await layerAddFunction(map, '已建通道')
+    await layerAddFunction(map, '在建通道')
+    await layerAddFunction(map, '规划通道')
+    await layerAddFunction(map, '已建通道-注记')
+    await layerAddFunction(map, '在建通道-注记')
+    await layerAddFunction(map, '规划通道-注记')
+
+    await layerAddFunction(map, '过江通道辅助线')
+
+
+    /////////// 水闸缩放
+    // await layerAddFunction(map,'水闸工程-面')
+    // await layerAddFunction(map, '大中型水闸')
+    // await layerAddFunction(map, '大中型水闸-注记')
+    // await layerAddFunction(map, '其他水闸')
+    // await layerAddFunction(map, '其他水闸-注记')
+
+
+
 
     // map.addSource('portEmbankmentPoint', {
     //     type: 'vector',
@@ -437,6 +467,9 @@ onMounted(async () => {
             console.log('wwwwwww');
             map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
         }
+        else if (e.key == '1') {
+            console.log(map.getZoom())
+        }
 
     })
 
@@ -542,6 +575,95 @@ const gj = {
 }
 
 
+const featureHighLight = (featureLayerid, map, featureName, property) => {
+
+    let layerId
+    let featureId
+    let featureLayer
+    let sourceid
+
+    if (featureLayerid.includes('通道')) {
+        // layerId = '过江通道-'
+        sourceid = property.source
+        layerId = (sourceid === 'riverPassagePolygon' ? '过江通道-桥' : '过江通道-隧道/通道')
+        featureId = featureName
+        featureLayer = map.getLayer(layerId)
+
+    } else {
+        layerId = featureLayerid
+        featureId = featureName
+        featureLayer = map.getLayer(layerId)
+        sourceid = featureLayer.source
+    }
+
+
+    emit('featureInfo', {
+        ogData: property,
+        sourceId: sourceid,
+        column: sourceColumnMap[sourceid]
+    })
+
+    let paintMap = {
+        'line': {
+            'line-color': '#FF5D06',
+            'line-width': 5,
+        },
+        'fill': {
+            'fill-color': '#FF5D06',
+            'fill-opacity': 0.8
+        },
+        'circle': {
+            'circle-color': '#FF5D06',
+            'circle-radius': 8,
+        },
+        'symbol': {
+
+        },
+        'fill-extrusion': {
+            'fill-extrusion-color': '#FF5D06',
+            'fill-extrusion-base': 200,
+            'fill-extrusion-height': 210,
+            'fill-extrusion-opacity': 1.0
+        }
+    }
+
+    // 1  add highlight layer
+    map.addLayer({
+        id: `${layerId}-highlight-${featureId}`,//自定义
+        type: featureLayer.type,
+        source: featureLayer.source,
+        'source-layer': featureLayer.sourceLayer,
+        filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
+        layout: {
+        },
+        paint: paintMap[featureLayer.type],
+    })
+
+    // 2  use expression  但不适用于现在的Map 还是用加图层的办法
+    // map.setPaintProperty(layerId, 'fill-color', [
+    //     'match',
+    //     ['get', sourceNameMap[sourceid]], // 获取要素的'name'属性
+    //     'featureName', ['literal', 'rgba(255, 0, 0, 1)'], // 如果'name'是'123'，则使用红色高亮
+    //     ['literal', map.getPaintProperty(layerId, 'fill-color')] // 否则保持原有样式
+    // ]);
+
+
+    let lng = property.center_x
+    let lat = property.center_y
+    map.flyTo({
+        center: [lng, lat],
+        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10,
+        duration: 3500
+    });
+
+    highlightLayer.value.push(`${layerId}-highlight-${featureId}`)
+    useHighlightLayerStore().highlightLayers = highlightLayer.value;
+    // setTimeout(() => {
+    //     if (map.getLayer(`${layerId}-highlight-${featureId}`))
+    //         map.removeLayer(`${layerId}-highlight-${featureId}`)
+    // }, 3000)
+}
+
 
 
 const baseImageStyle = {
@@ -562,6 +684,16 @@ const baseImageStyle = {
             'minzoom': 1,
             'maxzoom': 14
         }
+    ]
+}
+
+
+const banktest = {
+    "type": "FeatureCollection",
+    "name": "单条岸段平滑测试",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { "type": "Feature", "properties": { "id": 48, "city_name": "苏州市", "river_name": "澄通河段", "bank_name": "段山港至越洋码头", "warning_level": 1, "monitoring_length": 16.0, "memo": "长防办12", "description": "段山港至越洋码头段属Ⅰ级崩岸预警段，监测长度约16km，沿江分布着海螺水泥码头、海力0~9号码头、沙洲电厂一期工程重件码头等29个码头，张家港互益染整有限公司取水口、江苏新芳纺织集团取水口、浦项取水口、张江港市给排水总公司取水口、江苏沙钢集团有限公司取水口、张家港沙洲电力有限公司取水口6个取水口。该段江岸自1924年至解放初，已有七个集镇坍入江中，最大崩坍达4.8km。", "state": "active", "create_time": "2024-01-25T14:05:12", "update_time": "2024-01-25T14:05:12", "if_important": 0, "fix_project": "自七十年代初起，至八十年代初，治理区域位于一干河以上段，以丁坝为主，共建丁坝11条（其中12号丁坝已于1972年5月16日塌失），护岸长度约计5.8km。八十年代后，随着上游河势的变化，老海坝段顶冲点也下移至九龙港以下，治理区域位于一干河至二干河，除了对已建丁坝工程不断维修加固外，新建护岸工程全部改成平顺抛石护岸，至八十年代中，完成平顺抛石护岸2.23km。自1991～1997年累计抛石21.63万t，1988年～1997年累计抛石40.70万t。1998年大水后完成了九龙港至十一圩抛石护岸工程，新建护岸长2km，1999～2013年沙钢集团沿江码头前沿对护岸区域进行加固维护，累计抛石约114万m3。为稳定浏海沙右岸顶冲点、水下岸坡，使水上的堤防工程与水下的防护工程形成完整的防洪体系，保障防洪安全，老海坝节点综合整治工程2014年开工建设，对沙钢海力9号至0号码头范围7.25km的近岸河床进行抛石加固，抛护宽宽165～255m不等，抛石量240万方，目前已全部完工。" }, "geometry": { "type": "LineString", "coordinates": [[120.535135296341295, 32.005954184474653], [120.547606348126905, 31.999653113460344], [120.562131147053137, 31.995886453810993], [120.5912157023037, 31.992582979686979], [120.608624486576247, 31.987785076792594], [120.614977993687759, 31.98858035760021], [120.617792064237847, 31.990275791409896], [120.628454070669861, 31.988624054347891], [120.650311183855464, 31.989594122146197], [120.660588658907969, 31.988842538086249], [120.663778521488027, 31.992207187656994], [120.688012737746988, 31.992679112531864], [120.701576208224452, 31.994400764390164]] } }
     ]
 }
 

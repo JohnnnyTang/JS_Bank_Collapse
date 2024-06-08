@@ -99,8 +99,8 @@ const initBaseMap = (ref) => {
             container: ref.id, // container ID
             accessToken:
                 'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-            style: getStyleJson4base(),
-            // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+            // style: getStyleJson4base(),
+            style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
             // style: getHighZoomStyleJson(),
             center: [120.312, 31.917], // starting position [lng, lat]
             maxZoom: 22,

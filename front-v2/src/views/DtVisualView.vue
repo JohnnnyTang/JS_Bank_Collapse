@@ -101,16 +101,18 @@
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"  v-click-out-side="detailClickOutSideHandler">
+        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+            v-click-out-side="detailClickOutSideHandler">
             <!-- v-click-out-side="() => showDetail = false" -->
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
                 @close="showDetail = false" @pin="pinHandler"></featDetail>
         </div>
 
         <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-            v-loading="false" v-click-out-side="() => showInfoPannel = false">
+            v-loading="false" v-click-out-side="listClickOutSideHandler">
             <div class="title-block">
                 <div class="title">{{ infoPannelTitle }}</div>
+                <div class="miniIcon" :style="iconBackStyle" @click="listPinState = !listPinState"></div>
             </div>
             <!-- <div class="close" @click="showInfoPannel = false; showDetail = false"></div> -->
             <div class="important-feature">
@@ -155,10 +157,10 @@
             </el-radio-group>
         </div>
 
-        <!-- <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
+        <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
         opacity: 0.5; width: 8vw; height: 4vh;">
             <span style="font-weight: 600;">{{ realtimeZoom }}</span>
-        </div> -->
+        </div>
     </div>
 </template>
 
@@ -238,33 +240,36 @@ const pannelLoading = ref(true)
 const baseMapRadio = ref(1)
 const dataSource = ref([])
 const detailPinState = ref(false)
+const listPinState = ref(false)
+const iconBackStyle = computed(() => {
+    return listPinState.value ? { backgroundImage: `url('/icons/pin.png')` } : { backgroundImage: `url('/icons/notPin.png')` }
+})
 
 const expandKey = ['重点岸段', '全江概貌']
 const infoTableData_filtered = computed(() => {
-    // return infoTableData.value.filter((item) => {
-    //     let nameField = sourceNameMap[nowSource]
-    //     return item['' + nameField].includes(search.value)
-    // })
+    let nameField = sourceNameMap[nowSource]
     if (nowSource == null || nowSource == undefined || nowSource == '') {
-        return infoTableData.value
+        return arrayDistinctByName(infoTableData.value, nameField)
     } else {
-
-        // return infoTableData.value
-        let nameField = sourceNameMap[nowSource]
-        return infoTableData.value.filter((item) => {
+        let filterRes = infoTableData.value.filter((item) => {
             return item['' + nameField].includes(search.value)
         })
+        return arrayDistinctByName(filterRes, sourceNameMap[nowSource])
     }
 })
 
 /////// 
-const pinHandler = ()=>{
-    console.log('PIN IT');
+const pinHandler = (pinState) => {
+    detailPinState.value = pinState
 }
-const detailClickOutSideHandler = ()=>{
-    if(detailPinState.value){
-        console.log('PIN IT');
-    
+const detailClickOutSideHandler = () => {
+    if (!detailPinState.value) {
+        showDetail.value = false
+    }
+}
+const listClickOutSideHandler = () => {
+    if (!listPinState.value) {
+        showInfoPannel.value = false
     }
 }
 
@@ -463,7 +468,6 @@ const layerGroupClickHandler = (node, data) => {
     }
 }
 
-
 const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -548,7 +552,7 @@ const baseMapChangeHandler = async () => {
 // }
 const detailClickHandler4Feature = async (a) => {
     let featInfo = a
-    // let nowSource = DICT.LGIDSourceMap[infoTableHeader.value.LGID]
+    console.log(nowSource, a)
     let newFeatInfomation = {
         ogData: featInfo,
         sourceId: nowSource,
@@ -556,24 +560,72 @@ const detailClickHandler4Feature = async (a) => {
     }
     featureInfo.value = newFeatInfomation
     // showDetail.value = true
+
     let map = mapStore.getMap()
-    // console.log(nowSource, newFeatInfomation, sourceZoomMap[nowSource]);
-    map.flyTo({
-        center: [featInfo.center_x, featInfo.center_y],
-        zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
-        speed: 1.5,
-        curve: 1,
-        easing(t) {
-            return t;
-        }
-    })
+    if (nowSource == 'riverBridge') {
+        let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
+        let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+        console.log(bbox);
+        map.fitBounds(bbox, {
+            padding: paddingMap[nowSource],
+            maxZoom: maxZoomMap[nowSource],
+        });
+    }
+    else if (nowSource == 'riverArea') {
+        // http://localhost:5173/api/tile/vector/river/riverArea/id/1/buffer/500/cj/bbox
+        // let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/buffer/15000/cj/bbox`)).data
+        let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
+        let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+        console.log(bbox);
+        // normal 
+        // [
+        //     [
+        //         119.58517674018994,
+        //         31.991127747096748
+        //     ],
+        //     [
+        //         119.80391823662946,
+        //         32.10813474748528
+        //     ]
+        // ]
+        // buffer
+        // [
+        //     [
+        //         119.79256487316853,
+        //         32.10047783029321
+        //     ],
+        //     [
+        //         119.81053117885092,
+        //         32.11569613390725
+        //     ]
+        // ]
+
+        map.fitBounds(bbox, {
+            padding: paddingMap[nowSource],
+            maxZoom: maxZoomMap[nowSource],
+        });
+    }
+    else if (nowSource == 'sluiceArea' || nowSource == 'pumpArea') {
+        // http://localhost:5173/api/tile/vector/pumpArea/id/1/buffer/500/cj/bbox
+        let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/buffer/1000/cj/bbox`)).data
+        let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+        console.log(bbox);
+        map.fitBounds(bbox, {
+            padding: paddingMap[nowSource],
+            maxZoom: maxZoomMap[nowSource],
+        });
+    }
+    else {
+        console.log('else')
+    }
 }
 
-const featureNodeClick = (node, data) => {
-
+const featureNodeClick = async (node, data) => {
+    // only bank and riverBeach
     let featInfo = data.property
     let lgId = data.lgId
     let nowSource = layerSourceMap[lgId]
+    console.log(nowSource, data)
     let newFeatInfomation = {
         ogData: featInfo,
         sourceId: nowSource,
@@ -581,20 +633,19 @@ const featureNodeClick = (node, data) => {
     }
     featureInfo.value = newFeatInfomation
     if (node.parent.data.label.includes('岸段')) {
-        console.log('hello');
         showDetail.value = true
+        console.log(lgId, featInfo.id)
+        featureHighLight(lgId, mapStore.getMap(), featInfo.id)
     }
 
+    let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${data.property.id}/info/bbox`)).data
+    let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+
     let map = mapStore.getMap()
-    map.flyTo({
-        center: [featInfo.center_x, featInfo.center_y],
-        zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
-        speed: 1.0,
-        curve: 1,
-        easing(t) {
-            return t;
-        }
-    })
+    map.fitBounds(bbox, {
+        padding: paddingMap[nowSource],
+        maxZoom: maxZoomMap[nowSource],
+    });
 }
 
 // methods
@@ -633,7 +684,6 @@ const prepareMap = async () => {
 
 
     mapInstance.on('zoom', () => {
-        console.log('A zoom event occurred.');
         realtimeZoom.value = mapInstance.getZoom()
     });
 
@@ -756,11 +806,118 @@ const sideBarClickHandler = (node, data) => {
         }
     }
 }
+const featureHighLight = (featureLayerid, map, featureId) => {
+
+
+    let featureLayer = map.getLayer(featureLayerid)
+    console.log(featureLayer);
+
+    let sourceid = featureLayer.source
+    let layoutMap = {
+        'line': {
+
+        },
+        'fill': {
+
+        },
+        'circle': {
+
+        },
+        'symbol': {
+            "icon-size": 3.0
+        },
+    }
+    let paintMap = {
+        'line': {
+            'line-color': '#FF5D06',
+            'line-width': 5,
+        },
+        'fill': {
+            'fill-color': '#FF5D06',
+            'fill-opacity': 0.8
+        },
+        'circle': {
+            'circle-color': '#FF5D06',
+            'circle-radius': 8,
+        },
+        'symbol': {
+
+        },
+    }
+
+    // 1  add highlight layer
+    map.addLayer({
+        id: `${featureLayerid}-highlight-${featureId}`,//自定义
+        type: featureLayer.type,
+        source: featureLayer.source,
+        'source-layer': featureLayer.sourceLayer,
+        filter: ['==', ['get', 'id'], featureId],//自定义
+        layout: layoutMap[featureLayer.type],
+        paint: paintMap[featureLayer.type],
+    })
+
+    // 2  use expression  但不适用于现在的Map 还是用加图层的办法
+    // map.setPaintProperty(layerId, 'fill-color', [
+    //     'match',
+    //     ['get', sourceNameMap[sourceid]], // 获取要素的'name'属性
+    //     'featureName', ['literal', 'rgba(255, 0, 0, 1)'], // 如果'name'是'123'，则使用红色高亮
+    //     ['literal', map.getPaintProperty(layerId, 'fill-color')] // 否则保持原有样式
+    // ]);
+
+
+
+    // highlightLayer.value.push(`${layerId}-highlight-${featureId}`)
+    // useHighlightLayerStore().highlightLayers = highlightLayer.value;
+    setTimeout(() => {
+        if (map.getLayer(`${featureLayerid}-highlight-${featureId}`))
+            map.removeLayer(`${featureLayerid}-highlight-${featureId}`)
+    }, 5000)
+
+
+}
+
+const arrayDistinct = (arr) => {
+    return arr.filter((item, index) => {
+        return arr.indexOf(item) === index
+    })
+}
+
+
+const arrayDistinctByName = (tempArr, nameField) => {
+    let result = [];
+    let obj = {};
+    for (let i = 0; i < tempArr.length; i++) {
+        if (!obj[tempArr[i][nameField]]) {
+            result.push(tempArr[i]);
+            obj[tempArr[i][nameField]] = true;
+        };
+    };
+    return result;
+}
 
 onUnmounted(async () => {
     mapStore.getMap().remove()
     mapStore.destroyMap()
 })
+
+/////////////  BBOX MAP
+const paddingMap = {
+    'importantBank': { top: 50, bottom: 0, left: 300, right: 300 },
+    'riverBeach': { top: 50, bottom: 0, left: 300, right: 300 },
+    'riverBridge': { top: 150, bottom: 50, left: 100, right: 100 },
+    'riverArea': { top: 150, bottom: 50, left: 100, right: 100 },
+    'sluiceArea': {},
+    'pumpArea': {},
+}
+
+const maxZoomMap = {
+    'importantBank': 14,
+    'riverBeach': 13,
+    'riverBridge': 14,
+    'riverArea': 22,
+    'sluiceArea': 14,
+    'pumpArea': 14
+}
 
 </script>
 
@@ -1238,6 +1395,21 @@ onUnmounted(async () => {
                 font-weight: 600;
                 color: #e3f4ff;
                 text-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
+            }
+
+            div.miniIcon {
+                position: absolute;
+                right: 0.5vw;
+                top: 1vh;
+                width: 2.3vh;
+                height: 2.3vh;
+                // background-image: url('/icons/pin.png');
+                background-size: contain;
+                background-repeat: no-repeat;
+
+                &:hover {
+                    cursor: pointer;
+                }
             }
         }
 
