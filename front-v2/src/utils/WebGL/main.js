@@ -18,7 +18,7 @@ mapDiv.style.zIndex = '500 !important'
 mapDiv.style.background = 'transparent !important'
 mapDiv.id = 'map'
 document.body.appendChild(mapDiv)
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+// const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 
 scr.StartDash().then(() => {
 

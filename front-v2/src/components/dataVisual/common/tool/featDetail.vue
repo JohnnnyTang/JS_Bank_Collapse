@@ -4,7 +4,8 @@
 
         <div class="bankDesc" v-if="props.sourceId === 'importantBank'">
             <el-descriptions class="margin-top" :title="props.ogData['bank_name'] + '--' + level + '级预警'" :column="3"
-                border>
+            :class="{'smallFont':(props.ogData['bank_name'] + '--' + level + '级预警').length>15}"    
+            border>
                 <el-descriptions-item align="center">
                     <template #label>
                         <div class="cell-item">
@@ -275,17 +276,16 @@ onMounted(() => {
 
     .margin-top {
         box-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
-
         :deep(.el-descriptions__header) {
             justify-content: center;
             margin: 0;
             padding-top: 1vh;
             padding-bottom: 1vh;
             background-color: rgb(20, 115, 196);
-            font-family: Arial, Helvetica, sans-serif
+            font-family: Arial, Helvetica, sans-serif;
+
         }
     }
-
     :deep(.el-descriptions__header) {
         height: 3vh;
         border: #4f81ff solid 1px;
@@ -293,8 +293,6 @@ onMounted(() => {
         &:hover {
             cursor: move;
         }
-
-
         .el-descriptions__title {
             position: relative;
             width: fit-content;
@@ -306,6 +304,14 @@ onMounted(() => {
             font-weight: bold;
             color: #e3f4ff;
             text-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
+        }
+    }
+    .smallFont{
+        :deep(.el-descriptions__header) {
+
+            .el-descriptions__title {
+                font-size: calc(0.6vw + 0.6vh);
+            }
         }
     }
 

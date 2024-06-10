@@ -53,74 +53,77 @@ onMounted(async () => {
         realtimeZoom.value = map.getZoom()
     });
 
+    await layerAddFunction(map, '洲滩-边界')
+
+    // console.log('tileserver', tileServer)
 
 
     ///////////  BANK TEST
-    map.addSource('bank-test', {
-        type: 'geojson',
-        data: banktest
-    })
-    map.addLayer({
-        id: '一级预警岸段',
-        type: 'line',
-        source: 'bank-test',
-        layout: {
-            'line-join': 'round',
-        },
-        filter: ['==', 'warning_level', 1],
-        paint: {
-            'line-color': '#ff0303',
-            'line-width': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                7,
-                ['literal', 2],
-                10,
-                ['literal', 5],
-                13,
-                ['literal', 7],
-            ],
-        },
-    })
-    map.addLayer({
-        id: '一级预警岸段-注记',
-        type: 'symbol',
-        source: 'bank-test',
-        filter: ['==', 'warning_level', 1],
-        layout: {
-            'text-field': ['get', 'bank_name'],
-            'text-font': [
-                'Open Sans Semibold',
-                'Arial Unicode MS Bold',
-            ],
-            // 'symbol-placement': 'point',
-            'symbol-placement': 'line-center',
-            // 'text-offset': [0.0, 1.0],
-            'text-variable-anchor': ["top", "bottom", "center", "left", "right"],
-            'text-size': 21,
-            // 'text-padding': 0.0,
-            // 'text-writing-mode': ['vertical', 'horizontal'],
-            "text-allow-overlap": false,
-            'text-ignore-placement': true
-        },
-        paint: {
-            'text-color': '#2e0201',
-            'text-halo-color': "rgba(255, 255, 255, 1.0)",
-            'text-halo-width': 3.0,
-        },
-    })
+    // map.addSource('bank-test', {
+    //     type: 'geojson',
+    //     data: banktest
+    // })
+    // map.addLayer({
+    //     id: '一级预警岸段',
+    //     type: 'line',
+    //     source: 'bank-test',
+    //     layout: {
+    //         'line-join': 'round',
+    //     },
+    //     filter: ['==', 'warning_level', 1],
+    //     paint: {
+    //         'line-color': '#ff0303',
+    //         'line-width': [
+    //             'interpolate',
+    //             ['linear'],
+    //             ['zoom'],
+    //             7,
+    //             ['literal', 2],
+    //             10,
+    //             ['literal', 5],
+    //             13,
+    //             ['literal', 7],
+    //         ],
+    //     },
+    // })
+    // map.addLayer({
+    //     id: '一级预警岸段-注记',
+    //     type: 'symbol',
+    //     source: 'bank-test',
+    //     filter: ['==', 'warning_level', 1],
+    //     layout: {
+    //         'text-field': ['get', 'bank_name'],
+    //         'text-font': [
+    //             'Open Sans Semibold',
+    //             'Arial Unicode MS Bold',
+    //         ],
+    //         // 'symbol-placement': 'point',
+    //         'symbol-placement': 'line-center',
+    //         // 'text-offset': [0.0, 1.0],
+    //         'text-variable-anchor': ["top", "bottom", "center", "left", "right"],
+    //         'text-size': 21,
+    //         // 'text-padding': 0.0,
+    //         // 'text-writing-mode': ['vertical', 'horizontal'],
+    //         "text-allow-overlap": false,
+    //         'text-ignore-placement': true
+    //     },
+    //     paint: {
+    //         'text-color': '#2e0201',
+    //         'text-halo-color': "rgba(255, 255, 255, 1.0)",
+    //         'text-halo-width': 3.0,
+    //     },
+    // })
 
 
 
-    await layerAddFunction(map, '已建通道')
-    await layerAddFunction(map, '在建通道')
-    await layerAddFunction(map, '规划通道')
-    await layerAddFunction(map, '已建通道-注记')
-    await layerAddFunction(map, '在建通道-注记')
-    await layerAddFunction(map, '规划通道-注记')
+    // await layerAddFunction(map, '已建通道')
+    // await layerAddFunction(map, '在建通道')
+    // await layerAddFunction(map, '规划通道')
+    // await layerAddFunction(map, '已建通道-注记')
+    // await layerAddFunction(map, '在建通道-注记')
+    // await layerAddFunction(map, '规划通道-注记')
 
-    await layerAddFunction(map, '过江通道辅助线')
+    // await layerAddFunction(map, '过江通道辅助线')
 
 
     /////////// 水闸缩放
@@ -132,36 +135,37 @@ onMounted(async () => {
 
 
 
+    // console.log(tileServer + '/tile/vector/portEmbankmentPoint/')
+    // const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    map.addSource('portEmbankmentPoint', {
+        type: 'vector',
+        tiles: [
+            tileServer + '/tile/vector/portEmbankmentPoint/{x}/{y}/{z}',
+        ],
+    })
 
-    // map.addSource('portEmbankmentPoint', {
-    //     type: 'vector',
-    //     tiles: [
-    //         tileServer + '/tile/vector/portEmbankmentPoint/{x}/{y}/{z}',
-    //     ],
-    // })
-
-    // map.addLayer({
-    //     id: '里程桩',
-    //     type: 'circle',
-    //     source: 'portEmbankmentPoint',
-    //     'source-layer': 'default',
-    //     filter: ['==', 'if_important', 1],
-    //     layout: {},
-    //     paint: {
-    //         'circle-color': 'rgb(222,1,1)',
-    //         'circle-radius': [
-    //             'interpolate',
-    //             ['linear'],
-    //             ['zoom'],
-    //             7,
-    //             ['literal', 1],
-    //             10,
-    //             ['literal', 3],
-    //             12,
-    //             ['literal', 5],
-    //         ],
-    //     },
-    // })
+    map.addLayer({
+        id: '里程桩',
+        type: 'circle',
+        source: 'portEmbankmentPoint',
+        'source-layer': 'default',
+        filter: ['==', 'if_important', 1],
+        layout: {},
+        paint: {
+            'circle-color': 'rgb(222,1,1)',
+            'circle-radius': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                7,
+                ['literal', 1],
+                10,
+                ['literal', 3],
+                12,
+                ['literal', 5],
+            ],
+        },
+    })
     // map.addLayer({
     //     id: '里程桩-注记',
     //     type: 'symbol',
@@ -666,26 +670,26 @@ const featureHighLight = (featureLayerid, map, featureName, property) => {
 
 
 
-const baseImageStyle = {
-    // local img
-    'version': 8,
-    'sources': {
-        'raster-tiles': {
-            'type': 'raster',
-            'tiles': [tileServer + '/tile/raster/image/base/{x}/{y}/{z}'],
-            'tileSize': 256,
-        }
-    },
-    'layers': [
-        {
-            'id': 'simple-tiles',
-            'type': 'raster',
-            'source': 'raster-tiles',
-            'minzoom': 1,
-            'maxzoom': 14
-        }
-    ]
-}
+// const baseImageStyle = {
+//     // local img
+//     'version': 8,
+//     'sources': {
+//         'raster-tiles': {
+//             'type': 'raster',
+//             'tiles': [tileServer + '/tile/raster/image/base/{x}/{y}/{z}'],
+//             'tileSize': 256,
+//         }
+//     },
+//     'layers': [
+//         {
+//             'id': 'simple-tiles',
+//             'type': 'raster',
+//             'source': 'raster-tiles',
+//             'minzoom': 1,
+//             'maxzoom': 14
+//         }
+//     ]
+// }
 
 
 const banktest = {

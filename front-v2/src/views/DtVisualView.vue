@@ -53,14 +53,14 @@
                                     <div class="feature-container"
                                         v-else-if="data.type == 'feature' && node.parent.data.label.includes('岸段')"
                                         @click="featureNodeClick(node, data)">
-                                        <div class="feature-content">
+                                        <div class="feature-content" :class="{ smaller: data.label.length > 10 }">
                                             {{ data.label }}
                                         </div>
                                     </div>
                                     <div class="feature-container"
                                         v-else-if="data.type == 'feature' && node.parent.data.label.includes('沙洲')"
                                         @click="featureNodeClick(node, data)">
-                                        <div class="feature-content">
+                                        <div class="feature-content" :class="{ smaller: data.label.length > 10 }">
                                             <div>{{ data.label }}</div>
                                             <el-icon v-if="node.data.property['洲滩信息_人口活动'] == '2'"
                                                 style="margin-left: 0.6vw;">
@@ -248,14 +248,21 @@ const iconBackStyle = computed(() => {
 const expandKey = ['重点岸段', '全江概貌']
 const infoTableData_filtered = computed(() => {
     let nameField = sourceNameMap[nowSource]
+    let res
     if (nowSource == null || nowSource == undefined || nowSource == '') {
-        return arrayDistinctByName(infoTableData.value, nameField)
+        res = arrayDistinctByName(infoTableData.value, nameField)
+
     } else {
         let filterRes = infoTableData.value.filter((item) => {
-            return item['' + nameField].includes(search.value)
+            if (item['' + nameField].includes(search.value) &&
+                item['' + nameField] !== "长江")
+                return true
+            return false
         })
-        return arrayDistinctByName(filterRes, sourceNameMap[nowSource])
+        res = arrayDistinctByName(filterRes, sourceNameMap[nowSource])
     }
+
+    return res
 })
 
 /////// 
@@ -470,7 +477,6 @@ const layerGroupClickHandler = (node, data) => {
 
 const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
     if (baseMapRadio.value == 0) {
         map.setStyle(getImageStyleJson())
         map.addSource('mapRaster22', {
@@ -565,11 +571,32 @@ const detailClickHandler4Feature = async (a) => {
     if (nowSource == 'riverBridge') {
         let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
         let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
-        console.log(bbox);
+        console.log(bbox)
         map.fitBounds(bbox, {
             padding: paddingMap[nowSource],
             maxZoom: maxZoomMap[nowSource],
-        });
+        })
+        // const colorMap = {
+        //     '1': 'rgb(162,212,235)',
+        //     '0': 'rgb(247,132,9)',
+        //     '-1': 'rgb(85,112,125)',
+        // }
+        // !map.getLayer(nowSource + '-' + featInfo.id) &&
+        //     map.addLayer({
+        //         id: nowSource + '-' + featInfo.id,
+        //         type: 'line',
+        //         source: nowSource,
+        //         'source-layer': 'default',
+        //         filter: ['==', "id", featInfo.id],
+        //         layout: {},
+        //         paint: {
+        //             'line-color': '#FF0000',
+        //             'line-opacity': 0.3,
+        //         },
+        //     })
+        // setTimeout(() => {
+        //     map.removeLayer(nowSource + '-' + featInfo.id)
+        // }, 5000)
     }
     else if (nowSource == 'riverArea') {
         // http://localhost:5173/api/tile/vector/river/riverArea/id/1/buffer/500/cj/bbox
@@ -577,33 +604,31 @@ const detailClickHandler4Feature = async (a) => {
         let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
         let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
         console.log(bbox);
-        // normal 
-        // [
-        //     [
-        //         119.58517674018994,
-        //         31.991127747096748
-        //     ],
-        //     [
-        //         119.80391823662946,
-        //         32.10813474748528
-        //     ]
-        // ]
-        // buffer
-        // [
-        //     [
-        //         119.79256487316853,
-        //         32.10047783029321
-        //     ],
-        //     [
-        //         119.81053117885092,
-        //         32.11569613390725
-        //     ]
-        // ]
-
         map.fitBounds(bbox, {
             padding: paddingMap[nowSource],
             maxZoom: maxZoomMap[nowSource],
         });
+
+        !map.getLayer(nowSource + '-' + featInfo.id) &&
+            map.addLayer({
+                id: nowSource + '-' + featInfo.id,
+                type: 'fill',
+                source: nowSource,
+                'source-layer': 'default',
+                filter: ['==', "id", featInfo.id],
+                layout: {},
+                paint: {
+                    'fill-color': '#FF0000',
+                    'fill-opacity': 0.3,
+                },
+            })
+        // map.setPaintProperty(nowSource + '-' + featInfo.id, 'fill-opacity', 0.3)
+
+        setTimeout(() => {
+            map.removeLayer(nowSource + '-' + featInfo.id)
+        }, 5000)
+
+
     }
     else if (nowSource == 'sluiceArea' || nowSource == 'pumpArea') {
         // http://localhost:5173/api/tile/vector/pumpArea/id/1/buffer/500/cj/bbox
@@ -614,6 +639,23 @@ const detailClickHandler4Feature = async (a) => {
             padding: paddingMap[nowSource],
             maxZoom: maxZoomMap[nowSource],
         });
+
+        const colorMap = {
+            'sluiceArea': '#FF0000',
+            'pumpArea': '#0000FF',
+        }
+
+        // Set marker options.
+        const marker = new mapboxgl.Marker({
+            color: colorMap[nowSource],
+            draggable: true
+        }).setLngLat([featInfo.center_x, featInfo.center_y])
+            .addTo(map);
+
+        setTimeout(() => {
+            marker.remove()
+        }, 5000)
+
     }
     else {
         console.log('else')
@@ -626,16 +668,22 @@ const featureNodeClick = async (node, data) => {
     let lgId = data.lgId
     let nowSource = layerSourceMap[lgId]
     console.log(nowSource, data)
-    let newFeatInfomation = {
-        ogData: featInfo,
-        sourceId: nowSource,
-        column: sourceColumnMap[nowSource],
-    }
-    featureInfo.value = newFeatInfomation
+    // let newFeatInfomation = {
+    //     ogData: featInfo,
+    //     sourceId: nowSource,
+    //     column: sourceColumnMap[nowSource],
+    // }
+    // featureInfo.value = newFeatInfomation
     if (node.parent.data.label.includes('岸段')) {
         showDetail.value = true
-        console.log(lgId, featInfo.id)
-        featureHighLight(lgId, mapStore.getMap(), featInfo.id)
+        const featureDetailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
+        // console.log(lgId, featureDetailInfo)
+        featureInfo.value = {
+            ogData: featureDetailInfo,
+            sourceId: nowSource,
+            column: sourceColumnMap[nowSource],
+        }
+        // featureHighLight(lgId, mapStore.getMap(), featInfo.id)
     }
 
     let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${data.property.id}/info/bbox`)).data
@@ -646,9 +694,36 @@ const featureNodeClick = async (node, data) => {
         padding: paddingMap[nowSource],
         maxZoom: maxZoomMap[nowSource],
     });
+
+    ////////highlight
+    if (nowSource == 'riverBeach') {
+        !map.getSource('riverBeachLine') &&
+            map.addSource('riverBeachLine', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverBeachLine/{x}/{y}/{z}'],
+            })
+        !map.getLayer(nowSource + '-' + featInfo.id,) &&
+            map.addLayer({
+                id: nowSource + '-' + featInfo.id,
+                type: 'line',
+                source: 'riverBeachLine',
+                'source-layer': 'default',
+                filter: ['==', "id", featInfo.id],
+                layout: {
+                },
+                paint: {
+                    'line-color': 'rgb(240, 0, 0)',
+                    'line-width': 3.0,
+                    'line-opacity': 0.3,
+                    'line-dasharray': [5, 3],
+                },
+            })
+        setTimeout(() => {
+            map.removeLayer(nowSource + '-' + featInfo.id)
+        }, 5000)
+    }
 }
 
-// methods
 const toolClick = (i) => {
     if (i == 1) { //zoom
         mapFlyToRiver(mapStore.getMap())
@@ -697,8 +772,8 @@ onMounted(async () => {
     //////////add legend
     legendList.value = legendListt
     dataSource.value = await getSideBarTree()
-
     sideBarLoading.value = false
+    console.log('side bar tree ok')
 
 
 
@@ -1235,6 +1310,10 @@ const maxZoomMap = {
                         display: flex;
                         flex-direction: row;
                         align-items: center;
+                    }
+
+                    .smaller {
+                        font-size: calc(0.4vw + 0.5vh);
                     }
                 }
             }

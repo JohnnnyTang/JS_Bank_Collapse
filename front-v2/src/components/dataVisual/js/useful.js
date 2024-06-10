@@ -245,6 +245,8 @@ const getSideBarTree = async () => {
             w3.push({ label: item['bank_name'], active: false, type: 'feature', property: item, 'lgId': '三级预警岸段' })
         }
     }
+
+
     // debugger
     w1.sort((a, b) => {
         return bank1Sort.indexOf(a.label) - bank1Sort.indexOf(b.label);
@@ -287,6 +289,7 @@ const getSideBarTree = async () => {
     zt.forEach((item) => {
         mainZt.children.push({ label: item.name, active: false, type: 'feature', property: item, 'lgId': '长江沙洲' })
     })
+    console.log('11111')
 
     let quyushuixi = {
         label: '骨干河道',
@@ -410,7 +413,7 @@ const getSideBarTree = async () => {
             dock,
         ],
     }
-
+    console.log('22222')
 
     let tree = [
         importantBank,
