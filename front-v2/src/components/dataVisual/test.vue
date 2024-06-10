@@ -52,8 +52,85 @@ onMounted(async () => {
     map.on('zoom', () => {
         realtimeZoom.value = map.getZoom()
     });
+    /////  影像底图
+    map.addSource('mapRaster22', {
+        type: 'raster',
+        tiles: [
+            tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+        ],
+        tileSize: 256,
+        minzoom: 1,
+        maxzoom: 14,
+        bounds: [
+            118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+            32.835981186719593,
+        ],
+    })
+    map.addLayer({
+        id: 'ras',
+        type: 'raster',
+        source: 'mapRaster22',
+    })
 
-    await layerAddFunction(map, '洲滩-边界')
+    // 线
+    await layerAddFunction(map, '长江干堤-影像')// 全程
+    await layerAddFunction(map, '河道分段-影像')// max
+    await layerAddFunction(map, '一级预警岸段')// 缩放
+    await layerAddFunction(map, '二级预警岸段')// 缩放
+    await layerAddFunction(map, '三级预警岸段')// 缩放
+
+    // await layerAddFunction(map, '已建通道')// 缩放
+    // await layerAddFunction(map, '在建通道')// 缩放
+    // await layerAddFunction(map, '规划通道')// 缩放
+    await layerAddFunction(map, '重点行政区边界')// 全程
+
+    // // 点 
+    await layerAddFunction(map, '里程桩')
+    // await layerAddFunction(map, '水文站点')// 分类
+    // await layerAddFunction(map, '大中型水闸')// 全程展示
+    // await layerAddFunction(map, '其他水闸')// 缩放展示  level2 
+    // await layerAddFunction(map, '大中型泵站')
+    // await layerAddFunction(map, '其他泵站')
+    // await layerAddFunction(map, '河道分段点-影像')
+    // await layerAddFunction(map, '行政点')
+
+    // // 注记
+    await layerAddFunction(map, '里程桩-影像-注记')
+    // await layerAddFunction(map, '大型湖泊-注记')
+    // await layerAddFunction(map, '区域性骨干河道-注记')
+    // await layerAddFunction(map, '流域性河道-注记')
+    // await layerAddFunction(map, '其他河道-注记')
+    // await layerAddFunction(map, '沿江码头-注记')
+    // await layerAddFunction(map, '水库大坝-注记')
+    // await layerAddFunction(map, '洲滩-注记')
+    // await layerAddFunction(map, '行政点-注记')
+
+
+    // await layerAddFunction(map, '一级岸段-注记')
+    // await layerAddFunction(map, '二级岸段-注记')
+    // await layerAddFunction(map, '三级岸段-注记')
+    // await layerAddFunction(map, '已建通道-注记')
+    // await layerAddFunction(map, '在建通道-注记')
+    // await layerAddFunction(map, '规划通道-注记')
+    // await layerAddFunction(map, '水文站点-注记')
+    // await layerAddFunction(map, '大中型水闸-注记')
+    // await layerAddFunction(map, '其他水闸-注记')
+    // await layerAddFunction(map, '大中型泵站-注记')
+    // await layerAddFunction(map, '其他泵站-注记')
+
+    await layerAddFunction(map, '河道分段-注记')
+    // await layerAddFunction(map, '河道分段点-注记')
+
+    // await layerAddFunction(map, '一级预警岸段-注记')
+
+
+
+
+
+
+
+
+    // await layerAddFunction(map, '洲滩-边界')
 
     // console.log('tileserver', tileServer)
 
@@ -137,35 +214,35 @@ onMounted(async () => {
 
     // console.log(tileServer + '/tile/vector/portEmbankmentPoint/')
     // const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
-    map.addSource('portEmbankmentPoint', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/portEmbankmentPoint/{x}/{y}/{z}',
-        ],
-    })
+    // map.addSource('portEmbankmentPoint', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/portEmbankmentPoint/{x}/{y}/{z}',
+    //     ],
+    // })
 
-    map.addLayer({
-        id: '里程桩',
-        type: 'circle',
-        source: 'portEmbankmentPoint',
-        'source-layer': 'default',
-        filter: ['==', 'if_important', 1],
-        layout: {},
-        paint: {
-            'circle-color': 'rgb(222,1,1)',
-            'circle-radius': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                7,
-                ['literal', 1],
-                10,
-                ['literal', 3],
-                12,
-                ['literal', 5],
-            ],
-        },
-    })
+    // map.addLayer({
+    //     id: '里程桩',
+    //     type: 'circle',
+    //     source: 'portEmbankmentPoint',
+    //     'source-layer': 'default',
+    //     filter: ['==', 'if_important', 1],
+    //     layout: {},
+    //     paint: {
+    //         'circle-color': 'rgb(222,1,1)',
+    //         'circle-radius': [
+    //             'interpolate',
+    //             ['linear'],
+    //             ['zoom'],
+    //             7,
+    //             ['literal', 1],
+    //             10,
+    //             ['literal', 3],
+    //             12,
+    //             ['literal', 5],
+    //         ],
+    //     },
+    // })
     // map.addLayer({
     //     id: '里程桩-注记',
     //     type: 'symbol',

@@ -478,31 +478,59 @@ const layerGroupClickHandler = (node, data) => {
 const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
     if (baseMapRadio.value == 0) {
+        // map.once('style.load', async () => {
+        //     map.addSource('mapRaster22', {
+        //         type: 'raster',
+        //         tiles: [
+        //             tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+        //         ],
+        //         tileSize: 256,
+        //         minzoom: 1,
+        //         maxzoom: 14,
+        //         bounds: [
+        //             118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+        //             32.835981186719593,
+        //         ],
+        //     })
+        //     map.addLayer({
+        //         id: 'ras',
+        //         type: 'raster',
+        //         source: 'mapRaster22',
+        //     })
+        //     await initTextLayer(map)
+        // })
         map.setStyle(getImageStyleJson())
-        map.addSource('mapRaster22', {
-            type: 'raster',
-            tiles: [
-                tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
-            ],
-            tileSize: 256,
-            minzoom: 1,
-            maxzoom: 14,
-            bounds: [
-                118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
-                32.835981186719593,
-            ],
-        })
-        map.addLayer({
-            id: 'ras',
-            type: 'raster',
-            source: 'mapRaster22',
-        })
-        // await initSortedLayer(map)
-        await initTextLayer(map)
-    } else {
-        map.setStyle(getStyleJson4base())
-        await initSortedLayer(map)
 
+        setTimeout(() => {
+            map.addSource('mapRaster22', {
+                type: 'raster',
+                tiles: [
+                    tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+                ],
+                tileSize: 256,
+                minzoom: 1,
+                maxzoom: 14,
+                bounds: [
+                    118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+                    32.835981186719593,
+                ],
+            })
+            map.addLayer({
+                id: 'ras',
+                type: 'raster',
+                source: 'mapRaster22',
+            })
+            initTextLayer(map)
+        }, 500)
+    } else {
+        // map.once('style.load', async () => {
+        //     await initSortedLayer(map)
+        // })
+        map.setStyle(getStyleJson4base())
+
+        setTimeout(() => {
+            initSortedLayer(map)
+        }, 500);
 
     }
 }
@@ -761,6 +789,33 @@ const prepareMap = async () => {
     mapInstance.on('zoom', () => {
         realtimeZoom.value = mapInstance.getZoom()
     });
+    // mapInstance.on('style.load', async () => {
+    //     console.log('style load')
+    //     if (baseMapRadio.value == 0) {
+    //         mapInstance.addSource('mapRaster22', {
+    //             type: 'raster',
+    //             tiles: [
+    //                 tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+    //             ],
+    //             tileSize: 256,
+    //             minzoom: 1,
+    //             maxzoom: 14,
+    //             bounds: [
+    //                 118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+    //                 32.835981186719593,
+    //             ],
+    //         })
+    //         mapInstance.addLayer({
+    //             id: 'ras',
+    //             type: 'raster',
+    //             source: 'mapRaster22',
+    //         })
+    //         await initTextLayer(mapInstance)
+    //     }
+    //     else {
+    //         await initSortedLayer(mapInstance)
+    //     }
+    // })
 
     return mapInstance
 }

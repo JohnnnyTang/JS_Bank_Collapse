@@ -864,6 +864,50 @@ const layerAddFunctionMap = {
                 }
             })
     },
+    '河道分段-影像': async (map) => {
+        let nameLists = ['南京河段', '镇扬河段', '澄通河段', '扬中河段', '河口段',]
+        let boldLineLists = ['assist2', ...nameLists]
+        !map.getSource('river_division_line') &&
+            map.addSource('river_division_line', {
+                // type: 'geojson',
+                // data: river_division_line
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/riverSplitLine/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('河道分段-影像') &&
+            map.addLayer({
+                id: '河道分段-影像',
+                type: 'line',
+                minzoom: 8,
+                maxzoom: 11,
+                source: 'river_division_line',
+                'source-layer': 'default',
+                paint: {
+                    'line-color': 'rgb(220, 220, 220)',
+                    'line-width': [
+                        'case',
+                        ["in", ["get", "name"], ["literal", boldLineLists]],
+                        4.0,
+                        2.0
+                    ],
+                    'line-blur': [
+                        'case',
+                        ["in", ["get", "name"], ["literal", nameLists]],
+                        0.0,
+                        1.0
+                    ],
+                    "line-dasharray": [
+                        'match',
+                        ["get", "name"],
+                        'assist',
+                        [3, 1],
+                        [1, 0],
+                    ]
+                }
+            })
+    },
 
     河道分段点: async (map) => {
         !map.getSource('river_division_point') &&
@@ -876,6 +920,30 @@ const layerAddFunctionMap = {
                 ],
             })
         !map.getLayer('河道分段点') &&
+            map.addLayer({
+                id: '河道分段点',
+                type: 'circle',
+                source: 'river_division_point',
+                'source-layer': 'default',
+                minzoom: 7,
+                maxzoom: 14,
+                paint: {
+                    'circle-color': 'rgb(35,46,71)',
+                    'circle-radius': 7.0,
+                }
+            })
+    },
+    '河道分段点-影像': async (map) => {
+        !map.getSource('river_division_point') &&
+            map.addSource('river_division_point', {
+                // type: 'geojson',
+                // data: river_division_point
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/center/riverSplitPoint/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('河道分段点-影像') &&
             map.addLayer({
                 id: '河道分段点',
                 type: 'circle',
@@ -2758,6 +2826,51 @@ const layerAddFunctionMap = {
         })
 
     },
+    '长江干堤-影像': async (map) => {
+        !map.getSource('riverBankLine') &&
+            map.addSource('riverBankLine', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverBankLine/{x}/{y}/{z}'],
+            })
+        await loadImage(map, '/legend/堤防-影像.png', '堤防2')
+        !map.getLayer('长江干堤-影像') &&
+            map.addLayer({
+                id: '长江干堤-影像',
+                type: 'line',
+                source: 'riverBankLine',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-pattern': '堤防2',
+                    'line-width': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 1.0],
+                        10,
+                        ['literal', 3.0],
+                        13,
+                        ['literal', 6.0],
+                    ],
+                    'line-opacity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7,
+                        ['literal', 0.5],
+                        10,
+                        ['literal', 0.7],
+                        13,
+                        ['literal', 1.0],
+                    ],
+                },
+            })
+
+    },
     重点行政区边界: async (map) => {
         !map.getSource('igov-bound') &&
             map.addSource('igov-bound', {
@@ -2861,6 +2974,40 @@ const layerAddFunctionMap = {
                     'text-color': 'rgb(88,88,88)',
                     'text-halo-color': "rgba(255, 255, 255, 1.0)",
                     'text-halo-width': 0.5,
+                },
+            })
+    },
+    '里程桩-影像-注记': async (map) => {
+        !map.getSource('portEmbankmentPoint') &&
+            map.addSource('portEmbankmentPoint', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/portEmbankmentPoint/{x}/{y}/{z}',
+                ],
+            })
+        !map.getLayer('里程桩-影像-注记') &&
+            map.addLayer({
+                id: '里程桩-影像-注记',
+                type: 'symbol',
+                source: 'portEmbankmentPoint',
+                'source-layer': 'default',
+                minzoom: 12,
+                filter: ['==', 'if_important', 1],
+                layout: {
+                    'text-field': ['get', 'name2'],
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    'text-variable-anchor': ["left", "right", "top", "bottom", "center"],
+                    'text-allow-overlap': false,
+                    'text-size': 15,
+                    'text-offset': [0.3, 0]
+                },
+                paint: {
+                    'text-color': 'rgb(108,108,108)',
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 1,
                 },
             })
     },
