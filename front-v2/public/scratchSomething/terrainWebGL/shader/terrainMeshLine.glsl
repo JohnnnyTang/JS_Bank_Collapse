@@ -22,6 +22,7 @@ uniform vec2 centerHigh;
 uniform vec4 tileBox;
 uniform vec2 sectorRange;
 uniform float sectorSize;
+uniform float maxLodLevel;
 uniform float exaggeration;
 
 out float vDepth;
@@ -100,7 +101,20 @@ ivec2 indexToUV(usampler2D texture, int index) {
     return ivec2(x, y);
 }
 
-vec2 centering(int triangleID) {
+vec2 calculateIncenter(vec2 A, vec2 B, vec2 C) {
+
+    float a = length(B - C);
+    float b = length(A - C);
+    float c = length(A - B);
+    float sum = a + b + c;
+
+    float x_i = (a * A.x + b * B.x + c * C.x) / sum;
+    float y_i = (a * A.y + b * B.y + c * C.y) / sum;
+
+    return vec2(x_i, y_i);
+}
+
+vec2 centering(int triangleID, float level) {
     
     int v1ID = triangleID * 3 + 0;
     int v2ID = triangleID * 3 + 1;
@@ -114,7 +128,15 @@ vec2 centering(int triangleID) {
     vec2 v2 = texelFetch(positionsTexture, indexToUV(positionsTexture, v2Index), 0).rg;
     vec2 v3 = texelFetch(positionsTexture, indexToUV(positionsTexture, v3Index), 0).rg;
 
-    return (v1 + v2 + v3) / 3.0;
+    vec2 dir21 = normalize(v2 - v1);
+    vec2 dir31 = normalize(v3 - v1);
+    float dis = 1.0 / sectorSize / pow(2.0, maxLodLevel - level);
+    vec2 _v2 = v1 + dir21 * dis;
+    vec2 _v3 = v1 + dir31 * dis;
+
+    // return (v1 + v2 + v3) / 3.0;
+    // return v1 + (dir21 + dir31) * dis / 3.0;
+    return calculateIncenter(v1, _v2, _v3);
 }
 
 float stitching(float coord, float minVal, float delta, float edge) {
@@ -127,12 +149,13 @@ float stitching(float coord, float minVal, float delta, float edge) {
 void main() {
     int triangleID = gl_VertexID / 6;
     int vertexID = triangleID * 3 + (gl_VertexID - triangleID * 6) % 3;
-    
+
+    float level = float(texelFetch(levelTexture, ivec2(gl_InstanceID, 0), 0).r);
     int index = int(texelFetch(indicesTexture, indexToUV(indicesTexture, vertexID), 0).r);
     float x = texelFetch(positionsTexture, indexToUV(positionsTexture, index), 0).r;
     float y = texelFetch(positionsTexture, indexToUV(positionsTexture, index), 0).g;
 
-    vec2 center = centering(triangleID);
+    vec2 center = centering(triangleID, level);
     vec4 nodeBox = texelFetch(boxTexture, ivec2(gl_InstanceID, 0), 0);
 
     vec2 coord = vec2(
@@ -143,6 +166,13 @@ void main() {
         mix(nodeBox[0], nodeBox[2], center.x),
         clamp(mix(nodeBox[1], nodeBox[3], center.y), -85.0, 85.0)
     );
+
+    // centeroidCoord = vec2(
+    //     nodeBox[0] + floor((coord.x - nodeBox[0]) / sectorRange.x) * sectorRange.x + 0.5 * sectorRange.x,
+    //     nodeBox[1] + floor((coord.y - nodeBox[1]) / sectorRange.y) * sectorRange.y + 0.5 * sectorRange.y
+    // );
+
+    // centeroidCoord = coord;
 
     vec2 lodDim = vec2(textureSize(dLodMap, 0)) - vec2(1.0);
     vec2 lodUV = vec2(
@@ -164,15 +194,21 @@ void main() {
 
     if ((coord.x == nodeBox.x || coord.x == nodeBox.z)) {
         float dVertical = (coord.x == nodeBox.x) ? W : E;
-        offset.y = stitching(coord.y, nodeBox.y, deltaXY.y, dVertical);
+        // offset.y = stitching(coord.y, nodeBox.y, deltaXY.y, dVertical);
+
+        float interval = deltaXY.y * pow(2.0, dVertical);
+        coord.y = nodeBox[3] - interval * floor((nodeBox[3] - coord.y) / interval);
     }
 
     if ((coord.y == nodeBox.y || coord.y == nodeBox.w)) {
         float dHorizontal = (coord.y == nodeBox.y) ? N : S;
-        offset.x = stitching(coord.x, nodeBox.x, deltaXY.x, dHorizontal);
+        // offset.x = stitching(coord.x, nodeBox.x, deltaXY.x, dHorizontal);
+
+        float interval = deltaXY.x * pow(2.0, dHorizontal);
+        coord.x  = nodeBox[0] + interval * floor((coord.x - nodeBox[0]) / interval);
     }
 
-    coord += offset;
+    // coord += offset;
     vec2 uv = calcUVFromCoord(coord);
     vec2 dim = vec2(textureSize(demTexture, 0));
 
@@ -182,7 +218,8 @@ void main() {
 
     gl_Position = positionCS(coord, z);
     // vDepth = (elevation - e.x) / (e.y - e.x);
-    vIndex = float(texelFetch(levelTexture, ivec2(gl_InstanceID, 0), 0).r);
+    vIndex = level;
+    vIndex = float(dLevels);
 }
 
 #endif

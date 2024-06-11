@@ -3,12 +3,12 @@
         <div class="sideBar">
             <dv-border-box9>
                 <div class="sideBar-container">
-                    <dv-decoration-11 style="width:75%;height: 6.5vh;">
+                    <!-- <dv-decoration-11 style="width:75%;height: 6.5vh;">
                         <div class="title-text">
                             综合数据专题
                         </div>
                     </dv-decoration-11>
-                    <hr class="hr_gradient">
+                    <hr class="hr_gradient"> -->
                     <div class="scenes-tree-container" v-loading="sideBarLoading">
                         <el-tree style="max-width: 400px" :data="dataSource" :expand-on-click-node="false" node-key="label"
                             :default-expanded-keys="expandKey">
@@ -26,7 +26,10 @@
                                         <el-switch v-model="data.active" :active-action-icon="View"
                                             :inactive-action-icon="Hide" size="large" @change="viewChange(node, data)" />
                                     </div>
-                                    <div class="subScene-container" v-else-if="data.type == 'title2'">
+
+
+                                    <div class="subScene-container"
+                                        v-else-if="data.type == 'title2' || data.type == 'title3'">
                                         <div class="card" :class="{ active: data.active }">
                                             <div class="top-section" @click="treeNodeClickHandler(node, data)">
                                                 <div class="title">
@@ -35,27 +38,29 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- <el-switch v-model="data.active" :active-action-icon="View"
-                                                class="subScene-switch" :inactive-action-icon="Hide" size="small"
-                                                style="margin-top: 0.8vh;"
-                                                @change="viewChange(node, data)" /> -->
+                                            <div class="detail-icon">
+                                                <el-button type="info" :icon="List" circle size="large"
+                                                    @click="layerGroupClickHandler(node, data)" v-show="!(node.parent.data.label.includes('岸段') ||
+                                                        node.parent.data.label.includes('其他') ||
+                                                        data.label.includes('其他') ||
+                                                        data.label.includes('过江通道') ||
+                                                        data.label.includes('沿江码头'))" />
+                                            </div>
                                         </div>
-                                        <el-button type="info" :icon="List" circle size="large"
-                                            @click="layerGroupClickHandler(node, data)"
-                                            v-show="!(node.parent.data.label.includes('岸段') || node.parent.data.label.includes('其他'))" />
+
 
                                     </div>
                                     <div class="feature-container"
                                         v-else-if="data.type == 'feature' && node.parent.data.label.includes('岸段')"
                                         @click="featureNodeClick(node, data)">
-                                        <div class="feature-content">
+                                        <div class="feature-content" :class="{ smaller: data.label.length > 10 }">
                                             {{ data.label }}
                                         </div>
                                     </div>
                                     <div class="feature-container"
                                         v-else-if="data.type == 'feature' && node.parent.data.label.includes('沙洲')"
                                         @click="featureNodeClick(node, data)">
-                                        <div class="feature-content">
+                                        <div class="feature-content" :class="{ smaller: data.label.length > 10 }">
                                             <div>{{ data.label }}</div>
                                             <el-icon v-if="node.data.property['洲滩信息_人口活动'] == '2'"
                                                 style="margin-left: 0.6vw;">
@@ -96,16 +101,18 @@
             <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
         </div>
 
-        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
+        <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+            v-click-out-side="detailClickOutSideHandler">
             <!-- v-click-out-side="() => showDetail = false" -->
             <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
-                @close="showDetail = false"></featDetail>
+                @close="showDetail = false" @pin="pinHandler"></featDetail>
         </div>
 
         <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-            v-loading="false" v-click-out-side="() => showInfoPannel = false">
+            v-loading="false" v-click-out-side="listClickOutSideHandler">
             <div class="title-block">
                 <div class="title">{{ infoPannelTitle }}</div>
+                <div class="miniIcon" :style="iconBackStyle" @click="listPinState = !listPinState"></div>
             </div>
             <!-- <div class="close" @click="showInfoPannel = false; showDetail = false"></div> -->
             <div class="important-feature">
@@ -149,6 +156,11 @@
                 <el-radio-button label="影像底图" value=0 />
             </el-radio-group>
         </div>
+
+        <!-- <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
+        opacity: 0.5; width: 8vw; height: 4vh;">
+            <span style="font-weight: 600;">{{ realtimeZoom }}</span>
+        </div> -->
     </div>
 </template>
 
@@ -167,7 +179,7 @@ import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapU
 import { scenes, layerGroups, LayerGroup, lableLayerMap } from '../components/dataVisual/js/SCENES';
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../store/mapStore';
 import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt, layerSourceMap, sourceNameMap } from '../components/dataVisual/js/tilefieldMAP';
-import { initSortedLayer } from '../components/dataVisual/layerUtil'
+import { initSortedLayer, initTextLayer } from '../components/dataVisual/layerUtil'
 import { getSideBarTree, showLayers, hideLayers, DICT } from '../components/dataVisual/js/useful'
 
 // data
@@ -187,6 +199,7 @@ const sideBarLoading = ref(true)
 const legendList = ref([])
 const infoPannelTitle = ref('')
 const search = ref('')
+const realtimeZoom = ref(0)
 var latestLGID = ''
 const waterTableData = [
     {
@@ -223,29 +236,92 @@ const waterTableData = [
 const infoTableData = ref([])
 const infoTableHeader = ref([])
 let nowSource
+let nowLayerGroup
 const pannelLoading = ref(true)
 const baseMapRadio = ref(1)
 const dataSource = ref([])
+const detailPinState = ref(false)
+const listPinState = ref(false)
+const iconBackStyle = computed(() => {
+    return listPinState.value ? { backgroundImage: `url('/icons/pin.png')` } : { backgroundImage: `url('/icons/notPin.png')` }
+})
 
 const expandKey = ['重点岸段', '全江概貌']
 const infoTableData_filtered = computed(() => {
-    // return infoTableData.value.filter((item) => {
-    //     let nameField = sourceNameMap[nowSource]
-    //     return item['' + nameField].includes(search.value)
-    // })
+    let nameField = sourceNameMap[nowSource]
+    let res
     if (nowSource == null || nowSource == undefined || nowSource == '') {
-        return infoTableData.value
-    } else {
+        res = arrayDistinctByName(infoTableData.value, nameField)
 
-        // return infoTableData.value
-        let nameField = sourceNameMap[nowSource]
-        return infoTableData.value.filter((item) => {
-            return item['' + nameField].includes(search.value)
+    } else {
+        let filterRes = infoTableData.value.filter((item) => {
+            if (item['' + nameField].includes(search.value) &&
+                item['' + nameField] !== "长江")
+                return true
+            return false
         })
+
+        res = arrayDistinctByName(filterRes, sourceNameMap[nowSource])
+
+        if (nowSource == 'riverArea') {
+            if (nowLayerGroup == '流域性骨干河道') {
+                console.log('sort11111', res)
+                res.sort(customSort1)
+            } else if (nowLayerGroup == '区域性骨干河道') {
+                console.log('sort22222', res)
+                res.sort(customSort2)
+            }
+        }
+        console.log('sorted!', res)
     }
+
+    return res
 })
 
+const liuyuxing = [
+    '滁河', '望虞河', '新孟河', '京杭运河白马湖-高宝湖长江区段', '泰州引江河', '秦淮河'
+]
+const quyuxing = [
+    '七浦塘', '白茆塘', '常浒河', '张家港', '锡澄运河', '九曲河', '白屈港', '杨林塘', '通扬运河', '澡港河', '德胜河', '焦港',
+    '九圩港', '划子口河', '岳子河', '朱家山河', '如海运河', '通吕运河', '十一圩港', '夏仕港', '娄江-浏河', '走马塘'
+]
+
+const customSort1 = (a, b) => {
+
+    let indexA = liuyuxing.indexOf(a.name);
+    let indexB = liuyuxing.indexOf(b.name);
+
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
+}
+const customSort2 = (a, b) => {
+
+    let indexA = quyuxing.indexOf(a.name);
+    let indexB = quyuxing.indexOf(b.name);
+
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
+}
+
+
 /////// 
+const pinHandler = (pinState) => {
+    detailPinState.value = pinState
+}
+const detailClickOutSideHandler = () => {
+    if (!detailPinState.value) {
+        showDetail.value = false
+    }
+}
+const listClickOutSideHandler = () => {
+    if (!listPinState.value) {
+        showInfoPannel.value = false
+    }
+}
 
 const viewChange = (node, data) => {
     const map = mapStore.getMap()
@@ -266,11 +342,22 @@ const viewChange = (node, data) => {
         let children = node.childNodes
         for (let i = 0; i < children.length; i++) {
             children[i].data.active = data.active
+            for (let j = 0; j < children[i].childNodes.length; j++) {
+                children[i].childNodes[j].data.active = data.active
+            }
         }
     }
     else if (data.type == 'title2') {
         data.active ? showLayers(map, DICT.T2LayerDict[data.label])
             : hideLayers(map, DICT.T2LayerDict[data.label])
+        let children = node.childNodes
+        for (let i = 0; i < children.length; i++) {
+            children[i].data.active = data.active
+        }
+    }
+    else if (data.type == 'title3') {
+        data.active ? showLayers(map, DICT.T3LayerDict[data.label])
+            : hideLayers(map, DICT.T3LayerDict[data.label])
     }
 }
 const treeNodeClickHandler = async (node, data) => {
@@ -279,11 +366,16 @@ const treeNodeClickHandler = async (node, data) => {
         data.active = !data.active
         viewChange(node, data)
     }
+    if (node.level == 3) {
+        data.active = !data.active
+        viewChange(node, data)
+    }
     // showTable
-
 }
 
 const layerGroupClickHandler = (node, data) => {
+    console.log('click!!', data.label)
+    nowLayerGroup = data.label
     const parentLabel = node.parent.data.label
     const totalData = node.parent.data.data
     infoPannelTitle.value = data.label
@@ -428,35 +520,62 @@ const layerGroupClickHandler = (node, data) => {
     }
 }
 
-
 const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
     if (baseMapRadio.value == 0) {
+        // map.once('style.load', async () => {
+        //     map.addSource('mapRaster22', {
+        //         type: 'raster',
+        //         tiles: [
+        //             tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+        //         ],
+        //         tileSize: 256,
+        //         minzoom: 1,
+        //         maxzoom: 14,
+        //         bounds: [
+        //             118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+        //             32.835981186719593,
+        //         ],
+        //     })
+        //     map.addLayer({
+        //         id: 'ras',
+        //         type: 'raster',
+        //         source: 'mapRaster22',
+        //     })
+        //     await initTextLayer(map)
+        // })
         map.setStyle(getImageStyleJson())
-        map.addSource('mapRaster22', {
-            type: 'raster',
-            tiles: [
-                tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
-            ],
-            tileSize: 256,
-            minzoom: 1,
-            maxzoom: 14,
-            bounds: [
-                118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
-                32.835981186719593,
-            ],
-        })
-        map.addLayer({
-            id: 'ras',
-            type: 'raster',
-            source: 'mapRaster22',
-        })
-        await initSortedLayer(map)
-    } else {
-        map.setStyle(getStyleJson4base())
-        await initSortedLayer(map)
 
+        setTimeout(() => {
+            map.addSource('mapRaster22', {
+                type: 'raster',
+                tiles: [
+                    tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+                ],
+                tileSize: 256,
+                minzoom: 1,
+                maxzoom: 14,
+                bounds: [
+                    118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+                    32.835981186719593,
+                ],
+            })
+            map.addLayer({
+                id: 'ras',
+                type: 'raster',
+                source: 'mapRaster22',
+            })
+            initTextLayer(map)
+        }, 500)
+    } else {
+        // map.once('style.load', async () => {
+        //     await initSortedLayer(map)
+        // })
+        map.setStyle(getStyleJson4base())
+
+        setTimeout(() => {
+            initSortedLayer(map)
+        }, 500);
 
     }
 }
@@ -512,52 +631,178 @@ const baseMapChangeHandler = async () => {
 // }
 const detailClickHandler4Feature = async (a) => {
     let featInfo = a
-    // let nowSource = DICT.LGIDSourceMap[infoTableHeader.value.LGID]
+    console.log(nowSource, a)
     let newFeatInfomation = {
         ogData: featInfo,
         sourceId: nowSource,
         column: DICT.sourceColumnMap[nowSource],
     }
     featureInfo.value = newFeatInfomation
-    showDetail.value = true
+    // showDetail.value = true
+
     let map = mapStore.getMap()
-    // console.log(nowSource, newFeatInfomation, sourceZoomMap[nowSource]);
-    map.flyTo({
-        center: [featInfo.center_x, featInfo.center_y],
-        zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
-        speed: 1.0,
-        curve: 1,
-        easing(t) {
-            return t;
+    if (nowSource == 'riverBridge') {
+        let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
+        let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+        console.log(bbox)
+        map.fitBounds(bbox, {
+            padding: paddingMap[nowSource],
+            maxZoom: maxZoomMap[nowSource],
+        })
+        // const colorMap = {
+        //     '1': 'rgb(162,212,235)',
+        //     '0': 'rgb(247,132,9)',
+        //     '-1': 'rgb(85,112,125)',
+        // }
+        // !map.getLayer(nowSource + '-' + featInfo.id) &&
+        //     map.addLayer({
+        //         id: nowSource + '-' + featInfo.id,
+        //         type: 'line',
+        //         source: nowSource,
+        //         'source-layer': 'default',
+        //         filter: ['==', "id", featInfo.id],
+        //         layout: {},
+        //         paint: {
+        //             'line-color': '#FF0000',
+        //             'line-opacity': 0.3,
+        //         },
+        //     })
+        // setTimeout(() => {
+        //     map.removeLayer(nowSource + '-' + featInfo.id)
+        // }, 5000)
+    }
+    else if (nowSource == 'riverArea') {
+        // http://localhost:5173/api/tile/vector/river/riverArea/id/1/buffer/500/cj/bbox
+        // let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/buffer/15000/cj/bbox`)).data
+        let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
+        let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+        console.log(bbox);
+        map.fitBounds(bbox, {
+            padding: paddingMap[nowSource],
+            maxZoom: maxZoomMap[nowSource],
+        });
+        !map.getSource(nowSource + '-' + featInfo.id) &&
+            !map.getSource('riverArea') &&
+            map.addSource('riverArea', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverArea/{x}/{y}/{z}'],
+            })
+
+        !map.getLayer(nowSource + '-' + featInfo.id) &&
+            map.addLayer({
+                id: nowSource + '-' + featInfo.id,
+                type: 'fill',
+                source: nowSource,
+                'source-layer': 'default',
+                filter: ['==', "id", featInfo.id],
+                layout: {},
+                paint: {
+                    'fill-color': '#FF0000',
+                    'fill-opacity': 0.3,
+                },
+            })
+        // map.setPaintProperty(nowSource + '-' + featInfo.id, 'fill-opacity', 0.3)
+
+        setTimeout(() => {
+            map.removeLayer(nowSource + '-' + featInfo.id)
+        }, 5000)
+
+
+    }
+    else if (nowSource == 'sluiceArea' || nowSource == 'pumpArea') {
+        // http://localhost:5173/api/tile/vector/pumpArea/id/1/buffer/500/cj/bbox
+        let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/buffer/1000/cj/bbox`)).data
+        let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+        console.log(bbox);
+        map.fitBounds(bbox, {
+            padding: paddingMap[nowSource],
+            maxZoom: maxZoomMap[nowSource],
+        });
+
+        const colorMap = {
+            'sluiceArea': '#FF0000',
+            'pumpArea': '#0000FF',
         }
-    })
+
+        // Set marker options.
+        const marker = new mapboxgl.Marker({
+            color: colorMap[nowSource],
+            draggable: true
+        }).setLngLat([featInfo.center_x, featInfo.center_y])
+            .addTo(map);
+
+        setTimeout(() => {
+            marker.remove()
+        }, 5000)
+
+    }
+    else {
+        console.log('else')
+    }
 }
 
-const featureNodeClick = (node, data) => {
-
+const featureNodeClick = async (node, data) => {
+    // only bank and riverBeach
     let featInfo = data.property
     let lgId = data.lgId
     let nowSource = layerSourceMap[lgId]
-    let newFeatInfomation = {
-        ogData: featInfo,
-        sourceId: nowSource,
-        column: sourceColumnMap[nowSource],
-    }
-    featureInfo.value = newFeatInfomation
-    showDetail.value = true
-    let map = mapStore.getMap()
-    map.flyTo({
-        center: [featInfo.center_x, featInfo.center_y],
-        zoom: sourceZoomMap[nowSource] ? sourceZoomMap[nowSource] : 10,
-        speed: 1.0,
-        curve: 1,
-        easing(t) {
-            return t;
+    console.log(nowSource, data)
+    // let newFeatInfomation = {
+    //     ogData: featInfo,
+    //     sourceId: nowSource,
+    //     column: sourceColumnMap[nowSource],
+    // }
+    // featureInfo.value = newFeatInfomation
+    if (node.parent.data.label.includes('岸段')) {
+        showDetail.value = true
+        const featureDetailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
+        // console.log(lgId, featureDetailInfo)
+        featureInfo.value = {
+            ogData: featureDetailInfo,
+            sourceId: nowSource,
+            column: sourceColumnMap[nowSource],
         }
-    })
+        // featureHighLight(lgId, mapStore.getMap(), featInfo.id)
+    }
+
+    let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${data.property.id}/info/bbox`)).data
+    let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
+
+    let map = mapStore.getMap()
+    map.fitBounds(bbox, {
+        padding: paddingMap[nowSource],
+        maxZoom: maxZoomMap[nowSource],
+    });
+
+    ////////highlight
+    if (nowSource == 'riverBeach') {
+        !map.getSource('riverBeachLine') &&
+            map.addSource('riverBeachLine', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverBeachLine/{x}/{y}/{z}'],
+            })
+        !map.getLayer(nowSource + '-' + featInfo.id,) &&
+            map.addLayer({
+                id: nowSource + '-' + featInfo.id,
+                type: 'line',
+                source: 'riverBeachLine',
+                'source-layer': 'default',
+                filter: ['==', "id", featInfo.id],
+                layout: {
+                },
+                paint: {
+                    'line-color': 'rgb(240, 0, 0)',
+                    'line-width': 3.0,
+                    'line-opacity': 0.5,
+                    'line-dasharray': [5, 3],
+                },
+            })
+        setTimeout(() => {
+            map.removeLayer(nowSource + '-' + featInfo.id)
+        }, 5000)
+    }
 }
 
-// methods
 const toolClick = (i) => {
     if (i == 1) { //zoom
         mapFlyToRiver(mapStore.getMap())
@@ -590,6 +835,39 @@ const prepareMap = async () => {
     mapInstance.touchZoomRotate.disableRotation()
     mapFlyToRiver(mapInstance)
     await initSortedLayer(mapInstance)
+
+
+    mapInstance.on('zoom', () => {
+        realtimeZoom.value = mapInstance.getZoom()
+    });
+    // mapInstance.on('style.load', async () => {
+    //     console.log('style load')
+    //     if (baseMapRadio.value == 0) {
+    //         mapInstance.addSource('mapRaster22', {
+    //             type: 'raster',
+    //             tiles: [
+    //                 tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+    //             ],
+    //             tileSize: 256,
+    //             minzoom: 1,
+    //             maxzoom: 14,
+    //             bounds: [
+    //                 118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+    //                 32.835981186719593,
+    //             ],
+    //         })
+    //         mapInstance.addLayer({
+    //             id: 'ras',
+    //             type: 'raster',
+    //             source: 'mapRaster22',
+    //         })
+    //         await initTextLayer(mapInstance)
+    //     }
+    //     else {
+    //         await initSortedLayer(mapInstance)
+    //     }
+    // })
+
     return mapInstance
 }
 
@@ -600,8 +878,8 @@ onMounted(async () => {
     //////////add legend
     legendList.value = legendListt
     dataSource.value = await getSideBarTree()
-
     sideBarLoading.value = false
+    console.log('side bar tree ok')
 
 
 
@@ -709,11 +987,118 @@ const sideBarClickHandler = (node, data) => {
         }
     }
 }
+const featureHighLight = (featureLayerid, map, featureId) => {
+
+
+    let featureLayer = map.getLayer(featureLayerid)
+    console.log(featureLayer);
+
+    let sourceid = featureLayer.source
+    let layoutMap = {
+        'line': {
+
+        },
+        'fill': {
+
+        },
+        'circle': {
+
+        },
+        'symbol': {
+            "icon-size": 3.0
+        },
+    }
+    let paintMap = {
+        'line': {
+            'line-color': '#FF5D06',
+            'line-width': 5,
+        },
+        'fill': {
+            'fill-color': '#FF5D06',
+            'fill-opacity': 0.8
+        },
+        'circle': {
+            'circle-color': '#FF5D06',
+            'circle-radius': 8,
+        },
+        'symbol': {
+
+        },
+    }
+
+    // 1  add highlight layer
+    map.addLayer({
+        id: `${featureLayerid}-highlight-${featureId}`,//自定义
+        type: featureLayer.type,
+        source: featureLayer.source,
+        'source-layer': featureLayer.sourceLayer,
+        filter: ['==', ['get', 'id'], featureId],//自定义
+        layout: layoutMap[featureLayer.type],
+        paint: paintMap[featureLayer.type],
+    })
+
+    // 2  use expression  但不适用于现在的Map 还是用加图层的办法
+    // map.setPaintProperty(layerId, 'fill-color', [
+    //     'match',
+    //     ['get', sourceNameMap[sourceid]], // 获取要素的'name'属性
+    //     'featureName', ['literal', 'rgba(255, 0, 0, 1)'], // 如果'name'是'123'，则使用红色高亮
+    //     ['literal', map.getPaintProperty(layerId, 'fill-color')] // 否则保持原有样式
+    // ]);
+
+
+
+    // highlightLayer.value.push(`${layerId}-highlight-${featureId}`)
+    // useHighlightLayerStore().highlightLayers = highlightLayer.value;
+    setTimeout(() => {
+        if (map.getLayer(`${featureLayerid}-highlight-${featureId}`))
+            map.removeLayer(`${featureLayerid}-highlight-${featureId}`)
+    }, 5000)
+
+
+}
+
+const arrayDistinct = (arr) => {
+    return arr.filter((item, index) => {
+        return arr.indexOf(item) === index
+    })
+}
+
+
+const arrayDistinctByName = (tempArr, nameField) => {
+    let result = [];
+    let obj = {};
+    for (let i = 0; i < tempArr.length; i++) {
+        if (!obj[tempArr[i][nameField]]) {
+            result.push(tempArr[i]);
+            obj[tempArr[i][nameField]] = true;
+        };
+    };
+    return result;
+}
 
 onUnmounted(async () => {
     mapStore.getMap().remove()
     mapStore.destroyMap()
 })
+
+/////////////  BBOX MAP
+const paddingMap = {
+    'importantBank': { top: 50, bottom: 0, left: 300, right: 300 },
+    'riverBeach': { top: 50, bottom: 0, left: 300, right: 300 },
+    'riverBridge': { top: 150, bottom: 50, left: 100, right: 100 },
+    'riverArea': { top: 150, bottom: 50, left: 100, right: 100 },
+    'sluiceArea': {},
+    'pumpArea': {},
+}
+
+const maxZoomMap = {
+    'importantBank': 14,
+    'riverBeach': 13,
+    'riverBridge': 14,
+    'riverArea': 22,
+    'sluiceArea': 14,
+    'pumpArea': 14
+}
 
 </script>
 
@@ -766,7 +1151,8 @@ onUnmounted(async () => {
             .scenes-tree-container {
                 position: relative;
                 width: 90%;
-                height: 80vh;
+                // height: 80vh;
+                height: 95%;
                 background-color: #f1fcff;
                 overflow-y: auto;
 
@@ -901,7 +1287,7 @@ onUnmounted(async () => {
                         transition: .3s linear;
 
                         &:hover {
-                            transform: scale(1.02);
+                            // transform: scale(1.02);
                             cursor: pointer;
                         }
 
@@ -963,8 +1349,18 @@ onUnmounted(async () => {
                                 .subScene-title-text {
                                     color: rgb(234, 244, 252);
                                 }
+
+
                             }
                         }
+
+                        .detail-icon {
+                            position: absolute;
+                            right: 1.5vw;
+                            top: 0.9vh;
+                            z-index: 100;
+                        }
+
                     }
 
 
@@ -992,7 +1388,7 @@ onUnmounted(async () => {
 
                             &:hover {
                                 cursor: pointer;
-                                transform: scale(1.05);
+                                // transform: scale(1.05);
                             }
                         }
                     }
@@ -1020,6 +1416,10 @@ onUnmounted(async () => {
                         display: flex;
                         flex-direction: row;
                         align-items: center;
+                    }
+
+                    .smaller {
+                        font-size: calc(0.4vw + 0.5vh);
                     }
                 }
             }
@@ -1180,6 +1580,21 @@ onUnmounted(async () => {
                 font-weight: 600;
                 color: #e3f4ff;
                 text-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
+            }
+
+            div.miniIcon {
+                position: absolute;
+                right: 0.5vw;
+                top: 1vh;
+                width: 2.3vh;
+                height: 2.3vh;
+                // background-image: url('/icons/pin.png');
+                background-size: contain;
+                background-repeat: no-repeat;
+
+                &:hover {
+                    cursor: pointer;
+                }
             }
         }
 
