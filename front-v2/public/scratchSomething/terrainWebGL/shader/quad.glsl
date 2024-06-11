@@ -66,6 +66,7 @@ void main() {
 
     // fragColor = vec4(alpha * alphaFactor);
     fragColor = vec4(max(alpha, alphaFactor));
+    // fragColor = vec4(0.5);
     // fragColor = vec4(0.12, 0.61, 0.84, 1.0);
 }
 

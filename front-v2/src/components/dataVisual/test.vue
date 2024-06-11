@@ -1,8 +1,8 @@
 <template>
     <div class="main">
         <div class="map" ref="mapDom" id="map"></div>
-        <canvas id="GPUFrame" class="GPU"></canvas>
-        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas>
+        <!-- <canvas id="GPUFrame" class="GPU"></canvas> -->
+        <!-- <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom"></canvas> -->
 
         <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
         opacity: 0.9; width: 8vw; height: 4vh; z-index: 999; color: aliceblue;">
@@ -12,16 +12,16 @@
 </template>
 
 <script setup>
-import { initMap, initScratchMap, loadImage, initPureScratchMap, initBaseMap } from '../../utils/mapUtils'
+import { initMap, loadImage, initPureScratchMap, initBaseMap } from '../../utils/mapUtils'
 import { onMounted, watch, ref, reactive } from 'vue'
 import axios from 'axios'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { getStyleJson4base } from '../../utils/mapUtils'
 import BankWarnLayer from './js/bankWarnLayer'
-import FlowFieldLayer from '../../utils/WebGL/notSimpleLayer'
 import { layerAddFunction, layerRemoveFunction } from './layerUtil'
-import * as customLayers from '../../utils/WebGL/customLayers'
+// import * as customLayers from '../../utils/WebGL/customLayers'
+import TerrainLayer from '../../utils/WebGL/terrainLayer'
+// import { ScratchMap } from '../../utils/WebGL/test'
 
 
 const mapDom = ref()
@@ -42,88 +42,118 @@ const mapFlyToRiver = (mapIns) => {
     )
 }
 
+//
 onMounted(async () => {
 
-    const map = await initMap(mapDom.value)
+    const map = await initPureScratchMap(mapDom.value)
 
-    mapFlyToRiver(map)
-    // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
+    // mapFlyToRiver(map)
+    // // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
 
-    map.on('zoom', () => {
-        realtimeZoom.value = map.getZoom()
-    });
-    /////  影像底图
-    map.addSource('mapRaster22', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
-        ],
-        tileSize: 256,
-        minzoom: 1,
-        maxzoom: 14,
-        bounds: [
-            118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
-            32.835981186719593,
-        ],
-    })
-    map.addLayer({
-        id: 'ras',
-        type: 'raster',
-        source: 'mapRaster22',
-    })
-
-    // 线
-    await layerAddFunction(map, '长江干堤-影像')// 全程
-    await layerAddFunction(map, '河道分段-影像')// max
-    await layerAddFunction(map, '一级预警岸段')// 缩放
-    await layerAddFunction(map, '二级预警岸段')// 缩放
-    await layerAddFunction(map, '三级预警岸段')// 缩放
-
-    // await layerAddFunction(map, '已建通道')// 缩放
-    // await layerAddFunction(map, '在建通道')// 缩放
-    // await layerAddFunction(map, '规划通道')// 缩放
-    await layerAddFunction(map, '重点行政区边界')// 全程
-
-    // // 点 
-    await layerAddFunction(map, '里程桩')
-    // await layerAddFunction(map, '水文站点')// 分类
-    // await layerAddFunction(map, '大中型水闸')// 全程展示
-    // await layerAddFunction(map, '其他水闸')// 缩放展示  level2 
-    // await layerAddFunction(map, '大中型泵站')
-    // await layerAddFunction(map, '其他泵站')
-    // await layerAddFunction(map, '河道分段点-影像')
-    // await layerAddFunction(map, '行政点')
-
-    // // 注记
-    await layerAddFunction(map, '里程桩-影像-注记')
-    // await layerAddFunction(map, '大型湖泊-注记')
-    // await layerAddFunction(map, '区域性骨干河道-注记')
-    // await layerAddFunction(map, '流域性河道-注记')
-    // await layerAddFunction(map, '其他河道-注记')
-    // await layerAddFunction(map, '沿江码头-注记')
-    // await layerAddFunction(map, '水库大坝-注记')
-    // await layerAddFunction(map, '洲滩-注记')
-    // await layerAddFunction(map, '行政点-注记')
+    // map.on('zoom', () => {
+    //     realtimeZoom.value = map.getZoom()
+    // });
+    // console.log(TerrainLayer)
 
 
-    // await layerAddFunction(map, '一级岸段-注记')
-    // await layerAddFunction(map, '二级岸段-注记')
-    // await layerAddFunction(map, '三级岸段-注记')
-    // await layerAddFunction(map, '已建通道-注记')
-    // await layerAddFunction(map, '在建通道-注记')
-    // await layerAddFunction(map, '规划通道-注记')
-    // await layerAddFunction(map, '水文站点-注记')
-    // await layerAddFunction(map, '大中型水闸-注记')
-    // await layerAddFunction(map, '其他水闸-注记')
-    // await layerAddFunction(map, '大中型泵站-注记')
-    // await layerAddFunction(map, '其他泵站-注记')
+    map.addLayer(new TerrainLayer(14))
 
-    await layerAddFunction(map, '河道分段-注记')
-    // await layerAddFunction(map, '河道分段点-注记')
+    // const map = new ScratchMap({
+    //     accessToken:
+    //             'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+    //     style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+    //     center: [120.980697, 31.684162], // [ 120.556596, 32.042607 ], //[ 120.53525158459905, 31.94879239156117 ], // 120.980697, 31.684162
+    //     projection: 'mercator',
+    //     container: 'map',
+    //     antialias: true,
+    //     maxZoom: 22,
+    //     // maxPitch: 60.0,
+    //     zoom: 9 //10.496958973488436, // 16
 
-    // await layerAddFunction(map, '一级预警岸段-注记')
+    // }).on('load', () => {
+
+    //     map.addLayer(new TerrainLayer(14))
+    //     // map.addLayer(new UnityLayer([ 120.556596, 32.042607 ], 0))
+    // })
 
 
+
+    /*
+        /////  影像底图
+        map.addSource('mapRaster22', {
+            type: 'raster',
+            tiles: [
+                tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
+            ],
+            tileSize: 256,
+            minzoom: 1,
+            maxzoom: 14,
+            bounds: [
+                118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
+                32.835981186719593,
+            ],
+        })
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'mapRaster22',
+        })
+    
+        // 面
+        // await layerAddFunction(map, '大中型水闸-面')
+    
+        // 线
+        await layerAddFunction(map, '长江干堤-影像')// 全程
+        await layerAddFunction(map, '河道分段-影像')// max
+        // await layerAddFunction(map, '一级预警岸段')// 缩放
+        // await layerAddFunction(map, '二级预警岸段')// 缩放
+        // await layerAddFunction(map, '三级预警岸段')// 缩放
+    
+        await layerAddFunction(map, '已建通道')// 缩放
+        await layerAddFunction(map, '在建通道')// 缩放
+        await layerAddFunction(map, '规划通道')// 缩放
+        await layerAddFunction(map, '重点行政区边界')// 全程
+    
+        // // 点 
+        await layerAddFunction(map, '里程桩')
+        // await layerAddFunction(map, '水文站点')// 分类
+        // await layerAddFunction(map, '大中型水闸')// 全程展示
+        // await layerAddFunction(map, '其他水闸')// 缩放展示  level2 
+        // await layerAddFunction(map, '大中型泵站')
+        // await layerAddFunction(map, '其他泵站')
+        // await layerAddFunction(map, '河道分段点-影像')
+        // await layerAddFunction(map, '行政点')
+    
+        // // 注记
+        await layerAddFunction(map, '里程桩-影像-注记')
+        // await layerAddFunction(map, '大型湖泊-注记')
+        // await layerAddFunction(map, '区域性骨干河道-注记')
+        // await layerAddFunction(map, '流域性河道-注记')
+        // await layerAddFunction(map, '其他河道-注记')
+        // await layerAddFunction(map, '沿江码头-注记')
+        // await layerAddFunction(map, '水库大坝-注记')
+        // await layerAddFunction(map, '洲滩-注记')
+        // await layerAddFunction(map, '行政点-注记')
+    
+    
+        // await layerAddFunction(map, '一级岸段-注记')
+        // await layerAddFunction(map, '二级岸段-注记')
+        // await layerAddFunction(map, '三级岸段-注记')
+        // await layerAddFunction(map, '已建通道-注记')
+        // await layerAddFunction(map, '在建通道-注记')
+        // await layerAddFunction(map, '规划通道-注记')
+        // await layerAddFunction(map, '水文站点-注记')
+        // await layerAddFunction(map, '大中型水闸-注记')
+        // await layerAddFunction(map, '其他水闸-注记')
+        // await layerAddFunction(map, '大中型泵站-注记')
+        // await layerAddFunction(map, '其他泵站-注记')
+    
+        await layerAddFunction(map, '河道分段-注记')
+        // await layerAddFunction(map, '河道分段点-注记')
+    
+        // await layerAddFunction(map, '一级预警岸段-注记')
+    
+    */
 
 
 
@@ -794,7 +824,7 @@ const banktest = {
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 2;
+        z-index: 0;
     }
 
     canvas.GPU {

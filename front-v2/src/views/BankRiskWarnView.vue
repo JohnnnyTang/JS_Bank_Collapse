@@ -168,6 +168,16 @@
             </div>
         </div>
 
+        <div class="terrain-control-block">
+            <label class="switch">
+                <input type="checkbox" :checked="showTerrain" @click="TerrainControlHandler()" />
+                <span class="slider"></span>
+            </label>
+            <div class="text-block">
+                <div class="text">三维地形</div>
+            </div>
+        </div>
+
         <div class="risk-line-container">
             <div class="risk-line-title">风险等级图例：</div>
             <div class="risk-line"></div>
@@ -401,6 +411,7 @@ import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { initPureScratchMap } from '../utils/mapUtils'
 // import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask'
 import FlowFieldLayer from '../utils/WebGL/notSimpleLayer'
+import TerrainLayer from '../utils/WebGL/terrainLayer';
 // import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
 import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer'
 import { useMapStore } from '../store/mapStore'
@@ -470,6 +481,7 @@ const timeStep = ref(0)
 const showFlow = ref(false)
 const showRaster = ref(false)
 const showBankLine = ref(true)
+const showTerrain = ref(false)
 const infoTreeData = ref(InfoTree)
 const nowWaterConditionType = ref('洪季')
 let DryflowLayer
@@ -995,6 +1007,13 @@ const BankLineControlHandler = () => {
     }
     showBankLine.value = !showBankLine.value
 }
+
+const TerrainControlHandler = () => {
+    showTerrain.value ? mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+        : mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'visible')
+    showTerrain.value = !showTerrain.value
+}
+
 
 // 地形对比变量
 const sceneBeforeValue = ref('2019before')
@@ -1550,6 +1569,11 @@ onMounted(async () => {
         //         'fill-color': 'rgba(210,244,247, 1)',
         //     },
         // })
+
+        map.addLayer(new TerrainLayer(14))
+        map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+
+
         map.addLayer({
             id: 'mzsLine',
             type: 'line',
@@ -2737,6 +2761,84 @@ div.risk-warn-container {
         position: absolute;
         top: 79vh;
         left: 63vw;
+        height: 13vh;
+        width: 6vw;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        z-index: 3;
+
+        .switch {
+            font-size: 20px;
+            position: relative;
+            display: inline-block;
+            width: 2em;
+            height: 3.5em;
+
+            input {
+                display: none;
+            }
+
+            /* The slider */
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgb(165, 219, 253);
+                transition: 0.4s;
+                border-radius: 10px;
+
+                &:before {
+                    position: absolute;
+                    content: '';
+                    height: 1.4em;
+                    width: 1.4em;
+                    border-radius: 5px;
+                    left: 0.3em;
+                    bottom: 0.3em;
+                    background-color: white;
+                    transition: 0.4s;
+                }
+            }
+
+            input:checked {
+                +.slider {
+                    background-color: rgb(73, 90, 250);
+                }
+
+                +.slider:before {
+                    transform: translateY(-1.5em);
+                }
+            }
+        }
+
+        .text-block {
+            font-size: 20px;
+            width: 3em;
+            height: 5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .text {
+                writing-mode: vertical-lr;
+                color: rgb(3, 45, 90);
+                color-scheme: light;
+                font-family: 'Microsoft YaHei';
+                font-weight: 700;
+                user-select: none;
+            }
+        }
+    }
+
+    div.terrain-control-block {
+        position: absolute;
+        top: 79vh;
+        left: 59vw;
         height: 13vh;
         width: 6vw;
         display: flex;

@@ -346,7 +346,7 @@ import {
 } from '../components/bankRiskWarn/util.js'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
-import { initScratchMap } from '../utils/mapUtils'
+// import { initScratchMap } from '../utils/mapUtils'
 import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask'
 // import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
 import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer'

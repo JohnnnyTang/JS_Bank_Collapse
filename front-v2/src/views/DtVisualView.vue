@@ -157,10 +157,10 @@
             </el-radio-group>
         </div>
 
-        <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
+        <!-- <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
         opacity: 0.5; width: 8vw; height: 4vh;">
             <span style="font-weight: 600;">{{ realtimeZoom }}</span>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -236,6 +236,7 @@ const waterTableData = [
 const infoTableData = ref([])
 const infoTableHeader = ref([])
 let nowSource
+let nowLayerGroup
 const pannelLoading = ref(true)
 const baseMapRadio = ref(1)
 const dataSource = ref([])
@@ -259,11 +260,53 @@ const infoTableData_filtered = computed(() => {
                 return true
             return false
         })
+
         res = arrayDistinctByName(filterRes, sourceNameMap[nowSource])
+
+        if (nowSource == 'riverArea') {
+            if (nowLayerGroup == '流域性骨干河道') {
+                console.log('sort11111', res)
+                res.sort(customSort1)
+            } else if (nowLayerGroup == '区域性骨干河道') {
+                console.log('sort22222', res)
+                res.sort(customSort2)
+            }
+        }
+        console.log('sorted!', res)
     }
 
     return res
 })
+
+const liuyuxing = [
+    '滁河', '望虞河', '新孟河', '京杭运河白马湖-高宝湖长江区段', '泰州引江河', '秦淮河'
+]
+const quyuxing = [
+    '七浦塘', '白茆塘', '常浒河', '张家港', '锡澄运河', '九曲河', '白屈港', '杨林塘', '通扬运河', '澡港河', '德胜河', '焦港',
+    '九圩港', '划子口河', '岳子河', '朱家山河', '如海运河', '通吕运河', '十一圩港', '夏仕港', '娄江-浏河', '走马塘'
+]
+
+const customSort1 = (a, b) => {
+
+    let indexA = liuyuxing.indexOf(a.name);
+    let indexB = liuyuxing.indexOf(b.name);
+
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
+}
+const customSort2 = (a, b) => {
+
+    let indexA = quyuxing.indexOf(a.name);
+    let indexB = quyuxing.indexOf(b.name);
+
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
+}
+
 
 /////// 
 const pinHandler = (pinState) => {
@@ -331,6 +374,8 @@ const treeNodeClickHandler = async (node, data) => {
 }
 
 const layerGroupClickHandler = (node, data) => {
+    console.log('click!!', data.label)
+    nowLayerGroup = data.label
     const parentLabel = node.parent.data.label
     const totalData = node.parent.data.data
     infoPannelTitle.value = data.label
@@ -636,6 +681,12 @@ const detailClickHandler4Feature = async (a) => {
             padding: paddingMap[nowSource],
             maxZoom: maxZoomMap[nowSource],
         });
+        !map.getSource(nowSource + '-' + featInfo.id) &&
+            !map.getSource('riverArea') &&
+            map.addSource('riverArea', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverArea/{x}/{y}/{z}'],
+            })
 
         !map.getLayer(nowSource + '-' + featInfo.id) &&
             map.addLayer({
@@ -742,7 +793,7 @@ const featureNodeClick = async (node, data) => {
                 paint: {
                     'line-color': 'rgb(240, 0, 0)',
                     'line-width': 3.0,
-                    'line-opacity': 0.3,
+                    'line-opacity': 0.5,
                     'line-dasharray': [5, 3],
                 },
             })
