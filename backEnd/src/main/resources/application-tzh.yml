@@ -62,7 +62,8 @@ multiIndex:
 sms:
   accessTokenLoc: D:\2024-work\AccessKey.json
   signName: 江苏长江崩岸监测预警系统
-  verifyTemplateCode: SMS_465975002
+#  verifyTemplateCode: SMS_465975002
+  verifyTemplateCode: SMS_468300113
 
 flowData:
   texturePath: D:/2024-work/shore_collapse/data/flowData/flowFieldResourceArchive/

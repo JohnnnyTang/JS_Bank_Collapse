@@ -3,13 +3,13 @@
         <e-border-box-3 text="基本信息" background-color="#0446a8">
             <div class="basic-info-content">
                 <div class="title-container">民主沙右缘示范段</div>
-                <div class="splitter-container">
+                <!-- <div class="splitter-container">
                     <dv-decoration5
                         :dur="4"
                         :color="['#0446a8', 'rgb(28, 105, 247)']"
                         style="height: 2vh; background-color: transparent"
                     />
-                </div>
+                </div> -->
                 <div class="key-val-container">
                     <div class="key-text">预警级别：</div>
                     <div class="val-text">Ⅰ级</div>
@@ -66,8 +66,8 @@ div.basic-info-container {
     z-index: 3;
     left: 1vw;
     top: 3vh;
-    width: 24vw;
-    height: 20vh;
+    width: 26vw;
+    height: 18vh;
 
     // background-color: aliceblue;
 
@@ -112,6 +112,7 @@ div.basic-info-container {
             // background-color: #0446a8;
             text-align: center;
             border-bottom: 2px solid rgb(0, 32, 175);
+            letter-spacing: 0.2rem;
 
 
             div.icon {
@@ -147,13 +148,13 @@ div.basic-info-container {
                 // text-align: center;
             }
 
-            &:nth-child(2n + 1) {
+            &:nth-child(2n) {
                 text-align: left;
                 
                 // padding-left: 6%;
                 // border-right: 2px solid rgb(0, 32, 175);
             }
-            &:nth-child(2n) {
+            &:nth-child(2n + 1) {
                 text-align: right;
                 justify-content: flex-end;
                 // padding-right: 6%;

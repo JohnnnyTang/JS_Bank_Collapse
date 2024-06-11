@@ -764,11 +764,11 @@ const mapInit = async (map, vis) => {
         // })
 
         setTimeout(() => {
-            warnInterval(map, 20)
+            warnInterval(map, 40)
         }, 500)
         useWarnInfoStore().warnWatchTimer = setInterval(
             () => {
-                warnInterval(map, 20)
+                warnInterval(map, 40)
             },
             60 * 1000 * 20,
         )
@@ -1034,6 +1034,7 @@ const warnInterval = async (map, minute) => {
     let allWarnData = (
         await axios.get(`/api/data/deviceWarn/danger/minute/${minute}`)
     ).data
+    console.log(allWarnData)
     // let warnType = 'GNSS'
     let filteredData = filterWarnData(allWarnData)
     let lastPos
@@ -1046,6 +1047,9 @@ const warnInterval = async (map, minute) => {
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)
     if (filteredData.length != 0) {
         useWarnInfoStore().warnInfo = filteredData
+        useWarnInfoStore().videoActive = [0,2]
+    }
+    if(allWarnData.length !== 0) {
         useWarnInfoStore().warnInfo_history = [...allWarnData]
         console.log(
             'in interval history warn',

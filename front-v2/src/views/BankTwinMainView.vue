@@ -894,7 +894,7 @@ div.twin-main-container {
 
     div.marquee-container {
         position: absolute;
-        left: 26.4vw;
+        left: 27.4vw;
         top: 2vh;
         width: 44vw;
         height: 7vh;
@@ -1310,8 +1310,8 @@ div.twin-main-container {
 
     div.hide-status-button {
         position: absolute;
-        left: 25vw;
-        top: 26vh;
+        left: 25.6vw;
+        top: 23.2vh;
 
         width: 1.4vw;
         height: 2vw;

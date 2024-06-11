@@ -257,7 +257,7 @@ const dealtWarnList = computed(() => {
 })
 
 const token = ref(
-    'at.5cxvxrig152g1ybj4b67hk5ucv11if4w-7i08g7dedf-1c4h1rt-ns5tf5u9m',
+    'at.aiesix6wdmxhqgov73ss8cwi1cojuwbk-5j41zyk35u-04bzsju-xgfi1zltr',
 )
 
 const props = defineProps({

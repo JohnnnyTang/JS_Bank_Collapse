@@ -6,7 +6,7 @@
         >
             <div class="device-info-content">
                 <div class="monitor-title-container">设备状态</div>
-                <div class="monitor-info-splitter">
+                <!-- <div class="monitor-info-splitter">
                     <dv-decoration3
                         style="width: 50%; height: 100%"
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
@@ -15,7 +15,7 @@
                         style="width: 50%; height: 100%"
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
                     />
-                </div>
+                </div> -->
                 <div class="device-status-container">
                     <dv-border-box12
                         :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
@@ -27,17 +27,17 @@
                         <div class="device-status-content">
                             <div class="head device-status-row">
                                 <div class="device-name device-item head">
-                                    设备
+                                    设备类型
                                 </div>
                                 <div class="device-count device-item head">
                                     报警数/在线数/总数
                                 </div>
-                                <div class="device-time device-item head">
+                                <!-- <div class="device-time device-item head">
                                     最新更新时间
-                                </div>
-                                <div class="device-freq device-item head">
+                                </div> -->
+                                <!-- <div class="device-freq device-item head">
                                     更新频次
-                                </div>
+                                </div> -->
                             </div>
                             <div
                                 class="device-status-row body"
@@ -50,7 +50,7 @@
                                     content="点击查看数据"
                                     placement="right"
                                     :offset="-6"
-                                    :hide-after="50"
+                                    :hide-after="10"
                                     v-if="item.name != '视频监控'"
                                 >
                                     <div
@@ -81,15 +81,15 @@
                                     <div>/</div>
                                     <div>{{ item.count }}</div>
                                 </div>
-                                <div
+                                <!-- <div
                                     class="device-time device-item body"
                                     v-loading="deviceStatusLoading"
                                 >
                                     {{ item.time }}
-                                </div>
-                                <div class="device-freq device-item body">
+                                </div> -->
+                                <!-- <div class="device-freq device-item body">
                                     {{ item.freq }}
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </dv-border-box12>
@@ -186,7 +186,7 @@ const deviceStatusDataList = ref([
     { name: '应力桩', count: 7, time: '2024', freq: '1分钟' },
     { name: '孔隙水压力计', count: 9, time: '2024', freq: '1小时' },
     { name: '测斜仪', count: 9, time: '2024', freq: '1小时' },
-    { name: '视频监控', count: 3, time: '2024', freq: '实时' },
+    // { name: '视频监控', count: 3, time: '2024', freq: '实时' },
 ])
 
 const warnDeviceCount = ref([0, 0, 0, 0, '-'])
@@ -315,6 +315,7 @@ const sectionClassColorMap = ref({
     普通: 'normal',
     统计: 'all',
 })
+
 const deviceTypeList = ref(['位移测量站', '应力桩', '孔隙水压力计', '测斜仪'])
 
 const navToMoreData = () => {
@@ -425,21 +426,21 @@ watch(
 onMounted(async () => {
     await updateNewestTime()
     let myDate = new Date()
-    deviceStatusDataList.value[4].time =
-        zeroFill(myDate.getHours()) +
-        ':' +
-        zeroFill(myDate.getMinutes()) +
-        ':' +
-        zeroFill(myDate.getSeconds())
-    setInterval(() => {
-        myDate = new Date()
-        deviceStatusDataList.value[4].time =
-            zeroFill(myDate.getHours()) +
-            ':' +
-            zeroFill(myDate.getMinutes()) +
-            ':' +
-            zeroFill(myDate.getSeconds())
-    }, 1000)
+    // deviceStatusDataList.value[4].time =
+    //     zeroFill(myDate.getHours()) +
+    //     ':' +
+    //     zeroFill(myDate.getMinutes()) +
+    //     ':' +
+    //     zeroFill(myDate.getSeconds())
+    // setInterval(() => {
+    //     myDate = new Date()
+    //     deviceStatusDataList.value[4].time =
+    //         zeroFill(myDate.getHours()) +
+    //         ':' +
+    //         zeroFill(myDate.getMinutes()) +
+    //         ':' +
+    //         zeroFill(myDate.getSeconds())
+    // }, 1000)
     setInterval(async () => {
         deviceStatusLoading.value = true
         await updateNewestTime()
@@ -488,16 +489,16 @@ div.device-info-container {
 
     position: absolute;
     left: 1vw;
-    top: 25vh;
-    width: 24vw;
-    height: 66vh;
+    top: 23vh;
+    width: 26vw;
+    height: 68vh;
 
     transition: all ease-in-out 0.2s;
 
     div.device-info-content {
-        width: 23vw;
-        margin-left: 0.5vw;
-        margin-right: 0.5vw;
+        width: 25.4vw;
+        margin-left: 0.3vw;
+        margin-right: 0.3vw;
         height: 55vh;
         margin-top: 0vh;
         margin-bottom: 0.5vh;
@@ -572,31 +573,41 @@ div.device-info-container {
                 top: 1vh;
                 width: 97%;
                 margin-left: 1.5%;
-                height: 22vh;
+                height: 6vh;
+                display: flex;
+                flex-flow: column wrap;
 
                 // background-color: #c4fbff;
 
                 div.device-status-row {
-                    height: 16.6%;
-                    width: 100%;
+                    height: 100%;
+                    width: 20%;
                     border-radius: 2px;
 
                     // background-color: #2622fd;
 
                     display: flex;
-                    flex-flow: row nowrap;
+                    flex-flow: column nowrap;
                     justify-content: space-around;
 
-                    &.head {
-                        padding-bottom: 4px;
-                    }
+                    // &.head {
+                    //     // padding-bottom: 4px;
+                    // }
+
+                    // &.body {
+                    //     &:hover {
+                    //         div.device-item {
+                    //             background-color: #bee0ff;
+                    //         }
+                    //     }
+                    // }
 
                     div.device-item {
-                        width: 31%;
-                        height: 100%;
-                        line-height: 3.2vh;
+                        width: 100%;
+                        height: 33.3%;
+                        // line-height: 2vh;
                         text-align: center;
-                        font-size: calc(0.5vw + 0.3vh);
+                        font-size: calc(0.48vw + 0.36vh);
                         border-radius: 2px;
 
                         background-color: #d2f2ff;
@@ -604,18 +615,20 @@ div.device-info-container {
                         color: #2a5fdb;
 
                         &.device-name {
-                            width: 25%;
+                            width: 100%;
                         }
 
                         &.device-time {
-                            width: 25%;
+                            width: 100%;
                         }
 
                         &.device-freq {
-                            width: 19%;
+                            width: 100%;
                         }
 
                         &.device-count {
+                            height: 66.7%;
+                            align-items: center;
                             display: flex;
                             justify-content: center;
                             column-gap: 0.2vw;
@@ -641,6 +654,7 @@ div.device-info-container {
                             border: 1px solid #aaffff;
                             font-weight: bold;
                             color: #dafdff;
+                            font-size: calc(0.46vw + 0.3vh);
                             box-shadow:
                                 rgba(208, 252, 255, 0.6) 0px 2px 4px,
                                 rgba(208, 252, 255, 0.4) 0px 7px 13px -3px,
