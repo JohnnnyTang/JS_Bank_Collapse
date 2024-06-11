@@ -1311,7 +1311,7 @@ div.twin-main-container {
     div.hide-status-button {
         position: absolute;
         left: 25.6vw;
-        top: 23.2vh;
+        top: 18.5vh;
 
         width: 1.4vw;
         height: 2vw;

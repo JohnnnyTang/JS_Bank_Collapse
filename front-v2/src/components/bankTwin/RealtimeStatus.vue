@@ -17,100 +17,107 @@
                     />
                 </div> -->
                 <div class="device-status-container">
-                    <dv-border-box12
-                        :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
-                    >
-                        <!-- <div class="small-title-container">
+                    <!-- <div class="small-title-container">
                             <div class="small-title-icon"></div>
                             <div class="small-title-text">设备状态</div>
                         </div> -->
-                        <div class="device-status-content">
-                            <div class="head device-status-row">
-                                <div class="device-name device-item head">
-                                    设备类型
-                                </div>
-                                <div class="device-count device-item head">
-                                    报警数/在线数/总数
-                                </div>
-                                <!-- <div class="device-time device-item head">
+                    <div class="device-status-content">
+                        <div class="head device-status-row">
+                            <div class="device-name device-item head">
+                                设备类型
+                            </div>
+                            <div class="device-count device-item head">
+                                报警数/在线数/总数
+                            </div>
+                            <!-- <div class="device-time device-item head">
                                     最新更新时间
                                 </div> -->
-                                <!-- <div class="device-freq device-item head">
+                            <!-- <div class="device-freq device-item head">
                                     更新频次
                                 </div> -->
-                            </div>
-                            <div
-                                class="device-status-row body"
-                                v-for="(item, index) in deviceStatusDataList"
-                                :key="index"
+                        </div>
+                        <div
+                            class="device-status-row body"
+                            v-for="(item, index) in deviceStatusDataList"
+                            :key="index"
+                        >
+                            <el-tooltip
+                                class="box-item"
+                                effect="light"
+                                content="点击查看数据"
+                                placement="right"
+                                :offset="-6"
+                                :hide-after="10"
+                                v-if="item.name != '视频监控'"
                             >
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="light"
-                                    content="点击查看数据"
-                                    placement="right"
-                                    :offset="-6"
-                                    :hide-after="10"
-                                    v-if="item.name != '视频监控'"
-                                >
-                                    <div
-                                        class="device-name device-item body"
-                                        @click="changeDeviceType(item.name)"
-                                        :class="{
-                                            click: item.name != '视频监控',
-                                        }"
-                                    >
-                                        {{ item.name }}
-                                    </div>
-                                </el-tooltip>
                                 <div
                                     class="device-name device-item body"
-                                    v-else
+                                    @click="changeDeviceType(item.name)"
+                                    :class="{
+                                        click: item.name != '视频监控',
+                                    }"
                                 >
                                     {{ item.name }}
                                 </div>
-                                <div
-                                    class="device-count device-item body"
-                                    v-loading="deviceStatusLoading"
-                                >
-                                    <div class="warn">
-                                        {{ warnDeviceCount[index] }}
-                                    </div>
-                                    <div>/</div>
-                                    <div class="normal">{{ item.count }}</div>
-                                    <div>/</div>
-                                    <div>{{ item.count }}</div>
+                            </el-tooltip>
+                            <div class="device-name device-item body" v-else>
+                                {{ item.name }}
+                            </div>
+                            <div
+                                class="device-count device-item body"
+                                v-loading="deviceStatusLoading"
+                            >
+                                <div class="warn">
+                                    {{ warnDeviceCount[index] }}
                                 </div>
-                                <!-- <div
+                                <div>/</div>
+                                <div class="normal">{{ item.count }}</div>
+                                <div>/</div>
+                                <div>{{ item.count }}</div>
+                            </div>
+                            <!-- <div
                                     class="device-time device-item body"
                                     v-loading="deviceStatusLoading"
                                 >
                                     {{ item.time }}
                                 </div> -->
-                                <!-- <div class="device-freq device-item body">
+                            <!-- <div class="device-freq device-item body">
                                     {{ item.freq }}
                                 </div> -->
-                            </div>
                         </div>
-                    </dv-border-box12>
-                </div>
-
-                <div class="device-chart-container">
-                    <dv-border-box10
-                        :color="['rgb(28, 75, 247)', 'rgb(150, 255, 255)']"
-                    >
+                    </div>
+                    <div class="device-chart-container">
                         <div class="section-selector">
-                            <div class="section-selectior-item type">
+                            <!-- <div class="section-selectior-item type">
+                                    <el-select
+                                        v-model="selectedDeviceType"
+                                        placeholder="选择设备类型"
+                                        style="width: 12vw; height: 3.5vh"
+                                        @change="deviceTypeSelectChange"
+                                    >
+                                        <el-option
+                                            v-for="item in deviceTypeList"
+                                            :key="item"
+                                            :label="'设备类型：' + item"
+                                            :value="item"
+                                        >
+                                            <span class="section-name-text">{{
+                                                item
+                                            }}</span>
+                                        </el-option>
+                                    </el-select>
+                                </div> -->
+                            <div class="section-selectior-item">
                                 <el-select
-                                    v-model="selectedDeviceType"
-                                    placeholder="选择设备类型"
-                                    style="width: 12vw; height: 3.5vh"
-                                    @change="deviceTypeSelectChange"
+                                    v-model="selectedDevice"
+                                    placeholder="选择具体设备"
+                                    style="width: 4.5vw; height: 2.4vh"
+                                    @change="deviceSelectChange"
                                 >
                                     <el-option
-                                        v-for="item in deviceTypeList"
+                                        v-for="item in deviceList"
                                         :key="item"
-                                        :label="'设备类型：' + item"
+                                        :label="item"
                                         :value="item"
                                     >
                                         <span class="section-name-text">{{
@@ -119,15 +126,21 @@
                                     </el-option>
                                 </el-select>
                             </div>
+                            <div class="device-update-time">
+                                <div class="static">数据更新时间：</div>
+                                <div class="update-time">
+                                    {{ deviceUpdateTime }}
+                                </div>
+                            </div>
                             <div class="section-selectior-item">
                                 <el-select
-                                    v-model="selectedDevice"
-                                    placeholder="选择具体设备"
-                                    style="width: 6vw; height: 3.5vh"
-                                    @change="deviceSelectChange"
+                                    v-model="selectedDataMode"
+                                    placeholder="选择查看模式"
+                                    style="width: 4.5vw; height: 2.4vh"
+                                    @change="dataModeChange"
                                 >
                                     <el-option
-                                        v-for="item in deviceList"
+                                        v-for="item in ['实时', '长期']"
                                         :key="item"
                                         :label="item"
                                         :value="item"
@@ -148,7 +161,7 @@
                             v-loading="chartDataLoading"
                             @dblclick="navToMoreData"
                         ></div>
-                    </dv-border-box10>
+                    </div>
                 </div>
             </div>
         </dv-border-box12>
@@ -158,7 +171,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
+// import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
 import * as echarts from 'echarts'
 import BackEndRequest from '../../api/backend'
 import {
@@ -192,6 +205,8 @@ const deviceStatusDataList = ref([
 const warnDeviceCount = ref([0, 0, 0, 0, '-'])
 
 const domHide = ref(true)
+
+const deviceUpdateTime = ref('2024-06-11 14:00:00')
 
 const deviceListMap = {
     位移测量站: [
@@ -308,6 +323,8 @@ const deviceList = ref(deviceListMap['位移测量站'])
 // console.log(deviceList)
 const selectedDevice = ref('CL-01')
 
+const selectedDataMode = ref('实时')
+
 const sectionClassColorMap = ref({
     警告: 'warning',
     预警: 'pre-warning',
@@ -386,6 +403,10 @@ const deviceSelectChange = async (deviceName) => {
         echartIns.setOption(manoOption)
         chartDataLoading.value = false
     }
+}
+
+const dataModeChange = (deviceName) => {
+
 }
 
 function zeroFill(i) {
@@ -489,9 +510,9 @@ div.device-info-container {
 
     position: absolute;
     left: 1vw;
-    top: 23vh;
+    top: 18.5vh;
     width: 26vw;
-    height: 68vh;
+    height: 72.5vh;
 
     transition: all ease-in-out 0.2s;
 
@@ -530,13 +551,14 @@ div.device-info-container {
         }
 
         div.device-status-container {
+            position: relative;
             width: 98%;
-            margin-top: 0.2vh;
+            // margin-top: 0.2vh;
             margin-left: 1%;
             height: 24.2vh;
 
             div.small-title-container {
-                position: absolute;
+                position: relative;
                 width: 95%;
                 margin-left: 2.5%;
                 margin-top: 1vh;
@@ -569,8 +591,8 @@ div.device-info-container {
             }
 
             div.device-status-content {
-                position: absolute;
-                top: 1vh;
+                position: relative;
+                // top: 1vh;
                 width: 97%;
                 margin-left: 1.5%;
                 height: 6vh;
@@ -669,116 +691,150 @@ div.device-info-container {
                 }
             }
             // background-color: #2622fd;
-        }
 
-        div.device-chart-container {
-            width: 95%;
-            margin-left: 2.5%;
-            height: 34vh;
-            margin-top: 0.5vh;
-            border-radius: 10px;
-
-            // background-color: #6493ff;
-
-            div.device-chart-dom {
-                width: 96%;
-                margin-left: 2%;
-                height: 85%;
-                padding-top: 2%;
-                padding-bottom: 2%;
-
-                // background-color: #2a5fdb;
-            }
-
-            div.section-selector {
-                height: 3.5vh;
-                width: 21vw;
-                margin-left: 1vw;
-                padding-top: 0.5vh;
-                // margin-top: 0.5vh;
+            div.device-chart-container {
+                position: relative;
+                width: 95%;
+                margin-left: 2.5%;
+                height: 34vh;
+                // margin-top: 1vh;
+                border-radius: 10px;
 
                 // background-color: #6493ff;
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: center;
-                column-gap: 0.25vw;
 
-                div.section-selectior-item {
-                    width: 6vw;
-                    height: 3.3vh;
+                div.device-chart-dom {
+                    width: 100%;
+                    // margin-left: 2%;
+                    height: 85%;
+                    // padding-top: 2%;
+                    // padding-bottom: 2%;
 
-                    line-height: 3.3vh;
-                    text-align: center;
+                    // background-color: #2a5fdb;
+                }
 
-                    // background-color: #eef3ff;
-                    :deep(.el-select) {
-                        height: 3.3vh;
-                        box-shadow:
-                            rgba(0, 132, 255, 0.8) 1px 1px,
-                            rgba(0, 119, 255, 0.7) 2px 2px,
-                            rgba(0, 119, 255, 0.6) 3px 4px;
-                        border-radius: 3px;
-                    }
+                div.section-selector {
+                    height: 3vh;
+                    // width: 21vw;
+                    // margin-left: 1vw;
+                    // padding-top: 0.5vh;
+                    // margin-top: 0.5vh;
+                    width: 100%;
 
-                    :deep(.el-select__wrapper) {
-                        height: 3.3vh;
-                        line-height: 3.3vh;
-                        border-radius: 3px;
-                        font-family: 'Microsoft YaHei';
-                        font-weight: bold;
-                        font-size: calc(0.5vw + 0.7vh);
-                        background-color: #e6f7ff;
-                    }
+                    // background-color: #6493ff;
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: center;
+                    column-gap: 0.25vw;
 
-                    &.type {
-                        width: 12vw;
-                        :deep(.el-select__wrapper) {
-                            font-size: calc(0.5vw + 0.5vh);
+                    div.section-selectior-item {
+                        width: 4.5vw;
+                        height: 2.4vh;
+
+                        line-height: 2.4vh;
+                        text-align: center;
+                        letter-spacing: 0.12rem;
+
+                        // background-color: #eef3ff;
+                        :deep(.el-select) {
+                            height: 2.4vh;
+                            box-shadow:
+                                rgba(0, 132, 255, 0.8) 1px 1px,
+                                rgba(0, 119, 255, 0.7) 2px 2px,
+                                rgba(0, 119, 255, 0.6) 3px 3px;
+                            border-radius: 3px;
                         }
-                    }
 
-                    :deep(.el-select__placeholder) {
-                        color: #1267c9;
-                    }
+                        :deep(.el-select__wrapper) {
+                            height: 2.4vh;
+                            line-height: 2.4vh;
+                            border-radius: 3px;
+                            font-family: 'Microsoft YaHei';
+                            font-weight: bold;
+                            font-size: calc(0.45vw + 0.42vh);
+                            background-color: #e6f7ff;
+                        }
 
-                    :deep(.el-icon) {
-                        width: 0.5vw;
-                        height: 0.5vw;
+                        &.type {
+                            width: 12vw;
+                            :deep(.el-select__wrapper) {
+                                font-size: calc(0.45vw + 0.5vh);
+                            }
+                        }
 
-                        svg {
+                        :deep(.el-select__placeholder) {
+                            color: #1267c9;
+                        }
+
+                        :deep(.el-icon) {
                             width: 0.5vw;
                             height: 0.5vw;
 
-                            path {
-                                fill: #001cb8;
+                            svg {
+                                width: 0.5vw;
+                                height: 0.5vw;
+
+                                path {
+                                    fill: #001cb8;
+                                }
                             }
                         }
                     }
-                }
 
-                div.nav-data-button {
-                    width: 4vw;
-                    height: 3.5vh;
+                    div.device-update-time {
+                        position: relative;
+                        width: fit-content;
+                        line-height: 2.4vh;
+                        height: 2.4vh;
+                        margin-top: 0.2vh;
+                        background-color: #e6f7ff;
+                        color: #0056b8;
 
-                    background-color: #0748aa;
+                        display: flex;
+                        flex-flow: row nowrap;
+                        justify-content: center;
 
-                    box-shadow:
-                        rgba(0, 132, 255, 0.8) 1px 1px,
-                        rgba(0, 119, 255, 0.7) 2px 2px,
-                        rgba(0, 119, 255, 0.6) 3px 3px;
-                    border-radius: 6px;
+                        padding-left: 1%;
+                        padding-right: 1%;
+                        border-radius: 4px;
 
-                    line-height: 3.5vh;
-                    text-align: center;
-                    color: #c4fbff;
-                    font-size: calc(0.5vw + 0.4vh);
-                    transition: all 0.1s ease-in-out;
+                        font-size: calc(0.45vw + 0.36vh);
 
-                    &:hover {
-                        cursor: pointer;
-                        transform: translate3d(2px, 2px, 2px);
-                        font-weight: bold;
-                        box-shadow: rgba(0, 132, 255, 0.8) 1px 1px;
+                        div.update-time {
+                            color: #00ca22;
+                            // background-color: #deffe0;
+                            font-weight: bold;
+                        }
+
+                        box-shadow:
+                            rgba(0, 132, 255, 0.8) 1px 1px,
+                            rgba(0, 119, 255, 0.7) 2px 2px,
+                            rgba(0, 119, 255, 0.6) 3px 3px;
+                    }
+
+                    div.nav-data-button {
+                        width: 4vw;
+                        height: 3.5vh;
+
+                        background-color: #0748aa;
+
+                        box-shadow:
+                            rgba(0, 132, 255, 0.8) 1px 1px,
+                            rgba(0, 119, 255, 0.7) 2px 2px,
+                            rgba(0, 119, 255, 0.6) 3px 3px;
+                        border-radius: 6px;
+
+                        line-height: 3.5vh;
+                        text-align: center;
+                        color: #c4fbff;
+                        font-size: calc(0.5vw + 0.4vh);
+                        transition: all 0.1s ease-in-out;
+
+                        &:hover {
+                            cursor: pointer;
+                            transform: translate3d(2px, 2px, 2px);
+                            font-weight: bold;
+                            box-shadow: rgba(0, 132, 255, 0.8) 1px 1px;
+                        }
                     }
                 }
             }
