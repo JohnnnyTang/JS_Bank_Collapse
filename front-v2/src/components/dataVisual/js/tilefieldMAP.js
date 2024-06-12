@@ -455,8 +455,8 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('/legend/规划通道2.png')`,
-            'transform': 'scaleY(0.5) translateX(5%)'
+            'background-image': `url('/legend/规划通道.png')`,
+            'transform': ' translateX(5%)'
         },
         text: '规划过江通道'
     },

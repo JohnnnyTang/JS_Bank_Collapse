@@ -20,6 +20,7 @@ export default class FlowFieldLayer{
 
     uboMapBufferData:Float32Array = new Float32Array(12);
     phaseCount: number = 0.0;
+    timePerFrame: number = 150.0;
     timeLast: number = 10.0;
     currentResourcePointer:number = 0;
     _timeCount: number = 0.0;   
@@ -309,7 +310,7 @@ export default class FlowFieldLayer{
         // why?
         // the last one is a phase from the end to the head
         this.phaseCount = this.parser.flowFieldResourceArr.length;
-        this.timeLast = this.phaseCount * 150; // 150 frame per timePoint
+        this.timeLast = this.phaseCount * this.timePerFrame; // 150 frame per timePoint
 
         // why 3?
         this.textureArraySize = 3;

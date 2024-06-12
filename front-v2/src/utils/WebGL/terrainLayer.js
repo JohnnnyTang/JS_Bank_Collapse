@@ -153,6 +153,7 @@ export default class TerrainLayer {
 
         // No render condition
         if (!this.isInitialized) return
+        this.map.update()
 
         this.registerRenderableNode({
             cameraPos: this.map.mercatorCenter.toLngLat().toArray(),

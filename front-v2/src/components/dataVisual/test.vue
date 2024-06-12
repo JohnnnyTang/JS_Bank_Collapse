@@ -66,6 +66,8 @@ onMounted(async () => {
     await layerAddFunction(map, '二级岸段-注记')
     await layerAddFunction(map, '三级岸段-注记')
 
+    await layerAddFunction(map, '重点行政区边界')
+
 
 
     // const map = new ScratchMap({

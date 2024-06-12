@@ -399,6 +399,7 @@ import {
     watch,
     onUnmounted,
     defineAsyncComponent,
+    computed,
 } from 'vue'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
@@ -478,6 +479,10 @@ const geologyAndProjectVue = defineAsyncComponent(
 const loading_message = ref('自定义断面信息计算中...')
 const mapContainer = ref()
 const timeStep = ref(0)
+const timeStepFloat = ref(0)
+// const timeStepFloat = computed(()=>{
+//     return timeStep.value
+// })
 const showFlow = ref(false)
 const showRaster = ref(false)
 const showBankLine = ref(true)
@@ -504,6 +509,7 @@ const conditionChangeHandler = (lable) => {
     console.log(nowWaterConditionType.value);
     showFlow.value = false
     timeStep.value = 0
+    // timeStepFloat.value = 0
     // remove layer
     let map = useMapStore().getMap()
     if (map.getLayer('floodFlow')) {
@@ -897,17 +903,26 @@ const flowControlHandler = async () => {
     let map = useMapStore().getMap()
     // console.log(showFlow.value);
     timeStep.value = 0
+    // timeStepFloat.value = 0
     if (showFlow.value) {
         if (nowWaterConditionType.value == '洪季') {
             let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
             let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
             let floodFlow = reactive(new FlowFieldLayer('floodFlow', backEndJsonUrl2, imageSrcPrefix2))
-            map.addLayer(floodFlow)
+            map.addLayer(floodFlow, 'chaoWeiPointLable')
 
+            // floodWatcher = watch(
+            //     () => floodFlow.currentResourcePointer,
+            //     (v) => {
+            //         timeStep.value = floodFlow.currentResourcePointer
+            //         // timeStepFloat.value = floodFlow.currentResourcePointer + floodFlow.progressRate
+            //     },
+            // )
             floodWatcher = watch(
-                () => floodFlow.currentResourcePointer,
+                () => floodFlow._progressRate,
                 (v) => {
-                    timeStep.value = floodFlow.currentResourcePointer
+                    let val = parseFloat((floodFlow.timeCount / floodFlow.timePerFrame).toFixed(1))
+                    timeStep.value = val
                 },
             )
 
@@ -917,12 +932,19 @@ const flowControlHandler = async () => {
             let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
             let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
             let dryFlow = reactive(new FlowFieldLayer('dryFlow', backEndJsonUrl1, imageSrcPrefix1))
-            map.addLayer(dryFlow)
+            map.addLayer(dryFlow, 'chaoWeiPointLable')
 
+            // dryWatcher = watch(
+            //     () => dryFlow.currentResourcePointer,
+            //     (v) => {
+            //         timeStep.value = dryFlow.currentResourcePointer
+            //     },
+            // )
             dryWatcher = watch(
-                () => dryFlow.currentResourcePointer,
+                () => dryFlow._progressRate,
                 (v) => {
-                    timeStep.value = dryFlow.currentResourcePointer
+                    let val = parseFloat((dryFlow.timeCount / dryFlow.timePerFrame).toFixed(1))
+                    timeStep.value = val
                 },
             )
             console.log('add 枯季');
@@ -1068,6 +1090,7 @@ const showFlowSpeedFunc = async () => {
     }
     showFlowSpeed.value = !showFlowSpeed.value
     timeStep.value = 0
+    // timeStepFloat.value = 0
     await flowControlHandler()
 }
 const showRasterControl = ref(false)
@@ -1725,16 +1748,58 @@ onMounted(async () => {
         //         'line-width': 4,
         //     },
         // })
-        map.on('click', ['mzsBankLine'], (e) => {
-            console.log(e.features[0])
-        })
+
 
         map.addSource('mzsSectionLabel', {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/geomCenter/mzsBankLine/{x}/{y}/{z}'],
         })
 
-        map.addLayer(new BankWarnLayer(defaultWarnLayerData))
+        const chaoWeiPoint = {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                properties: {
+                    label: '潮位点',
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: [120.51873, 32.03220],
+                }
+            }]
+        }
+        map.addSource('chaoWeiPoint', {
+            type: 'geojson',
+            data: chaoWeiPoint
+        })
+        map.addLayer({
+            id: 'chaoWeiPoint',
+            type: 'circle',
+            source: 'chaoWeiPoint',
+            paint: {
+                'circle-radius': 7,
+                'circle-color': 'rgb(255, 0,0)',
+            }
+        })
+        map.addLayer({
+            id: 'chaoWeiPointLable',
+            type: 'symbol',
+            source: 'chaoWeiPoint',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-anchor': 'top',
+                'text-offset': [0.0, 0.5],
+                'text-size': 18,
+                'text-allow-overlap': true,
+            },
+            paint: {
+                'text-color': 'rgb(255,255,255)'
+            }
+        }, 'chaoWeiPoint')
+
+
+        map.addLayer(new BankWarnLayer(defaultWarnLayerData), 'chaoWeiPoint')
 
         map.addLayer({
             id: 'mzsBankLineChoosen',
@@ -1751,12 +1816,38 @@ onMounted(async () => {
                 'line-color': 'rgb(134, 245, 230)',
                 'line-width': 10,
             },
-        })
+        }, 'chaoWeiPoint')
+
+
+        map.addLayer({
+            id: 'mzsSectionLabelLayer-important',
+            type: 'symbol',
+            source: 'mzsSectionLabel',
+            'source-layer': 'default',
+            maxzoom: 12,
+            minzoom: 8,
+            filter: ['==', 'label', 'MZ08海事码头'],
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-offset': [-1.0, 1.15],
+                'text-anchor': 'top',
+                'text-size': 18,
+                'text-allow-overlap': true,
+            },
+            paint: {
+                'text-color': 'rgb(100, 2, 125)',
+                // 'text-color': 'rgb(255, 0,0)',
+            },
+        }, 'chaoWeiPoint')
+
         map.addLayer({
             id: 'mzsSectionLabelLayer',
             type: 'symbol',
             source: 'mzsSectionLabel',
             'source-layer': 'default',
+            maxzoom: 22,
+            minzoom: 12,
             layout: {
                 'text-field': ['get', 'label'],
                 'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
@@ -1769,7 +1860,7 @@ onMounted(async () => {
             paint: {
                 'text-color': 'rgb(0, 22, 145)',
             },
-        })
+        }, 'chaoWeiPoint')
 
         // !map.getSource('mzsBankLabel') &&
         //     map.addSource('mzsBankLabel', {
@@ -2682,7 +2773,7 @@ div.risk-warn-container {
     div.raster-control-block {
         position: absolute;
         top: 79vh;
-        left: 57vw;
+        left: 55vw;
         height: 13vh;
         width: 6vw;
         display: flex;

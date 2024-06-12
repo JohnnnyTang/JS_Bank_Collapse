@@ -157,10 +157,10 @@
             </el-radio-group>
         </div>
 
-        <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
+        <!-- <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
         opacity: 0.5; width: 8vw; height: 4vh;">
             <span style="font-weight: 600;">{{ realtimeZoom }}</span>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -270,39 +270,22 @@ const infoTableData_filtered = computed(() => {
                 res.sort(customSort2)
             }
         }
+        // console.log(nowSource)
+        else if (nowSource == 'sluiceArea') {
+            console.log(res);
+            console.log('sort');
+            res.sort(customSort3)
+            console.log(res);
+        }
+        else if (nowSource == 'pumpArea') {
+            res.sort(customSort4)
+        }
     }
 
     return res
 })
 
-const liuyuxing = [
-    '滁河', '望虞河', '新孟河', '京杭运河白马湖-高宝湖长江区段', '泰州引江河', '秦淮河'
-]
-const quyuxing = [
-    '七浦塘', '白茆塘', '常浒河', '张家港', '锡澄运河', '九曲河', '白屈港', '杨林塘', '通扬运河', '澡港河', '德胜河', '焦港',
-    '九圩港', '划子口河', '岳子河', '朱家山河', '如海运河', '通吕运河', '十一圩港', '夏仕港', '娄江-浏河', '走马塘'
-]
 
-const customSort1 = (a, b) => {
-
-    let indexA = liuyuxing.indexOf(a.name);
-    let indexB = liuyuxing.indexOf(b.name);
-
-    if (indexA === -1) indexA = Infinity;
-    if (indexB === -1) indexB = Infinity;
-
-    return indexA - indexB;
-}
-const customSort2 = (a, b) => {
-
-    let indexA = quyuxing.indexOf(a.name);
-    let indexB = quyuxing.indexOf(b.name);
-
-    if (indexA === -1) indexA = Infinity;
-    if (indexB === -1) indexB = Infinity;
-
-    return indexA - indexB;
-}
 
 
 /////// 
@@ -604,7 +587,6 @@ const detailClickHandler4Feature = async (a) => {
         // let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/buffer/15000/cj/bbox`)).data
         let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
         let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
-        console.log(bbox);
         map.fitBounds(bbox, {
             padding: paddingMap[nowSource],
             maxZoom: maxZoomMap[nowSource],
@@ -758,6 +740,13 @@ const resetSideBarTree = () => {
     nowTree[1].active = true
 
     nowTree[2].active = false
+    nowTree[2].children[0].active = false
+    nowTree[2].children[0].children[0].active = false
+    nowTree[2].children[0].children[1].active = false
+    nowTree[2].children[0].children[2].active = false
+
+
+    nowTree[2].children[1].active = false
 
     nowTree[3].active = true
     nowTree[3].children[0].active = true
@@ -1055,6 +1044,64 @@ const maxZoomMap = {
     'riverArea': 22,
     'sluiceArea': 14,
     'pumpArea': 14
+}
+
+
+
+
+const liuyuxing = [
+    '滁河', '望虞河', '新孟河', '京杭运河白马湖-高宝湖长江区段', '泰州引江河', '秦淮河'
+]
+const quyuxing = [
+    '七浦塘', '白茆塘', '常浒河', '张家港', '锡澄运河', '九曲河', '白屈港', '杨林塘', '通扬运河', '澡港河', '德胜河', '焦港',
+    '九圩港', '划子口河', '岳子河', '朱家山河', '如海运河', '通吕运河', '十一圩港', '夏仕港', '娄江-浏河', '走马塘'
+]
+const shuizha = [
+    '秦淮新河节制闸', '三汊河河口闸', '朱家山河闸', '岳子河河闸', '划子口节制闸', '中坝闸', '七摆渡闸站', '瓜洲节制闸',
+    '引航道枢纽工程-水闸工程', '京口闸', '泰州引江河枢纽—高港节制闸', '三茅镇沙家港闸', '口岸闸', '过船节制闸',
+    '天星港闸', '焦土港闸', '夏仕港节制闸', '太字港节制闸', '南通节制闸', '营船港闸', '白茆闸', '浏河节制闸'
+]
+const bengzhan = [
+    '新沟泵站', '秦淮新河闸站——泵站工程', '杨家沟站', '大年站', '十二圩翻水站', '大年站', '引航道枢纽工程-泵站工程',
+    '东风泵站', '谏壁抽水站', '大港泵站', '高港泵站', '上九圩泵站', '新夏港泵站', '焦港泵站', '三干河泵站', '七浦塘江边枢纽泵站'
+]
+
+const customSort1 = (a, b) => {
+
+    let indexA = liuyuxing.indexOf(a.name);
+    let indexB = liuyuxing.indexOf(b.name);
+
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
+}
+const customSort2 = (a, b) => {
+
+    let indexA = quyuxing.indexOf(a.name);
+    let indexB = quyuxing.indexOf(b.name);
+
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
+}
+const customSort3 = (a, b) => {
+    let indexA = shuizha.indexOf(a.sp_name);
+    let indexB = shuizha.indexOf(b.sp_name);
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
+}
+const customSort4 = (a, b) => {
+    let indexA = bengzhan.indexOf(a.sp_name);
+    let indexB = bengzhan.indexOf(b.sp_name);
+
+    if (indexA === -1) indexA = Infinity;
+    if (indexB === -1) indexB = Infinity;
+
+    return indexA - indexB;
 }
 
 </script>

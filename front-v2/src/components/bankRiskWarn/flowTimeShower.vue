@@ -3,7 +3,7 @@
         <el-progress type="dashboard" :percentage="percentage">
             <template #default="{ percentage }">
                 <!-- <span class="percentage-value">{{ hour + '时' }}</span> -->
-                <span class="percentage-value">{{ props.timeStep + '时' }}</span>
+                <span class="percentage-value">{{ Math.floor(props.timeStep!) + '时' }}</span>
                 <!-- <span class="percentage-label">{{ day }}</span> -->
             </template>
         </el-progress>
@@ -44,7 +44,7 @@ const timee = computed(() => {
     }
     else if (props.type == 'exp') {
         let today0 = dayjs().startOf('day').subtract(1, 'day');
-        let passHour = props.timeStep! * 1 //exmp 1小时一个
+        let passHour = Math.floor(props.timeStep!) * 1 //exmp 1小时一个
         return today0.add(passHour, 'hour').format('YYYY/MM/DD HH')
 
     }

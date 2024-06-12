@@ -2911,9 +2911,19 @@ const layerAddFunctionMap = {
                         '省界', // 默认颜色为黑色
                     ],
                     'line-width': 2.0,
-                    // 'line-blur': 2,
+                    'line-opacity':0.8
                 }
+                // paint: {
+                //     'line-color': 'rgb(255,0,0)',
+                //     'line-width': 5.0,
+                // }
             })
+
+        map.on('click', ['重点行政区边界'], (e) => {
+            console.log(e.features[0])
+        })
+
+
     },
 
     里程桩: async (map) => {
@@ -3431,6 +3441,7 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {
                     'line-join': 'round',
+                    'line-cap': 'round',
                 },
                 filter: ['==', 'warning_level', 1],
                 paint: {
@@ -3463,6 +3474,7 @@ const layerAddFunctionMap = {
                 'source-layer': 'default',
                 layout: {
                     'line-join': 'round',
+                    'line-cap': 'round',
                 },
                 filter: ['==', 'warning_level', 2],
                 paint: {
@@ -3495,8 +3507,8 @@ const layerAddFunctionMap = {
                 source: 'importantBank',
                 'source-layer': 'default',
                 layout: {
-                    // 'line-cap': 'round',
                     'line-join': 'round',
+                    'line-cap': 'round',
                 },
                 filter: ['==', 'warning_level', 3],
                 paint: {
@@ -3818,7 +3830,7 @@ const initSortedLayer = async (map) => {
     await layerInitFunction(map, '在建通道')// 缩放
     await layerInitFunction(map, '过江通道辅助线')// 缩放
     await layerInitFunction(map, '规划通道')// 缩放
-    await layerInitFunction(map, '重点行政区边界')// 全程
+    await layerAddFunction(map, '重点行政区边界')// 全程
 
     // 点
     await layerAddFunction(map, '里程桩')
