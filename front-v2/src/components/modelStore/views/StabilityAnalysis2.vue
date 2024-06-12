@@ -257,7 +257,9 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import { initScratchMap } from '../../../utils/mapUtils.js'
+// import { initScratchMap } from '../../../utils/mapUtils.js'
+import { initPureScratchMap } from '../../../utils/mapUtils.js'
+
 import ModelTitleVue from '../ModelTitle.vue'
 import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue'
 import SetParameter from '../stability-sub/SetParameter.vue'
@@ -1121,7 +1123,10 @@ const handleCloseChart = () => {
 
 onMounted(async () => {
     chart = echarts.init(echartRef.value)
-    map = await initScratchMap(mapContainerRef.value)
+    //initPureScratchMap
+    // map = await initScratchMap(mapContainerRef.value)
+    map = await initPureScratchMap(mapContainerRef.value)
+
 
     map.addSource('1998-01-dem', {
         type: 'raster',

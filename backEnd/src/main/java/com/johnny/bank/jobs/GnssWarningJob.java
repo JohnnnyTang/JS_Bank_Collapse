@@ -203,7 +203,7 @@ public class GnssWarningJob implements Job {
                     }
                 }
                 log.info(paramsJson.toString());
-                globalMap.getWarMessageMap().put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 2, TimeUnit.HOURS);
+                globalMap.getWarMessageMap().put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 24, TimeUnit.HOURS);
 //                log.info("message map: " + globalMap.getWarMessageMap().toString());
             }
             log.info("curMessage: " + globalMap.getWarMessageMap().toString());

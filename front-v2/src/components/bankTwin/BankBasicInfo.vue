@@ -67,7 +67,7 @@ div.basic-info-container {
     left: 1vw;
     top: 3vh;
     width: 26vw;
-    height: 18vh;
+    height: 14vh;
 
     // background-color: aliceblue;
 
@@ -81,9 +81,9 @@ div.basic-info-container {
         justify-content: center;
 
         div.title-container {
-            margin-top: 1.5vh;
-            height: 4vh;
-            line-height: 4vh;
+            margin-top: 1.4vh;
+            height: 3.6vh;
+            line-height: 3.6vh;
             width: 100%;
             background-color: transparent;
             text-align: center;
@@ -104,9 +104,9 @@ div.basic-info-container {
         }
 
         div.key-val-container {
-            margin-top: 0.4vh;
+            // margin-top: 0.4vh;
             width: 48%;
-            height: 5vh;
+            height: 4vh;
             display: flex;
             flex-flow: row wrap;
             // background-color: #0446a8;
@@ -134,14 +134,14 @@ div.basic-info-container {
 
             div.key-text {
                 width: fit-content;
-                line-height: 5vh;
+                line-height: 4vh;
                 background-color: transparent;
                 font-size: calc(0.7vw + 0.6vh);
                 color: #0043fd;
             }
 
             div.val-text {
-                line-height: 5vh;
+                line-height: 4vh;
                 font-size: calc(0.7vw + 0.5vh);
                 font-weight: bold;
                 color: #1d00be;
