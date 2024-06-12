@@ -17,6 +17,22 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: QWERBOOM123
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1275441282@qq.com
+    password: ezuxlysqewrgfhhi
+    from: 1275441282@qq.com
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        debug: true #启动debug调试
+        smtp:
+          ssl:
+            enable: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory #SSL连接配置
 mybatis:
   mapper-locations: classpath:mapper/resourceRepo/*/*.xml
   configuration:
@@ -36,3 +52,8 @@ tile:
 
 flowData:
   texturePath: D:/UyNauhL/Assignments/flowFieldResourceArchive/
+sms:
+  accessTokenLoc: E:\WATER\AccessKey.json
+  signName: 江苏长江崩岸监测预警系统
+  #  verifyTemplateCode: SMS_465975002
+  verifyTemplateCode: SMS_468300113
