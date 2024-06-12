@@ -1344,10 +1344,11 @@ const customSort4 = (a, b) => {
 
                     .card.active {
                         // box-shadow: #cbeafd 10px 7px 20px 0px;
-                        border: inset #C9E1F5 3px solid;
+                        // border: inset #C9E1F5 3px solid;
 
                         .top-section {
                             background: rgb(26, 143, 245);
+                        
 
                             .title {
                                 .subScene-title-text {
@@ -1553,8 +1554,8 @@ const customSort4 = (a, b) => {
     div.infomation-pannel {
         position: absolute;
         z-index: 2;
-        left: 20vw;
-        top: 20vh;
+        left: 19vw;
+        top: 17vh;
         width: 13vw;
         background-color: rgb(20, 115, 196);
         backdrop-filter: blur(5px);
