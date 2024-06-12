@@ -554,7 +554,7 @@ const viewChangeClick = (value) => {
         )
         unityLayer && unityLayer.remove()
         map.getLayer('Mask-Layer') && map.removeLayer('Mask-Layer')
-        map.getLayer('Unity-Layer') && map.removeLayer('Unity-Layer')
+        map.getLayer('UnityLayer') && map.removeLayer('UnityLayer')
         mapFlyToRiver(map)
         let fatherDom = document.querySelector('#DeviceInfoBox')
         // fatherDom.innerHTML = ''
