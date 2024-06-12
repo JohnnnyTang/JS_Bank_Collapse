@@ -1764,7 +1764,7 @@ onMounted(async () => {
                 },
                 geometry: {
                     type: 'Point',
-                    coordinates: [120.51873, 32.03220],
+                    coordinates: [120.522864, 32.035502],
                 }
             }]
         }
