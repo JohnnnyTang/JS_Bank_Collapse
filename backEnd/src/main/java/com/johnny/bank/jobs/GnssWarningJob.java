@@ -37,10 +37,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class GnssWarningJob implements Job {
 
-//    private static final List<String> mailList = List.of("249884523@qq.com", "2404994899@qq.com");
-    private static final List<String> mailList = List.of("2404994899@qq.com");
-//    private static final List<String> phoneList = List.of("18860847206", "13382058110", "13913859225");
-    private static final List<String> phoneList = List.of("13382058110");
+    private static final List<String> mailList = List.of("249884523@qq.com", "2404994899@qq.com");
+//    private static final List<String> mailList = List.of("2404994899@qq.com");
+    private static final List<String> phoneList = List.of("18860847206", "13382058110", "13913859225");
+//    private static final List<String> phoneList = List.of("13382058110");
 //    private static final List<String> phoneList = List.of("18860847206");
 //    ExpiringMap<String, Double> messageMap = ExpiringMap.builder()
 //        .variableExpiration()
@@ -203,7 +203,7 @@ public class GnssWarningJob implements Job {
                     }
                 }
                 log.info(paramsJson.toString());
-                globalMap.getWarMessageMap().put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 2, TimeUnit.HOURS);
+                globalMap.getWarMessageMap().put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 24, TimeUnit.HOURS);
 //                log.info("message map: " + globalMap.getWarMessageMap().toString());
             }
             log.info("curMessage: " + globalMap.getWarMessageMap().toString());

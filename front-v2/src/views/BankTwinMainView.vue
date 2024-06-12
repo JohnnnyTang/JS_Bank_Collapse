@@ -17,7 +17,7 @@
         </div>
         <BankBasicInfoVue />
         <RealtimeStatusVue :domHide="domHideMap.status" />
-        <RealtimeVideoVue :active="!warnActive" :domHide="domHideMap.video" />
+        <!-- <RealtimeVideoVue :active="!warnActive" :domHide="domHideMap.video" /> -->
         <!-- <SectionRisk />
         <DeviceWarn /> -->
 
@@ -64,14 +64,14 @@
                 </div>
             </DvBorderBox12>
         </div>
-        <div
+        <!-- <div
             class="button-block"
             @click="warnActive = !warnActive"
             :class="{ active: warnActive }"
             v-if="!domHideMap.video"
         >
             {{ buttonText }}
-        </div>
+        </div> -->
 
         <div class="monitor-legend-container">
             <div class="monitor-legend-title" @click="deviceShowControl(-1)">
@@ -243,7 +243,7 @@
         >
             <HideDomButtom :direction="domHideMap.status ? 'right' : 'left'" />
         </div>
-        <div
+        <!-- <div
             class="hide-status-button right"
             :class="{
                 'in-active': domHideMap.video,
@@ -252,7 +252,7 @@
             @click="hideDom('video')"
         >
             <HideDomButtom :direction="domHideMap.video ? 'left' : 'right'" />
-        </div>
+        </div> -->
         <div
             class="hide-status-button right warn"
             :class="{ 'in-active': domHideMap.warn, 'warn-active': warnActive }"
@@ -305,7 +305,7 @@ const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const unityCanvaDom = ref()
 const mapDom = ref()
-const warnActive = ref(false)
+const warnActive = ref(true)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
@@ -486,8 +486,8 @@ const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
-            [120.45957922676836, 32.00001616423072],
-            [120.62109640208264, 32.084171362618625],
+            [120.45997922676836, 32.00001616423072],
+            [120.60909640208264, 32.084171362618625],
         ],
         {
             // pitch: 32.45,
@@ -993,7 +993,7 @@ div.twin-main-container {
     div.monitor-legend-container {
         position: absolute;
         bottom: 1vh;
-        left: 28vw;
+        left: 30vw;
         width: 43vw;
         height: 10vh;
         user-select: none;
@@ -1332,7 +1332,7 @@ div.twin-main-container {
         }
 
         &.right {
-            left: 72vw;
+            left: 75vw;
             top: 3.2vh;
             z-index: 4;
             transition: none;

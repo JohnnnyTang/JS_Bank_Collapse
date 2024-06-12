@@ -17,15 +17,27 @@ let gnssOption = {
     yAxis: {
         scale: true,
         min: 0,
-        max: 60,
+        max: function (value) {
+            return parseInt((value.max * 1.5)/10+1) * 10;
+        },
         name: '土体表面累积位移(mm)',
         nameLocation: 'end',
         nameTextStyle: {
-            fontSize: 16,
+            fontSize: 13,
             align: 'left',
             verticalAlign: 'top',
             fontWeight: 'bold',
         },
+    },
+    legend: {
+        right: '1%',
+        width: '60%',
+        data: [
+            { name: '累积位移' },
+            { name: '累积位移滑动平均' },
+            { name: '累积位移滑动误差区间下限' },
+            { name: '累积位移误差区间' },
+        ],
     },
     // toolbox: {
     //     right: 10,
@@ -40,14 +52,19 @@ let gnssOption = {
     dataZoom: [
         {
             type: 'inside',
+            start: 98,
+            end: 100,
         },
         {
             type: 'slider',
+            start: 98,
+            end: 100,
         },
     ],
     backgroundColor: 'rgba(255,255,255,1)',
     visualMap: [
         {
+            show: false,
             top: '4%',
             right: '2%',
             itemHeight: '20',
@@ -97,7 +114,7 @@ let gnssOption = {
                 },
             ],
             outOfRange: {
-                color: 'rgb(133,133,133)',
+                color: 'rgb(163,163,163)',
             },
         },
     ],
@@ -116,20 +133,20 @@ let gnssOption = {
                     opacity: 0.75,
                 },
                 data: [
-                    {
-                        yAxis: 35,
-                        lineStyle: {
-                            color: '#FF8E00',
-                            width: 3,
-                        },
-                    },
-                    {
-                        yAxis: 50,
-                        lineStyle: {
-                            color: '#FD0100',
-                            width: 3,
-                        },
-                    },
+                    // {
+                    //     yAxis: 35,
+                    //     lineStyle: {
+                    //         color: '#FF8E00',
+                    //         width: 3,
+                    //     },
+                    // },
+                    // {
+                    //     yAxis: 50,
+                    //     lineStyle: {
+                    //         color: '#FD0100',
+                    //         width: 3,
+                    //     },
+                    // },
                 ],
             },
         },
@@ -140,7 +157,70 @@ let gnssOption = {
     ],
 }
 
-const genGnssOptionOfDevice = (deviceDataList, halfError) => {
+let gnssRealTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            let i = parseInt((value.min / 1.1)/2-1) * 2
+            return (i<0)?0:i
+        },
+        max: function (value) {
+            return parseInt((value.max * 1.1)/2+1) * 2
+        },
+        name: '土体表面累积位移(mm)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 98,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 98,
+            end: 100,
+        },
+    ],
+}
+
+let gnssLongTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: 0,
+        max: function (value) {
+            return parseInt((value.max * 1.5)/10+1) * 10;
+        },
+        name: '土体表面累积位移(mm)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 0,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 0,
+            end: 100,
+        },
+    ],
+}
+
+const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     gnssOption.xAxis.data = []
     let gnssDataInterval = [[], [], [], []]
     deviceDataList.map(function (item) {
@@ -162,9 +242,9 @@ const genGnssOptionOfDevice = (deviceDataList, halfError) => {
         name: '累积位移',
         type: 'scatter',
         data: gnssDataInterval[0],
-        symbolSize: 7,
+        symbolSize: 4,
         itemStyle: {
-            color: 'rgb(133,133,133)',
+            color: 'rgb(163,163,163)',
             opacity: 0.4,
         },
     }
@@ -174,7 +254,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError) => {
         data: gnssDataInterval[1],
         lineStyle: {
             opacity: 1,
-            width: 4,
+            width: 2,
         },
     }
     gnssOption.series[3] = {
@@ -211,6 +291,15 @@ const genGnssOptionOfDevice = (deviceDataList, halfError) => {
         symbol: 'none',
         data: gnssDataInterval[3],
     }
+    if(dataMode === "实时"){
+        gnssOption.yAxis = gnssRealTimeSetting.yAxis
+        gnssOption.dataZoom = gnssRealTimeSetting.dataZoom
+        // console.log("shishi sdada")
+    }
+    else {
+        gnssOption.yAxis = gnssLongTimeSetting.yAxis
+        gnssOption.dataZoom = gnssLongTimeSetting.dataZoom
+    }
     return gnssOption
 }
 
@@ -245,11 +334,13 @@ let stressOption = {
     yAxis: {
         scale: true,
         min: 0,
-        max: 800,
+        max: function (value) {
+            return parseInt((value.max * 1.2)/100+1) * 100;
+        },
         name: '土体内部应变值(με)',
         nameLocation: 'end',
         nameTextStyle: {
-            fontSize: 16,
+            fontSize: 13,
             align: 'left',
             verticalAlign: 'top',
             fontWeight: 'bold',
@@ -267,7 +358,67 @@ let stressOption = {
     series: [{}, {}, {}, {}, {}, {}, {}, {}],
 }
 
-const genStressOptionOfDevice = (deviceDataList, halfError) => {
+let stressRealTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: 0,
+        max: function (value) {
+            return parseInt((value.max * 1.1)/50+1) * 50;
+        },
+        name: '土体表面累积位移(mm)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 98,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 98,
+            end: 100,
+        },
+    ],
+}
+
+let stressLongTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: 0,
+        max: function (value) {
+            return parseInt((value.max * 1.2)/100+1) * 100;
+        },
+        name: '土体内部应变值(με)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 0,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 0,
+            end: 100,
+        },
+    ],
+}
+
+const genStressOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     stressOption.xAxis.data = []
     let dataInterval = [[], [], [], [], [], [], [], []]
     deviceDataList.map(function (item) {
@@ -301,7 +452,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         name: '下层主应变',
         type: 'scatter',
         data: dataInterval[0],
-        symbolSize: 7,
+        symbolSize: 4,
         itemStyle: {
             color: 'rgb(73,73,73)',
             opacity: 0.4,
@@ -311,9 +462,9 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         name: '中层主应变',
         type: 'scatter',
         data: dataInterval[1],
-        symbolSize: 7,
+        symbolSize: 4,
         itemStyle: {
-            color: 'rgb(133,133,133)',
+            color: 'rgb(163,163,163)',
             opacity: 0.4,
         },
     }
@@ -321,7 +472,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         name: '上层主应变',
         type: 'scatter',
         data: dataInterval[2],
-        symbolSize: 7,
+        symbolSize: 4,
         itemStyle: {
             color: 'rgb(183,183,183)',
             opacity: 0.4,
@@ -333,7 +484,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         data: dataInterval[3],
         lineStyle: {
             opacity: 1,
-            width: 4,
+            width: 2,
             color: '#FFA378',
         },
         itemStyle: {
@@ -347,7 +498,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         data: dataInterval[4],
         lineStyle: {
             opacity: 1,
-            width: 4,
+            width: 2,
             color: '#05AFF2',
         },
         itemStyle: {
@@ -361,7 +512,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         data: dataInterval[5],
         lineStyle: {
             opacity: 1,
-            width: 4,
+            width: 2,
             color: '#45BF55',
         },
         itemStyle: {
@@ -400,6 +551,15 @@ const genStressOptionOfDevice = (deviceDataList, halfError) => {
         symbol: 'none',
         data: dataInterval[7],
     }
+    if(dataMode === "实时"){
+        stressOption.yAxis = stressRealTimeSetting.yAxis
+        stressOption.dataZoom = stressRealTimeSetting.dataZoom
+        // console.log("shishi sdada")
+    }
+    else {
+        stressOption.yAxis = stressLongTimeSetting.yAxis
+        stressOption.dataZoom = stressLongTimeSetting.dataZoom
+    }
     return stressOption
 }
 
@@ -431,12 +591,18 @@ let incinometerOption = {
     },
     yAxis: {
         scale: true,
-        min: -10,
-        max: 10,
+        min: function (value) {
+            if(value.min > 0) return -10
+            return parseInt((value.min * 1.5)/4-1) * 4;
+        },
+        max: function (value) {
+            if(value.max < 2) return 10
+            return parseInt((value.max * 1.5)/4+1) * 4;
+        },
         name: '土体体内部位移(με)',
         nameLocation: 'end',
         nameTextStyle: {
-            fontSize: 16,
+            fontSize: 13,
             align: 'left',
             verticalAlign: 'top',
             fontWeight: 'bold',
@@ -454,7 +620,75 @@ let incinometerOption = {
     series: [{}, {}, {}, {}, {}, {}],
 }
 
-const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
+let incinometerRealTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            if(value.min > 0) return -4
+            return parseInt((value.min * 1.2)/2-1) * 2;
+        },
+        max: function (value) {
+            if(value.max < 2) return 4
+            return parseInt((value.max * 1.2)/2+1) * 2;
+        },
+        name: '土体体内部位移(με)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 90,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 90,
+            end: 100,
+        },
+    ],
+}
+
+let incinometerLongTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            if(value.min > 0) return -10
+            return parseInt((value.min * 1.5)/4-1) * 4;
+        },
+        max: function (value) {
+            if(value.max < 2) return 10
+            return parseInt((value.max * 1.5)/4+1) * 4;
+        },
+        name: '土体体内部位移(με)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 0,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 0,
+            end: 100,
+        },
+    ],
+}
+
+const genIncinometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     incinometerOption.xAxis.data = []
     let dataInterval = [[], [], [], [], [], []]
     let noArea = false
@@ -477,9 +711,9 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         name: '下层内部位移',
         type: 'scatter',
         data: dataInterval[0],
-        symbolSize: 7,
+        symbolSize: 4,
         itemStyle: {
-            color: 'rgb(133,133,133)',
+            color: 'rgb(163,163,163)',
             opacity: 0.6,
         },
     }
@@ -487,7 +721,7 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         name: '中层内部位移',
         type: 'scatter',
         data: dataInterval[1],
-        symbolSize: 7,
+        symbolSize: 4,
         itemStyle: {
             color: '#38D0F2',
             opacity: 0.6,
@@ -497,7 +731,7 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         name: '上层内部位移',
         type: 'scatter',
         data: dataInterval[2],
-        symbolSize: 7,
+        symbolSize: 4,
         itemStyle: {
             color: '#FFA378',
             opacity: 0.6,
@@ -509,7 +743,7 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         data: dataInterval[3],
         lineStyle: {
             opacity: 1,
-            width: 4,
+            width: 2,
             color: '#45BF55',
         },
         itemStyle: {
@@ -552,6 +786,16 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError) => {
         symbol: 'none',
         data: dataInterval[5],
     }
+    
+    if(dataMode === "实时"){
+        incinometerOption.yAxis = incinometerRealTimeSetting.yAxis
+        incinometerOption.dataZoom = incinometerRealTimeSetting.dataZoom
+        // console.log("shishi sdada")
+    }
+    else {
+        incinometerOption.yAxis = incinometerLongTimeSetting.yAxis
+        incinometerOption.dataZoom = incinometerLongTimeSetting.dataZoom
+    }
     return incinometerOption
 }
 
@@ -582,12 +826,18 @@ let manometerOption = {
     },
     yAxis: {
         scale: true,
-        min: -6,
-        max: 2,
+        min: function (value) {
+            if(value.min > 0) return -2
+            return parseInt((value.min * 1.5)/2-1) * 2;
+        },
+        max: function (value) {
+            if(value.max < 2) return 2
+            return parseInt((value.max * 1.5)/2+1) * 2;
+        },
         name: '潜水位土体孔隙水压力(m)',
         nameLocation: 'end',
         nameTextStyle: {
-            fontSize: 16,
+            fontSize: 13,
             align: 'left',
             verticalAlign: 'top',
             fontWeight: 'bold',
@@ -605,7 +855,74 @@ let manometerOption = {
     series: [{}, {}, {}],
 }
 
-const genManometerOptionOfDevice = (deviceDataList, halfError) => {
+let manometerRealTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            if(value.min > 0) return 0
+            return Math.floor(value.min)-0.5;
+        },
+        max: function (value) {
+            return Math.floor(value.max + 1)+0.5;
+        },
+        name: '土体体内部位移(με)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 90,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 90,
+            end: 100,
+        },
+    ],
+}
+
+let manometerLongTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            if(value.min > 0) return -10
+            return parseInt((value.min * 1.5)/4-1) * 4;
+        },
+        max: function (value) {
+            if(value.max < 2) return 10
+            return parseInt((value.max * 1.5)/4+1) * 4;
+        },
+        name: '土体体内部位移(με)',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 0,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 0,
+            end: 100,
+        },
+    ],
+}
+
+const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     manometerOption.xAxis.data = []
     let dataInterval = [[], [], []]
     let noArea = false
@@ -625,7 +942,7 @@ const genManometerOptionOfDevice = (deviceDataList, halfError) => {
         data: dataInterval[0],
         lineStyle: {
             opacity: 1,
-            width: 4,
+            width: 2,
             color: '#45BF55',
         },
         itemStyle: {
@@ -667,6 +984,15 @@ const genManometerOptionOfDevice = (deviceDataList, halfError) => {
         },
         symbol: 'none',
         data: dataInterval[2],
+    }
+    
+    if(dataMode === "实时"){
+        manometerOption.yAxis = manometerRealTimeSetting.yAxis
+        manometerOption.dataZoom = manometerRealTimeSetting.dataZoom
+    }
+    else {
+        manometerOption.yAxis = manometerLongTimeSetting.yAxis
+        manometerOption.dataZoom = manometerLongTimeSetting.dataZoom
     }
     return manometerOption
 }
