@@ -258,19 +258,58 @@ const mapInit = async (map, vis) => {
                 'interpolate',
                 ['linear'],
                 ['zoom'],
-                2,
-                ['literal', 6],
-                10,
-                ['literal', 10],
-                18,
-                ['literal', 24],
-                22,
-                ['literal', 32],
+                1, 1,
+                10, 2,
+                12, 12,
+                18, 24,
+                22, 40,
             ],
             'text-allow-overlap': true,
         },
         paint: {
             'text-color': 'rgb(0, 22, 145)',
+            'text-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                12, 0,
+                13, 0.8,
+                16, 1,
+                22, 32,
+            ],
+        },
+    })
+    map.addLayer({
+        id: '点21',
+        type: 'symbol',
+        source: 'mzsSectionLabel',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+            'text-offset': [-1.0, 1.15],
+            'text-anchor': 'top',
+            'text-size': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                1, 2,
+                10, 2,
+                12, 12,
+                18, 24,
+                22, 40,
+            ],
+            'text-allow-overlap': true,
+        },
+        paint: {
+            'text-color': 'rgb(0, 22, 145)',
+            'text-opacity': [
+                'match',
+                ['get', 'label'],
+                'MZ08海事码头', 0.9,
+                0
+            ],
         },
     })
     map.addLayer({
@@ -764,11 +803,11 @@ const mapInit = async (map, vis) => {
         // })
 
         setTimeout(() => {
-            warnInterval(map, 20)
+            warnInterval(map, 40)
         }, 500)
         useWarnInfoStore().warnWatchTimer = setInterval(
             () => {
-                warnInterval(map, 20)
+                warnInterval(map, 40)
             },
             60 * 1000 * 20,
         )
@@ -1034,6 +1073,7 @@ const warnInterval = async (map, minute) => {
     let allWarnData = (
         await axios.get(`/api/data/deviceWarn/danger/minute/${minute}`)
     ).data
+    console.log(allWarnData)
     // let warnType = 'GNSS'
     let filteredData = filterWarnData(allWarnData)
     let lastPos
@@ -1046,6 +1086,9 @@ const warnInterval = async (map, minute) => {
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)
     if (filteredData.length != 0) {
         useWarnInfoStore().warnInfo = filteredData
+        useWarnInfoStore().videoActive = [0,2]
+    }
+    if(allWarnData.length !== 0) {
         useWarnInfoStore().warnInfo_history = [...allWarnData]
         console.log(
             'in interval history warn',

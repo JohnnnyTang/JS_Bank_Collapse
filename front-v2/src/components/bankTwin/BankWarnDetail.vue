@@ -1,7 +1,10 @@
 <template>
     <div
         class="warn-detail-container"
-        :class="[props.warnActive ? 'active' : 'in-active', {'hide-right': props.domHide}]"
+        :class="[
+            props.warnActive ? 'active' : 'in-active',
+            { 'hide-right': props.domHide },
+        ]"
         v-if="props.warnActive"
     >
         <div class="warn-detail-title">报警处置详情</div>
@@ -131,13 +134,18 @@
                     >
                         暂无未处置报警
                     </div>
-                    <el-collapse-item style="margin-top: 0.5vh">
+                </el-collapse>
+            </el-scrollbar>
+            <el-scrollbar class="accordion-scroll">
+                <el-collapse
+                    v-model="inactiveCollapseOpenItem"
+                >
+                    <el-collapse-item name="inActive">
                         <template #title>
                             <div
                                 style="
                                     margin-left: 1vw;
                                     font-size: calc(0.8vw + 0.6vh);
-                                    color: rgb(0, 193, 243);
                                 "
                             >
                                 已处置报警列表
@@ -264,6 +272,7 @@ const warnDetailList = ref([])
 const curDealWith = ref(new Array(10).fill(false))
 
 const collapseOpenItem = ref([])
+const inactiveCollapseOpenItem = ref(['inActive'])
 
 const dealtWarnList = computed(() => {
     let res = []
@@ -493,8 +502,8 @@ div.warn-detail-container {
     position: absolute;
     right: 0.5vw;
     top: 10vh;
-    height: 43vh;
-    width: 27.5vw;
+    height: 81vh;
+    width: 24.5vw;
 
     backdrop-filter: blur(12px);
     box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
@@ -523,14 +532,14 @@ div.warn-detail-container {
     }
 
     div.warn-detail-content {
-        height: 32vh;
-        width: 27vw;
+        height: 68vh;
+        width: 24vw;
         margin-left: 0.25vw;
 
         background-color: #acd7ff6b;
 
         div.accordion-scroll {
-            height: 100%;
+            height: 50%;
             width: 100%;
         }
 
@@ -557,7 +566,7 @@ div.warn-detail-container {
                 font-size: calc(0.8vw + 0.4vh);
                 &.is-active {
                     color: rgb(221, 251, 255);
-                    background-color: #0019a5;
+                    background-color: #003b94;
                 }
 
                 div.deal-warn-button {
@@ -655,7 +664,7 @@ div.warn-detail-container {
                     border-radius: 6px;
                     background-color: #8bbcfc;
                     color: #000f41;
-                    font-size: calc(0.6vw + 0.6vh);
+                    font-size: calc(0.6vw + 0.45vh);
                     border: 2px solid black;
 
                     &:hover {
@@ -776,8 +785,8 @@ div.warn-detail-container {
     }
 
     div.plan-button-group {
-        height: 5.6vh;
-        width: 26.5vw;
+        height: 7.6vh;
+        width: 23.5vw;
         margin-left: 0.5vw;
         margin-top: 0.5vh;
 
@@ -793,7 +802,7 @@ div.warn-detail-container {
         align-items: center;
 
         div.plan-button-title {
-            height: 4.5vh;
+            height: 6.5vh;
             line-height: 2vh;
             padding-left: 0.5vw;
             padding-right: 0.5vw;
@@ -813,7 +822,7 @@ div.warn-detail-container {
             padding-left: 0.5vw;
             padding-right: 0.5vw;
             font-size: calc(0.5vw + 0.4vh);
-            height: 4vh;
+            height: 5vh;
             line-height: 2vh;
             font-weight: bold;
 

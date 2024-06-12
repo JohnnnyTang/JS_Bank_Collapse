@@ -5,23 +5,23 @@ import { GUI } from 'dat.gui'
 let tickCount = 0
 const WORLD_SIZE = 1024000 //TILE_SIZE * 2000
 
-// const unityCanvas = document.createElement('canvas')
-// unityCanvas.id = 'UnityCanvas'
-// unityCanvas.style.zIndex = '1'
-// unityCanvas.style.width = '100%'
-// unityCanvas.style.height = '100%'
-// unityCanvas.style.border = 'none'
-// unityCanvas.style.position = 'absolute'
-// unityCanvas.style.pointerEvents = 'none'
-// unityCanvas.style.background = 'transparent !important'
-// document.body.appendChild(unityCanvas)
+const unityCanvas = document.createElement('canvas')
+unityCanvas.id = 'UnityCanvas'
+unityCanvas.style.zIndex = '1'
+unityCanvas.style.width = '100%'
+unityCanvas.style.height = '100%'
+unityCanvas.style.border = 'none'
+unityCanvas.style.position = 'absolute'
+unityCanvas.style.pointerEvents = 'none'
+unityCanvas.style.background = 'transparent !important'
+document.body.appendChild(unityCanvas)
 
 class UnityLayer {
 
-    constructor(originPosition, visibleZoom, unityCanvas) {
+    constructor(originPosition, visibleZoom) {
 
         this.type = 'custom'
-        this.id = 'Unity-Layer'
+        this.id = 'UnityLayer'
         this.renderingMode = '3d'
         this.unityProjName = 'output'
         this.visibleZoom = visibleZoom
@@ -38,16 +38,17 @@ class UnityLayer {
         unityCanvas.style.width = unityCanvas.clientWidth
         unityCanvas.style.height = unityCanvas.clientHeight
 
+        // this.movable = true
         this.movable = false
-        this.pX = -2.0591
+        this.pX = -4.0517
         this.pY = 0.00
-        this.pZ = -4.45
+        this.pZ = -4.956
         this.rX = 0.0
         this.rY = 0.0
         this.rZ = 0.0
-        this.sX = 0.927
+        this.sX = 0.9089
         this.sY = 1.0
-        this.sZ = 0.927
+        this.sZ = 0.8863
     }
 
     onAdd(map, gl) {
@@ -141,56 +142,53 @@ class UnityLayer {
             // stopWebCam()
 
             const offset = 0.0
-            /*
-            const devices = [
-                0, 120.5289404, 32.03504751,
-                0, 120.5222438, 32.03900986,
-                0, 120.5212035, 32.04098681,
-                3, 120.515163, 32.04214443 + offset,     //  3
-                3, 120.5209528, 32.04067285,
-                3, 120.5108725, 32.04263819 + offset,    //  5
-                3, 120.5113986, 32.04257987 + offset,    //  6
-                3, 120.5210704, 32.0403478,
-                3, 120.5156746, 32.04204412 + offset,    //  8
-                0, 120.515204, 32.04180251 + offset,     //  9
-                3, 120.5103731, 32.04268722 + offset,    // 10
-                3, 120.5146732, 32.04226309 + offset,    // 11
-                0, 120.547948, 32.02945642,
-                0, 120.5643912, 32.02367567,
-                0, 120.5587575, 32.02524072 + offset * 0.2,    // 14 
-                0, 120.51129, 32.0429479 + offset,       // 15
-                3, 120.5208149, 32.04101417,
-                0, 120.5511673, 32.02840145,
-                0, 120.5414619, 32.03076972,
-                4, 120.5422418, 32.03077085,
-                4, 120.5155315, 32.04267723 + offset,    // 20
-                4, 120.522407, 32.03941692,
-                1, 120.5149435, 32.04269763 + offset,    // 22
-                1, 120.5418489, 32.0309461,
-                1, 120.5592327, 32.025761,
-                2, 120.5410243, 32.03071962,
-                2, 120.551624, 32.02829712,
-                2, 120.5286929, 32.03476855,
-                2, 120.5108859, 32.04228621 + offset + 0.0002,    // 28
-                2, 120.5205948, 32.04056061,
-                2, 120.5474064, 32.02961633,
-                2, 120.5147123, 32.0417763 + offset,     // 31
-                // 3, 120.5210704, 32.0403478, 
-                // 3, 120.5113986, 32.04257987, 
-                // 3, 120.5108725, 32.04263819, 
-                // 3, 120.5146732, 32.04226309, 
-                // 3, 120.5208149, 32.04101417, 
-                // 3, 120.515163, 32.04214443, 
-                // 3, 120.5156746, 32.04204412, 
-                // 3, 120.5209528, 32.04067285, 
-                // 3, 120.5103731, 32.04268722, 
-            ]
+            // const devices = [
+            //     0, 120.5289404,32.03504751,
+            //     0, 120.5222438, 32.03900986, 
+            //     0, 120.5212035, 32.04098681, 
+            //     3, 120.515163, 32.04214443 + offset,     //  3
+            //     3, 120.5209528, 32.04067285, 
+            //     3, 120.5108725, 32.04263819 + offset,    //  5
+            //     3, 120.5113986, 32.04257987 + offset,    //  6
+            //     3, 120.5210704, 32.0403478, 
+            //     3, 120.5156746, 32.04204412 + offset,    //  8
+            //     0, 120.515204, 32.04180251 + offset,     //  9
+            //     3, 120.5103731, 32.04268722 + offset,    // 10
+            //     3, 120.5146732, 32.04226309 + offset,    // 11
+            //     0, 120.547948, 32.02945642, 
+            //     0, 120.5643912, 32.02367567, 
+            //     0, 120.5587575, 32.02524072 + offset * 0.2,    // 14 
+            //     0, 120.51129, 32.0429479 + offset,       // 15
+            //     3, 120.5208149, 32.04101417, 
+            //     0, 120.5511673, 32.02840145, 
+            //     0, 120.5414619, 32.03076972, 
+            //     4, 120.5422418, 32.03077085, 
+            //     4, 120.5155315, 32.04267723 + offset,    // 20
+            //     4, 120.522407, 32.03941692, 
+            //     1, 120.5149435, 32.04269763 + offset,    // 22
+            //     1, 120.5418489, 32.0309461, 
+            //     1, 120.5592327, 32.025761, 
+            //     2, 120.5410243, 32.03071962, 
+            //     2, 120.551624, 32.02829712, 
+            //     2, 120.5286929, 32.03476855, 
+            //     2, 120.5108859, 32.04228621 + offset,// + 0.0002,    // 28
+            //     2, 120.5205948, 32.04056061, 
+            //     2, 120.5474064, 32.02961633, 
+            //     2, 120.5147123, 32.0417763 + offset,     // 31
+            //     // 3, 120.5210704, 32.0403478, 
+            //     // 3, 120.5113986, 32.04257987, 
+            //     // 3, 120.5108725, 32.04263819, 
+            //     // 3, 120.5146732, 32.04226309, 
+            //     // 3, 120.5208149, 32.04101417, 
+            //     // 3, 120.515163, 32.04214443, 
+            //     // 3, 120.5156746, 32.04204412, 
+            //     // 3, 120.5209528, 32.04067285, 
+            //     // 3, 120.5103731, 32.04268722, 
+            // ]
 
-            for (let i = 0; i < devices.length / 3; i++) {
-                this.addDevice(`${i}`, devices[i * 3 + 0], devices[i * 3 + 1], devices[i * 3 + 2])
-            }
-            */
-
+            // for (let i = 0; i < devices.length / 3; i++) {
+            //     this.addDevice(`${i}`, devices[i * 3 + 0], devices[i * 3 + 1], devices[i * 3 + 2], 10.0)
+            // }
             const DEVICECES = [
                 '01', 0, 120.51129, 32.0429479 + offset,
                 '02', 0, 120.515204, 32.04180251 + offset,
@@ -230,9 +228,8 @@ class UnityLayer {
                 '03', 4, 120.5422418, 32.03077085,
             ]
             for (let i = 0; i < DEVICECES.length / 4; i++) {
-                this.addDevice(DEVICECES[i * 4 + 0], DEVICECES[i * 4 + 1], DEVICECES[i * 4 + 2], DEVICECES[i * 4 + 3])
+                this.addDevice(DEVICECES[i * 4 + 0], DEVICECES[i * 4 + 1], DEVICECES[i * 4 + 2], DEVICECES[i * 4 + 3], 10.0)
             }
-
 
             // dat.GUI
             if (this.movable) {
@@ -291,8 +288,6 @@ class UnityLayer {
 
     move() {
 
-        this.movable = true
-
         this.dispatchMessage({
             Method: 'Translate',
             F32Array: [
@@ -350,7 +345,7 @@ class UnityLayer {
         })
     }
 
-    addDevice(name, type, lon, lat) {
+    addDevice(name, type, lon, lat, scale) {
 
         const WMC = this.wgs84ToWorld(lon, lat)
         const coord = this.worldToModel(WMC[0], WMC[1], 0.0)
@@ -363,6 +358,7 @@ class UnityLayer {
                 /* 1 */   coord[0],
                 /* 2 */   coord[2],
                 /* 3 */   coord[1],
+                /* 4 */   scale,
             ]
         })
     }
@@ -516,7 +512,6 @@ function makePerspectiveMatrix(fovy, aspect, near, far) {
 //         })
 //     }
 // }
-
 export {
     UnityLayer
 }

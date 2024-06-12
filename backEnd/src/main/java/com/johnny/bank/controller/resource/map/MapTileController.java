@@ -1,5 +1,6 @@
 package com.johnny.bank.controller.resource.map;
 
+import com.johnny.bank.model.common.SimpleBboxInfo;
 import com.johnny.bank.service.resource.map.impl.RasterTileService;
 import com.johnny.bank.service.resource.map.impl.VectorTileService;
 import jakarta.servlet.ServletOutputStream;
@@ -95,6 +96,34 @@ public class MapTileController {
     @GetMapping("/vector/{tileName}/info/bbox")
     public ResponseEntity<List<Map<String, Object>>> getVectorTileBboxInfo(@PathVariable String tileName) {
         return ResponseEntity.ok(vectorTileService.getLayerWholeInfo(tileName));
+    }
+
+    @GetMapping("/vector/{tileName}/id/{id}/info/bbox")
+    public ResponseEntity<Object> getVectorTileBboxInfo(@PathVariable String tileName,@PathVariable String id) {
+        return ResponseEntity.ok(vectorTileService.getLayerBboxInfoById(tileName, id));
+    }
+
+    @GetMapping("/vector/{tileName}/cj/bbox")
+    public ResponseEntity<List<Map<String, Object>>> getLinkedRiverVectorTileBboxInfo(@PathVariable String tileName) {
+        return ResponseEntity.ok(vectorTileService.getLinkedRiverLayerBboxInfo(tileName));
+    }
+
+    @GetMapping("/vector/{tileName}/id/{id}/cj/bbox")
+    public ResponseEntity<Map<String, Object>> getLinkedRiverVectorTileBboxInfoById(
+            @PathVariable String tileName, @PathVariable String id) {
+        return ResponseEntity.ok(vectorTileService.getLinkedRiverLayerBboxInfoById(tileName, id));
+    }
+
+    @GetMapping("/vector/{tileName}/id/{id}/buffer/{buf}/cj/bbox")
+    public ResponseEntity<SimpleBboxInfo> getLinkedRiverVectorTileBboxInfoByIdWithRad(
+            @PathVariable String tileName, @PathVariable String id, @PathVariable Integer buf) {
+        return ResponseEntity.ok(vectorTileService.getLinkedRiverLayerBboxInfoByIdWithBuffer(tileName, id, buf));
+    }
+
+    @GetMapping("/vector/river/{tileName}/id/{id}/buffer/{buf}/cj/bbox")
+    public ResponseEntity<SimpleBboxInfo> getRiverVectorTileBboxInfoByIdWithRad(
+            @PathVariable String tileName, @PathVariable String id, @PathVariable Integer buf) {
+        return ResponseEntity.ok(vectorTileService.getRiverLayerBboxInfoByIdWithBuffer(tileName, id, buf));
     }
 
     @CrossOrigin

@@ -1,10 +1,11 @@
 <template>
     <div class="description-container">
-        <div class="miniIcon" @click="close"></div>
+        <div class="miniIcon" :style="iconBackStyle" @click="pinIt"></div>
 
         <div class="bankDesc" v-if="props.sourceId === 'importantBank'">
             <el-descriptions class="margin-top" :title="props.ogData['bank_name'] + '--' + level + '级预警'" :column="3"
-                border>
+            :class="{'smallFont':(props.ogData['bank_name'] + '--' + level + '级预警').length>15}"    
+            border>
                 <el-descriptions-item align="center">
                     <template #label>
                         <div class="cell-item">
@@ -174,12 +175,16 @@ const props = defineProps({
     sourceId: String,
     column: Number,
 })
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'pin'])
 
 
 const fMap = ref({})
 const title = ref('')
 const data = ref({})
+const pinState = ref(false)
+const iconBackStyle = computed(() => {
+    return pinState.value ? { backgroundImage: `url('/icons/pin.png')` } : { backgroundImage: `url('/icons/notPin.png')` }
+})
 
 const bankfiledDict = {
     "importantBank": {
@@ -225,9 +230,15 @@ watch(props, (V) => {
         // console.log(fMap.value, title.value, data.value);
     }
 })
-const close = () => {
-    emit('close')
+// const close = () => {
+//     emit('close')
+// }
+
+const pinIt = () => {
+    pinState.value = !pinState.value
+    emit('pin', pinState.value)
 }
+
 const noDataMap = (data) => {
     if (data === '0' || data === '*' || data === '' || data === undefined || data === null) {
         return 'N/A'
@@ -271,18 +282,17 @@ onMounted(() => {
             padding-top: 1vh;
             padding-bottom: 1vh;
             background-color: rgb(20, 115, 196);
-            font-family: Arial, Helvetica, sans-serif
+            font-family: Arial, Helvetica, sans-serif;
+
         }
     }
-
     :deep(.el-descriptions__header) {
         height: 3vh;
-        border:  #4f81ff solid 1px;
-        &:hover{
+        border: #4f81ff solid 1px;
+
+        &:hover {
             cursor: move;
         }
-
-
         .el-descriptions__title {
             position: relative;
             width: fit-content;
@@ -296,10 +306,19 @@ onMounted(() => {
             text-shadow: #173eaa 1px 1px, #173eaa 2px 2px, #173eaa 3px 3px;
         }
     }
+    .smallFont{
+        :deep(.el-descriptions__header) {
+
+            .el-descriptions__title {
+                font-size: calc(0.6vw + 0.6vh);
+            }
+        }
+    }
 
     :deep(.el-descriptions__body) {
 
-        border:  #60c0ff solid 1px;
+        border: #60c0ff solid 1px;
+
         .el-descriptions__cell.el-descriptions__content.is-bordered-content {
             background-color: #ffffff;
             text-align: center;
@@ -342,7 +361,7 @@ onMounted(() => {
         top: 1vh;
         width: 2.3vh;
         height: 2.3vh;
-        background-image: url('/icons/minimize.png');
+        // background-image: url('/icons/pin.png');
         background-size: contain;
         background-repeat: no-repeat;
 

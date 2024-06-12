@@ -22,4 +22,7 @@ public class VectorTileSource {
     List<String> fieldList;
     int activeStatus;
     String memo;
+    List<String> mapField;
+    List<String> detailField;
+    List<String> basicField;
 }
