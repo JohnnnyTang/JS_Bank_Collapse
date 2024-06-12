@@ -47,16 +47,26 @@ onMounted(async () => {
 
     const map = await initPureScratchMap(mapDom.value)
 
-    // mapFlyToRiver(map)
+    mapFlyToRiver(map)
     // // E:\WATER\BankCollapse\JS_Bank_Collapse\front-v2\public\scratchSomething\flowWebGL\json\flow_field_description.json
 
-    // map.on('zoom', () => {
-    //     realtimeZoom.value = map.getZoom()
-    // });
+    map.on('zoom', () => {
+        realtimeZoom.value = map.getZoom()
+    });
     // console.log(TerrainLayer)
 
 
-    map.addLayer(new TerrainLayer(14))
+    await layerAddFunction(map, '一级预警岸段')
+    await layerAddFunction(map, '二级预警岸段')
+    await layerAddFunction(map, '三级预警岸段')
+    await layerAddFunction(map, '一级岸段-点注记')
+    await layerAddFunction(map, '二级岸段-点注记')
+    await layerAddFunction(map, '三级岸段-点注记')
+    await layerAddFunction(map, '一级岸段-注记')
+    await layerAddFunction(map, '二级岸段-注记')
+    await layerAddFunction(map, '三级岸段-注记')
+
+
 
     // const map = new ScratchMap({
     //     accessToken:

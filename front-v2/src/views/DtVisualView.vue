@@ -157,10 +157,10 @@
             </el-radio-group>
         </div>
 
-        <!-- <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
+        <div class="temp" style="display: block; position: absolute; left: 30vw; top: 30vh; background-color: rgb(182, 70, 18); 
         opacity: 0.5; width: 8vw; height: 4vh;">
             <span style="font-weight: 600;">{{ realtimeZoom }}</span>
-        </div> -->
+        </div>
     </div>
 </template>
 
@@ -265,14 +265,11 @@ const infoTableData_filtered = computed(() => {
 
         if (nowSource == 'riverArea') {
             if (nowLayerGroup == '流域性骨干河道') {
-                console.log('sort11111', res)
                 res.sort(customSort1)
             } else if (nowLayerGroup == '区域性骨干河道') {
-                console.log('sort22222', res)
                 res.sort(customSort2)
             }
         }
-        console.log('sorted!', res)
     }
 
     return res
@@ -523,28 +520,8 @@ const layerGroupClickHandler = (node, data) => {
 const baseMapChangeHandler = async () => {
     let map = mapStore.getMap()
     if (baseMapRadio.value == 0) {
-        // map.once('style.load', async () => {
-        //     map.addSource('mapRaster22', {
-        //         type: 'raster',
-        //         tiles: [
-        //             tileServer + '/tile/raster/image/base/{x}/{y}/{z}',
-        //         ],
-        //         tileSize: 256,
-        //         minzoom: 1,
-        //         maxzoom: 14,
-        //         bounds: [
-        //             118.3372672298279582, 30.5615244886408277, 122.3900937696443378,
-        //             32.835981186719593,
-        //         ],
-        //     })
-        //     map.addLayer({
-        //         id: 'ras',
-        //         type: 'raster',
-        //         source: 'mapRaster22',
-        //     })
-        //     await initTextLayer(map)
-        // })
         map.setStyle(getImageStyleJson())
+        resetSideBarTree()
 
         setTimeout(() => {
             map.addSource('mapRaster22', {
@@ -572,66 +549,18 @@ const baseMapChangeHandler = async () => {
         //     await initSortedLayer(map)
         // })
         map.setStyle(getStyleJson4base())
+        resetSideBarTree()
 
         setTimeout(() => {
             initSortedLayer(map)
         }, 500);
 
+
     }
 }
 
-// const detailClickHandler4layerGroup = async (lable) => {
-//     infoTableData.value = []
-//     infoTableHeader.value = []
-//     pannelLoading.value = true
-
-//     // showInfoPannel.value = true
-//     let layers = sceneStore.LAYERGROUPMAP.value[lable].layerIDs
-//     let infoLayer = layers.filter((item) => {
-//         if (item.includes('注记') || item.includes('重点行政区边界') || item.includes('桥墩') || item.includes('水闸工程-重点')) {
-//             return false
-//         } return true
-//     })
-//     let data
-//     let thData
-//     let map = mapStore.getMap()
-//     for (let i = 0; i < infoLayer.length; i++) {
-//         if (infoLayer[i].includes('过江通道')) {
-//             // let t1 = [] // 已
-//             // let t2 = []  // 在
-//             // let t3 = [] // 规划
-//             let res1 = (await axios.get(tileServer + `/tile/vector/riverPassageLine/info`)).data
-//             let res2 = (await axios.get(tileServer + `/tile/vector/riverPassagePolygon/info`)).data
-//             data = [...res1, ...res2]
-//             thData = {
-//                 'name': '名称',
-//                 'plan': '类型',
-//             }
-//             break
-//         }
-//         else if (infoLayer[i].includes('长江干堤')) {
-//         }
-//         else {
-//             data = await getLayerFeatureArray(map, infoLayer[i])
-//             thData = getTableHeader(map, infoLayer[i])
-//         }
-//     }
-//     const process = (obj) => {
-//         let res = []
-//         let keys = Object.keys(obj)
-//         keys.forEach(item => {
-//             res.push({ 'label': obj[item], 'prop': item })
-//         })
-//         return res
-//     }
-
-//     infoTableData.value = data
-//     infoTableHeader.value = process(thData)
-//     pannelLoading.value = false
-// }
 const detailClickHandler4Feature = async (a) => {
     let featInfo = a
-    console.log(nowSource, a)
     let newFeatInfomation = {
         ogData: featInfo,
         sourceId: nowSource,
@@ -644,7 +573,6 @@ const detailClickHandler4Feature = async (a) => {
     if (nowSource == 'riverBridge') {
         let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
         let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
-        console.log(bbox)
         map.fitBounds(bbox, {
             padding: paddingMap[nowSource],
             maxZoom: maxZoomMap[nowSource],
@@ -713,7 +641,6 @@ const detailClickHandler4Feature = async (a) => {
         // http://localhost:5173/api/tile/vector/pumpArea/id/1/buffer/500/cj/bbox
         let detailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/buffer/1000/cj/bbox`)).data
         let bbox = [[detailInfo.bbox[0], detailInfo.bbox[1]], [detailInfo.bbox[2], detailInfo.bbox[3]]]
-        console.log(bbox);
         map.fitBounds(bbox, {
             padding: paddingMap[nowSource],
             maxZoom: maxZoomMap[nowSource],
@@ -746,7 +673,6 @@ const featureNodeClick = async (node, data) => {
     let featInfo = data.property
     let lgId = data.lgId
     let nowSource = layerSourceMap[lgId]
-    console.log(nowSource, data)
     // let newFeatInfomation = {
     //     ogData: featInfo,
     //     sourceId: nowSource,
@@ -756,7 +682,6 @@ const featureNodeClick = async (node, data) => {
     if (node.parent.data.label.includes('岸段')) {
         showDetail.value = true
         const featureDetailInfo = (await axios.get(tileServer + `/tile/vector/${nowSource}/id/${featInfo.id}/info/bbox`)).data
-        // console.log(lgId, featureDetailInfo)
         featureInfo.value = {
             ogData: featureDetailInfo,
             sourceId: nowSource,
@@ -821,6 +746,40 @@ const mapFlyToRiver = (mapIns) => {
 const closeHandler = (index) => {
     activeStatus.value[index] = false
 }
+const resetSideBarTree = () => {
+    console.log('reset!')
+    /////// STATIC
+    let nowTree = dataSource.value
+    nowTree[0].active = true
+    nowTree[0].children[0].active = true
+    nowTree[0].children[1].active = true
+    nowTree[0].children[2].active = true
+
+    nowTree[1].active = true
+
+    nowTree[2].active = false
+
+    nowTree[3].active = true
+    nowTree[3].children[0].active = true
+    nowTree[3].children[1].active = true
+
+    nowTree[4].active = false
+    nowTree[4].children[0].active = false
+    nowTree[4].children[1].active = false
+
+    nowTree[5].active = false
+    nowTree[5].children[0].active = false
+    nowTree[5].children[1].active = false
+
+    nowTree[6].active = true
+
+    nowTree[7].active = false
+    nowTree[7].children[0].active = true
+    nowTree[7].children[1].active = true
+    nowTree[7].children[2].active = false
+
+
+}
 
 const prepareMap = async () => {
     const mapInstance = await initBaseMap(mapContainer.value)
@@ -835,7 +794,6 @@ const prepareMap = async () => {
     mapInstance.touchZoomRotate.disableRotation()
     mapFlyToRiver(mapInstance)
     await initSortedLayer(mapInstance)
-
 
     mapInstance.on('zoom', () => {
         realtimeZoom.value = mapInstance.getZoom()
@@ -991,7 +949,6 @@ const featureHighLight = (featureLayerid, map, featureId) => {
 
 
     let featureLayer = map.getLayer(featureLayerid)
-    console.log(featureLayer);
 
     let sourceid = featureLayer.source
     let layoutMap = {

@@ -1914,14 +1914,15 @@ const layerAddFunctionMap = {
             })
     },
     '过江通道辅助线': async (map) => {
+        console.log('1111111111');
         !map.getSource('riverBridgeAssist') &&
             map.addSource('riverBridgeAssist', {
                 type: 'geojson',
                 data: riverBridgeAssist,
             })
-        !map.getLayer('riverBridgeAssist') &&
+        !map.getLayer('过江通道辅助线') &&
             map.addLayer({
-                id: 'riverBridgeAssist',
+                id: '过江通道辅助线',
                 type: 'line',
                 source: 'riverBridgeAssist',
                 layout: {
@@ -2390,6 +2391,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'sp_name'],
                     'text-font': [
                         'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
                     ],
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, 0.5],
@@ -2452,6 +2454,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'sp_name'],
                     'text-font': [
                         'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
                     ],
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, 0.5],
@@ -3065,31 +3068,24 @@ const layerAddFunctionMap = {
                 id: '一级岸段-注记',
                 type: 'symbol',
                 source: 'importantBank',
-                minzoom: 11,
+                minzoom: 13,
                 'source-layer': 'default',
                 filter: ['==', 'warning_level', 1],
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    // 'symbol-placement': 'line',
-                    'symbol-placement': 'line-center',
+                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
                     'text-offset': [0, 0],
-                    'text-anchor': 'bottom',
-                    'text-size': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        ['literal', 15],
-                        10,
-                        ['literal', 20],
-                        13,
-                        ['literal', 25],
-                    ],
+                    'text-size': 23,
+
+                    // 'text-size': 16,
+
                     'text-allow-overlap': true,
+                    'text-ignore-placement': true,
 
                 },
                 paint: {
@@ -3110,32 +3106,35 @@ const layerAddFunctionMap = {
                 id: '二级岸段-注记',
                 type: 'symbol',
                 source: 'importantBank',
-                minzoom: 11,
+                minzoom: 13,
                 'source-layer': 'default',
                 filter: ['==', 'warning_level', 2],
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    // 'symbol-placement': 'line',
-                    'symbol-placement': 'line-center',
+                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
                     'text-offset': [0, 0],
-                    'text-anchor': 'bottom',
-                    'text-size': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        ['literal', 15],
-                        10,
-                        ['literal', 20],
-                        13,
-                        ['literal', 25],
-                    ],
+                    // 'text-size': [
+                    //     'interpolate',
+                    //     ['linear'],
+                    //     ['zoom'],
+                    //     11,
+                    //     ['literal', 18],
+                    //     13,
+                    //     ['literal', 24],
+                    // ],
+                    // 'symbol-spacing': 100,
+                    // 'text-max-angle': 90,
+                    'text-size': 22,
+
+
 
                     'text-allow-overlap': true,
+                    'text-ignore-placement': true,
 
                 },
                 paint: {
@@ -3156,32 +3155,24 @@ const layerAddFunctionMap = {
                 id: '三级岸段-注记',
                 type: 'symbol',
                 source: 'importantBank',
-                minzoom: 11,
+                minzoom: 13,
+
                 'source-layer': 'default',
                 filter: ['==', 'warning_level', 3],
                 layout: {
                     'text-field': ['get', 'bank_name'],
-                    // 'symbol-placement': 'line',
-                    'symbol-placement': 'line-center',
+                    'symbol-placement': 'line',
+                    // 'symbol-placement': 'line-center',
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
                     'text-offset': [0, 0],
-                    'text-anchor': 'bottom',
-                    'text-size': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7,
-                        ['literal', 15],
-                        10,
-                        ['literal', 20],
-                        13,
-                        ['literal', 25],
-                    ],
+                    'text-size': 21,
+
 
                     'text-allow-overlap': true,
+                    'text-ignore-placement': true,
 
                 },
                 paint: {
@@ -3192,18 +3183,24 @@ const layerAddFunctionMap = {
             })
     },
     '一级预警岸段-注记': async (map) => {
-        !map.getSource('importantBank') &&
-            map.addSource('importantBank', {
+        // !map.getSource('importantBank') &&
+        //     map.addSource('importantBank', {
+        //         type: 'vector',
+        //         tiles: [tileServer + '/tile/vector/importantBank/{x}/{y}/{z}'],
+        //     })
+        !map.getSource('importantBankCenter') &&
+            map.addSource('importantBankCenter', {
                 type: 'vector',
-                tiles: [tileServer + '/tile/vector/importantBank/{x}/{y}/{z}'],
+                tiles: [tileServer + '/tile/vector/center/importantBank/{x}/{y}/{z}'],
             })
         !map.getLayer('一级预警岸段-注记') &&
             map.addLayer({
                 id: '一级预警岸段-注记',
                 type: 'symbol',
-                source: 'importantBank',
+                // source: 'importantBank',
+                source: 'importantBankCenter',
                 minzoom: 8,
-                maxzoom: 12,
+                maxzoom: 11,
                 'source-layer': 'default',
                 filter: ['==', 'warning_level', 1],
                 layout: {
@@ -3214,13 +3211,161 @@ const layerAddFunctionMap = {
                     ],
                     'symbol-placement': 'point',
                     // 'symbol-placement': 'line-center',
-                    // 'text-offset': [0.0, 1.0],
-                    'text-variable-anchor': ["top", "bottom", "center", "left", "right"],
+                    'text-offset': [0.0, 0.0],
+                    // 'text-offset': [
+                    //     'match',
+                    //     ['get', 'id'],
+                    //     '22',
+                    //     [0.0, 10.0],
+                    //     [0.0, 0.0]
+                    // ],
+                    'text-variable-anchor': ["left", "top", "bottom", "center", "right",],
                     'text-size': 21,
                     // 'text-padding': 0.0,
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                     "text-allow-overlap": false,
-                    'text-ignore-placement': true
+                    'text-ignore-placement': false
+                },
+                paint: {
+                    'text-color': '#2e0201',
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 3.0,
+                },
+            })
+    },
+
+    '一级岸段-点注记': async (map) => {
+        !map.getSource('importantBankCenter') &&
+            map.addSource('importantBankCenter', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/center/importantBank/{x}/{y}/{z}'],
+            })
+        !map.getLayer('一级岸段-点注记') &&
+            map.addLayer({
+                id: '一级岸段-点注记',
+                type: 'symbol',
+                source: 'importantBankCenter',
+                minzoom: 11,
+                maxzoom: 13,
+                'source-layer': 'default',
+                filter: ['==', 'warning_level', 1],
+                layout: {
+                    'text-field': ['get', 'bank_name'],
+                    'symbol-placement': 'point',
+                    // 'symbol-placement': 'line-center',
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    'text-offset': [0, 0],
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        11,
+                        ['literal', 18],
+                        13,
+                        ['literal', 24],
+                    ],
+                    // 'text-size': 16,
+
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true,
+
+                },
+                paint: {
+                    'text-color': '#2e0201',
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 3.0,
+                },
+            })
+    },
+    '二级岸段-点注记': async (map) => {
+        !map.getSource('importantBankCenter') &&
+            map.addSource('importantBankCenter', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/center/importantBank/{x}/{y}/{z}'],
+            })
+        !map.getLayer('二级岸段-点注记') &&
+            map.addLayer({
+                id: '二级岸段-点注记',
+                type: 'symbol',
+                source: 'importantBankCenter',
+                minzoom: 11,
+                maxzoom: 13,
+                'source-layer': 'default',
+                filter: ['==', 'warning_level', 2],
+                layout: {
+                    'text-field': ['get', 'bank_name'],
+                    // 'symbol-placement': 'line',
+                    'symbol-placement': 'point',
+                    // 'symbol-placement': 'line-center',
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    'text-offset': [0, 0],
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        11,
+                        ['literal', 18],
+                        13,
+                        ['literal', 24],
+                    ],
+
+
+
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true,
+
+                },
+                paint: {
+                    'text-color': '#2e0201',
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 3.0,
+                },
+            })
+    },
+    '三级岸段-点注记': async (map) => {
+        !map.getSource('importantBankCenter') &&
+            map.addSource('importantBankCenter', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/center/importantBank/{x}/{y}/{z}'],
+            })
+        !map.getLayer('三级岸段-点注记') &&
+            map.addLayer({
+                id: '三级岸段-点注记',
+                type: 'symbol',
+                source: 'importantBankCenter',
+                minzoom: 11,
+                maxzoom: 13,
+                'source-layer': 'default',
+                filter: ['==', 'warning_level', 3],
+                layout: {
+                    'text-field': ['get', 'bank_name'],
+                    // 'symbol-placement': 'line',
+                    'symbol-placement': 'point',
+                    // 'symbol-placement': 'line-center',
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    'text-offset': [0, 0],
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        11,
+                        ['literal', 18],
+                        13,
+                        ['literal', 24],
+                    ],
+
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true,
+
                 },
                 paint: {
                     'text-color': '#2e0201',
@@ -3486,7 +3631,16 @@ const layerAddFunctionMap = {
                     'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
                     'symbol-placement': "point",
                     // 'text-anchor': 'center',
-                    'text-size': 18,
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        10,
+                        ['literal', 8],
+                        13,
+                        ['literal', 18],
+                    ],
+
                     'text-padding': 0,
                     // 'text-offset': [
                     //     'match',
@@ -3662,8 +3816,9 @@ const initSortedLayer = async (map) => {
 
     await layerInitFunction(map, '已建通道')// 缩放
     await layerInitFunction(map, '在建通道')// 缩放
+    await layerInitFunction(map, '过江通道辅助线')// 缩放
     await layerInitFunction(map, '规划通道')// 缩放
-    await layerAddFunction(map, '重点行政区边界')// 全程
+    await layerInitFunction(map, '重点行政区边界')// 全程
 
     // 点
     await layerAddFunction(map, '里程桩')
@@ -3690,6 +3845,9 @@ const initSortedLayer = async (map) => {
     await layerAddFunction(map, '一级岸段-注记')
     await layerAddFunction(map, '二级岸段-注记')
     await layerAddFunction(map, '三级岸段-注记')
+    await layerAddFunction(map, '一级岸段-点注记')
+    await layerAddFunction(map, '二级岸段-点注记')
+    await layerAddFunction(map, '三级岸段-点注记')
     await layerInitFunction(map, '已建通道-注记')
     await layerInitFunction(map, '在建通道-注记')
     await layerInitFunction(map, '规划通道-注记')
@@ -3770,6 +3928,7 @@ const initTextLayer = async (map) => {
 
     await layerInitFunction(map, '已建通道')// 缩放
     await layerInitFunction(map, '在建通道')// 缩放
+    await layerInitFunction(map, '过江通道辅助线')// 缩放
     await layerInitFunction(map, '规划通道')// 缩放
     await layerAddFunction(map, '重点行政区边界')// 全程
 
@@ -3798,6 +3957,9 @@ const initTextLayer = async (map) => {
     await layerAddFunction(map, '一级岸段-注记')
     await layerAddFunction(map, '二级岸段-注记')
     await layerAddFunction(map, '三级岸段-注记')
+    await layerAddFunction(map, '一级岸段-点注记')
+    await layerAddFunction(map, '二级岸段-点注记')
+    await layerAddFunction(map, '三级岸段-点注记')
     await layerInitFunction(map, '已建通道-注记')
     await layerInitFunction(map, '在建通道-注记')
     await layerInitFunction(map, '规划通道-注记')
