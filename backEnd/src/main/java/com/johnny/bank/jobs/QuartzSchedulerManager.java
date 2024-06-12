@@ -118,7 +118,7 @@ public class QuartzSchedulerManager {
                 .withIdentity("gnssWarning", "group1")
                 .build();
         // 基于表达式构建触发器
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/59 * * * ?");
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/20 * * * ?");
         // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("gnssWarningTrigger", "tesGroup")
                 .withSchedule(cronScheduleBuilder).build();
