@@ -139,7 +139,7 @@ class UnityLayer {
             this.init()
             this.keep(this.zoom >= this.visibleZoom)
 
-            // stopWebCam()
+            stopWebCam()
 
             const offset = 0.0
             // const devices = [
@@ -503,15 +503,15 @@ function makePerspectiveMatrix(fovy, aspect, near, far) {
     return out
 }
 
-// function stopWebCam() {
-//     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-//         navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-//             stream.getTracks().forEach(track => track.stop())
-//         }).catch(function(error) {
-//             console.log("Error stopping the webcam: ", error)
-//         })
-//     }
-// }
+function stopWebCam() {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+            stream.getTracks().forEach(track => track.stop())
+        }).catch(function(error) {
+            console.log("Error stopping the webcam: ", error)
+        })
+    }
+}
 export {
     UnityLayer
 }

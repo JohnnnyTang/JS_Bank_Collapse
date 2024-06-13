@@ -57,6 +57,11 @@ void main() {
     uint dSM = uint(levelS != 0 ? clamp(levelM - levelS, 0, 2) : 0);
     uint dWM = uint(levelW != 0 ? clamp(levelM - levelW, 0, 2) : 0);
 
+    // uint dNM = uint(max(levelM - levelN, 0));
+    // uint dEM = uint(max(levelM - levelE, 0));
+    // uint dSM = uint(max(levelM - levelS, 0));
+    // uint dWM = uint(max(levelM - levelW, 0));
+
     uint color = (dNM << 24) + (dEM << 16) + (dSM << 8) + dWM;
 
     fragColor = uvec4(color, 0, 0, 0);

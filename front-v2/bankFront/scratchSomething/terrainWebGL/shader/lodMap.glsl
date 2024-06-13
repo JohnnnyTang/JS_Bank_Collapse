@@ -25,8 +25,8 @@ void main() {
     vec4 nodeData = texelFetch(boxTexture, instanceCoords, 0);
     float nodeStartX = floor((nodeData.r - tileBox[0]) / sectorRange.x);
     float nodeStartY = floor((nodeData.g - tileBox[1]) / sectorRange.y);
-    float nodeEndX = floor((nodeData.b - tileBox[0]) / sectorRange.x);
-    float nodeEndY = floor((nodeData.a - tileBox[1]) / sectorRange.y);
+    float nodeEndX = ceil((nodeData.b - tileBox[0]) / sectorRange.x);
+    float nodeEndY = ceil((nodeData.a - tileBox[1]) / sectorRange.y);
 
     vec2 vertices[4] = vec2[4](
         vec2(nodeStartX, nodeStartY),
