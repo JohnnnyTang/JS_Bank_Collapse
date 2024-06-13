@@ -272,7 +272,7 @@ const getSideBarTree = async () => {
             warning3
         ]
     }
-    console.log(importantBank);
+    // console.log(importantBank);
     let zt = (await axios.get(tileServer + `/tile/vector/riverBeach/info`)).data
     let mainZt = {
         label: '长江沙洲',
@@ -289,7 +289,7 @@ const getSideBarTree = async () => {
     zt.forEach((item) => {
         mainZt.children.push({ label: item.name, active: false, type: 'feature', property: item, 'lgId': '长江沙洲' })
     })
-    console.log('11111')
+    // console.log('11111')
 
     let quyushuixi = {
         label: '骨干河道',
@@ -314,7 +314,8 @@ const getSideBarTree = async () => {
                 filter: true,
             }
         ],
-        data: (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
+        // data: (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
+        data:[]
     }
     let sluice = {
         label: '重要水闸',
@@ -338,7 +339,8 @@ const getSideBarTree = async () => {
                 children: []
             }
         ],
-        data: (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
+        // data: (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
+        data:[]
     }
     let pump = {
         label: '重要泵站',
@@ -362,7 +364,8 @@ const getSideBarTree = async () => {
                 children: []
             }
         ],
-        data: (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
+        // data: (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
+        data:[]
     }
     let treeNode1 = {
         label: '已建通道',
@@ -392,7 +395,8 @@ const getSideBarTree = async () => {
             treeNode2,
             treeNode3
         ],
-        data: (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
+        // data: (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
+        data:[]
     }
     let dock = {
         label: '沿江码头',
@@ -401,7 +405,8 @@ const getSideBarTree = async () => {
         filter: true,
         children: [
         ],
-        data: (await axios.get(tileServer + `/tile/vector/dockArea/info`)).data
+        // data: (await axios.get(tileServer + `/tile/vector/dockArea/info`)).data
+        data:[]
     }
     let transport = {
         label: '交通设施',
@@ -413,7 +418,6 @@ const getSideBarTree = async () => {
             dock,
         ],
     }
-    console.log('22222')
 
     let tree = [
         importantBank,

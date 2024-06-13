@@ -337,7 +337,7 @@ watch(
     // 监视timeStep变量移动
     () => props.timeStep,
     (newVal) => {
-        console.log(newVal, 'inner');
+        // console.log(newVal, 'inner');
 
         option.series[0].markLine.data[0].xAxis = parseFloat(newVal)
         option.series[0].markLine.data[0].label.formatter = `${parseFloat(newVal)}小时`
