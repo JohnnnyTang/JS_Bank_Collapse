@@ -328,6 +328,7 @@ import {
     genStressOptionOfDevice,
     genIncinometerOptionOfDevice,
     genManometerOptionOfDevice,
+    toggleOptionDataMode,
 } from './dataChartSettings'
 import router from '../../router'
 import { useWarnInfoStore } from '../../store/mapStore'
@@ -456,7 +457,7 @@ const deviceIdMap = {
 const deviceTypeTimeMap = {
     位移测量站: {
         timeUnit: 'day',
-        timeCount: 3,
+        timeCount: 40,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '10分钟',
@@ -477,7 +478,7 @@ const deviceTypeTimeMap = {
     },
     应力桩: {
         timeUnit: 'hour',
-        timeCount: 6,
+        timeCount: 24,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '1分钟',
@@ -596,6 +597,18 @@ let stressOption = {}
 let inclinoOption = {}
 let manoOption = {}
 let echartIns = null
+let deviceOptionMap = {
+    位移测量站: {},
+    测斜仪: {},
+    孔隙水压力计: {},
+    应力桩: {},
+}
+let deviceGenOptionMap = {
+    位移测量站: genGnssOptionOfDevice,
+    测斜仪: genIncinometerOptionOfDevice,
+    孔隙水压力计: genManometerOptionOfDevice,
+    应力桩: genStressOptionOfDevice,
+}
 
 const changeDeviceType = (deviceName) => {
     selectedDeviceType.value = deviceName
@@ -620,36 +633,45 @@ let curUpdateInterval = null
 
 const toggleChartOptionFromData = (deviceData) => {
     // console.log('select data mode', selectedDataMode.value)
-    if (selectedDeviceType.value == '位移测量站') {
-        gnssOption = genGnssOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['位移测量站'],
-            selectedDataMode.value,
-        )
-        // console.log('option', gnssOption)
-        echartIns.setOption(gnssOption)
-    } else if (selectedDeviceType.value == '应力桩') {
-        stressOption = genStressOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['应力桩'],
-            selectedDataMode.value,
-        )
-        echartIns.setOption(stressOption)
-    } else if (selectedDeviceType.value == '测斜仪') {
-        inclinoOption = genIncinometerOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['测斜仪'],
-            selectedDataMode.value,
-        )
-        echartIns.setOption(inclinoOption)
-    } else {
-        manoOption = genManometerOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['孔隙水压力计'],
-            selectedDataMode.value,
-        )
-        echartIns.setOption(manoOption)
-    }
+    deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[
+        selectedDeviceType.value
+    ](
+        deviceData,
+        deviceTypeErrorMap[selectedDeviceType.value],
+        selectedDataMode.value,
+    )
+    // console.log('option', gnssOption)
+    echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
+    // if (selectedDeviceType.value == '位移测量站') {
+    //     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[selectedDeviceType.value](
+    //         deviceData,
+    //         deviceTypeErrorMap[selectedDeviceType.value],
+    //         selectedDataMode.value,
+    //     )
+    //     // console.log('option', gnssOption)
+    //     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
+    // } else if (selectedDeviceType.value == '应力桩') {
+    //     stressOption = genStressOptionOfDevice(
+    //         deviceData,
+    //         deviceTypeErrorMap['应力桩'],
+    //         selectedDataMode.value,
+    //     )
+    //     echartIns.setOption(stressOption)
+    // } else if (selectedDeviceType.value == '测斜仪') {
+    //     inclinoOption = genIncinometerOptionOfDevice(
+    //         deviceData,
+    //         deviceTypeErrorMap['测斜仪'],
+    //         selectedDataMode.value,
+    //     )
+    //     echartIns.setOption(inclinoOption)
+    // } else {
+    //     manoOption = genManometerOptionOfDevice(
+    //         deviceData,
+    //         deviceTypeErrorMap['孔隙水压力计'],
+    //         selectedDataMode.value,
+    //     )
+    //     echartIns.setOption(manoOption)
+    // }
 }
 
 const deviceSelectChange = async (deviceName) => {
@@ -670,12 +692,27 @@ const deviceSelectChange = async (deviceName) => {
     }
     chartDataLoading.value = false
     updateTimeLoading.value = false
-    // console.log('device data', curDeviceData)
+    console.log('device data', curDeviceData)
     toggleChartOptionFromData(curDeviceData)
 }
 
 const dataModeChange = (dataMode) => {
-    deviceSelectChange(selectedDevice.value)
+    if (curDeviceData != null) {
+        console.log('in change.. no data request')
+        chartDataLoading.value = true
+        updateTimeLoading.value = true
+        if (curDeviceData.length > 0) {
+            let newestData = curDeviceData.slice(-1)[0]
+            deviceUpdateTime.value = newestData.measureTime
+        }
+        chartDataLoading.value = false
+        updateTimeLoading.value = false
+        // console.log('device data', curDeviceData)
+        toggleChartOptionFromData(curDeviceData)
+    } else {
+        console.log('request data', curDeviceData)
+        deviceSelectChange(selectedDevice.value)
+    }
 }
 
 const basicVideoFunction = async (functionIndex) => {
@@ -821,7 +858,7 @@ onMounted(async () => {
     updateTimeLoading.value = true
     // console.log('213', newestDataStatus)
     echartIns = echarts.init(chartDom.value)
-    let initialData = (
+    curDeviceData = (
         await BackEndRequest.getMonitorDataByTypeIdWithTime(
             'gnss',
             deviceIdMap['CL-01'],
@@ -829,16 +866,16 @@ onMounted(async () => {
             deviceTypeTimeMap['位移测量站'].timeCount,
         )
     ).data
-    let newestData = initialData.slice(-1)[0]
+    let newestData = curDeviceData.slice(-1)[0]
     deviceUpdateTime.value = newestData.measureTime
     updateTimeLoading.value = false
-    gnssOption = genGnssOptionOfDevice(
-        initialData,
+    deviceOptionMap['位移测量站'] = genGnssOptionOfDevice(
+        curDeviceData,
         deviceTypeErrorMap['位移测量站'],
         selectedDataMode.value,
     )
     // console.log('option', gnssOption)
-    echartIns.setOption(gnssOption)
+    echartIns.setOption(deviceOptionMap['位移测量站'])
     chartDataLoading.value = false
     setInterval(
         async () => {
@@ -856,7 +893,6 @@ onMounted(async () => {
 onBeforeUnmount(async () => {
     await moveBack2Origin()
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -868,7 +904,6 @@ $shadowRed: #cf0000;
 $hoverColor: rgb(0, 160, 252);
 $splitColor: rgba(0, 51, 160, 0.575);
 $controlSize: 12vh;
-
 
 div.device-info-container {
     z-index: 3;

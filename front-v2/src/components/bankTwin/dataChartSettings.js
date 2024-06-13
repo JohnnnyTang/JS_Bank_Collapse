@@ -179,12 +179,12 @@ let gnssRealTimeSetting = {
     dataZoom: [
         {
             type: 'inside',
-            start: 98,
+            start: 99.5,
             end: 100,
         },
         {
             type: 'slider',
-            start: 98,
+            start: 99.5,
             end: 100,
         },
     ],
@@ -247,6 +247,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
             color: 'rgb(163,163,163)',
             opacity: 0.4,
         },
+        large: true,
     }
     gnssOption.series[2] = {
         name: '位移滑动平均',
@@ -302,6 +303,8 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     }
     return gnssOption
 }
+
+
 
 let stressOption = {
     tooltip: {
@@ -997,9 +1000,34 @@ const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     return manometerOption
 }
 
+const dataModeOptionMap = {
+    位移测量站: {
+        实时: gnssRealTimeSetting,
+        长期: gnssLongTimeSetting,
+    },
+    测斜仪: {
+        实时: incinometerLongTimeSetting,
+        长期: incinometerRealTimeSetting,
+    },
+    孔隙水压力计: {
+        实时: manometerRealTimeSetting,
+        长期: manometerLongTimeSetting,
+    },
+    应力桩: {
+        实时: stressRealTimeSetting,
+        长期: stressLongTimeSetting,
+    },
+}
+
+const toggleOptionDataMode = (option, deviceType, dataMode) => {
+    option.yAxis = dataModeOptionMap[deviceType][dataMode].yAxis
+    option.dataZoom = dataModeOptionMap[deviceType][dataMode].dataZoom
+}
+
 export {
     genGnssOptionOfDevice,
     genStressOptionOfDevice,
     genIncinometerOptionOfDevice,
     genManometerOptionOfDevice,
+    toggleOptionDataMode
 }
