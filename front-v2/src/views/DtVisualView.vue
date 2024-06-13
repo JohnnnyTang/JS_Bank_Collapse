@@ -782,7 +782,6 @@ const prepareMap = async () => {
     mapInstance.dragRotate.disable();
     mapInstance.touchZoomRotate.disableRotation()
     mapFlyToRiver(mapInstance)
-    await initSortedLayer(mapInstance)
 
     mapInstance.on('zoom', () => {
         realtimeZoom.value = mapInstance.getZoom()
@@ -826,7 +825,9 @@ onMounted(async () => {
     legendList.value = legendListt
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
+    initSortedLayer(map)
     console.log('side bar tree ok')
+
 
 
 

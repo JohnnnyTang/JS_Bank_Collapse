@@ -3712,7 +3712,7 @@ const layerAddFunctionMap = {
                     // 'circle-blur': 0.5,
                     'circle-radius': [
                         "case",
-                        ["==", ["get", "Level"], 1],
+                        ["==", ["get", "level"], 1],
                         8,
                         6,
                     ],
@@ -3743,9 +3743,9 @@ const layerAddFunctionMap = {
                     // 'text-variable-anchor': ["center", "bottom", "top", "left", "right",],
                     'text-size': [
                         "case",
-                        ["==", ["get", "Level"], 1],
+                        ["==", ["get", "level"], 1],
                         26,
-                        23
+                        22
                     ],
                     'text-padding': 0,
                     'text-ignore-placement': true,
