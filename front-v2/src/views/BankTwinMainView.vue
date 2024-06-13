@@ -519,9 +519,9 @@ const deviceShowControl = (index) => {
     let layerNameList = [
         'GNSS',
         'GNSS基准站',
-        '测斜仪',
-        '孔隙水压力计',
         '应力桩',
+        '孔隙水压力计',
+        '测斜仪',
         '监控摄像头',
     ]
     let map = useMapStore().getMap()
