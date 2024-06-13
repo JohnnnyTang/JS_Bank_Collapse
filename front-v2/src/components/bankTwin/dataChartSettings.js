@@ -33,10 +33,10 @@ let gnssOption = {
         right: '1%',
         width: '60%',
         data: [
-            { name: '累积位移' },
-            { name: '累积位移滑动平均' },
-            { name: '累积位移滑动误差区间下限' },
-            { name: '累积位移误差区间' },
+            { name: '土体表面位移' },
+            { name: '位移滑动平均' },
+            { name: '位移滑动误差区间下限' },
+            { name: '位移误差区间' },
         ],
     },
     // toolbox: {
@@ -239,7 +239,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         gnssDataInterval[3].push(halfError * 2)
     })
     gnssOption.series[1] = {
-        name: '累积位移',
+        name: '土体表面位移',
         type: 'scatter',
         data: gnssDataInterval[0],
         symbolSize: 4,
@@ -249,7 +249,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         },
     }
     gnssOption.series[2] = {
-        name: '累积位移滑动平均',
+        name: '位移滑动平均',
         type: 'line',
         data: gnssDataInterval[1],
         lineStyle: {
@@ -258,7 +258,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         },
     }
     gnssOption.series[3] = {
-        name: '累积位移滑动误差区间下限',
+        name: '位移滑动误差区间下限',
         type: 'line',
         stack: 'error',
         lineStyle: {
@@ -277,7 +277,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         data: gnssDataInterval[2],
     }
     gnssOption.series[4] = {
-        name: '累积位移误差区间',
+        name: '位移误差区间',
         type: 'line',
         stack: 'error',
         areaStyle: {
