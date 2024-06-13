@@ -692,25 +692,31 @@ const deviceSelectChange = async (deviceName) => {
     }
     chartDataLoading.value = false
     updateTimeLoading.value = false
-    console.log('device data', curDeviceData)
+    // console.log('device data', curDeviceData)
     toggleChartOptionFromData(curDeviceData)
 }
 
 const dataModeChange = (dataMode) => {
     if (curDeviceData != null) {
         console.log('in change.. no data request')
-        chartDataLoading.value = true
-        updateTimeLoading.value = true
-        if (curDeviceData.length > 0) {
-            let newestData = curDeviceData.slice(-1)[0]
-            deviceUpdateTime.value = newestData.measureTime
-        }
-        chartDataLoading.value = false
-        updateTimeLoading.value = false
-        // console.log('device data', curDeviceData)
-        toggleChartOptionFromData(curDeviceData)
+        // chartDataLoading.value = true
+        // updateTimeLoading.value = true
+        // if (curDeviceData.length > 0) {
+        //     let newestData = curDeviceData.slice(-1)[0]
+        //     deviceUpdateTime.value = newestData.measureTime
+        // }
+        // chartDataLoading.value = false
+        // updateTimeLoading.value = false
+        // // console.log('device data', curDeviceData)
+        // toggleChartOptionFromData(curDeviceData)
+        deviceOptionMap[selectedDeviceType.value] = toggleOptionDataMode(
+            deviceOptionMap[selectedDeviceType.value],
+            selectedDeviceType.value,
+            dataMode
+        )
+        echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
     } else {
-        console.log('request data', curDeviceData)
+        // console.log('request data', curDeviceData)
         deviceSelectChange(selectedDevice.value)
     }
 }
@@ -795,21 +801,24 @@ async function updateNewestTime() {
 }
 
 async function updateNewestData() {
-    if(curDeviceData == null) return
+    if (curDeviceData == null) return
     let deviceNewestData = (
         await BackEndRequest.getDeviceNewestData(
             deviceTypeNameMap[selectedDeviceType.value],
             deviceIdMap[selectedDevice.value],
         )
     ).data
-    if(curDeviceData.length == 0 || (deviceNewestData.measureTime != curDeviceData[curDeviceData.length-1].measureTime)) {
+    if (
+        curDeviceData.length == 0 ||
+        deviceNewestData.measureTime !=
+            curDeviceData[curDeviceData.length - 1].measureTime
+    ) {
         curDeviceData.push(deviceNewestData)
         toggleChartOptionFromData(curDeviceData)
         deviceUpdateTime.value = deviceNewestData.measureTime
-        console.log("data update")
-    }
-    else {
-        console.log("no update data")
+        console.log('data update')
+    } else {
+        console.log('no update data')
     }
 }
 
@@ -868,7 +877,7 @@ onMounted(async () => {
     //         ':' +
     //         zeroFill(myDate.getSeconds())
     // }, 1000)
-    
+
     deviceStatusLoading.value = false
     updateTimeLoading.value = true
     // console.log('213', newestDataStatus)
@@ -889,19 +898,16 @@ onMounted(async () => {
         deviceTypeErrorMap['位移测量站'],
         selectedDataMode.value,
     )
-    console.log('option', deviceOptionMap['位移测量站'])
+    // console.log('option', deviceOptionMap['位移测量站'])
     echartIns.setOption(deviceOptionMap['位移测量站'])
     chartDataLoading.value = false
-    setInterval(
-        async () => {
-            chartDataLoading.value = true
-            updateTimeLoading.value = true
-            await updateNewestData()
-            chartDataLoading.value = false
-            updateTimeLoading.value = false
-        },
-        1000 * 60,
-    )
+    setInterval(async () => {
+        chartDataLoading.value = true
+        updateTimeLoading.value = true
+        await updateNewestData()
+        chartDataLoading.value = false
+        updateTimeLoading.value = false
+    }, 1000 * 60)
     // console.log('initialData', initialData)
 })
 

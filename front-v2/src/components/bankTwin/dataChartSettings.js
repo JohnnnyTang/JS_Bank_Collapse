@@ -1006,8 +1006,8 @@ const dataModeOptionMap = {
         长期: gnssLongTimeSetting,
     },
     测斜仪: {
-        实时: incinometerLongTimeSetting,
-        长期: incinometerRealTimeSetting,
+        实时: incinometerRealTimeSetting,
+        长期: incinometerLongTimeSetting,
     },
     孔隙水压力计: {
         实时: manometerRealTimeSetting,
@@ -1022,6 +1022,7 @@ const dataModeOptionMap = {
 const toggleOptionDataMode = (option, deviceType, dataMode) => {
     option.yAxis = dataModeOptionMap[deviceType][dataMode].yAxis
     option.dataZoom = dataModeOptionMap[deviceType][dataMode].dataZoom
+    return option
 }
 
 export {
