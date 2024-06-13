@@ -388,12 +388,12 @@ const gnssLegendInfo = {
     device2: 'GNSS基准站',
 }
 const legendList = [
-    {
-        icon: '/icons/测斜仪.png',
+{
+        icon: '/icons/应力桩.png',
         text1: '土体',
-        strong: '内部位移',
+        strong: '应力应变',
         text2: '监测',
-        device: '测斜仪',
+        device: '应力桩',
     },
     {
         icon: '/icons/孔隙水压力计.png',
@@ -403,11 +403,11 @@ const legendList = [
         device: '孔隙水压力计',
     },
     {
-        icon: '/icons/应力桩.png',
+        icon: '/icons/测斜仪.png',
         text1: '土体',
-        strong: '应力应变',
+        strong: '内部位移',
         text2: '监测',
-        device: '应力桩',
+        device: '测斜仪',
     },
     {
         icon: '/icons/视频监控.png',
