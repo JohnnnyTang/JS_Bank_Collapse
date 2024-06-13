@@ -362,7 +362,7 @@ const warnDeviceCount = ref([0, 0, 0, 0, '-'])
 
 const domHide = ref(true)
 
-const deviceUpdateTime = ref('2024-06-11 14:00:00')
+const deviceUpdateTime = ref('2024-06-15 14:00:00')
 
 const deviceListMap = {
     位移测量站: [
@@ -457,7 +457,7 @@ const deviceIdMap = {
 const deviceTypeTimeMap = {
     位移测量站: {
         timeUnit: 'day',
-        timeCount: 40,
+        timeCount: 60,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '10分钟',
@@ -794,6 +794,25 @@ async function updateNewestTime() {
     })
 }
 
+async function updateNewestData() {
+    if(curDeviceData == null) return
+    let deviceNewestData = (
+        await BackEndRequest.getDeviceNewestData(
+            deviceTypeNameMap[selectedDeviceType.value],
+            deviceIdMap[selectedDevice.value],
+        )
+    ).data
+    if(curDeviceData.length == 0 || (deviceNewestData.measureTime != curDeviceData[curDeviceData.length-1].measureTime)) {
+        curDeviceData.push(deviceNewestData)
+        toggleChartOptionFromData(curDeviceData)
+        deviceUpdateTime.value = deviceNewestData.measureTime
+        console.log("data update")
+    }
+    else {
+        console.log("no update data")
+    }
+}
+
 watch(
     () => useWarnInfoStore().warnInfo,
     (newVal) => {
@@ -832,8 +851,8 @@ watch(
 )
 
 onMounted(async () => {
-    await updateNewestTime()
-    let myDate = new Date()
+    // await updateNewestTime()
+    // let myDate = new Date()
     // deviceStatusDataList.value[4].time =
     //     zeroFill(myDate.getHours()) +
     //     ':' +
@@ -849,11 +868,7 @@ onMounted(async () => {
     //         ':' +
     //         zeroFill(myDate.getSeconds())
     // }, 1000)
-    setInterval(async () => {
-        deviceStatusLoading.value = true
-        await updateNewestTime()
-        deviceStatusLoading.value = false
-    }, 1000 * 60)
+    
     deviceStatusLoading.value = false
     updateTimeLoading.value = true
     // console.log('213', newestDataStatus)
@@ -874,18 +889,18 @@ onMounted(async () => {
         deviceTypeErrorMap['位移测量站'],
         selectedDataMode.value,
     )
-    // console.log('option', gnssOption)
+    console.log('option', deviceOptionMap['位移测量站'])
     echartIns.setOption(deviceOptionMap['位移测量站'])
     chartDataLoading.value = false
     setInterval(
         async () => {
             chartDataLoading.value = true
             updateTimeLoading.value = true
-            await deviceSelectChange(selectedDevice.value)
+            await updateNewestData()
             chartDataLoading.value = false
             updateTimeLoading.value = false
         },
-        1000 * 60 * 5,
+        1000 * 60,
     )
     // console.log('initialData', initialData)
 })

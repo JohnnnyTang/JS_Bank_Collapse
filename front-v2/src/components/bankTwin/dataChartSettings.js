@@ -20,7 +20,7 @@ let gnssOption = {
         max: function (value) {
             return parseInt((value.max * 1.5)/10+1) * 10;
         },
-        name: '土体表面累积位移(mm)',
+        name: '土体表面位移(mm)',
         nameLocation: 'end',
         nameTextStyle: {
             fontSize: 13,

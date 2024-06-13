@@ -140,6 +140,10 @@ export default class BackEndRequest {
         ])
     }
 
+    static getDeviceNewestData(deviceType, deviceId) {
+        return backendInstance.get(`/data/${deviceType}Data/newest/device/${deviceId}`)
+    }
+
     static getVideoDeviceInfo() {
         return backendInstance.get('/data/monitorInfo/type/6')
     }
