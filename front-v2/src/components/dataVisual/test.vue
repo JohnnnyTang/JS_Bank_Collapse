@@ -55,18 +55,22 @@ onMounted(async () => {
     });
     // console.log(TerrainLayer)
 
+    map.addSource('riverSmallSection',{
+        type:'vector',
+        
+    })
 
-    await layerAddFunction(map, '一级预警岸段')
-    await layerAddFunction(map, '二级预警岸段')
-    await layerAddFunction(map, '三级预警岸段')
-    await layerAddFunction(map, '一级岸段-点注记')
-    await layerAddFunction(map, '二级岸段-点注记')
-    await layerAddFunction(map, '三级岸段-点注记')
-    await layerAddFunction(map, '一级岸段-注记')
-    await layerAddFunction(map, '二级岸段-注记')
-    await layerAddFunction(map, '三级岸段-注记')
+    // await layerAddFunction(map, '一级预警岸段')
+    // await layerAddFunction(map, '二级预警岸段')
+    // await layerAddFunction(map, '三级预警岸段')
+    // await layerAddFunction(map, '一级岸段-点注记')
+    // await layerAddFunction(map, '二级岸段-点注记')
+    // await layerAddFunction(map, '三级岸段-点注记')
+    // await layerAddFunction(map, '一级岸段-注记')
+    // await layerAddFunction(map, '二级岸段-注记')
+    // await layerAddFunction(map, '三级岸段-注记')
 
-    await layerAddFunction(map, '重点行政区边界')
+    // await layerAddFunction(map, '重点行政区边界')
 
 
 
