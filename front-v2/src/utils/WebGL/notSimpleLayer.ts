@@ -106,7 +106,7 @@ export default class FlowFieldLayer{
 
         if(currentPhase != lastPhase){
             this.currentResourcePointer = (this.currentResourcePointer+1) % this.phaseCount;
-            console.log('now time step :: ', this.currentResourcePointer)
+            // console.log('now time step :: ', this.currentResourcePointer)
             //checkout new texture
             let index = nextPhase % this.textureArraySize;
             let gl:WebGL2RenderingContext = this.GL!;
