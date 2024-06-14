@@ -1,6 +1,7 @@
 package com.johnny.bank.jobs;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.johnny.bank.model.resource.dataResource.DeviceWarning;
 import com.johnny.bank.model.resource.dataResource.GnssData;
 import com.johnny.bank.model.resource.dataResource.MonitorInfo;
@@ -17,6 +18,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,10 +156,10 @@ public class GnssWarningJob implements Job {
             warnStrBuilder.append("河岸变形较大，崩岸风险很高，请注意相关防汛安全！");
             String warnStr = warnStrBuilder.toString();
             log.info(warnStr);
-//            for(String mailTo: mailList) {
-//                mailUtil.sendSimpleMail(
-//                        mailTo, "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", warnStr);
-//            }
+            for(String mailTo: mailList) {
+                mailUtil.sendSimpleMail(
+                        mailTo, "江苏省长江崩岸监测预警系统（测试版）系统崩岸预警信息", warnStr);
+            }
         }
 
         GlobalMap globalMap = BeanUtil.getBean(GlobalMap.class);
@@ -186,20 +188,20 @@ public class GnssWarningJob implements Job {
                 paramsJson.put("time", sdf.format(gnssData.getMeasureTime()));
                 paramsJson.put("position", "(" + gnssInfo.getLongitude() + "," + gnssInfo.getLatitude() + ")");
                 paramsJson.put("device", deviceName);
-//                for(String phoneNumber: phoneList) {
-//                    SendSmsResponse smsResponse = null;
-//                    try {
-//                        smsResponse = smsUtil.sendSms(phoneNumber, paramsJson.toJSONString());
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                    log.info(smsResponse.getMessage());
-//                    try {
-//                        TimeUnit.SECONDS.sleep(5);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
+                for(String phoneNumber: phoneList) {
+                    SendSmsResponse smsResponse = null;
+                    try {
+                        smsResponse = smsUtil.sendSms(phoneNumber, paramsJson.toJSONString());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    log.info(smsResponse.getMessage());
+                    try {
+                        TimeUnit.SECONDS.sleep(5);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 log.info(paramsJson.toString());
                 globalMap.getWarMessageMap().put(gnssInfo.getCode(), gnssData.getThreeD(), ExpirationPolicy.CREATED, 24, TimeUnit.HOURS);
 //                log.info("message map: " + globalMap.getWarMessageMap().toString());
