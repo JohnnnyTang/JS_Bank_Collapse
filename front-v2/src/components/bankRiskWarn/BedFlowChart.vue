@@ -1,6 +1,6 @@
 <template>
     <div class="bed-chart-container">
-        <div class="bed-chart-title">造床流量当量指标</div>
+        <div class="bed-chart-title">年径流过程</div>
         <div class="bed-chart-content" ref="chartDom"></div>
         <div class="bed-desc-text">2023年无超过造床流量(45000)时期</div>
         <div class="bed-desc-equa"></div>

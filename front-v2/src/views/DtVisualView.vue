@@ -116,8 +116,9 @@
             </div>
             <!-- <div class="close" @click="showInfoPannel = false; showDetail = false"></div> -->
             <div class="important-feature">
-                <el-table :data="infoTableData_filtered" height="30vh" stripe border class="infomation-table">
-                    <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
+                <el-table :data="infoTableData_filtered" height="30vh" stripe border class="infomation-table"
+                    v-loading="pannelLoading">
+                    <el-table-column v-for="(item, index) in  infoTableHeader " :key="index" :prop="item.prop"
                         :label="item.label"></el-table-column>
 
                     <el-table-column align="right">
@@ -194,6 +195,7 @@ const styles = [
 const featureInfo = ref({})
 const showDetail = ref(false)
 const showHydroPannel = ref(false)
+const featureTableLoading = ref(true)
 const showInfoPannel = ref(false)
 const sideBarLoading = ref(true)
 const legendList = ref([])
@@ -270,17 +272,16 @@ const infoTableData_filtered = computed(() => {
                 res.sort(customSort2)
             }
         }
-        // console.log(nowSource)
         else if (nowSource == 'sluiceArea') {
-            console.log(res);
-            console.log('sort');
             res.sort(customSort3)
-            console.log(res);
         }
         else if (nowSource == 'pumpArea') {
             res.sort(customSort4)
         }
     }
+
+    pannelLoading.value = false
+
 
     return res
 })
@@ -315,7 +316,6 @@ const viewChange = (node, data) => {
         }
     }
 
-    // console.log(data.label, node.level, ' view status change!! ')
     if (data.type == 'title1') {
         data.active ? showLayers(map, DICT.T1LayerDict[data.label])
             : hideLayers(map, DICT.T1LayerDict[data.label])
@@ -353,11 +353,12 @@ const treeNodeClickHandler = async (node, data) => {
     // showTable
 }
 
-const layerGroupClickHandler = (node, data) => {
-    console.log('click!!', data.label)
+const layerGroupClickHandler = async (node, data) => {
+    pannelLoading.value = true
+
     nowLayerGroup = data.label
     const parentLabel = node.parent.data.label
-    const totalData = node.parent.data.data
+    // const totalData = node.parent.data.data
     infoPannelTitle.value = data.label
     const process = (obj) => {
         let res = []
@@ -370,11 +371,13 @@ const layerGroupClickHandler = (node, data) => {
     // data filter
 
     if (parentLabel === '过江通道') {
+        featureTableLoading.value = true
         showInfoPannel.value = true
         infoTableData.value = []
         infoTableHeader.value = []
         nowSource = ''
-        pannelLoading.value = true
+
+        const totalData = (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
         const filterFlag = {
             '已建通道': 1,
             '在建通道': 0,
@@ -398,15 +401,12 @@ const layerGroupClickHandler = (node, data) => {
         infoTableData.value = tableData
         infoTableHeader.value = { ...process(tableHeadData) }
         nowSource = DICT.LGIDSourceMap['过江通道']
-        pannelLoading.value = false
-        return
     }
     else if (parentLabel === '骨干河道') {
         showInfoPannel.value = true
         infoTableData.value = []
         infoTableHeader.value = []
         nowSource = ''
-        pannelLoading.value = true
 
         const filterFlag = {
             '流域性骨干河道': '流域性河道',
@@ -416,14 +416,13 @@ const layerGroupClickHandler = (node, data) => {
             '流域性河道': '流域性骨干河道',
             '区域性骨干河道': '区域性骨干河道',
         }
-
+        const totalData = (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
         let tableData = totalData.filter((item) => {
             return item.kind == filterFlag[data.label]
         })
         for (let i = 0; i < tableData.length; i++) {
             tableData[i].typeText = typeText['' + tableData[i].kind]
         }
-        // console.log(tableData);
         let tableHeadData = {
             'name': '名称',
             // 'typeText': '类型',
@@ -431,16 +430,14 @@ const layerGroupClickHandler = (node, data) => {
         infoTableData.value = tableData
         infoTableHeader.value = { ...process(tableHeadData) }
         nowSource = DICT.LGIDSourceMap['骨干河道']
-        pannelLoading.value = false
-        return
     }
     else if (parentLabel === '重要水闸') {
         showInfoPannel.value = true
         infoTableData.value = []
         infoTableHeader.value = []
         nowSource = ''
-        pannelLoading.value = true
 
+        const totalData = (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
         const filterFlag = {
             '大中型水闸': 1,
             '其他水闸': 0,
@@ -463,15 +460,12 @@ const layerGroupClickHandler = (node, data) => {
         infoTableData.value = tableData
         infoTableHeader.value = { ...process(tableHeadData) }
         nowSource = DICT.LGIDSourceMap['重要水闸']
-        pannelLoading.value = false
-        return
     }
     else if (parentLabel === '重要泵站') {
         showInfoPannel.value = true
         infoTableData.value = []
         infoTableHeader.value = []
         nowSource = ''
-        pannelLoading.value = true
 
         const filterFlag = {
             '大中型泵站': 1,
@@ -481,7 +475,7 @@ const layerGroupClickHandler = (node, data) => {
             '0': '其他泵站',
             '1': '大中型泵站',
         }
-
+        const totalData = (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
         let tableData = totalData.filter((item) => {
             return item['if_important'] == filterFlag[data.label]
         })
@@ -495,9 +489,10 @@ const layerGroupClickHandler = (node, data) => {
         infoTableData.value = tableData
         infoTableHeader.value = { ...process(tableHeadData) }
         nowSource = DICT.LGIDSourceMap['重要泵站']
-        pannelLoading.value = false
-        return
     }
+
+
+
 }
 
 const baseMapChangeHandler = async () => {
@@ -614,7 +609,8 @@ const detailClickHandler4Feature = async (a) => {
         // map.setPaintProperty(nowSource + '-' + featInfo.id, 'fill-opacity', 0.3)
 
         setTimeout(() => {
-            map.removeLayer(nowSource + '-' + featInfo.id)
+            map.getLayer(nowSource + '-' + featInfo.id) &&
+                map.removeLayer(nowSource + '-' + featInfo.id)
         }, 5000)
 
 
@@ -646,7 +642,7 @@ const detailClickHandler4Feature = async (a) => {
 
     }
     else {
-        console.log('else')
+        // console.log('else')
     }
 }
 
@@ -729,7 +725,7 @@ const closeHandler = (index) => {
     activeStatus.value[index] = false
 }
 const resetSideBarTree = () => {
-    console.log('reset!')
+    // console.log('reset!')
     /////// STATIC
     let nowTree = dataSource.value
     nowTree[0].active = true
@@ -826,7 +822,7 @@ onMounted(async () => {
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
     initSortedLayer(map)
-    console.log('side bar tree ok')
+    // console.log('side bar tree ok')
 
 
 
@@ -1063,8 +1059,10 @@ const shuizha = [
     '天星港闸', '焦土港闸', '夏仕港节制闸', '太字港节制闸', '南通节制闸', '营船港闸', '白茆闸', '浏河节制闸'
 ]
 const bengzhan = [
-    '新沟泵站', '秦淮新河闸站——泵站工程', '杨家沟站', '大年站', '十二圩翻水站', '大年站', '引航道枢纽工程-泵站工程',
-    '东风泵站', '谏壁抽水站', '大港泵站', '高港泵站', '上九圩泵站', '新夏港泵站', '焦港泵站', '三干河泵站', '七浦塘江边枢纽泵站'
+    '望虞河常熟水利枢纽泵站工程', '秦淮新河闸站一泵站工程', '武定门闸站—泵站工程', '高港泵站', '澡港河水利枢纽-泵站工程', '魏村水利枢纽-泵站工程',
+    '九圩港提水泵站（新增）',
+    '杨家沟站', '大年站', '十二圩翻水站', '大年站', '引航道枢纽工程-泵站工程',
+    '东风泵站', '谏壁抽水站', '大港泵站', '上九圩泵站', '新夏港泵站', '焦港泵站', '三干河泵站', '七浦塘江边枢纽泵站', '新沟泵站',
 ]
 
 const customSort1 = (a, b) => {
@@ -1349,7 +1347,7 @@ const customSort4 = (a, b) => {
 
                         .top-section {
                             background: rgb(26, 143, 245);
-                        
+
 
                             .title {
                                 .subScene-title-text {

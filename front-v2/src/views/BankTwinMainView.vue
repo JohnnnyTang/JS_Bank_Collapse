@@ -7,57 +7,37 @@
         </div> -->
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab
-                    style="z-index: 3; font-size: calc(0.4vw + 0.4vh)"
-                    :items="items"
-                    :columns="2"
-                    @change="viewChangeClick"
-                ></e-tab>
+                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
+                    @change="viewChangeClick"></e-tab>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
-        <RealtimeStatusVue :domHide="domHideMap.status" />
+        <RealtimeStatusVue :domHide="domHideMap.status" :device-type="currentDeviceType" />
         <!-- <RealtimeVideoVue :active="!warnActive" :domHide="domHideMap.video" /> -->
         <!-- <SectionRisk />
         <DeviceWarn /> -->
 
         <div class="marquee-container" v-loading="warnLoading">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 140)">
-                <div
-                    class="marquee-block"
-                    ref="marqueeBlockDom"
-                    :style="{ animationDuration: animateTime }"
-                    style="animation-iteration-count: infinite"
-                >
-                    <div
-                        class="no-warn-block"
-                        v-if="warningList.length == 0"
-                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff"
-                    >
+                <div class="marquee-block" ref="marqueeBlockDom" :style="{ animationDuration: animateTime }"
+                    style="animation-iteration-count: infinite">
+                    <div class="no-warn-block" v-if="warningList.length == 0"
+                        style="font-size: calc(0.7vw + 1vh); color: #e7f2ff">
                         {{ `暂无报警信息` }}
                     </div>
-                    <div
-                        v-else
-                        class="warn-block"
-                        v-for="(warningString, index) in warningList"
-                        :key="index"
-                    >
-                        <div
-                            style="
+                    <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
+                        <div style="
                                 background-size: contain;
                                 background-image: url('/icons/warning.png');
                                 width: 3vh;
                                 height: 3vh;
-                            "
-                        ></div>
-                        <div
-                            style="
+                            "></div>
+                        <div style="
                                 font-size: calc(0.7vw + 1vh);
                                 color: rgb(254, 14, 11);
                                 margin-left: 0.5vw;
                                 font-weight: bold;
-                            "
-                        >
+                            ">
                             {{ warningString }}
                         </div>
                     </div>
@@ -80,7 +60,7 @@
             <div class="monitor-legend-block">
                 <!-- GNSS only -->
                 <div class="monitor-legend-item GNSS">
-                    <div class="item-title">
+                    <div class="item-title" @click="deviceShowControl(-2)">
                         <span>{{ gnssLegendInfo.text1 }}</span>
                         <span style="font-weight: bold">{{
                             gnssLegendInfo.strong
@@ -89,110 +69,64 @@
                     </div>
                     <div style="display: flex; flex-direction: row">
                         <div class="legend-block" style="margin-right: 0.5vw">
-                            <div
-                                class="icon-block GNSS-icon"
-                                :style="{
-                                    backgroundImage: `url(${gnssLegendInfo.icon1})`,
-                                }"
-                            ></div>
-                            <span
-                                style="
+                            <div class="icon-block GNSS-icon" :style="{
+                                backgroundImage: `url(${gnssLegendInfo.icon1})`,
+                            }"></div>
+                            <span style="
                                     text-align: center;
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
                                     color: rgb(16, 71, 165);
                                     text-shadow: #7388c148 1px 1px 0;
-                                "
-                            >
-                                {{ gnssLegendInfo.device1 }}</span
-                            >
+                                ">
+                                {{ gnssLegendInfo.device1 }}</span>
 
-                            <label
-                                class="device-check-container"
-                                @click="deviceShowControl(0)"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="input"
-                                    disabled
-                                    v-model="deviceShowing[0]"
-                                />
+                            <label class="device-check-container" @click="deviceShowControl(0)">
+                                <input type="checkbox" class="input" disabled v-model="deviceShowing[0]" />
                                 <span class="custom-checkbox"></span>
                             </label>
                         </div>
                         <div class="legend-block">
-                            <div
-                                class="icon-block GNSS-icon"
-                                :style="{
-                                    backgroundImage: `url(${gnssLegendInfo.icon2})`,
-                                }"
-                            ></div>
-                            <span
-                                style="
+                            <div class="icon-block GNSS-icon" :style="{
+                                backgroundImage: `url(${gnssLegendInfo.icon2})`,
+                            }"></div>
+                            <span style="
                                     text-align: center;
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
                                     color: rgb(16, 71, 165);
                                     text-shadow: #7388c148 1px 1px 0;
-                                "
-                            >
-                                {{ gnssLegendInfo.device2 }}</span
-                            >
-                            <label
-                                class="device-check-container"
-                                @click="deviceShowControl(1)"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="input"
-                                    disabled
-                                    v-model="deviceShowing[1]"
-                                />
+                                ">
+                                {{ gnssLegendInfo.device2 }}</span>
+                            <label class="device-check-container" @click="deviceShowControl(1)">
+                                <input type="checkbox" class="input" disabled v-model="deviceShowing[1]" />
                                 <span class="custom-checkbox"></span>
                             </label>
                         </div>
                     </div>
                 </div>
                 <!-- others -->
-                <div
-                    v-for="(item, index) in legendList"
-                    :key="index"
-                    class="monitor-legend-item"
-                >
-                    <div class="item-title">
+                <div v-for="(item, index) in legendList" :key="index" class="monitor-legend-item">
+                    <div class="item-title" @click="deviceShowControl(index + 2, true)">
                         <span>{{ item.text1 }}</span>
                         <span style="font-weight: bold">{{ item.strong }}</span>
                         <span>{{ item.text2 }}</span>
                     </div>
                     <div class="legend-block">
-                        <div
-                            class="icon-block"
-                            :style="{ backgroundImage: `url(${item.icon})` }"
-                        ></div>
-                        <span
-                            style="
+                        <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
+                        <span style="
                                 text-align: center;
                                 width: 100%;
                                 display: block;
                                 line-height: 2.5vh;
                                 color: rgb(16, 71, 165);
                                 text-shadow: #7388c148 1px 1px 0;
-                            "
-                        >
-                            {{ item.device }}</span
-                        >
-                        <label
-                            class="device-check-container"
-                            @click="deviceShowControl(index + 2)"
-                        >
-                            <input
-                                type="checkbox"
-                                class="input"
-                                disabled
-                                v-model="deviceShowing[index + 2]"
-                            />
+                            ">
+                            {{ item.device }}</span>
+                        <label class="device-check-container" @click="deviceShowControl(index + 2)">
+                            <input type="checkbox" class="input" disabled v-model="deviceShowing[index + 2]" />
                             <span class="custom-checkbox"></span>
                         </label>
                     </div>
@@ -202,45 +136,24 @@
 
         <div class="warn-status-container" v-loading="warnLoading">
             <div class="warn-status-title">民主沙右缘状态</div>
-            <div
-                class="warn-status-content"
-                :class="statusText == '正常' ? 'normal' : 'warn'"
-            >
+            <div class="warn-status-content" :class="statusText == '正常' ? 'normal' : 'warn'">
                 {{ statusText }}
             </div>
         </div>
-        <BanWarnDetail
-            :warnActive="warnActive"
-            v-loading="warnLoading"
-            :domHide="domHideMap.warn"
-        />
+        <BanWarnDetail :warnActive="warnActive" v-loading="warnLoading" :domHide="domHideMap.warn" />
         <!-- <WarnHistoryTable v-show="warnActive" /> -->
 
-        <div
-            class="map-container"
-            id="map"
-            style="z-index: 2"
-            ref="mapDom"
-        ></div>
+        <div class="map-container" id="map" style="z-index: 2" ref="mapDom"></div>
 
         <!-- BANK3D -->
         <canvas id="GPUFrame" class="GPU" style="z-index: 2"></canvas>
-        <canvas
-            id="UnityCanvas"
-            class="GPU"
-            ref="unityCanvaDom"
-            style="z-index: 1"
-        ></canvas>
+        <canvas id="UnityCanvas" class="GPU" ref="unityCanvaDom" style="z-index: 1"></canvas>
         <div class="loading-container" v-show="threeDLoading">
             <dv-loading class="loading-icon">
                 <div class="loading-message">三维视图资源加载中</div>
             </dv-loading>
         </div>
-        <div
-            class="hide-status-button left"
-            :class="{ 'in-active': domHideMap.status }"
-            @click="hideDom('status')"
-        >
+        <div class="hide-status-button left" :class="{ 'in-active': domHideMap.status }" @click="hideDom('status')">
             <HideDomButtom :direction="domHideMap.status ? 'right' : 'left'" />
         </div>
         <!-- <div
@@ -253,12 +166,8 @@
         >
             <HideDomButtom :direction="domHideMap.video ? 'left' : 'right'" />
         </div> -->
-        <div
-            class="hide-status-button right warn"
-            :class="{ 'in-active': domHideMap.warn, 'warn-active': warnActive }"
-            @click="hideDom('warn')"
-            v-if="warnActive"
-        >
+        <div class="hide-status-button right warn" :class="{ 'in-active': domHideMap.warn, 'warn-active': warnActive }"
+            @click="hideDom('warn')" v-if="warnActive">
             <HideDomButtom :direction="domHideMap.warn ? 'left' : 'right'" />
         </div>
     </div>
@@ -305,29 +214,22 @@ const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const unityCanvaDom = ref()
 const mapDom = ref()
-const warnActive = ref(true)
+const warnActive = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
 const test = ref(false)
+const currentDeviceType = ref('位移测量站')
+////////DEBUG
 window.addEventListener('keydown', (e) => {
-    if (e.key == '1') {
-        let map = useMapStore().getMap()
-        console.log('on')
-        map.on(
-            'click',
-            ['GNSS', '测斜仪', '孔隙水压力计', '应力桩'],
-            deviceOnClick,
-        )
-    } else if (e.key == '2') {
-        let map = useMapStore().getMap()
-        console.log('off')
-        map.off(
-            'click',
-            ['GNSS', '测斜仪', '孔隙水压力计', '应力桩'],
-            deviceOnClick,
-        )
+    if (e.key === '1') {
+        // currentDeviceType.value = '位移测量站'
+        warnActive.value = true
+    } else if (e.key === '2') {
+        // currentDeviceType.value = '应力桩'
+        warnActive.value = false
     }
+
 })
 
 const detailLoading = ref(false)
@@ -388,7 +290,7 @@ const gnssLegendInfo = {
     device2: 'GNSS基准站',
 }
 const legendList = [
-{
+    {
         icon: '/icons/应力桩.png',
         text1: '土体',
         strong: '应力应变',
@@ -496,6 +398,19 @@ const mapFlyToRiver = (mapIns) => {
         },
     )
 }
+const mapFlyToRiver2 = (mapIns) => {
+    if (!mapIns) return
+    mapIns.fitBounds(
+        [
+            [120.43987922676836, 32.03201616423072],
+            [120.59089640208264, 32.052171362618625],
+        ],
+        {
+            duration: 1500,
+            // zoom: 11.5,
+        },
+    )
+}
 
 const hideDom = (domName) => {
     domHideMap.value[domName] = !domHideMap.value[domName]
@@ -508,30 +423,65 @@ const hideDom = (domName) => {
 
 //     // map.
 // }
-const deviceShowControl = (index) => {
-    if (index == -1) {
-        deviceShowing.value = [true, true, true, true, true, true]
-    } else {
-        deviceShowing.value = [false, false, false, false, false, false]
-        deviceShowing.value[index] = true
-    }
-    console.log(deviceShowing.value, '11111')
+const deviceShowControl = (index, only = false) => {
     let layerNameList = [
         'GNSS',
         'GNSS基准站',
-        '测斜仪',
-        '孔隙水压力计',
         '应力桩',
+        '孔隙水压力计',
+        '测斜仪',
         '监控摄像头',
     ]
+    let nameMap = {
+        'GNSS': '位移测量站',
+        'GNSS基准站': '位移测量站',
+        '应力桩': '应力桩',
+        '孔隙水压力计': '孔隙水压力计',
+        '测斜仪': '测斜仪'
+    }
+    if (index == -2) {
+        deviceShowing.value = [true, true, false, false, false, false]
+        currentDeviceType.value = '位移测量站'
+    }
+    else if (index == -1) {
+        if (deviceShowing.value.includes(true)) {
+            deviceShowing.value = [false, false, false, false, false, false]
+        } else {
+            deviceShowing.value = [true, true, true, true, true, true]
+        }
+    }
+    else if (index == 0 || index == 1) {
+        let gnssShowing = [deviceShowing.value[0], deviceShowing.value[1]]
+        if (gnssShowing.includes(true)) {
+            deviceShowing.value[0] = deviceShowing.value[1] = false
+        } else {
+            deviceShowing.value[0] = deviceShowing.value[1] = true
+            currentDeviceType.value = nameMap[layerNameList[index]]
+        }
+    }
+    else {
+        if (only) {
+            deviceShowing.value = [false, false, false, false, false, false]
+            deviceShowing.value[index] = true
+            index != 5 && (currentDeviceType.value = nameMap[layerNameList[index]])
+
+        } else {
+            deviceShowing.value[index] = !deviceShowing.value[index]
+            if (index != 5 && deviceShowing.value[index]) {
+                (currentDeviceType.value = nameMap[layerNameList[index]])
+            }
+
+        }
+    }
+
     let map = useMapStore().getMap()
     deviceShowing.value.forEach((item, index) => {
         item
             ? map.setLayoutProperty(
-                  layerNameList[index],
-                  'visibility',
-                  'visible',
-              )
+                layerNameList[index],
+                'visibility',
+                'visible',
+            )
             : map.setLayoutProperty(layerNameList[index], 'visibility', 'none')
     })
 }
@@ -659,6 +609,7 @@ watch(
     (newV, oldV) => {
         console.log('new val warn', newV)
         updateWarnInfoDesc(newV)
+        mapFlyToRiver(useMapStore().getMap())
     },
     { immediate: true, deep: true, flush: 'sync' },
 )
@@ -669,6 +620,7 @@ watch(
         if (newVal && newVal != '') {
             // console.log("123123123123", newVal)
             warnActive.value = true
+            // mapFlyToRiver(useMapStore().getMap())
         }
     },
 )
@@ -695,7 +647,10 @@ onMounted(async () => {
     map.on('render', () => {
         map.triggerRepaint()
     })
-    mapFlyToRiver(map)
+    // mapFlyToRiver(map)
+    console.log()
+    warnInfoStore.warnInfo.length ? mapFlyToRiver(map) : mapFlyToRiver2(map)
+
     useMapStore().setMap(map)
     await mapInit(map, true)
     map.addSource('zjgLine', {
@@ -1061,6 +1016,10 @@ div.twin-main-container {
                 div.item-title {
                     height: 3vh;
                     line-height: 3vh;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
                 }
 
                 div.legend-block {
@@ -1135,8 +1094,7 @@ div.twin-main-container {
                         }
 
                         /* Show the checkmark when checkbox is checked */
-                        .input[type='checkbox']:checked
-                            + .custom-checkbox::after {
+                        .input[type='checkbox']:checked+.custom-checkbox::after {
                             opacity: 1;
                         }
                     }
@@ -1145,6 +1103,10 @@ div.twin-main-container {
 
             div.GNSS {
                 width: 14vw;
+
+                div.item-title {
+                    cursor: pointer;
+                }
             }
         }
     }

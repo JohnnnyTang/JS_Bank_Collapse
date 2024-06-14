@@ -1,55 +1,52 @@
 <template>
-<div class="riskInfo-container">
-    <div class="riskInfo-title">
-        <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
+    <div class="riskInfo-container">
+        <div class="riskInfo-title">
+            <!-- <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
             历史断面变化
-        </dv-border-box2>
-    </div>
-    <div class="riskInfo-item profileShape">
-        <div class="item-title">{{ profileName }}</div>
-        <div class="profile-selector-container">
-            <el-select
-                v-model="profileValue"
-                placeholder="选择断面"
-                style="width: 10vw; height: 3.5vh"
-                @change="calProfileData"
-                popper-class="profile-popper"
-            >
-                <el-option
-                    v-for="item in props.profileList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                >
-                    <span class="profile-name-text">
-                        {{ item.label }}
-                    </span>
-                </el-option>
-            </el-select>
+        </dv-border-box2> -->
+            <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
+                岸坡断面形态变化
+            </dv-border-box2>
         </div>
-        <div
-            ref="shapeGraphRef"
-            class="shape graph"
-            element-loading-background="rgba(214, 235, 255,0.8)"
-        ></div>
-        <div class="graph-container shape">
-            <div
-                ref="shapeGraphRef"
-                class="shape graph"
-                v-loading="props.shapeChartLoad"
-                element-loading-background="rgba(255, 255, 255, 0.4)"
-            ></div>
-            <div v-if="shapeGraphNotShow" class="empty-graph">
-                当前暂无地形数据
+        <div class="riskInfo-item profileShape">
+            <div class="item-title">{{ profileName }}</div>
+            <div class="profile-selector-container">
+                <el-select v-model="profileValue" placeholder="选择断面" style="width: 10vw; height: 3.5vh"
+                    @change="calProfileData" popper-class="profile-popper">
+                    <el-option v-for="item in props.profileList" :key="item.value" :label="item.label" :value="item.value">
+                        <span class="profile-name-text">
+                            {{ item.label }}
+                        </span>
+                    </el-option>
+                </el-select>
+            </div>
+            <div ref="shapeGraphRef" class="shape graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
+            <div class="graph-container shape">
+                <div ref="shapeGraphRef" class="shape graph" v-loading="props.shapeChartLoad"
+                    element-loading-background="rgba(255, 255, 255, 0.4)"></div>
+                <div v-if="shapeGraphNotShow" class="empty-graph">
+                    当前暂无地形数据
+                </div>
+            </div>
+        </div>
+        <div class="text-info-container">
+            <div class="text-info-block">
+                <div class="text-info-item">
+                    2023年该断面滩槽高程为 <span style="color: rgb(226, 80, 80);">XX</span> m
+                </div>
+            </div>
+            <div class="text-info-block">
+                <div class="text-info-item">
+                    2023年断面最大岸坡坡比为 <span style="color: rgb(226, 80, 80);">XX</span>
+                </div>
+            </div>
+            <div class="text-info-block">
+                <div class="text-info-item">
+                    1999~2023年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">XX</span> m/年
+                </div>
             </div>
         </div>
     </div>
-    <div class="text-info-container">
-        <div class="text-info-item">
-            该断面近岸冲刷速率值为 <span style="color: red;">{{ speedList[profileValue-1]}}</span> m/年
-        </div>
-    </div>
-</div>
 </template>
 
 <script setup>
@@ -58,7 +55,7 @@ import { drawShapeCompareGraph } from './util.js'
 import * as echarts from 'echarts'
 
 const speedList = ref([
-    3.575,4.725,2.675,5.025,4.700,5.650,3.375,3.150,4.325,3.850,1.275,0.975 
+    3.575, 4.725, 2.675, 5.025, 4.700, 5.650, 3.375, 3.150, 4.325, 3.850, 1.275, 0.975
 ])
 
 const shapeGraphNotShow = ref(false)
@@ -93,29 +90,29 @@ const props = defineProps({
 const calProfileData = () => {
     emit('profileValueChange', profileValue.value)
     shapeGraphNotShow.value = false
-    const profileDataItem = props.profileData[profileValue.value-1]
-    const profileDataCompareItem = props.profileDataCompare[profileValue.value-1]
-    const profileInfoItem = props.profileList[profileValue.value-1]
+    const profileDataItem = props.profileData[profileValue.value - 1]
+    const profileDataCompareItem = props.profileDataCompare[profileValue.value - 1]
+    const profileInfoItem = props.profileList[profileValue.value - 1]
     profileName.value = profileInfoItem.name
     try {
         section = profileDataItem
-        .section.map((value) => {
-            return value[2] < -999 ? null : value[2]
-        }),
-        beforeSection = profileDataItem
-        .beforeSection.map((value) => {
-            return value[2] < -999 ? null : value[2]
-        })
+            .section.map((value) => {
+                return value[2] < -999 ? null : value[2]
+            }),
+            beforeSection = profileDataItem
+                .beforeSection.map((value) => {
+                    return value[2] < -999 ? null : value[2]
+                })
         compareSection = profileDataCompareItem
-        .section.map((value) => {
-            return value[2] < -999 ? null : value[2]
-        })
+            .section.map((value) => {
+                return value[2] < -999 ? null : value[2]
+            })
         compareBeforeSection = profileDataCompareItem
-        .beforeSection.map((value) => {
-            return value[2] < -999 ? null : value[2]
-        })
+            .beforeSection.map((value) => {
+                return value[2] < -999 ? null : value[2]
+            })
     } catch (error) {
-        DrawGraph([],[],[],[],[])
+        DrawGraph([], [], [], [], [])
         shapeGraphNotShow.value = true
         return
     }
@@ -143,7 +140,7 @@ onMounted(() => {
     calProfileData()
 })
 
-watch(()=>props.profileData, ()=>{
+watch(() => props.profileData, () => {
     calProfileData()
 })
 
@@ -152,9 +149,10 @@ watch(()=>props.profileData, ()=>{
 <style lang="scss" scoped>
 div.riskInfo-container {
     position: absolute;
-    top: 54.25vh;
-    left:0.3vw;
-    height: 37.5vh;
+    // top: 54.25vh;
+    top: 17vh;
+    left: 0.3vw;
+    height: 70vh;
     width: 26vw;
     border-radius: 8px;
     border: #167aec 1px solid;
@@ -173,7 +171,7 @@ div.riskInfo-container {
         text-align: center;
         font-family: 'Microsoft YaHei';
         font-weight: bold;
-        font-size: calc(0.8vw + 0.7vh);
+        font-size: calc(0.7vw + 0.7vh);
         color: #0c60af;
         text-shadow:
             #f1f1ef 1px 1px,
@@ -195,13 +193,13 @@ div.riskInfo-container {
 
         &.profileShape {
             top: 5.5vh;
-            height: 27vh;
+            height: 45vh;
             // background-color: #c9cad4;
         }
 
         div.item-title {
             position: absolute;
-            top: 0.5vh;
+            top: 1vh;
             left: 0.5vw;
             font-size: calc(0.6vh + 0.6vw);
             font-weight: 600;
@@ -215,6 +213,7 @@ div.riskInfo-container {
             width: 10vw;
             height: 4vh;
             left: 15vw;
+            top: 1vh;
             // background-color: #d1d2db;
 
             :deep(.el-select) {
@@ -266,11 +265,11 @@ div.riskInfo-container {
         div.graph-container {
             position: absolute;
             width: 24vw;
-            top: 4vh;
+            top: 5.6vh;
             left: 0.25vw;
 
             &.shape {
-                height: 22.5vh;
+                height: 38vh;
                 backdrop-filter: blur(5px);
                 // background-color: rgba(220, 250, 248, 0.4);
             }
@@ -295,6 +294,7 @@ div.riskInfo-container {
                     // height: 17vh;
                     // background-color: #00098a;
                 }
+
                 z-index: 99;
             }
 
@@ -313,23 +313,39 @@ div.riskInfo-container {
     }
 
     div.text-info-container {
-        position:absolute;
-        top: 33vh;
+        position: absolute;
+        top: 52vh;
         width: 25vw;
-        height: 4.25vh;
+        height: 17vh;
         left: 0.5vw;
-        background-color: rgba(18, 161, 218, 0.5);
+        // background-color: rgb(223, 255, 250, 0.719);
         border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
 
-        div.text-info-item {
-            position: absolute;
-            left: 4vw;
-            top: 0.7vh;
-            color: #070707;
-            font-size: calc(0.7vw + 0.5vh);
-            font-family: 'Microsoft YaHei';
-            font-weight: bold;
+        div.text-info-block {
+
+            width: 22vw;
+            height: 4.5vh;
+            background-color: #1f73c2;
+            margin-top: 0.2vh;
+            margin-bottom: 0.2vh;
+            border-radius: 10px;
+
+            div.text-info-item {
+                text-align: center;
+                line-height: 4.5vh;
+                position: relative;
+                color: #ffffff;
+                font-size: calc(0.7vw + 0.5vh);
+                font-family: 'Microsoft YaHei';
+                font-weight: bold;
+            }
+
         }
+
     }
 }
 </style>

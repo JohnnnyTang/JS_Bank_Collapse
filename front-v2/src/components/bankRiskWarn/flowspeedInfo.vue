@@ -1,9 +1,9 @@
 <template>
     <div class="flowspeed-content">
         <div class="flowspeed-title">
-            流速信息展示
+            近岸计算流速
         </div>
-        <div class="profile-selector-container">
+        <div class="profile-selector-container" v-show="false">
             <div class="select-descriptiopn">水文条件选择：</div>
             <el-select v-model="waterConditionValue" placeholder="选择水文条件" style="width: 5vw; height: 3.5vh"
                 @change="calFlowspeedData" popper-class="water-condition-popper">
@@ -15,18 +15,18 @@
             </el-select>
         </div>
         <div class="riskInfo-item flowspeed">
-            <div class="item-title">
+            <!-- <div class="item-title">
                 沿岸流速分布：
-            </div>
+            </div> -->
 
             <!-- <div class="profile-condition-container">
                 <div class="profile-condition-text">
                     当前水文条件：{{ props.type }}
                 </div>
             </div> -->
-            <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div>
-            <div class="graph-container flowspeed">
-                <div ref="flowspeedGraphRef" class="flowspeed graph" v-loading="props.flowspeedChartLoad"
+            <!-- <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div> -->
+            <div class="graph-container flowspeed" id="flowspeed-chart-container">
+                <div id="flowspeed-chart" ref="flowspeedGraphRef" class="flowspeed graph" v-loading="props.flowspeedChartLoad"
                     element-loading-background="rgba(255, 255, 255, 0.4)"></div>
             </div>
         </div>
@@ -194,7 +194,7 @@ div.flowspeed-content {
         div.graph-container {
             position: absolute;
             width: 19.5vw;
-            top: 4vh;
+            top: 0.5vh;
             left: 0.25vw;
 
             &.flowspeed {
@@ -211,6 +211,7 @@ div.flowspeed-content {
 
                 &.flowspeed {
                     width: 17vw;
+                    height: 15vh;
                     // background-color: #00098a;
                     // height: 17vh;
                     // background-color: #00098a;
@@ -218,6 +219,8 @@ div.flowspeed-content {
             }
         }
     }
+
+
 }
 
 div.profile-selector-container {
@@ -286,5 +289,14 @@ div.profile-selector-container {
         color: #2b61f7;
         font-size: calc(0.4vw + 0.4vh);
     }
+}
+
+div#flowspeed-chart-container{
+    margin-top: 0;
+}
+
+div#flowspeed-chart{
+    width: 17.5vw;
+    height: 18vh;
 }
 </style>
