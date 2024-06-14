@@ -970,17 +970,18 @@ const setWarningDeviceStyle = (
             'mzsBankLine',
         )
         let i = 0
-        let interval = [0.2, 0.3, 0.4, 0.5, 0.4, 0.3]
-        let intv = setInterval(() => {
-            if (map && map.getLayer(`${deviceLayer}-${deviceCode}`)) {
-                i = (i + 1) % 6
-                map.setPaintProperty(
-                    `${deviceLayer}-${deviceCode}`,
-                    'fill-opacity',
-                    0.3 + interval[i],
-                )
-            }
-        }, 200)
+        // let interval = [0.2, 0.3, 0.4, 0.5, 0.4, 0.3]
+        // let intv = setInterval(() => {
+        //     if (map && map.getLayer(`${deviceLayer}-${deviceCode}`)) {
+        //         i = (i + 1) % 6
+        //         map.setPaintProperty(
+        //             `${deviceLayer}-${deviceCode}`,
+        //             'fill-opacity',
+        //             0.3 + interval[i],
+        //         )
+        //     }
+        // }, 200)
+        let intv = warnPulsing(map, deviceCode, `${deviceLayer}-${deviceCode}`)
         useWarnInfoStore().areaBreatheInterval[warnData.id] = intv
     }
     // let json = map.getSource(sourceMap[deviceLayer])['_data']
@@ -1108,6 +1109,23 @@ const warnInterval = async (map, minute) => {
     //     })
     // }
 }
+
+const warnPulsing = (map, deviceCode, deviceLayer) => {
+    let i = 0
+    let interval = [0.2, 0.3, 0.4, 0.5, 0.4, 0.3]
+    let intv = setInterval(() => {
+        if (map && map.getLayer(`${deviceLayer}-${deviceCode}`)) {
+            i = (i + 1) % 6
+            map.setPaintProperty(
+                `${deviceLayer}-${deviceCode}`,
+                'fill-opacity',
+                0.3 + interval[i],
+            )
+        }
+    }, 200)
+    return intv
+}
+
 
 const open = (features, map) => {
     const items = features

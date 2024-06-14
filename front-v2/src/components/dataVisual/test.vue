@@ -55,9 +55,31 @@ onMounted(async () => {
     });
     // console.log(TerrainLayer)
 
-    map.addSource('riverSmallSection',{
-        type:'vector',
-        
+    map.addSource('riverSmallSection', {
+        type: 'geojson',
+        data: smallRiverTest
+    })
+    map.addLayer({
+
+        id: 'riverSmallSection',
+        type: 'symbol',
+        source: 'riverSmallSection',
+        minzoom: 11.5,
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-rotate': ['get', 'rotateAngle'],
+            'text-font': [
+                'Open Sans Semibold',
+                'Arial Unicode MS Bold',
+            ],
+        },
+        paint: {
+            'text-color': 'rgb(82,163,235)',
+            'text-size': 20,
+            'text-halo-color': "rgba(255, 255, 255, 1.0)",
+            'text-halo-width': 3.0,
+        }
+
     })
 
     // await layerAddFunction(map, '一级预警岸段')
@@ -823,6 +845,28 @@ const banktest = {
         { "type": "Feature", "properties": { "id": 48, "city_name": "苏州市", "river_name": "澄通河段", "bank_name": "段山港至越洋码头", "warning_level": 1, "monitoring_length": 16.0, "memo": "长防办12", "description": "段山港至越洋码头段属Ⅰ级崩岸预警段，监测长度约16km，沿江分布着海螺水泥码头、海力0~9号码头、沙洲电厂一期工程重件码头等29个码头，张家港互益染整有限公司取水口、江苏新芳纺织集团取水口、浦项取水口、张江港市给排水总公司取水口、江苏沙钢集团有限公司取水口、张家港沙洲电力有限公司取水口6个取水口。该段江岸自1924年至解放初，已有七个集镇坍入江中，最大崩坍达4.8km。", "state": "active", "create_time": "2024-01-25T14:05:12", "update_time": "2024-01-25T14:05:12", "if_important": 0, "fix_project": "自七十年代初起，至八十年代初，治理区域位于一干河以上段，以丁坝为主，共建丁坝11条（其中12号丁坝已于1972年5月16日塌失），护岸长度约计5.8km。八十年代后，随着上游河势的变化，老海坝段顶冲点也下移至九龙港以下，治理区域位于一干河至二干河，除了对已建丁坝工程不断维修加固外，新建护岸工程全部改成平顺抛石护岸，至八十年代中，完成平顺抛石护岸2.23km。自1991～1997年累计抛石21.63万t，1988年～1997年累计抛石40.70万t。1998年大水后完成了九龙港至十一圩抛石护岸工程，新建护岸长2km，1999～2013年沙钢集团沿江码头前沿对护岸区域进行加固维护，累计抛石约114万m3。为稳定浏海沙右岸顶冲点、水下岸坡，使水上的堤防工程与水下的防护工程形成完整的防洪体系，保障防洪安全，老海坝节点综合整治工程2014年开工建设，对沙钢海力9号至0号码头范围7.25km的近岸河床进行抛石加固，抛护宽宽165～255m不等，抛石量240万方，目前已全部完工。" }, "geometry": { "type": "LineString", "coordinates": [[120.535135296341295, 32.005954184474653], [120.547606348126905, 31.999653113460344], [120.562131147053137, 31.995886453810993], [120.5912157023037, 31.992582979686979], [120.608624486576247, 31.987785076792594], [120.614977993687759, 31.98858035760021], [120.617792064237847, 31.990275791409896], [120.628454070669861, 31.988624054347891], [120.650311183855464, 31.989594122146197], [120.660588658907969, 31.988842538086249], [120.663778521488027, 31.992207187656994], [120.688012737746988, 31.992679112531864], [120.701576208224452, 31.994400764390164]] } }
     ]
 }
+
+const smallRiverTest = {
+    "type": "FeatureCollection",
+    "name": "汊道",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { "type": "Feature", "properties": { "label": "扬中河段", "rotateAngle": 10.0 }, "geometry": { "type": "Point", "coordinates": [120.062481080071635, 31.956970753818254] } },
+        { "type": "Feature", "properties": { "label": "福姜沙河段", "rotateAngle": -24.0 }, "geometry": { "type": "Point", "coordinates": [120.330740341349212, 31.978740247639973] } },
+        { "type": "Feature", "properties": { "label": "世业洲汊道段", "rotateAngle": 30.0 }, "geometry": { "type": "Point", "coordinates": [119.265741129459101, 32.202441586550535] } },
+        { "type": "Feature", "properties": { "label": "白茆沙河段", "rotateAngle": 30.0 }, "geometry": { "type": "Point", "coordinates": [121.126911517266223, 31.74556429930384] } },
+        { "type": "Feature", "properties": { "label": "通州沙河段", "rotateAngle": 60.0 }, "geometry": { "type": "Point", "coordinates": [120.830453573931351, 31.931231086376297] } },
+        { "type": "Feature", "properties": { "label": "和畅洲汊道段", "rotateAngle": -19.0 }, "geometry": { "type": "Point", "coordinates": [119.639035107054426, 32.197306590178727] } },
+        { "type": "Feature", "properties": { "label": "龙潭水道", "rotateAngle": -2.0 }, "geometry": { "type": "Point", "coordinates": [118.97086139111093, 32.180048919121447] } },
+        { "type": "Feature", "properties": { "label": "八卦洲汊道段", "rotateAngle": -25.0 }, "geometry": { "type": "Point", "coordinates": [118.806354318771426, 32.154336578459521] } },
+        { "type": "Feature", "properties": { "label": "新济洲汊道段", "rotateAngle": -40.0 }, "geometry": { "type": "Point", "coordinates": [118.603033031801772, 31.93807490118834] } },
+        { "type": "Feature", "properties": { "label": "梅子洲汊道段", "rotateAngle": -65.0 }, "geometry": { "type": "Point", "coordinates": [118.68209552034952, 32.044123455644339] } },
+        { "type": "Feature", "properties": { "label": "六圩弯道", "rotateAngle": -2.0 }, "geometry": { "type": "Point", "coordinates": [119.436207601399929, 32.263247326420078] } },
+        { "type": "Feature", "properties": { "label": "如皋沙群段", "rotateAngle": 12.0 }, "geometry": { "type": "Point", "coordinates": [120.582445321434321, 32.00829051096477] } },
+        { "type": "Feature", "properties": { "label": "仪征河段", "rotateAngle": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.123144846834933, 32.247644717205432] } }
+    ]
+}
+
 
 
 

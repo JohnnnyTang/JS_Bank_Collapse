@@ -648,7 +648,6 @@ onMounted(async () => {
         map.triggerRepaint()
     })
     // mapFlyToRiver(map)
-    console.log()
     warnInfoStore.warnInfo.length ? mapFlyToRiver(map) : mapFlyToRiver2(map)
 
     useMapStore().setMap(map)
