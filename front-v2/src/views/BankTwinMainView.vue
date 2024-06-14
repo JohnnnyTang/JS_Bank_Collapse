@@ -648,7 +648,9 @@ onMounted(async () => {
         map.triggerRepaint()
     })
     // mapFlyToRiver(map)
-    mapFlyToRiver2(map)
+    console.log()
+    warnInfoStore.warnInfo.length ? mapFlyToRiver(map) : mapFlyToRiver2(map)
+
     useMapStore().setMap(map)
     await mapInit(map, true)
     map.addSource('zjgLine', {
