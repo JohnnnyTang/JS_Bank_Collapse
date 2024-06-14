@@ -20,7 +20,7 @@ let gnssOption = {
         max: function (value) {
             return parseInt((value.max * 1.5)/10+1) * 10;
         },
-        name: '土体表面累积位移(mm)',
+        name: '土体表面位移(mm)',
         nameLocation: 'end',
         nameTextStyle: {
             fontSize: 13,
@@ -179,12 +179,12 @@ let gnssRealTimeSetting = {
     dataZoom: [
         {
             type: 'inside',
-            start: 98,
+            start: 99.5,
             end: 100,
         },
         {
             type: 'slider',
-            start: 98,
+            start: 99.5,
             end: 100,
         },
     ],
@@ -247,6 +247,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
             color: 'rgb(163,163,163)',
             opacity: 0.4,
         },
+        large: true,
     }
     gnssOption.series[2] = {
         name: '位移滑动平均',
@@ -302,6 +303,8 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     }
     return gnssOption
 }
+
+
 
 let stressOption = {
     tooltip: {
@@ -997,9 +1000,35 @@ const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     return manometerOption
 }
 
+const dataModeOptionMap = {
+    位移测量站: {
+        实时: gnssRealTimeSetting,
+        长期: gnssLongTimeSetting,
+    },
+    测斜仪: {
+        实时: incinometerRealTimeSetting,
+        长期: incinometerLongTimeSetting,
+    },
+    孔隙水压力计: {
+        实时: manometerRealTimeSetting,
+        长期: manometerLongTimeSetting,
+    },
+    应力桩: {
+        实时: stressRealTimeSetting,
+        长期: stressLongTimeSetting,
+    },
+}
+
+const toggleOptionDataMode = (option, deviceType, dataMode) => {
+    option.yAxis = dataModeOptionMap[deviceType][dataMode].yAxis
+    option.dataZoom = dataModeOptionMap[deviceType][dataMode].dataZoom
+    return option
+}
+
 export {
     genGnssOptionOfDevice,
     genStressOptionOfDevice,
     genIncinometerOptionOfDevice,
     genManometerOptionOfDevice,
+    toggleOptionDataMode
 }

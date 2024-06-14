@@ -1,9 +1,6 @@
 <template>
     <div class="device-info-container" :class="{ 'hide-left': props.domHide }">
-        <dv-border-box12
-            :dur="5"
-            :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']"
-        >
+        <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
             <div class="device-info-content">
                 <div class="monitor-title-container">设备状态</div>
                 <!-- <div class="monitor-info-splitter">
@@ -36,37 +33,19 @@
                                     更新频次
                                 </div> -->
                         </div>
-                        <div
-                            class="device-status-row body"
-                            v-for="(item, index) in deviceStatusDataList"
-                            :key="index"
-                        >
-                            <el-tooltip
-                                class="box-item"
-                                effect="light"
-                                content="点击查看数据"
-                                placement="right"
-                                :offset="-6"
-                                :hide-after="10"
-                                v-if="item.name != '视频监控'"
-                            >
-                                <div
-                                    class="device-name device-item body"
-                                    @click="changeDeviceType(item.name)"
-                                    :class="{
-                                        click: item.name != '视频监控',
-                                    }"
-                                >
+                        <div class="device-status-row body" v-for="(item, index) in deviceStatusDataList" :key="index">
+                            <el-tooltip class="box-item" effect="light" content="点击查看数据" placement="right" :offset="-6"
+                                :hide-after="10" v-if="item.name != '视频监控'">
+                                <div class="device-name device-item body" @click="changeDeviceType(item.name)" :class="{
+                                    click: item.name != '视频监控',
+                                }">
                                     {{ item.name }}
                                 </div>
                             </el-tooltip>
                             <div class="device-name device-item body" v-else>
                                 {{ item.name }}
                             </div>
-                            <div
-                                class="device-count device-item body"
-                                v-loading="deviceStatusLoading"
-                            >
+                            <div class="device-count device-item body" v-loading="deviceStatusLoading">
                                 <div class="warn">
                                     {{ warnDeviceCount[index] }}
                                 </div>
@@ -108,18 +87,9 @@
                                     </el-select>
                                 </div> -->
                             <div class="section-selectior-item">
-                                <el-select
-                                    v-model="selectedDevice"
-                                    placeholder="选择具体设备"
-                                    style="width: 4.5vw; height: 2.4vh"
-                                    @change="deviceSelectChange"
-                                >
-                                    <el-option
-                                        v-for="(item, index) in deviceList"
-                                        :key="index"
-                                        :label="item"
-                                        :value="item"
-                                    >
+                                <el-select v-model="selectedDevice" placeholder="选择具体设备" style="width: 4.5vw; height: 2.4vh"
+                                    @change="deviceSelectChange">
+                                    <el-option v-for="(item, index) in deviceList" :key="index" :label="item" :value="item">
                                         <span class="section-name-text">{{
                                             item
                                         }}</span>
@@ -128,10 +98,7 @@
                             </div>
                             <div class="device-update-time">
                                 <div class="static">数据更新时间：</div>
-                                <div
-                                    class="update-time"
-                                    v-loading="updateTimeLoading"
-                                >
+                                <div class="update-time" v-loading="updateTimeLoading">
                                     {{
                                         deviceUpdateTime +
                                         '(' +
@@ -142,18 +109,9 @@
                                 </div>
                             </div>
                             <div class="section-selectior-item">
-                                <el-select
-                                    v-model="selectedDataMode"
-                                    placeholder="选择查看模式"
-                                    style="width: 4.5vw; height: 2.4vh"
-                                    @change="dataModeChange"
-                                >
-                                    <el-option
-                                        v-for="item in ['实时', '长期']"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item"
-                                    >
+                                <el-select v-model="selectedDataMode" placeholder="选择查看模式"
+                                    style="width: 4.5vw; height: 2.4vh" @change="dataModeChange">
+                                    <el-option v-for="item in ['实时', '长期']" :key="item" :label="item" :value="item">
                                         <span class="section-name-text">{{
                                             item
                                         }}</span>
@@ -164,37 +122,18 @@
                         更多数据
                     </div> -->
                         </div>
-                        <div
-                            class="device-chart-dom"
-                            ref="chartDom"
-                            v-loading="chartDataLoading"
-                            @dblclick="navToMoreData"
-                        ></div>
+                        <div class="device-chart-dom" ref="chartDom" v-loading="chartDataLoading" @dblclick="navToMoreData">
+                        </div>
                     </div>
                     <div class="video-content-container">
-                        <div
-                            class="video-box"
-                            v-for="(item, index) in videoList"
-                            :key="index"
-                            :id="item.order"
-                        >
+                        <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                             <div class="video-content">
-                                <iframe
-                                    :src="item.videoUrl + token"
-                                    width="100%"
-                                    height="100%"
-                                    :id="item.name"
-                                    allowfullscreen
-                                >
+                                <iframe :src="item.videoUrl + token" width="100%" height="100%" :id="item.name"
+                                    allowfullscreen>
                                 </iframe>
                             </div>
-                            <div
-                                class="video-title"
-                                :class="
-                                    videoList[index].warn ? 'warn' : 'normal'
-                                "
-                                @click="focusOn(index)"
-                            >
+                            <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
+                                " @click="focusOn(index)">
                                 {{ item.name }}
                             </div>
                             <!-- <div
@@ -204,107 +143,64 @@
                             >
                                 放大
                             </div> -->
-                            <div
-                                class="small-pic"
-                                v-if="item.order == 0"
-                                :id="index"
-                            ></div>
+                            <div class="small-pic" v-if="item.order == 0" :id="index"></div>
                         </div>
                     </div>
-                    <div
-                        class="video-control-opener"
-                        :class="{ open: videoControlOpen }"
-                    >
+                    <div class="video-control-opener" :class="{ open: videoControlOpen }">
                         <div class="left tri"></div>
-                        <div
-                            class="control-open-text"
-                            @click="videoControlOpen = !videoControlOpen"
-                        >
+                        <div class="control-open-text" @click="videoControlOpen = !videoControlOpen">
                             {{
                                 videoControlOpen
-                                    ? '◀监控云台控制◀'
-                                    : '▶监控云台控制▶'
+                                ? '◀监控云台控制◀'
+                                : '▶监控云台控制▶'
                             }}
                         </div>
                         <div class="right tri"></div>
                     </div>
-                    <div
-                        class="video-controller-container"
-                        v-if="videoControlOpen"
-                    >
+                    <div class="video-controller-container" v-if="videoControlOpen">
                         <div class="crc-directions">
-                            <div
-                                class="crc-directions-up"
-                                @click="basicVideoFunction(0)"
-                            >
-                                <ArrowUpBold
-                                    style="
+                            <div class="crc-directions-up" @click="basicVideoFunction(0)">
+                                <ArrowUpBold style="
                                         width: 3vh;
                                         height: 3vh;
                                         display: block;
-                                    "
-                                />
+                                    " />
                             </div>
-                            <div
-                                class="crc-directions-left"
-                                @click="basicVideoFunction(2)"
-                            >
-                                <ArrowLeftBold
-                                    style="
+                            <div class="crc-directions-left" @click="basicVideoFunction(2)">
+                                <ArrowLeftBold style="
                                         width: 3vh;
                                         height: 3vh;
                                         display: block;
-                                    "
-                                />
+                                    " />
                             </div>
-                            <div
-                                class="crc-directions-right"
-                                @click="basicVideoFunction(3)"
-                            >
-                                <ArrowRightBold
-                                    style="
+                            <div class="crc-directions-right" @click="basicVideoFunction(3)">
+                                <ArrowRightBold style="
                                         width: 3vh;
                                         height: 3vh;
                                         display: block;
-                                    "
-                                />
+                                    " />
                             </div>
-                            <div
-                                class="crc-directions-down"
-                                @click="basicVideoFunction(1)"
-                            >
-                                <ArrowDownBold
-                                    style="
+                            <div class="crc-directions-down" @click="basicVideoFunction(1)">
+                                <ArrowDownBold style="
                                         width: 3vh;
                                         height: 3vh;
                                         display: block;
-                                    "
-                                />
+                                    " />
                             </div>
                         </div>
                         <div class="function-button-group">
                             <div class="preset button-title">预设点</div>
                             <div class="preset button-column">
-                                <div
-                                    class="preset button-item"
-                                    v-for="(item, i) in videoList[
-                                        curBigVideoIndex
-                                    ].presetPt"
-                                    :key="i"
-                                    @click="move2PresetPoint(i + 1)"
-                                    :class="item.status"
-                                >
+                                <div class="preset button-item" v-for="(item, i) in videoList[
+                                    curBigVideoIndex
+                                ].presetPt" :key="i" @click="move2PresetPoint(i + 1)" :class="item.status">
                                     {{ item.name }}
                                 </div>
                             </div>
                             <div class="zoom button-title">视角缩放</div>
                             <div class="zoom button-column">
-                                <div
-                                    class="zoom button-item"
-                                    v-for="(func, index) in zoomFuncList"
-                                    :key="index"
-                                    @click="basicVideoFunction(index + 4)"
-                                >
+                                <div class="zoom button-item" v-for="(func, index) in zoomFuncList" :key="index"
+                                    @click="basicVideoFunction(index + 4)">
                                     {{ func.label }}
                                 </div>
                             </div>
@@ -328,6 +224,7 @@ import {
     genStressOptionOfDevice,
     genIncinometerOptionOfDevice,
     genManometerOptionOfDevice,
+    toggleOptionDataMode,
 } from './dataChartSettings'
 import router from '../../router'
 import { useWarnInfoStore } from '../../store/mapStore'
@@ -337,6 +234,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    deviceType: {
+        type: String,
+        default: '位移测量站'
+    }
 })
 
 const token = ref(
@@ -361,7 +262,7 @@ const warnDeviceCount = ref([0, 0, 0, 0, '-'])
 
 const domHide = ref(true)
 
-const deviceUpdateTime = ref('2024-06-11 14:00:00')
+const deviceUpdateTime = ref('2024-06-15 14:00:00')
 
 const deviceListMap = {
     位移测量站: [
@@ -456,7 +357,7 @@ const deviceIdMap = {
 const deviceTypeTimeMap = {
     位移测量站: {
         timeUnit: 'day',
-        timeCount: 3,
+        timeCount: 60,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '10分钟',
@@ -477,7 +378,7 @@ const deviceTypeTimeMap = {
     },
     应力桩: {
         timeUnit: 'hour',
-        timeCount: 6,
+        timeCount: 24,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '1分钟',
@@ -579,9 +480,9 @@ const focusOn = (index) => {
         videoList.value[curBigVideoIndex.value].order,
         videoList.value[index].order,
     ] = [
-        videoList.value[index].order,
-        videoList.value[curBigVideoIndex.value].order,
-    ]
+            videoList.value[index].order,
+            videoList.value[curBigVideoIndex.value].order,
+        ]
     curBigVideoIndex.value = index
 }
 
@@ -596,6 +497,18 @@ let stressOption = {}
 let inclinoOption = {}
 let manoOption = {}
 let echartIns = null
+let deviceOptionMap = {
+    位移测量站: {},
+    测斜仪: {},
+    孔隙水压力计: {},
+    应力桩: {},
+}
+let deviceGenOptionMap = {
+    位移测量站: genGnssOptionOfDevice,
+    测斜仪: genIncinometerOptionOfDevice,
+    孔隙水压力计: genManometerOptionOfDevice,
+    应力桩: genStressOptionOfDevice,
+}
 
 const changeDeviceType = (deviceName) => {
     selectedDeviceType.value = deviceName
@@ -620,36 +533,45 @@ let curUpdateInterval = null
 
 const toggleChartOptionFromData = (deviceData) => {
     // console.log('select data mode', selectedDataMode.value)
-    if (selectedDeviceType.value == '位移测量站') {
-        gnssOption = genGnssOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['位移测量站'],
-            selectedDataMode.value,
-        )
-        // console.log('option', gnssOption)
-        echartIns.setOption(gnssOption)
-    } else if (selectedDeviceType.value == '应力桩') {
-        stressOption = genStressOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['应力桩'],
-            selectedDataMode.value,
-        )
-        echartIns.setOption(stressOption)
-    } else if (selectedDeviceType.value == '测斜仪') {
-        inclinoOption = genIncinometerOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['测斜仪'],
-            selectedDataMode.value,
-        )
-        echartIns.setOption(inclinoOption)
-    } else {
-        manoOption = genManometerOptionOfDevice(
-            deviceData,
-            deviceTypeErrorMap['孔隙水压力计'],
-            selectedDataMode.value,
-        )
-        echartIns.setOption(manoOption)
-    }
+    deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[
+        selectedDeviceType.value
+    ](
+        deviceData,
+        deviceTypeErrorMap[selectedDeviceType.value],
+        selectedDataMode.value,
+    )
+    // console.log('option', gnssOption)
+    echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
+    // if (selectedDeviceType.value == '位移测量站') {
+    //     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[selectedDeviceType.value](
+    //         deviceData,
+    //         deviceTypeErrorMap[selectedDeviceType.value],
+    //         selectedDataMode.value,
+    //     )
+    //     // console.log('option', gnssOption)
+    //     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
+    // } else if (selectedDeviceType.value == '应力桩') {
+    //     stressOption = genStressOptionOfDevice(
+    //         deviceData,
+    //         deviceTypeErrorMap['应力桩'],
+    //         selectedDataMode.value,
+    //     )
+    //     echartIns.setOption(stressOption)
+    // } else if (selectedDeviceType.value == '测斜仪') {
+    //     inclinoOption = genIncinometerOptionOfDevice(
+    //         deviceData,
+    //         deviceTypeErrorMap['测斜仪'],
+    //         selectedDataMode.value,
+    //     )
+    //     echartIns.setOption(inclinoOption)
+    // } else {
+    //     manoOption = genManometerOptionOfDevice(
+    //         deviceData,
+    //         deviceTypeErrorMap['孔隙水压力计'],
+    //         selectedDataMode.value,
+    //     )
+    //     echartIns.setOption(manoOption)
+    // }
 }
 
 const deviceSelectChange = async (deviceName) => {
@@ -675,7 +597,28 @@ const deviceSelectChange = async (deviceName) => {
 }
 
 const dataModeChange = (dataMode) => {
-    deviceSelectChange(selectedDevice.value)
+    if (curDeviceData != null) {
+        console.log('in change.. no data request')
+        // chartDataLoading.value = true
+        // updateTimeLoading.value = true
+        // if (curDeviceData.length > 0) {
+        //     let newestData = curDeviceData.slice(-1)[0]
+        //     deviceUpdateTime.value = newestData.measureTime
+        // }
+        // chartDataLoading.value = false
+        // updateTimeLoading.value = false
+        // // console.log('device data', curDeviceData)
+        // toggleChartOptionFromData(curDeviceData)
+        deviceOptionMap[selectedDeviceType.value] = toggleOptionDataMode(
+            deviceOptionMap[selectedDeviceType.value],
+            selectedDeviceType.value,
+            dataMode
+        )
+        echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
+    } else {
+        // console.log('request data', curDeviceData)
+        deviceSelectChange(selectedDevice.value)
+    }
 }
 
 const basicVideoFunction = async (functionIndex) => {
@@ -757,6 +700,28 @@ async function updateNewestTime() {
     })
 }
 
+async function updateNewestData() {
+    if (curDeviceData == null) return
+    let deviceNewestData = (
+        await BackEndRequest.getDeviceNewestData(
+            deviceTypeNameMap[selectedDeviceType.value],
+            deviceIdMap[selectedDevice.value],
+        )
+    ).data
+    if (
+        curDeviceData.length == 0 ||
+        deviceNewestData.measureTime !=
+        curDeviceData[curDeviceData.length - 1].measureTime
+    ) {
+        curDeviceData.push(deviceNewestData)
+        toggleChartOptionFromData(curDeviceData)
+        deviceUpdateTime.value = deviceNewestData.measureTime
+        console.log('data update')
+    } else {
+        console.log('no update data')
+    }
+}
+
 watch(
     () => useWarnInfoStore().warnInfo,
     (newVal) => {
@@ -794,9 +759,16 @@ watch(
     },
 )
 
+watch(
+    () => props.deviceType,
+    (v) => {
+        changeDeviceType(v)
+    }
+)
+
 onMounted(async () => {
-    await updateNewestTime()
-    let myDate = new Date()
+    // await updateNewestTime()
+    // let myDate = new Date()
     // deviceStatusDataList.value[4].time =
     //     zeroFill(myDate.getHours()) +
     //     ':' +
@@ -812,16 +784,12 @@ onMounted(async () => {
     //         ':' +
     //         zeroFill(myDate.getSeconds())
     // }, 1000)
-    setInterval(async () => {
-        deviceStatusLoading.value = true
-        await updateNewestTime()
-        deviceStatusLoading.value = false
-    }, 1000 * 60)
+
     deviceStatusLoading.value = false
     updateTimeLoading.value = true
     // console.log('213', newestDataStatus)
     echartIns = echarts.init(chartDom.value)
-    let initialData = (
+    curDeviceData = (
         await BackEndRequest.getMonitorDataByTypeIdWithTime(
             'gnss',
             deviceIdMap['CL-01'],
@@ -829,34 +797,30 @@ onMounted(async () => {
             deviceTypeTimeMap['位移测量站'].timeCount,
         )
     ).data
-    let newestData = initialData.slice(-1)[0]
+    let newestData = curDeviceData.slice(-1)[0]
     deviceUpdateTime.value = newestData.measureTime
     updateTimeLoading.value = false
-    gnssOption = genGnssOptionOfDevice(
-        initialData,
+    deviceOptionMap['位移测量站'] = genGnssOptionOfDevice(
+        curDeviceData,
         deviceTypeErrorMap['位移测量站'],
         selectedDataMode.value,
     )
-    // console.log('option', gnssOption)
-    echartIns.setOption(gnssOption)
+    // console.log('option', deviceOptionMap['位移测量站'])
+    echartIns.setOption(deviceOptionMap['位移测量站'])
     chartDataLoading.value = false
-    setInterval(
-        async () => {
-            chartDataLoading.value = true
-            updateTimeLoading.value = true
-            await deviceSelectChange(selectedDevice.value)
-            chartDataLoading.value = false
-            updateTimeLoading.value = false
-        },
-        1000 * 60 * 5,
-    )
+    setInterval(async () => {
+        chartDataLoading.value = true
+        updateTimeLoading.value = true
+        await updateNewestData()
+        chartDataLoading.value = false
+        updateTimeLoading.value = false
+    }, 1000 * 60)
     // console.log('initialData', initialData)
 })
 
 onBeforeUnmount(async () => {
     await moveBack2Origin()
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -868,7 +832,6 @@ $shadowRed: #cf0000;
 $hoverColor: rgb(0, 160, 252);
 $splitColor: rgba(0, 51, 160, 0.575);
 $controlSize: 12vh;
-
 
 div.device-info-container {
     z-index: 3;
@@ -934,12 +897,10 @@ div.device-info-container {
                 display: flex;
                 border-radius: 2px;
 
-                background: linear-gradient(
-                    90deg,
-                    rgba(0, 56, 128, 1) 0%,
-                    rgba(16, 104, 203, 1) 60%,
-                    rgba(68, 159, 255, 1) 100%
-                );
+                background: linear-gradient(90deg,
+                        rgba(0, 56, 128, 1) 0%,
+                        rgba(16, 104, 203, 1) 60%,
+                        rgba(68, 159, 255, 1) 100%);
 
                 text-align: left;
                 color: #c4fbff;
@@ -1049,13 +1010,13 @@ div.device-info-container {
                                 rgba(208, 252, 255, 0.3) 0px -3px 0px inset;
                         }
 
-                        box-shadow:
-                            rgba(13, 70, 228, 0.6) 0px 2px 4px,
-                            rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
-                            rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
+                        box-shadow: rgba(13, 70, 228, 0.6) 0px 2px 4px,
+                        rgba(6, 55, 189, 0.4) 0px 7px 13px -3px,
+                        rgba(9, 61, 204, 0.3) 0px -3px 0px inset;
                     }
                 }
             }
+
             // background-color: #2622fd;
 
             div.device-chart-container {
@@ -1123,6 +1084,7 @@ div.device-info-container {
 
                         &.type {
                             width: 12vw;
+
                             :deep(.el-select__wrapper) {
                                 font-size: calc(0.45vw + 0.5vh);
                             }
@@ -1172,10 +1134,9 @@ div.device-info-container {
                             font-weight: bold;
                         }
 
-                        box-shadow:
-                            rgba(0, 132, 255, 0.8) 1px 1px,
-                            rgba(0, 119, 255, 0.7) 2px 2px,
-                            rgba(0, 119, 255, 0.6) 3px 3px;
+                        box-shadow: rgba(0, 132, 255, 0.8) 1px 1px,
+                        rgba(0, 119, 255, 0.7) 2px 2px,
+                        rgba(0, 119, 255, 0.6) 3px 3px;
                     }
 
                     div.nav-data-button {
@@ -1295,9 +1256,11 @@ div.device-info-container {
                         &[id='0'] {
                             background-image: url('/mzsBase-monitor3.png');
                         }
+
                         &[id='1'] {
                             background-image: url('/mzsBase-monitor2.png');
                         }
+
                         &[id='2'] {
                             background-image: url('/mzsBase-monitor1.png');
                         }
@@ -1320,6 +1283,7 @@ div.device-info-container {
                     &[id='1'] {
                         order: 2;
                         transform: translateY(-100%);
+
                         &:hover {
                             div.video-title {
                                 color: #9df8ff;
@@ -1336,6 +1300,7 @@ div.device-info-container {
                     &[id='2'] {
                         order: 3;
                         transform: translateY(-100%);
+
                         &:hover {
                             div.video-title {
                                 color: #9df8ff;
@@ -1343,6 +1308,7 @@ div.device-info-container {
                                 cursor: pointer;
                             }
                         }
+
                         div.video-content {
                             opacity: 0.85;
                         }
@@ -1381,41 +1347,34 @@ div.device-info-container {
                 div.tri {
                     width: 2.4vh;
                     height: 2.4vh;
-                    background: linear-gradient(
-                        -135deg,
-                        transparent 49%,
-                        #001885 51%,
-                        #001885 100%
-                    );
-
-                    &.right {
-                        background: linear-gradient(
-                            -45deg,
+                    background: linear-gradient(-135deg,
                             transparent 49%,
                             #001885 51%,
-                            #001885 100%
-                        );
+                            #001885 100%);
+
+                    &.right {
+                        background: linear-gradient(-45deg,
+                                transparent 49%,
+                                #001885 51%,
+                                #001885 100%);
                     }
                 }
 
                 &.open {
                     border-left: none;
                     border-right: 2px solid blue;
-                    div.tri {
-                        background: linear-gradient(
-                            135deg,
-                            transparent 49%,
-                            #001885 51%,
-                            #001885 100%
-                        );
 
-                        &.right {
-                            background: linear-gradient(
-                                45deg,
+                    div.tri {
+                        background: linear-gradient(135deg,
                                 transparent 49%,
                                 #001885 51%,
-                                #001885 100%
-                            );
+                                #001885 100%);
+
+                        &.right {
+                            background: linear-gradient(45deg,
+                                    transparent 49%,
+                                    #001885 51%,
+                                    #001885 100%);
                         }
                     }
 
@@ -1444,6 +1403,7 @@ div.device-info-container {
                     position: relative;
                     list-style-type: none;
                     margin: 0;
+
                     // transform: translate(
                     //     -4px,
                     //     -50%
@@ -1460,6 +1420,7 @@ div.device-info-container {
                         z-index: 2;
                         border-radius: 50%;
                         box-shadow: 12px 8px 20px -10px rgba(0, 0, 0, 0.4);
+
                         &::before {
                             position: relative;
                             content: '';
@@ -1467,15 +1428,14 @@ div.device-info-container {
                             height: $controlSize;
                             width: $controlSize;
                             border-radius: 50%;
-                            background: linear-gradient(
-                                45deg,
-                                transparent 49%,
-                                $splitColor 51%,
-                                $splitColor 51%,
-                                transparent 51%
-                            );
+                            background: linear-gradient(45deg,
+                                    transparent 49%,
+                                    $splitColor 51%,
+                                    $splitColor 51%,
+                                    transparent 51%);
                             z-index: 2;
                         }
+
                         &::after {
                             position: relative;
                             content: '';
@@ -1484,13 +1444,11 @@ div.device-info-container {
                             width: $controlSize;
                             transform: translateY(-$controlSize);
                             border-radius: 50%;
-                            background: linear-gradient(
-                                135deg,
-                                transparent 49%,
-                                $splitColor 51%,
-                                $splitColor 51%,
-                                transparent 51%
-                            );
+                            background: linear-gradient(135deg,
+                                    transparent 49%,
+                                    $splitColor 51%,
+                                    $splitColor 51%,
+                                    transparent 51%);
                             z-index: 2;
                         }
 
@@ -1501,6 +1459,7 @@ div.device-info-container {
                             transform: translateX(-50%);
                             cursor: pointer;
                             transition: all 250ms ease-in-out;
+
                             svg {
                                 &:hover {
                                     :deep(path) {
@@ -1508,8 +1467,10 @@ div.device-info-container {
                                     }
                                 }
                             }
+
                             z-index: 4;
                         }
+
                         &-down {
                             position: absolute;
                             bottom: 1vh;
@@ -1517,6 +1478,7 @@ div.device-info-container {
                             transform: translateX(-50%);
                             cursor: pointer;
                             transition: all 250ms ease-in-out;
+
                             svg {
                                 &:hover {
                                     :deep(path) {
@@ -1524,8 +1486,10 @@ div.device-info-container {
                                     }
                                 }
                             }
+
                             z-index: 4;
                         }
+
                         &-left {
                             position: absolute;
                             top: 50%;
@@ -1533,6 +1497,7 @@ div.device-info-container {
                             transform: translateY(-50%);
                             cursor: pointer;
                             transition: all 250ms ease-in-out;
+
                             svg {
                                 &:hover {
                                     :deep(path) {
@@ -1540,8 +1505,10 @@ div.device-info-container {
                                     }
                                 }
                             }
+
                             z-index: 4;
                         }
+
                         &-right {
                             position: absolute;
                             top: 50%;
@@ -1549,6 +1516,7 @@ div.device-info-container {
                             transform: translateY(-50%);
                             cursor: pointer;
                             transition: all 250ms ease-in-out;
+
                             svg {
                                 &:hover {
                                     :deep(path) {
@@ -1556,6 +1524,7 @@ div.device-info-container {
                                     }
                                 }
                             }
+
                             z-index: 4;
                         }
                     }
@@ -1626,6 +1595,7 @@ div.device-info-container {
                                 background-color: red;
                                 animation: breathing 1s linear infinite;
                                 font-weight: bold;
+
                                 @keyframes breathing {
                                     0% {
                                         transform: scale(1);
@@ -1646,6 +1616,7 @@ div.device-info-container {
             }
         }
     }
+
     // border-radius: 12px;
 }
 
@@ -1671,18 +1642,23 @@ div.device-info-container {
 
 :deep(.section-class-text) {
     font-size: calc(0.4vw + 0.4vh);
+
     &[id='warning'] {
         color: $shadowRed;
     }
+
     &[id='pre-warning'] {
         color: $shadowOrange;
     }
+
     &[id='attention'] {
         color: $shadowBlue;
     }
+
     &[id='normal'] {
         color: $shadowGreen;
     }
+
     &[id='all'] {
         color: #3d00ad;
     }

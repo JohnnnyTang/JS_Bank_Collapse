@@ -20,7 +20,7 @@ export default class FlowFieldLayer{
 
     uboMapBufferData:Float32Array = new Float32Array(12);
     phaseCount: number = 0.0;
-    timePerFrame: number = 150.0;
+    timePerFrame: number = 100.0;
     timeLast: number = 10.0;
     currentResourcePointer:number = 0;
     _timeCount: number = 0.0;   
@@ -106,7 +106,7 @@ export default class FlowFieldLayer{
 
         if(currentPhase != lastPhase){
             this.currentResourcePointer = (this.currentResourcePointer+1) % this.phaseCount;
-            console.log('now time step :: ', this.currentResourcePointer)
+            // console.log('now time step :: ', this.currentResourcePointer)
             //checkout new texture
             let index = nextPhase % this.textureArraySize;
             let gl:WebGL2RenderingContext = this.GL!;

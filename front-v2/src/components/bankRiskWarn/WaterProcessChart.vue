@@ -1,6 +1,6 @@
 <template>
     <div class="water-chart-container">
-        <div class="water-chart-title">潮位过程</div>
+        <div class="water-chart-title">计算潮位过程</div>
         <div class="water-chart-content" ref="chartDom"></div>
         <!-- <div class="selector-container">
             <el-select
@@ -17,7 +17,7 @@
                 />
             </el-select>
         </div> -->
-        <div class="profile-condition-container">
+        <div class="profile-condition-container" v-show="false">
             <div class="profile-condition-text">
                 当前水文条件：{{ props.type }}
             </div>
@@ -337,7 +337,7 @@ watch(
     // 监视timeStep变量移动
     () => props.timeStep,
     (newVal) => {
-        console.log(newVal, 'inner');
+        // console.log(newVal, 'inner');
 
         option.series[0].markLine.data[0].xAxis = parseFloat(newVal)
         option.series[0].markLine.data[0].label.formatter = `${parseFloat(newVal)}小时`

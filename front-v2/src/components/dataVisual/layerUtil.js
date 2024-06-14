@@ -1914,7 +1914,6 @@ const layerAddFunctionMap = {
             })
     },
     '过江通道辅助线': async (map) => {
-        console.log('1111111111');
         !map.getSource('riverBridgeAssist') &&
             map.addSource('riverBridgeAssist', {
                 type: 'geojson',
@@ -2919,15 +2918,12 @@ const layerAddFunctionMap = {
                 // }
             })
 
-        map.on('click', ['重点行政区边界'], (e) => {
-            console.log(e.features[0])
-        })
+
 
 
     },
 
     里程桩: async (map) => {
-        console.log('add 里程桩');
 
         !map.getSource('portEmbankmentPoint') &&
             map.addSource('portEmbankmentPoint', {

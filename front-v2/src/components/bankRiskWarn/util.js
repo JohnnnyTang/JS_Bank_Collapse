@@ -212,6 +212,11 @@ export const drawShapeSlopeGraph = (echarts, after, before, rates) => {
  * @param {number[]} flowspeed
  */
 export const drawFlowspeedGraph = (echarts, flowspeed) => {
+
+    const sectionName = [
+        'MZ01围堤', 'MZ02顺堤', 'MZ03顺堤尾', 'MZ04江滩办', 'MZ05小港池', 'MZ06张靖皋桥位', 'MZ07桥位下游', 'MZ08海事码头', 'MZ09码头下游', 'MZ10雷达站', 'MZ11主路', 'MZ12沙尾',
+    ]
+
     const option = {
         backgroundColor: "rgba(220, 250, 248, 0.3)",
         tooltip: {
@@ -240,7 +245,8 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
         xAxis: [
             {
                 type: 'category',
-                data: flowspeed.map((_, index) => `断面${index + 1}`),
+                // data: flowspeed.map((_, index) => `断面${index + 1}`),
+                data: flowspeed.map((_, index) => sectionName[index]),
                 axisLine: {
                     lineStyle: {
                         color: 'black'
@@ -758,6 +764,12 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
             lineStyle: {
                 inactiveColor: 'rgb(86,88,93)',
                 inactiveWidth: 1,
+            },
+            selected: {
+                '1999年地形': false,
+                '2012年地形': false,
+                '2019年地形': false,
+                '2023年地形': true,
             }
         },
         axisPointer: {
@@ -877,8 +889,8 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
                     type: 'text',
                     style: {
                         text: '高程(m)',
-                        x: 20,
-                        y: 20,
+                        x: 15,
+                        y: 60,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
@@ -888,8 +900,8 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
                     type: 'text',
                     style: {
                         text: '距离(m)',
-                        x: 530,
-                        y: 240,
+                        x: 560,
+                        y: 440,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'

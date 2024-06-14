@@ -972,7 +972,7 @@ const setWarningDeviceStyle = (
         let i = 0
         let interval = [0.2, 0.3, 0.4, 0.5, 0.4, 0.3]
         let intv = setInterval(() => {
-            if (map.getLayer(`${deviceLayer}-${deviceCode}`)) {
+            if (map && map.getLayer(`${deviceLayer}-${deviceCode}`)) {
                 i = (i + 1) % 6
                 map.setPaintProperty(
                     `${deviceLayer}-${deviceCode}`,
@@ -1086,9 +1086,9 @@ const warnInterval = async (map, minute) => {
     // console.log('123213 store warn pop map', useWarnInfoStore().warnPopupMap)
     if (filteredData.length != 0) {
         useWarnInfoStore().warnInfo = filteredData
-        useWarnInfoStore().videoActive = [0,2]
+        useWarnInfoStore().videoActive = [0, 2]
     }
-    if(allWarnData.length !== 0) {
+    if (allWarnData.length !== 0) {
         useWarnInfoStore().warnInfo_history = [...allWarnData]
         console.log(
             'in interval history warn',

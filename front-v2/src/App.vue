@@ -482,6 +482,16 @@ body,
             height: 2.8vh;
         }
     }
-
 }
+
+.el-popper.is-light.el-popover {
+    background: rgba(255,255,255,0.8);
+    color:#134dcc;
+    border: #1248bb 1px solid;
+    border-radius: 5px;
+    box-shadow: 0 0 4px #1248bb;
+    font-size: 20px;
+    font-weight: bold;;
+}
+
 </style>

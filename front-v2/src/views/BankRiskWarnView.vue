@@ -225,8 +225,8 @@
         <profileInfoVue v-if="showProfileInfo" @profile-value-change="changeProfileValue" :profileData="profileData"
             :profileList="profileList" :shapeChartLoad="shapeChartLoad" :erosionChartLoad="erosionChartLoad" />
 
-        <profileShapeYearlyVue v-if="showYearlyProfileShape" @profile-value-change="changeProfileValue"
-            :profileData="profileData" :profileList="profileList" :shapeYearlyChartLoad="shapeYearlyChartLoad" />
+        <profileShapeYearlyVue v-if="false" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :shapeYearlyChartLoad="shapeYearlyChartLoad" />
 
         <profileShapeVue v-if="showProfileShape" @profile-value-change="changeProfileValue" :profileData="profileData"
             :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />

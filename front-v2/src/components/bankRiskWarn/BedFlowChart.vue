@@ -1,6 +1,6 @@
 <template>
     <div class="bed-chart-container">
-        <div class="bed-chart-title">造床流量当量指标</div>
+        <div class="bed-chart-title">年径流过程</div>
         <div class="bed-chart-content" ref="chartDom"></div>
         <div class="bed-desc-text">2023年无超过造床流量(45000)时期</div>
         <div class="bed-desc-equa"></div>
@@ -10,7 +10,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import * as echarts from 'echarts'
-import { bedFlowTime, bedFlowValue } from './staticData'
+import { bedFlowTime, bedFlowValue, bedResData } from './staticData'
 
 const chartDom = ref()
 
@@ -19,16 +19,25 @@ const option = {
         trigger: 'axis',
     },
     xAxis: {
-        data: bedFlowTime,
+        // data: bedFlowTime,
+        type: 'time',
         boundaryGap: false,
         axisLabel: {
-            fontSize: 14,
+            fontSize: 12,
+            formatter: function(value, index) { // 坐标轴文字展示样式处理
+              const date = new Date(value)
+              const year = date.getFullYear().toString()
+              const texts = [year.substring(2, year.length), (date.getMonth() + 1), date.getDate()]
+              return texts.join('/')
+              // echarts自带的日期格式化方法
+              // return echarts.format.formatTime('yyyy-MM-dd', value)
+            }
         },
     },
     yAxis: {
         type: 'value',
         min: 0,
-        max: 50000,
+        max: 90000,
         boundaryGap: [0, '100%'],
         name: 'm3/s',
         nameTextStyle: {
@@ -45,16 +54,21 @@ const option = {
             fontSize: 14,
         },
     },
-    // dataZoom: [
-    //     {
-    //         type: 'inside',
-    //     },
-    //     {},
-    // ],
+    dataZoom: [
+        {
+            type: 'inside',
+            startValue: "2023/01/01 00:00:00",
+            endValue: "2023/12/31 23:00:00",
+        },
+        {
+            startValue: "2023/01/01 00:00:00",
+            endValue: "2023/12/31 23:00:00",
+        },
+    ],
     grid: {
         left: '2%',
         right: '4%',
-        bottom: '5%',
+        bottom: '18%',
         top: '20%',
         containLabel: true,
     },
@@ -64,7 +78,7 @@ const option = {
             type: 'line',
             smooth: true,
             symbol: 'none',
-            data: bedFlowValue,
+            data: bedResData,
         },
         {
             name: 'SplitLine',
