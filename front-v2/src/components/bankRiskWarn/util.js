@@ -212,6 +212,11 @@ export const drawShapeSlopeGraph = (echarts, after, before, rates) => {
  * @param {number[]} flowspeed
  */
 export const drawFlowspeedGraph = (echarts, flowspeed) => {
+
+    const sectionName = [
+        'MZ01围堤', 'MZ02顺堤', 'MZ03顺堤尾', 'MZ04江滩办', 'MZ05小港池', 'MZ06张靖皋桥位', 'MZ07桥位下游', 'MZ08海事码头', 'MZ09码头下游', 'MZ10雷达站', 'MZ11主路', 'MZ12沙尾',
+    ]
+
     const option = {
         backgroundColor: "rgba(220, 250, 248, 0.3)",
         tooltip: {
@@ -240,7 +245,8 @@ export const drawFlowspeedGraph = (echarts, flowspeed) => {
         xAxis: [
             {
                 type: 'category',
-                data: flowspeed.map((_, index) => `断面${index + 1}`),
+                // data: flowspeed.map((_, index) => `断面${index + 1}`),
+                data: flowspeed.map((_, index) => sectionName[index]),
                 axisLine: {
                     lineStyle: {
                         color: 'black'

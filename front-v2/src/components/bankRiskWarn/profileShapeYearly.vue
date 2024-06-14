@@ -2,7 +2,7 @@
     <div class="riskInfo-container">
         <div class="riskInfo-title">
             <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
-                当前断面形态
+                岸坡断面形态变化
             </dv-border-box2>
         </div>
         <div class="riskInfo-item profileShape">

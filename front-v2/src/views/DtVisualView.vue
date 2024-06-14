@@ -116,14 +116,14 @@
             </div>
             <!-- <div class="close" @click="showInfoPannel = false; showDetail = false"></div> -->
             <div class="important-feature">
-                <el-table :data="infoTableData_filtered" height="30vh" stripe border class="infomation-table"  v-loading="pannelLoading"
-                    >
+                <el-table :data="infoTableData_filtered" height="30vh" stripe border class="infomation-table"
+                    v-loading="pannelLoading">
                     <el-table-column v-for="(item, index) in  infoTableHeader " :key="index" :prop="item.prop"
-                        :label=" item.label "></el-table-column>
+                        :label="item.label"></el-table-column>
 
                     <el-table-column align="right">
                         <template #header>
-                            <el-input v-model=" search " size="small" placeholder="输入关键字搜索" />
+                            <el-input v-model="search" size="small" placeholder="输入关键字搜索" />
                         </template>
                         <template #default="scope">
                             <el-button link type="primary" size="small" @click="detailClickHandler4Feature(scope.row)">
@@ -143,7 +143,7 @@
                 </el-icon>
             </div>
 
-            <el-table :data=" waterTableData " border style="width: 15vw" v-show=" showHydroPannel ">
+            <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
                 <el-table-column prop="station" label="站点" />
                 <el-table-column prop="flow" label="流量" />
                 <el-table-column prop="level" label="水位" />
@@ -152,7 +152,7 @@
 
         <!-- 底图切换 -->
         <div class="radio-container">
-            <el-radio-group v-model=" baseMapRadio " size="large" @change=" baseMapChangeHandler ">
+            <el-radio-group v-model="baseMapRadio" size="large" @change="baseMapChangeHandler">
                 <el-radio-button label="矢量底图" value=1 />
                 <el-radio-button label="影像底图" value=0 />
             </el-radio-group>
@@ -280,7 +280,7 @@ const infoTableData_filtered = computed(() => {
         }
     }
 
-        pannelLoading.value = false
+    pannelLoading.value = false
 
 
     return res
@@ -1059,8 +1059,10 @@ const shuizha = [
     '天星港闸', '焦土港闸', '夏仕港节制闸', '太字港节制闸', '南通节制闸', '营船港闸', '白茆闸', '浏河节制闸'
 ]
 const bengzhan = [
-    '新沟泵站', '秦淮新河闸站——泵站工程', '杨家沟站', '大年站', '十二圩翻水站', '大年站', '引航道枢纽工程-泵站工程',
-    '东风泵站', '谏壁抽水站', '大港泵站', '高港泵站', '上九圩泵站', '新夏港泵站', '焦港泵站', '三干河泵站', '七浦塘江边枢纽泵站'
+    '望虞河常熟水利枢纽泵站工程', '秦淮新河闸站一泵站工程', '武定门闸站—泵站工程', '高港泵站', '澡港河水利枢纽-泵站工程', '魏村水利枢纽-泵站工程',
+    '九圩港提水泵站（新增）',
+    '杨家沟站', '大年站', '十二圩翻水站', '大年站', '引航道枢纽工程-泵站工程',
+    '东风泵站', '谏壁抽水站', '大港泵站', '上九圩泵站', '新夏港泵站', '焦港泵站', '三干河泵站', '七浦塘江边枢纽泵站', '新沟泵站',
 ]
 
 const customSort1 = (a, b) => {
