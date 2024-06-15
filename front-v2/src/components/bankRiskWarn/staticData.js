@@ -77,5 +77,4 @@ bedFlowTime.forEach((item, i) => {
     bedResData.push([item, bedFlowValue[i]])
 })
 
-export { bedFlowTime, bedFlowValue, bedResData
-}
+export { bedFlowTime, bedFlowValue, bedResData }
