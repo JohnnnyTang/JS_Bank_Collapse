@@ -1,0 +1,1 @@
+import{_ as e,o as c,c as o}from"./index-Ctb4il06.js";const t={},n={class:"expert-know-container"};function r(s,a){return c(),o("div",n)}const d=e(t,[["render",r],["__scopeId","data-v-48351efa"]]);export{d as default};

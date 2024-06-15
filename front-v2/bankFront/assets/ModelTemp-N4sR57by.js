@@ -1,0 +1,1 @@
+import{_ as o,o as s,c,p as t,f as a,a as d}from"./index-Ctb4il06.js";const _=e=>(t("data-v-1a3d7dfc"),e=e(),a(),e),p={class:"model-temp-container"},n=_(()=>d("div",{class:"bg-img"},null,-1)),r=[n],l={__name:"ModelTemp",setup(e){return(i,m)=>(s(),c("div",p,r))}},h=o(l,[["__scopeId","data-v-1a3d7dfc"]]);export{h as default};
