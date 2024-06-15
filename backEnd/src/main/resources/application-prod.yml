@@ -42,3 +42,6 @@ tile:
 
 video:
   yangzhong: C:/Project/Bank/data/video/125_1711267167.mp4
+
+flowData:
+  texturePath: C:/Project/Bank/data/flowData/flowFieldResourceArchive/

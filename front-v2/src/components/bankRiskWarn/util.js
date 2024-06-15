@@ -764,6 +764,12 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
             lineStyle: {
                 inactiveColor: 'rgb(86,88,93)',
                 inactiveWidth: 1,
+            },
+            selected: {
+                '1999年地形': false,
+                '2012年地形': false,
+                '2019年地形': false,
+                '2023年地形': true,
             }
         },
         axisPointer: {
@@ -883,8 +889,8 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
                     type: 'text',
                     style: {
                         text: '高程(m)',
-                        x: 20,
-                        y: 20,
+                        x: 15,
+                        y: 60,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
@@ -894,8 +900,8 @@ export const drawShapeCompareGraph = (echarts, after, before, compareNow, compar
                     type: 'text',
                     style: {
                         text: '距离(m)',
-                        x: 530,
-                        y: 240,
+                        x: 560,
+                        y: 440,
                         textFill: 'black',
                         fontSize: 12,
                         fontWeight: 'bold'
