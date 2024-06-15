@@ -819,6 +819,7 @@ onMounted(async () => {
 
     //////////add legend
     legendList.value = legendListt
+    console.log(legendListt)
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
     initSortedLayer(map)

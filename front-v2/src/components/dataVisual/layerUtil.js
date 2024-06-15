@@ -3774,10 +3774,10 @@ const layerAddFunctionMap = {
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
+                    // 'text-size': 20,
                 },
                 paint: {
                     'text-color': 'rgb(86,126,216)',
-                    'text-size': 20,
                     'text-halo-color': "rgba(255, 255, 255, 1.0)",
                     'text-halo-width': 3.0,
                 }

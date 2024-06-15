@@ -10,16 +10,27 @@
         </div>
         <hr>
         <div class="content">
-            <legendItem v-for="(legendItem, i) in props.legendList" :key="i" :style="legendItem.style"
+            <!-- <legendItem v-for="(legendItem, i) in props.legendList" :key="i" :style="legendItem.style"
                 :text="legendItem.text">
-            </legendItem>
+            </legendItem> -->
+
+
+            <div class="legend-item" v-for="(legendItem, i) in props.legendList" :key="i">
+                <div class="legend-style-region">
+                    <div class="legend-style" :style="legendItem.style"></div>
+                </div>
+                <div class="legend-text-region">
+                    <div class="legend-text">{{ legendItem.text }}</div>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script setup>
 import { Decoration7 } from '@kjgl77/datav-vue3'
-import legendItem from './legendItem.vue'
+// import legendItem from './legendItem.vue'
 import { onMounted, watch } from 'vue';
 
 const emit = defineEmits(['close'])
@@ -135,6 +146,49 @@ div.legend-container {
         //     background-color: #3af0f781;
         // }
 
+    }
+
+}
+
+.legend-item {
+    position: relative;
+    width: 100%;
+    height: 3vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.5vh;
+
+    .legend-style-region {
+        width: 45%;
+        height: 3vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .legend-style {
+            // height..
+            // image..
+            // background-color...
+            width: 100%;
+            height: 30%;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    }
+
+
+    .legend-text-region {
+        width: 45%;
+        height: 3vh;
+
+        .legend-text {
+            text-align: center;
+            line-height: 3vh;
+            font-size: calc(0.5vw + 0.5vh);
+            color: rgb(10, 46, 106);
+        }
     }
 
 }
