@@ -10,6 +10,16 @@
         </div>
         <div class="riskInfo-item profileShape">
             <div class="item-title">{{ profileName }}</div>
+            <el-popover
+                placement="bottom-start"
+                content="其他年份地形"
+                :width="100"
+                trigger="hover"
+            >
+                <template #reference>
+                    <div class="profile-show-container" @click="showOtherLine"></div>
+                </template>
+            </el-popover>
             <div class="profile-selector-container">
                 <el-select v-model="profileValue" placeholder="选择断面" style="width: 10vw; height: 3.5vh"
                     @change="calProfileData" popper-class="profile-popper">
@@ -32,17 +42,21 @@
         <div class="text-info-container">
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年该断面滩槽高程为 <span style="color: rgb(226, 80, 80);">XX</span> m
+                    2023年该断面滩槽高程为 <span style="color: rgb(226, 80, 80);">{{ gaochaList[profileValue - 1] }}</span> m
                 </div>
             </div>
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年断面最大岸坡坡比为 <span style="color: rgb(226, 80, 80);">XX</span>
+                    2023年断面最大岸坡坡比为
+                    <span v-if="profileValue - 1 === 5" style="color: rgb(226, 80, 80);">1 / 1.7</span>
+                    <span v-else-if="profileValue - 1 === 6" style="color: rgb(226, 80, 80);">1 / 1.8</span>
+                    <span v-else-if="profileValue - 1 === 7" style="color: rgb(226, 80, 80);">1 / 2.2</span>
+                    <span v-else style="color: rgb(226, 80, 80);">{{ pobiList[profileValue - 1] }}</span>
                 </div>
             </div>
             <div class="text-info-block">
                 <div class="text-info-item">
-                    1999~2023年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">XX</span> m/年
+                    1999~2023年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">{{ speedList[profileValue - 1] }}</span> m/年
                 </div>
             </div>
         </div>
@@ -51,12 +65,16 @@
 
 <script setup>
 import { ref, onMounted, watch, defineEmits } from 'vue'
+import { ElPopover, ElButton } from 'element-plus';
 import { drawShapeCompareGraph } from './util.js'
 import * as echarts from 'echarts'
 
 const speedList = ref([
     3.575, 4.725, 2.675, 5.025, 4.700, 5.650, 3.375, 3.150, 4.325, 3.850, 1.275, 0.975
 ])
+const gaochaList = ref([38.27, 32.72, 33.56, 30.84, 34.94, 32.88,
+    33.65, 31.45, 28.53, 27.61, 27.01, 25.73])
+const pobiList = ref(["1/4.1", "1/3.9", "1/4.0", "1/6.3", "1/3.9", "1/3.3", "1/3.1", "1/3.1", "1/6.5", "1/7.9", "1/11.3", "1/11.0"])
 
 const shapeGraphNotShow = ref(false)
 const shapeGraphRef = ref(null)
@@ -117,6 +135,14 @@ const calProfileData = () => {
         return
     }
     DrawGraph(section, beforeSection, compareSection, compareBeforeSection)
+}
+
+const showOtherLine = () => {
+    var option = shapeChart.getOption()
+    option.legend[0].selected['1999年地形'] = !option.legend[0].selected['1999年地形']
+    option.legend[0].selected['2012年地形'] = !option.legend[0].selected['2012年地形']
+    option.legend[0].selected['2019年地形'] = !option.legend[0].selected['2019年地形']
+    shapeChart.setOption(option)
 }
 
 const DrawGraph = (section, beforesection, compareSection, compareBeforeSection) => {
@@ -206,6 +232,31 @@ div.riskInfo-container {
             font-family: 'Microsoft YaHei';
             // color: #a231e4;
             // text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
+        }
+
+        .el-popover {
+            .el-popover__is-light{
+                background: red;
+            }
+            
+        }
+
+        div.profile-show-container {
+            position: absolute;
+            top: 6.2vh;
+            width: 0.7vw;
+            height: 1.5vh;
+            left: 23vw;
+            z-index: 5;
+            background-color: rgba(67, 148, 240, 0.6);
+            border: #56636b solid 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s linear;
+            &:hover {
+                transform: scale(1.1);
+                cursor: pointer;
+            }
         }
 
         div.profile-selector-container {

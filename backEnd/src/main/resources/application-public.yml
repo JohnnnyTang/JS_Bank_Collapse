@@ -63,3 +63,6 @@ sms:
   accessTokenLoc: E:\bankAppData\AccessKey.json
   signName: 江苏长江崩岸监测预警系统
   verifyTemplateCode: SMS_465975002
+
+flowData:
+  texturePath: E:/bankAppData/flowData/flowFieldResourceArchive/

@@ -776,6 +776,7 @@ const layerAddFunctionMap = {
                     'text-color': 'rgb(82, 81, 84)',
                     'text-halo-color': "rgba(255, 255, 255, 1.0)",
                     'text-halo-width': 3.0,
+                    'text-letter-spacing': 0.5
                 },
             })
     },
@@ -2910,7 +2911,7 @@ const layerAddFunctionMap = {
                         '省界', // 默认颜色为黑色
                     ],
                     'line-width': 2.0,
-                    'line-opacity':0.8
+                    'line-opacity': 0.8
                 }
                 // paint: {
                 //     'line-color': 'rgb(255,0,0)',
@@ -3753,7 +3754,36 @@ const layerAddFunctionMap = {
                     'text-halo-width': 2.0,
                 },
             })
-    }
+    },
+    '汊道': async (map) => {
+        !map.getSource('riverSmallSection') &&
+            map.addSource('riverSmallSection', {
+                type: 'geojson',
+                data: smallRiverTest
+            })
+        !map.getLayer('汊道') &&
+            map.addLayer({
+                id: '汊道',
+                type: 'symbol',
+                source: 'riverSmallSection',
+                minzoom: 11.5,
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-rotate': ['get', 'rotateAngle'],
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold',
+                    ],
+                    // 'text-size': 20,
+                },
+                paint: {
+                    'text-color': 'rgb(86,126,216)',
+                    'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                    'text-halo-width': 3.0,
+                }
+
+            })
+    },
 }
 
 const layerAddFunction = async (map, layerID) => {
@@ -3850,6 +3880,7 @@ const initSortedLayer = async (map) => {
     await layerAddFunction(map, '行政点-注记')
 
 
+    await layerAddFunction(map, '汊道')
     await layerAddFunction(map, '一级岸段-注记')
     await layerAddFunction(map, '二级岸段-注记')
     await layerAddFunction(map, '三级岸段-注记')
@@ -3962,6 +3993,7 @@ const initTextLayer = async (map) => {
     await layerAddFunction(map, '行政点-注记')
 
 
+    await layerAddFunction(map, '汊道')
     await layerAddFunction(map, '一级岸段-注记')
     await layerAddFunction(map, '二级岸段-注记')
     await layerAddFunction(map, '三级岸段-注记')
@@ -3983,6 +4015,28 @@ const initTextLayer = async (map) => {
     await layerAddFunction(map, '一级预警岸段-注记')
 
 }
+
+const smallRiverTest = {
+    "type": "FeatureCollection",
+    "name": "汊道",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { "type": "Feature", "properties": { "label": "扬中河段", "rotateAngle": 10.0 }, "geometry": { "type": "Point", "coordinates": [120.062481080071635, 31.956970753818254] } },
+        { "type": "Feature", "properties": { "label": "福姜沙河段", "rotateAngle": -24.0 }, "geometry": { "type": "Point", "coordinates": [120.330740341349212, 31.978740247639973] } },
+        { "type": "Feature", "properties": { "label": "世业洲汊道段", "rotateAngle": 30.0 }, "geometry": { "type": "Point", "coordinates": [119.265741129459101, 32.202441586550535] } },
+        { "type": "Feature", "properties": { "label": "白茆沙河段", "rotateAngle": 30.0 }, "geometry": { "type": "Point", "coordinates": [121.126911517266223, 31.74556429930384] } },
+        { "type": "Feature", "properties": { "label": "通州沙河段", "rotateAngle": 60.0 }, "geometry": { "type": "Point", "coordinates": [120.830453573931351, 31.931231086376297] } },
+        { "type": "Feature", "properties": { "label": "和畅洲汊道段", "rotateAngle": -19.0 }, "geometry": { "type": "Point", "coordinates": [119.639035107054426, 32.197306590178727] } },
+        { "type": "Feature", "properties": { "label": "龙潭水道", "rotateAngle": -2.0 }, "geometry": { "type": "Point", "coordinates": [118.97086139111093, 32.180048919121447] } },
+        { "type": "Feature", "properties": { "label": "八卦洲汊道段", "rotateAngle": -25.0 }, "geometry": { "type": "Point", "coordinates": [118.806354318771426, 32.154336578459521] } },
+        { "type": "Feature", "properties": { "label": "新济洲汊道段", "rotateAngle": -40.0 }, "geometry": { "type": "Point", "coordinates": [118.603033031801772, 31.93807490118834] } },
+        { "type": "Feature", "properties": { "label": "梅子洲汊道段", "rotateAngle": -65.0 }, "geometry": { "type": "Point", "coordinates": [118.68209552034952, 32.044123455644339] } },
+        { "type": "Feature", "properties": { "label": "六圩弯道", "rotateAngle": -2.0 }, "geometry": { "type": "Point", "coordinates": [119.436207601399929, 32.263247326420078] } },
+        { "type": "Feature", "properties": { "label": "如皋沙群段", "rotateAngle": 12.0 }, "geometry": { "type": "Point", "coordinates": [120.582445321434321, 32.00829051096477] } },
+        { "type": "Feature", "properties": { "label": "仪征河段", "rotateAngle": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.123144846834933, 32.247644717205432] } }
+    ]
+}
+
 
 
 export {

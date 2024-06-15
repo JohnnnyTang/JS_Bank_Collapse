@@ -25,7 +25,7 @@
                             :disabled="item.disabled"
                         >
                             <span class="section-name-text">{{
-                                item.label
+                            -    item.label
                             }}</span>
                         </el-option>
                     </el-select>
@@ -123,13 +123,13 @@
             <div class="risk-item" :class="{ active: showWaterPower }">
                 <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
                     <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
-                    <div class="risk-item-text">水流动力分析</div>
+                    <div class="risk-item-text">水流动力</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
                     <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
-                    <div class="risk-item-text">河床演变分析</div>
+                    <div class="risk-item-text">河床演变</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
@@ -143,7 +143,7 @@
                 <div class="risk-main-index outproject" @click="showGeologyAndProjectFunc">
                     <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']"
                         v-if="showGeologyAndProject"></dv-border-box-12>
-                    <div class="risk-item-text">外部因素分析</div>
+                    <div class="risk-item-text">外部因素</div>
                 </div>
             </div> -->
         </div>
@@ -388,6 +388,21 @@
                 <div class="loading-message">{{ loading_message }}</div>
             </dv-loading>
         </div>
+
+        <div class="hydro-pannel">
+            <div class="title"> 实时水文信息
+                <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%;" class="iconn">
+                    <More />
+                </el-icon>
+            </div>
+
+            <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
+                <el-table-column prop="station" label="站点" />
+                <el-table-column prop="flow" label="流量" />
+                <el-table-column prop="level" label="水位" />
+            </el-table>
+        </div>
+
     </div>
 </template>
 
@@ -479,6 +494,7 @@ const geologyAndProjectVue = defineAsyncComponent(
 const loading_message = ref('自定义断面信息计算中...')
 const mapContainer = ref()
 const timeStep = ref(0)
+const showHydroPannel = ref(false)
 const timeStepFloat = ref(0)
 // const timeStepFloat = computed(()=>{
 //     return timeStep.value
@@ -503,6 +519,38 @@ let floodflow = {
     currentResourcePointer: 0,
     watcher: null,
 }
+const waterTableData = [
+    {
+        station: '大通站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '南京站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '镇江站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '三江营站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '江阴站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+    {
+        station: '徐六泾站',
+        flow: 'N/A',
+        level: 'N/A',
+    },
+]
 
 const conditionChangeHandler = (lable) => {
     nowWaterConditionType.value = lable
@@ -3163,6 +3211,33 @@ div.risk-warn-container {
             font-weight: bold;
         }
     }
+
+    div.hydro-pannel {
+        position: absolute;
+        z-index: 2;
+        right: 5vw;
+        top: 0vh;
+        width: 15vw;
+        padding: calc(0.1vw + 0.1vh);
+        background-color: aliceblue;
+        user-select: none;
+        border: solid calc(0.1vh + 0.1vw) rgb(82,163,235);
+        border-radius: calc(0.1vh + 0.3vw);
+
+        .title {
+            border-bottom: rgb(41, 40, 40) 1px solid;
+            font-weight: bold;
+            font-size: calc(0.7vw + 0.5vh);
+            line-height: 3vh;
+            width: 100%;
+
+            .iconn {
+                :hover {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
 }
 
 @keyframes border-dance {
@@ -3191,5 +3266,88 @@ div.risk-warn-container {
     100% {
         transform: translateX(-50%);
     }
+}
+
+
+
+:deep(.el-table__inner-wrapper::before) {
+    background: hsl(210, 70%, 30%);
+}
+
+:deep(.el-table__border-left-patch) {
+    background: transparent;
+}
+
+:deep(.el-table .el-table__cell) {
+    border: 1px solid #c6e7f0;
+}
+
+:deep(.el-table thead th.el-table__cell) {
+    color: #173eaa;
+    background: rgba(238, 244, 255, 0.6);
+    font-size: calc(0.6vw + 0.3vh);
+    height: 2vh;
+
+    div.cell {
+        height: 2vh;
+        line-height: 2vh;
+    }
+}
+
+:deep(.el-table tbody tr) {
+    transition: all 0.6s cubic-bezier(0.68, -0.15, 0.265, 1.15);
+    height: fit-content;
+
+    div.cell {
+        height: fit-content;
+        line-height: 2vh;
+        width: fit-content;
+        font-size: calc(0.6vw + 0.2vh);
+    }
+}
+
+:deep(.el-table tbody tr:nth-child(2n)) {
+    &.even-state {
+        color: hsl(209, 58%, 39%);
+        background: rgb(235, 242, 255);
+        font-weight: 600;
+    }
+
+    &.odd-state {
+        color: rgba(230, 243, 255, 0.9);
+        background: rgb(45, 87, 177);
+        font-weight: 600;
+    }
+}
+
+// :deep(.el-table__body tr:nth-child(2n):hover > td) {
+//     background: hsl(210, 70%, 32%);
+// }
+
+:deep(.el-table tbody tr:nth-child(2n + 1)) {
+    &.even-state {
+        color: rgba(230, 243, 255, 0.9);
+        background: rgb(45, 87, 177);
+        font-weight: 600;
+    }
+
+    &.odd-state {
+        color: hsl(209, 58%, 39%);
+        background: rgb(235, 242, 255);
+        font-weight: 600;
+    }
+}
+
+// :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
+//     background: hsl(210, 70%, 32%);
+// }
+
+:deep(.el-table tbody tr.highLight-row) {
+    background: hsl(210, 70%, 16%);
+    animation: shine 2.4s infinite;
+}
+
+:deep(.el-table tbody tr.highLight-row:hover > td) {
+    cursor: pointer;
 }
 </style>

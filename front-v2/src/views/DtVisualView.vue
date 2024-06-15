@@ -819,6 +819,7 @@ onMounted(async () => {
 
     //////////add legend
     legendList.value = legendListt
+    console.log(legendListt)
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
     initSortedLayer(map)
@@ -1059,8 +1060,7 @@ const shuizha = [
     '天星港闸', '焦土港闸', '夏仕港节制闸', '太字港节制闸', '南通节制闸', '营船港闸', '白茆闸', '浏河节制闸'
 ]
 const bengzhan = [
-    '望虞河常熟水利枢纽泵站工程', '秦淮新河闸站一泵站工程', '武定门闸站—泵站工程', '高港泵站', '澡港河水利枢纽-泵站工程', '魏村水利枢纽-泵站工程',
-    '九圩港提水泵站（新增）',
+    '望虞河常熟水利枢纽泵站工程', '秦淮新河闸站一泵站工程', '武定门闸站—泵站工程', '高港泵站','九圩港提水泵站', '澡港河水利枢纽-泵站工程', '魏村水利枢纽-泵站工程',
     '杨家沟站', '大年站', '十二圩翻水站', '大年站', '引航道枢纽工程-泵站工程',
     '东风泵站', '谏壁抽水站', '大港泵站', '上九圩泵站', '新夏港泵站', '焦港泵站', '三干河泵站', '七浦塘江边枢纽泵站', '新沟泵站',
 ]
@@ -1695,7 +1695,8 @@ const customSort4 = (a, b) => {
         padding: calc(0.1vw + 0.1vh);
         background-color: aliceblue;
         user-select: none;
-
+        border: solid calc(0.1vh + 0.1vw) rgb(82,163,235);
+        border-radius: calc(0.1vh + 0.3vw);
         .title {
             border-bottom: rgb(41, 40, 40) 1px solid;
             font-weight: bold;

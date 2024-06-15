@@ -648,7 +648,6 @@ onMounted(async () => {
         map.triggerRepaint()
     })
     // mapFlyToRiver(map)
-    console.log()
     warnInfoStore.warnInfo.length ? mapFlyToRiver(map) : mapFlyToRiver2(map)
 
     useMapStore().setMap(map)
@@ -721,7 +720,8 @@ div.twin-main-container {
     left: 0;
     overflow: hidden;
 
-    background-color: rgb(100, 154, 202);
+    // background-color: rgb(100, 154, 202);
+    background-color: hsl(194, 69%, 91%);
 
     div.nav-manage-button {
         position: absolute;
@@ -791,7 +791,9 @@ div.twin-main-container {
         top: 0;
         left: 0;
         z-index: 2;
+        // background-color: hsl(194, 69%, 91%);
     }
+
 
     canvas.GPU {
         position: absolute;
