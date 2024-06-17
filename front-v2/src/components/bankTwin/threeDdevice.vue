@@ -73,7 +73,9 @@ const showChart = ref(false)
 const buttonShow = ref(true)
 const buttonTxt = ref("查看图表")
 const elevation = ref((5 + Math.random()).toFixed(1))
-const imgSrcPrefix = 'http://localhost:5173//device/all/'
+// const imgSrcPrefix = 'http://localhost:5173//device/all/'
+const imgSrcPrefix = 'http://' + window.location.host + '//device/all/'
+
 
 
 const deviceInfo = ref({})
