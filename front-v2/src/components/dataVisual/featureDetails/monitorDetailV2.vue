@@ -154,7 +154,7 @@ const show = computed(() => {
     return false
 })
 // const imgSrcPrefix = 'http://localhost:5173//device/all/'
-const imgSrcPrefix = 'http://' + window.location.host + '//device/all/'
+const imgSrcPrefix = 'http://' + window.location.host + '//monitorImg/all/'
 
 console.log('imgSrcPrefix:', imgSrcPrefix)
 
