@@ -533,7 +533,7 @@ const viewChangeClick = (value) => {
             setTimeout(() => {
                 threeDLoading.value = false
                 createCompIns()
-            }, 3000)
+            }, 5000)
             // map.addLayer(maskLayer)
         }
     }
@@ -1360,7 +1360,7 @@ div.twin-main-container {
     top: 3px;
     z-index: 3;
     // border: none;
-    // display: none;
+    display: none;
 }
 
 :deep(.el-overlay) {
