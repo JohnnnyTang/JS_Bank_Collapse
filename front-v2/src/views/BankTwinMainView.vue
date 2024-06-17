@@ -947,14 +947,15 @@ div.twin-main-container {
     div.monitor-legend-container {
         position: absolute;
         bottom: 1vh;
-        left: 30vw;
-        width: 43vw;
+        left: 28.5lvw;
+        width: 45vw;
         height: 10vh;
         user-select: none;
         z-index: 4;
         display: flex;
-        flex-flow: column nowrap;
-        justify-content: space-between;
+        flex-flow: row nowrap;
+        // justify-content: space-between;
+        justify-content: space-around;
 
         backdrop-filter: blur(12px);
         box-shadow: 4px 8px 8px -4px rgb(0, 47, 117);
@@ -987,7 +988,7 @@ div.twin-main-container {
 
         div.monitor-legend-block {
             position: relative;
-            width: 43vw;
+            width: 45vw;
             height: 7vh;
             margin-top: 2vh;
             display: flex;
@@ -1000,7 +1001,7 @@ div.twin-main-container {
                 flex-direction: column;
                 justify-content: flex-start;
                 align-items: center;
-                width: 6vw;
+                width: 7vw;
                 height: 6vh;
                 border: #0400fd 1px solid;
                 box-shadow:
@@ -1061,7 +1062,7 @@ div.twin-main-container {
                             width: calc(0.4vw + 0.4vh);
                             height: calc(0.4vw + 0.4vh);
                             // background-color: #0400fc;
-                            border: 2px solid rgb(0, 24, 133);
+                            border: 2px solid rgb(3, 36, 184);
                             border-radius: 20%;
                             position: relative;
                             cursor: pointer;
@@ -1084,9 +1085,9 @@ div.twin-main-container {
                             top: 10%;
                             left: 25%;
                             // transform: translate(-50%, -50%);
-                            width: 5px;
-                            height: 10px;
-                            border: solid #000;
+                            width: calc(0.1vh + 0.1vw);
+                            height: calc(0.2vh + 0.2vw);
+                            border: solid #013c63;
                             border-width: 0 2px 2px 0;
                             opacity: 0;
                             transform: rotate(45deg);
