@@ -802,21 +802,22 @@ const mapInit = async (map, vis) => {
         //     zoomRef.value = map.getZoom()
         // })
 
-        setTimeout(() => {
-            warnInterval(map, 40)
-        }, 500)
-        useWarnInfoStore().warnWatchTimer = setInterval(
-            () => {
-                warnInterval(map, 40)
-            },
-            60 * 1000 * 20,
-        )
+        // current no warn show on front
+        // setTimeout(() => {
+        //     warnInterval(map, 40)
+        // }, 500)
+        // useWarnInfoStore().warnWatchTimer = setInterval(
+        //     () => {
+        //         warnInterval(map, 40)
+        //     },
+        //     60 * 1000 * 20,
+        // )
         // request per 20minutes
 
         ///////DEBUG////////
         window.addEventListener('keydown', async (e) => {
             if (e.key == 'Enter') {
-                const minute = 60 * 36
+                const minute = 60
                 let allWarnData = (
                     await axios.get(`/api/data/deviceWarn/minute/${minute}`)
                 ).data
