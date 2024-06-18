@@ -54,6 +54,42 @@ onMounted(async () => {
         realtimeZoom.value = map.getZoom()
     });
     // console.log(TerrainLayer)
+    // console.log(warnText)
+    await layerAddFunction(map, '一级预警岸段')
+    await layerAddFunction(map, '二级预警岸段')
+    await layerAddFunction(map, '三级预警岸段')
+    map.addSource('warn1text', {
+        type: 'geojson',
+        data: warnText
+    })
+    map.addLayer({
+        id: 'warntext',
+        source: 'warn1text',
+        type: 'symbol',
+        minzoom: 8,
+        maxzoom: 11,
+        layout: {
+            'text-field': ['get', 'bank_name'],
+            'text-font': [
+                'Open Sans Semibold',
+                'Arial Unicode MS Bold',
+            ],
+            // 'text-rotate': ['get', 'rotate'],
+            'symbol-placement': 'point',
+            'text-anchor': 'center',
+            'text-size': 18,
+            "text-allow-overlap": true,
+            'text-ignore-placement': false,
+
+        },
+        paint: {
+            'text-color': '#333',
+            'text-halo-color': "rgba(255, 255, 255, 1.0)",
+            'text-halo-width': 3.0,
+        }
+    })
+
+
 
     map.addSource('riverSmallSection', {
         type: 'geojson',
@@ -75,7 +111,6 @@ onMounted(async () => {
         },
         paint: {
             'text-color': 'rgb(82,163,235)',
-            'text-size': 20,
             'text-halo-color': "rgba(255, 255, 255, 1.0)",
             'text-halo-width': 3.0,
         }
@@ -607,20 +642,20 @@ onMounted(async () => {
     //     console.log(e.features[0]);
     // })
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key == 'q') {
-            console.log('qqqqqqq');
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key == 'q') {
+    //         console.log('qqqqqqq');
 
-            map.setLayoutProperty('FlowLayer', 'visibility', 'none');
-        } else if (e.key == 'w') {
-            console.log('wwwwwww');
-            map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
-        }
-        else if (e.key == '1') {
-            console.log(map.getZoom())
-        }
+    //         map.setLayoutProperty('FlowLayer', 'visibility', 'none');
+    //     } else if (e.key == 'w') {
+    //         console.log('wwwwwww');
+    //         map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
+    //     }
+    //     else if (e.key == '1') {
+    //         console.log(map.getZoom())
+    //     }
 
-    })
+    // })
 
 
     // const scriptInteract = document.createElement('script')
@@ -724,94 +759,94 @@ const gj = {
 }
 
 
-const featureHighLight = (featureLayerid, map, featureName, property) => {
+// const featureHighLight = (featureLayerid, map, featureName, property) => {
 
-    let layerId
-    let featureId
-    let featureLayer
-    let sourceid
+//     let layerId
+//     let featureId
+//     let featureLayer
+//     let sourceid
 
-    if (featureLayerid.includes('通道')) {
-        // layerId = '过江通道-'
-        sourceid = property.source
-        layerId = (sourceid === 'riverPassagePolygon' ? '过江通道-桥' : '过江通道-隧道/通道')
-        featureId = featureName
-        featureLayer = map.getLayer(layerId)
+//     if (featureLayerid.includes('通道')) {
+//         // layerId = '过江通道-'
+//         sourceid = property.source
+//         layerId = (sourceid === 'riverPassagePolygon' ? '过江通道-桥' : '过江通道-隧道/通道')
+//         featureId = featureName
+//         featureLayer = map.getLayer(layerId)
 
-    } else {
-        layerId = featureLayerid
-        featureId = featureName
-        featureLayer = map.getLayer(layerId)
-        sourceid = featureLayer.source
-    }
-
-
-    emit('featureInfo', {
-        ogData: property,
-        sourceId: sourceid,
-        column: sourceColumnMap[sourceid]
-    })
-
-    let paintMap = {
-        'line': {
-            'line-color': '#FF5D06',
-            'line-width': 5,
-        },
-        'fill': {
-            'fill-color': '#FF5D06',
-            'fill-opacity': 0.8
-        },
-        'circle': {
-            'circle-color': '#FF5D06',
-            'circle-radius': 8,
-        },
-        'symbol': {
-
-        },
-        'fill-extrusion': {
-            'fill-extrusion-color': '#FF5D06',
-            'fill-extrusion-base': 200,
-            'fill-extrusion-height': 210,
-            'fill-extrusion-opacity': 1.0
-        }
-    }
-
-    // 1  add highlight layer
-    map.addLayer({
-        id: `${layerId}-highlight-${featureId}`,//自定义
-        type: featureLayer.type,
-        source: featureLayer.source,
-        'source-layer': featureLayer.sourceLayer,
-        filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
-        layout: {
-        },
-        paint: paintMap[featureLayer.type],
-    })
-
-    // 2  use expression  但不适用于现在的Map 还是用加图层的办法
-    // map.setPaintProperty(layerId, 'fill-color', [
-    //     'match',
-    //     ['get', sourceNameMap[sourceid]], // 获取要素的'name'属性
-    //     'featureName', ['literal', 'rgba(255, 0, 0, 1)'], // 如果'name'是'123'，则使用红色高亮
-    //     ['literal', map.getPaintProperty(layerId, 'fill-color')] // 否则保持原有样式
-    // ]);
+//     } else {
+//         layerId = featureLayerid
+//         featureId = featureName
+//         featureLayer = map.getLayer(layerId)
+//         sourceid = featureLayer.source
+//     }
 
 
-    let lng = property.center_x
-    let lat = property.center_y
-    map.flyTo({
-        center: [lng, lat],
-        zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10,
-        duration: 3500
-    });
+//     emit('featureInfo', {
+//         ogData: property,
+//         sourceId: sourceid,
+//         column: sourceColumnMap[sourceid]
+//     })
 
-    highlightLayer.value.push(`${layerId}-highlight-${featureId}`)
-    useHighlightLayerStore().highlightLayers = highlightLayer.value;
-    // setTimeout(() => {
-    //     if (map.getLayer(`${layerId}-highlight-${featureId}`))
-    //         map.removeLayer(`${layerId}-highlight-${featureId}`)
-    // }, 3000)
-}
+//     let paintMap = {
+//         'line': {
+//             'line-color': '#FF5D06',
+//             'line-width': 5,
+//         },
+//         'fill': {
+//             'fill-color': '#FF5D06',
+//             'fill-opacity': 0.8
+//         },
+//         'circle': {
+//             'circle-color': '#FF5D06',
+//             'circle-radius': 8,
+//         },
+//         'symbol': {
+
+//         },
+//         'fill-extrusion': {
+//             'fill-extrusion-color': '#FF5D06',
+//             'fill-extrusion-base': 200,
+//             'fill-extrusion-height': 210,
+//             'fill-extrusion-opacity': 1.0
+//         }
+//     }
+
+//     // 1  add highlight layer
+//     map.addLayer({
+//         id: `${layerId}-highlight-${featureId}`,//自定义
+//         type: featureLayer.type,
+//         source: featureLayer.source,
+//         'source-layer': featureLayer.sourceLayer,
+//         filter: ['==', ['get', sourceNameMap[sourceid]], featureName],//自定义
+//         layout: {
+//         },
+//         paint: paintMap[featureLayer.type],
+//     })
+
+//     // 2  use expression  但不适用于现在的Map 还是用加图层的办法
+//     // map.setPaintProperty(layerId, 'fill-color', [
+//     //     'match',
+//     //     ['get', sourceNameMap[sourceid]], // 获取要素的'name'属性
+//     //     'featureName', ['literal', 'rgba(255, 0, 0, 1)'], // 如果'name'是'123'，则使用红色高亮
+//     //     ['literal', map.getPaintProperty(layerId, 'fill-color')] // 否则保持原有样式
+//     // ]);
+
+
+//     let lng = property.center_x
+//     let lat = property.center_y
+//     map.flyTo({
+//         center: [lng, lat],
+//         zoom: sourceZoomMap[featureLayer.source] ? sourceZoomMap[featureLayer.source] : 10,
+//         duration: 3500
+//     });
+
+//     highlightLayer.value.push(`${layerId}-highlight-${featureId}`)
+//     useHighlightLayerStore().highlightLayers = highlightLayer.value;
+//     // setTimeout(() => {
+//     //     if (map.getLayer(`${layerId}-highlight-${featureId}`))
+//     //         map.removeLayer(`${layerId}-highlight-${featureId}`)
+//     // }, 3000)
+// }
 
 
 
@@ -865,6 +900,25 @@ const smallRiverTest = {
         { "type": "Feature", "properties": { "label": "如皋沙群段", "rotateAngle": 12.0 }, "geometry": { "type": "Point", "coordinates": [120.582445321434321, 32.00829051096477] } },
         { "type": "Feature", "properties": { "label": "仪征河段", "rotateAngle": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.123144846834933, 32.247644717205432] } }
     ]
+}
+
+const warnText ={
+"type": "FeatureCollection",
+"name": "2",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 4, "bank_name": "七坝", "warning_level": 1, "if_important": 0, "rotate": -20.0 }, "geometry": { "type": "Point", "coordinates": [ 118.539043007955726, 31.930389078485575 ] } },
+{ "type": "Feature", "properties": { "id": 9, "bank_name": "下关", "warning_level": 1, "if_important": 0, "rotate": -20.0 }, "geometry": { "type": "Point", "coordinates": [ 118.743098171339227, 32.089774055223202 ] } },
+{ "type": "Feature", "properties": { "id": 21, "bank_name": "和畅洲头及左右缘", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [ 119.560031678826576, 32.21427862447802 ] } },
+{ "type": "Feature", "properties": { "id": 22, "bank_name": "孟家港", "warning_level": 1, "if_important": 0, "rotate": 90.0 }, "geometry": { "type": "Point", "coordinates": [ 119.620459761959992, 32.241961034537233 ] } },
+{ "type": "Feature", "properties": { "id": 24, "bank_name": "太平洲左缘（二墩港至胜利河）", "warning_level": 1, "if_important": 0, "rotate": 90.0 }, "geometry": { "type": "Point", "coordinates": [ 119.858238420174885, 32.198468608765843 ] } },
+{ "type": "Feature", "properties": { "id": 34, "bank_name": "六圩弯道", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [ 119.443299043465473, 32.283678662631409 ] } },
+{ "type": "Feature", "properties": { "id": 36, "bank_name": "嘶马弯道", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [ 119.759722975119772, 32.338082888072989 ] } },
+{ "type": "Feature", "properties": { "id": 37, "bank_name": "杨湾至高港闸", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [ 119.857165977942927, 32.301018139269736 ] } },
+{ "type": "Feature", "properties": { "id": 42, "bank_name": "民主沙", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [ 120.53109004069502, 32.04344092161385 ] } },
+{ "type": "Feature", "properties": { "id": 48, "bank_name": "段山港至越洋码头", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [ 120.585893278634913, 31.980141845084106 ] } },
+{ "type": "Feature", "properties": { "id": 51, "bank_name": "新太海汽渡～七丫口", "warning_level": 1, "if_important": 0, "rotate": 45.0 }, "geometry": { "type": "Point", "coordinates": [ 121.128476871991722, 31.659050949236342 ] } }
+]
 }
 
 
