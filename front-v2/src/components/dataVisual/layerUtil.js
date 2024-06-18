@@ -3226,11 +3226,11 @@ const layerAddFunctionMap = {
                     //     [0.0, 10.0],
                     //     [0.0, 0.0]
                     // ],
-                    'text-variable-anchor': ["left", "top", "bottom", "center", "right",],
+                    'text-variable-anchor': ["left", "top-left", "top", "top-right", "right", "center", "bottom-left", "bottom-right", "bottom",],
                     'text-size': 21,
                     // 'text-padding': 0.0,
                     // 'text-writing-mode': ['vertical', 'horizontal'],
-                    "text-allow-overlap": false,
+                    "text-allow-overlap": true,
                     'text-ignore-placement': false
                 },
                 paint: {

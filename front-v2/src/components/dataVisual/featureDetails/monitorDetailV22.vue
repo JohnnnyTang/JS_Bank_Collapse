@@ -74,7 +74,11 @@ const checked = ref([true, false])
 const showChart = ref(false)
 const buttonTxt = ref("查看图表")
 
-const imgSrcPrefix = 'http://localhost:5173//device/all/'
+// const imgSrcPrefix = 'http://localhost:5173//device/all/'
+const imgSrcPrefix = 'http://' + window.location.host + '//monitorImg/all/'
+
+
+
 
 
 const deviceInfo = props.deviceInfo_CX

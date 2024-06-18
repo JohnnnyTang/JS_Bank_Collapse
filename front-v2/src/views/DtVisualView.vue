@@ -36,16 +36,17 @@
                                                     <div class="subScene-title-text">
                                                         {{ data.label }}
                                                     </div>
+                                                    <div class="detail-icon">
+                                                        <el-button type="info" :icon="List" circle size="default"
+                                                            @click.stop="layerGroupClickHandler(node, data)" v-show="!(node.parent.data.label.includes('岸段') ||
+                                                                node.parent.data.label.includes('其他') ||
+                                                                data.label.includes('其他') ||
+                                                                data.label.includes('过江通道') ||
+                                                                data.label.includes('沿江码头'))" />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="detail-icon">
-                                                <el-button type="info" :icon="List" circle size="large"
-                                                    @click="layerGroupClickHandler(node, data)" v-show="!(node.parent.data.label.includes('岸段') ||
-                                                        node.parent.data.label.includes('其他') ||
-                                                        data.label.includes('其他') ||
-                                                        data.label.includes('过江通道') ||
-                                                        data.label.includes('沿江码头'))" />
-                                            </div>
+
                                         </div>
 
 
@@ -1060,7 +1061,7 @@ const shuizha = [
     '天星港闸', '焦土港闸', '夏仕港节制闸', '太字港节制闸', '南通节制闸', '营船港闸', '白茆闸', '浏河节制闸'
 ]
 const bengzhan = [
-    '望虞河常熟水利枢纽泵站工程', '秦淮新河闸站一泵站工程', '武定门闸站—泵站工程', '高港泵站','九圩港提水泵站', '澡港河水利枢纽-泵站工程', '魏村水利枢纽-泵站工程',
+    '望虞河常熟水利枢纽泵站工程', '秦淮新河闸站一泵站工程', '武定门闸站—泵站工程', '高港泵站', '九圩港提水泵站', '澡港河水利枢纽-泵站工程', '魏村水利枢纽-泵站工程',
     '杨家沟站', '大年站', '十二圩翻水站', '大年站', '引航道枢纽工程-泵站工程',
     '东风泵站', '谏壁抽水站', '大港泵站', '上九圩泵站', '新夏港泵站', '焦港泵站', '三干河泵站', '七浦塘江边枢纽泵站', '新沟泵站',
 ]
@@ -1273,7 +1274,7 @@ const customSort4 = (a, b) => {
 
                     .card {
                         flex-grow: 1;
-                        width: 75%;
+                        width: 100%;
                         height: 4vh;
                         margin-right: 5%;
                         border-radius: 5px;
@@ -1307,26 +1308,30 @@ const customSort4 = (a, b) => {
                             position: relative;
                             transition: .3s linear;
 
-                            .icon-container {
-                                position: relative;
-                                width: 4vh;
-                                height: 4vh;
+                            // .icon-container {
+                            //     position: relative;
+                            //     width: 4vh;
+                            //     height: 4vh;
 
-                                .icon {
-                                    top: 0;
-                                    right: 15%;
-                                    transform: translateX(50%) translateY(20%);
-                                    width: 3vh;
-                                    height: 3vh;
-                                    position: absolute;
-                                    background-size: contain;
-                                }
-                            }
+                            //     .icon {
+                            //         top: 0;
+                            //         right: 15%;
+                            //         transform: translateX(50%) translateY(20%);
+                            //         width: 3vh;
+                            //         height: 3vh;
+                            //         position: absolute;
+                            //         background-size: contain;
+                            //     }
+                            // }
 
                             .title {
                                 position: relative;
-                                width: 70%;
+                                width: 100%;
                                 height: 4vh;
+                                display: flex;
+                                flex-direction: row;
+                                justify-content: flex-start;
+                                align-items: center;
 
                                 .subScene-title-text {
                                     color: rgb(20, 115, 196);
@@ -1336,6 +1341,12 @@ const customSort4 = (a, b) => {
                                     margin-left: 1vw;
                                     line-height: 4vh;
                                     font-family: 'Microsoft YaHei';
+                                }
+
+                                .detail-icon {
+                                    position: absolute;
+                                    right: 0.2vw;
+                                    z-index: 100;
                                 }
                             }
                         }
@@ -1354,16 +1365,14 @@ const customSort4 = (a, b) => {
                                     color: rgb(234, 244, 252);
                                 }
 
+                                .detail-icon {
+
+                                }
 
                             }
                         }
 
-                        .detail-icon {
-                            position: absolute;
-                            right: 1.5vw;
-                            top: 0.9vh;
-                            z-index: 100;
-                        }
+
 
                     }
 
@@ -1409,17 +1418,22 @@ const customSort4 = (a, b) => {
                     border-radius: 5%;
                     border-color: #0a72c7;
 
+                    &:hover {
+                        cursor: pointer;
+                    }
+
                     .feature-content {
                         color: rgb(20, 115, 196);
                         font-size: calc(0.5vw + 0.5vh);
                         font-weight: 600;
                         font-style: normal;
-                        margin-left: 0.5vw;
+                        margin-left: 0.2vw;
                         line-height: 3vh;
                         font-family: 'Microsoft YaHei';
                         display: flex;
                         flex-direction: row;
                         align-items: center;
+
                     }
 
                     .smaller {
@@ -1695,8 +1709,9 @@ const customSort4 = (a, b) => {
         padding: calc(0.1vw + 0.1vh);
         background-color: aliceblue;
         user-select: none;
-        border: solid calc(0.1vh + 0.1vw) rgb(82,163,235);
+        border: solid calc(0.1vh + 0.1vw) rgb(82, 163, 235);
         border-radius: calc(0.1vh + 0.3vw);
+
         .title {
             border-bottom: rgb(41, 40, 40) 1px solid;
             font-weight: bold;

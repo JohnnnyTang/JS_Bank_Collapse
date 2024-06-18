@@ -153,7 +153,11 @@ const show = computed(() => {
         return true
     return false
 })
-const imgSrcPrefix = 'http://localhost:5173//device/all/'
+// const imgSrcPrefix = 'http://localhost:5173//device/all/'
+const imgSrcPrefix = 'http://' + window.location.host + '//monitorImg/all/'
+
+console.log('imgSrcPrefix:', imgSrcPrefix)
+
 
 
 const deviceInfo = props.deviceInfo
