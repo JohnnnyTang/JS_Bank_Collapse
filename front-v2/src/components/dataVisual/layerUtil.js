@@ -978,7 +978,7 @@ const layerAddFunctionMap = {
                     'text-field': ['get', 'name'],
                     'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
                     'symbol-placement': 'point',
-                    'text-size': 22,
+                    'text-size': 20,
                     'text-offset': [0.0, 0.2],
                     'text-anchor': 'top'
                 },
@@ -3195,21 +3195,27 @@ const layerAddFunctionMap = {
         //         type: 'vector',
         //         tiles: [tileServer + '/tile/vector/importantBank/{x}/{y}/{z}'],
         //     })
-        !map.getSource('importantBankCenter') &&
-            map.addSource('importantBankCenter', {
-                type: 'vector',
-                tiles: [tileServer + '/tile/vector/center/importantBank/{x}/{y}/{z}'],
+        // !map.getSource('importantBankCenter') &&
+        //     map.addSource('importantBankCenter', {
+        //         type: 'vector',
+        //         tiles: [tileServer + '/tile/vector/center/importantBank/{x}/{y}/{z}'],
+        //     })
+        !map.getSource('warn1text') &&
+            map.addSource('warn1text', {
+                type: 'geojson',
+                data: warnText
             })
         !map.getLayer('一级预警岸段-注记') &&
             map.addLayer({
                 id: '一级预警岸段-注记',
                 type: 'symbol',
                 // source: 'importantBank',
-                source: 'importantBankCenter',
+                // source: 'importantBankCenter',
+                source: 'warn1text',
                 minzoom: 8,
                 maxzoom: 11,
-                'source-layer': 'default',
-                filter: ['==', 'warning_level', 1],
+                // 'source-layer': 'default',
+                // filter: ['==', 'warning_level', 1],
                 layout: {
                     'text-field': ['get', 'bank_name'],
                     'text-font': [
@@ -3226,15 +3232,16 @@ const layerAddFunctionMap = {
                     //     [0.0, 10.0],
                     //     [0.0, 0.0]
                     // ],
-                    'text-variable-anchor': ["left", "top-left", "top", "top-right", "right", "center", "bottom-left", "bottom-right", "bottom",],
-                    'text-size': 21,
+                    // 'text-variable-anchor': ["left", "top-left", "top", "top-right", "right", "center", "bottom-left", "bottom-right", "bottom",],
+                    'text-anchor': 'center',
+                    'text-size': 18,
                     // 'text-padding': 0.0,
                     // 'text-writing-mode': ['vertical', 'horizontal'],
                     "text-allow-overlap": true,
                     'text-ignore-placement': false
                 },
                 paint: {
-                    'text-color': '#2e0201',
+                    'text-color': '#333',
                     'text-halo-color': "rgba(255, 255, 255, 1.0)",
                     'text-halo-width': 3.0,
                 },
@@ -3710,8 +3717,8 @@ const layerAddFunctionMap = {
                     'circle-radius': [
                         "case",
                         ["==", ["get", "level"], 1],
-                        8,
-                        6,
+                        7,
+                        5,
                     ],
                     'circle-opacity': 0.8
                 },
@@ -3741,8 +3748,8 @@ const layerAddFunctionMap = {
                     'text-size': [
                         "case",
                         ["==", ["get", "level"], 1],
-                        26,
-                        22
+                        24,
+                        20
                     ],
                     'text-padding': 0,
                     'text-ignore-placement': true,
@@ -4036,6 +4043,27 @@ const smallRiverTest = {
         { "type": "Feature", "properties": { "label": "仪征河段", "rotateAngle": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.123144846834933, 32.247644717205432] } }
     ]
 }
+
+const warnText = {
+    "type": "FeatureCollection",
+    "name": "2",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { "type": "Feature", "properties": { "id": 4, "bank_name": "七坝", "warning_level": 1, "if_important": 0, "rotate": -20.0 }, "geometry": { "type": "Point", "coordinates": [118.539043007955726, 31.930389078485575] } },
+        { "type": "Feature", "properties": { "id": 9, "bank_name": "下关", "warning_level": 1, "if_important": 0, "rotate": -20.0 }, "geometry": { "type": "Point", "coordinates": [118.743098171339227, 32.089774055223202] } },
+        { "type": "Feature", "properties": { "id": 21, "bank_name": "和畅洲头及左右缘", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.560031678826576, 32.21427862447802] } },
+        { "type": "Feature", "properties": { "id": 22, "bank_name": "孟家港", "warning_level": 1, "if_important": 0, "rotate": 90.0 }, "geometry": { "type": "Point", "coordinates": [119.620459761959992, 32.241961034537233] } },
+        { "type": "Feature", "properties": { "id": 24, "bank_name": "太平洲左缘（二墩港至胜利河）", "warning_level": 1, "if_important": 0, "rotate": 90.0 }, "geometry": { "type": "Point", "coordinates": [119.858238420174885, 32.198468608765843] } },
+        { "type": "Feature", "properties": { "id": 34, "bank_name": "六圩弯道", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.443299043465473, 32.283678662631409] } },
+        { "type": "Feature", "properties": { "id": 36, "bank_name": "嘶马弯道", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.759722975119772, 32.338082888072989] } },
+        { "type": "Feature", "properties": { "id": 37, "bank_name": "杨湾至高港闸", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [119.857165977942927, 32.301018139269736] } },
+        { "type": "Feature", "properties": { "id": 42, "bank_name": "民主沙", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [120.53109004069502, 32.04344092161385] } },
+        { "type": "Feature", "properties": { "id": 48, "bank_name": "段山港至越洋码头", "warning_level": 1, "if_important": 0, "rotate": 0.0 }, "geometry": { "type": "Point", "coordinates": [120.585893278634913, 31.980141845084106] } },
+        { "type": "Feature", "properties": { "id": 51, "bank_name": "新太海汽渡～七丫口", "warning_level": 1, "if_important": 0, "rotate": 45.0 }, "geometry": { "type": "Point", "coordinates": [121.128476871991722, 31.659050949236342] } }
+    ]
+}
+
+
 
 
 

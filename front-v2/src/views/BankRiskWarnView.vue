@@ -1723,7 +1723,7 @@ onMounted(async () => {
             source: 'dockAreaSource',
             'source-layer': 'default',
             paint: {
-                'fill-color': '#18b915',
+                'fill-color': 'rgb(172,214,239)',
             },
         })
         map.addLayer({
