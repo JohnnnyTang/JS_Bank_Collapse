@@ -8,10 +8,7 @@ import com.johnny.bank.model.resource.dataResource.MonitorInfo;
 import com.johnny.bank.service.resource.data.impl.DeviceWarningService;
 import com.johnny.bank.service.resource.data.impl.GnssDataService;
 import com.johnny.bank.service.resource.data.impl.MonitorInfoService;
-import com.johnny.bank.utils.BeanUtil;
-import com.johnny.bank.utils.GlobalMap;
-import com.johnny.bank.utils.MailUtil;
-import com.johnny.bank.utils.SMSUtil;
+import com.johnny.bank.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.expiringmap.ExpirationPolicy;
 import org.quartz.Job;
@@ -19,8 +16,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +45,10 @@ public class GnssWarningJob implements Job {
 //    ExpiringMap<String, Double> messageMap = ExpiringMap.builder()
 //        .variableExpiration()
 //        .build();
+    private Boolean CheckDataTimeValid(Timestamp checkTime, Integer checkMinutes) {
+        Timestamp check = TimeCalcUtil.calcTimeBeforeNow(Calendar.MINUTE, checkMinutes);
+        return !check.before(checkTime);
+    }
 
     public List<List<GnssData>> before() {
         MonitorInfoService monitorInfoService = BeanUtil.getBean(MonitorInfoService.class);
@@ -60,6 +63,9 @@ public class GnssWarningJob implements Job {
         for(String gnssId: gnssIdList) {
             GnssData gnssData = gnssDataService.getNewestDataOfDevice(gnssDataService.getDataNode(), gnssId);
             if(gnssData == null) {
+                continue;
+            } else if (CheckDataTimeValid(gnssData.getMeasureTime(), 30)) {
+                System.out.println("time not valid");
                 continue;
             }
             double threeDiff = gnssData.getMovingAvg();
