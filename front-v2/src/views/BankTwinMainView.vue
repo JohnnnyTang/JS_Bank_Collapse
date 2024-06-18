@@ -214,11 +214,10 @@ const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const unityCanvaDom = ref()
 const mapDom = ref()
-const warnActive = ref(false)
+const warnActive = ref(true)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
-const test = ref(false)
 const currentDeviceType = ref('位移测量站')
 ////////DEBUG
 window.addEventListener('keydown', (e) => {
@@ -250,7 +249,7 @@ const statusText = ref('正常')
 const domHideMap = ref({
     video: false,
     status: false,
-    warn: false,
+    warn: true,
 })
 
 // custome layer
