@@ -6,14 +6,14 @@ spring:
     mongodb:
       database: bank
       authentication-database: admin
-      uri: mongodb://localhost:27017/bank
+      uri: mongodb://localhost:17017/bank
   datasource:
     hikari:
       maxLifeTime: 120000
       idle-timeout: 0
       #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
     default:
-      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
+      url: jdbc:postgresql://localhost:5431/bank?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: 123456
