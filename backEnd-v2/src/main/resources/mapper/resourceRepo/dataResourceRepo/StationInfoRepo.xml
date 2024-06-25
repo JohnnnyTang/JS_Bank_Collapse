@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IStationInfoRepo">
+    <resultMap id="stationMap" type="com.johnny.bank.model.resource.dataResource.StationInfo">
+        <result property="code" column="station_id"/>
+        <result property="beginDate" column="begin_time"/>
+        <result property="endDate" column="end_time"/>
+        <result property="operateTime" column="operate_time"/>
+        <result property="operateUser" column="operator"/>
+        <result property="operateFlag" column="data_v"/>
+        <result property="operateDesc" column="data_v_explain"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="stationMap">
+        SELECT * FROM station;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM station;
+    </select>
+
+    <select id="findById" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id = #{id};
+    </select>
+
+    <select id="findByIdList" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id IN #{ids};
+    </select>
+
+    <select id="findByCode" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id = #{stationCode};
+    </select>
+
+    <select id="findByCodeList" resultMap="stationMap">
+        SELECT * FROM station WHERE station_id IN #{stationCodeList};
+    </select>
+
+    <select id="findNewestData" resultMap="stationMap">
+        SELECT * FROM station ORDER BY begin_time DESC LIMIT 1;
+    </select>
+</mapper>

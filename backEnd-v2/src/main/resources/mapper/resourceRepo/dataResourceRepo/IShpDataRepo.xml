@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IShpDataRepo">
+    <resultMap id="shpMap" type="com.johnny.bank.model.resource.dataResource.ShpData">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="path" column="path"/>
+        <result property="createTime" column="createtime"/>
+        <result property="updateTime" column="updatetime"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="shpMap">
+        SELECT * FROM shpdata;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM shpdata;
+    </select>
+
+    <select id="findById" resultMap="shpMap">
+        SELECT * FROM shpdata WHERE id = #{id};
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM shpdata WHERE id = #{id};
+    </delete>
+
+    <insert id="insertData" parameterType="com.johnny.bank.model.resource.dataResource.ShpData" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO shpdata (name, type, path, createtime, updatetime)
+        VALUES (#{name}, #{type}, #{path}, #{createTime}, #{updateTime});
+    </insert>
+
+    <select id="findByIdList" resultMap="shpMap">
+        SELECT * FROM shpdata WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+</mapper>

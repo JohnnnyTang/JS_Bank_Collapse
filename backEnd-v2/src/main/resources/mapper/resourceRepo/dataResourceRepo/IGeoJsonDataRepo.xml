@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IGeoJsonDataRepo">
+    <resultMap id="geojsonMap" type="com.johnny.bank.model.resource.dataResource.GeoJsonData">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="path" column="path"/>
+        <result property="createTime" column="createtime"/>
+        <result property="updateTime" column="updatetime"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="geojsonMap">
+        SELECT * FROM geojsondata;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM geojsondata;
+    </select>
+
+    <select id="findById" resultMap="geojsonMap">
+        SELECT * FROM geojsondata WHERE id = #{id};
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM geojsondata WHERE id = #{id};
+    </delete>
+
+    <insert id="insertData" parameterType="com.johnny.bank.model.resource.dataResource.GeoJsonData" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO geojsondata (id, name, type, path, createtime, updatetime)
+        VALUES (#{id}, #{name}, #{type}, #{path}, #{createTime}, #{updateTime});
+    </insert>
+
+    <select id="findByIdList" resultMap="geojsonMap">
+        SELECT * FROM geojsondata WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+    <select id="findByName" resultMap="geojsonMap">
+        SELECT * FROM geojsondata WHERE name = #{name};
+    </select>
+
+    <select id="findByNameNewest" resultType="com.johnny.bank.model.resource.dataResource.GeoJsonData">
+        SELECT * FROM geojsondata WHERE name = #{name} order by createtime DESC limit 1;
+    </select>
+</mapper>

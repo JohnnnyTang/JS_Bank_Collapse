@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IDeviceWarningRepo">
+    <resultMap id="deviceWarningMap" type="com.johnny.bank.model.resource.dataResource.DeviceWarning">
+        <result property="id" column="id"/>
+        <result property="deviceId" column="device_id"/>
+        <result property="deviceCode" column="device_code"/>
+        <result property="warnTime" column="warn_time"/>
+        <result property="threeDiff" column="warn_value"/>
+    </resultMap>
+    <select id="findAll" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning order by warn_time DESC;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM device_warning;
+    </select>
+
+    <select id="getTotalWarnCount" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE warn_value BETWEEN 40 AND 60;
+    </select>
+
+    <select id="getTotalDangerCount" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE warn_value >= 60;
+    </select>
+
+    <select id="getTotalCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE device_id = #{deviceId};
+    </select>
+
+    <select id="getTotalWarnCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (device_id = #{deviceId}) AND (warn_value BETWEEN 40 AND 60);
+    </select>
+
+    <select id="getTotalDangerCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (device_id = #{deviceId}) AND (warn_value >= 60);
+    </select>
+
+    <select id="getTotalCountByTime" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE warn_time BETWEEN #{begTime} AND #{endTime};
+    </select>
+
+    <select id="getTotalWarnCountByTime" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (warn_value BETWEEN 40 AND 60);
+    </select>
+
+    <select id="getTotalDangerCountByTime" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (warn_value >= 60);
+    </select>
+
+    <select id="getTotalCountByTimeOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (device_id = #{deviceId});
+    </select>
+    <select id="getTotalWarnCountByTimeOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (device_id = #{deviceId}) AND (warn_value BETWEEN 40 AND 60);
+    </select>
+    <select id="getTotalDangerCountByTimeOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (device_id = #{deviceId}) AND (warn_value >= 60);
+    </select>
+
+    <select id="findNewestData" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning ORDER BY warn_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataOfDevice" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE device_id = #{deviceId} ORDER BY warn_time DESC LIMIT 1;
+    </select>
+
+    <select id="findDataByTime" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE warn_time BETWEEN #{begTime} AND #{endTime} ORDER BY warn_time DESC;
+    </select>
+    <select id="findWarnDataByTime" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND (warn_value BETWEEN 40 AND 60) ORDER BY warn_time DESC;
+    </select>
+    <select id="findDangerDataByTime" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE (warn_time BETWEEN #{begTime} AND #{endTime}) AND ((warn_value BETWEEN 10 AND 15) OR (warn_value >= 50) ) ORDER BY warn_time DESC;
+    </select>
+
+    <select id="findDataByTimeOfDevice" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE warn_time BETWEEN #{begTime} AND #{endTime} AND device_id = #{deviceId} ORDER BY warn_time DESC;
+    </select>
+
+    <select id="findByDeviceCode" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE device_id = #{deviceId};
+    </select>
+
+    <insert id="save" parameterType="com.johnny.bank.model.resource.dataResource.DeviceWarning">
+        INSERT INTO device_warning(device_id,device_code,warn_time,warn_value) VALUES (#{deviceId},#{deviceCode},#{warnTime},#{threeDiff});
+    </insert>
+
+    <select id="findById" resultMap="deviceWarningMap">
+        SELECT * FROM device_warning WHERE id = #{id};
+    </select>
+
+    <update id="updateWarnDealtStatus">
+        UPDATE device_warning
+        SET if_dealt = #{dealt}
+        WHERE id=#{id}
+    </update>
+
+</mapper>
