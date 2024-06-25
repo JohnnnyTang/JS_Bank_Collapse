@@ -1,0 +1,1406 @@
+{
+  "code": 0,
+  "msg": "成功",
+  "data": [
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:46:30.000+00:00"
+      },
+      "x_move": -0.98,
+      "y_move": -0.14,
+      "z_move": 3.88,
+      "threeD": 4.00429769123126,
+      "threeDF": 7.26804650507961,
+      "in_time": "2024-04-16T01:24:23.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:45:44.000+00:00"
+      },
+      "x_move": 4.77,
+      "y_move": -2.58,
+      "z_move": -4.93,
+      "threeD": 7.32899720289208,
+      "threeDF": 6.92738045728687,
+      "in_time": "2024-04-16T01:24:15.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:45:41.000+00:00"
+      },
+      "x_move": 1.8,
+      "y_move": -2.55,
+      "z_move": 2.31,
+      "threeD": 3.88311730443467,
+      "threeDF": 5.15566678519859,
+      "in_time": "2024-04-16T01:24:08.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:45:24.000+00:00"
+      },
+      "x_move": 2.8,
+      "y_move": -3.65,
+      "z_move": 2.78,
+      "threeD": 5.37502558133447,
+      "threeDF": 3.62727170198208,
+      "in_time": "2024-04-16T01:24:00.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:43:21.000+00:00"
+      },
+      "x_move": -0.3,
+      "y_move": 1.75,
+      "z_move": 3.26,
+      "threeD": 3.71215570794114,
+      "threeDF": 2.81215220071745,
+      "in_time": "2024-04-16T01:23:53.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:42:00.000+00:00"
+      },
+      "x_move": 0.25,
+      "y_move": -0.33,
+      "z_move": -2.43,
+      "threeD": 2.4650152129348,
+      "threeDF": 2.77800287976813,
+      "in_time": "2024-04-16T01:23:46.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:40:59.000+00:00"
+      },
+      "x_move": -0.97,
+      "y_move": -0.23,
+      "z_move": 1.46,
+      "threeD": 1.7678800864312,
+      "threeDF": 4.07211247388871,
+      "in_time": "2024-04-16T01:23:38.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:40:22.000+00:00"
+      },
+      "x_move": 1.52,
+      "y_move": -2.97,
+      "z_move": -3.61,
+      "threeD": 4.91562813890555,
+      "threeDF": 4.22048575403353,
+      "in_time": "2024-04-16T01:23:31.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:40:17.000+00:00"
+      },
+      "x_move": -1.61,
+      "y_move": 0.37,
+      "z_move": 2.84,
+      "threeD": 3.28551365847108,
+      "threeDF": 7.1660170248193,
+      "in_time": "2024-04-16T01:23:24.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:40:49.000+00:00"
+      },
+      "x_move": -0.86,
+      "y_move": 1.57,
+      "z_move": -2.98,
+      "threeD": 3.47633427621683,
+      "threeDF": 2.42870335776109,
+      "in_time": "2024-04-16T01:23:16.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:39:28.000+00:00"
+      },
+      "x_move": 1.98,
+      "y_move": -2.69,
+      "z_move": 0.51,
+      "threeD": 3.37884595683201,
+      "threeDF": 4.71682096331841,
+      "in_time": "2024-04-16T01:23:09.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:39:10.000+00:00"
+      },
+      "x_move": 2.21,
+      "y_move": -3.63,
+      "z_move": 3.59,
+      "threeD": 5.5631915300482,
+      "threeDF": 3.8146821623826,
+      "in_time": "2024-04-16T01:23:02.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:37:06.000+00:00"
+      },
+      "x_move": -0.42,
+      "y_move": 1.67,
+      "z_move": 3.68,
+      "threeD": 4.06296689624713,
+      "threeDF": 2.37676250391157,
+      "in_time": "2024-04-16T01:22:54.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:35:46.000+00:00"
+      },
+      "x_move": 0.17,
+      "y_move": -0.19,
+      "z_move": -2.65,
+      "threeD": 2.66223590239483,
+      "threeDF": 2.60955934977536,
+      "in_time": "2024-04-16T01:22:47.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:34:06.000+00:00"
+      },
+      "x_move": 2.09,
+      "y_move": -2.92,
+      "z_move": -4.23,
+      "threeD": 5.54863947287982,
+      "threeDF": 3.72038976452737,
+      "in_time": "2024-04-16T01:22:39.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:34:01.000+00:00"
+      },
+      "x_move": -2.11,
+      "y_move": 0.4,
+      "z_move": 2.8,
+      "threeD": 3.52875332093361,
+      "threeDF": 7.35972825585293,
+      "in_time": "2024-04-16T01:22:32.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:34:46.000+00:00"
+      },
+      "x_move": -1.5,
+      "y_move": -0.35,
+      "z_move": 1.48,
+      "threeD": 2.136094567195,
+      "threeDF": 4.69862745916294,
+      "in_time": "2024-04-16T01:22:25.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:33:14.000+00:00"
+      },
+      "x_move": 4.16,
+      "y_move": -1.82,
+      "z_move": -4.69,
+      "threeD": 6.52794761008389,
+      "threeDF": 3.64738262319708,
+      "in_time": "2024-04-16T01:22:10.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:33:11.000+00:00"
+      },
+      "x_move": 2.91,
+      "y_move": -2.72,
+      "z_move": -2.19,
+      "threeD": 4.54561326995599,
+      "threeDF": 3.38332676518246,
+      "in_time": "2024-04-16T01:22:02.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:32:57.000+00:00"
+      },
+      "x_move": 2.32,
+      "y_move": -3.48,
+      "z_move": 3.83,
+      "threeD": 5.67112863546578,
+      "threeDF": 4.20320116102002,
+      "in_time": "2024-04-16T01:21:47.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:30:51.000+00:00"
+      },
+      "x_move": 0.07,
+      "y_move": 1.39,
+      "z_move": 4.14,
+      "threeD": 4.36767672796419,
+      "threeDF": 2.55790930253596,
+      "in_time": "2024-04-16T01:21:33.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:30:52.000+00:00"
+      },
+      "x_move": -0.51,
+      "y_move": 1.35,
+      "z_move": -3.72,
+      "threeD": 3.99011278036098,
+      "threeDF": 1.58050624801043,
+      "in_time": "2024-04-16T01:21:25.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:27:52.000+00:00"
+      },
+      "x_move": 2.36,
+      "y_move": -2.67,
+      "z_move": -5.53,
+      "threeD": 6.57870807985884,
+      "threeDF": 4.22539938940688,
+      "in_time": "2024-04-16T01:21:18.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:26:59.000+00:00"
+      },
+      "x_move": 4.25,
+      "y_move": -0.76,
+      "z_move": -7.66,
+      "threeD": 8.79293466369448,
+      "threeDF": 6.50048459732042,
+      "in_time": "2024-04-16T01:21:10.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:27:47.000+00:00"
+      },
+      "x_move": -1.98,
+      "y_move": -0.18,
+      "z_move": 3.45,
+      "threeD": 3.98187141932032,
+      "threeDF": 9.05807926659952,
+      "in_time": "2024-04-16T01:21:03.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:26:57.000+00:00"
+      },
+      "x_move": 2.67,
+      "y_move": -1.91,
+      "z_move": -6.51,
+      "threeD": 7.29089157785246,
+      "threeDF": 4.5003222106867,
+      "in_time": "2024-04-16T01:20:56.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:26:44.000+00:00"
+      },
+      "x_move": 1.71,
+      "y_move": -3.11,
+      "z_move": 2.43,
+      "threeD": 4.30129050402318,
+      "threeDF": 3.79354715273186,
+      "in_time": "2024-04-16T01:20:48.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:25:49.000+00:00"
+      },
+      "x_move": 0.27,
+      "y_move": -0.02,
+      "z_move": -4.2,
+      "threeD": 4.2087171442139,
+      "threeDF": 2.79302703173457,
+      "in_time": "2024-04-16T01:20:41.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:24:32.000+00:00"
+      },
+      "x_move": 0.23,
+      "y_move": 1.23,
+      "z_move": 4.75,
+      "threeD": 4.91205659576516,
+      "threeDF": 3.27423273455019,
+      "in_time": "2024-04-16T01:20:34.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:24:48.000+00:00"
+      },
+      "x_move": -1.6,
+      "y_move": -0.17,
+      "z_move": -0.12,
+      "threeD": 1.61347451172927,
+      "threeDF": 3.92802749481212,
+      "in_time": "2024-04-16T01:20:26.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:24:38.000+00:00"
+      },
+      "x_move": 0.31,
+      "y_move": 1.09,
+      "z_move": -4.56,
+      "threeD": 4.69870194841086,
+      "threeDF": 1.85564005130305,
+      "in_time": "2024-04-16T01:20:19.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:21:38.000+00:00"
+      },
+      "x_move": 2.06,
+      "y_move": -2.07,
+      "z_move": -5.1,
+      "threeD": 5.8769464860589,
+      "threeDF": 4.85521369251653,
+      "in_time": "2024-04-16T01:20:12.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:21:28.000+00:00"
+      },
+      "x_move": -2.38,
+      "y_move": 0.1,
+      "z_move": 2.25,
+      "threeD": 3.27672092189738,
+      "threeDF": 8.25962468881002,
+      "in_time": "2024-04-16T01:20:04.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:20:45.000+00:00"
+      },
+      "x_move": 4.34,
+      "y_move": 0.05,
+      "z_move": -6.98,
+      "threeD": 8.21939778815942,
+      "threeDF": 5.87551699852873,
+      "in_time": "2024-04-16T01:19:57.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:20:43.000+00:00"
+      },
+      "x_move": 2.31,
+      "y_move": -1.4,
+      "z_move": -6.17,
+      "threeD": 6.73535448213381,
+      "threeDF": 5.34717682520412,
+      "in_time": "2024-04-16T01:19:49.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:20:25.000+00:00"
+      },
+      "x_move": 0.62,
+      "y_move": -3.17,
+      "z_move": 2.56,
+      "threeD": 4.12151671111497,
+      "threeDF": 5.48905274159394,
+      "in_time": "2024-04-16T01:19:42.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:15:18.000+00:00"
+      },
+      "x_move": 0.18,
+      "y_move": -1.44,
+      "z_move": -5.2,
+      "threeD": 5.39870354807522,
+      "threeDF": 7.30140397457914,
+      "in_time": "2024-04-16T01:19:35.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:15:14.000+00:00"
+      },
+      "x_move": -2.87,
+      "y_move": 0.47,
+      "z_move": 1.64,
+      "threeD": 3.33877222942806,
+      "threeDF": 8.498476334026,
+      "in_time": "2024-04-16T01:19:27.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:14:28.000+00:00"
+      },
+      "x_move": 1.65,
+      "y_move": -1.93,
+      "z_move": -5.81,
+      "threeD": 6.34062299778184,
+      "threeDF": 7.03752797507761,
+      "in_time": "2024-04-16T01:19:20.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:14:10.000+00:00"
+      },
+      "x_move": 0.5,
+      "y_move": -3.83,
+      "z_move": 3.63,
+      "threeD": 5.30054714156944,
+      "threeDF": 6.6440349186319,
+      "in_time": "2024-04-16T01:19:13.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:12:02.000+00:00"
+      },
+      "x_move": -0.44,
+      "y_move": 0.91,
+      "z_move": 5.19,
+      "threeD": 5.28751359336314,
+      "threeDF": 2.69325082381868,
+      "in_time": "2024-04-16T01:19:05.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:11:34.000+00:00"
+      },
+      "x_move": 0.47,
+      "y_move": -0.24,
+      "z_move": -3.26,
+      "threeD": 3.30243849299272,
+      "threeDF": 1.62662226715363,
+      "in_time": "2024-04-16T01:18:58.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:10:34.000+00:00"
+      },
+      "x_move": -1.3,
+      "y_move": -0.5,
+      "z_move": 0.19,
+      "threeD": 1.40573824021402,
+      "threeDF": 4.72607659692477,
+      "in_time": "2024-04-16T01:18:51.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:10:24.000+00:00"
+      },
+      "x_move": 1.21,
+      "y_move": 0.8,
+      "z_move": -0.88,
+      "threeD": 1.69661427554998,
+      "threeDF": 1.4013564856952,
+      "in_time": "2024-04-16T01:18:43.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:09:01.000+00:00"
+      },
+      "x_move": -0.45,
+      "y_move": -0.79,
+      "z_move": -2.01,
+      "threeD": 2.2060598359972,
+      "threeDF": 4.59152480119622,
+      "in_time": "2024-04-16T01:18:36.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:09:00.000+00:00"
+      },
+      "x_move": -3.14,
+      "y_move": 0.91,
+      "z_move": 2.93,
+      "threeD": 4.39005694723884,
+      "threeDF": 8.07154260349284,
+      "in_time": "2024-04-16T01:18:28.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:08:13.000+00:00"
+      },
+      "x_move": 2.24,
+      "y_move": 0.63,
+      "z_move": -7.21,
+      "threeD": 7.57618637574341,
+      "threeDF": 7.28017856923853,
+      "in_time": "2024-04-16T01:18:21.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:08:11.000+00:00"
+      },
+      "x_move": 0.57,
+      "y_move": -1.3,
+      "z_move": -0.83,
+      "threeD": 1.64432356913109,
+      "threeDF": 2.34644411823508,
+      "in_time": "2024-04-16T01:18:14.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:07:57.000+00:00"
+      },
+      "x_move": 0.19,
+      "y_move": -4.47,
+      "z_move": 5.78,
+      "threeD": 7.30926808921386,
+      "threeDF": 7.91194034355669,
+      "in_time": "2024-04-16T01:18:06.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:05:45.000+00:00"
+      },
+      "x_move": -0.43,
+      "y_move": 1.07,
+      "z_move": 5.07,
+      "threeD": 5.19949035964103,
+      "threeDF": 3.07536989645148,
+      "in_time": "2024-04-16T01:17:59.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:05:06.000+00:00"
+      },
+      "x_move": 0.74,
+      "y_move": -0.45,
+      "z_move": -2.82,
+      "threeD": 2.95,
+      "threeDF": 1.57724443254684,
+      "in_time": "2024-04-16T01:17:52.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:04:20.000+00:00"
+      },
+      "x_move": -0.46,
+      "y_move": -0.54,
+      "z_move": -0.62,
+      "threeD": 0.94212525706511,
+      "threeDF": 4.833166663793,
+      "in_time": "2024-04-16T01:17:44.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:04:09.000+00:00"
+      },
+      "x_move": 1.24,
+      "y_move": 0.33,
+      "z_move": -0.29,
+      "threeD": 1.31552270980018,
+      "threeDF": 2.15733632055829,
+      "in_time": "2024-04-16T01:17:37.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:02:48.000+00:00"
+      },
+      "x_move": -0.61,
+      "y_move": -0.06,
+      "z_move": -3.16,
+      "threeD": 3.21889732672541,
+      "threeDF": 5.45493354679963,
+      "in_time": "2024-04-16T01:17:29.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:02:43.000+00:00"
+      },
+      "x_move": -3.53,
+      "y_move": 1.02,
+      "z_move": 3.11,
+      "threeD": 4.81387577737523,
+      "threeDF": 6.30946114973379,
+      "in_time": "2024-04-16T01:17:22.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:01:57.000+00:00"
+      },
+      "x_move": 2.77,
+      "y_move": 1.37,
+      "z_move": -6.61,
+      "threeD": 7.2967047357009,
+      "threeDF": 7.49039384812307,
+      "in_time": "2024-04-16T01:17:15.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:01:58.000+00:00"
+      },
+      "x_move": 1.27,
+      "y_move": -0.23,
+      "z_move": -0.81,
+      "threeD": 1.52377819908279,
+      "threeDF": 2.13859767137253,
+      "in_time": "2024-04-16T01:17:07.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T14:01:40.000+00:00"
+      },
+      "x_move": 0.61,
+      "y_move": -4.36,
+      "z_move": 5.38,
+      "threeD": 6.95169763439119,
+      "threeDF": 8.66199746017049,
+      "in_time": "2024-04-16T01:17:00.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:59:30.000+00:00"
+      },
+      "x_move": 0.15,
+      "y_move": 1.59,
+      "z_move": 2.78,
+      "threeD": 3.20608795886825,
+      "threeDF": 1.14236596587959,
+      "in_time": "2024-04-16T01:16:53.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:56:33.000+00:00"
+      },
+      "x_move": -0.66,
+      "y_move": 0.19,
+      "z_move": -2.58,
+      "threeD": 2.66985018306271,
+      "threeDF": 6.2171456473208,
+      "in_time": "2024-04-16T01:16:45.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:56:28.000+00:00"
+      },
+      "x_move": -2.56,
+      "y_move": 1.14,
+      "z_move": 3.2,
+      "threeD": 4.25361023132115,
+      "threeDF": 5.94309683582558,
+      "in_time": "2024-04-16T01:16:38.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:55:43.000+00:00"
+      },
+      "x_move": 1.96,
+      "y_move": 1.83,
+      "z_move": -6.13,
+      "threeD": 6.69084449079487,
+      "threeDF": 7.5830073189995,
+      "in_time": "2024-04-16T01:16:31.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:55:44.000+00:00"
+      },
+      "x_move": 0.45,
+      "y_move": 0.13,
+      "z_move": 1.44,
+      "threeD": 1.51426549851735,
+      "threeDF": 0.827586853448023,
+      "in_time": "2024-04-16T01:16:23.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:55:27.000+00:00"
+      },
+      "x_move": 1.37,
+      "y_move": -3.41,
+      "z_move": 4.08,
+      "threeD": 5.49102904745549,
+      "threeDF": 7.2154140560331,
+      "in_time": "2024-04-16T01:16:16.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:54:13.000+00:00"
+      },
+      "x_move": 0.51,
+      "y_move": -0.65,
+      "z_move": -1.84,
+      "threeD": 2.01697793741032,
+      "threeDF": 3.54764710759117,
+      "in_time": "2024-04-16T01:16:09.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:54:00.000+00:00"
+      },
+      "x_move": 1.43,
+      "y_move": -0.03,
+      "z_move": -0.52,
+      "threeD": 1.52190669884852,
+      "threeDF": 1.82860602645841,
+      "in_time": "2024-04-16T01:16:01.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:53:17.000+00:00"
+      },
+      "x_move": 0.87,
+      "y_move": 2.16,
+      "z_move": 1.36,
+      "threeD": 2.69668314786888,
+      "threeDF": 1.56872559741977,
+      "in_time": "2024-04-16T01:15:54.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:52:53.000+00:00"
+      },
+      "x_move": 1.25,
+      "y_move": -0.4,
+      "z_move": -3.43,
+      "threeD": 3.67251957108468,
+      "threeDF": 2.44705945984155,
+      "in_time": "2024-04-16T01:15:47.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:50:15.000+00:00"
+      },
+      "x_move": -2.39,
+      "y_move": 0.68,
+      "z_move": 4.08,
+      "threeD": 4.77712256489197,
+      "threeDF": 6.72788971372153,
+      "in_time": "2024-04-16T01:15:39.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:49:31.000+00:00"
+      },
+      "x_move": -0.64,
+      "y_move": -0.06,
+      "z_move": 0.06,
+      "threeD": 0.645600495662759,
+      "threeDF": 5.991135117822,
+      "in_time": "2024-04-16T01:15:32.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:49:29.000+00:00"
+      },
+      "x_move": 1.96,
+      "y_move": 1.75,
+      "z_move": -3.97,
+      "threeD": 4.76077724746706,
+      "threeDF": 6.90994934858426,
+      "in_time": "2024-04-16T01:15:24.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:49:30.000+00:00"
+      },
+      "x_move": 1.23,
+      "y_move": -0.47,
+      "z_move": 3.92,
+      "threeD": 4.13523880809803,
+      "threeDF": 5.27697830202096,
+      "in_time": "2024-04-16T01:15:17.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:49:14.000+00:00"
+      },
+      "x_move": 2.33,
+      "y_move": -3,
+      "z_move": 2.44,
+      "threeD": 4.51469821804293,
+      "threeDF": 6.66523818029033,
+      "in_time": "2024-04-16T01:15:10.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:47:02.000+00:00"
+      },
+      "x_move": 1.62,
+      "y_move": 2.16,
+      "z_move": -1.15,
+      "threeD": 2.93470611816584,
+      "threeDF": 4.01315337359538,
+      "in_time": "2024-04-16T01:15:02.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:47:59.000+00:00"
+      },
+      "x_move": 0.45,
+      "y_move": -0.77,
+      "z_move": -0.74,
+      "threeD": 1.15887876846545,
+      "threeDF": 4.74140274602359,
+      "in_time": "2024-04-16T01:14:55.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:47:47.000+00:00"
+      },
+      "x_move": 1.28,
+      "y_move": -0.05,
+      "z_move": -0.3,
+      "threeD": 1.31563672797623,
+      "threeDF": 1.60533485603472,
+      "in_time": "2024-04-16T01:14:47.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:44:00.000+00:00"
+      },
+      "x_move": -1.9,
+      "y_move": 0.66,
+      "z_move": 2.28,
+      "threeD": 3.04039471121761,
+      "threeDF": 5.71946675836131,
+      "in_time": "2024-04-16T01:14:40.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:43:00.000+00:00"
+      },
+      "x_move": 3.07,
+      "y_move": -2.51,
+      "z_move": 0.89,
+      "threeD": 4.06412352174488,
+      "threeDF": 7.42114546414501,
+      "in_time": "2024-04-16T01:14:33.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:43:56.000+00:00"
+      },
+      "x_move": 1.22,
+      "y_move": -0.11,
+      "z_move": -4.3,
+      "threeD": 4.47107369655209,
+      "threeDF": 2.26691420216999,
+      "in_time": "2024-04-16T01:14:25.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:42:57.000+00:00"
+      },
+      "x_move": -0.23,
+      "y_move": 0.11,
+      "z_move": 1.55,
+      "threeD": 1.5708278072405,
+      "threeDF": 6.05115691417765,
+      "in_time": "2024-04-16T01:14:18.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:42:55.000+00:00"
+      },
+      "x_move": 2,
+      "y_move": 1.15,
+      "z_move": -0.31,
+      "threeD": 2.32778865020001,
+      "threeDF": 4.7231980691053,
+      "in_time": "2024-04-16T01:14:11.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:42:55.000+00:00"
+      },
+      "x_move": 1.84,
+      "y_move": -0.73,
+      "z_move": 6.8,
+      "threeD": 7.08226658634084,
+      "threeDF": 6.72771134933716,
+      "in_time": "2024-04-16T01:14:03.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:41:46.000+00:00"
+      },
+      "x_move": 0.26,
+      "y_move": -0.99,
+      "z_move": -0.58,
+      "threeD": 1.17647779409558,
+      "threeDF": 5.7355470532461,
+      "in_time": "2024-04-16T01:13:56.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:41:33.000+00:00"
+      },
+      "x_move": 0.8,
+      "y_move": -0.16,
+      "z_move": -0.47,
+      "threeD": 0.941541289588513,
+      "threeDF": 1.18410303605725,
+      "in_time": "2024-04-16T01:13:48.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:40:49.000+00:00"
+      },
+      "x_move": 1.44,
+      "y_move": 1.81,
+      "z_move": -0.6,
+      "threeD": 2.38949785519887,
+      "threeDF": 3.34843246908161,
+      "in_time": "2024-04-16T01:13:41.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:37:45.000+00:00"
+      },
+      "x_move": -2.65,
+      "y_move": 0.02,
+      "z_move": 2.79,
+      "threeD": 3.84798648646276,
+      "threeDF": 5.43828097839749,
+      "in_time": "2024-04-16T01:13:34.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:36:43.000+00:00"
+      },
+      "x_move": -0.92,
+      "y_move": -0.08,
+      "z_move": 4.75,
+      "threeD": 4.83893583342453,
+      "threeDF": 4.5340710184116,
+      "in_time": "2024-04-16T01:13:26.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3234005268193",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:36:41.000+00:00"
+      },
+      "x_move": 0.72,
+      "y_move": 1.65,
+      "z_move": 4.53,
+      "threeD": 4.87460767652126,
+      "threeDF": 4.17527244620037,
+      "in_time": "2024-04-16T01:13:19.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:36:41.000+00:00"
+      },
+      "x_move": 1.81,
+      "y_move": -1.02,
+      "z_move": 9.58,
+      "threeD": 9.80269860803646,
+      "threeDF": 8.66242460284648,
+      "in_time": "2024-04-16T01:13:12.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:36:48.000+00:00"
+      },
+      "x_move": 0.95,
+      "y_move": 0.21,
+      "z_move": -4.52,
+      "threeD": 4.62352679239561,
+      "threeDF": 2.2006589922112,
+      "in_time": "2024-04-16T01:13:04.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:35:32.000+00:00"
+      },
+      "x_move": 0.18,
+      "y_move": -0.18,
+      "z_move": -0.28,
+      "threeD": 0.37841775856849,
+      "threeDF": 5.39690652133238,
+      "in_time": "2024-04-16T01:12:57.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:35:20.000+00:00"
+      },
+      "x_move": 0.3,
+      "y_move": 0.08,
+      "z_move": 0.18,
+      "threeD": 0.358887168898527,
+      "threeDF": 1.67874953462391,
+      "in_time": "2024-04-16T01:12:50.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3010425438293",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:34:35.000+00:00"
+      },
+      "x_move": 1.1,
+      "y_move": 1.28,
+      "z_move": 1.07,
+      "threeD": 1.99832429800571,
+      "threeDF": 3.54544778554134,
+      "in_time": "2024-04-16T01:12:42.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI9432973031240",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:31:23.000+00:00"
+      },
+      "x_move": -2.24,
+      "y_move": 0.28,
+      "z_move": 2.75,
+      "threeD": 3.55787858140213,
+      "threeDF": 4.36744776728927,
+      "in_time": "2024-04-16T01:12:20.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI3225380117004",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:30:29.000+00:00"
+      },
+      "x_move": -0.93,
+      "y_move": -0.87,
+      "z_move": 8,
+      "threeD": 8.1007283623141,
+      "threeDF": 7.16727284258106,
+      "in_time": "2024-04-16T01:12:05.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI8342090032041",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:30:27.000+00:00"
+      },
+      "x_move": 1.64,
+      "y_move": -0.87,
+      "z_move": 12.44,
+      "threeD": 12.5777621220947,
+      "threeDF": 13.4183829130041,
+      "in_time": "2024-04-16T01:11:57.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0246093232014",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:30:30.000+00:00"
+      },
+      "x_move": 3.22,
+      "y_move": -3.25,
+      "z_move": 3.29,
+      "threeD": 5.63515749558076,
+      "threeDF": 8.46151877620088,
+      "in_time": "2024-04-16T01:11:50.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI4162902100432",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:30:00.000+00:00"
+      },
+      "x_move": 0.93,
+      "y_move": 0.19,
+      "z_move": -4.48,
+      "threeD": 4.57945411594002,
+      "threeDF": 1.24503012011758,
+      "in_time": "2024-04-16T01:11:43.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI0335102424034",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:29:16.000+00:00"
+      },
+      "x_move": 0.77,
+      "y_move": 0.21,
+      "z_move": -3.12,
+      "threeD": 3.22046580481768,
+      "threeDF": 2.50067990754515,
+      "in_time": "2024-04-16T01:11:35.000+00:00"
+    },
+    {
+      "idGroup": {
+        "station_id": "MZS",
+        "machine_id": "DVI2330310410972",
+        "machine_id_nnu": "MZS120.0_32.0_4",
+        "measure_time": "2024-04-09T13:29:03.000+00:00"
+      },
+      "x_move": 0.57,
+      "y_move": 0.17,
+      "z_move": -1.19,
+      "threeD": 1.33037588673277,
+      "threeDF": 1.51799209484108,
+      "in_time": "2024-04-16T01:11:28.000+00:00"
+    }
+  ]
+}
