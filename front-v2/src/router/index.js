@@ -16,8 +16,8 @@ const routes = [
     {
         path: '/knowledgeStore',
         redirect: '/knowledgeStore/home',
-        component: () => import('../views/KnowledgeStoreView.vue'),
-        // component: () => import('../components/knowStore/TempKnow.vue'),
+        // component: () => import('../views/KnowledgeStoreView.vue'),
+        component: () => import('../components/knowStore/TempKnow.vue'),
         children: [
             {
                 path: 'home',

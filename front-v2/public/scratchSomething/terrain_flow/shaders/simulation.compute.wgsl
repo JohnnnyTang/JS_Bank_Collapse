@@ -245,8 +245,10 @@ fn cMain(@builtin(global_invocation_id) id: vec3<u32>) {
 
         particles[index * 6 + 0] = x;
         particles[index * 6 + 1] = y;
+
         particles[index * 6 + 2] = x;
         particles[index * 6 + 3] = y;
+        
         particles[index * 6 + 4] = 0.0;
         particles[index * 6 + 5] = 0.0;
 
@@ -254,8 +256,10 @@ fn cMain(@builtin(global_invocation_id) id: vec3<u32>) {
 
         particles[index * 6 + 0] = nextPos.x;
         particles[index * 6 + 1] = nextPos.y;
+
         particles[index * 6 + 2] = lastPos.x;
         particles[index * 6 + 3] = lastPos.y;
+
         particles[index * 6 + 4] = velocity.x;
         particles[index * 6 + 5] = velocity.y;
     }
