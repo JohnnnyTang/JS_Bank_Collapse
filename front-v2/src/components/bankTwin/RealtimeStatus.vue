@@ -345,7 +345,7 @@ const props = defineProps({
 })
 
 const token = ref(
-    'at.9sre27ig1wovmpz31wcuj58y24azfnz4-73tt9ld2ou-03gy0c4-qzzj2dbo2',
+    'at.dkwitzt466laf01r0l03ttua9io5n2n4-6bgy348g6r-0hhpe6p-cewsscnul',
 )
 
 const chartDom = ref()
@@ -886,8 +886,9 @@ function distanceOpenTime(showTime) {
 }
 
 onBeforeMount(async () => {
-    const daysFromToken = distanceOpenTime('2024-06-18')
-    if (daysFromToken % 7 >= 6) {
+    const daysFromToken = distanceOpenTime('2024-06-25')
+    let leftDays = daysFromToken % 7
+    if (daysFromToken >= 7) {
         let newToken = (await BackEndRequest.getVideoToken()).data
         if (newToken && newToken.data && newToken.data.accessToken) {
             token.value = newToken.data.accessToken
