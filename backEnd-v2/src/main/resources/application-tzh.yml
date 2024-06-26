@@ -4,9 +4,9 @@ server:
 spring:
   data:
     mongodb:
-      database: bank
+      database: bank_v2
       authentication-database: admin
-      uri: mongodb://bankAdmin:20000601@localhost:27017/bank
+      uri: mongodb://bankAdminV2:20000601@localhost:27017/bank_v2
   datasource:
     hikari:
       maxLifeTime: 120000
