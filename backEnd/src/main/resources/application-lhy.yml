@@ -4,9 +4,9 @@ server:
 spring:
   data:
     mongodb:
-      database: bank_0301
+      database: newBank
       authentication-database: admin
-      uri: mongodb://localhost:27017/bank_0301
+      uri: mongodb://localhost:27017/newBank
   datasource:
     hikari:
       maxLifeTime: 120000
@@ -43,11 +43,17 @@ springfox:
     swagger-ui:
       enabled: true
 
+multiIndex:
+  condaEnv: Env1
+  dataPath: E:\WATER\BankCollapse\backdata\modelData
+  wholeDataPath: E:\WATER\BankCollapse\backdata\dataWhole
+  resPath: E:\WATER\BankCollapse\backdata\modelRes\
 
 tile:
   mzsTilePath:  E:/WATER/BankCollapse/backdata/rasterTIle/
   worldTilePath: E:/WATER/offline_map
   nodeServicePath: E:/WATER/node/index.js
+  riverTilePath: E:/WATER/BankCollapse/backdata/riverRasterTile/
   riverImagePath: E:/WATER/BankCollapse/backdata/imageTiles/tiles/
 
 flowData:
