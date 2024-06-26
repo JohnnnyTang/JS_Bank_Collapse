@@ -31,13 +31,8 @@
                             <div class="title-text">数据面板</div>
                         </div>
                         <div class="dp-content">
-                            <el-tree
-                                style="max-height: 28vh; overflow: auto"
-                                :data="data"
-                                :props="defaultProps"
-                                @node-contextmenu="handleNodeClick"
-                                node-key="nodeID"
-                            >
+                            <el-tree style="max-height: 28vh; overflow: auto" :data="data" :props="defaultProps"
+                                @node-contextmenu="handleNodeClick" node-key="nodeID">
                                 <template #default="{ node, data }">
                                     <div class="custom-tree-node" style="width: 100%">
                                         <el-dropdown @command="handleNodeCommand" trigger="contextmenu"
@@ -241,8 +236,7 @@
 
         <div class="analysisCenter" v-show="showAnalysisCenter">
             <div class="background"></div>
-            <div class="back"
-                @click="showAnalysisCenter = !showAnalysisCenter; checky1 = true; checky2 = false"></div>
+            <div class="back" @click="showAnalysisCenter = !showAnalysisCenter; checky1 = true; checky2 = false"></div>
             <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
                 src="http://172.21.212.165:8050/#/analysis/73c29959-16f0-4478-8526-0927d1aff6f7">
 
@@ -265,7 +259,8 @@ import HydrologicalCondition from '../stability-sub/HydrologicalCondition.vue'
 import SetParameter from '../stability-sub/SetParameter.vue'
 import ModelStatus from '../stability-sub/ModelStatus.vue'
 import { ElMessage } from 'element-plus'
-import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
+// import SteadyFlowLayer from '../../../utils/m_demLayer/newFlow'
+import FlowFieldLayer from '../../../utils/WebGL/notSimpleLayer'
 import { useStabilityStore } from '../../../store/stabilityStore.js'
 import {
     addLineToMap,
@@ -624,26 +619,20 @@ const checkedlayers = ref([])
 const layers = ref([])
 let globalMap = undefined
 
-let flowSrc = []
-for (let i = 0; i < 26; i++) {
-    flowSrc.push(`/scratchSomething/terrain_flow/json/uv_${i}.bin`)
-}
-let flow = new SteadyFlowLayer(
-    '近岸流场',
-    '/scratchSomething/terrain_flow/json/station.bin',
-    flowSrc,
-    (url) => url.match(/uv_(\d+)\.bin/)[1],
-    '/scratchSomething/terrain_flow/json/ChangJiang.geojson',
-)
+let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
+let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
+let flow = reactive(new FlowFieldLayer('floodFlow', backEndJsonUrl2, imageSrcPrefix2))
+// map.addLayer(floodFlow, 'chaoWeiPointLable')
 
-// watch(checkedlayers, (value) => {
-// })
 
 const handleCheckedlayersChange = (value) => {
     console.log('handle checked layer', value);
     for (let i = 0; i < value.length; i++) {
         if (value[i].includes('flow')) {
-            flow.show()
+            globalMap.getLayer('floodFlow') ?
+                globalMap.setLayoutProperty('floodFlow', 'visibility', 'visible')
+                : globalMap.addLayer(flow)
+
             if (globalMap) {
                 globalMap.flyTo({
                     center: [120.54070965313992, 32.042615280683805],
@@ -657,7 +646,9 @@ const handleCheckedlayersChange = (value) => {
             return
         }
     }
-    flow.hide()
+    globalMap.getLayer('floodFlow') ?
+        globalMap.setLayoutProperty('floodFlow', 'visibility', 'none')
+        : console.log()
 
 
 }
@@ -872,7 +863,7 @@ const handleEvolutionLayerCheckChange = (data, checked) => {
                         ],
                         'raster-color-mix': [
                             DEMMINMAXMAP[data.label].max -
-                                DEMMINMAXMAP[data.label].min,
+                            DEMMINMAXMAP[data.label].min,
                             0,
                             0,
                             0,
@@ -881,7 +872,7 @@ const handleEvolutionLayerCheckChange = (data, checked) => {
                         'raster-color-range': [
                             0,
                             DEMMINMAXMAP[data.label].max -
-                                DEMMINMAXMAP[data.label].min,
+                            DEMMINMAXMAP[data.label].min,
                         ],
                     },
                 })
@@ -1126,7 +1117,7 @@ onMounted(async () => {
     //initPureScratchMap
     // map = await initScratchMap(mapContainerRef.value)
     map = await initPureScratchMap(mapContainerRef.value)
-
+    console.log('init map')
 
     map.addSource('1998-01-dem', {
         type: 'raster',
@@ -1154,8 +1145,8 @@ onMounted(async () => {
     })
 
     globalMap = map
-    map.addLayer(flow)
-    flow.hide()
+    // map.addLayer(flow)
+    // flow.hide()
 })
 </script>
 

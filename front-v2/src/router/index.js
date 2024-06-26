@@ -71,8 +71,8 @@ const routes = [
         children: [
             {
                 path: 'main', // 默认子页面
-                // component: () => import('../views/ModelStoreView.vue')
-                component: () => import('../components/modelStore/ModelTemp.vue')
+                component: () => import('../views/ModelStoreView.vue')
+                // component: () => import('../components/modelStore/ModelTemp.vue')
             },
             {
                 path: 'dataInterpretation',

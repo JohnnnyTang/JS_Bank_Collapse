@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IStressPileDataRepo">
+    <resultMap id="stressPileDataMap" type="com.johnny.bank.model.resource.dataResource.StressPileData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="topAngle" column="top_angle"/>
+        <result property="middleAngle" column="middle_angle"/>
+        <result property="bottomAngle" column="bottom_angle"/>
+        <result property="topPower" column="top_power"/>
+        <result property="middlePower" column="middle_power"/>
+        <result property="bottomPower" column="bottom_power"/>
+        <result property="topChange" column="top_change"/>
+        <result property="middleChange" column="middle_change"/>
+        <result property="bottomChange" column="bottom_change"/>
+        <result property="topChangeAvg" column="top_change_avg"/>
+        <result property="middleChangeAvg" column="middle_change_avg"/>
+        <result property="bottomChangeAvg" column="bottom_change_avg"/>
+    </resultMap>
+    <select id="findAll" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM stresspile_record;
+    </select>
+
+    <select id="getTotalCountOfDevice" resultType="integer">
+        SELECT COUNT(*) FROM stresspile_record WHERE machine_id_nnu = #{deviceCode};
+    </select>
+
+    <select id="getTotalCountInStation" resultType="integer">
+        SELECT COUNT(*) FROM stresspile_record WHERE station_id = #{stationCode};
+    </select>
+
+    <select id="findByStationCode" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE station_id = #{stationCode}
+        order by measure_time DESC;
+    </select>
+
+    <select id="findByDeviceCode" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC;
+    </select>
+
+<!--    <select id="findByStationCodeList" resultType="com.johnny.bank.model.resource.dataResource.MonitorInfo">-->
+<!--        SELECT * FROM device WHERE station_code IN #{stationCodeList};-->
+<!--    </select>-->
+
+    <select id="findNewestData" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        order by measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataInStation" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE station_id = #{stationCode}
+        order by measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDataOfDevice" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE machine_id_nnu = #{deviceCode}
+        order by measure_time DESC LIMIT 1;
+    </select>
+
+    <select id="findDataByTime" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime};
+    </select>
+
+    <select id="findDataByTimeOfDevice" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND machine_id_nnu = #{deviceCode};
+    </select>
+
+    <select id="findDataByTimeInStation" resultMap="stressPileDataMap">
+        SELECT *,
+               round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+               round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+               round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN 299 PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        FROM stresspile_record
+        WHERE measure_time BETWEEN #{begTime} AND #{endTime} AND station_id = #{stationCode};
+    </select>
+
+    <select id="ifContinueUpdateOfDevice" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM stresspile_record
+            WHERE measure_time >= #{timeLimit}
+            AND machine_id_nnu = #{deviceCode}
+        );
+    </select>
+
+    <select id="ifContinueUpdateInStation" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM stresspile_record
+            WHERE measure_time >= #{timeLimit}
+              AND station_id = #{stationCode}
+        );
+    </select>
+</mapper>
