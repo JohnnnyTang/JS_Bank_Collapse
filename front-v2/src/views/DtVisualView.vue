@@ -181,7 +181,7 @@ import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapU
 import { scenes, layerGroups, LayerGroup, lableLayerMap } from '../components/dataVisual/js/SCENES';
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../store/mapStore';
 import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt, layerSourceMap, sourceNameMap } from '../components/dataVisual/js/tilefieldMAP';
-import { initSortedLayer, initTextLayer } from '../components/dataVisual/layerUtil'
+import { initSortedLayer, initTextLayer,temp } from '../components/dataVisual/layerUtil'
 import { getSideBarTree, showLayers, hideLayers, DICT } from '../components/dataVisual/js/useful'
 
 // data
@@ -824,6 +824,7 @@ onMounted(async () => {
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
     initSortedLayer(map)
+    // temp(map)
     // console.log('side bar tree ok')
 
 

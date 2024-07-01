@@ -84,6 +84,10 @@ const routes = [
             },
             {
                 path: 'stabilityAnalysis',
+                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
+            },
+            {
+                path: 'stabilityAnalysis2',
                 component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
             },
             {

@@ -1359,7 +1359,7 @@ const layerAddFunctionMap = {
                     "icon-size": [
                         "case",
                         ["==", ["get", "if_important"], 1], // 如果if_important字段为1
-                        1.5,                                  // 则图标大小为0.6
+                        1.3,                                  // 则图标大小为0.6
                         1.1                                   // 否则图标大小为0.4
                     ],
                     'icon-anchor': 'center',
@@ -1372,7 +1372,7 @@ const layerAddFunctionMap = {
                         "step",
                         ["zoom"],
                         ["case", ["==", ["get", "if_important"], 1], 1, 0],
-                        10,
+                        9,
                         [
                             "case",
                             ["==", ["get", "if_important"], 1],
@@ -1401,18 +1401,19 @@ const layerAddFunctionMap = {
                 type: 'symbol',
                 source: 'hydroStationPoint',
                 'source-layer': 'default',
-                minzoom: 10,
+                minzoom: 8,
                 layout: {
                     'text-field': ['get', 'sp_name'],
                     'text-font': [
                         'Open Sans Semibold',
                         'Arial Unicode MS Bold',
                     ],
-                    'text-offset': [0.4, 0.8],
+                    'text-offset': [0.2, 0.6],
                     'text-anchor': 'top',
                     'text-variable-anchor': ["top", "bottom", "left", "right"],
-                    'text-size': ["case", ["==", ["get", "if_important"], 1], 19, 17],
-                    'text-allow-overlap': false,
+                    // 'text-variable-anchor': ["bottom", "bottom-left", "bottom-right", "right", "top-right", "top-left", "left", "top",],
+                    'text-size': ["case", ["==", ["get", "if_important"], 1], 18, 16],
+                    'text-allow-overlap': true,
                 },
                 paint: {
                     "text-color": [
@@ -1425,7 +1426,7 @@ const layerAddFunctionMap = {
                         "step",
                         ["zoom"],
                         ["case", ["==", ["get", "if_important"], 1], 1, 0],
-                        11,
+                        9,
                         [
                             "case",
                             ["==", ["get", "if_important"], 1],
@@ -3909,6 +3910,20 @@ const initSortedLayer = async (map) => {
     await layerAddFunction(map, '一级预警岸段-注记')
 }
 
+const temp = async (map) => {
+
+    await layerAddFunction(map, '流域性河道')// 全程展
+    await layerAddFunction(map, '区域性骨干河道')// 全程展示
+
+
+
+    await layerAddFunction(map, '水文站点')// 分类
+
+    // 注记
+    await layerAddFunction(map, '水文站点-注记')
+
+}
+
 const initTextLayer = async (map) => {
 
     // // 线
@@ -4076,5 +4091,6 @@ export {
     layerRemoveFunction, // hide and remove
     layerAddFunction, // add and show
     initSortedLayer,
-    initTextLayer
+    initTextLayer,
+    temp
 }
