@@ -83,6 +83,10 @@ const routes = [
                 component: () => import('../components/modelStore/views/SoilAnalysis2.vue'),
             },
             {
+                path: 'stabilityAnalysis2',
+                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
+            },
+            {
                 path: 'stabilityAnalysis',
                 component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
             },
