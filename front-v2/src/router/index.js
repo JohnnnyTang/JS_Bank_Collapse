@@ -49,7 +49,8 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        redirect: '/dataVisual'
+        // redirect: '/dataVisual'
+        redirect: '/login'
         // component: () => import("../views/BankMainView.vue")
     },
     {
@@ -123,6 +124,10 @@ const routes = [
         path: '/bankWarn',
         component: () => import('../views/BankRiskWarnView.vue')
     },
+    {
+        path: '/login',
+        component: () => import('../views/LoginView.vue')
+    },
 ]
 // 3、创建一个路由的对象
 const router = createRouter({
@@ -134,6 +139,20 @@ const router = createRouter({
     history: createWebHistory(),
     // 下面这个 可以写成ES6的简写 routers
     routes: routes,
+})
+
+router.beforeEach((to, from, next) => {
+    console.log(localStorage.getItem('loggedIn'))
+    if(to.path === '/login'){
+        next()
+    }else{
+        const isLoggedIn = localStorage.getItem('loggedIn');
+        if (isLoggedIn === 'true') {
+            next();
+        }else{
+            next('/login');
+        }
+    }
 })
 
 export default router

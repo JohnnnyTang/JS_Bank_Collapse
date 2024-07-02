@@ -2,26 +2,14 @@
     <div class="main-header-container" ref="headerDom">
         <div class="header-logo-pic"></div>
         <div class="header-nav-container">
-            <div
-                class="header-nav-item"
-                v-for="(navItem, index) in navList"
-                :key="index"
-                @click="emitNavClick(index)"
+            <div class="header-nav-item" v-for="(navItem, index) in navList" :key="index" @click="emitNavClick(index)"
                 :class="{
                     active: navItem.isActive,
                     'long-text': !navItem.oneRow,
-                }"
-                ref="navItemRefs"
-                @mouseover="hoverNav(index)"
-                @mouseleave="leaveNav()"
-            >
-                <div
-                    class="header-nav-icon"
-                    :style="{
-                        'background-image': 'url(' + navItem.iconUrl + ')',
-                    }"
-                    v-if="navItem.oneRow"
-                ></div>
+                }" ref="navItemRefs" @mouseover="hoverNav(index)" @mouseleave="leaveNav()">
+                <div class="header-nav-icon" :style="{
+                    'background-image': 'url(' + navItem.iconUrl + ')',
+                }" v-if="navItem.oneRow"></div>
                 <div class="header-nav-text" v-if="navItem.oneRow">
                     {{ navItem.name }}
                 </div>
@@ -30,48 +18,27 @@
                     <br />
                     {{ navItem.nameTwo }}
                 </div>
-                <el-dropdown
-                    ref="eleDropDownDomRef"
-                    v-if="index == 4 || index == 1 || index == 3"
-                    trigger="click"
-                    :popper-class="
-                        index == 4 ? 'nav-popper center' : 'nav-popper'
-                    "
-                >
-                    <div
-                        style="
+                <el-dropdown ref="eleDropDownDomRef" v-if="index == 4 || index == 1 || index == 3" trigger="click"
+                    :popper-class="index == 4 ? 'nav-popper center' : 'nav-popper'
+                        ">
+                    <div style="
                             width: 10vw;
                             height: 1px;
                             background-color: transparent;
                             position: relative;
-                        "
-                    ></div>
+                        "></div>
                     <template #dropdown>
                         <el-dropdown-menu v-if="index == 4">
-                            <el-dropdown-item @click="navToModelPage"
-                                >崩岸模型库</el-dropdown-item
-                            >
-                            <el-dropdown-item @click="navToKnowledgePage"
-                                >崩岸知识库</el-dropdown-item
-                            >
+                            <el-dropdown-item @click="navToModelPage">崩岸模型库</el-dropdown-item>
+                            <el-dropdown-item @click="navToKnowledgePage">崩岸知识库</el-dropdown-item>
                         </el-dropdown-menu>
                         <el-dropdown-menu v-if="index == 1 || index == 3">
-                            <el-dropdown-item
-                                @click="navToWarnOrRiskPage(index)"
-                            >
-                                <span style="float: left" class="left"
-                                    >民主沙右缘</span
-                                >
-                                <span
-                                    style="float: right"
-                                    class="right level-one"
-                                    >一级预警岸段</span
-                                >
+                            <el-dropdown-item @click="navToWarnOrRiskPage(index)">
+                                <span style="float: left" class="left">民主沙右缘</span>
+                                <span style="float: right" class="right level-one">一级预警岸段</span>
                             </el-dropdown-item>
                             <el-dropdown-item disabled>
-                                <span style="text-align: center" class=""
-                                    >...</span
-                                >
+                                <span style="text-align: center" class="">...</span>
                             </el-dropdown-item>
                             <!-- <el-dropdown-item @click="navToWarnPage" disabled>
                                 <span
@@ -103,48 +70,34 @@
             </div>
         </div>
         <div class="header-user-container">
-            <div class="user-avatar-icon"></div>
-            <div class="drop-down-icon"></div>
+            <el-dropdown trigger="click">
+                <div class="user-avatar-icon"></div>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item>登录</el-dropdown-item>
+                        <el-dropdown-item>退出</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
         </div>
     </div>
     <div class="title-header">
-        <TitleContainerVue
-            style="width: 28vw; height: 8vh"
-            :title-width="titleWidthInPixel"
-        ></TitleContainerVue>
+        <TitleContainerVue style="width: 28vw; height: 8vh" :title-width="titleWidthInPixel"></TitleContainerVue>
     </div>
     <div class="header-decorate-line left">
-        <DecorateLineVue
-            :lineWidth="decLineWidth"
-            :nodeSize="decLineNodeWidth"
-            :line-animate="decLineAnimation"
-            :node-animate="decNodeAnimation"
-        />
+        <DecorateLineVue :lineWidth="decLineWidth" :nodeSize="decLineNodeWidth" :line-animate="decLineAnimation"
+            :node-animate="decNodeAnimation" />
     </div>
     <div class="header-decorate-line right">
-        <DecorateLineVue
-            :lineWidth="decLineWidth"
-            :nodeSize="decLineNodeWidth"
-            :if-reverse="true"
-            :line-animate="decLineAnimation"
-            :node-animate="decNodeAnimation"
-        />
+        <DecorateLineVue :lineWidth="decLineWidth" :nodeSize="decLineNodeWidth" :if-reverse="true"
+            :line-animate="decLineAnimation" :node-animate="decNodeAnimation" />
     </div>
-    <div
-        class="title-bracket-container active-bracket"
-        v-show="bracketTitleActiveShow"
-        :style="{ left: activeBracketLeft + 'px' }"
-    >
-        <TitleBracket
-            :title-width="bracketActiveTitleWidth"
-            ref="activeBracketDomRef"
-        />
+    <div class="title-bracket-container active-bracket" v-show="bracketTitleActiveShow"
+        :style="{ left: activeBracketLeft + 'px' }">
+        <TitleBracket :title-width="bracketActiveTitleWidth" ref="activeBracketDomRef" />
     </div>
-    <div
-        class="title-bracket-container hover-bracket"
-        v-show="bracketTitleHoverShow"
-        :style="{ left: hoverBracketLeft + 'px' }"
-    >
+    <div class="title-bracket-container hover-bracket" v-show="bracketTitleHoverShow"
+        :style="{ left: hoverBracketLeft + 'px' }">
         <TitleBracket :title-width="bracketHoverTitleWidth" />
     </div>
 </template>
@@ -291,7 +244,7 @@ const navToWarnOrRiskPage = (index) => {
     if (index == 1) {
         eleDropDownDomRef.value[0].handleClose()
         router.push('/bankTwin')
-    } else if(index == 3) {
+    } else if (index == 3) {
         eleDropDownDomRef.value[1].handleClose()
         router.push('/bankWarn')
     }
@@ -371,13 +324,11 @@ div.main-header-container {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-    background: radial-gradient(
-        circle,
-        rgba(16, 2, 84, 1) 0%,
-        rgba(16, 31, 128, 1) 40%,
-        rgba(13, 80, 147, 1) 80%,
-        rgba(0, 134, 255, 1) 100%
-    );
+    background: radial-gradient(circle,
+            rgba(16, 2, 84, 1) 0%,
+            rgba(16, 31, 128, 1) 40%,
+            rgba(13, 80, 147, 1) 80%,
+            rgba(0, 134, 255, 1) 100%);
     // z-index: 1;
 
     div.header-logo-pic {
@@ -477,37 +428,38 @@ div.main-header-container {
 
     div.header-user-container {
         width: 7vw;
-        // margin-left: calc(8vw - 6vh);
-        height: 7vh;
-        // background-color: #b1f6ff;
+        height: 8.5vh;
         display: flex;
         flex-flow: row nowrap;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
 
         div.user-avatar-icon {
-            height: 4vh;
-            width: 4vh;
+            position: relative;
+            margin-top: 2.2vh;
+            height: 5vh;
+            width: 5vh;
             // background-color: antiquewhite;
-            // background-image: url('/user.png');
+            background-image: url('/user.png');
             background-repeat: no-repeat;
             background-size: contain;
+
             &:hover {
                 cursor: pointer;
             }
         }
 
-        div.drop-down-icon {
-            height: 1.6vh;
-            width: 1.6vh;
-            // background-color: #8a9a9e;
-            // background-image: url('/down-arrow.png');
-            background-repeat: no-repeat;
-            background-size: contain;
-            &:hover {
-                cursor: pointer;
-            }
-        }
+        // div.drop-down-icon {
+        //     height: 1.6vh;
+        //     width: 1.6vh;
+        //     // background-color: #8a9a9e;
+        //     // background-image: url('/down-arrow.png');
+        //     background-repeat: no-repeat;
+        //     background-size: contain;
+        //     &:hover {
+        //         cursor: pointer;
+        //     }
+        // }
     }
 }
 
