@@ -71,11 +71,13 @@
         </div>
         <div class="header-user-container">
             <el-dropdown trigger="click">
-                <div class="user-avatar-icon" ></div>
+                <div class="user-avatar-icon"></div>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item @click="router.push('/login')">登录</el-dropdown-item>
-                        <!-- <el-dropdown-item>退出登录</el-dropdown-item> -->
+                        <el-dropdown-item v-if="!statusStore.loginStatus"
+                            @click="login">登录</el-dropdown-item>
+                        <el-dropdown-item v-else="statusStore.loginStatus"
+                            @click="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -108,7 +110,10 @@ import TitleContainerVue from '../header/TitleContainer.vue'
 import DecorateLineVue from '../header/DecorateLine.vue'
 import TitleBracket from '../header/TitleBracket.vue'
 import router from '../../router/index'
+import { useStatusStore } from '../../store/statusStore'
 import { onBeforeRouteUpdate } from 'vue-router'
+
+const statusStore = useStatusStore()
 
 const titleWidthInPixel = ref(300)
 const headerDom = ref(null)
@@ -268,6 +273,15 @@ const resizeObserver = new ResizeObserver((entries) => {
         titleWidthInPixel.value = (4 * entry.contentRect.width) / 25
     })
 })
+
+const login = ()=>{
+    router.push('/login')
+}
+const logout = ()=>{
+    localStorage.removeItem('token')
+    statusStore.loginStatus = false
+    router.push('/login')
+}
 
 onMounted(() => {
     // console.log(headerDom.value);

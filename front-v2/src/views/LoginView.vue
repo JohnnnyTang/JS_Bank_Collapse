@@ -24,24 +24,31 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import router from '../router/index';
 import axios from 'axios';
 import { ElMessage } from 'element-plus'
+import { useStatusStore } from '../store/statusStore';
 
+const statusStore = useStatusStore();
 const username = ref('');
 const password = ref('');
 
 const loginFail = () => {
+    statusStore.loginStatus = false
     ElMessage.error('登录失败,请检查用户名或密码')
 }
-const loginSuccess = ()=>{
+const loginSuccess = () => {
+    statusStore.loginStatus = true
     ElMessage.success('登录成功')
 }
 
 const login = () => {
     // step 1 input checkin
-
+    if (username.value.trim() === '' || password.value.trim() === '') {
+        ElMessage.info('用户名或密码不能为空')
+        return
+    }
     // step 2 post request
     const requestBody = {
         "email": username.value,
@@ -60,6 +67,11 @@ const login = () => {
         loginFail()
     })
 };
+
+onUnmounted(() => {
+    username.value = '';
+    password.value = '';
+})
 </script>
 
 <style lang="scss" scoped>
@@ -72,7 +84,7 @@ div.login-view {
     align-items: center;
     background-color: rgb(230, 243, 255);
     overflow: hidden;
-
+    user-select: none;
     div.overlay {
         position: absolute;
         left: 17%;
