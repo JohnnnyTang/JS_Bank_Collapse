@@ -1524,6 +1524,8 @@ const addBankLineRiskLayer = (map, profileList) => {
 }
 
 onMounted(async () => {
+    await axios.get('/api/data/monitorInfo')
+
     await initPureScratchMap(mapContainer.value).then(async (map) => {
         mapInstance = map
         // map.on('draw.create', function (e) {
@@ -1961,8 +1963,10 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-    useMapStore().getMap().remove()
-    useMapStore().destroyMap()
+    if (useMapStore().getMap()) {
+        useMapStore().getMap().remove()
+        useMapStore().destroyMap()
+    }
 })
 </script>
 
@@ -3221,7 +3225,7 @@ div.risk-warn-container {
         padding: calc(0.1vw + 0.1vh);
         background-color: aliceblue;
         user-select: none;
-        border: solid calc(0.1vh + 0.1vw) rgb(82,163,235);
+        border: solid calc(0.1vh + 0.1vw) rgb(82, 163, 235);
         border-radius: calc(0.1vh + 0.3vw);
 
         .title {

@@ -33,6 +33,7 @@ public class TokenUtil {
         Map<String, Object> map = new HashMap<>();
         Calendar instance = Calendar.getInstance();
         instance.add(Calendar.HOUR,72);
+//        instance.add(Calendar.SECOND, 30);
         return JWT.create()
                 .withHeader(map)
                 .withClaim("userId",user.getId())

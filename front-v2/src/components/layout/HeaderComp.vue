@@ -71,11 +71,11 @@
         </div>
         <div class="header-user-container">
             <el-dropdown trigger="click">
-                <div class="user-avatar-icon"></div>
+                <div class="user-avatar-icon" ></div>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item>登录</el-dropdown-item>
-                        <el-dropdown-item>退出</el-dropdown-item>
+                        <el-dropdown-item @click="router.push('/login')">登录</el-dropdown-item>
+                        <!-- <el-dropdown-item>退出登录</el-dropdown-item> -->
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>

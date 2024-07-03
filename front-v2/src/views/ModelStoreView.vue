@@ -31,10 +31,16 @@ import BottomWaveVue from '../components/modelStore/BottomWave.vue'
 import { infoItemList } from '../components/modelStore/modelInfoList.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
+import { onMounted } from 'vue';
+import axios from 'axios';
 
 const navToKnowLedge = () => {
   router.push('/knowledgeStore');
 }
+
+onMounted(()=>{
+  axios.get('/api/data/monitorInfo')
+})
 
 </script>
 

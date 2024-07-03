@@ -144,7 +144,6 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    console.log(sessionStorage.getItem('token'), from.path)
     if (to.path === '/login') {
         next()
     } else {

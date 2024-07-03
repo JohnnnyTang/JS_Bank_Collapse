@@ -4,7 +4,7 @@ import axios from 'axios'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router/index'
-import ElementPlus from 'element-plus'
+import ElementPlus, { ElMessage } from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 import DataVVue3 from '@kjgl77/datav-vue3'
@@ -19,8 +19,6 @@ axios.interceptors.request.use(
     config => {
         const token = sessionStorage.getItem('token');
         if (token) {
-            console.log("token存在");
-            // config.headers.Authorization = `Bearer ${token}`;
             config.headers["token"] = token;
         }
         return config;
@@ -29,23 +27,24 @@ axios.interceptors.request.use(
         return Promise.reject(error);
     }
 );
-// axios.interceptors.response.use(
-//     response => {
-//         if (response.data.errno === 999) {
-//             router.replace('/');
-//             console.log("token过期");
-//         }
-//         return response;
-//     },
-//     error => {
-//         return Promise.reject(error);
-//     }
-// );
+axios.interceptors.response.use(
+    response => {
+        if (response.data["msg"] === "token过期") {
+            ElMessage.error("用户认证过期，请重新登录");
+            router.push('/login');
+            return Promise.reject(response.data);
+        }
+        return response;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
 
 
 window.addEventListener('keydown', (e) => {
     if (e.key == '1') {
-        axios.get('/api/tile/vector/riverBridge/info').then((res) => {
+        axios.get('/api/data/monitorInfo').then((res) => {
             console.log(res.data)
         })
     }

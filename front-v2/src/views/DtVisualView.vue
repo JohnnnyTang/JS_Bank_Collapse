@@ -181,7 +181,7 @@ import { initBaseMap, getStyleJson4base, getImageStyleJson } from '../utils/mapU
 import { scenes, layerGroups, LayerGroup, lableLayerMap } from '../components/dataVisual/js/SCENES';
 import { useMapStore, useNewSceneStore, useHighlightLayerStore } from '../store/mapStore';
 import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomMap, legendListt, layerSourceMap, sourceNameMap } from '../components/dataVisual/js/tilefieldMAP';
-import { initSortedLayer, initTextLayer,temp } from '../components/dataVisual/layerUtil'
+import { initSortedLayer, initTextLayer, temp } from '../components/dataVisual/layerUtil'
 import { getSideBarTree, showLayers, hideLayers, DICT } from '../components/dataVisual/js/useful'
 
 // data
@@ -768,6 +768,9 @@ const resetSideBarTree = () => {
 }
 
 const prepareMap = async () => {
+
+    await axios.get('/api/data/monitorInfo')
+
     const mapInstance = await initBaseMap(mapContainer.value)
     mapStore.setMap(mapInstance)
     mapInstance.addControl(new mapboxgl.NavigationControl({
@@ -1023,8 +1026,10 @@ const arrayDistinctByName = (tempArr, nameField) => {
 }
 
 onUnmounted(async () => {
-    mapStore.getMap().remove()
-    mapStore.destroyMap()
+    if (useMapStore().getMap()) {
+        useMapStore().getMap().remove()
+        useMapStore().destroyMap()
+    }
 })
 
 /////////////  BBOX MAP
