@@ -1056,10 +1056,10 @@ const flowControlHandler = async () => {
 
 const RasterControlHandler = () => {
     if (showRaster.value && showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
+        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
         showRaster.value = !showRaster.value
     } else if (!showRaster.value && showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
+        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
         showRaster.value = !showRaster.value
     } else if (showRaster.value && !showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
@@ -1151,7 +1151,6 @@ const showRasterControlFunc = () => {
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
 const showWaterPower = ref(false)
 const showWaterPowerFunc = async () => {
-    console.log('213123213', curActiveIndex.value)
 
     if (showRiverBed.value === true) {
         showRiverBedFunc()
@@ -1161,6 +1160,7 @@ const showWaterPowerFunc = async () => {
     showBedFlowChartFunc()
     showWaterProcessChartFunc()
     await showFlowSpeedFunc()
+    mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
     showWaterPower.value = !showWaterPower.value
 }
 
@@ -1196,7 +1196,7 @@ const showGeologyAndProjectFunc = () => {
     } else if (showRiverBed.value === true) {
         showRiverBedFunc()
     }
-
+    mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
     showGeologyAndProject.value = !showGeologyAndProject.value
 }
 
