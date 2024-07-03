@@ -191,6 +191,7 @@ import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
 // import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
 import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
+import axios from 'axios'
 import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
 import {
     mapInit,
@@ -641,6 +642,7 @@ onMounted(async () => {
     //     ],
     // })
     //////////return loaded Map
+    await axios.get('/api/data/monitorInfo')
     map = await initPureScratchMap(mapDom.value)
     // map = await initBaseMap(mapDom.value)
     map.on('render', () => {
@@ -687,8 +689,10 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-    useMapStore().getMap().remove()
-    useMapStore().destroyMap()
+    if (useMapStore().getMap()) {
+        useMapStore().getMap().remove()
+        useMapStore().destroyMap()
+    }
 })
 
 ///////// DEBUG REGION
