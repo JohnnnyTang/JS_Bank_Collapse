@@ -10,7 +10,6 @@ import { onMounted, ref, createApp } from 'vue'
 import HeaderComp from './components/layout/HeaderComp.vue'
 import router from './router/index'
 import { useDeviceNameStore } from './store/mapStore';
-import axios from 'axios';
 
 onMounted(async () => {
 
@@ -18,7 +17,7 @@ onMounted(async () => {
     // const tileServer = `http://` + tileServerInfo.data.ip + ':' + tileServerInfo.data.port+`/api/v1`
     // console.log('TILE_SERVER::', tileServer)
     // window.tileServer = tileServer
-    // await Scratch.StartDash()
+    
     const infoBoxDiv = document.createElement('div')
     infoBoxDiv.style.position = 'absolute'
     infoBoxDiv.style.zIndex = '999'

@@ -1,6 +1,6 @@
 <template>
     <div class="login-view">
-
+        <div class="overlay"></div>
         <div class="login-card">
             <div class="left-side">
                 <div class="login-pic"></div>
@@ -26,17 +26,39 @@
 <script setup>
 import { ref } from 'vue';
 import router from '../router/index';
+import axios from 'axios';
+import { ElMessage } from 'element-plus'
 
 const username = ref('');
 const password = ref('');
 
+const loginFail = () => {
+    ElMessage.error('登录失败,请检查用户名或密码')
+}
+const loginSuccess = ()=>{
+    ElMessage.success('登录成功')
+}
+
 const login = () => {
-    if (username.value === '123' && password.value === '123') {
-        localStorage.setItem('loggedIn', true);
-        router.push('/dataVisual')
+    // step 1 input checkin
+
+    // step 2 post request
+    const requestBody = {
+        "email": username.value,
+        "password": password.value
     }
-    else
-        alert('用户名或密码错误，请重新输入！');
+    axios.post('/api/user/login', requestBody).then(response => {
+        let token
+        if (token = response.data) {
+            sessionStorage.setItem('token', token)
+            loginSuccess()
+            router.push('/dataVisual')
+        } else {
+            loginFail()
+        }
+    }).catch(error => {
+        loginFail()
+    })
 };
 </script>
 
@@ -45,23 +67,52 @@ div.login-view {
     position: absolute;
     width: 100vw;
     height: 92vh;
-    opacity: 0.5;
-    background-image: repeating-radial-gradient(circle at 0 0, transparent 0, #e5e5f7 10px), repeating-linear-gradient(#93dbff55, #93dbff);
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: rgb(230, 243, 255);
+    overflow: hidden;
+
+    div.overlay {
+        position: absolute;
+        left: 17%;
+        top: 10%;
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        --size: 1080px;
+        --speed: 10s;
+        --easing: cubic-bezier(0.8, 0.2, 0.2, 0.8);
+        width: 70vw;
+        height: 70vh;
+        filter: blur(calc(var(--size) / 5));
+        background-image: linear-gradient(rgba(11, 125, 255, 0.479), rgba(22, 246, 235, 0.411));
+        animation: rotate var(--speed) var(--easing) alternate infinite;
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+
+    }
+
 
     div.login-card {
         position: relative;
+        z-index: 100;
         width: 38vw;
         height: 48vh;
         background-color: #ffffff;
         // box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
         border-radius: calc(0.2vw + 0.5vh);
-        border-right: #045f8d solid calc(0.2vw + 0.5vh);
-        border-bottom: #045f8d solid calc(0.2vw + 0.5vh);
-        border-top: #0382c2 solid calc(0.1vw + 0.1vh);
-        border-left: #0382c2 solid calc(0.1vw + 0.1vh);
+        border-right: rgb(0, 44, 126) solid calc(0.2vw + 0.3vh);
+        border-bottom: rgb(0, 49, 141) solid calc(0.2vw + 0.5vh);
+        border-top: rgb(22, 129, 240) solid calc(0.1vw + 0.1vh);
+        border-left: rgb(22, 129, 240) solid calc(0.1vw + 0.1vh);
 
         display: flex;
         flex-direction: row;
@@ -72,6 +123,8 @@ div.login-view {
             width: 55%;
             height: 100%;
             background-color: #f3f3f3;
+            // border-radius: calc(0.1vw + 0.5vh);
+            border-top-left-radius: calc(0.1vw + 0.5vh);
             border-right: #219cda solid 1px;
 
             div.login-pic {
@@ -148,6 +201,11 @@ div.login-view {
                     padding-left: 20px;
                     margin-top: 2vh;
                     font-size: calc(0.6vw + 0.6vh);
+                    transition: .4s ease-in-out;
+
+                    &:hover {
+                        border-color: #004c72;
+                    }
                 }
 
                 .form-btn {

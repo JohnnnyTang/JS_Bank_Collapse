@@ -150,7 +150,7 @@ const navList = ref([
     {
         name: '江苏省长江崩岸',
         nameTwo: '监测预警应用系统',
-        routerLink: '/',
+        routerLink: '/dataVisual',
         isActive: true,
         oneRow: false,
     },
