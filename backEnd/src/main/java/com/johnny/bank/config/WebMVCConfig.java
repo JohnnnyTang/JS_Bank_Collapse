@@ -45,6 +45,7 @@ public class WebMVCConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JWTInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/api/v1/user/**");
+                .excludePathPatterns("/api/v1/user/**")
+                .excludePathPatterns("/api/v1/tile/**");
     }
 }
