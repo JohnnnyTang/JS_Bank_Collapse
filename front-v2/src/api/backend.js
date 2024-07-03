@@ -10,7 +10,8 @@ const backendInstance = axios.create({
 })
 backendInstance.interceptors.request.use(
     config => {
-        const token = sessionStorage.getItem('token');
+        const token = localStorage.getItem('token');
+        // const token = sessionStorage.getItem('token');
         if (token) {
             config.headers["token"] = token;
         }
