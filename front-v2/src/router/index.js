@@ -91,6 +91,10 @@ const routes = [
                 component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
             },
             {
+                path: 'analysisCenter',
+                component: () => import('../components/modelStore/views/AnalysisCenter.vue'),
+            },
+            {
                 path: 'riskWarning',
                 component: () => import('../components/modelStore/views/RiskWarning.vue'),
             },
