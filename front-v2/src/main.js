@@ -20,7 +20,8 @@ axios.interceptors.request.use(
         const token = sessionStorage.getItem('token');
         if (token) {
             console.log("token存在");
-            config.headers.Authorization = `Bearer ${token}`;
+            // config.headers.Authorization = `Bearer ${token}`;
+            config.headers["token"] = token;
         }
         return config;
     },
@@ -40,6 +41,15 @@ axios.interceptors.request.use(
 //         return Promise.reject(error);
 //     }
 // );
+
+
+window.addEventListener('keydown', (e) => {
+    if (e.key == '1') {
+        axios.get('/api/tile/vector/riverBridge/info').then((res) => {
+            console.log(res.data)
+        })
+    }
+})
 
 
 const app = createApp(App)
