@@ -51,7 +51,7 @@ const routes = [
         name: 'home',
         // redirect: '/dataVisual'
         redirect: _ => {
-            return sessionStorage.getItem('token') ? '/dataVisual' : '/login';
+            return localStorage.getItem('token') ? '/dataVisual' : '/login';
         }
         // component: () => import("../views/BankMainView.vue")
     },
@@ -147,7 +147,7 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/login') {
         next()
     } else {
-        const isLoggedIn = sessionStorage.getItem('token');
+        const isLoggedIn = localStorage.getItem('token');
         if (isLoggedIn) {
             next();
         } else {

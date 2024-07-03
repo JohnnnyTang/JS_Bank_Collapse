@@ -50,7 +50,7 @@ const login = () => {
     axios.post('/api/user/login', requestBody).then(response => {
         let token
         if (token = response.data) {
-            sessionStorage.setItem('token', token)
+            localStorage.setItem('token', token)
             loginSuccess()
             router.push('/dataVisual')
         } else {
