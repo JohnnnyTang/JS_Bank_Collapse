@@ -23,7 +23,6 @@ backendInstance.interceptors.request.use(
 );
 backendInstance.interceptors.response.use(
     response => {
-        console.log('hello',response.data)
         if (response.data["msg"] === "token过期") {
             ElMessage.error("用户认证过期，请重新登录");
             router.push('/login');
