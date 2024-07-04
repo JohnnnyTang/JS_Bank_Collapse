@@ -117,6 +117,46 @@ onMounted(async () => {
 
     })
 
+    map.addSource('mapRaster6', {
+        type: 'raster',
+        tiles: [
+            'http://127.0.0.1:8989/api/v1/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
+        ],
+        tileSize: 1024,
+        minzoom: 10,
+        maxzoom: 20,
+        bounds: [120.50548, 32.0224, 120.55304, 32.0415],
+    })
+    map.addLayer({
+        id: 'ras',
+        type: 'raster',
+        source: 'mapRaster6',
+    })
+
+    // let name = '123'
+    // let time = '23092209'
+    // map.addSource(name, {
+    //     type: 'raster',
+    //     tiles: [tileServer + `/tile/raster/mzs/flood/${time}/{x}/{y}/{z}`],
+    //     tileSize: 256,
+    //     minzoom: 10,
+    //     maxzoom: 20,
+    //     bounds: [120.109, 31.823, 120.855, 32.102],
+    // })
+    // let rasterMin = -10
+    // let rasterMax = 15
+    // map.addLayer({
+    //     id: name,
+    //     type: 'raster',
+    //     source: name,
+    //     paint: {
+    //         'raster-color':'rgba(255, 0, 0, 1)',
+    //         'raster-color-mix': [rasterMax - rasterMin, 0, 0, 0],
+    //         'raster-opacity': 0.85,
+    //         'raster-color-range': [-30, 30],
+    //     },
+    // })
+
     // await layerAddFunction(map, '一级预警岸段')
     // await layerAddFunction(map, '二级预警岸段')
     // await layerAddFunction(map, '三级预警岸段')

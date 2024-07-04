@@ -41,7 +41,7 @@ public class DynamicDataSourceAspect {
         this.dynamicDataSource = dynamicDataSource;
     }
 
-    /**
+    /**+
      * 切换数据源
      */
 //    @Around("execution(* com.johnny.bank.service.resource.*.*(..))")
@@ -74,5 +74,4 @@ public class DynamicDataSourceAspect {
 
         return result;
     }
-
 }

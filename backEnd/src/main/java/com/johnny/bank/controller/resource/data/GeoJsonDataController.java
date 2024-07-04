@@ -105,7 +105,7 @@ public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService
         }
     }
 
-    @GetMapping(value="/jsonStr/id/{id}", produces = "text/plain;charset=UTF-8")
+    @GetMapping(value="/jsonStr/id/{id}", produces = "application/json;charset=utf-8")
     public String getGeoJsonById(@PathVariable String id) throws IOException {
         GeoJsonData geoJsonData = igeoDataService.findById(dataNode, id);
         String filePath = geoJsonData.getPath();
@@ -113,7 +113,7 @@ public class GeoJsonDataController extends GeoDataController<IGeoJsonDataService
         return igeoDataService.readGeoJsonFile(filePath);
     }
 
-    @GetMapping(value="/jsonStr/name/{name}/newest", produces = "text/plain;charset=UTF-8")
+    @GetMapping(value="/jsonStr/name/{name}/newest", produces = "application/json;charset=utf-8")
     public ResponseEntity<String> getNewestGeoJsonByName(@PathVariable String name) throws IOException {
         GeoJsonData geoJsonData = igeoDataService.findNewestByName(dataNode, name);
         if(geoJsonData == null) {

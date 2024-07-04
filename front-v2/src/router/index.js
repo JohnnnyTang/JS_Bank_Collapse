@@ -15,9 +15,10 @@ const routes = [
     },
     {
         path: '/knowledgeStore',
-        redirect: '/knowledgeStore/history',
-        component: () => import('../views/KnowledgeStoreView.vue'),
-        // component: () => import('../components/knowStore/TempKnow.vue'),
+        // redirect: '/knowledgeStore/history',
+        // component: () => import('../views/KnowledgeStoreView.vue'),
+        redirect: '/knowledgeStore/home',
+        component: () => import('../components/knowStore/TempKnow.vue'),
         children: [
             {
                 path: 'home',
@@ -49,7 +50,10 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        redirect: '/dataVisual'
+        // redirect: '/dataVisual'
+        redirect: _ => {
+            return localStorage.getItem('token') ? '/dataVisual' : '/login';
+        }
         // component: () => import("../views/BankMainView.vue")
     },
     {
@@ -81,6 +85,10 @@ const routes = [
             {
                 path: 'soilAnalysis',
                 component: () => import('../components/modelStore/views/SoilAnalysis2.vue'),
+            },
+            {
+                path: 'stabilityAnalysis2',
+                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
             },
             {
                 path: 'stabilityAnalysis',
@@ -119,6 +127,10 @@ const routes = [
         path: '/bankWarn',
         component: () => import('../views/BankRiskWarnView.vue')
     },
+    {
+        path: '/login',
+        component: () => import('../views/LoginView.vue')
+    },
 ]
 // 3、创建一个路由的对象
 const router = createRouter({
@@ -130,6 +142,19 @@ const router = createRouter({
     history: createWebHistory(),
     // 下面这个 可以写成ES6的简写 routers
     routes: routes,
+})
+
+router.beforeEach((to, from, next) => {
+    if (to.path === '/login') {
+        next()
+    } else {
+        const isLoggedIn = localStorage.getItem('token');
+        if (isLoggedIn) {
+            next();
+        } else {
+            next('/login');
+        }
+    }
 })
 
 export default router
