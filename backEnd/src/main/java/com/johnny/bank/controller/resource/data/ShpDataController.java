@@ -2,16 +2,14 @@ package com.johnny.bank.controller.resource.data;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.controller.resource.data.base.GeoDataController;
-import com.johnny.bank.model.resource.dataResource.RasterData;
 import com.johnny.bank.model.resource.dataResource.ShpData;
-import com.johnny.bank.service.resource.data.IShpDataService;
+import com.johnny.bank.service.resource.dataResource.IShpDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;

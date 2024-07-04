@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataNode extends BaseNode {
     String apiPrefix;
-//    @DBRef
+    //    @DBRef
     JSONObject usage;
     String bank;
     @Indexed

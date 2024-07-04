@@ -1,5 +1,6 @@
 package com.johnny.bank.model.resource.dataResource.base;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import java.sql.Timestamp;
 public class StaticInfoData {
     private String code; // id
     private String operateUser;
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Timestamp operateTime; // operate time || in time
     private int operateFlag;
     private String operateDesc;

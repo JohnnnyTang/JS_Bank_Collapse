@@ -1,16 +1,9 @@
 package com.johnny.bank.controller.resource.data.base;
 
 import com.johnny.bank.model.node.DataNode;
-import com.johnny.bank.model.resource.dataResource.ShpData;
-import com.johnny.bank.service.resource.data.base.IGeoDataService;
-import org.springframework.core.io.FileSystemResource;
+import com.johnny.bank.service.resource.dataResource.base.IGeoDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.xml.crypto.Data;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.http.HttpHeaders;
 
 /**
  * @projectName: backEnd

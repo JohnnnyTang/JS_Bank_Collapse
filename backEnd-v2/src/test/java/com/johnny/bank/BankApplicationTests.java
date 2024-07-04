@@ -6,7 +6,8 @@ import com.johnny.bank.model.resource.dataResource.SectionLineInfo;
 import com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IDeviceWarningRepo;
 import com.johnny.bank.service.node.impl.DataNodeService;
-import com.johnny.bank.service.resource.data.impl.StationInfoService;
+import com.johnny.bank.service.resource.dataSource.impl.StationInfoService;
+import com.johnny.bank.utils.DataNodeSyncUtilV2;
 import com.johnny.bank.utils.MailUtil;
 import com.johnny.bank.utils.SMSUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ class BankApplicationTests {
     @Qualifier("DeviceWarningRepo")
     @Autowired
     IDeviceWarningRepo deviceWarningRepo;
+
+
     @Value("${server.port}")
     int localServerPort;
 
@@ -99,6 +102,11 @@ void testUpdateDeviceWarn() {
     void testIpAndPort() throws UnknownHostException {
         System.out.println("ip: " + InetAddress.getLocalHost().getHostAddress());
         System.out.println("port: " + localServerPort);
+    }
+
+//    @Test
+    void testDataNodeSyncV2() {
+        DataNodeSyncUtilV2.SyncMonitorNodeOfTreeAndOrigin("Mzs");
     }
 
 }
