@@ -94,6 +94,7 @@ const routes = [
                 path: 'riskWarning',
                 component: () => import('../components/modelStore/views/RiskWarning.vue'),
             },
+            
         ]
     },
     {
