@@ -1,3 +1,5 @@
+import { ElNotification } from "element-plus";
+
 export default class CommonUtils {
     /*
     将大驼峰字符串添加间隔符并转换为小写，也就是转换为连字符
@@ -65,11 +67,20 @@ export default class CommonUtils {
                 "type": "FeatureCollection",
                 "features": []
             }
-            for(let item of staticInfoList) {
+            for (let item of staticInfoList) {
                 geoJsonRes["features"].push(this.staticInfoItem2GeoJsonFeature(item));
             }
         }
         console.log(geoJsonRes);
         return geoJsonRes;
+    }
+
+    static notice(type, title, msg) {
+        ElNotification({
+            type: type,
+            title: title,
+            message: msg,
+            offset: 100,
+        });
     }
 }
