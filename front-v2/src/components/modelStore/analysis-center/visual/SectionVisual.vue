@@ -72,10 +72,17 @@ export default defineComponent({
           xdata2.push(index * 160);
         });
         option = {
-          title: {
-            text: "地形剖面图",
-            left: "5%",
-          },
+          title: [
+            {
+              text: "地形剖面图",
+              left: "5%",
+            },
+            {
+              text: "坡比图",
+              left: "5%",
+              bottom: "50%",
+            },
+          ],
           // 提示框
           tooltip: {
             trigger: "axis",
@@ -134,7 +141,6 @@ export default defineComponent({
               type: "value",
               name: "坡比",
               splitLine: { show: false },
-              interval: 2,
               gridIndex: 1,
             },
           ],
@@ -223,7 +229,7 @@ export default defineComponent({
                       },
                     },
                     {
-                      yAxis: -40,     //填充区域下界
+                      yAxis: -40, //填充区域下界
                     },
                   ],
                 ],
@@ -265,6 +271,7 @@ export default defineComponent({
               animation: false,
               smooth: true,
               silent: true,
+              lineStyle: { color: "#0D7509" },
               markLine: {
                 symbol: ["none", "none"],
                 animation: false,
@@ -274,28 +281,10 @@ export default defineComponent({
                   type: "dotted",
                 },
                 label: { show: false },
-                data: [
-                  { yAxis: 10 },
-                  { yAxis: 8 },
-                  { yAxis: 6 },
-                  { yAxis: 4 },
-                  { yAxis: 2 },
-                  {
-                    yAxis: 0,
-                    lineStyle: {
-                      type: "solid",
-                    },
-                  },
-                  { yAxis: -10 },
-                  { yAxis: -8 },
-                  { yAxis: -6 },
-                  { yAxis: -4 },
-                  { yAxis: -2 },
-                ],
               },
-              areaStyle: {
-                origin: 0,
-              },
+              // areaStyle: {
+              //   origin: 0,
+              // },
             },
           ],
         };
@@ -318,6 +307,6 @@ export default defineComponent({
 <style lang="scss" scoped>
 .section {
   width: 900px;
-  height: 400px;
+  height: 700px;
 }
 </style>
