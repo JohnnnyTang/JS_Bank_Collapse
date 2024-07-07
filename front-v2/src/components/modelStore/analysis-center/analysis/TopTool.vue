@@ -42,6 +42,8 @@
       >
     </div>
 
+    <!-- <div class="draw-tool"></div> -->
+
     <el-dialog v-model="dialogAddData" width="1000px" title="添加数据">
       <add-data-dialog @returnData="returnData" v-if="dialogAddData" />
     </el-dialog>
@@ -117,7 +119,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .top-tool {
-  height: 50px;
+  height: 6vh;
   display: flex;
   // background: #d1e7ff;
   background: #abd5f8;
@@ -125,22 +127,24 @@ export default defineComponent({
   box-sizing: border-box;
   position: relative;
   color: #26f4f9;
+  align-items: center;
 
   .base-function {
+    display: flex;
+    align-items: center;
     margin-left: 70px;
     height: 100%;
-    line-height: 50px;
   }
 
   .btn-main {
     width: 8vw;
-    background-color: #11aee0;
+    background-color: #00afff;
     backdrop-filter: blur(8px);
     z-index: 3;
     border-radius: 6px;
     text-align: center;
     overflow: hidden;
-    height: 4.5vh;
+    height: 4vh;
     line-height: 6vh;
     letter-spacing: 0.1vw;
     font-size: calc(0.9vw + 0.7vh);
@@ -157,17 +161,28 @@ export default defineComponent({
     }
   }
 
+  .draw-tool {
+    width: 20%;
+    height: 5vh;
+    position: absolute;
+    right: 5%;
+    background: #0055e1;
+    display: flex;
+    align-items: center;
+  }
+
   .map-tool {
     height: 100%;
     position: absolute;
     left: 35%;
-    line-height: 50px;
+    display: flex;
+    align-items: center;
     .el-button {
       border: solid 1px rgba($color: #000000, $alpha: 0);
       box-sizing: border-box;
       font-size: calc(0.9vw + 0.4vh);
       font-weight: bold;
-      color: #0055E1;
+      color: #0055e1;
       // box-shadow: 0px 2px rgb(0, 225, 255);
       // text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
     }
