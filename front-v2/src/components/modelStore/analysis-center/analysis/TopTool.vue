@@ -42,6 +42,8 @@
       >
     </div>
 
+    <!-- <div class="draw-tool"></div> -->
+
     <el-dialog v-model="dialogAddData" width="1000px" title="添加数据">
       <add-data-dialog @returnData="returnData" v-if="dialogAddData" />
     </el-dialog>
@@ -136,7 +138,7 @@ export default defineComponent({
 
   .btn-main {
     width: 8vw;
-    background-color: #11aee0;
+    background-color: #00afff;
     backdrop-filter: blur(8px);
     z-index: 3;
     border-radius: 6px;
@@ -157,6 +159,16 @@ export default defineComponent({
       background: #1384f6;
       cursor: pointer;
     }
+  }
+
+  .draw-tool {
+    width: 20%;
+    height: 5vh;
+    position: absolute;
+    right: 5%;
+    background: #0055e1;
+    display: flex;
+    align-items: center;
   }
 
   .map-tool {
