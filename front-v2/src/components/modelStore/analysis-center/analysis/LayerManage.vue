@@ -232,13 +232,15 @@ export default defineComponent({
     color: white;
 
     .input {
-      height: 40px;
+      height: 18%;
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       background: rgba($color: #abadb3, $alpha: 0.5);
       line-height: 40px;
       font-size: 20px;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .content {
       padding: 0 10px;

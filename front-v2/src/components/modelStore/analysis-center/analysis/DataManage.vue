@@ -454,7 +454,7 @@ export default defineComponent({
     const checkStateHandle = async (key, text) => {
       const res = await checkState(key);
       if (res !== null && res.code === 0) {
-        console.log(res.data)
+        console.log(res.data);
         if (treeData.value[treeData.value.length - 1].id !== "") {
           treeData.value.push({
             id: "",
@@ -663,13 +663,15 @@ export default defineComponent({
     color: white;
 
     .input {
-      height: 40px;
+      height: 18%;
       border-top-left-radius: 8px;
       border-top-right-radius: 8px;
       background: rgba($color: #abadb3, $alpha: 0.5);
       line-height: 40px;
       font-size: 20px;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .content {

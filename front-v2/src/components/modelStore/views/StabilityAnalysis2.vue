@@ -344,14 +344,14 @@
 
     <div class="analysisCenter" v-show="showAnalysisCenter">
       <div class="background"></div>
-      <div
+      <!-- <div
         class="back"
         @click="
           showAnalysisCenter = !showAnalysisCenter;
           checky1 = true;
           checky2 = false;
         "
-      ></div>
+      ></div> -->
       <!-- <iframe id="inlineFrameExample" title="Inline Frame Example" width="100%" height="100%"
                 src="http://172.21.212.165:8050/#/analysis/16382174-13e3-4c18-aaa0-ddb90e7f4a7b">
             </iframe> -->

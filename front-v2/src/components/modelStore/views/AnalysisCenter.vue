@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+    <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" />
     <top-tool
       @returnFileList="returnFileList"
       @operateDraw="operateDraw"
@@ -37,6 +38,7 @@
 
 <script>
 import { defineComponent, ref, watch, onBeforeUnmount, onMounted } from "vue";
+import ModelTitleVue from "../ModelTitle.vue";
 import ModelRequest from "../modelApi.js";
 import TopTool from "../analysis-center/analysis/TopTool.vue";
 import DataManage from "../analysis-center/analysis/DataManage.vue";
@@ -44,7 +46,7 @@ import LayerManage from "../analysis-center/analysis/LayerManage.vue";
 import RightVisual from "../analysis-center/analysis/RightVisual.vue";
 
 export default defineComponent({
-  components: { TopTool, RightVisual, DataManage, LayerManage },
+  components: { ModelTitleVue, TopTool, RightVisual, DataManage, LayerManage },
   setup() {
     const skeletonFlag = ref(true);
     const layerList = ref([]);
@@ -160,7 +162,7 @@ export default defineComponent({
   .body {
     height: 100%;
     display: flex;
-    background: #89BBFF;
+    background: #89bbff;
     .left {
       width: 25%;
       height: 100%;
