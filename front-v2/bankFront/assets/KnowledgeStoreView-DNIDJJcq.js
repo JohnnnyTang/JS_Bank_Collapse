@@ -1,1 +1,0 @@
-import{_ as o,i as t,o as n,c as r,b as c}from"./index-Bdok3Q-i.js";const s={class:"bankKnowledge-container",ref:"knowledgeContainer"},a={__name:"KnowledgeStoreView",setup(_){return(d,i)=>{const e=t("router-view");return n(),r("div",s,[c(e)],512)}}},p=o(a,[["__scopeId","data-v-ffcddd32"]]);export{p as default};

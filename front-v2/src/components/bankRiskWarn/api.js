@@ -3,6 +3,32 @@ import axios from 'axios'
 const bankRiskWarnInstance = axios.create({
     baseURL: '/api'
 })
+bankRiskWarnInstance.interceptors.request.use(
+    config => {
+        const token = localStorage.getItem('token');
+        // const token = sessionStorage.getItem('token');
+        if (token) {
+            config.headers["token"] = token;
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
+bankRiskWarnInstance.interceptors.response.use(
+    response => {
+        if (response.data["msg"] === "token过期") {
+            ElMessage.error("用户认证过期，请重新登录");
+            router.push('/login');
+            return Promise.reject(response.data);
+        }
+        return response;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
 
 export class bankRiskWarn {
     static runProfileModelTest = (profileId) => {
