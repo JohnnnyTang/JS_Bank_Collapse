@@ -1,7 +1,7 @@
 package com.johnny.bank.controller.resource.data;
 
 import com.johnny.bank.model.resource.dataResource.BankImpData;
-import com.johnny.bank.service.resource.data.impl.BankImpDataService;
+import com.johnny.bank.service.resource.dataResource.impl.BankImpDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

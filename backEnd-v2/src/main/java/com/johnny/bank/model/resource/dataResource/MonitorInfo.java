@@ -1,6 +1,6 @@
 package com.johnny.bank.model.resource.dataResource;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.johnny.bank.model.resource.dataResource.base.StaticInfoData;
 import lombok.*;
 
@@ -16,7 +16,6 @@ import java.sql.Timestamp;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MonitorInfo extends StaticInfoData {
      private String stationCode;
      private String machineId;
@@ -25,7 +24,11 @@ public class MonitorInfo extends StaticInfoData {
      private Double longitude;
      private Double latitude;
      private Double elevation;
+     private Integer sectionId;
+     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
      private Timestamp inTime;
+     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
      private Timestamp begTime;
+     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
      private Timestamp endTime;
 }

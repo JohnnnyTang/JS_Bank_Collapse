@@ -1,7 +1,7 @@
 package com.johnny.bank.controller.resource.data;
 
 import com.johnny.bank.model.configuration.FlowData;
-import com.johnny.bank.service.resource.data.impl.GeoJsonDataServiceImpl;
+import com.johnny.bank.service.resource.dataResource.impl.GeoJsonDataServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;

@@ -2,7 +2,7 @@ package com.johnny.bank.controller.resource.data.base;
 
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.base.DetailMonitorInfo;
-import com.johnny.bank.service.resource.data.impl.DetailMonitorInfoService;
+import com.johnny.bank.service.resource.dataResource.impl.DetailMonitorInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

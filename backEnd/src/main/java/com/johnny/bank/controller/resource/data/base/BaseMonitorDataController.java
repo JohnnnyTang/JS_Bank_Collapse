@@ -2,7 +2,7 @@ package com.johnny.bank.controller.resource.data.base;
 
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.base.MonitorData;
-import com.johnny.bank.service.resource.data.impl.MonitorDataService;
+import com.johnny.bank.service.resource.dataResource.impl.MonitorDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

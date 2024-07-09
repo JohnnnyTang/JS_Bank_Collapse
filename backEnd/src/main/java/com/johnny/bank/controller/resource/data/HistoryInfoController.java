@@ -1,7 +1,7 @@
 package com.johnny.bank.controller.resource.data;
 
 import com.johnny.bank.model.resource.dataResource.CollapseHistory;
-import com.johnny.bank.service.resource.data.impl.CollapseInfoService;
+import com.johnny.bank.service.resource.dataResource.impl.CollapseInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

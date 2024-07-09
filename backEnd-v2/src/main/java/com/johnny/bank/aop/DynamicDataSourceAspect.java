@@ -51,9 +51,10 @@ public class DynamicDataSourceAspect {
         DataNode dataNode = (DataNode) args[0];
         String hashCode4JDBC = String.valueOf(dataNode.getApiPrefix().hashCode());
         if (!DataSourceContextHolder.containDataSourceKey(hashCode4JDBC)) {
-            DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+            DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
             dataSourceBuilder.url(dataNode.getApiPrefix());
-            dataSourceBuilder.driverClassName(datasourceDriverMapper.get((String) dataNode.getUsage().get("driver")));
+//            dataSourceBuilder.driverClassName(datasourceDriverMapper.get((String) dataNode.getUsage().get("driver")));
+            dataSourceBuilder.driverClassName(datasourceDriverMapper.get("postgresql"));
             if(dataNode.getUsage().containsKey("userName")) {
                 dataSourceBuilder.username((String) dataNode.getUsage().get("userName"));
             }

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.base.IMonitorDataRepoV2">
+    <resultMap id="gnssDataMap" type="com.johnny.bank.model.resource.dataResource.GnssData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="xMove" column="x_move"/>
+        <result property="yMove" column="y_move"/>
+        <result property="zMove" column="z_move"/>
+        <result property="movingAvg" column="avg"/>
+    </resultMap>
+    <resultMap id="inclinometerDataMap" type="com.johnny.bank.model.resource.dataResource.InclinometerData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="topMove" column="top_move"/>
+        <result property="middleMove" column="middle_move"/>
+        <result property="bottomMove" column="bottom_move"/>
+        <result property="topMovePerDay" column="top_move_24h"/>
+        <result property="middleMovePerDay" column="middle_move_24h"/>
+        <result property="bottomMovePerDay" column="bottom_move_24h"/>
+        <result property="topMoveAvg" column="top_move_avg"/>
+        <result property="middleMoveAvg" column="middle_move_avg"/>
+        <result property="bottomMoveAvg" column="bottom_move_avg"/>
+    </resultMap>
+    <resultMap id="manometerDataMap" type="com.johnny.bank.model.resource.dataResource.ManometerData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="frequency" column="zx"/>
+        <result property="temperature" column="wd"/>
+        <result property="height" column="swgc"/>
+    </resultMap>
+    <resultMap id="stressPileDataMap" type="com.johnny.bank.model.resource.dataResource.StressPileData">
+        <result property="stationId" column="station_id"/>
+        <result property="deviceId" column="machine_id_nnu"/>
+        <result property="deviceCode" column="machine_id"/>
+        <result property="measureTime" column="measure_time"/>
+        <result property="inTime" column="in_time"/>
+        <result property="topAngle" column="top_angle"/>
+        <result property="middleAngle" column="middle_angle"/>
+        <result property="bottomAngle" column="bottom_angle"/>
+        <result property="topPower" column="top_power"/>
+        <result property="middlePower" column="middle_power"/>
+        <result property="bottomPower" column="bottom_power"/>
+        <result property="topChange" column="top_change"/>
+        <result property="middleChange" column="middle_change"/>
+        <result property="bottomChange" column="bottom_change"/>
+        <result property="topChangeAvg" column="top_change_avg"/>
+        <result property="middleChangeAvg" column="middle_change_avg"/>
+        <result property="bottomChangeAvg" column="bottom_change_avg"/>
+    </resultMap>
+
+    <sql id="select-data">
+        select *
+        <if test="tableName == 'gnss_record'">
+            , round(avg(threed) OVER(ORDER BY measure_time
+                ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ), 2)
+                as avg
+        </if>
+        <if test="tableName == 'stresspile_record'">
+            , round( avg(top_change) OVER (ORDER BY measure_time ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ) ,2) as top_change_avg,
+            round( avg(middle_change) OVER (ORDER BY measure_time ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ) ,2) as middle_change_avg,
+            round( avg(bottom_change) OVER (ORDER BY measure_time ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ) ,2) as bottom_change_avg
+        </if>
+        <if test="tableName == 'manometer_record'">
+        </if>
+        <if test="tableName == 'inclinometer_record'">
+            , round(avg(top_move) OVER(ORDER BY measure_time ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ), 2) as top_move_avg,
+            round(avg(middle_move) OVER(ORDER BY measure_time ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ), 2) as middle_move_avg,
+            round(avg(bottom_move) OVER(ORDER BY measure_time ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ), 2) as bottom_move_avg
+        </if>
+        from ${tableName}
+        <where>
+            <if test="stationCode != null">
+                station_id = #{stationCode}
+            </if>
+            <if test="deviceId != null">
+                AND machine_id_nnu = #{deviceId}
+            </if>
+            <if test="begTime != null and endTime != null">
+                AND measure_time BETWEEN #{begTime} AND #{endTime}
+            </if>
+        </where>
+        <if test="rowLimit != null">
+            order by measure_time DESC LIMIT #{rowLimit}
+        </if>
+        ;
+    </sql>
+
+    <select id="getCount" resultType="integer">
+        SELECT COUNT(*) FROM ${tableName}
+        <where>
+            <if test="stationCode != null">
+                station_id = #{stationCode}
+            </if>
+            <if test="deviceId != null">
+                AND machine_id_nnu = #{deviceId}
+            </if>
+            <if test="begTime != null and endTime != null">
+                AND measure_time BETWEEN #{begTime} AND #{endTime}
+            </if>
+        </where>
+        ;
+    </select>
+
+    <select id="getGnssData" resultMap="gnssDataMap">
+        <include refid="select-data" />
+    </select>
+
+    <select id="getStressData" resultMap="stressPileDataMap">
+        <include refid="select-data" />
+    </select>
+
+    <select id="getManometerData" resultMap="manometerDataMap">
+        <include refid="select-data" />
+    </select>
+
+    <select id="getInclinometerData" resultMap="inclinometerDataMap">
+        <include refid="select-data" />
+    </select>
+
+    <select id="ifContinueUpdateOfDevice" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM ${tableName}
+            WHERE measure_time >= #{timeLimit}
+            AND machine_id_nnu = #{deviceId}
+        );
+    </select>
+
+</mapper>

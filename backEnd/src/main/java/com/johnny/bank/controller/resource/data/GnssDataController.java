@@ -2,7 +2,7 @@ package com.johnny.bank.controller.resource.data;
 
 import com.johnny.bank.controller.resource.data.base.BaseMonitorDataController;
 import com.johnny.bank.model.resource.dataResource.GnssData;
-import com.johnny.bank.service.resource.data.impl.MonitorDataService;
+import com.johnny.bank.service.resource.dataResource.impl.MonitorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;

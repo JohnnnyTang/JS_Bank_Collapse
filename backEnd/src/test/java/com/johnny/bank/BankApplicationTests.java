@@ -6,7 +6,7 @@ import com.johnny.bank.model.resource.dataResource.SectionLineInfo;
 import com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo;
 import com.johnny.bank.repository.resourceRepo.dataResourceRepo.IDeviceWarningRepo;
 import com.johnny.bank.service.node.impl.DataNodeService;
-import com.johnny.bank.service.resource.data.impl.StationInfoService;
+import com.johnny.bank.service.resource.dataResource.impl.StationInfoService;
 import com.johnny.bank.utils.MailUtil;
 import com.johnny.bank.utils.SMSUtil;
 import org.springframework.beans.factory.annotation.Autowired;
