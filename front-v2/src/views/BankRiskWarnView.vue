@@ -1541,31 +1541,33 @@ const addBankLineRiskLayer = (map, profileList) => {
 };
 
 onMounted(async () => {
-  await initPureScratchMap(mapContainer.value).then(async (map) => {
-    mapInstance = map;
-    // map.on('draw.create', function (e) {
-    //     sectionConfirmShow.value = true
-    //     let lineFeature = e.features[0]
-    //     sectionLineLabel.value =
-    //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
-    //         ',' +
-    //         lineFeature.geometry.coordinates[0][1].toFixed(6)
-    //     sectionLineLabelSec.value =
-    //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
-    //         ',' +
-    //         lineFeature.geometry.coordinates[1][1].toFixed(6)
-    //     let startWebMerCoord = convertToMercator(
-    //         lineFeature.geometry.coordinates[0],
-    //     )
-    //     let endWebMerCoord = convertToMercator(
-    //         lineFeature.geometry.coordinates[1],
-    //     )
-    //     StartPtX = startWebMerCoord[0]
-    //     StartPtY = startWebMerCoord[1]
-    //     EndPtX = endWebMerCoord[0]
-    //     EndPtY = endWebMerCoord[1]
-    //     return
-    // })
+    await axios.get('/api/data/monitorInfo')
+
+    await initPureScratchMap(mapContainer.value).then(async (map) => {
+        mapInstance = map
+        // map.on('draw.create', function (e) {
+        //     sectionConfirmShow.value = true
+        //     let lineFeature = e.features[0]
+        //     sectionLineLabel.value =
+        //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
+        //         ',' +
+        //         lineFeature.geometry.coordinates[0][1].toFixed(6)
+        //     sectionLineLabelSec.value =
+        //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
+        //         ',' +
+        //         lineFeature.geometry.coordinates[1][1].toFixed(6)
+        //     let startWebMerCoord = convertToMercator(
+        //         lineFeature.geometry.coordinates[0],
+        //     )
+        //     let endWebMerCoord = convertToMercator(
+        //         lineFeature.geometry.coordinates[1],
+        //     )
+        //     StartPtX = startWebMerCoord[0]
+        //     StartPtY = startWebMerCoord[1]
+        //     EndPtX = endWebMerCoord[0]
+        //     EndPtY = endWebMerCoord[1]
+        //     return
+        // })
 
     // map.addControl(new mapboxgl.NavigationControl(), 'top-left')
     // mapJumpToRiver(map)
@@ -1981,9 +1983,17 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+<<<<<<< HEAD
   useMapStore().getMap().remove();
   useMapStore().destroyMap();
 });
+=======
+    if (useMapStore().getMap()) {
+        useMapStore().getMap().remove()
+        useMapStore().destroyMap()
+    }
+})
+>>>>>>> 5f07516def664e639efa40ea4cad551eb2aa7655
 </script>
 
 <style lang="scss" scoped>
@@ -2545,8 +2555,27 @@ div.risk-warn-container {
         font-family: "Microsoft YaHei";
         font-weight: 700;
         user-select: none;
+<<<<<<< HEAD
         margin-left: 2vw;
       }
+=======
+        border: solid calc(0.1vh + 0.1vw) rgb(82, 163, 235);
+        border-radius: calc(0.1vh + 0.3vw);
+
+        .title {
+            border-bottom: rgb(41, 40, 40) 1px solid;
+            font-weight: bold;
+            font-size: calc(0.7vw + 0.5vh);
+            line-height: 3vh;
+            width: 100%;
+
+            .iconn {
+                :hover {
+                    cursor: pointer;
+                }
+            }
+        }
+>>>>>>> 5f07516def664e639efa40ea4cad551eb2aa7655
     }
   }
 

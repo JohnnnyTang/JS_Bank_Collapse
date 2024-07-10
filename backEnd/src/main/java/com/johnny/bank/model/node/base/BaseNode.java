@@ -23,7 +23,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class BaseNode {
     @Id
     String id;
-//    String nodeType;
+    //    String nodeType;
     String name;
     String auth;
     String category;

@@ -1,9 +1,9 @@
 <template>
     <div class="bankKnowledge-container" ref="knowledgeContainer">
-        <!-- <VerticalNavVue /> -->
+        <VerticalNavVue />
         <!-- <div class="selector-container"></div> -->
         <router-view></router-view>
-        <!-- <ScrollHistoryVue :knowledgeContainerWidth="knowledgeContainerWidth" ref="scrollDom"/> -->
+        <ScrollHistoryVue :knowledgeContainerWidth="knowledgeContainerWidth" ref="scrollDom"/>
         <!-- <bottomWaveVue /> -->
     </div>
 </template>
@@ -12,7 +12,7 @@
 import { ref, onMounted } from 'vue';
 import bottomWaveVue from '../components/knowStore/BottomWave.vue';
 import VerticalNavVue from '../components/knowStore/VerticalNav.vue';
-
+import axios from 'axios';
 // const knowledgeContainerWidth = ref(0)
 // const knowledgeContainer = ref();
 // const scrollDom = ref(null)
@@ -20,6 +20,7 @@ import VerticalNavVue from '../components/knowStore/VerticalNav.vue';
 // onMounted(async () => {
 //     knowledgeContainerWidth.value = knowledgeContainer.value.clientWidth;
 // });
+
 
 </script>
 

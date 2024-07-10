@@ -37,10 +37,13 @@ public class QuartzListener implements ApplicationListener<ContextRefreshedEvent
         } catch (SchedulerException e) {
             log.info(e.getMessage(), e.toString());
         }
+//        System.out.println("not start quartz");
     }
+
     // 初始注入scheduler
     @Bean
-    public Scheduler scheduler() throws SchedulerException{
+    public Scheduler scheduler() throws SchedulerException {
+//        return StdSchedulerFactory.getDefaultScheduler();
         SchedulerFactory schedulerFactoryBean = new StdSchedulerFactory();
         return schedulerFactoryBean.getScheduler();
     }

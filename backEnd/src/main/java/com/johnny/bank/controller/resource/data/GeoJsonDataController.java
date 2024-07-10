@@ -3,7 +3,7 @@ package com.johnny.bank.controller.resource.data;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.controller.resource.data.base.GeoDataController;
 import com.johnny.bank.model.resource.dataResource.GeoJsonData;
-import com.johnny.bank.service.resource.data.IGeoJsonDataService;
+import com.johnny.bank.service.resource.dataResource.IGeoJsonDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;

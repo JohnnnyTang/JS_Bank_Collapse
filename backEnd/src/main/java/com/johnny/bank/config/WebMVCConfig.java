@@ -1,10 +1,12 @@
 package com.johnny.bank.config;
 
+import com.johnny.bank.model.configuration.JWTInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -40,4 +42,11 @@ public class WebMVCConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/api/v1/static/**").addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
     }
 
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new JWTInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/api/v1/user/**")
+                .excludePathPatterns("/api/v1/tile/**")
+                .excludePathPatterns("/api/v1/proxy/**");
+    }
 }

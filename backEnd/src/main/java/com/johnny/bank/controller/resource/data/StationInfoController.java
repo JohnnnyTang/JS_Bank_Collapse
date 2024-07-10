@@ -3,7 +3,7 @@ package com.johnny.bank.controller.resource.data;
 import com.johnny.bank.controller.resource.data.base.BaseStaticInfoController;
 import com.johnny.bank.model.node.DataNode;
 import com.johnny.bank.model.resource.dataResource.StationInfo;
-import com.johnny.bank.service.resource.data.impl.StationInfoService;
+import com.johnny.bank.service.resource.dataResource.impl.StationInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;

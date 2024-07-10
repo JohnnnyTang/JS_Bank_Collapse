@@ -1,7 +1,7 @@
 package com.johnny.bank.controller.resource.data;
 
 import com.johnny.bank.model.resource.dataResource.DeviceWarning;
-import com.johnny.bank.service.resource.data.impl.DeviceWarningService;
+import com.johnny.bank.service.resource.dataResource.impl.DeviceWarningService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

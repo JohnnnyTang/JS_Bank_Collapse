@@ -19,6 +19,9 @@ public interface IBaseNodeRepo<T extends BaseNode> extends MongoRepository<T, St
     @Query("{'category' : ?0 , 'name' : ?1}")
     T getNodeByCategoryAndName(String category, String name);
 
+    @Query("{'category' : ?0}")
+    List<T> getNodeByCategory(String category);
+
     @Query("{'path': {$regex:?0}}")
     List<T> getNodeChildByPath(String nodePath);
 

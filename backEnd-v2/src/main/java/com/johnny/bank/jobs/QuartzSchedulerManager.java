@@ -1,5 +1,6 @@
 package com.johnny.bank.jobs;
 
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -17,6 +18,7 @@ import java.util.Date;
  * @version: 1.0
  */
 @Component("QuartzManager")
+@Slf4j
 public class QuartzSchedulerManager {
     @Autowired
     @Lazy
@@ -24,8 +26,10 @@ public class QuartzSchedulerManager {
 
     // 开始执行定时器
     public void startJob() throws SchedulerException {
+        log.info("start job here");
 //        startTestJob(scheduler);
-        startGnssWarningJob(scheduler);
+        startTestRunningJob(scheduler);
+//        startGnssWarningJob(scheduler);
         scheduler.start();
     }
 
@@ -98,6 +102,7 @@ public class QuartzSchedulerManager {
         // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("testJob", "tesGroup")
                 .withSchedule(cronScheduleBuilder).build();
+
         scheduler.scheduleJob(jobDetail, cronTrigger);
     }
 
@@ -105,7 +110,7 @@ public class QuartzSchedulerManager {
         // 通过JobBuilder构建JobDetail实例，JobDetail规定其job只能是实现Job接口的实例
         JobDetail jobDetail = JobBuilder.newJob(TestRunningJob.class).withIdentity("testJob", "group1").build();
         // 基于表达式构建触发器
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/55 * * * ?");
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/51 * * * ?");
         // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("testJob", "tesGroup")
                 .withSchedule(cronScheduleBuilder).build();
