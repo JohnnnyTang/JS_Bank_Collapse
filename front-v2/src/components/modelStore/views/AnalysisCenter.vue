@@ -1,29 +1,55 @@
 <template>
-  <div class="main">
+  <div class="all">
     <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" />
-    <top-tool
-      @returnFileList="returnFileList"
-      @operateDraw="operateDraw"
-      @analyse="analyse"
-    ></top-tool>
-    <div class="body">
-      <div class="left" ref="left">
-        <data-manage
-          class="top"
-          ref="dataManage"
-          @operateLayer="operateLayer"
-        ></data-manage>
-        <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
-        <layer-manage
-          class="bottom"
-          ref="layerManage"
-          :layerList="layerList"
-          @closeLayer="closeLayer"
-          @hideLayer="hideLayer"
-          @moveLayer="moveLayer"
-          v-else
-        ></layer-manage>
-        <div class="left-resize" ref="leftResize"></div>
+
+    <div class="model-content-container">
+      <div class="model-item-container">
+        <div class="model-choice">
+          <div class="basemap-radio-container">
+            <input
+              type="radio"
+              id="radio-1"
+              name="tabs"
+              :checked="checky1"
+              @click="radio1Click()"
+            />
+            <label class="tab" for="radio-1">近岸动力分析</label>
+            <input type="radio" id="radio-2" name="tabs" :checked="checky2" />
+            <label class="tab" for="radio-2">近岸演变分析</label>
+            <span class="glider"></span>
+          </div>
+        </div>
+        <div class="main-page">
+          <div class="user-react">
+            <div class="title">
+              <div class="title-icon uricon"></div>
+              <div class="title-text">模型配置</div>
+            </div>
+            <top-tool
+              @returnFileList="returnFileList"
+              @operateDraw="operateDraw"
+              @analyse="analyse"
+              @uploadHandle="drawHandle"
+            ></top-tool>
+          </div>
+          <data-manage
+            class="top"
+            ref="dataManage"
+            @operateLayer="operateLayer"
+          ></data-manage>
+          <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
+          <layer-manage
+            class="bottom"
+            ref="layerManage"
+            :layerList="layerList"
+            @closeLayer="closeLayer"
+            @hideLayer="hideLayer"
+            @moveLayer="moveLayer"
+            v-else
+          ></layer-manage>
+        </div>
+      
+        <!-- <div class="left-resize" ref="leftResize"></div> -->
       </div>
       <el-skeleton :rows="5" animated v-if="skeletonFlag" />
       <right-visual
@@ -44,17 +70,20 @@ import TopTool from "../analysis-center/analysis/TopTool.vue";
 import DataManage from "../analysis-center/analysis/DataManage.vue";
 import LayerManage from "../analysis-center/analysis/LayerManage.vue";
 import RightVisual from "../analysis-center/analysis/RightVisual.vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   components: { ModelTitleVue, TopTool, RightVisual, DataManage, LayerManage },
   setup() {
     const skeletonFlag = ref(true);
     const layerList = ref([]);
-    const leftResize = ref();
-    const left = ref();
     const rightMap = ref();
     const dataManage = ref();
     const layerManage = ref();
+
+    const checky1 = ref(false);
+    const checky2 = ref(true);
+    const router = useRouter();
 
     let eventSource;
 
@@ -127,6 +156,10 @@ export default defineComponent({
       await dataManage.value.addAnalyse(val);
     };
 
+    const radio1Click = () => {
+      router.push("/modelStore/stabilityAnalysis");
+    };
+
     onMounted(async () => {
       const res = await ModelRequest.getLayersInfo(import.meta.env.VITE_APP_ROUTER_ID);
       if (res != null && res.code === 0) {
@@ -136,8 +169,6 @@ export default defineComponent({
     });
 
     return {
-      leftResize,
-      left,
       rightMap,
       returnFileList,
       dataManage,
@@ -151,42 +182,14 @@ export default defineComponent({
       skeletonFlag,
       layerList,
       moveLayer,
+      checky1,
+      checky2,
+      radio1Click,
     };
   },
 });
 </script>
 
-<style lang="scss" scoped>
-.main {
-  height: calc(100% - 5rem);
-  .body {
-    height: 100%;
-    display: flex;
-    background: #89bbff;
-    .left {
-      width: 25%;
-      height: 100%;
-      position: relative;
-      flex-shrink: 0;
-      flex-grow: 0;
-      .left-resize {
-        position: absolute;
-        width: 5px;
-        height: 100%;
-        top: 0;
-        right: 0;
-        cursor: col-resize;
-      }
-      .top {
-        height: 45%;
-      }
-      .bottom {
-        height: 45%;
-      }
-    }
-    .right {
-      width: 75%;
-    }
-  }
-}
+<style lang="scss">
+@import "../StabilityAnalysis.scss";
 </style>

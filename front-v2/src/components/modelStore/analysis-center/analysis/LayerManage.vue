@@ -1,11 +1,11 @@
 <template>
   <div class="layer-manage">
-    <div class="bottom-resize"></div>
-    <div class="layer-manage-body">
-      <div class="input">
-        <strong class="title-text">图层管理</strong>
+    <div class="layer-panel">
+      <div class="title">
+        <div class="title-icon lpicon"></div>
+        <div class="title-text">图层面板</div>
       </div>
-      <div class="content">
+      <div class="lp-content">
         <div class="scroll">
           <el-scrollbar>
             <div>
@@ -17,7 +17,7 @@
                 @node-drop="dragHandle"
               >
                 <template #default="{ data }">
-                  <div class="custom">
+                  <div class="custom" style="width: 100%">
                     <el-checkbox
                       v-model="data.flag"
                       size="large"
@@ -211,112 +211,26 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .layer-manage {
-  position: relative;
-  padding: 5px;
-  .bottom-resize {
-    height: 5px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    cursor: row-resize;
+  
+  .custom {
+    position: relative;
     width: 100%;
-  }
-  .layer-manage-body {
-    height: 100%;
-    border-radius: 8px;
-    background: #111845a6;
-    box-sizing: border-box;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgb(23, 32, 90);
-    border: 2px solid #10cad3;
-    color: white;
-
-    .input {
-      height: 18%;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      background: rgba($color: #abadb3, $alpha: 0.5);
-      line-height: 40px;
-      font-size: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .content {
-      padding: 0 10px;
-      height: calc(100% - 40px);
-
-      .scroll {
-        height: 100%;
-        :deep() .el-scrollbar__wrap {
-          overflow-x: hidden;
-        }
-        :deep().el-scrollbar__bar.is-horizontal {
-          display: none;
-        }
-
-        .custom {
-          position: relative;
-          width: 100%;
-          .el-checkbox {
-            width: 100%;
-            :deep() .el-checkbox__label {
-              width: calc(100% - 60px);
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              color: #36e3db;
-              line-height: 5vh;
-            }
-          }
-
-          .close {
-            position: absolute;
-            right: 10px;
-            top: 13px;
-          }
-        }
-        .el-tree {
-          width: 100%;
-          background: none;
-
-          :deep()
-            .el-tree--highlight-current
-            .el-tree-node.is-current
-            > .el-tree-node__content {
-            background-color: rgba(17, 24, 69, 0.5);
-          }
-
-          :deep() .el-tree-node:focus > .el-tree-node__content {
-            background-color: rgba(17, 24, 69, 0.5);
-          }
-
-          :deep().el-tree-node__content:active {
-            background-color: rgba(17, 24, 69, 0.5);
-          }
-
-          :deep().el-tree-node__content:hover {
-            background-color: rgba(17, 24, 69, 0.5);
-          }
-          :deep() .el-tree-node__content {
-            height: 40px;
-            width: 100%;
-          }
-          :deep() .el-tree-node__label {
-            width: 100%;
-            overflow: hidden;
-          }
-        }
+    .el-checkbox {
+      width: 100%;
+      :deep() .el-checkbox__label {
+        width: calc(100% - 60px);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: #36e3db;
+        line-height: 5vh;
       }
     }
-    .bottom {
-      height: 40px;
-      margin-top: 10px;
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
-      background: rgba($color: #abadb3, $alpha: 0.5);
-      line-height: 40px;
-      font-size: 20px;
+
+    .close {
+      position: absolute;
+      right: 10px;
+      top: 13px;
     }
   }
 }

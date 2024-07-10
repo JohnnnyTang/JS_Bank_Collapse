@@ -1,4 +1,6 @@
 import axios from "axios";
+import utils from "@/utils/CommonUtils";
+const { notice } = utils;
 
 const requestList = new Set();
 
@@ -29,7 +31,7 @@ ModelInstance.interceptors.response.use(
 
 ModelInstance.interceptors.request.use((config) => {
   //const token = getToken();
-  const token = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJuYW1lIjoi566h55CG5ZGYIiwiZXhwIjoxNzIwMjUwNTAzLCJlbWFpbCI6Im5ocmlfYWRtaW5AMTYzLmNvbSJ9.O2_JJzyg2825Z4UWYVjC-lNqbeN5fGXN77Huae8p7CrhUAVya0TSRGdtyWU_A5asxSX8gNrwZaLuxDGVLRJRDQ"
+  const token = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJuYW1lIjoi566h55CG5ZGYIiwiaWQiOm51bGwsImV4cCI6MTcyMDc2NzI5MSwiZW1haWwiOiJuaHJpX2FkbWluQDE2My5jb20ifQ.-Gy7Ec6cNKz1E3LcQy3pBkqzWqsZSwm9qlSXZvQX1QUPJtCofuB6J1uNlX70rwfmxsS2yRbRPXZq3uerOyjm3A"
   const flag = config.headers["debounce"];
   (config.headers.Authorization = `Bearer ${token}`),
     (config.cancelToken = new axios.CancelToken((e) => {

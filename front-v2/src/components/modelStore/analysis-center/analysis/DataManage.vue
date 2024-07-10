@@ -1,32 +1,28 @@
 <template>
   <div class="data-manage">
-    <div class="data-manage-body">
-      <div class="input box"><strong>数据管理</strong></div>
-      <div class="content">
+    <div class="data-panel" style="height: 40vh">
+      <div class="title">
+        <div class="title-icon dpicon"></div>
+        <div class="title-text">数据面板</div>
+      </div>
+      <div class="dp-content" style="height: 32vh">
         <el-skeleton :rows="5" animated v-if="skeletonFlag" />
         <div class="scroll" v-else>
           <el-scrollbar>
             <el-tree
+              style="overflow: auto"
               :data="treeData"
               :props="defaultProps"
               @node-contextmenu="rightClick"
               default-expand-all
             >
               <template #default="{ data }">
-                <div class="custom">
-                  <div class="icon">
-                    <el-icon
-                      v-if="data.flag"
-                      :color="data.label == '分析结果集' ? '#E1E1E1' : ''"
-                      ><FolderOpened
-                    /></el-icon>
-                    <el-icon v-else><Document /></el-icon>
-                  </div>
+                <div class="custom-tree-node" style="width: 100%">
                   <div class="text">
-                    <strong
+                    <span
                       v-if="data.flag"
                       :style="data.label == '分析结果集' ? 'color:#E1E1E1' : ''"
-                      >{{ data.label }}</strong
+                      >{{ data.label }}</span
                     >
                     <span v-else>{{ data.label }}</span>
                   </div>
@@ -595,6 +591,7 @@ export default defineComponent({
         });
       }
       const analyticData = await getAnalysisResult(id);
+      console.log(analyticData)
       if (analyticData != null && data.code === 0) {
         if (analyticData.data.length > 0) {
           treeData.value.push({
@@ -651,105 +648,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .data-manage {
-  padding: 5px;
-  .data-manage-body {
-    height: 100%;
-    border-radius: 8px;
-    background: #111845a6;
-    box-sizing: border-box;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgb(23, 32, 90);
-    border: 2px solid #10cad3;
-    color: white;
 
-    .input {
-      height: 18%;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      background: rgba($color: #abadb3, $alpha: 0.5);
-      line-height: 40px;
-      font-size: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .content {
-      padding: 0 10px;
-      height: calc(100% - 40px);
-      .scroll {
-        height: 100%;
-        :deep() .el-scrollbar__wrap {
-          overflow-x: hidden;
-        }
-        :deep().el-scrollbar__bar.is-horizontal {
-          display: none;
-        }
-        .el-tree {
-          width: 100%;
-          background: none;
-          color: #36e3db;
-          :deep()
-            .el-tree--highlight-current
-            .el-tree-node.is-current
-            > .el-tree-node__content {
-            background-color: transparent;
-          }
-
-          :deep() .el-tree-node:focus > .el-tree-node__content {
-            background-color: transparent;
-          }
-
-          :deep().el-tree-node__content:active {
-            background-color: transparent;
-          }
-
-          :deep().el-tree-node__content:hover {
-            background-color: rgba(17, 24, 69, 0.5);
-          }
-
-          :deep() .el-tree-node__content {
-            height: 40px;
-            width: 100%;
-          }
-          :deep() .el-tree-node__children {
-            .el-tree-node__content {
-              width: calc(100% - 18px);
-              overflow: hidden;
-            }
-          }
-          :deep() .el-tree-node__label {
-            width: 100%;
-            overflow: hidden;
-          }
-        }
-        .custom {
-          display: flex;
-          .icon {
-            width: 15px;
-            margin-top: 12px;
-            margin-right: 5px;
-          }
-          .text {
-            line-height: 40px;
-            width: calc(100% - 20px);
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-          }
-        }
-      }
-    }
-    .bottom {
-      height: 40px;
-      margin-top: 10px;
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
-      background: rgba($color: #abadb3, $alpha: 0.5);
-      line-height: 40px;
-      font-size: 20px;
-    }
-  }
   .right-menu {
     z-index: 1;
     position: absolute;

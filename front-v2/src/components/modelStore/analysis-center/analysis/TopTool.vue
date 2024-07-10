@@ -1,12 +1,51 @@
 <template>
   <div class="top-tool">
-    <div class="base-function">
-      <div class="btn-back" @click="backToStability"></div>
-      <el-button text @click="dialogAddData = true" class="btn-main">添加数据</el-button>
-      <el-button text @click="dialogAnalyse = true" class="btn-main">模型计算</el-button>
+    <div class="buttons">
+      <div class="button" @click="dialogAddData = true">加载数据</div>
+      <div class="button" @click="dialogAnalyse = true">模型计算</div>
+      <el-dropdown popper-class="draw-popper">
+        <div class="button btn-draw">添加断面</div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="sectionClick">绘制</el-dropdown-item>
+            <el-dropdown-item>
+              <el-upload
+                ref="uploadSectionRef"
+                :limit="1"
+                :show-file-list="false"
+                :on-change="uploadSection"
+                accept=".json,.geojson"
+                action=""
+                :auto-upload="false"
+                >上传</el-upload
+              ></el-dropdown-item
+            >
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+      <el-dropdown popper-class="draw-popper">
+        <div class="button btn-draw">添加区域</div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item @click="regionClick">绘制</el-dropdown-item>
+            <el-dropdown-item>
+              <el-upload
+                ref="uploadRegionRef"
+                :limit="1"
+                :show-file-list="false"
+                :on-change="uploadRegion"
+                accept=".json,.geojson"
+                action=""
+                :auto-upload="false"
+                >上传</el-upload
+              ></el-dropdown-item
+            >
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
 
-    <div class="map-tool">
+    <!-- <div class="map-tool">
       <el-dropdown popper-class="draw-popper">
         <span class="menu-add">
           <svg
@@ -77,7 +116,7 @@
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-    </div>
+    </div> -->
 
     <!-- <div class="draw-tool"></div> -->
 
@@ -98,7 +137,7 @@ import AnalyseDialog from "./AnalyseDialog.vue";
 import { useRouter } from "vue-router";
 export default defineComponent({
   components: { AddDataDialog, AnalyseDialog },
-  emits: ["returnFileList", "operateDraw", "analyse"],
+  emits: ["returnFileList", "operateDraw", "analyse", "uploadHandle"],
   setup(_, context) {
     const router = useRouter();
 
@@ -148,6 +187,56 @@ export default defineComponent({
       router.push("/modelStore/stabilityAnalysis");
     };
 
+    const uploadSection = (file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const geojson = JSON.parse(e.target.result);
+          context.emit("uploadHandle", {
+            geoJson: geojson,
+            visualType: "geoJsonLine",
+            fileName: file.name,
+          });
+
+          uploadSectionRef.value.clearFiles();
+        } catch (error) {
+          console.error("Error parsing GeoJSON:", error);
+        }
+      };
+      reader.readAsText(file.raw, "UTF-8");
+    };
+
+    const uploadRegion = (file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const geojson = JSON.parse(e.target.result);
+          context.emit("uploadHandle", {
+            geoJson: geojson,
+            visualType: "geoJsonPolygon",
+            fileName: file.name,
+          });
+
+          uploadRegionRef.value.clearFiles();
+        } catch (error) {
+          console.error("Error parsing GeoJSON:", error);
+        }
+      };
+      reader.readAsText(file.raw, "UTF-8");
+    };
+
+    // const handleExceed = (files) => {
+    //   upload.value.clearFiles(); // Assuming `upload` is defined elsewhere
+    //   const file = files[0];
+    //   file.uid = genFileId();
+    //   upload.value.handleStart(file);
+    //   submitUpload();
+    // };
+
+    // const submitUpload = () => {
+    //   upload.value.submit();
+    // };
+
     return {
       state,
       dialogAddData,
@@ -157,6 +246,9 @@ export default defineComponent({
       dialogAnalyse,
       analyse,
       backToStability,
+      uploadSectionRef,
+      uploadSection,
+      uploadRegion,
     };
   },
 });
@@ -164,73 +256,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .top-tool {
-  height: 6vh;
-  display: flex;
-  // background: #d1e7ff;
-  background: rgb(140, 213, 247);
-  border-bottom: solid 0.5px #dcdfe6;
-  box-sizing: border-box;
-  position: relative;
-  color: #26f4f9;
-  align-items: center;
-
-  .base-function {
-    display: flex;
-    align-items: center;
-    margin-left: 2%;
-    height: 100%;
-
-    .btn-back {
-      width: 3vh;
-      height: 3vh;
-      background-size: contain;
-      background-image: url("/back.png");
-      z-index: 11;
-      margin-right: 2vw;
-
-      &:hover {
-        cursor: pointer;
-        transform: scale(1.03);
-        transition: 500ms;
-      }
-    }
-
-    .btn-main {
-      width: 8vw;
-      background-color: #00afff;
-      backdrop-filter: blur(8px);
-      z-index: 3;
-      border-radius: 6px;
-      text-align: center;
-      overflow: hidden;
-      height: 4vh;
-      line-height: 6vh;
-      letter-spacing: 0.1vw;
-      font-size: calc(0.9vw + 0.7vh);
-      font-weight: bold;
-      // background-color: #2688f8;
-      color: #ffffff;
-      text-align: center;
-      box-shadow: 2px 3px 3px -2px rgb(0, 47, 117);
-
-      &:hover {
-        transform: scale(1.05);
-        background: #1384f6;
-        cursor: pointer;
-      }
-    }
-  }
-
-  .draw-tool {
-    width: 20%;
-    height: 5vh;
-    position: absolute;
-    right: 5%;
-    background: #0055e1;
-    display: flex;
-    align-items: center;
-  }
-
   .map-tool {
     height: 100%;
     position: absolute;
@@ -246,23 +271,6 @@ export default defineComponent({
       color: #0055e1;
       // box-shadow: 0px 2px rgb(0, 225, 255);
       // text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
-    }
-
-    :deep(.el-dropdown) {
-      border: solid 1px rgba($color: #000000, $alpha: 0);
-      box-sizing: border-box;
-      font-size: calc(0.9vw + 0.4vh);
-      font-weight: bold;
-      color: rgb(2, 51, 124);
-      display: flex;
-      align-items: middle;
-      margin: 1vw;
-
-      .menu-add {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-      }
     }
   }
 
@@ -284,7 +292,7 @@ export default defineComponent({
       padding: 10px;
       margin: 0;
       background: #125a9d;
-      
+
       .el-dialog__title {
         color: white;
         font-weight: bold;

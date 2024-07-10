@@ -1,6 +1,10 @@
 <template>
   <div class="right-visual">
-    <div ref="container" class="container"></div>
+    <div class="main">
+      <div class="map-container">
+        <div ref="container" class="container"  id="map"></div>
+      </div>
+    </div>
     <el-dialog v-model="chartVisual" width="900px" id="chart" title="可视化结果">
       <chart-visual :chartVisualInfo="chartVisualInfo"></chart-visual>
     </el-dialog>
@@ -415,15 +419,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .right-visual {
-  height: calc(100% - 10px);
-  width: 100%;
-  position: relative;
-  padding: 5px;
-  .container {
-    height: 100%;
-    width: 100%;
-    border-radius: 8px;
-  }
+
   :deep() .el-dialog {
     padding: 0;
 
