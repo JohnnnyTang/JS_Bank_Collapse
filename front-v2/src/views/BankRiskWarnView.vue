@@ -1983,17 +1983,11 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-<<<<<<< HEAD
-  useMapStore().getMap().remove();
-  useMapStore().destroyMap();
-});
-=======
     if (useMapStore().getMap()) {
         useMapStore().getMap().remove()
         useMapStore().destroyMap()
     }
 })
->>>>>>> 5f07516def664e639efa40ea4cad551eb2aa7655
 </script>
 
 <style lang="scss" scoped>
@@ -2555,10 +2549,6 @@ div.risk-warn-container {
         font-family: "Microsoft YaHei";
         font-weight: 700;
         user-select: none;
-<<<<<<< HEAD
-        margin-left: 2vw;
-      }
-=======
         border: solid calc(0.1vh + 0.1vw) rgb(82, 163, 235);
         border-radius: calc(0.1vh + 0.3vw);
 
@@ -2575,7 +2565,6 @@ div.risk-warn-container {
                 }
             }
         }
->>>>>>> 5f07516def664e639efa40ea4cad551eb2aa7655
     }
   }
 
