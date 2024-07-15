@@ -27,7 +27,7 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/device/, ''),
             },
-            '/model': {
+            '/model/': {
                 target: 'http://223.2.36.49:8700/',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),

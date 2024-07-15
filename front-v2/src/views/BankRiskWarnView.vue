@@ -1541,33 +1541,33 @@ const addBankLineRiskLayer = (map, profileList) => {
 };
 
 onMounted(async () => {
-    await axios.get('/api/data/monitorInfo')
+  await axios.get("/api/data/monitorInfo");
 
-    await initPureScratchMap(mapContainer.value).then(async (map) => {
-        mapInstance = map
-        // map.on('draw.create', function (e) {
-        //     sectionConfirmShow.value = true
-        //     let lineFeature = e.features[0]
-        //     sectionLineLabel.value =
-        //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
-        //         ',' +
-        //         lineFeature.geometry.coordinates[0][1].toFixed(6)
-        //     sectionLineLabelSec.value =
-        //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
-        //         ',' +
-        //         lineFeature.geometry.coordinates[1][1].toFixed(6)
-        //     let startWebMerCoord = convertToMercator(
-        //         lineFeature.geometry.coordinates[0],
-        //     )
-        //     let endWebMerCoord = convertToMercator(
-        //         lineFeature.geometry.coordinates[1],
-        //     )
-        //     StartPtX = startWebMerCoord[0]
-        //     StartPtY = startWebMerCoord[1]
-        //     EndPtX = endWebMerCoord[0]
-        //     EndPtY = endWebMerCoord[1]
-        //     return
-        // })
+  await initPureScratchMap(mapContainer.value).then(async (map) => {
+    mapInstance = map;
+    // map.on('draw.create', function (e) {
+    //     sectionConfirmShow.value = true
+    //     let lineFeature = e.features[0]
+    //     sectionLineLabel.value =
+    //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
+    //         ',' +
+    //         lineFeature.geometry.coordinates[0][1].toFixed(6)
+    //     sectionLineLabelSec.value =
+    //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
+    //         ',' +
+    //         lineFeature.geometry.coordinates[1][1].toFixed(6)
+    //     let startWebMerCoord = convertToMercator(
+    //         lineFeature.geometry.coordinates[0],
+    //     )
+    //     let endWebMerCoord = convertToMercator(
+    //         lineFeature.geometry.coordinates[1],
+    //     )
+    //     StartPtX = startWebMerCoord[0]
+    //     StartPtY = startWebMerCoord[1]
+    //     EndPtX = endWebMerCoord[0]
+    //     EndPtY = endWebMerCoord[1]
+    //     return
+    // })
 
     // map.addControl(new mapboxgl.NavigationControl(), 'top-left')
     // mapJumpToRiver(map)
@@ -1983,11 +1983,11 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-    if (useMapStore().getMap()) {
-        useMapStore().getMap().remove()
-        useMapStore().destroyMap()
-    }
-})
+  if (useMapStore().getMap()) {
+    useMapStore().getMap().remove();
+    useMapStore().destroyMap();
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -2553,816 +2553,817 @@ div.risk-warn-container {
         border-radius: calc(0.1vh + 0.3vw);
 
         .title {
-            border-bottom: rgb(41, 40, 40) 1px solid;
-            font-weight: bold;
-            font-size: calc(0.7vw + 0.5vh);
-            line-height: 3vh;
-            width: 100%;
-
-            .iconn {
-                :hover {
-                    cursor: pointer;
-                }
-            }
-        }
-    }
-  }
-
-  div.time-shower-block {
-    position: absolute;
-    top: 55vh;
-    left: 20vw;
-  }
-
-  div.risk-year-container {
-    position: absolute;
-    top: 8.5vh;
-    left: 0.2vw;
-    height: 6.8vh;
-    width: 23.5vw;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    border: rgba(0, 119, 255, 0.6) 2px solid;
-    border-radius: 6px;
-    z-index: 3;
-
-    div.risk-year-title {
-      position: absolute;
-      top: -0.8vh;
-      left: 2vw;
-      color: rgb(159, 68, 187);
-      text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
-      color-scheme: light;
-      font-family: "Microsoft YaHei";
-      font-weight: bolder;
-      font-size: calc(0.9vw + 0.6vh);
-    }
-
-    div.risk-year-content {
-      position: absolute;
-      top: -0.7vh;
-      left: 14vw;
-      color: rgb(24, 116, 170);
-      color-scheme: light;
-      font-family: "Microsoft YaHei";
-      font-weight: bolder;
-      font-size: calc(1vw + 0.6vh);
-    }
-  }
-
-  div.risk-item-title {
-    position: absolute;
-    top: 8vh;
-    height: 2.6vh;
-    line-height: 2.6vh;
-    left: 0.4vw;
-    z-index: 8;
-    width: 26vw;
-    font-weight: bold;
-    font-size: calc(0.6vw + 0.8vh);
-    text-shadow: #eef3ff 1px 1px;
-    // box-shadow: 0px 2px rgb(0, 26, 255);
-    color: #0011ff;
-    text-align: center;
-  }
-
-  div.risk-item-container {
-    position: absolute;
-    top: 11.2vh;
-    left: 0.4vw;
-    height: 4.5vh;
-    width: 26vw;
-    // background-color: rgba(197, 211, 228, 0.6);
-    // border: rgba(0, 119, 255, 0.6) 2px solid;
-    border-radius: 6px;
-    z-index: 20;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    // background-color: red;
-    backdrop-filter: blur(8px);
-
-    div.risk-item {
-      flex: 1 1 0;
-      position: relative;
-      display: flex;
-      margin-bottom: 0.5vh;
-      margin-left: 0.5vw;
-      margin-right: 0.5vw;
-
-      @keyframes colorSlide {
-        0% {
-          background-position: 0% 50%;
-        }
-
-        // 50% {
-        //     background-position: 200% 50%;
-        // }
-        100% {
-          background-position: 300% 50%;
-        }
-      }
-
-      &.active {
-        div.risk-main-index {
-          &.waterpower {
-            animation: colorSlide ease-in-out 2s;
-            animation-fill-mode: forwards;
-          }
-
-          &.riverbed {
-            animation: colorSlide ease-in-out 2s;
-            animation-fill-mode: forwards;
-          }
-
-          &.bankGeology {
-            animation: colorSlide ease-in-out 2s;
-            animation-fill-mode: forwards;
-          }
-
-          &.outproject {
-            animation: colorSlide ease-in-out 2s;
-            animation-fill-mode: forwards;
-          }
-        }
-      }
-    }
-
-    div.risk-main-index {
-      width: 6.8vw;
-      cursor: pointer;
-      position: relative;
-      flex: 1 1 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 5px;
-      transition: 0.3s linear;
-
-      &:hover {
-        transform: scale(1.05);
-        cursor: pointer;
-      }
-
-      :deep(.dv-border-box-12) {
-        position: absolute;
-        width: 7vw;
-        height: 98%;
-      }
-
-      // background-position: 0% 50%;
-
-      &.waterpower {
-        // transition: all ease-in-out;
-        background: linear-gradient(
-          90deg,
-          rgba(33, 100, 182, 0.35),
-          // rgba(33, 100, 182, 1),
-          // rgba(0, 34, 215, 1),
-          // rgba(0, 34, 215, 1),
-          rgba(0, 34, 215, 1),
-          rgba(0, 34, 215, 1)
-        );
-        background-size: 400% 100%;
-        // background-color: rgba(28, 85, 156, 0.6);
-      }
-
-      &.riverbed {
-        background: linear-gradient(
-          90deg,
-          rgba(39, 145, 87, 0.35),
-          // rgba(39, 145, 87, 1),
-          // rgb(0, 121, 16, 1),
-          // rgba(0, 121, 16, 1),
-          rgba(0, 121, 16, 1),
-          rgba(0, 121, 16, 1)
-        );
-        background-size: 400% 100%;
-      }
-
-      &.bankGeology {
-        background: linear-gradient(
-          90deg,
-          rgba(95, 21, 138, 0.35),
-          // rgba(95, 21, 138, 1),
-          // rgb(63, 0, 121, 1),
-          // rgba(63, 0, 121, 1),
-          rgba(63, 0, 121, 1),
-          rgba(63, 0, 121, 1)
-        );
-        background-size: 400% 100%;
-      }
-
-      &.outproject {
-        background: linear-gradient(
-          90deg,
-          rgba(228, 143, 16, 0.35),
-          // rgba(228, 143, 16, 1),
-          // rgba(121, 83, 0, 1),
-          // rgba(121, 83, 0, 1),
-          rgba(121, 83, 0, 1),
-          rgba(121, 83, 0, 1)
-        );
-        background-size: 400% 100%;
-      }
-
-      div.risk-item-text {
-        text-align: center;
-        font-size: calc(0.6vw + 0.4vh);
-        color: white;
-        font-family: "Microsoft YaHei";
-        font-weight: bolder;
-        text-shadow: #101113 2px 2px, #767779 2px 2px, #6493ff 3px 3px;
-      }
-    }
-  }
-
-  div.basic-info-container {
-    position: absolute;
-    z-index: 5;
-    left: 0.3vw;
-    top: 0.5vh;
-    // width: 31.2vw;
-    width: 26vw;
-    height: 15vh;
-    background-color: rgba(146, 190, 228, 0.5);
-    backdrop-filter: blur(5px);
-    border: #0a59ec 2px solid;
-    border-radius: 6px;
-
-    div.basic-info-content {
-      width: 100%;
-      height: 100%;
-      border-radius: 16px;
-      display: flex;
-      flex-flow: row wrap;
-      align-content: flex-start;
-      justify-content: center;
-
-      div.title-container {
-        height: 3vh;
-        line-height: 3vh;
-        width: 100%;
-        background-color: transparent;
-        text-align: center;
-        font-size: calc(0.8vw + 0.8vh);
-        font-weight: bold;
-        color: #003bfd;
-        text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
-        letter-spacing: 0.4rem;
-      }
-
-      div.key-val-container {
-        width: 48%;
-        height: 4vh;
-        display: flex;
-        flex-flow: row wrap;
-        // background-color: #0446a8;
-        text-align: center;
-        border-bottom: 2px solid rgb(0, 32, 175);
-
-        &.right {
-          justify-content: flex-end;
-        }
-
-        div.key-text {
-          width: fit-content;
-          line-height: 3.5vh;
-          background-color: transparent;
-          font-size: calc(0.7vw + 0.6vh);
-          color: #0043fd;
-        }
-
-        div.val-text {
-          line-height: 3.5vh;
-          font-size: calc(0.7vw + 0.5vh);
+          border-bottom: rgb(41, 40, 40) 1px solid;
           font-weight: bold;
-          color: #1d00be;
-          // text-align: center;
-        }
-      }
-    }
-  }
+          font-size: calc(0.7vw + 0.5vh);
+          line-height: 3vh;
+          width: 100%;
 
-  div.raster-control-block {
-    position: absolute;
-    top: 79vh;
-    left: 55vw;
-    height: 13vh;
-    width: 6vw;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    z-index: 3;
-
-    .switch {
-      font-size: 20px;
-      position: relative;
-      display: inline-block;
-      width: 2em;
-      height: 3.5em;
-
-      input {
-        display: none;
-      }
-
-      /* The slider */
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgb(165, 219, 253);
-        transition: 0.4s;
-        border-radius: 10px;
-
-        &:before {
-          position: absolute;
-          content: "";
-          height: 1.4em;
-          width: 1.4em;
-          border-radius: 5px;
-          left: 0.3em;
-          bottom: 0.3em;
-          background-color: white;
-          transition: 0.4s;
-        }
-      }
-
-      input:checked {
-        + .slider {
-          background-color: rgb(73, 90, 250);
-        }
-
-        + .slider:before {
-          transform: translateY(-1.5em);
+          .iconn {
+            :hover {
+              cursor: pointer;
+            }
+          }
         }
       }
     }
 
-    .text-block {
-      font-size: 20px;
-      width: 3em;
-      height: 5em;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .text {
-        writing-mode: vertical-lr;
-        color: rgb(3, 45, 90);
-        color-scheme: light;
-        font-family: "Microsoft YaHei";
-        font-weight: 700;
-        user-select: none;
-      }
-    }
-  }
-
-  div.bankLine-control-block {
-    position: absolute;
-    top: 79vh;
-    left: 63vw;
-    height: 13vh;
-    width: 6vw;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    z-index: 3;
-
-    .switch {
-      font-size: 20px;
-      position: relative;
-      display: inline-block;
-      width: 2em;
-      height: 3.5em;
-
-      input {
-        display: none;
-      }
-
-      /* The slider */
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgb(165, 219, 253);
-        transition: 0.4s;
-        border-radius: 10px;
-
-        &:before {
-          position: absolute;
-          content: "";
-          height: 1.4em;
-          width: 1.4em;
-          border-radius: 5px;
-          left: 0.3em;
-          bottom: 0.3em;
-          background-color: white;
-          transition: 0.4s;
-        }
-      }
-
-      input:checked {
-        + .slider {
-          background-color: rgb(73, 90, 250);
-        }
-
-        + .slider:before {
-          transform: translateY(-1.5em);
-        }
-      }
-    }
-
-    .text-block {
-      font-size: 20px;
-      width: 3em;
-      height: 5em;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .text {
-        writing-mode: vertical-lr;
-        color: rgb(3, 45, 90);
-        color-scheme: light;
-        font-family: "Microsoft YaHei";
-        font-weight: 700;
-        user-select: none;
-      }
-    }
-  }
-
-  div.terrain-control-block {
-    position: absolute;
-    top: 79vh;
-    left: 59vw;
-    height: 13vh;
-    width: 6vw;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    z-index: 3;
-
-    .switch {
-      font-size: 20px;
-      position: relative;
-      display: inline-block;
-      width: 2em;
-      height: 3.5em;
-
-      input {
-        display: none;
-      }
-
-      /* The slider */
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgb(165, 219, 253);
-        transition: 0.4s;
-        border-radius: 10px;
-
-        &:before {
-          position: absolute;
-          content: "";
-          height: 1.4em;
-          width: 1.4em;
-          border-radius: 5px;
-          left: 0.3em;
-          bottom: 0.3em;
-          background-color: white;
-          transition: 0.4s;
-        }
-      }
-
-      input:checked {
-        + .slider {
-          background-color: rgb(73, 90, 250);
-        }
-
-        + .slider:before {
-          transform: translateY(-1.5em);
-        }
-      }
-    }
-
-    .text-block {
-      font-size: 20px;
-      width: 3em;
-      height: 5em;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .text {
-        writing-mode: vertical-lr;
-        color: rgb(3, 45, 90);
-        color-scheme: light;
-        font-family: "Microsoft YaHei";
-        font-weight: 700;
-        user-select: none;
-      }
-    }
-  }
-
-  div.raster-legend-container {
-    position: absolute;
-    top: 12vh;
-    left: 32.3vw;
-    width: 2.9vw;
-    height: 32vh;
-    z-index: 2;
-
-    img {
-      width: 100%;
-      height: 100%;
-      margin-bottom: 10px;
-      object-fit: contain;
-    }
-  }
-
-  div.profile-draw-content {
-    position: absolute;
-    top: 2vh;
-    right: 2vw;
-    height: 15vh;
-    width: 29vw;
-    border-radius: 8px;
-    background-color: rgba(164, 212, 255, 0.8);
-    backdrop-filter: blur(8px);
-    border: 2px solid rgb(169, 197, 226);
-    z-index: 2;
-
-    div.profile-draw-title {
+    div.time-shower-block {
       position: absolute;
-      height: 4.5vh;
-      width: 7vw;
-      line-height: 4vh;
-      border-radius: 6px;
-      // background-color: rgba(235, 240, 247, 0.4);
-      text-align: center;
-      font-family: "Microsoft YaHei";
-      font-weight: bold;
-      font-size: calc(0.7vw + 0.5vh);
-      color: #0f1011;
-      text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
+      top: 55vh;
+      left: 20vw;
     }
 
-    div.profile-info-container {
+    div.risk-year-container {
       position: absolute;
-      top: 4vh;
-      right: 0.5vw;
-      width: 13vw;
-      height: 10vh;
+      top: 8.5vh;
+      left: 0.2vw;
+      height: 6.8vh;
+      width: 23.5vw;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      border: rgba(0, 119, 255, 0.6) 2px solid;
       border-radius: 6px;
-      border: 2px solid #1735ae;
       z-index: 3;
 
-      div.profile-info-item {
-        font-size: calc(0.5vw + 0.4vh);
-        color: #001cb8;
-        font-weight: bold;
+      div.risk-year-title {
+        position: absolute;
+        top: -0.8vh;
+        left: 2vw;
+        color: rgb(159, 68, 187);
+        text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
+        color-scheme: light;
+        font-family: "Microsoft YaHei";
+        font-weight: bolder;
+        font-size: calc(0.9vw + 0.6vh);
+      }
 
-        &.title {
-          color: #0f1011;
-          font-size: calc(0.7vw + 0.5vh);
-          position: absolute;
-          left: 0.5vw;
-          top: 0.5vh;
+      div.risk-year-content {
+        position: absolute;
+        top: -0.7vh;
+        left: 14vw;
+        color: rgb(24, 116, 170);
+        color-scheme: light;
+        font-family: "Microsoft YaHei";
+        font-weight: bolder;
+        font-size: calc(1vw + 0.6vh);
+      }
+    }
+
+    div.risk-item-title {
+      position: absolute;
+      top: 8vh;
+      height: 2.6vh;
+      line-height: 2.6vh;
+      left: 0.4vw;
+      z-index: 8;
+      width: 26vw;
+      font-weight: bold;
+      font-size: calc(0.6vw + 0.8vh);
+      text-shadow: #eef3ff 1px 1px;
+      // box-shadow: 0px 2px rgb(0, 26, 255);
+      color: #0011ff;
+      text-align: center;
+    }
+
+    div.risk-item-container {
+      position: absolute;
+      top: 11.2vh;
+      left: 0.4vw;
+      height: 4.5vh;
+      width: 26vw;
+      // background-color: rgba(197, 211, 228, 0.6);
+      // border: rgba(0, 119, 255, 0.6) 2px solid;
+      border-radius: 6px;
+      z-index: 20;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      // background-color: red;
+      backdrop-filter: blur(8px);
+
+      div.risk-item {
+        flex: 1 1 0;
+        position: relative;
+        display: flex;
+        margin-bottom: 0.5vh;
+        margin-left: 0.5vw;
+        margin-right: 0.5vw;
+
+        @keyframes colorSlide {
+          0% {
+            background-position: 0% 50%;
+          }
+
+          // 50% {
+          //     background-position: 200% 50%;
+          // }
+          100% {
+            background-position: 300% 50%;
+          }
         }
 
-        &.name {
-          position: absolute;
-          left: 0.3vw;
-          top: 4vh;
-        }
+        &.active {
+          div.risk-main-index {
+            &.waterpower {
+              animation: colorSlide ease-in-out 2s;
+              animation-fill-mode: forwards;
+            }
 
-        &.risk {
-          position: absolute;
-          left: 0.3vw;
-          top: 7vh;
-        }
+            &.riverbed {
+              animation: colorSlide ease-in-out 2s;
+              animation-fill-mode: forwards;
+            }
 
-        &.before {
-          color: #b3771d;
-          position: absolute;
-          left: 6.4vw;
-          top: 4vh;
-        }
+            &.bankGeology {
+              animation: colorSlide ease-in-out 2s;
+              animation-fill-mode: forwards;
+            }
 
-        &.now {
-          color: #b3771d;
-          position: absolute;
-          left: 6.4vw;
-          top: 7vh;
+            &.outproject {
+              animation: colorSlide ease-in-out 2s;
+              animation-fill-mode: forwards;
+            }
+          }
         }
       }
 
-      div.detail-info {
-        position: absolute;
-        left: 8.4vw;
-        top: 3vh;
-        width: 4vw;
-        height: 6vh;
-        border: 2px solid #1735ae;
-        border-radius: 6px;
-        background-color: #1753ae;
+      div.risk-main-index {
+        width: 6.8vw;
         cursor: pointer;
-        transition: transform 0.2s ease;
+        position: relative;
+        flex: 1 1 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        transition: 0.3s linear;
 
         &:hover {
-          transform: scale(1.03);
-        }
-
-        div.detail-info-text {
-          font-size: calc(0.7vw + 0.5vh);
-          font-weight: bold;
-          color: #cefffd;
-          position: absolute;
-          left: 0.5vw;
-          top: 0.5vh;
-        }
-      }
-
-      div.null-text {
-        font-size: calc(1vw + 0.7vh);
-        font-weight: bold;
-        position: absolute;
-        left: 2.3vw;
-        top: 4.6vh;
-        color: #001cb8;
-      }
-    }
-  }
-
-  div.loading-container {
-    position: absolute;
-    top: 9vh;
-    left: 47.5vw;
-    width: 6vw;
-    height: 10vh;
-    background-color: rgba(190, 222, 230, 0.5);
-    z-index: 5;
-
-    :deep(.dv-loading.loading-icon) {
-      position: absolute;
-      top: -2.5vh;
-      right: 0vw;
-    }
-
-    div.loading-message {
-      text-align: center;
-      position: absolute;
-      left: 0.5vw;
-      width: 5vw;
-      height: 6vh;
-      top: 7.3vh;
-      font-size: calc(0.6vw + 0.4svh);
-      font-weight: bold;
-    }
-  }
-
-  div.hydro-pannel {
-    position: absolute;
-    z-index: 2;
-    right: 5vw;
-    top: 0vh;
-    width: 15vw;
-    padding: calc(0.1vw + 0.1vh);
-    background-color: aliceblue;
-    user-select: none;
-    border: solid calc(0.1vh + 0.1vw) rgb(82, 163, 235);
-    border-radius: calc(0.1vh + 0.3vw);
-
-    .title {
-      border-bottom: rgb(41, 40, 40) 1px solid;
-      font-weight: bold;
-      font-size: calc(0.7vw + 0.5vh);
-      line-height: 3vh;
-      width: 100%;
-
-      .iconn {
-        :hover {
+          transform: scale(1.05);
           cursor: pointer;
         }
+
+        :deep(.dv-border-box-12) {
+          position: absolute;
+          width: 7vw;
+          height: 98%;
+        }
+
+        // background-position: 0% 50%;
+
+        &.waterpower {
+          // transition: all ease-in-out;
+          background: linear-gradient(
+            90deg,
+            rgba(33, 100, 182, 0.35),
+            // rgba(33, 100, 182, 1),
+            // rgba(0, 34, 215, 1),
+            // rgba(0, 34, 215, 1),
+            rgba(0, 34, 215, 1),
+            rgba(0, 34, 215, 1)
+          );
+          background-size: 400% 100%;
+          // background-color: rgba(28, 85, 156, 0.6);
+        }
+
+        &.riverbed {
+          background: linear-gradient(
+            90deg,
+            rgba(39, 145, 87, 0.35),
+            // rgba(39, 145, 87, 1),
+            // rgb(0, 121, 16, 1),
+            // rgba(0, 121, 16, 1),
+            rgba(0, 121, 16, 1),
+            rgba(0, 121, 16, 1)
+          );
+          background-size: 400% 100%;
+        }
+
+        &.bankGeology {
+          background: linear-gradient(
+            90deg,
+            rgba(95, 21, 138, 0.35),
+            // rgba(95, 21, 138, 1),
+            // rgb(63, 0, 121, 1),
+            // rgba(63, 0, 121, 1),
+            rgba(63, 0, 121, 1),
+            rgba(63, 0, 121, 1)
+          );
+          background-size: 400% 100%;
+        }
+
+        &.outproject {
+          background: linear-gradient(
+            90deg,
+            rgba(228, 143, 16, 0.35),
+            // rgba(228, 143, 16, 1),
+            // rgba(121, 83, 0, 1),
+            // rgba(121, 83, 0, 1),
+            rgba(121, 83, 0, 1),
+            rgba(121, 83, 0, 1)
+          );
+          background-size: 400% 100%;
+        }
+
+        div.risk-item-text {
+          text-align: center;
+          font-size: calc(0.6vw + 0.4vh);
+          color: white;
+          font-family: "Microsoft YaHei";
+          font-weight: bolder;
+          text-shadow: #101113 2px 2px, #767779 2px 2px, #6493ff 3px 3px;
+        }
+      }
+    }
+
+    div.basic-info-container {
+      position: absolute;
+      z-index: 5;
+      left: 0.3vw;
+      top: 0.5vh;
+      // width: 31.2vw;
+      width: 26vw;
+      height: 15vh;
+      background-color: rgba(146, 190, 228, 0.5);
+      backdrop-filter: blur(5px);
+      border: #0a59ec 2px solid;
+      border-radius: 6px;
+
+      div.basic-info-content {
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        display: flex;
+        flex-flow: row wrap;
+        align-content: flex-start;
+        justify-content: center;
+
+        div.title-container {
+          height: 3vh;
+          line-height: 3vh;
+          width: 100%;
+          background-color: transparent;
+          text-align: center;
+          font-size: calc(0.8vw + 0.8vh);
+          font-weight: bold;
+          color: #003bfd;
+          text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
+          letter-spacing: 0.4rem;
+        }
+
+        div.key-val-container {
+          width: 48%;
+          height: 4vh;
+          display: flex;
+          flex-flow: row wrap;
+          // background-color: #0446a8;
+          text-align: center;
+          border-bottom: 2px solid rgb(0, 32, 175);
+
+          &.right {
+            justify-content: flex-end;
+          }
+
+          div.key-text {
+            width: fit-content;
+            line-height: 3.5vh;
+            background-color: transparent;
+            font-size: calc(0.7vw + 0.6vh);
+            color: #0043fd;
+          }
+
+          div.val-text {
+            line-height: 3.5vh;
+            font-size: calc(0.7vw + 0.5vh);
+            font-weight: bold;
+            color: #1d00be;
+            // text-align: center;
+          }
+        }
+      }
+    }
+
+    div.raster-control-block {
+      position: absolute;
+      top: 79vh;
+      left: 55vw;
+      height: 13vh;
+      width: 6vw;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      z-index: 3;
+
+      .switch {
+        font-size: 20px;
+        position: relative;
+        display: inline-block;
+        width: 2em;
+        height: 3.5em;
+
+        input {
+          display: none;
+        }
+
+        /* The slider */
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgb(165, 219, 253);
+          transition: 0.4s;
+          border-radius: 10px;
+
+          &:before {
+            position: absolute;
+            content: "";
+            height: 1.4em;
+            width: 1.4em;
+            border-radius: 5px;
+            left: 0.3em;
+            bottom: 0.3em;
+            background-color: white;
+            transition: 0.4s;
+          }
+        }
+
+        input:checked {
+          + .slider {
+            background-color: rgb(73, 90, 250);
+          }
+
+          + .slider:before {
+            transform: translateY(-1.5em);
+          }
+        }
+      }
+
+      .text-block {
+        font-size: 20px;
+        width: 3em;
+        height: 5em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .text {
+          writing-mode: vertical-lr;
+          color: rgb(3, 45, 90);
+          color-scheme: light;
+          font-family: "Microsoft YaHei";
+          font-weight: 700;
+          user-select: none;
+        }
+      }
+    }
+
+    div.bankLine-control-block {
+      position: absolute;
+      top: 79vh;
+      left: 63vw;
+      height: 13vh;
+      width: 6vw;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      z-index: 3;
+
+      .switch {
+        font-size: 20px;
+        position: relative;
+        display: inline-block;
+        width: 2em;
+        height: 3.5em;
+
+        input {
+          display: none;
+        }
+
+        /* The slider */
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgb(165, 219, 253);
+          transition: 0.4s;
+          border-radius: 10px;
+
+          &:before {
+            position: absolute;
+            content: "";
+            height: 1.4em;
+            width: 1.4em;
+            border-radius: 5px;
+            left: 0.3em;
+            bottom: 0.3em;
+            background-color: white;
+            transition: 0.4s;
+          }
+        }
+
+        input:checked {
+          + .slider {
+            background-color: rgb(73, 90, 250);
+          }
+
+          + .slider:before {
+            transform: translateY(-1.5em);
+          }
+        }
+      }
+
+      .text-block {
+        font-size: 20px;
+        width: 3em;
+        height: 5em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .text {
+          writing-mode: vertical-lr;
+          color: rgb(3, 45, 90);
+          color-scheme: light;
+          font-family: "Microsoft YaHei";
+          font-weight: 700;
+          user-select: none;
+        }
+      }
+    }
+
+    div.terrain-control-block {
+      position: absolute;
+      top: 79vh;
+      left: 59vw;
+      height: 13vh;
+      width: 6vw;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      z-index: 3;
+
+      .switch {
+        font-size: 20px;
+        position: relative;
+        display: inline-block;
+        width: 2em;
+        height: 3.5em;
+
+        input {
+          display: none;
+        }
+
+        /* The slider */
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgb(165, 219, 253);
+          transition: 0.4s;
+          border-radius: 10px;
+
+          &:before {
+            position: absolute;
+            content: "";
+            height: 1.4em;
+            width: 1.4em;
+            border-radius: 5px;
+            left: 0.3em;
+            bottom: 0.3em;
+            background-color: white;
+            transition: 0.4s;
+          }
+        }
+
+        input:checked {
+          + .slider {
+            background-color: rgb(73, 90, 250);
+          }
+
+          + .slider:before {
+            transform: translateY(-1.5em);
+          }
+        }
+      }
+
+      .text-block {
+        font-size: 20px;
+        width: 3em;
+        height: 5em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .text {
+          writing-mode: vertical-lr;
+          color: rgb(3, 45, 90);
+          color-scheme: light;
+          font-family: "Microsoft YaHei";
+          font-weight: 700;
+          user-select: none;
+        }
+      }
+    }
+
+    div.raster-legend-container {
+      position: absolute;
+      top: 12vh;
+      left: 32.3vw;
+      width: 2.9vw;
+      height: 32vh;
+      z-index: 2;
+
+      img {
+        width: 100%;
+        height: 100%;
+        margin-bottom: 10px;
+        object-fit: contain;
+      }
+    }
+
+    div.profile-draw-content {
+      position: absolute;
+      top: 2vh;
+      right: 2vw;
+      height: 15vh;
+      width: 29vw;
+      border-radius: 8px;
+      background-color: rgba(164, 212, 255, 0.8);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgb(169, 197, 226);
+      z-index: 2;
+
+      div.profile-draw-title {
+        position: absolute;
+        height: 4.5vh;
+        width: 7vw;
+        line-height: 4vh;
+        border-radius: 6px;
+        // background-color: rgba(235, 240, 247, 0.4);
+        text-align: center;
+        font-family: "Microsoft YaHei";
+        font-weight: bold;
+        font-size: calc(0.7vw + 0.5vh);
+        color: #0f1011;
+        text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
+      }
+
+      div.profile-info-container {
+        position: absolute;
+        top: 4vh;
+        right: 0.5vw;
+        width: 13vw;
+        height: 10vh;
+        border-radius: 6px;
+        border: 2px solid #1735ae;
+        z-index: 3;
+
+        div.profile-info-item {
+          font-size: calc(0.5vw + 0.4vh);
+          color: #001cb8;
+          font-weight: bold;
+
+          &.title {
+            color: #0f1011;
+            font-size: calc(0.7vw + 0.5vh);
+            position: absolute;
+            left: 0.5vw;
+            top: 0.5vh;
+          }
+
+          &.name {
+            position: absolute;
+            left: 0.3vw;
+            top: 4vh;
+          }
+
+          &.risk {
+            position: absolute;
+            left: 0.3vw;
+            top: 7vh;
+          }
+
+          &.before {
+            color: #b3771d;
+            position: absolute;
+            left: 6.4vw;
+            top: 4vh;
+          }
+
+          &.now {
+            color: #b3771d;
+            position: absolute;
+            left: 6.4vw;
+            top: 7vh;
+          }
+        }
+
+        div.detail-info {
+          position: absolute;
+          left: 8.4vw;
+          top: 3vh;
+          width: 4vw;
+          height: 6vh;
+          border: 2px solid #1735ae;
+          border-radius: 6px;
+          background-color: #1753ae;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+
+          &:hover {
+            transform: scale(1.03);
+          }
+
+          div.detail-info-text {
+            font-size: calc(0.7vw + 0.5vh);
+            font-weight: bold;
+            color: #cefffd;
+            position: absolute;
+            left: 0.5vw;
+            top: 0.5vh;
+          }
+        }
+
+        div.null-text {
+          font-size: calc(1vw + 0.7vh);
+          font-weight: bold;
+          position: absolute;
+          left: 2.3vw;
+          top: 4.6vh;
+          color: #001cb8;
+        }
+      }
+    }
+
+    div.loading-container {
+      position: absolute;
+      top: 9vh;
+      left: 47.5vw;
+      width: 6vw;
+      height: 10vh;
+      background-color: rgba(190, 222, 230, 0.5);
+      z-index: 5;
+
+      :deep(.dv-loading.loading-icon) {
+        position: absolute;
+        top: -2.5vh;
+        right: 0vw;
+      }
+
+      div.loading-message {
+        text-align: center;
+        position: absolute;
+        left: 0.5vw;
+        width: 5vw;
+        height: 6vh;
+        top: 7.3vh;
+        font-size: calc(0.6vw + 0.4svh);
+        font-weight: bold;
+      }
+    }
+
+    div.hydro-pannel {
+      position: absolute;
+      z-index: 2;
+      right: 5vw;
+      top: 0vh;
+      width: 15vw;
+      padding: calc(0.1vw + 0.1vh);
+      background-color: aliceblue;
+      user-select: none;
+      border: solid calc(0.1vh + 0.1vw) rgb(82, 163, 235);
+      border-radius: calc(0.1vh + 0.3vw);
+
+      .title {
+        border-bottom: rgb(41, 40, 40) 1px solid;
+        font-weight: bold;
+        font-size: calc(0.7vw + 0.5vh);
+        line-height: 3vh;
+        width: 100%;
+
+        .iconn {
+          :hover {
+            cursor: pointer;
+          }
+        }
       }
     }
   }
-}
 
-@keyframes border-dance {
-  0% {
-    background-position: 0 0, 100% 100%, 0 100%, 100% 0;
+  @keyframes border-dance {
+    0% {
+      background-position: 0 0, 100% 100%, 0 100%, 100% 0;
+    }
+
+    100% {
+      background-position: 100% 0, 0 100%, 0 0, 100% 100%;
+    }
   }
 
-  100% {
-    background-position: 100% 0, 0 100%, 0 0, 100% 100%;
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
   }
-}
 
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
+  :deep(.el-table__inner-wrapper::before) {
+    background: hsl(210, 70%, 30%);
   }
 
-  100% {
-    transform: translateX(-50%);
+  :deep(.el-table__border-left-patch) {
+    background: transparent;
   }
-}
 
-:deep(.el-table__inner-wrapper::before) {
-  background: hsl(210, 70%, 30%);
-}
+  :deep(.el-table .el-table__cell) {
+    border: 1px solid #c6e7f0;
+  }
 
-:deep(.el-table__border-left-patch) {
-  background: transparent;
-}
-
-:deep(.el-table .el-table__cell) {
-  border: 1px solid #c6e7f0;
-}
-
-:deep(.el-table thead th.el-table__cell) {
-  color: #173eaa;
-  background: rgba(238, 244, 255, 0.6);
-  font-size: calc(0.6vw + 0.3vh);
-  height: 2vh;
-
-  div.cell {
+  :deep(.el-table thead th.el-table__cell) {
+    color: #173eaa;
+    background: rgba(238, 244, 255, 0.6);
+    font-size: calc(0.6vw + 0.3vh);
     height: 2vh;
-    line-height: 2vh;
+
+    div.cell {
+      height: 2vh;
+      line-height: 2vh;
+    }
   }
-}
 
-:deep(.el-table tbody tr) {
-  transition: all 0.6s cubic-bezier(0.68, -0.15, 0.265, 1.15);
-  height: fit-content;
-
-  div.cell {
+  :deep(.el-table tbody tr) {
+    transition: all 0.6s cubic-bezier(0.68, -0.15, 0.265, 1.15);
     height: fit-content;
-    line-height: 2vh;
-    width: fit-content;
-    font-size: calc(0.6vw + 0.2vh);
-  }
-}
 
-:deep(.el-table tbody tr:nth-child(2n)) {
-  &.even-state {
-    color: hsl(209, 58%, 39%);
-    background: rgb(235, 242, 255);
-    font-weight: 600;
+    div.cell {
+      height: fit-content;
+      line-height: 2vh;
+      width: fit-content;
+      font-size: calc(0.6vw + 0.2vh);
+    }
   }
 
-  &.odd-state {
-    color: rgba(230, 243, 255, 0.9);
-    background: rgb(45, 87, 177);
-    font-weight: 600;
-  }
-}
+  :deep(.el-table tbody tr:nth-child(2n)) {
+    &.even-state {
+      color: hsl(209, 58%, 39%);
+      background: rgb(235, 242, 255);
+      font-weight: 600;
+    }
 
-// :deep(.el-table__body tr:nth-child(2n):hover > td) {
-//     background: hsl(210, 70%, 32%);
-// }
-
-:deep(.el-table tbody tr:nth-child(2n + 1)) {
-  &.even-state {
-    color: rgba(230, 243, 255, 0.9);
-    background: rgb(45, 87, 177);
-    font-weight: 600;
+    &.odd-state {
+      color: rgba(230, 243, 255, 0.9);
+      background: rgb(45, 87, 177);
+      font-weight: 600;
+    }
   }
 
-  &.odd-state {
-    color: hsl(209, 58%, 39%);
-    background: rgb(235, 242, 255);
-    font-weight: 600;
+  // :deep(.el-table__body tr:nth-child(2n):hover > td) {
+  //     background: hsl(210, 70%, 32%);
+  // }
+
+  :deep(.el-table tbody tr:nth-child(2n + 1)) {
+    &.even-state {
+      color: rgba(230, 243, 255, 0.9);
+      background: rgb(45, 87, 177);
+      font-weight: 600;
+    }
+
+    &.odd-state {
+      color: hsl(209, 58%, 39%);
+      background: rgb(235, 242, 255);
+      font-weight: 600;
+    }
   }
-}
 
-// :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
-//     background: hsl(210, 70%, 32%);
-// }
+  // :deep(.el-table__body tr:nth-child(2n + 1):hover > td) {
+  //     background: hsl(210, 70%, 32%);
+  // }
 
-:deep(.el-table tbody tr.highLight-row) {
-  background: hsl(210, 70%, 16%);
-  animation: shine 2.4s infinite;
-}
+  :deep(.el-table tbody tr.highLight-row) {
+    background: hsl(210, 70%, 16%);
+    animation: shine 2.4s infinite;
+  }
 
-:deep(.el-table tbody tr.highLight-row:hover > td) {
-  cursor: pointer;
+  :deep(.el-table tbody tr.highLight-row:hover > td) {
+    cursor: pointer;
+  }
 }
 </style>
