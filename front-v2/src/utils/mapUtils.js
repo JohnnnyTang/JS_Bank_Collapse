@@ -42,25 +42,25 @@ const initPureScratchMap = (ref) => {
             // minZoom: 8,
         }).on('load', async () => {
             console.log('PureScratchMap init!')
-            map.addLayer({
-                id: 'sky',
-                type: 'sky',
-                paint: {
-                    'sky-type': 'gradient',
-                    'sky-gradient': [
-                        'interpolate',
-                        ['linear'],
-                        ['sky-radial-progress'],
-                        0.8,
-                        'rgba(135, 206, 235, 1)', // 远处颜色
-                        1,
-                        'rgba(135, 206, 235, 1)', // 近处颜色
-                    ],
-                    'sky-gradient-center': [0, 0],
-                    'sky-gradient-radius': 90,
-                    'sky-opacity': 1,
-                },
-            })
+            // map.addLayer({
+            //     id: 'sky',
+            //     type: 'sky',
+            //     paint: {
+            //         'sky-type': 'gradient',
+            //         'sky-gradient': [
+            //             'interpolate',
+            //             ['linear'],
+            //             ['sky-radial-progress'],
+            //             0.8,
+            //             'rgba(135, 206, 235, 1)', // 远处颜色
+            //             1,
+            //             'rgba(135, 206, 235, 1)', // 近处颜色
+            //         ],
+            //         'sky-gradient-center': [0, 0],
+            //         'sky-gradient-radius': 90,
+            //         'sky-opacity': 1,
+            //     },
+            // })
             res(map)
         })
     })
