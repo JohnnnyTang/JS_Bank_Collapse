@@ -27,7 +27,7 @@ public abstract class BaseNodeController<T extends BaseNode> extends AbstractNod
 
     @PostMapping
     public ResponseEntity<String> save(@RequestBody T baseNode) {
-        return  ResponseEntity.ok(nodeServiceImpl.save(baseNode));
+        return ResponseEntity.ok(nodeServiceImpl.save(baseNode));
     }
 
     @GetMapping

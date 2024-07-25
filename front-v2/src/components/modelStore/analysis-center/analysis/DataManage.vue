@@ -1,11 +1,11 @@
 <template>
   <div class="data-manage">
-    <div class="data-panel" style="height: 40vh">
+    <div class="data-panel">
       <div class="title">
         <div class="title-icon dpicon"></div>
         <div class="title-text">数据面板</div>
       </div>
-      <div class="dp-content" style="height: 32vh">
+      <div class="dp-content" style="height:27vh">
         <el-skeleton :rows="5" animated v-if="skeletonFlag" />
         <div class="scroll" v-else>
           <el-scrollbar>
@@ -222,6 +222,7 @@ export default defineComponent({
       });
       if (jsonData.list.length > 0) {
         await addAnalysisData(jsonData);
+        //window.sessionStorage.setItem("treeData", treeData.value);
       }
     };
 
@@ -233,7 +234,6 @@ export default defineComponent({
       //     fileName: string;
       //     visualType: string;
       //   }
-      console.log(param);
       const jsonData = {
         caseId: import.meta.env.VITE_APP_ROUTER_ID,
         geoJson: param.geoJson,
@@ -241,7 +241,6 @@ export default defineComponent({
         visualType: param.visualType,
       };
       const data = await addDraw(jsonData);
-      console.log(data);
       if (data != null && data.code === 0) {
         if (
           treeData.value.length != 0 &&
@@ -271,6 +270,9 @@ export default defineComponent({
             visualId: "",
           });
         }
+
+        //window.sessionStorage.setItem("treeData", treeData.value);
+
         return {
           id: data.data,
           name: param.fileName,
@@ -556,6 +558,7 @@ export default defineComponent({
     const initData = async (id) => {
       treeData.value = [];
       const data = await getData(id);
+      console.log(data);
       if (data != null && data.code === 0) {
         data.data.forEach((item) => {
           let flag = true;
@@ -591,7 +594,7 @@ export default defineComponent({
         });
       }
       const analyticData = await getAnalysisResult(id);
-      console.log(analyticData)
+      console.log(analyticData);
       if (analyticData != null && data.code === 0) {
         if (analyticData.data.length > 0) {
           treeData.value.push({
@@ -617,10 +620,13 @@ export default defineComponent({
 
     onMounted(() => {
       initData(import.meta.env.VITE_APP_ROUTER_ID);
+      //const data = window.sessionStorage.getItem("dataList");
+      //if (data != null) treeData.value = JSON.parse(data);
       skeletonFlag.value = false;
     });
 
     onBeforeUnmount(() => {
+      window.sessionStorage.setItem("dataList", JSON.stringify(treeData.value));
       clearTimeout(sectionTimeout);
     });
 
@@ -648,7 +654,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .data-manage {
-
   .right-menu {
     z-index: 1;
     position: absolute;

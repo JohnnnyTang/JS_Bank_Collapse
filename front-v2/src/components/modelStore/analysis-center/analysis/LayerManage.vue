@@ -179,6 +179,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
+      console.log(props.layerList)
       props.layerList?.forEach((item) => {
         treeData.value.push({
           id: item.id,

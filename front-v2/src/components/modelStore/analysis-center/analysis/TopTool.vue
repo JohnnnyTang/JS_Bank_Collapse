@@ -124,7 +124,7 @@
       <add-data-dialog @returnData="returnData" v-if="dialogAddData" />
     </el-dialog>
 
-    <el-dialog v-model="dialogAnalyse" width="580px" title="河床分析">
+    <el-dialog v-model="dialogAnalyse" width="580px" title="模型计算">
       <analyse-dialog @analyse="analyse" v-if="dialogAnalyse" />
     </el-dialog>
   </div>

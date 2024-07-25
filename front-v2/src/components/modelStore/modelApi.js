@@ -9,45 +9,41 @@ const ModelInstance = axios.create({
   timeout: 200000,
 })
 
-ModelInstance.interceptors.response.use(
-  (response) => {
-    setTimeout(() => {
-      requestList.delete(response.config.url + response.config.data);
-    }, 600); //请求间隔600ms
-    return response.data;
+// ModelInstance.interceptors.request.use((config) => {
+//   //const token = getToken();
+//   const token = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJuYW1lIjoi566h55CG5ZGYIiwiaWQiOm51bGwsImV4cCI6MTcyMTc0MDg3OCwiZW1haWwiOiJuaHJpX2FkbWluQDE2My5jb20ifQ.tEMP3dapCQpsbq_iXEa9MDlNhGffGBBRTPcNihNgkShlSbei4Pd5guamSHrGkLrYp7W3kQ-nQEu-jqu8BsFu7Q"
+//   const flag = config.headers["debounce"];
+//   (config.headers.Authorization = `Bearer ${token}`),
+//     (config.cancelToken = new axios.CancelToken((e) => {
+//       const cancelRequest = () => {
+//         let url = (config.baseURL) + config.url;
+//         e(url);
+//       };
+
+//       if (flag === "true") {
+//         requestList.has(config.url + JSON.stringify(config.data))
+//           ? cancelRequest()
+//           : requestList.add(config.url + JSON.stringify(config.data));
+//       }
+//     }));
+//   return config;
+// });
+
+ModelInstance.interceptors.request.use(
+  config => {
+      const token = localStorage.getItem('token');
+      console.log(token)
+      // const token = sessionStorage.getItem('token');
+      if (token) {
+          // config.headers['Authorization'] = `Bearer ${token}`;
+          config.headers.token = `${token}`;
+      }
+      return config;
   },
-  (err) => {
-    if (axios.isCancel(err)) {
-      console.log(err);
-      notice("warning", "警告", "操作过于频繁");
-      return null;
-    } else {
-      notice("error", "错误", "请求错误");
-      requestList.delete(err.config.url + err.config.data);
-      return err.data;
-    }
+  error => {
+      return Promise.reject(error);
   }
 );
-
-ModelInstance.interceptors.request.use((config) => {
-  //const token = getToken();
-  const token = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJuYW1lIjoi566h55CG5ZGYIiwiaWQiOm51bGwsImV4cCI6MTcyMDc2NzI5MSwiZW1haWwiOiJuaHJpX2FkbWluQDE2My5jb20ifQ.-Gy7Ec6cNKz1E3LcQy3pBkqzWqsZSwm9qlSXZvQX1QUPJtCofuB6J1uNlX70rwfmxsS2yRbRPXZq3uerOyjm3A"
-  const flag = config.headers["debounce"];
-  (config.headers.Authorization = `Bearer ${token}`),
-    (config.cancelToken = new axios.CancelToken((e) => {
-      const cancelRequest = () => {
-        let url = (config.baseURL) + config.url;
-        e(url);
-      };
-
-      if (flag === "true") {
-        requestList.has(config.url + JSON.stringify(config.data))
-          ? cancelRequest()
-          : requestList.add(config.url + JSON.stringify(config.data));
-      }
-    }));
-  return config;
-});
 
 export const get = (
   url,

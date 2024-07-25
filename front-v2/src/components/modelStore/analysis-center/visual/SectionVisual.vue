@@ -22,7 +22,7 @@ export default defineComponent({
 
     const getArrs = async () => {
       try {
-        const response = await axios.get("/section.txt");
+        const response = await axios.get("/section-view2.txt");
         const content = response.data;
 
         const lines = content.split("\n");
@@ -39,7 +39,7 @@ export default defineComponent({
           } else {
             currentArray.push(
               line.trim() === "-3.4028235e+38" || line.trim() === "-9999.0"
-                ? "0"
+                ? null
                 : line.trim()
             );
           }
@@ -69,7 +69,7 @@ export default defineComponent({
           xdata.push(index * 40);
         });
         data.data.slopeRatio.forEach((item, index) => {
-          xdata2.push(index * 160);
+          xdata2.push(index * 40);
         });
         option = {
           title: [

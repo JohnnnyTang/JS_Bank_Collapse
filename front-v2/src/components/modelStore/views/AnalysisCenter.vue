@@ -165,7 +165,13 @@ export default defineComponent({
       if (res != null && res.code === 0) {
         layerList.value = res.data;
       }
+      // const data = window.sessionStorage.getItem("layerList");
+      // if (data != null) layerList.value = JSON.parse(data);
       skeletonFlag.value = false;
+    });
+
+    onBeforeUnmount(() => {
+      window.sessionStorage.setItem("layerList", JSON.stringify(layerList.value));
     });
 
     return {

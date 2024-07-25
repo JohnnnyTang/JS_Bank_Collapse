@@ -32,12 +32,13 @@ public class TestPyController {
             InputStreamReader ir = new InputStreamReader(process.getInputStream());
             LineNumberReader input = new LineNumberReader(ir);
             String aLine = null;
+            // 如外部进程已经完成输出并关闭了输出流，input.readLine()返回null
             while((aLine = input.readLine()) != null) {
                 result.append(aLine).append(' ');
             }
             input.close();
             ir.close();
-            int re = process.waitFor();
+            int re = process.waitFor();     //等待外部进程完全结束
             System.out.println(result);
         } catch (IOException | InterruptedException e) {
             System.out.println("调用python脚本并读取结果时出错：" + e.getMessage());
