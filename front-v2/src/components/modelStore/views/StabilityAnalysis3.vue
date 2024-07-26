@@ -105,7 +105,7 @@
                                     <el-row>
                                         <el-col :span="10">
                                             <div class="running-status grid-content">
-                                                状态：<span>未运行</span>
+                                                状态：<span :style="statusStyle">{{ modelRunnningStatusDesc }}</span>
                                             </div>
                                         </el-col>
 
@@ -121,7 +121,8 @@
                                         <el-col :span="24">
                                             <div class="grid-content">
                                                 <div class="progress-container">
-                                                    <el-progress :percentage="50" :stroke-width="15" striped />
+                                                    <el-progress :percentage="modelRunnningProgress" :stroke-width="15"
+                                                        striped />
 
                                                 </div>
                                             </div>
@@ -137,8 +138,9 @@
 
                             <div class="content">
                                 <div class="slide-control-block">
-                                    <label class="switch">
-                                        <input type="checkbox" :checked="showFlow == 1" @click="showFlowClickHandler(1)" />
+                                    <label class="switch" :class="{ 'forbbidden': globleVariable.status === false }">
+                                        <input type="checkbox" :checked="showFlow == 1"
+                                            :disabled="globleVariable.status === false" @click="showFlowClickHandler(1)" />
                                         <span class="slider"></span>
                                     </label>
                                     <div class="text-block">
@@ -147,8 +149,9 @@
                                 </div>
 
                                 <div class="slide-control-block">
-                                    <label class="switch">
-                                        <input type="checkbox" :checked="showFlow == 2" @click="showFlowClickHandler(2)" />
+                                    <label class="switch" :class="{ 'forbbidden': globleVariable.status === false }">
+                                        <input type="checkbox" :checked="showFlow == 2"
+                                            :disabled="globleVariable.status === false" @click="showFlowClickHandler(2)" />
                                         <span class="slider"></span>
                                     </label>
                                     <div class="text-block">
@@ -168,23 +171,40 @@
 <script setup>
 import ModelTitleVue from '../ModelTitle.vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { ref, onMounted, onUnmounted } from 'vue'
-import { initPureScratchMap } from '../../../utils/mapUtils';
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { initFineMap } from '../../../utils/mapUtils';
 import { useMapStore } from '../../../store/mapStore';
 import { ElNotification } from 'element-plus'
 import axios from 'axios';
 import dayjs from 'dayjs';
+import FlowFieldLayer from '../../../utils/WebGL/flowFieldLayer'
+import { EulerFlowLayer } from '../../../utils/WebGL/eulerFlowLayer'
+import * as dat from 'dat.gui'
+import '../../../utils/WebGL/dat_gui_style.css'
 
 
 
+let globleVariable = reactive({
+    taskID: null,
+    caseID: null,
+    pngPrefix: null,
+    visualizationJsonUrl: null,
+    stationBinUrl: null,
+    uvBinUrls: null,
+    status: false,
+    lagrangeLayer: 'flowLayer1',
+    eulerLayer: 'flowLayer2',
+})
 const mapRef = ref(null)
 const mapStore = useMapStore()
 const updateTime = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 const showFlow = ref(0)
+const modelRunnningStatusDesc = ref('未运行')
+const modelRunnningProgress = ref(0)
 const params = ref({
-    flow: 0,
-    maxTide: 0,
-    minTide: 0,
+    flow: null,
+    maxTide: null,
+    minTide: null,
 })
 const customParams = ref({
     flow: null,
@@ -198,6 +218,18 @@ const tableData = ref([
         minTide: 2.7,
     }
 ])
+const statusStyle = computed(() => {
+    switch (modelRunnningStatusDesc.value) {
+        case '未运行':
+            return { color: 'rgb(255, 2, 2)' }
+        case '运行中':
+            return { color: 'rgb(255, 165, 0)' }
+        case '运行完毕':
+            return { color: 'rgb(0, 180, 0)' }
+        default:
+            return { color: 'rgb(255, 255, 255)' }
+    }
+})
 
 
 const check = (p) => {
@@ -210,9 +242,12 @@ const conditionClickHandler = (type) => {
     if (type === 'realtime') {
         params.value = tableData.value[0]
     } else if (type === 'custom') {
-        params.value = customParams.value
+        params.value = {
+            flow: Number(customParams.value.flow),
+            maxTide: Number(customParams.value.maxTide),
+            minTide: Number(customParams.value.minTide),
+        }
     }
-
     if (check(params.value))
         ElNotification({
             title: '水文条件配置成功',
@@ -227,9 +262,11 @@ const conditionClickHandler = (type) => {
             offset: 120,
             type: 'error',
         })
+    modelRunnningProgress.value = 0
+    modelRunnningStatusDesc.value = '未运行'
+    globleVariable.status = false
 }
 const runModelClickHandler = async () => {
-
     if (!check(params.value)) {
         ElNotification({
             title: '运行失败',
@@ -239,51 +276,108 @@ const runModelClickHandler = async () => {
         })
         return
     }
-
     const modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
     const modelParams = {
         "water-qs": params.value.flow,
         "tidal-level": [params.value.minTide, params.value.maxTide]
     }
     const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
-
+    console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
+    modelRunnningStatusDesc.value = '运行中'
+    modelRunnningProgress.value = 0
+    globleVariable.taskID = TASK_ID
     let runningStatusInterval = setInterval(async () => {
         let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
+        modelRunnningStatusDesc.value = '运行中'
+        modelRunnningProgress.value = modelRunnningProgress.value + Number((Math.random() * 2.0).toFixed(2))
         if (runningStatus === 'COMPLETE') {
             clearInterval(runningStatusInterval)
+            modelRunnningStatusDesc.value = '运行中'
             let runningResult = (await axios.get('/temp/taskNode/result/id?taskId=' + TASK_ID)).data
             console.log('runningResult ', runningResult)
-            let visulizationDescUrl = `/temp/data/modelServer/file?caseId=${runningResult['case-id']}&name=${runningResult['visualization-description-json']}`
+
+            globleVariable.caseID = runningResult['case-id']
+            globleVariable.pngPrefix = `/temp/data/modelServer/file/image?caseId=${globleVariable.caseID}&name=`
+            globleVariable.binPrefix = `/temp/data/modelServer/file/bin?caseId=${globleVariable.caseID}&name=`
+            globleVariable.visualizationJsonUrl = runningResult['visualization-description-json']
+            globleVariable.stationBinUrl = runningResult['visualization-station-bin']
+            globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
+
+            let visulizationDescUrl = `/temp/data/modelServer/file/common?caseId=${runningResult['case-id']}&name=${runningResult['visualization-description-json']}`
+            console.log(visulizationDescUrl)
             const visualizationJson = (await axios.get(visulizationDescUrl)).data
-            console.log('visualizationJson ', visualizationJson);
+            globleVariable.visualizationJsonUrl = visulizationDescUrl
+            console.log('visualizationJson ', visualizationJson)
+            globleVariable.status = true
+            modelRunnningStatusDesc.value = '运行完毕'
+            modelRunnningProgress.value = 100
+
+            // showFlowClickHandler(1)
         }
-
     }, 1000)
-
-
-    // const url = `/apiv2/data/modelServer/file?caseId=34aba3372bfd9cf2391b65ee39969381&name=visualization/mask_0.png`
-    // const url = `/apiv2/taskNode/status/id?taskId=66a066793fe8f9282c3a2e6d`
-    // const test = (await axios.post(url)).data
-    // console.log(test)
 }
 
+const flowLayerControl = (type, show) => {
+    let map = mapStore.getMap()
+    const controlMap = {
+        'lagrange': {
+            add: () => {
+                console.log('add lagrenge');
+                let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix)
+                mapStore.getMap().addLayer(flow, 'mzsLabel')
+            },
+            remove: () => {
+                console.log('rm lagrenge');
+                map.getLayer(globleVariable.lagrangeLayer) && map.removeLayer(globleVariable.lagrangeLayer)
+            }
+        },
+        'euler': {
+            add: () => {
+                console.log('add euler');
+                let flow = new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix)
+                // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
+                // '/scratchSomething/temp/')
+
+                mapStore.getMap().addLayer(flow, 'mzsLabel')
+            },
+            remove: () => {
+                console.log('rm euler');
+                map.getLayer(globleVariable.eulerLayer) && map.removeLayer(globleVariable.eulerLayer)
+            }
+        }
+    }
+    controlMap[type][show ? 'add' : 'remove']()
+}
 
 const showFlowClickHandler = (id) => {
+    console.log(globleVariable)
+    if (!globleVariable.status) {
+        ElNotification({
+            title: '错误',
+            message: '模型尚未运行，缺乏可视化依赖数据',
+            offset: 120,
+            type: 'error',
+        })
+        showFlow.value = 0
+        return
+    }
     if (id === 1) {
         showFlow.value = showFlow.value === 1 ? 0 : 1
+        flowLayerControl('euler', false)
         if (!showFlow.value) {
-            // remove flow
+            flowLayerControl('lagrange', false)
             return
         }
-        // add flow 
+        flowLayerControl('lagrange', true)
         return
     } else if (id === 2) {
         showFlow.value = showFlow.value === 2 ? 0 : 2
+        flowLayerControl('lagrange', false)
         if (!showFlow.value) {
-            // remove flow
+            flowLayerControl('euler', false)
             return
         }
-        // add flow 
+        flowLayerControl('euler', true)
         return
     }
 }
@@ -297,12 +391,13 @@ const mapFlyToRiver = (mapIns) => {
             [120.60909640208264, 32.084171362618625],
         ],
         {
-            // pitch: 32.45,
-            duration: 1000,
-            // zoom: 8,
+            duration: 1500,
         },
     )
 }
+
+
+
 const updateRealtimeWaterCondition = async () => {
     // async request
     const response = {
@@ -322,20 +417,12 @@ const updateRealtimeWaterCondition = async () => {
 
 let realtimeWaterConditionIntervalID = null
 onMounted(async () => {
-    let map = await initPureScratchMap(mapRef.value)
+    let map = await initFineMap(mapRef.value)
     mapStore.setMap(map)
     mapFlyToRiver(map)
     realtimeWaterConditionIntervalID = setInterval(() => {
         updateRealtimeWaterCondition()
     }, 1000 * 60 * 5)
-
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '1') {
-            runModelClickHandler()
-        }
-    })
-
 
 })
 
@@ -638,7 +725,7 @@ div.stability-analysis {
                                 position: relative;
                                 display: block;
                                 height: 100%;
-                                width: 85%;
+                                width: 90%;
                             }
 
                             .grid-content {
@@ -732,6 +819,15 @@ div.stability-analysis {
                                         transform: translateY(-1.5em);
                                     }
                                 }
+                            }
+
+                            .switch.forbbidden {
+
+                                .slider {
+                                    cursor: not-allowed;
+                                    // pointer-events: none;
+                                }
+
                             }
 
                             .text-block {
