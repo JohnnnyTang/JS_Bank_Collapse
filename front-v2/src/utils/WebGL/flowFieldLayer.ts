@@ -1,10 +1,72 @@
 // import {CustomLayerInterface} from 'mapbox-gl'
 // import {FlowFieldManager} from './FlowFieldManager';
 import { FlowFieldController } from './FlowFieldController'
-import { JsonFileParser } from './JsonFileParser'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import axios from 'axios'
+import * as dat from 'dat.gui'
+import './dat_gui_style.css'
+
+class JsonFileParser {
+    //JsonFile info
+    url = '';
+    flowFieldResourceArr: Array<string> = [];
+    seedingResourceArr: Array<string> = []
+    projection2DResource = '';
+    projection3DResource = '';
+    flowFieldTexSize = [0.0, 0.0];
+    seedingTexSize = [0.0, 0.0];
+    projectionTexSize = [0.0, 0.0];
+    flowBoundary = [0.0, 0.0, 0.0, 0.0];
+    extent = [0.0, 0.0, 0.0, 0.0];
+    maxDropRate = 0.0;
+    maxDropRateBump = 0.0;
+    maxSegmentNum = 0.0;
+    maxTrajectoryNum = 0.0;
+    maxTextureSize = 0.0;
+
+    constructor(fileurl: string) {
+        this.url = fileurl
+    }
+
+    async Parsing() {
+        await axios.get(this.url)
+            .then((response) => {
+
+                for (let item of response.data['flow_fields']) {
+                    this.flowFieldResourceArr.push(item);
+                }
+                for (let item of response.data['area_masks']) {
+                    this.seedingResourceArr.push(item)
+                }
+
+                this.projection2DResource = response.data['projection'][0];
+                // this.projection3DResource = response.data['projection']['3D'];
+
+                this.flowFieldTexSize = response.data['texture_size']['flow_field'];
+                this.seedingTexSize = response.data['texture_size']['area_mask'];
+                this.projectionTexSize = response.data['texture_size']['projection'];
+
+                this.flowBoundary[0] = response.data['flow_boundary']['u_min'];
+                this.flowBoundary[1] = response.data['flow_boundary']['v_min'];
+                this.flowBoundary[2] = response.data['flow_boundary']['u_max'];
+                this.flowBoundary[3] = response.data['flow_boundary']['v_max'];
+
+                this.extent[0] = response.data['extent'][0];
+                this.extent[1] = response.data['extent'][1];
+                this.extent[2] = response.data['extent'][2];
+                this.extent[3] = response.data['extent'][3];
+
+                this.maxDropRate = response.data['constraints']['max_drop_rate'];
+                this.maxDropRateBump = response.data['constraints']['max_drop_rate_bump'];
+                this.maxSegmentNum = response.data['constraints']['max_segment_num'];
+
+                // trajectoryNum === streamline_num
+                this.maxTrajectoryNum = response.data['constraints']['max_streamline_num'];
+                this.maxTextureSize = response.data['constraints']['max_texture_size'];
+            })
+    }
+}
 
 
 export default class FlowFieldLayer {
@@ -17,7 +79,8 @@ export default class FlowFieldLayer {
     resourcePrefix: string;
     map: mapboxgl.Map | null = null;
     GL: WebGL2RenderingContext | null = null;
-    exaggeration: number = 0.9;
+    gui: dat.GUI | null = null;
+    exaggeration: number = 4.0;
 
     uboMapBufferData: Float32Array = new Float32Array(12);
     phaseCount: number = 0.0;
@@ -181,7 +244,7 @@ export default class FlowFieldLayer {
     async FillTextureByImage(gl: WebGL2RenderingContext, Tex: WebGLTexture, format: number, filter: number, width: number, height: number, imgSrc: string, type: string) {
         // /temp/data/modelServer/file?caseId=35580981ae885d6d4d92bd22d453816d&name=visualization/mask_0.png
         let imgSrc_backEnd = this.resourcePrefix + imgSrc
-        console.log(imgSrc_backEnd)
+        // console.log(imgSrc_backEnd)
         //reparsing 
         if (type === 'Float') {
             axios.get(imgSrc_backEnd, { responseType: 'blob' })
@@ -285,21 +348,19 @@ export default class FlowFieldLayer {
 
     async prepare(gl: WebGL2RenderingContext) {
         await this.parser.Parsing();
-
+        console.log(this.parser)
         //get gl extensions 
         const extensions = gl.getSupportedExtensions()!
         for (let ext of extensions) {
             gl.getExtension(ext);
-            // console.log(ext);
-
         }
 
         //parser as a JsonFileParser and a data storage
         //just for short writing
-        console.log(this.parser)
-        // maxSegmentNum === segmentNum === segmentPrepare
 
-        this.parser.trajectoryNum = this.controller.lineNum;
+        // maxSegmentNum === segmentNum === segmentPrepare
+        // this.parser.trajectoryNum = this.parser.maxTrajectoryNum;
+        this.parser.trajectoryNum = 65536;
         this.parser.segmentPrepare = this.parser.maxSegmentNum;
         this.parser.segmentNum = this.parser.maxSegmentNum;
         this.parser.maxBlockSize = Math.ceil(Math.sqrt(this.parser.maxTrajectoryNum));
@@ -518,8 +579,8 @@ export default class FlowFieldLayer {
 
 
     tickfunc(gl: WebGL2RenderingContext, matrix: number[]) {
-        this.beginBlock = (this.beginBlock + 1) % this.parser.segmentNum;
 
+        this.beginBlock = (this.beginBlock + 1) % this.parser.segmentNum;
         this.swap();
 
         if (this.controller.isUnsteady) {
@@ -527,6 +588,7 @@ export default class FlowFieldLayer {
             // here  set the uboMapBufferData[0] -- would be a data in (0,1)
             this.timeCount = this.timeCount + 1;
         }
+
 
 
         this.uboMapBufferData[1] = this.parser.maxSegmentNum;
@@ -544,6 +606,7 @@ export default class FlowFieldLayer {
         // this.uboMapBufferData[11] = this.parser.flowBoundary[3];
 
         //## simulation
+
 
         gl.bindBuffer(gl.UNIFORM_BUFFER, this.BO);//array_buffer as uniform_buffer
         gl.bufferData(gl.UNIFORM_BUFFER, this.uboMapBufferData, gl.DYNAMIC_DRAW);
@@ -617,6 +680,7 @@ export default class FlowFieldLayer {
             return;
         }
 
+
         // // console.log('all block is updated , start rendering');
 
         //## render
@@ -635,6 +699,7 @@ export default class FlowFieldLayer {
 
         // ------primitive == 0  ---> flow
         // ------trajectoryShader working!
+
 
         gl.useProgram(this.trajectoryShaderObj.program);
         location = gl.getUniformLocation(this.trajectoryShaderObj.program, 'particlePool');
@@ -661,7 +726,7 @@ export default class FlowFieldLayer {
         gl.uniformBlockBinding(this.trajectoryShaderObj.program, blockIndex, bindingPoint);
 
 
-        gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, (this.parser.segmentNum - 1) * 2, this.parser.trajectoryNum);
+        gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, (this.controller.segmentNum - 1) * 2, this.controller.lineNum);
 
         gl.bindVertexArray(null);
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -675,9 +740,13 @@ export default class FlowFieldLayer {
 
         this.map = map;
         await this.prepare(gl);
+        this.initGUI()
 
     }
 
+    onRemove() {
+        this.gui.destroy()
+    }
 
     render(gl: WebGL2RenderingContext, matrix: number[]) {
         if (!this.isReady) {
@@ -688,5 +757,22 @@ export default class FlowFieldLayer {
 
         this.tickfunc(gl, matrix);
         this.map?.triggerRepaint();
+    }
+
+    initGUI = () => {
+        this.gui = new dat.GUI()
+        this.gui.domElement.style.position = 'absolute'
+        this.gui.domElement.style.top = '15vh'
+        this.gui.domElement.style.right = '1vw'
+        this.gui.add(this.controller, 'isUnsteady', true).name('非稳态流场').onChange(value => this.controller.isUnsteady = value);
+        this.gui.add(this.controller, 'lineNum', 0, 65536).name('流线数量').onChange(value => this.controller.lineNum = value);
+        this.gui.add(this.controller, 'segmentNum', 1, 64).name('流线分段数').onChange(value => this.controller.segmentNum = value);
+        // this.gui.add(this.controller, 'progressRate', 0.0, 1.0).name('进度率').onChange(value => this.controller.progressRate = value);
+        this.gui.add(this.controller, 'speedFactor', 0.1, 10.0).name('速度因子').onChange(value => this.controller.speedFactor = value);
+        this.gui.add(this.controller, 'fillWidth', 0, 10).name('填充宽度').onChange(value => this.controller.fillWidth = value);
+        this.gui.add(this.controller, 'aaWidth', 0, 10).name('反走样宽度').onChange(value => this.controller.aaWidth = value);
+        this.gui.add(this.controller, 'colorScheme', [1.0, 2.0, 3.0]).name('颜色方案').onChange(value => this.controller.colorScheme = value);
+
+        this.gui.open();
     }
 }
