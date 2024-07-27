@@ -4,7 +4,7 @@ import { useMapStore, useSceneStore, useLayerStore } from '../store/mapStore'
 import popUpContent from '../components/dataVisual/featureDetails/popUpContent.vue'
 import { layerAddFunctionMap } from '../components/dataVisual/layerUtil'
 import PureScratchMap from './WebGL/pureScratchMap'
-
+const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 const initMap = async (ref) => {
     return new Promise((resolve, reject) => {
         const map = new mapboxgl.Map({
@@ -22,6 +22,194 @@ const initMap = async (ref) => {
         })
     })
 }
+
+const attachBaseLayer = (map) => {
+    map.addSource('mzsPlaceLabelSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
+    })
+    map.addSource('mzsPlaceLineSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
+    })
+    map.addSource('dockAreaSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
+    })
+    map.addSource('dockAreaLabelSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}'],
+    })
+    map.addSource('fixProjectAreaSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}'],
+    })
+    map.addSource('fixProjectLineSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
+    })
+    map.addSource('fixProjectAreaLabelSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}'],
+    })
+    map.addSource('riverPlaceLabelSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+    })
+    map.addSource('riverBeachSource', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+    })
+    map.addSource('zjgLine', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
+    })
+    // 民主沙面
+    map.addLayer({
+        id: 'riverBeachArea',
+        type: 'fill',
+        source: 'riverBeachSource',
+        'source-layer': 'default',
+        paint: {
+            'fill-color': 'rgba(210,244,247, 1)',
+        },
+    })
+    // zjg大桥
+    map.addLayer({
+        id: 'zjgBridge',
+        type: 'line',
+        source: 'zjgLine',
+        'source-layer': 'default',
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+        },
+        paint: {
+            'line-opacity': 0.6,
+            // 'line-pattern': 'test',
+            'line-color': 'rgb(183, 189, 183)',
+            'line-width': 2.0,
+        },
+    })
+    // 民主地物地貌
+    map.addLayer({
+        id: 'mzsLine',
+        type: 'line',
+        source: 'mzsPlaceLineSource',
+        'source-layer': 'default',
+        // filter:['==', '$type', 'LineString'],
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+        },
+        paint: {
+            'line-opacity': 1,
+            'line-color': 'rgba(26, 87, 138, 0.6)',
+            'line-width': 2,
+        },
+    })
+    // 整治工程
+    map.addLayer({
+        id: 'fjsFixLine',
+        type: 'line',
+        source: 'fixProjectLineSource',
+        'source-layer': 'default',
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+        },
+        paint: {
+            'line-opacity': 1,
+            'line-color': 'rgba(216, 217, 228, 0.5)',
+            'line-width': 4,
+        },
+    })
+    map.addLayer({
+        id: 'fixProjectFillLayer',
+        type: 'fill',
+        source: 'fixProjectAreaSource',
+        'source-layer': 'default',
+        paint: {
+            'fill-color': 'rgba(220,224,237, 0.8)',
+            'fill-outline-color': 'rgba(220,224,237, 0.8)',
+        },
+    })
+    map.addLayer({
+        id: 'fixProjectAreaLabel',
+        type: 'symbol',
+        source: 'fixProjectAreaLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'layer'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'right',
+            'text-size': 12,
+        },
+        paint: {
+            'text-color': 'rgba(31, 44, 126, 0.6)',
+        },
+    })
+    map.addLayer({
+        id: 'dockArea',
+        type: 'fill',
+        source: 'dockAreaSource',
+        'source-layer': 'default',
+        paint: {
+            'fill-color': 'rgb(172,214,239)',
+        },
+    })
+    map.addLayer({
+        id: 'mzsLabel',
+        type: 'symbol',
+        source: 'mzsPlaceLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'left',
+        },
+        paint: {
+            'text-color': 'rgba(31, 14, 126, 0.75)',
+        },
+    })
+    map.addLayer({
+        id: 'dockAreaLabel',
+        type: 'symbol',
+        source: 'dockAreaLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'project_name'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'bottom',
+            'text-size': 12,
+        },
+        paint: {
+            'text-color': 'rgba(31, 44, 126, 0.6)',
+        },
+    })
+    map.addLayer({
+        id: 'riverPlaceLabel',
+        type: 'symbol',
+        source: 'riverPlaceLabelSource',
+        'source-layer': 'default',
+        layout: {
+            'text-field': ['get', 'label'],
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            // 'text-offset': [0, 1.25],
+            'text-anchor': 'left',
+            'text-size': 18,
+        },
+        paint: {
+            'text-color': 'rgba(31, 44, 226, 0.8)',
+        },
+    })
+
+
+}
+
 
 
 const initPureScratchMap = (ref) => {
@@ -42,29 +230,55 @@ const initPureScratchMap = (ref) => {
             // minZoom: 8,
         }).on('load', async () => {
             console.log('PureScratchMap init!')
-            map.addLayer({
-                id: 'sky',
-                type: 'sky',
-                paint: {
-                    'sky-type': 'gradient',
-                    'sky-gradient': [
-                        'interpolate',
-                        ['linear'],
-                        ['sky-radial-progress'],
-                        0.8,
-                        'rgba(135, 206, 235, 1)', // 远处颜色
-                        1,
-                        'rgba(135, 206, 235, 1)', // 近处颜色
-                    ],
-                    'sky-gradient-center': [0, 0],
-                    'sky-gradient-radius': 90,
-                    'sky-opacity': 1,
-                },
-            })
+            // map.addLayer({
+            //     id: 'sky',
+            //     type: 'sky',
+            //     paint: {
+            //         'sky-type': 'gradient',
+            //         'sky-gradient': [
+            //             'interpolate',
+            //             ['linear'],
+            //             ['sky-radial-progress'],
+            //             0.8,
+            //             'rgba(135, 206, 235, 1)', // 远处颜色
+            //             1,
+            //             'rgba(135, 206, 235, 1)', // 近处颜色
+            //         ],
+            //         'sky-gradient-center': [0, 0],
+            //         'sky-gradient-radius': 90,
+            //         'sky-opacity': 1,
+            //     },
+            // })
             res(map)
         })
     })
 }
+
+const initFineMap = (ref) => {
+    return new Promise((res, rej) => {
+        const map = new PureScratchMap({
+            container: ref.id, // container ID
+            accessToken:
+                'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+            // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+            style: getHighZoomStyleJson(),
+            center: [120.312, 31.917], // starting position [lng, lat]
+            maxZoom: 22,
+            zoom: 8,
+            projection: 'mercator',
+            antialias: true,
+            useWebGL2: true,
+        }).on('load', async () => {
+            console.log('PureScratchMap init!')
+            attachBaseLayer(map)
+            res(map)
+        })
+    })
+}
+
+
+
+
 
 const initBaseMap = (ref) => {
     return new Promise((resolve, reject) => {
@@ -6613,5 +6827,6 @@ export {
     showLayersFunction,
     hideLayersFunction,
     initPureScratchMap,
+    initFineMap,
     getHighZoomStyleJson,
 }

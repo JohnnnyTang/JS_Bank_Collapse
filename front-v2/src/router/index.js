@@ -65,10 +65,10 @@ const routes = [
         path: '/main',
         component: () => import("../views/BankMainView.vue")
     },
-    // {
-    //     path: '/test',
-    //     component: ()=> import("../components/dataVisual/test.vue")
-    // },
+    {
+        path: '/test',
+        component: ()=> import("../components/dataVisual/test.vue")
+    },
     {
         path: '/modelStore',
         redirect: '/modelStore/main',
@@ -91,13 +91,17 @@ const routes = [
                 component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
             },
             {
-                path: 'stabilityAnalysis',
+                path: 'stabilityAnalysis3',
                 component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
             },
             {
                 path: 'analysisCenter',
                 component: () => import('../components/modelStore/views/AnalysisCenter.vue'),
             },
+            {
+                path: 'stabilityAnalysis',
+                component: () => import('../components/modelStore/views/StabilityAnalysis3.vue'),
+            }
             {
                 path: 'riskWarning',
                 component: () => import('../components/modelStore/views/RiskWarning.vue'),

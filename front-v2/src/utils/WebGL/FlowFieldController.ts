@@ -15,21 +15,24 @@ export class FlowFieldController{
     primitive: number;
     platform: string;
 
+    stop: boolean;
+
     constructor(){
         this.lineNum =30000;
-        this.segmentNum = 8;
+        this.segmentNum = 24;
         this.fullLife = this.segmentNum * 10;
         this.progressRate = 0.0;
         this.speedFactor = 2.0;
         this.dropRate = 0.01;
-        this.dropRateBump = 0.005;
+        this.dropRateBump = 0.002;
         this.fillWidth = 2;
         this.aaWidth = 3;
-        this.colorScheme = 0;
+        this.colorScheme = 1;
         this.isUnsteady = true;
         this.content = "none";
         this.primitive = 0;
         this.platform = "mapbox no worker";
+        this.stop = false;
     }
 
     //省去 Constrainst，先用这里的死数据来尝试
