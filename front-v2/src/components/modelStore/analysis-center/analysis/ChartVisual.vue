@@ -12,26 +12,6 @@
       :chartInfo="chartInfo"
       v-if="chartInfo.visualType === 'sectionFlush'"
     />
-    <!-- <flow-sand-z
-      :visualId="chartInfo.visualId"
-      v-if="chartInfo.visualType === 'flowSand_Z'"
-    />
-    <rate-and-direction
-      :visualId="chartInfo.visualId"
-      v-if="chartInfo.visualType === 'rateDirection'"
-    />
-    <salinity
-      :visualId="chartInfo.visualId"
-      v-if="chartInfo.visualType === 'salinity'"
-    />
-    <sand-content
-      :visualId="chartInfo.visualId"
-      v-if="chartInfo.visualType === 'sandContent'"
-    />
-    <suspension
-      :visualId="chartInfo.visualId"
-      v-if="chartInfo.visualType === 'suspension'"
-    /> -->
   </div>
 </template>
 

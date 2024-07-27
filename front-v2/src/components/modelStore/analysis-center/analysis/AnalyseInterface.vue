@@ -310,9 +310,11 @@ export default defineComponent({
     const btnClick = () => {
       if (props.analyseType === "section") {
         if (
-          sectionValue.value != "" &&
-          sectionDem.value != undefined &&
-          inputValue.value != ""
+          1
+          // TODO: 输入非空判断
+          // sectionValue.value != "" &&
+          // sectionDem.value != undefined &&
+          // inputValue.value != ""
         ) {
           context.emit("returnParameter", {
             section: sectionValue.value,
@@ -332,9 +334,10 @@ export default defineComponent({
         }
       } else if (props.analyseType === "volume") {
         if (
-          sectionValue.value != "" &&
-          sectionDem.value != undefined &&
-          inputValue.value != ""
+          1
+          // sectionValue.value != "" &&
+          // sectionDem.value != undefined &&
+          // inputValue.value != ""
         ) {
           context.emit("returnParameter", {
             region: sectionValue.value,
@@ -358,21 +361,29 @@ export default defineComponent({
         props.analyseType === "regionFlush"
       ) {
         if (
-          sectionValue.value != "" &&
-          benchmarkDem.value != undefined &&
-          referDem.value != undefined &&
-          inputValue.value != ""
+          1
+          // sectionValue.value != "" &&
+          // benchmarkDem.value != undefined &&
+          // referDem.value != undefined &&
+          // inputValue.value != ""
         ) {
-          if (referDem.value.fileId === benchmarkDem.value.fileId) {
-            notice("warning", "警告", "基准DEM数据不能与参考DEM数据相同");
-          } else {
-            context.emit("returnParameter", {
-              section: sectionValue.value,
-              benchmarkDem: benchmarkDem.value,
-              referDem: referDem.value,
-              fileName: inputValue.value,
-            });
-          }
+          //TODO:
+          // if (referDem.value.fileId === benchmarkDem.value.fileId) {
+          //   notice("warning", "警告", "基准DEM数据不能与参考DEM数据相同");
+          // } else {
+          //   context.emit("returnParameter", {
+          //     section: sectionValue.value,
+          //     benchmarkDem: benchmarkDem.value,
+          //     referDem: referDem.value,
+          //     fileName: inputValue.value,
+          //   });
+          // }
+          context.emit("returnParameter", {
+            section: sectionValue.value,
+            benchmarkDem: benchmarkDem.value,
+            referDem: referDem.value,
+            fileName: inputValue.value,
+          });
         } else if (sectionValue.value === "") {
           if (props.analyseType === "sectionFlush") {
             notice("warning", "警告", "请选择断面");
@@ -388,19 +399,25 @@ export default defineComponent({
         }
       } else if (props.analyseType === "flushContour") {
         if (
-          benchmarkDem.value != undefined &&
-          referDem.value != undefined &&
-          inputValue.value != ""
+          1
+          // benchmarkDem.value != undefined &&
+          // referDem.value != undefined &&
+          // inputValue.value != ""
         ) {
-          if (referDem.value.fileId === benchmarkDem.value.fileId) {
-            notice("warning", "警告", "基准DEM数据不能与参考DEM数据相同");
-          } else {
-            context.emit("returnParameter", {
-              benchmarkDem: benchmarkDem.value,
-              referDem: referDem.value,
-              fileName: inputValue.value,
-            });
-          }
+          // if (referDem.value.fileId === benchmarkDem.value.fileId) {
+          //   notice("warning", "警告", "基准DEM数据不能与参考DEM数据相同");
+          // } else {
+          //   context.emit("returnParameter", {
+          //     benchmarkDem: benchmarkDem.value,
+          //     referDem: referDem.value,
+          //     fileName: inputValue.value,
+          //   });
+          // }
+          context.emit("returnParameter", {
+            benchmarkDem: benchmarkDem.value,
+            referDem: referDem.value,
+            fileName: inputValue.value,
+          });
         } else {
           let target = "";
           if (benchmarkDem.value === undefined) {
@@ -491,7 +508,8 @@ export default defineComponent({
 
     onMounted(async () => {
       skeletonFlag.value = true;
-      await getParame(props.analyseType);
+      // TODO: 获取输入参数
+      // await getParame(props.analyseType);
       skeletonFlag.value = false;
     });
 

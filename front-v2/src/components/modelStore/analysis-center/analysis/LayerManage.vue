@@ -60,7 +60,6 @@ export default defineComponent({
       children: "children",
       label: "label",
     };
-    const serach = ref("");
     // {
     //     id: string;
     //     flag: boolean;
@@ -79,7 +78,7 @@ export default defineComponent({
     // }
     const addLayer = async (val) => {
       for (let i = 0; i < treeData.value.length; i++) {
-        if (treeData.value[i].id === val.id) {
+        if (treeData.value[i].caseid === val.caseid) {
           return;
         }
       }
@@ -179,22 +178,19 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      console.log(props.layerList)
       props.layerList?.forEach((item) => {
         treeData.value.push({
-          id: item.id,
+          caseid: item.id,
           label: item.fileName,
           visualType: item.visualType,
           flag: true,
           children: [],
-          visualId: item.visualId,
         });
       });
     });
 
     return {
       Search,
-      serach,
       treeData,
       defaultProps,
       addLayer,

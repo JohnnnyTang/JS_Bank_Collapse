@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, onMounted, ref } from "vue";
 import ModelRequest from "../../modelApi.js";
 const { getAnalysisResult } = ModelRequest;

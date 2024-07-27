@@ -2,7 +2,7 @@
   <div class="right-visual">
     <div class="main">
       <div class="map-container">
-        <div ref="container" class="container"  id="map"></div>
+        <div ref="container" class="container" id="map"></div>
       </div>
     </div>
     <el-dialog v-model="chartVisual" width="900px" id="chart" title="可视化结果">
@@ -29,7 +29,7 @@
 import { computed, defineComponent, nextTick, onMounted, ref } from "vue";
 import mapBoxGl, { AnySourceData } from "mapbox-gl";
 import ModelRequest from "../../modelApi.js";
-const { getCoordinates, getAnalysisGeoJson, getContent } = ModelRequest;
+const { getResultData, getCoordinates, getAnalysisGeoJson, getContent } = ModelRequest;
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ChartVisual from "./ChartVisual.vue";
@@ -185,11 +185,10 @@ export default defineComponent({
 
     // param: {
     //   id: string;
-    //   visualId: string;
     //   visualType: string;
     // }
     const addMapLayer = async (param) => {
-      if (map.getLayer(param.id) === undefined) {
+      if (map.getLayer(param.caseid) === undefined) {
         let type;
         if (
           param.visualType === "lineVectorTile3D" ||
@@ -217,19 +216,29 @@ export default defineComponent({
           param.visualType === "polygonVectorTile3D" ||
           param.visualType === "flushContour"
         ) {
-          map.addSource(param.id, {
-            type: "vector",
-            tiles: [
-              `${import.meta.env.VITE_APP_BACK_ADDRESS}visual/getVectorTiles/${
-                param.visualId
-              }/{x}/{y}/{z}`,
-            ],
+          // map.addSource(param.id, {
+          //   type: "vector",
+          //   tiles: [
+          //     `${import.meta.env.VITE_APP_BACK_ADDRESS}visual/getVectorTiles/${
+          //       param.visualId
+          //     }/{x}/{y}/{z}`,
+          //   ],
+          // });
+          // map.addLayer({
+          //   id: param.id,
+          //   source: param.id,
+          //   type: type,
+          //   "source-layer": param.visualId,
+          // });
+          const geojsonData = await getResultData('common', param.caseid, param.name)
+          map.addSource(param.caseid, {
+            type: "geojson",
+            data: geojsonData.data
           });
           map.addLayer({
-            id: param.id,
-            source: param.id,
-            type: type,
-            "source-layer": param.visualId,
+            id: param.caseid,
+            source: param.caseid,
+            type: type
           });
         } else if (
           param.visualType === "rasterTile" ||
@@ -254,21 +263,22 @@ export default defineComponent({
           param.visualType === "movePng" ||
           param.visualType === "regionFlush"
         ) {
-          const coordinates = await getCoordinates(param.visualId);
-          if (coordinates != null && coordinates.code === 0) {
-            map.addSource(param.id, {
-              type: "image",
-              url: `${import.meta.env.VITE_APP_BACK_ADDRESS}visual/getPngResource/${
-                param.visualId
-              }`,
-              coordinates: coordinates.data,
-            });
-            map.addLayer({
-              id: param.id,
-              type: "raster",
-              source: param.id,
-            });
-          }
+          map.addSource(param.caseid, {
+            type: "image",
+            url: `/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            // 'url': 'https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif',
+            'coordinates': [
+                [120.425, 46.437],
+                [124.516, 46.437],
+                [124.516, 37.936],
+                [120.425, 37.936]
+            ]
+          });
+          map.addLayer({
+            id: param.caseid,
+            type: "raster",
+            source: param.caseid,
+          });
         } else if (param.visualType === "volume") {
           const content = await getContent(param.visualId);
           if (content != null && content.code === 0) {
@@ -419,7 +429,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .right-visual {
-
   :deep() .el-dialog {
     padding: 0;
 

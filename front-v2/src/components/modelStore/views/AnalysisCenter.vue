@@ -109,7 +109,6 @@ export default defineComponent({
     //   },
     // }
     const operateLayer = (val) => {
-      console.log(val);
       if (val.type === "add") {
         layerManage.value.addLayer(val.content);
         rightMap.value.addMapLayer(val.content);
@@ -152,7 +151,6 @@ export default defineComponent({
     };
 
     const analyse = async (val) => {
-      console.log(val);
       await dataManage.value.addAnalyse(val);
     };
 
@@ -161,10 +159,11 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      const res = await ModelRequest.getLayersInfo(import.meta.env.VITE_APP_ROUTER_ID);
-      if (res != null && res.code === 0) {
-        layerList.value = res.data;
-      }
+      // TODO: sessionstorage获得图层列表
+      // const res = await ModelRequest.getLayersInfo(import.meta.env.VITE_APP_ROUTER_ID);
+      // if (res != null && res.code === 0) {
+      //   layerList.value = res.data;
+      // }
       // const data = window.sessionStorage.getItem("layerList");
       // if (data != null) layerList.value = JSON.parse(data);
       skeletonFlag.value = false;
