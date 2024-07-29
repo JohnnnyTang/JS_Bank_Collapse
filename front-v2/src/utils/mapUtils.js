@@ -227,6 +227,7 @@ const initPureScratchMap = (ref) => {
             // GPUFrame: GPUFrame,
             antialias: true,
             useWebGL2: true,
+            trackResize: true,
             // minZoom: 8,
         }).on('load', async () => {
             console.log('PureScratchMap init!')

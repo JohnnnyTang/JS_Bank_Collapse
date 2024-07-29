@@ -3,6 +3,7 @@ import {
     createWebHistory,
     createWebHashHistory,
 } from 'vue-router'
+import axios from 'axios';
 // 1、引入组件
 // import BankMainPage from "../views/BankMainPage.vue"
 /**
@@ -67,7 +68,7 @@ const routes = [
     },
     {
         path: '/test',
-        component: ()=> import("../components/dataVisual/test.vue")
+        component: () => import("../components/dataVisual/test.vue")
     },
     {
         path: '/modelStore',
@@ -89,10 +90,6 @@ const routes = [
             {
                 path: 'stabilityAnalysis2',
                 component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
-            },
-            {
-                path: 'stabilityAnalysis3',
-                component: () => import('../components/modelStore/views/StabilityAnalysis2.vue'),
             },
             {
                 path: 'stabilityAnalysis',
@@ -154,7 +151,17 @@ router.beforeEach((to, from, next) => {
     } else {
         const isLoggedIn = localStorage.getItem('token');
         if (isLoggedIn) {
-            next();
+            axios.get('/api/data/monitorInfo').then(res => {
+                // as token check
+                // if (res.data.state ) next()
+                // else next('/login');
+                console.log(res.data)
+                next()
+            }).catch(err => {
+                console.log(err)
+                next('/login');
+            })
+            // next()
         } else {
             next('/login');
         }

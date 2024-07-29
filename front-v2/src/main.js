@@ -9,6 +9,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 import DataVVue3 from '@kjgl77/datav-vue3'
 import { DraggablePlugin } from '@braks/revue-draggable'
+import { useStatusStore } from './store/statusStore'
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
@@ -28,9 +29,10 @@ axios.interceptors.request.use(
 )
 axios.interceptors.response.use(
     response => {
-        if (response.data["msg"] === "token过期") {
-            ElMessage.error("用户认证过期，请重新登录")
+        if (response.data["state"] === false) {
+            ElMessage.error("用户认证未通过，请重新登录")
             router.push('/login')
+            useStatusStore().loginStatus = false
             return Promise.reject(response.data)
         }
         return response

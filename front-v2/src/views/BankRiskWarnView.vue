@@ -1524,8 +1524,6 @@ const addBankLineRiskLayer = (map, profileList) => {
 }
 
 onMounted(async () => {
-    await axios.get('/api/data/monitorInfo')
-
     await initPureScratchMap(mapContainer.value).then(async (map) => {
         mapInstance = map
         // map.on('draw.create', function (e) {
