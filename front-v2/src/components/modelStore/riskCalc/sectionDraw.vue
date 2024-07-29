@@ -384,8 +384,8 @@ const convertToMercator = (lonLat) => {
 <style lang="scss" scoped>
 div.section-choose-content {
     position: relative;
-    height: 100%;
-    width: 100%;
+    height: 60vh;
+    width: 50vw;
     overflow: hidden;
 
     &.section-choose-content {
@@ -414,7 +414,7 @@ div.section-choose-content {
         border: 2px solid #1735ae;
 
         &.section {
-            width: 30%;
+            width: 28%;
         }
 
         div.current-year-title {

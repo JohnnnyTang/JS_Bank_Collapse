@@ -9,12 +9,73 @@ const props = defineProps({
     },
 })
 
+// const nodeContent = computed(() => {
+//     if (props.data.name == "评估断面选择") {
+//         if (props.data.status == 0) {
+//             return '正在选择'
+//         }
+//         else if (props.data.status == 1) {
+//             return '已选择'
+//         }
+//         else if (props.data.status == 2) {
+//             return '已计算剖面'
+//         }
+//     }
+//     else if (props.data.name == '动力指标计算') {
+//         if (props.data.status == -1) {
+//             return '请先选择断面'
+//         }
+//         else if (props.data.status == 0) {
+//             return '配置中'
+//         }
+//         else if (props.data.status == 1) {
+//             return '正在计算'
+//         }
+//         else if (props.data.status == 2) {
+//             return props.data.result
+//         }
+//     }
+//     else if (props.data.name == '演变分析指标计算') {
+//         if (props.data.status == -1) {
+//             return '请先选择断面'
+//         }
+//         else if (props.data.status == 0) {
+//             return '配置中'
+//         }
+//         else if (props.data.status == 1) {
+//             return '正在计算'
+//         }
+//         else if (props.data.status == 2) {
+//             return props.data.result
+//         }
+//     }
+//     else {
+//         if (props.data.status == -2) {
+//             return '请完成前置步骤'
+//         }
+//         else if (props.data.status == -1) {
+//             return '请完成指标计算'
+//         }
+//         else if (props.data.status == 0) {
+//             return '配置中'
+//         }
+//         else if (props.data.status == 1) {
+//             return '正在计算'
+//         }
+//         else if (props.data.status == 2) {
+//             return props.data.result
+//         }
+//     }
+
+// })
+
 console.log(props.data)
 </script>
 
 <template>
-    <Handle type="source" :position="Position.Bottom"  />
-    <Handle type="target" :position="Position.Top" />
+    <!-- <Handle type="target" :position="props.data.targetPosition" /> -->
+    <Handle type="source" :position="Position.Right"  />
+    <Handle type="target" :position="Position.Left" />
     <div class="process-node" :status-id="props.data.status">
         <div class="node-title">{{ props.data.label }}</div>
         <div class="node-content" :status-id="props.data.status">{{ 'happy' }}</div>
