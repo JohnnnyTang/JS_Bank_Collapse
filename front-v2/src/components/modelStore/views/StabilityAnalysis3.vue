@@ -13,17 +13,17 @@
                             </div>
                             <div class="content">
 
-                                <el-tabs type="border-card" class="tab-pages">
+                                <el-tabs type="border-card" class="tab-pages" v-model="activeTab">
                                     <el-tab-pane>
                                         <template #label>
                                             <span class="custom-tabs-label">
                                                 <el-icon>
                                                     <Histogram />
                                                 </el-icon>
-                                                <span>实时</span>
+                                                <span>匹配工况</span>
                                             </span>
                                         </template>
-                                        <div class="condition-card">
+                                        <!-- <div class="condition-card">
                                             <div class="set-icon"></div>
                                             <div class="center">
                                                 实时水文条件
@@ -44,6 +44,38 @@
                                                 :class="{ 'active': true }">
                                                 确定
                                             </button>
+                                        </div> -->
+                                        <div class="condition-card">
+                                            <div class="set-icon"></div>
+                                            <div class="center">
+                                                匹配工况
+                                            </div>
+
+                                            <div class="section-selectior-item">
+                                                <el-select v-model="flowSelected" placeholder="选择流量"
+                                                    style="width: 10vw; height: 3.5vh">
+                                                    <el-option v-for="item in selectableFlowList" :key="item" :label="item"
+                                                        :value="item"> </el-option>
+                                                </el-select>
+                                            </div>
+                                            <div class="section-selectior-item">
+                                                <el-select v-model="tideSelected" placeholder="选择潮型"
+                                                    style="width: 10vw; height: 3.5vh">
+                                                    <el-option v-for="item in selectableTideList" :key="item" :label="item"
+                                                        :value="item"> </el-option>
+                                                </el-select>
+                                            </div>
+
+                                            <!-- <div class="last-update-time">
+                                                <div class="water-condition-item">
+                                                    <span class="water-condition-title">上次更新：</span>
+                                                    <span class="water-condition-value">{{ updateTime }}</span>
+                                                </div>
+                                            </div> -->
+                                            <button class="condition-button" @click="conditionClickHandler('match')"
+                                                :class="{ 'active': true }">
+                                                确定
+                                            </button>
                                         </div>
                                     </el-tab-pane>
                                     <el-tab-pane>
@@ -52,13 +84,13 @@
                                                 <el-icon>
                                                     <Tools />
                                                 </el-icon>
-                                                <span>自定义</span>
+                                                <span>新建工况</span>
                                             </span>
                                         </template>
                                         <div class="condition-card">
                                             <div class="set-icon"></div>
                                             <div class="center">
-                                                特定水文条件
+                                                新建工况
                                             </div>
                                             <div class="realtime-water-condition">
                                                 <div class="water-condition-item">
@@ -70,19 +102,20 @@
                                                 </div>
                                                 <div class="water-condition-item">
                                                     <span class="water-condition-title">大潮潮位：</span>
-
                                                     <el-input v-model="customParams.maxTide"
                                                         style="width: 50%; height: 70%;" placeholder="请输入潮位" />
-
                                                 </div>
                                                 <div class="water-condition-item">
                                                     <span class="water-condition-title">小潮潮位：</span>
-
                                                     <el-input v-model="customParams.minTide"
                                                         style="width: 50%; height: 70%;" placeholder="请输入潮位" />
-
                                                 </div>
                                             </div>
+
+                                            <button class="realtime-button" @click="updateRealtimeWaterCondition()">
+                                                实时工况
+                                            </button>
+
                                             <button class="condition-button" @click="conditionClickHandler('custom')"
                                                 :class="{ 'active': true }">
                                                 确定
@@ -113,7 +146,8 @@
                                         </el-col>
                                         <el-col :span="8">
                                             <div class="running-control grid-content">
-                                                <div class="run-button" @click="runModelClickHandler">运行</div>
+                                                <div class="run-button" @click="runModelClickHandler">{{ runningText }}
+                                                </div>
                                             </div>
                                         </el-col>
                                     </el-row>
@@ -171,10 +205,10 @@
 <script setup>
 import ModelTitleVue from '../ModelTitle.vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import { initFineMap } from '../../../utils/mapUtils';
 import { useMapStore } from '../../../store/mapStore';
-import { ElNotification } from 'element-plus'
+import { ElNotification, ElMessageBox } from 'element-plus'
 import axios from 'axios';
 import dayjs from 'dayjs';
 import FlowFieldLayer from '../../../utils/WebGL/flowFieldLayer'
@@ -192,6 +226,7 @@ let globleVariable = reactive({
     stationBinUrl: null,
     uvBinUrls: null,
     status: false,
+    runningStatus: 'NONE',
     lagrangeLayer: 'flowLayer1',
     eulerLayer: 'flowLayer2',
 })
@@ -201,10 +236,12 @@ const updateTime = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 const showFlow = ref(0)
 const modelRunnningStatusDesc = ref('未运行')
 const modelRunnningProgress = ref(0)
+const activeTab = ref('1')
 const params = ref({
     flow: null,
     maxTide: null,
     minTide: null,
+    tideType: null,
 })
 const customParams = ref({
     flow: null,
@@ -230,6 +267,13 @@ const statusStyle = computed(() => {
             return { color: 'rgb(255, 255, 255)' }
     }
 })
+const flowSelected = ref(null)
+const tideSelected = ref(null)
+const selectableFlowList = [88000, 98000, 100000, 120000, 130000, 150000]
+const selectableTideList = ['大潮', '中潮', '小潮']
+const runningText = computed(() => {
+    return activeTab.value === '0' ? '匹配' : '运行'
+})
 
 
 const check = (p) => {
@@ -239,8 +283,14 @@ const check = (p) => {
     return true
 }
 const conditionClickHandler = (type) => {
-    if (type === 'realtime') {
-        params.value = tableData.value[0]
+    // if (type === 'realtime') {
+    //     params.value = tableData.value[0]
+    // } 
+    if (type === 'match') {
+        params.value = {
+            flow: flowSelected.value,
+            tideType: tideSelected.value,
+        }
     } else if (type === 'custom') {
         params.value = {
             flow: Number(customParams.value.flow),
@@ -251,7 +301,8 @@ const conditionClickHandler = (type) => {
     if (check(params.value))
         ElNotification({
             title: '水文条件配置成功',
-            message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
+            // message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
+            message: `流量：${params.value.flow}，潮型：${params.value.tideType}`,
             offset: 120,
             type: 'success',
         })
@@ -276,39 +327,112 @@ const runModelClickHandler = async () => {
         })
         return
     }
+    const Confirm = {
+        'NONE': () => {
+            console.log('first run')
+            // modelRunnning()
+        },
+        'RUNNING': () => {
+            ElMessageBox.confirm(
+                '模型正在运行，请勿重复提交',
+                '警告',
+                {
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    // confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                }
+            )
+                .catch(() => {
+                    console.log('do nothing')
+                })
+        },
+        'COMPLETE': () => {
+            ElMessageBox.confirm(
+                '已有运行结果，是否采用新工况重新运行？',
+                '警告',
+                {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                }
+            )
+                .then(() => {
+                    console.log('run with new condition')
+                    // modelRunnning()
+                })
+                .catch(() => {
+                    console.log('do nothing')
+                })
+        },
+        'ERROR': () => {
+
+        }
+    }
+    Confirm[globleVariable.runningStatus]()
+}
+
+
+
+
+const modelRunnning = () => {
     const modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
     const modelParams = {
         "water-qs": params.value.flow,
         "tidal-level": [params.value.minTide, params.value.maxTide]
     }
-    const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+    // 请求体改成潮型？
+
+    // const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+    const TASK_ID = '1'
     console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
     modelRunnningStatusDesc.value = '运行中'
     modelRunnningProgress.value = 0
     globleVariable.taskID = TASK_ID
     let runningStatusInterval = setInterval(async () => {
-        let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
+        // let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
+        let runningStatus = 'RUNNING'
         modelRunnningStatusDesc.value = '运行中'
-        modelRunnningProgress.value = modelRunnningProgress.value + Number((Math.random() * 2.0).toFixed(2))
-        if (runningStatus === 'COMPLETE') {
+        let randomFactor = 3.0
+        if (runningStatus === 'RUNNING') {
+            globleVariable.runningStatus = 'RUNNING'
+            if (modelRunnningProgress.value < 88) randomFactor = 1.0
+            if (modelRunnningProgress.value > 88) randomFactor = 0.5
+            if (modelRunnningProgress.value > 95) randomFactor = 0.1
+
+            let nextProgress = Math.round((modelRunnningProgress.value + Math.random() * randomFactor) * 100) / 100
+            nextProgress = nextProgress > 95 ? 95 : nextProgress
+            modelRunnningProgress.value = nextProgress
+        }
+        else if (runningStatus === 'ERROR') {
             clearInterval(runningStatusInterval)
-            modelRunnningStatusDesc.value = '运行中'
+            globleVariable.runningStatus = 'ERROR'
+            ElNotification({
+                title: '模型运行失败',
+                message: `请检查模型服务`,
+                offset: 120,
+                type: 'error',
+            })
+        }
+        else if (runningStatus === 'COMPLETE') {
+            clearInterval(runningStatusInterval)
             let runningResult = (await axios.get('/temp/taskNode/result/id?taskId=' + TASK_ID)).data
             console.log('runningResult ', runningResult)
 
             globleVariable.caseID = runningResult['case-id']
             globleVariable.pngPrefix = `/temp/data/modelServer/file/image?caseId=${globleVariable.caseID}&name=`
             globleVariable.binPrefix = `/temp/data/modelServer/file/bin?caseId=${globleVariable.caseID}&name=`
-            globleVariable.visualizationJsonUrl = runningResult['visualization-description-json']
             globleVariable.stationBinUrl = runningResult['visualization-station-bin']
             globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
-
-            let visulizationDescUrl = `/temp/data/modelServer/file/common?caseId=${runningResult['case-id']}&name=${runningResult['visualization-description-json']}`
-            console.log(visulizationDescUrl)
-            const visualizationJson = (await axios.get(visulizationDescUrl)).data
+            let visulizationDescUrl = `/temp/data/modelServer/file/json?caseId=${runningResult['case-id']}&name=${runningResult['visualization-description-json']}`
             globleVariable.visualizationJsonUrl = visulizationDescUrl
+            console.log('globle data info::', globleVariable)
+
+            const visualizationJson = (await axios.get(visulizationDescUrl)).data
             console.log('visualizationJson ', visualizationJson)
             globleVariable.status = true
+            globleVariable.runningStatus = 'COMPLETE'
             modelRunnningStatusDesc.value = '运行完毕'
             modelRunnningProgress.value = 100
 
@@ -316,6 +440,11 @@ const runModelClickHandler = async () => {
         }
     }, 1000)
 }
+
+
+
+
+
 
 const flowLayerControl = (type, show) => {
     let map = mapStore.getMap()
@@ -354,7 +483,7 @@ const showFlowClickHandler = (id) => {
     if (!globleVariable.status) {
         ElNotification({
             title: '错误',
-            message: '模型尚未运行，缺乏可视化依赖数据',
+            message: '模型尚未运行或运行未结束，缺乏可视化依赖数据',
             offset: 120,
             type: 'error',
         })
@@ -381,7 +510,6 @@ const showFlowClickHandler = (id) => {
         return
     }
 }
-
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -410,6 +538,14 @@ const updateRealtimeWaterCondition = async () => {
         response
     ]
     updateTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss')
+
+    customParams.value = response
+    ElNotification({
+        title: '已更新实时水文条件',
+        message: `更新时间：${updateTime.value}`,
+        offset: 120,
+        type: 'success',
+    })
 }
 
 
@@ -420,9 +556,9 @@ onMounted(async () => {
     let map = await initFineMap(mapRef.value)
     mapStore.setMap(map)
     mapFlyToRiver(map)
-    realtimeWaterConditionIntervalID = setInterval(() => {
-        updateRealtimeWaterCondition()
-    }, 1000 * 60 * 5)
+    // realtimeWaterConditionIntervalID = setInterval(() => {
+    //     updateRealtimeWaterCondition()
+    // }, 1000 * 60 * 5)
 
 })
 
@@ -576,14 +712,59 @@ div.stability-analysis {
 
                                 .center {
                                     position: relative;
-                                    height: 35%;
+                                    height: 30%;
                                     // background-color: red;
                                     width: 100%;
                                     color: #055279;
                                     font-weight: 800;
                                     font-size: calc(0.8vw + 0.7vh);
                                     padding-left: 0.4vw;
-                                    padding-top: 0.5vh;
+                                    // padding-top: 0.5vh;
+                                }
+
+                                div.section-selectior-item {
+                                    position: relative;
+
+                                    width: 8vw;
+                                    height: 4vh;
+                                    margin-left: .5vw;
+                                    line-height: 3vh;
+                                    text-align: center;
+
+                                    // background-color: #eef3ff;
+                                    :deep(.el-select) {
+                                        height: 3.3vh;
+                                        border-radius: 6px;
+                                        // background-color: rgba(0, 119, 255, 1);
+                                    }
+
+                                    :deep(.el-select__wrapper) {
+                                        height: 3.3vh;
+                                        line-height: 3.3vh;
+                                        border-radius: 6px;
+                                        font-family: 'Microsoft YaHei';
+                                        font-weight: bold;
+                                        font-size: calc(0.5vw + 0.6vh);
+                                        background-color: #e6f7ff;
+                                    }
+
+                                    :deep(.el-select__placeholder) {
+                                        color: #738ab6;
+                                    }
+
+                                    :deep(.el-icon) {
+                                        width: 0.5vw;
+                                        height: 0.5vw;
+
+                                        svg {
+                                            width: 0.5vw;
+                                            height: 0.5vw;
+
+                                            path {
+                                                fill: #001cb8;
+                                            }
+                                        }
+                                    }
                                 }
 
                                 .realtime-water-condition {
@@ -655,12 +836,35 @@ div.stability-analysis {
                                     border-radius: 0.4em;
                                     box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
                                     cursor: pointer;
-                                    transition: .3s linear;
+                                    transition: .1s linear;
 
-                                    &:active {
-                                        scale: 1.01;
+                                    &:hover {
+                                        background: #1377fad0;
+                                        color: #ffffff;
                                     }
+                                }
 
+                                button.realtime-button {
+                                    position: absolute;
+                                    right: 4vw;
+                                    top: .5vh;
+                                    width: 4vw;
+                                    height: 3vh;
+                                    background: #76b2ffd0;
+                                    color: #fff;
+                                    font-family: inherit;
+                                    font-weight: 900;
+                                    font-size: calc(0.3vw + 0.7vh);
+                                    border: 1px solid rgb(3, 107, 167);
+                                    border-radius: 0.4em;
+                                    box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+                                    cursor: pointer;
+                                    transition: .1s linear;
+
+                                    &:hover {
+                                        background: #1377fad0;
+                                        color: #ffffff;
+                                    }
                                 }
 
                             }
@@ -714,10 +918,11 @@ div.stability-analysis {
                                 border-radius: 0.4em;
                                 box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
                                 cursor: pointer;
-                                transition: .3s linear;
+                                transition: .1s linear;
 
-                                &:active {
-                                    scale: 1.01;
+                                &:hover {
+                                    background: #1377fad0;
+                                    color: #deedfc;
                                 }
                             }
 
