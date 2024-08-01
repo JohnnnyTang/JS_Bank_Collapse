@@ -152,12 +152,12 @@ export class EulerFlowLayer {
         const idle = () => {
             // need to regenerate point data
             // do nothing
-            this.stop = true
+            // this.stop = true
             // stop simulate?
         }
 
         const restart = () => {
-            this.stop = false
+            // this.stop = false
 
             let flowExtent = this.flowExtent
             let mapExtent = this.mapExtent

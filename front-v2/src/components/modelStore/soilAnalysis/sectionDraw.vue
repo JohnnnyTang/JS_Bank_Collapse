@@ -1,5 +1,5 @@
 <template>
-    <div class="section-choose-content" ref="containerDom">
+    <div class="section-choose-content" ref="containerDom" id="section-draw-container">
         <div id="map" class="map-container"></div>
 
         <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh" :before-close="sectionConfirmClose">
@@ -36,25 +36,24 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { onMounted, ref, onUnmounted } from 'vue'
 import { initPureScratchMap } from '../../../utils/mapUtils'
-import { useMultiIndexStore } from '@/store/multiIndexStore'
+// import { useMultiIndexStore } from '@/store/multiIndexStore'
+import { useMapStore } from '@/store/mapStore'
 
+const mapStore = useMapStore()
 const containerDom = ref()
 const sectionConfirmShow = ref(false)
 const sectionLineLabel = ref('')
 const sectionLineLabelSec = ref('')
-
 const calcEnable = ref(false)
 const paramFill = [false, false]
-
 const sectionConfirmClose = () => { }
-
 const cancelSectionRese = () => {
     sectionConfirmShow.value = false
 }
-
-
-const multiIndexStore = useMultiIndexStore()
+// const multiIndexStore = useMultiIndexStore()
+let line = null
 let map = null
+const emit = defineEmits(['sectionDraw'])
 
 const draw = new MapboxDraw({
     displayControlsDefault: false,
@@ -82,7 +81,7 @@ const draw = new MapboxDraw({
                 'line-join': 'round',
             },
             paint: {
-                'line-color': '#D20C0C',
+                'line-color': '#d18800',
                 'line-dasharray': [0.2, 2],
                 'line-width': 2,
             },
@@ -114,7 +113,7 @@ const draw = new MapboxDraw({
             ],
             paint: {
                 'circle-radius': 3,
-                'circle-color': '#D20C0C',
+                'circle-color': '#d49100',
             },
         },
         // INACTIVE (static, already drawn)
@@ -132,14 +131,40 @@ const draw = new MapboxDraw({
                 'line-join': 'round',
             },
             paint: {
-                'line-color': '#ff6262',
+                'line-color': '#000000',
                 'line-width': 3,
             },
         },
     ],
 })
 
+const resizeMap = () => {
+    setTimeout(() => {
+        if (map) {
+            map.resize()
+            mapFlyToRiver(map)
+        }
+    }, 10);
+}
 
+const getSection = () => {
+    if (line) {
+        const geojson = {
+            "type": "FeatureCollection",
+            "features": [line]
+        }
+        return geojson
+    }
+    else {
+        console.warn('No feature found')
+        return null
+    }
+}
+
+defineExpose({
+    resizeMap,
+    getSection
+})
 
 
 
@@ -147,10 +172,11 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 onMounted(async () => {
 
     map = await initPureScratchMap({ id: 'map' })
+    mapStore.setMap(map)
     mapFlyToRiver(map)
     attachBaseLayer(map)
+    // map.showTileBoundaries = true;
     map.on('draw.create', function (e) {
-        console.log('aaa')
         console.log(e.features[0])
         sectionConfirmShow.value = true
         let lineFeature = e.features[0]
@@ -168,36 +194,45 @@ onMounted(async () => {
         let endWebMerCoord = convertToMercator(
             lineFeature.geometry.coordinates[1],
         )
+        line = lineFeature
+        emit('sectionDraw', {
+            "type": "FeatureCollection",
+            "features": [line]
+        })
         paramFill[1] = true
         if (paramFill.includes(false)) {
             return
         } else {
-            multiIndexStore.updateSectionStatus(1)
+            // multiIndexStore.updateSectionStatus(1)
             calcEnable.value = true
         }
     })
 
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key == '1') {
-            let dom = map.getContainer()
-            dom.style.width = '400px'
-            dom.style.height = '400px'
-            setTimeout(() => {
-                map.resize()
-                mapFlyToRiver(map)
-            }, 310);
-        }
-        if (e.key == '2') {
-            let dom = map.getContainer()
-            dom.style.width = '600px'
-            dom.style.height = '600px'
-            setTimeout(() => {
-                map.resize()
-                mapFlyToRiver(map)
-            }, 310);
-        }
-    })
+    // window.addEventListener('keydown', (e) => {
+    //     if (e.key == '1') {
+    //         let dom = map.getContainer()
+    //         dom.style.width = '400px'
+    //         dom.style.height = '400px'
+    //         setTimeout(() => {
+    //             map.resize()
+    //             mapFlyToRiver(map)
+    //         }, 310);
+    //     }
+    //     if (e.key == '2') {
+    //         let dom = map.getContainer()
+    //         dom.style.width = '600px'
+    //         dom.style.height = '600px'
+    //         setTimeout(() => {
+    //             map.resize()
+    //             mapFlyToRiver(map)
+    //         }, 310);
+    //     }
+    //     if (e.key == '3') {
+    //         map.resize()
+    //         mapFlyToRiver(map)
+    //     }
+    // })
 
 })
 
@@ -393,7 +428,7 @@ div.section-choose-content {
             width: 100%;
             height: 100%;
             background-color: hsl(194, 69%, 91%);
-            transition: .3s linear;
+            // transition: .3s linear;
         }
     }
 
@@ -414,7 +449,7 @@ div.section-choose-content {
         border: 2px solid #1735ae;
 
         &.section {
-            width: 30%;
+            width: 25%;
         }
 
         div.current-year-title {
@@ -422,7 +457,7 @@ div.section-choose-content {
             display: grid;
             place-items: center;
             background-color: #1753ae;
-            font-size: 5%;
+            font-size: calc(0.8vw + 0.8vh);
             color: #cefffd;
         }
 
@@ -436,7 +471,7 @@ div.section-choose-content {
 
             &.two-line {
                 height: 27.5%;
-                font-size: calc(0.3vw + 0.3vh);
+                font-size: calc(0.5vw + 0.5vh);
             }
         }
     }

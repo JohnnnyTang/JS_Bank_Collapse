@@ -26,91 +26,16 @@
 
 <script setup>
 import '@vue-flow/core/dist/style.css'
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { VueFlow, Position, MarkerType, useGetPointerPosition } from '@vue-flow/core'
 import FlowNode from './customNode.vue'
 import FLowEdge from './customEdge.vue'
+import { useSoilAnalysisStore } from '../../../store/modelStore'
 
-const nodes = ref([
-    // an input node, specified by using `type: 'input'`
-    {
-        id: '1',
-        type: 'flow', // <-- this is the custom node type name
-        position: { x: 202, y: 48 },
-        data: { label: '评估断面选择', status: 0, },
-    },
+const soilAnalysisStore = useSoilAnalysisStore()
 
-    {
-        id: '2',
-        type: 'flow', // <-- this is the custom node type name
-        position: { x: 32, y: 249 },
-        data: { label: 'Detailed Bank', status: 1, },
-    },
-    // An output node, specified by using `type: 'output'`
-    {
-        id: '3',
-        type: 'flow', // <-- this is the custom node type name
-        position: { x: 203, y: 249 },
-        data: { label: 'Layer Thickness', status: 1, },
-    },
-    {
-        id: '4',
-        type: 'flow', // <-- this is the custom node type name
-        position: { x: 374, y: 249 },
-        data: { label: 'Elevation of Flow', status: 1, },
-    },
-    {
-        id: '5',
-        type: 'flow', // <-- this is the custom node type name
-        position: { x: 202, y: 481 },
-        data: { label: '评估结果', status: 1, },
-    }
-])
-
-const edges = ref([
-    {
-        id: 'e1->2',
-        source: '1',
-        target: '2',
-        animated: false,
-        markerEnd: MarkerType.ArrowClosed,
-    },
-    {
-        id: 'e1->3',
-        source: '1',
-        target: '3',
-        animated: false,
-        markerEnd: MarkerType.ArrowClosed,
-    },
-    {
-        id: 'e1->4',
-        source: '1',
-        target: '4',
-        animated: false,
-        markerEnd: MarkerType.ArrowClosed,
-    },
-    {
-        id: 'e2->5',
-        source: '2',
-        target: '5',
-        animated: false,
-        markerEnd: MarkerType.ArrowClosed,
-    },
-    {
-        id: 'e3->5',
-        source: '3',
-        target: '5',
-        animated: false,
-        markerEnd: MarkerType.ArrowClosed,
-    },
-    {
-        id: 'e4->5',
-        source: '4',
-        target: '5',
-        animated: false,
-        markerEnd: MarkerType.ArrowClosed,
-    },
-])
+const nodes = soilAnalysisStore.nodes
+const edges = soilAnalysisStore.edges
 
 const onDragLeave = (e) => {
     console.log(e)
@@ -119,11 +44,14 @@ const onNodeClick = (e) => {
     console.log(e.node.computedPosition.x, e.node.computedPosition.y)
 }
 
+onMounted(() => {
+    console.log('soilFlowChart onMounted', nodes, edges)
+})
+
 
 </script>
 
 <style lang="scss" scoped>
-
 div.model-flow-container {
     width: 26vw;
     height: 85vh;

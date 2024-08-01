@@ -88,8 +88,8 @@ const routes = [
                 component: () => import('../components/modelStore/views/SoilAnalysis2.vue'),
             },
             {
-                path: 'soilAnalysis3',
-                component: () => import('../components/modelStore/views/SoilAnalysis3.vue'),
+                path: 'soilAnalysis4',
+                component: () => import('../components/modelStore/views/SoilAnalysis4.vue'),
             },
             {
                 path: 'stabilityAnalysis2',
@@ -157,9 +157,6 @@ router.beforeEach((to, from, next) => {
         if (isLoggedIn) {
             axios.get('/api/data/monitorInfo').then(res => {
                 // as token check
-                // if (res.data.state ) next()
-                // else next('/login');
-                console.log(res.data)
                 next()
             }).catch(err => {
                 console.log(err)

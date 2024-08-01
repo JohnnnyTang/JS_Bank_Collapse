@@ -9,7 +9,17 @@ const props = defineProps({
     },
 })
 
-console.log(props.data)
+const statusText = computed(() => {
+    if (props.data.status === 0) {
+        return '待处理'
+    } else if (props.data.status === 1) {
+        return '处理中'
+    } else if (props.data.status === 2) {
+        return '已完成'
+    } 
+})
+
+// console.log(props.data)
 </script>
 
 <template>
@@ -17,7 +27,7 @@ console.log(props.data)
     <Handle type="target" :position="Position.Top" />
     <div class="process-node" :status-id="props.data.status">
         <div class="node-title">{{ props.data.label }}</div>
-        <div class="node-content" :status-id="props.data.status">{{ 'happy' }}</div>
+        <div class="node-content" :status-id="props.data.status">{{ statusText }}</div>
         <div class="node-status" :status-id="props.data.status"></div>
     </div>
 </template>
@@ -61,9 +71,9 @@ $rotate-border-color: #23c100;
         width: 8rem;
         background-color: rgb(198, 255, 196);
 
-        &[status-id='2'] {
-            font-size: 0.6rem;
-        }
+        // &[status-id='2'] {
+        //     font-size: 0.6rem;
+        // }
     }
 
     div.node-status {

@@ -236,7 +236,7 @@ const updateTime = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 const showFlow = ref(0)
 const modelRunnningStatusDesc = ref('未运行')
 const modelRunnningProgress = ref(0)
-const activeTab = ref('1')
+const activeTab = ref('0')
 const params = ref({
     flow: null,
     maxTide: null,
@@ -269,7 +269,7 @@ const statusStyle = computed(() => {
 })
 const flowSelected = ref(null)
 const tideSelected = ref(null)
-const selectableFlowList = [88000, 98000, 100000, 120000, 130000, 150000]
+const selectableFlowList = [10000, 13000, 16500, 205000, 35000, 45000, 62000, 84000, 10400, 92000].sort((a, b) => a - b)
 const selectableTideList = ['大潮', '中潮', '小潮']
 const runningText = computed(() => {
     return activeTab.value === '0' ? '匹配' : '运行'
@@ -277,12 +277,18 @@ const runningText = computed(() => {
 
 
 const check = (p) => {
-    if (p.flow === null || p.flow < 5000 || p.flow > 150000) return false
-    if (p.maxTide === null || p.maxTide < 0 || p.maxTide > 100) return false
-    if (p.minTide === null || p.minTide < 0 || p.minTide > 100) return false
+    if (activeTab.value === '0') {
+        if (p.flow === null || p.flow < 5000 || p.flow > 500000) return false
+        if (p.tideType === null) return false
+    } else if (activeTab.value === '1') {
+        if (p.flow === null || p.flow < 5000 || p.flow > 500000) return false
+        if (p.maxTide === null || p.maxTide < 0 || p.maxTide > 100) return false
+        if (p.minTide === null || p.minTide < 0 || p.minTide > 100) return false
+    }
     return true
 }
 const conditionClickHandler = (type) => {
+    console.log('conditionClickHandler', type)
     // if (type === 'realtime') {
     //     params.value = tableData.value[0]
     // } 
@@ -309,7 +315,7 @@ const conditionClickHandler = (type) => {
     else
         ElNotification({
             title: '水文条件配置失败',
-            message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}，请检查输入是否合法`,
+            message: `请检查输入是否合法`,
             offset: 120,
             type: 'error',
         })
@@ -321,7 +327,7 @@ const runModelClickHandler = async () => {
     if (!check(params.value)) {
         ElNotification({
             title: '运行失败',
-            message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}，请检查输入是否合法`,
+            message: `请检查输入是否合法`,
             offset: 120,
             type: 'error',
         })
@@ -329,7 +335,8 @@ const runModelClickHandler = async () => {
     }
     const Confirm = {
         'NONE': () => {
-            console.log('first run')
+            console.log('first run', activeTab.value)
+            modelRunnning(activeTab.value)
             // modelRunnning()
         },
         'RUNNING': () => {
@@ -360,7 +367,10 @@ const runModelClickHandler = async () => {
             )
                 .then(() => {
                     console.log('run with new condition')
-                    // modelRunnning()
+                    showFlow.value = 0
+                    flowLayerControl('lagrange', false)
+                    flowLayerControl('euler', false)
+                    modelRunnning(activeTab.value)
                 })
                 .catch(() => {
                     console.log('do nothing')
@@ -376,23 +386,40 @@ const runModelClickHandler = async () => {
 
 
 
-const modelRunnning = () => {
-    const modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
-    const modelParams = {
-        "water-qs": params.value.flow,
-        "tidal-level": [params.value.minTide, params.value.maxTide]
+const modelRunnning = async (type) => {
+    let modelPostUrl = ''
+    let modelParams = {}
+    const mmap = {
+        '大潮': 'dc',
+        '中潮': 'zc',
+        '小潮': 'xc'
     }
-    // 请求体改成潮型？
-
-    // const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
-    const TASK_ID = '1'
+    console.log('check0 ', type)
+    if (type === '0') {
+        modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+        modelParams = {
+            "water-qs": params.value.flow,
+            "tidal-level": mmap[params.value.tideType],
+        }
+    } else if (type === '1') {
+        modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+        modelParams = {
+            "water-qs": params.value.flow,
+            "tidal-level": [params.value.minTide, params.value.maxTide]
+        }
+    }
+    console.log('check1 ', modelPostUrl, modelParams)
+    const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+    // const TASK_ID = '1'
     console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
     modelRunnningStatusDesc.value = '运行中'
     modelRunnningProgress.value = 0
     globleVariable.taskID = TASK_ID
+    console.log('===Interval')
     let runningStatusInterval = setInterval(async () => {
-        // let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
-        let runningStatus = 'RUNNING'
+        console.log('runningStatusInterval')
+        let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
+        // let runningStatus = 'RUNNING'
         modelRunnningStatusDesc.value = '运行中'
         let randomFactor = 3.0
         if (runningStatus === 'RUNNING') {
@@ -406,7 +433,6 @@ const modelRunnning = () => {
             modelRunnningProgress.value = nextProgress
         }
         else if (runningStatus === 'ERROR') {
-            clearInterval(runningStatusInterval)
             globleVariable.runningStatus = 'ERROR'
             ElNotification({
                 title: '模型运行失败',
@@ -414,6 +440,8 @@ const modelRunnning = () => {
                 offset: 120,
                 type: 'error',
             })
+            clearInterval(runningStatusInterval)
+
         }
         else if (runningStatus === 'COMPLETE') {
             clearInterval(runningStatusInterval)
@@ -429,8 +457,8 @@ const modelRunnning = () => {
             globleVariable.visualizationJsonUrl = visulizationDescUrl
             console.log('globle data info::', globleVariable)
 
-            const visualizationJson = (await axios.get(visulizationDescUrl)).data
-            console.log('visualizationJson ', visualizationJson)
+            // const visualizationJson = (await axios.get(visulizationDescUrl)).data
+            // console.log('visualizationJson ', visualizationJson)
             globleVariable.status = true
             globleVariable.runningStatus = 'COMPLETE'
             modelRunnningStatusDesc.value = '运行完毕'
@@ -529,9 +557,9 @@ const mapFlyToRiver = (mapIns) => {
 const updateRealtimeWaterCondition = async () => {
     // async request
     const response = {
-        flow: 84000,
+        flow: 205000,
         maxTide: 5.2,
-        minTide: 2.7,
+        minTide: 3.9,
     }
     // update
     tableData.value = [
@@ -566,6 +594,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
     if (useMapStore().getMap()) {
+        flowLayerControl('lagrange', false)
+        flowLayerControl('euler', false)
         useMapStore().getMap().remove()
         useMapStore().destroyMap()
     }

@@ -6829,5 +6829,6 @@ export {
     hideLayersFunction,
     initPureScratchMap,
     initFineMap,
+    attachBaseLayer,
     getHighZoomStyleJson,
 }

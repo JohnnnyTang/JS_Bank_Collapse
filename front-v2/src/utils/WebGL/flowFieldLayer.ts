@@ -84,7 +84,7 @@ export default class FlowFieldLayer {
 
     uboMapBufferData: Float32Array = new Float32Array(12);
     phaseCount: number = 0.0;
-    timePerFrame: number = 100.0;
+    timePerFrame: number = 160.0;
     timeLast: number = 10.0;
     currentResourcePointer: number = 0;
     _timeCount: number = 0.0;
