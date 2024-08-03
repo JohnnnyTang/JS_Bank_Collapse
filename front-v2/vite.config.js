@@ -22,6 +22,11 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
+            '/temp': {
+                target: 'http://172.21.212.165:8989/api/v2',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/temp/, ''),
+            },
             '/device': {
                 target: 'http://119.45.198.54:9999/api/v1',
                 changeOrigin: true,
