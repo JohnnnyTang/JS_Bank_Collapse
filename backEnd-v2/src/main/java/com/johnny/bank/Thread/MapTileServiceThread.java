@@ -40,7 +40,7 @@ public class MapTileServiceThread extends Thread{
             }
             int code = cmdProcess.waitFor();
             cmdProcess.destroy();
-            if(code == 0) {
+            if (code == 0) {
                 System.out.println("tile service end");
             }
             else {

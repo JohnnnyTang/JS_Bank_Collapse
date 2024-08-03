@@ -8,6 +8,10 @@ import lombok.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 /**
  * @Author: Johnny T
  * @Date: 2023/12/19
@@ -27,6 +31,8 @@ public class TaskNode extends BaseNode {
     ParamNode paramNode;
     @DBRef
     DataNode dataNode;
+    String caseId;
+    LocalDateTime updateTime;
     String status;
     Boolean ifAuto; // 是否为自动任务
     JSONObject result;
@@ -35,13 +41,15 @@ public class TaskNode extends BaseNode {
     public TaskNode(
             String id, String name, String auth,
             String category, String path,
-            ModelNode modelNode, ParamNode paramNode, DataNode dataNode,
-            String status, JSONObject result, Boolean ifAuto
+            ModelNode modelNode, ParamNode paramNode, DataNode dataNode, String caseId,
+            LocalDateTime updateTime, String status, JSONObject result, Boolean ifAuto
     ) {
         super(id, name, auth, category, path);
         this.modelNode = modelNode;
         this.paramNode = paramNode;
         this.dataNode = dataNode;
+        this.caseId = caseId;
+        this.updateTime = updateTime;
         this.status = status;
         this.result = result;
         this.ifAuto = ifAuto;
