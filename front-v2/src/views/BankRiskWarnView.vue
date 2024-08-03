@@ -1541,31 +1541,33 @@ const addBankLineRiskLayer = (map, profileList) => {
 };
 
 onMounted(async () => {
-    await initPureScratchMap(mapContainer.value).then(async (map) => {
-        mapInstance = map
-        // map.on('draw.create', function (e) {
-        //     sectionConfirmShow.value = true
-        //     let lineFeature = e.features[0]
-        //     sectionLineLabel.value =
-        //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
-        //         ',' +
-        //         lineFeature.geometry.coordinates[0][1].toFixed(6)
-        //     sectionLineLabelSec.value =
-        //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
-        //         ',' +
-        //         lineFeature.geometry.coordinates[1][1].toFixed(6)
-        //     let startWebMerCoord = convertToMercator(
-        //         lineFeature.geometry.coordinates[0],
-        //     )
-        //     let endWebMerCoord = convertToMercator(
-        //         lineFeature.geometry.coordinates[1],
-        //     )
-        //     StartPtX = startWebMerCoord[0]
-        //     StartPtY = startWebMerCoord[1]
-        //     EndPtX = endWebMerCoord[0]
-        //     EndPtY = endWebMerCoord[1]
-        //     return
-        // })
+  await axios.get("/api/data/monitorInfo");
+
+  await initPureScratchMap(mapContainer.value).then(async (map) => {
+    mapInstance = map;
+    // map.on('draw.create', function (e) {
+    //     sectionConfirmShow.value = true
+    //     let lineFeature = e.features[0]
+    //     sectionLineLabel.value =
+    //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
+    //         ',' +
+    //         lineFeature.geometry.coordinates[0][1].toFixed(6)
+    //     sectionLineLabelSec.value =
+    //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
+    //         ',' +
+    //         lineFeature.geometry.coordinates[1][1].toFixed(6)
+    //     let startWebMerCoord = convertToMercator(
+    //         lineFeature.geometry.coordinates[0],
+    //     )
+    //     let endWebMerCoord = convertToMercator(
+    //         lineFeature.geometry.coordinates[1],
+    //     )
+    //     StartPtX = startWebMerCoord[0]
+    //     StartPtY = startWebMerCoord[1]
+    //     EndPtX = endWebMerCoord[0]
+    //     EndPtY = endWebMerCoord[1]
+    //     return
+    // })
 
     // map.addControl(new mapboxgl.NavigationControl(), 'top-left')
     // mapJumpToRiver(map)

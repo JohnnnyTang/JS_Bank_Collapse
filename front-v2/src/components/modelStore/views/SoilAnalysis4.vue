@@ -6,13 +6,28 @@
                 <soilFlowChart></soilFlowChart>
             </div>
 
+
+
             <div class="model-run-container">
+
+                <div class="loading-container" v-show="ModelRunningShow">
+                    <dv-loading class="loading-icon">
+                        <div class="loading-message">{{ ModelRunningMessage }}</div>
+                    </dv-loading>
+                </div>
+
+
                 <el-tabs v-model="activeTab" type="card" class="custom-tabs" :before-leave="beforeTabLeave"
                     @tab-click="tabClickCallback">
                     <el-tab-pane label="评估断面选择" name="section-tab">
                         <div class="tab-page-container">
                             <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler"
                                 v-on:dem-select="demSelectHandler"></sectionDraw>
+                            <div class="sectionView-run-button one-center">
+                                <div class="run-button one-center" @click="sectionViewModelRun">
+                                    计算断面形态
+                                </div>
+                            </div>
                         </div>
 
                     </el-tab-pane>
@@ -86,17 +101,25 @@
                         <div class="tab-page-container">
                             <div class="map-container" id="resultMap" ref="mapRef">
                             </div>
+                            <div class="warn-status-Desc">土体变形分析模型结果显示,当前断面稳定性因子为{{ fosText }}</div>
+
                             <div class="warn-status-container">
-                                <div class="warn-status-title">当前断面风险状态</div>
+                                <div class="warn-status-title">断面风险状态</div>
                                 <div class="warn-status-content high">高风险</div>
                             </div>
                             <div class="fos-result-container">
-                                <div class="title">FoS</div>
+                                <div class="title">稳定性因子</div>
                                 <div class="pallete-container">
                                     <div class="pallete">
                                         <div class="color-section green"></div>
                                         <div class="color-section orange"></div>
                                         <div class="color-section red"></div>
+                                    </div>
+                                    <div class="pallete-text-container">
+                                        <div class="pallete-text val15">1.5</div>
+                                        <div class="pallete-text val13">1.3</div>
+                                        <div class="pallete-text val10">1.0</div>
+                                        <div class="pallete-text val00">0.0</div>
                                     </div>
                                     <div class="pointer" id="pointer"></div>
                                 </div>
@@ -115,7 +138,7 @@ import soilFlowChart from '../soilAnalysis/soilFlowChart.vue';
 import sectionDraw from '../soilAnalysis/sectionDraw.vue'
 import sectionChart from '../soilAnalysis/chart copy'
 import { getTestData } from '../soilAnalysis/chart'
-import { onMounted, ref, reactive, watch, nextTick } from 'vue';
+import { onMounted, ref, reactive, watch, nextTick, computed } from 'vue';
 import { ElNotification } from 'element-plus';
 import { initPureScratchMap } from '../../../utils/mapUtils';
 import { useSoilAnalysisStore } from '../../../store/modelStore';
@@ -127,6 +150,9 @@ const chartdom = ref(null)
 const sectionDrawRef = ref(null)
 const mapRef = ref(null)
 const elevationOfFlow = ref(null)
+const ModelRunningShow = ref(false)
+const ModelRunningMessage = ref('')
+
 let resultMap = null
 let chart = null
 
@@ -140,7 +166,8 @@ let sectionGeojson = null
 const sectionDrawHandler = (geojson) => {
     console.log(' i got geojson !!', geojson)
     sectionGeojson = geojson
-    soilAnalysisStore.updateSectionStatus(2)
+    if (selectedDem)
+        soilAnalysisStore.updateSectionStatus(2)
 }
 const demSelectHandler = (name) => {
     const NameList = {
@@ -148,10 +175,15 @@ const demSelectHandler = (name) => {
         '2004': '200408_dem/w001001.adf'
     }
     selectedDem = NameList[name]
+    if (sectionGeojson)
+        soilAnalysisStore.updateSectionStatus(2)
 }
 let globalSectionJson = null
-let globalFos = null
-
+// let globalFos = null
+const globalFos = ref(0.0)
+const fosText = computed(() => {
+    return globalFos.value.toFixed(2)
+})
 
 
 const beforeTabLeave = (e) => {
@@ -238,8 +270,8 @@ const tabClickCallback = (tab, event) => {
             }, 1)
         }
         setTimeout(() => {
-            if (globalFos) {
-                updateFoSPointer(0.67);
+            if (globalFos.value != 0.0) {
+                updateFoSPointer(globalFos.value);
             }
         }, 2000)
     }
@@ -270,6 +302,8 @@ const BSTEMModelRun = async () => {
         return true
     }
     if (paramsCheck()) {
+        ModelRunningShow.value = true
+        ModelRunningMessage.value = '正在执行土地变形分析模型'
         soilAnalysisStore.updateBankDetailStatus(2)
         soilAnalysisStore.updateThicknessStatus(2)
         soilAnalysisStore.updateFlowsStatus(2)
@@ -293,15 +327,33 @@ const BSTEMModelRun = async () => {
                 case 'COMPLETE':
                     clearInterval(statusInterval)
                     const result = await BSTEMMR.getModelResult()
-                    console.log('result', result)
+                    console.log('fos result', result)
                     let fos = result['fos']
-                    globalFos = fos
+                    globalFos.value = Number.parseFloat(fos)
 
+                    ModelRunningShow.value = false
+                    ModelRunningMessage.value = ''
+                    ElNotification({
+                        type: 'success',
+                        message: '土地变形分析模型执行成功',
+                        title: '成功',
+                        offset: 130
+                    })
+                    soilAnalysisStore.updateResultStatus(2)
                     break
                 case 'ERROR':
                     clearInterval(statusInterval)
                     let errorLog = BSTEMMR.getErrorLog()
                     console.log('error', errorLog)
+
+                    ModelRunningShow.value = false
+                    ModelRunningMessage.value = ''
+                    ElNotification({
+                        type: 'error',
+                        message: '土地变形分析模型执行失败,\n' + errorLog,
+                        title: '错误',
+                        offset: 130
+                    })
                     break
             }
         }, 1000)
@@ -329,6 +381,8 @@ const sectionViewModelRun = async () => {
         return true
     }
     if (paramsCheck()) {
+        ModelRunningShow.value = true
+        ModelRunningMessage.value = '正在计算断面形态'
         let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
         const sectionViewMR = new ModelRunner(sectionViewModelUrl, sectionViewParams)
         const taskId = await sectionViewMR.modelStart()
@@ -348,11 +402,29 @@ const sectionViewModelRun = async () => {
                     console.log('section json', sectionJson)
                     sectionViewMR.sectionJson = sectionJson
                     globalSectionJson = sectionJson
+
+                    ModelRunningShow.value = false
+                    ModelRunningMessage.value = ''
+                    ElNotification({
+                        type: 'success',
+                        message: '计算断面形态成功',
+                        title: '成功',
+                        offset: 130
+                    })
                     break
                 case 'ERROR':
                     clearInterval(statusInterval)
                     let errorLog = sectionViewMR.getErrorLog()
                     console.log('error', errorLog)
+
+                    ModelRunningShow.value = false
+                    ModelRunningMessage.value = ''
+                    ElNotification({
+                        type: 'error',
+                        message: '计算断面形态失败,\n' + errorLog,
+                        title: '错误',
+                        offset: 130
+                    })
                     break
             }
         }, 1000)
@@ -366,7 +438,7 @@ const updateFoSPointer = (fos) => {
     const container = document.querySelector('.pallete');
     const containerHeight = container.clientHeight;
     let position;
-    position = fos / 1.5 * containerHeight // 1.5 is the max fos value
+    position = fos / 1.5 * containerHeight * 0.95 // 1.5 is the max fos value
     console.log('=================')
     console.log(position, containerHeight)
     // pointer.style.bottom = `${position}px`;
@@ -409,13 +481,19 @@ onMounted(async () => {
 
     window.addEventListener('keydown', (e) => {
         if (e.key == '1') {
-            console.log(selectedDem)
+            // console.log(selectedDem)
+            globalFos.value = 1.5
+            updateFoSPointer(globalFos.value)
         }
         if (e.key == '2') {
-            console.log(sectionGeojson)
+            // console.log(sectionGeojson)
+            globalFos.value = 0
+            updateFoSPointer(globalFos.value)
         }
         if (e.key == '3') {
-            sectionViewModelRun()
+            // sectionViewModelRun()
+            globalFos.value = 1.17
+            updateFoSPointer(globalFos.value)
         }
     })
     // /taskNode/result/id?taskId=66ade6c2cb34b50d7075f6a4
@@ -1680,6 +1758,8 @@ div.title2 {
 
         div.flow-container {}
 
+
+
         div.model-run-container {
             position: relative;
             width: 74.4vw;
@@ -1689,6 +1769,34 @@ div.title2 {
             // border-image: repeating-linear-gradient(to bottom right, #fdfeff81, #97b1ff73, #b0ffe7, rgba(3, 175, 255, 0.459)) 20;
             border-radius: 10px;
             overflow: hidden;
+
+            div.loading-container {
+                position: absolute;
+                top: 10vh;
+                right: 35vw;
+                width: 6vw;
+                height: 10vh;
+                background-color: rgba(249, 254, 255, 0.634);
+                backdrop-filter: blur(5px);
+                z-index: 5;
+
+                :deep(.dv-loading.loading-icon) {
+                    position: absolute;
+                    top: -2.5vh;
+                    right: 0vw;
+                }
+
+                div.loading-message {
+                    text-align: center;
+                    position: absolute;
+                    left: 0vw;
+                    width: 6vw;
+                    height: 6vh;
+                    top: 7.3vh;
+                    font-size: calc(0.6vw + 0.4svh);
+                    font-weight: bold;
+                }
+            }
 
             div.custom-tabs {
                 height: 6vh;
@@ -1743,6 +1851,41 @@ div.title2 {
                 width: 75vw;
                 height: 79vh;
                 background-color: #03589e;
+
+                div.sectionView-run-button {
+                    position: absolute;
+                    top: 10vh;
+                    right: 4vw;
+                    width: 10vw;
+                    height: 5vh;
+                    background-color: transparent;
+                    z-index: 2;
+
+                    .run-button {
+                        position: relative;
+                        width: 9vw;
+                        height: 4vh;
+                        background-color: #b8e9ff;
+                        border-right: 12px solid rgb(2, 143, 199);
+                        border-bottom: 8px solid rgb(87, 179, 216);
+                        border-radius: 5px;
+                        transition: .1s ease-in-out;
+                        cursor: pointer;
+                        font-size: calc(0.7vw + 0.6vh);
+                        font-weight: 700;
+
+                        color: rgb(23, 87, 112);
+                        text-shadow: 0px 0px 5px #b4f1f1;
+                        background-color: #b8e9ff;
+
+                        &:active {
+                            border-right: 6px solid rgb(2, 143, 199);
+                            border-bottom: 4px solid rgb(87, 179, 216);
+                        }
+
+
+                    }
+                }
 
                 div.model-run-content {
                     width: 75vw;
@@ -2016,14 +2159,30 @@ div.title2 {
                     background-color: hsl(194, 69%, 91%);
                 }
 
+                div.warn-status-Desc {
+                    position: absolute;
+                    right: 26vw;
+                    top: 1vh;
+                    height: 4vh;
+                    line-height: 4vh;
+                    width: 25vw;
+                    text-align: center;
+                    font-size: calc(0.8vw + 0.3vh);
+                    font-weight: bold;
+                    color: #e3f9ff;
+                    box-shadow: 0px 2px rgb(0, 225, 255);
+                    border-radius: 6px;
+                    background-color: #0011ffd5;
+                }
+
                 div.warn-status-container {
                     position: absolute;
                     right: 32vw;
-                    top: 3vh;
+                    top: 6vh;
                     width: 14vw;
                     height: 10vh;
 
-                    background-color: #5a65fdd5;
+                    background-color: #0511bbd5;
                     backdrop-filter: blur(8px);
                     z-index: 3;
                     border-radius: 6px;
@@ -2031,6 +2190,7 @@ div.title2 {
                     overflow: hidden;
 
                     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+
 
                     div.warn-status-title {
                         height: 4vh;
@@ -2056,6 +2216,7 @@ div.title2 {
 
                         &.low {
                             background-color: rgb(17, 17, 255);
+
                         }
 
                         &.middle {
@@ -2064,6 +2225,7 @@ div.title2 {
 
                         &.high {
                             background-color: rgb(255, 9, 9);
+
                         }
                     }
                 }
@@ -2072,9 +2234,10 @@ div.title2 {
                     position: absolute;
                     right: 1vw;
                     bottom: 5vh;
-                    width: 5vw;
-                    height: 20vh;
-                    background-color: rgb(160, 209, 247);
+                    width: 6vw;
+                    height: 21vh;
+                    background-color: rgb(81, 95, 114);
+                    color: white;
                     border-radius: 5px;
 
                     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
@@ -2088,6 +2251,7 @@ div.title2 {
                         font-size: calc(0.6vw + 0.6vh);
                         font-weight: bold;
                         line-height: 4vh;
+                        margin-bottom: 0.5vh;
                     }
 
                     .pallete-container {
@@ -2109,6 +2273,8 @@ div.title2 {
                                 &.green {
                                     height: 3vh;
                                     background-color: green;
+                                    border-top-right-radius: 5px;
+                                    border-top-left-radius: 5px;
                                 }
 
                                 &.orange {
@@ -2119,20 +2285,51 @@ div.title2 {
                                 &.red {
                                     height: 10vh;
                                     background-color: red;
+                                    border-bottom-left-radius: 5px;
+                                    border-bottom-right-radius: 5px;
                                 }
+                            }
+                        }
+
+                        .pallete-text-container {
+                            position: absolute;
+                            top: 0;
+                            left: 2.2vw;
+                            width: 100%;
+                            height: 15vh;
+
+                            .pallete-text {
+                                width: 100%;
+
+                                &.val15 {
+                                    margin-top: -1vh;
+                                }
+
+                                &.val13 {
+                                    margin-top: 1vh;
+                                }
+
+                                &.val10 {
+                                    margin-top: 0vh;
+                                }
+
+                                &.val00 {
+                                    margin-top: 7vh;
+                                }
+
                             }
                         }
 
                         .pointer {
                             position: absolute;
                             transition: .3s ease-in-out;
-                            left: -20px;
-                            bottom: 0;
+                            left: -1.2vw;
+                            bottom: -10px;
                             width: 0;
                             height: 0;
                             border-top: 10px solid transparent;
                             border-bottom: 10px solid transparent;
-                            border-left: 20px solid black;
+                            border-left: 20px solid rgb(255, 178, 178);
                             /* 向右指的三角形 */
                         }
 

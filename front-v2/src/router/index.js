@@ -85,10 +85,6 @@ const routes = [
             },
             {
                 path: 'soilAnalysis',
-                component: () => import('../components/modelStore/views/SoilAnalysis2.vue'),
-            },
-            {
-                path: 'soilAnalysis4',
                 component: () => import('../components/modelStore/views/SoilAnalysis4.vue'),
             },
             {

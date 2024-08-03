@@ -203,199 +203,6 @@
       </div>
     </div>
   </div>
-  <!-- <div class="stability-analysis">
-    <ModelTitleVue :ModelName="'近岸动力分析模型'" />
-    <div class="main-content">
-      <div class="map" id="map" ref="mapRef"></div>
-
-      <div class="model-pannel">
-        <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
-          <div class="real-content">
-            <div class="condition-configure flex-row">
-              <div class="title">
-                <div class="title-div">水文条件配置</div>
-                <div class="arrow-up"></div>
-              </div>
-              <div class="content">
-                <el-tabs type="border-card" class="tab-pages">
-                  <el-tab-pane>
-                    <template #label>
-                      <span class="custom-tabs-label">
-                        <el-icon>
-                          <Histogram />
-                        </el-icon>
-                        <span>实时</span>
-                      </span>
-                    </template>
-                    <div class="condition-card">
-                      <div class="set-icon"></div>
-                      <div class="center">实时水文条件</div>
-                      <el-table
-                        :data="tableData"
-                        border
-                        style="width: 85%; height: 60%"
-                        :scrollbar-always-on="false"
-                      >
-                        <el-table-column prop="flow" label="流量" />
-                        <el-table-column prop="maxTide" label="大潮潮位" />
-                        <el-table-column prop="minTide" label="小潮潮位" />
-                      </el-table>
-                      <div class="last-update-time">
-                        <div class="water-condition-item">
-                          <span class="water-condition-title">上次更新：</span>
-                          <span class="water-condition-value">{{ updateTime }}</span>
-                        </div>
-                      </div>
-                      <button
-                        class="condition-button"
-                        @click="conditionClickHandler('realtime')"
-                        :class="{ active: true }"
-                      >
-                        确定
-                      </button>
-                    </div>
-                  </el-tab-pane>
-                  <el-tab-pane>
-                    <template #label>
-                      <span class="custom-tabs-label">
-                        <el-icon>
-                          <Tools />
-                        </el-icon>
-                        <span>自定义</span>
-                      </span>
-                    </template>
-                    <div class="condition-card">
-                      <div class="set-icon"></div>
-                      <div class="center">特定水文条件</div>
-                      <div class="realtime-water-condition">
-                        <div class="water-condition-item">
-                          <span class="water-condition-title">流量：</span>
-
-                          <el-input
-                            v-model="customParams.flow"
-                            style="width: 65%; height: 70%"
-                            placeholder="请输入流量"
-                          />
-                        </div>
-                        <div class="water-condition-item">
-                          <span class="water-condition-title">大潮潮位：</span>
-
-                          <el-input
-                            v-model="customParams.maxTide"
-                            style="width: 50%; height: 70%"
-                            placeholder="请输入潮位"
-                          />
-                        </div>
-                        <div class="water-condition-item">
-                          <span class="water-condition-title">小潮潮位：</span>
-
-                          <el-input
-                            v-model="customParams.minTide"
-                            style="width: 50%; height: 70%"
-                            placeholder="请输入潮位"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        class="condition-button"
-                        @click="conditionClickHandler('custom')"
-                        :class="{ active: true }"
-                      >
-                        确定
-                      </button>
-                    </div>
-                  </el-tab-pane>
-                </el-tabs>
-              </div>
-            </div>
-
-            <div class="model-running flex-row">
-              <div class="title">
-                <div class="title-div">模型计算</div>
-                <div class="arrow-up"></div>
-              </div>
-              <div class="content">
-                <div class="content-box">
-                  <el-row>
-                    <el-col :span="10">
-                      <div class="running-status grid-content">
-                        状态：<span :style="statusStyle">{{
-                          modelRunnningStatusDesc
-                        }}</span>
-                      </div>
-                    </el-col>
-
-                    <el-col :span="6"> </el-col>
-                    <el-col :span="8">
-                      <div class="running-control grid-content">
-                        <div class="run-button" @click="runModelClickHandler">运行</div>
-                      </div>
-                    </el-col>
-                  </el-row>
-                  <el-row>
-                    <el-col :span="24">
-                      <div class="grid-content">
-                        <div class="progress-container">
-                          <el-progress
-                            :percentage="modelRunnningProgress"
-                            :stroke-width="15"
-                            striped
-                          />
-                        </div>
-                      </div>
-                    </el-col>
-                  </el-row>
-                </div>
-              </div>
-            </div>
-            <div class="visulization-result flex-row">
-              <div class="title">
-                <div class="title-div">结果可视化</div>
-              </div>
-
-              <div class="content">
-                <div class="slide-control-block">
-                  <label
-                    class="switch"
-                    :class="{ forbbidden: globleVariable.status === false }"
-                  >
-                    <input
-                      type="checkbox"
-                      :checked="showFlow == 1"
-                      :disabled="globleVariable.status === false"
-                      @click="showFlowClickHandler(1)"
-                    />
-                    <span class="slider"></span>
-                  </label>
-                  <div class="text-block">
-                    <div class="text">拉格朗日场</div>
-                  </div>
-                </div>
-
-                <div class="slide-control-block">
-                  <label
-                    class="switch"
-                    :class="{ forbbidden: globleVariable.status === false }"
-                  >
-                    <input
-                      type="checkbox"
-                      :checked="showFlow == 2"
-                      :disabled="globleVariable.status === false"
-                      @click="showFlowClickHandler(2)"
-                    />
-                    <span class="slider"></span>
-                  </label>
-                  <div class="text-block">
-                    <div class="text">欧拉场</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </dv-border-box12>
-      </div>
-    </div>
-  </div> -->
 </template>
 
 <script setup>
@@ -667,12 +474,24 @@ const modelRunnning = async (type) => {
     }
     else if (runningStatus === 'ERROR') {
       globleVariable.runningStatus = 'ERROR'
+
+      const url = `/temp/taskNode/result/id?taskId=${TASK_ID}`
+      // axios.get(url).then(response => {
+      //     let errorLog = response.data['error-log']
+      //     resolve(errorLog)
+      // }).catch(error => {
+      //     console.warn(error)
+      //     reject(error)
+      // })
+      const errorLog = (await axios.get(url)).data['error-log']
+
       ElNotification({
         title: '模型运行失败',
-        message: `请检查模型服务`,
+        message: `错误原因:\n` + errorLog,
         offset: 120,
         type: 'error',
       })
+      modelRunnningStatusDesc.value = '运行失败'
       clearInterval(runningStatusInterval)
 
     }
