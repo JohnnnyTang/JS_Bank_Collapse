@@ -60,7 +60,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import mapBoxGl, { AnySourceData } from "mapbox-gl";
 import MapboxLanguage  from '@mapbox/mapbox-gl-language'

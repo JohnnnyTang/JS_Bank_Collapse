@@ -18,7 +18,7 @@ export default defineConfig({
         host: '0.0.0.0',
         proxy: {
             '/api': {
-                target: 'http://localhost:8989/api/v1',
+                target: 'http://172.21.212.165:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
@@ -33,7 +33,7 @@ export default defineConfig({
                 rewrite: (path) => path.replace(/^\/device/, ''),
             },
             '/model/': {
-                target: 'http://223.2.36.49:8700/',
+                target: 'http://172.21.212.165:8989/api/v2',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),
             }

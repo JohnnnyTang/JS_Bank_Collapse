@@ -60,7 +60,6 @@ export default defineComponent({
       children: "children",
       label: "label",
     };
-    const serach = ref("");
     // {
     //     id: string;
     //     flag: boolean;
@@ -73,30 +72,29 @@ export default defineComponent({
 
     // val: {
     //   id: string;
-    //   name: string;
+    //   label: string;
     //   visualType: string;
-    //   visualId: string;
+    //   params: object
     // }
     const addLayer = async (val) => {
       for (let i = 0; i < treeData.value.length; i++) {
-        if (treeData.value[i].id === val.id) {
+        if (treeData.value[i].caseid === val.caseid) {
           return;
         }
       }
       treeData.value.unshift({
-        id: val.id,
-        label: val.name,
+        caseid: val.caseid,
+        label: val.label,
         visualType: val.visualType,
         children: [],
         flag: true,
-        visualId: val.visualId,
+        params: val.params
       });
-      const list = [];
-      treeData.value.forEach((item) => {
-        list.push(item.id);
-      });
-      console.log(treeData.value);
-      const data = await updateLayer(import.meta.env.VITE_APP_ROUTER_ID, list);
+      // const list = [];
+      // treeData.value.forEach((item) => {
+      //   list.push(item.id);
+      // });
+      //const data = await updateLayer(import.meta.env.VITE_APP_ROUTER_ID, list);
     };
 
     const closeClick = async (id) => {
@@ -181,19 +179,17 @@ export default defineComponent({
     onMounted(() => {
       props.layerList?.forEach((item) => {
         treeData.value.push({
-          id: item.id,
+          caseid: item.id,
           label: item.fileName,
           visualType: item.visualType,
           flag: true,
           children: [],
-          visualId: item.visualId,
         });
       });
     });
 
     return {
       Search,
-      serach,
       treeData,
       defaultProps,
       addLayer,

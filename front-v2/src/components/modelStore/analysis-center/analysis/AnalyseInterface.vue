@@ -24,11 +24,14 @@
           >选择河床参数与区域，设置最大深度计算河道容积</strong
         >
       </div>
-      <div class="flushType" v-if="analyseType === 'regionFlush'">
+      <div
+        class="flushType"
+        v-if="analyseType === 'regionFlush' || analyseType === 'flushContour'"
+      >
         <div class="text">选择冲淤类型:</div>
         <el-radio-group v-model="flushType">
-          <el-radio label="globalFlush">全江冲淤</el-radio>
-          <el-radio label="regionFlush">区域冲淤</el-radio>
+          <el-radio label="global">全江冲淤</el-radio>
+          <el-radio label="region">区域冲淤</el-radio>
         </el-radio-group>
       </div>
       <el-select v-model="sectionValue" :placeholder="placeholder" v-if="selectFlag">
@@ -159,7 +162,6 @@
 import { computed, defineComponent, nextTick, onMounted, ref } from "vue";
 import { ArrowLeft } from "@element-plus/icons-vue";
 import ModelRequest from "../../modelApi.js";
-const { findParameterByType } = ModelRequest;
 import utils from "@/utils/CommonUtils";
 const { notice } = utils;
 export default defineComponent({
@@ -168,6 +170,9 @@ export default defineComponent({
       type: String,
     },
     analyticDataList: {
+      type: Object,
+    },
+    demDataList: {
       type: Object,
     },
   },
@@ -198,11 +203,9 @@ export default defineComponent({
       }
     });
     const selectFlag = computed(() => {
-      if (props.analyseType === "flushContour") {
-        return false;
-      } else if (
-        props.analyseType === "regionFlush" &&
-        flushType.value === "globalFlush"
+      if (
+        (props.analyseType === "regionFlush" || props.analyseType === "flushContour") &&
+        flushType.value === "global"
       ) {
         return false;
       } else {
@@ -228,7 +231,7 @@ export default defineComponent({
 
     const inputValue = ref("");
 
-    const flushType = ref("globalFlush");
+    const flushType = ref("global");
 
     const backClick = () => {
       context.emit("back");
@@ -247,7 +250,6 @@ export default defineComponent({
                   fileName: c.label,
                   dataListId: item.id,
                   dataListName: item.label,
-                  visualId: c.visualId,
                   visualType: c.visualType,
                 };
               } else {
@@ -273,7 +275,6 @@ export default defineComponent({
                     fileName: c.label,
                     dataListId: item.id,
                     dataListName: item.label,
-                    visualId: c.visualId,
                     visualType: c.visualType,
                   };
                 } else {
@@ -294,7 +295,6 @@ export default defineComponent({
                     fileName: c.label,
                     dataListId: item.id,
                     dataListName: item.label,
-                    visualId: c.visualId,
                     visualType: c.visualType,
                   };
                 } else {
@@ -355,10 +355,10 @@ export default defineComponent({
         }
       } else if (
         props.analyseType === "sectionFlush" ||
-        props.analyseType === "regionFlush"
+        props.analyseType === "regionFlush" ||
+        props.analyseType === "flushContour"
       ) {
         if (
-          sectionValue.value != "" &&
           benchmarkDem.value != undefined &&
           referDem.value != undefined &&
           inputValue.value != ""
@@ -366,18 +366,32 @@ export default defineComponent({
           if (referDem.value.fileId === benchmarkDem.value.fileId) {
             notice("warning", "警告", "基准DEM数据不能与参考DEM数据相同");
           } else {
-            context.emit("returnParameter", {
-              section: sectionValue.value,
-              benchmarkDem: benchmarkDem.value,
-              referDem: referDem.value,
-              fileName: inputValue.value,
-            });
-          }
-        } else if (sectionValue.value === "") {
-          if (props.analyseType === "sectionFlush") {
-            notice("warning", "警告", "请选择断面");
-          } else if (props.analyseType === "regionFlush") {
-            notice("warning", "警告", "请选择区域");
+            if (props.analyseType === "sectionFlush" || flushType.value === "region") {
+              if (sectionValue.value === "") {
+                if (props.analyseType === "sectionFlush") {
+                  notice("warning", "警告", "请选择断面");
+                } else if (props.analyseType === "regionFlush") {
+                  notice("warning", "警告", "请选择区域");
+                }
+                return;
+              }
+            }
+            if (props.analyseType === "sectionFlush") {
+              context.emit("returnParameter", {
+                section: sectionValue.value,
+                benchmarkDem: benchmarkDem.value,
+                referDem: referDem.value,
+                fileName: inputValue.value,
+              });
+            } else {
+              context.emit("returnParameter", {
+                region: sectionValue.value,
+                benchmarkDem: benchmarkDem.value,
+                referDem: referDem.value,
+                fileName: inputValue.value,
+                global: flushType.value === "global",
+              });
+            }
           }
         } else if (inputValue.value == "") {
           notice("warning", "警告", "输出文件名不得为空");
@@ -386,112 +400,74 @@ export default defineComponent({
         } else {
           notice("warning", "警告", "参考DEM数据不得为空");
         }
-      } else if (props.analyseType === "flushContour") {
-        if (
-          benchmarkDem.value != undefined &&
-          referDem.value != undefined &&
-          inputValue.value != ""
-        ) {
-          if (referDem.value.fileId === benchmarkDem.value.fileId) {
-            notice("warning", "警告", "基准DEM数据不能与参考DEM数据相同");
-          } else {
-            context.emit("returnParameter", {
-              benchmarkDem: benchmarkDem.value,
-              referDem: referDem.value,
-              fileName: inputValue.value,
-            });
-          }
-        } else {
-          let target = "";
-          if (benchmarkDem.value === undefined) {
-            target = "基准DEM数据不得为空";
-          } else if (referDem.value === undefined) {
-            target = "参考DEM数据不得为空";
-          } else {
-            target = "输出文件名不得为空";
-          }
-          notice("warning", "警告", target);
-        }
       }
     };
 
-    const getParame = async (type) => {
-      const data = await findParameterByType("dem");
-      if (data != null && data.code === 0) {
-        for (let i = 0; i < data.data.length; i++) {
-          let flag = true;
-          for (let j = 0; j < treeData.value.length; j++) {
-            if (treeData.value[j].id === data.data[i].dataListId) {
-              treeData.value[j].children.push({
-                id: data.data[i].fileId,
-                label: data.data[i].fileName,
-                flag: false,
-                children: [],
-                checkFlag: false,
-                visualId: data.data[i].visualId,
-                visualType: data.data[i].visualType,
-                parentId: data.data[i].dataListId,
-                parentName: data.data[i].dataListName,
-              });
-              flag = false;
-              break;
-            }
-          }
-          if (flag) {
-            treeData.value.push({
-              id: data.data[i].dataListId,
-              label: data.data[i].dataListName,
-              flag: true,
-              children: [],
-            });
-            treeData.value[treeData.value.length - 1].children.push({
-              id: data.data[i].fileId,
-              label: data.data[i].fileName,
+    const getParame = (type) => {
+      const data = props.demDataList;
+      for (let i = 0; i < data.length; i++) {
+        let flag = true;
+        for (let j = 0; j < treeData.value.length; j++) {
+          if (treeData.value[j].id === data[i].dataListId) {
+            treeData.value[j].children.push({
+              id: data[i].fileId,
+              label: data[i].fileName,
               flag: false,
-              checkFlag: false,
               children: [],
-              visualId: data.data[i].visualId,
-              visualType: data.data[i].visualType,
-              parentId: data.data[i].dataListId,
-              parentName: data.data[i].dataListName,
+              checkFlag: false,
+              visualType: data[i].visualType,
             });
+            flag = false;
+            break;
           }
         }
-        if (
-          type === "sectionFlush" ||
-          type === "regionFlush" ||
-          type === "flushContour"
-        ) {
-          benchmarkTreeData.value = JSON.parse(JSON.stringify(treeData.value));
-          referTreeData.value = JSON.parse(JSON.stringify(treeData.value));
-        }
-        if (type === "section" || type === "sectionFlush") {
-          options.value = [];
-          analyticDataList.value.forEach((item) => {
-            if (item.visualType === "geoJsonLine") {
-              options.value.push({
-                id: item.id,
-                name: item.fileName,
-              });
-            }
+        if (flag) {
+          treeData.value.push({
+            id: data[i].dataListId,
+            label: data[i].dataListName,
+            flag: true,
+            children: [],
           });
-        } else {
-          options.value = [];
-          analyticDataList.value.forEach((item) => {
-            if (item.visualType === "geoJsonPolygon") {
-              options.value.push({
-                id: item.id,
-                name: item.fileName,
-              });
-            }
+          treeData.value[treeData.value.length - 1].children.push({
+            id: data[i].fileId,
+            label: data[i].fileName,
+            flag: false,
+            checkFlag: false,
+            children: [],
+            visualType: data[i].visualType,
           });
         }
+      }
+      if (type === "sectionFlush" || type === "regionFlush" || type === "flushContour") {
+        benchmarkTreeData.value = JSON.parse(JSON.stringify(treeData.value));
+        referTreeData.value = JSON.parse(JSON.stringify(treeData.value));
+      }
+      if (type === "section" || type === "sectionFlush") {
+        options.value = [];
+        analyticDataList.value.forEach((item) => {
+          if (item.visualType === "geoJsonLine") {
+            options.value.push({
+              id: item.caseid,
+              name: item.label,
+            });
+          }
+        });
+      } else {
+        options.value = [];
+        analyticDataList.value.forEach((item) => {
+          if (item.visualType === "geoJsonPolygon") {
+            options.value.push({
+              id: item.caseid,
+              name: item.label,
+            });
+          }
+        });
       }
     };
 
     onMounted(async () => {
       skeletonFlag.value = true;
-      await getParame(props.analyseType);
+      getParame(props.analyseType);
       skeletonFlag.value = false;
     });
 

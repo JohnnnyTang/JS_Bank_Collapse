@@ -5,7 +5,7 @@
 <script>
 import { defineComponent, onMounted, ref } from "vue";
 import ModelRequest from "../../modelApi.js";
-const { getSection } = ModelRequest;
+const { getResultData } = ModelRequest;
 import * as echarts from "echarts";
 import axios from "axios";
 export default defineComponent({
@@ -22,7 +22,7 @@ export default defineComponent({
 
     const getArrs = async () => {
       try {
-        const response = await axios.get("/section.txt");
+        const response = await axios.get("/section-view2.txt");
         const content = response.data;
 
         const lines = content.split("\n");
@@ -39,7 +39,7 @@ export default defineComponent({
           } else {
             currentArray.push(
               line.trim() === "-3.4028235e+38" || line.trim() === "-9999.0"
-                ? "0"
+                ? null
                 : line.trim()
             );
           }
@@ -59,18 +59,24 @@ export default defineComponent({
     };
 
     const initData = async () => {
-      // const data = await getSection(props.chartInfo?.id);
-      const data = await getArrs(props.chartInfo?.id);
-      console.log(data);
-      if (data != null && data.code === 0) {
-        const xdata = [];
-        const xdata2 = [];
-        data.data.list.forEach((item, index) => {
-          xdata.push(index * 40);
+      const result = await getResultData('json', props.chartInfo.caseid, props.chartInfo.name);
+      const data = result.data
+      const interval = props.chartInfo.params.interval
+      //const data = await getArrs(props.chartInfo?.id);
+      if (data != null) {
+        let hList = [];
+        let xdata = [];
+        let xdata2 = [];
+
+        data.points.forEach((item, index) => {
+          hList.push(item[2]);
+          xdata.push(index * interval);
         });
-        data.data.slopeRatio.forEach((item, index) => {
-          xdata2.push(index * 160);
+
+        data.Sa_h.forEach((item, index) => {
+          xdata2.push(index * interval);
         });
+
         option = {
           title: [
             {
@@ -119,15 +125,27 @@ export default defineComponent({
           xAxis: [
             {
               type: "category",
+              name: "米",
               axisLine: {
                 onZero: false,
               },
               data: xdata,
+              axisLabel: {
+                formatter: function (value) {
+                  return Math.round(parseFloat(value));
+                },
+              },
             },
             {
               type: "category",
+              name: "米",
               gridIndex: 1,
               data: xdata2,
+              axisLabel: {
+                formatter: function (value) {
+                  return Math.round(parseFloat(value));
+                },
+              },
             },
           ],
           yAxis: [
@@ -146,7 +164,7 @@ export default defineComponent({
           ],
           series: [
             {
-              data: data.data.list,
+              data: hList,
               type: "line",
               connectNulls: true,
               symbol: "none",
@@ -264,7 +282,7 @@ export default defineComponent({
             {
               xAxisIndex: 1,
               yAxisIndex: 1,
-              data: data.data.slopeRatio,
+              data: data.Sa_h,
               type: "line",
               connectNulls: true,
               symbol: "none",

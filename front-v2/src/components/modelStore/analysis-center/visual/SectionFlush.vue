@@ -5,7 +5,7 @@
 <script>
 import { defineComponent, onMounted, ref } from "vue";
 import ModelRequest from "../../modelApi.js";
-const { getSectionFlush } = ModelRequest;
+const { getResultData } = ModelRequest;
 import * as echarts from "echarts";
 import axios from 'axios';
 export default defineComponent({
@@ -56,9 +56,11 @@ export default defineComponent({
     };
 
     const initData = async () => {
-      //const data = await getSectionFlush(props.chartInfo?.id);
-      const data = await getArrs(props.chartInfo?.id);
-      if (data != null && data.code === 0) {
+      //const data = await getArrs(props.chartInfo?.id);
+      console.log(props.chartInfo)
+      const data = await getResultData('json', props.chartInfo.caseid, props.chartInfo.name);
+      console.log(data)
+      if (data != null) {
         const benchmark = data.data.benchmark;
         const refer = data.data.refer;
         const flush = data.data.flush;
