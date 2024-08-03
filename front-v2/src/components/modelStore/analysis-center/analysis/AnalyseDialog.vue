@@ -16,6 +16,7 @@
       v-if="!flag"
       :analyseType="analyseType"
       :analyticDataList="analyticDataList"
+      :demDataList="demDataList"
       @back="flag = true"
       @returnParameter="returnParameter"
     />
@@ -25,23 +26,27 @@
 <script>
 import { defineComponent, onMounted, ref } from "vue";
 import ModelRequest from "../../modelApi.js";
-const { getAnalysisResult } = ModelRequest;
 import AnalyseInterface from "./AnalyseInterface.vue";
 import router from "@/router";
 export default defineComponent({
   components: { AnalyseInterface },
   emits: ["analyse"],
-  setup(_, context) {
+  props: {
+    dataList: {
+      type: Array,
+    },
+  },
+  setup(props, context) {
     const flag = ref(true);
     const analyseType = ref("");
-    const analyticDataList = ref();
+    const analyticDataList = ref([]);
+    const demDataList = ref([]);
     const list = [
       {
         name: "断面形态",
         src: "/analyse/断面形态.png",
         value: "section",
       },
-
       {
         name: "断面冲淤",
         src: "/analyse/断面冲淤.png",
@@ -83,11 +88,36 @@ export default defineComponent({
       context.emit("analyse", { type: analyseType.value, value: val });
     };
 
-    onMounted(async () => {
-      const data = await getAnalysisResult(import.meta.env.VITE_APP_ROUTER_ID);
-      if (data != null && data.code === 0) {
-        analyticDataList.value = data.data;
+    const getDemList = () => {
+      let baseData;
+      if (
+        props.dataList.length != 0 &&
+        props.dataList[props.dataList.length - 1].id === ""
+      ) {
+        baseData = props.dataList.slice(0, -1);
+      } else {
+        baseData = props.dataList;
       }
+      let demList = [];
+      baseData.forEach((item) => {
+        item.children.forEach((data) => {
+          if (data.visualType === "rasterTile") {
+            demList.push({
+              dataListId: item.id,
+              dataListName: item.label,
+              fileId: data.id,
+              fileName: data.label,
+              visualType: "rasterTile",
+            });
+          }
+        });
+      });
+      return demList;
+    };
+
+    onMounted(() => {
+      analyticDataList.value = props.dataList[props.dataList.length - 1].children;
+      demDataList.value = getDemList();
     });
 
     return {
@@ -96,6 +126,7 @@ export default defineComponent({
       cardClick,
       analyseType,
       analyticDataList,
+      demDataList,
       returnParameter,
     };
   },

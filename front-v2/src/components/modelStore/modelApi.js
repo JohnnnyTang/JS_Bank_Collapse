@@ -57,6 +57,20 @@ export const get = (
   });
 };
 
+export const getBlob = (
+  url,
+  debounce,
+  params
+) => {
+  return ModelInstance.get(url, {
+    headers: {
+      debounce: debounce ? "true" : "false",
+    },
+    params: params,
+    responseType: 'blob'
+  });
+};
+
 export const post = (
   url,
   debounce,
@@ -201,13 +215,6 @@ export default class ModelRequest {
   }
 
   /**
-   * @param {string} caseId
-   */
-  static async getAnalysisResult(caseId) {
-    return await get(`/analysis/getAnalysisResult/${caseId}`, true);
-  }
-
-  /**
    * @param {{ caseId: string; list: { fileId: string; dataListId: string; }[]; }} jsonData
    */
   static async addAnalysisData(jsonData) {
@@ -328,6 +335,10 @@ export default class ModelRequest {
 
   static async getResultData(type, caseid, name) {
     return await get(`/data/modelServer/file/${type}?caseId=${caseid}&name=${name}`, true)
+  }
+
+  static async getResultBlobData(type, caseid, name) {
+    return await getBlob(`/data/modelServer/file/${type}?caseId=${caseid}&name=${name}`, true)
   }
 
   /**

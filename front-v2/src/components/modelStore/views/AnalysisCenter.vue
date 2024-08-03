@@ -1,6 +1,6 @@
 <template>
   <div class="all">
-    <ModelTitleVue :ModelName="'岸坡稳定性分析模型'" />
+    <ModelTitleVue :ModelName="'近岸演变分析模型'" />
 
     <div class="model-content-container">
       <div class="model-item-container">
@@ -30,12 +30,16 @@
               @operateDraw="operateDraw"
               @analyse="analyse"
               @uploadHandle="drawHandle"
+              :dataList="dataList"
             ></top-tool>
           </div>
+          <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
           <data-manage
             class="top"
             ref="dataManage"
+            :dataList="dataList"
             @operateLayer="operateLayer"
+            v-else
           ></data-manage>
           <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
           <layer-manage
@@ -48,7 +52,7 @@
             v-else
           ></layer-manage>
         </div>
-      
+
         <!-- <div class="left-resize" ref="leftResize"></div> -->
       </div>
       <el-skeleton :rows="5" animated v-if="skeletonFlag" />
@@ -76,6 +80,7 @@ export default defineComponent({
   components: { ModelTitleVue, TopTool, RightVisual, DataManage, LayerManage },
   setup() {
     const skeletonFlag = ref(true);
+    const dataList = ref([]);
     const layerList = ref([]);
     const rightMap = ref();
     const dataManage = ref();
@@ -104,6 +109,7 @@ export default defineComponent({
     //   content: {
     //     id: string,
     //     name: string,
+    //     label: string,
     //     visualType: string,
     //     visualId: string,
     //   },
@@ -140,6 +146,7 @@ export default defineComponent({
     };
 
     // val: {
+    //   id: string,
     //   geoJson: any,
     //   visualType: string,
     //   fileName: string,
@@ -159,6 +166,50 @@ export default defineComponent({
     };
 
     onMounted(async () => {
+      dataList.value = [
+        {
+          id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
+          label: "2006年长江南京以下DEM",
+          flag: true,
+          children: [
+            {
+              id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
+              label: "w001001.adf",
+              flag: false,
+              children: [],
+              visualType: "rasterTile",
+            },
+          ],
+        },
+        {
+          id: "30c14195-bfe7-47e4-ac06-70991392409c",
+          label: "2004年长江南京以下DEM",
+          flag: true,
+          children: [
+            {
+              id: "200408_dem/w001001.adf",
+              label: "w001001.adf",
+              flag: false,
+              children: [],
+              visualType: "rasterTile",
+            },
+          ],
+        },
+        {
+          id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
+          label: "1998年长江南京以下DEM",
+          flag: true,
+          children: [
+            {
+              id: "199801_dem/w001001.adf",
+              label: "w001001.adf",
+              flag: false,
+              children: [],
+              visualType: "rasterTile",
+            },
+          ],
+        },
+      ];
       // TODO: sessionstorage获得图层列表
       // const res = await ModelRequest.getLayersInfo(import.meta.env.VITE_APP_ROUTER_ID);
       // if (res != null && res.code === 0) {
@@ -185,6 +236,7 @@ export default defineComponent({
       drawHandle,
       analyse,
       skeletonFlag,
+      dataList,
       layerList,
       moveLayer,
       checky1,

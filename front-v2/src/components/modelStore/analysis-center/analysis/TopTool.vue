@@ -45,87 +45,16 @@
       </el-dropdown>
     </div>
 
-    <!-- <div class="map-tool">
-      <el-dropdown popper-class="draw-popper">
-        <span class="menu-add">
-          <svg
-            width="16px"
-            height="16px"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style="margin-right: 10px"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M18 5C17.4477 5 17 5.44772 17 6C17 6.27642 17.1108 6.52505 17.2929 6.70711C17.475 6.88917 17.7236 7 18 7C18.5523 7 19 6.55228 19 6C19 5.44772 18.5523 5 18 5ZM15 6C15 4.34315 16.3431 3 18 3C19.6569 3 21 4.34315 21 6C21 7.65685 19.6569 9 18 9C17.5372 9 17.0984 8.8948 16.7068 8.70744L8.70744 16.7068C8.8948 17.0984 9 17.5372 9 18C9 19.6569 7.65685 21 6 21C4.34315 21 3 19.6569 3 18C3 16.3431 4.34315 15 6 15C6.46278 15 6.90157 15.1052 7.29323 15.2926L15.2926 7.29323C15.1052 6.90157 15 6.46278 15 6ZM6 17C5.44772 17 5 17.4477 5 18C5 18.5523 5.44772 19 6 19C6.55228 19 7 18.5523 7 18C7 17.7236 6.88917 17.475 6.70711 17.2929C6.52505 17.1108 6.27642 17 6 17Z"
-              fill="#000000"
-            /></svg
-          >添加断面</span
-        >
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="sectionClick">绘制</el-dropdown-item>
-            <el-dropdown-item @click="navToKnowledgePage">
-              <el-upload
-                ref="uploadSectionRef"
-                :limit="1"
-                :on-exceed="handleExceed"
-                :show-file-list="false"
-                accept=".json,.geojson"
-                >上传</el-upload
-              ></el-dropdown-item
-            >
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-
-      <el-divider direction="vertical" />
-
-      <el-dropdown popper-class="draw-popper">
-        <span class="menu-add">
-          <svg
-            width="16px"
-            height="16px"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            style="margin-right: 10px"
-          >
-            <g>
-              <path fill="none" d="M0 0h24v24H0z" />
-              <path
-                d="M20 16h2v6h-6v-2H8v2H2v-6h2V8H2V2h6v2h8V2h6v6h-2v8zm-2 0V8h-2V6H8v2H6v8h2v2h8v-2h2zM4 4v2h2V4H4zm0 14v2h2v-2H4zM18 4v2h2V4h-2zm0 14v2h2v-2h-2z"
-              />
-            </g></svg
-          >添加区域</span
-        >
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="regionClick">绘制</el-dropdown-item>
-            <el-dropdown-item @click="navToKnowledgePage">
-              <el-upload
-                ref="uploadRegionRef"
-                :limit="1"
-                :on-exceed="handleExceed"
-                :show-file-list="false"
-                accept=".json,.geojson"
-                >上传</el-upload
-              ></el-dropdown-item
-            >
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </div> -->
-
-    <!-- <div class="draw-tool"></div> -->
-
     <el-dialog v-model="dialogAddData" width="1000px" title="添加数据">
       <add-data-dialog @returnData="returnData" v-if="dialogAddData" />
     </el-dialog>
 
     <el-dialog v-model="dialogAnalyse" width="580px" title="模型计算">
-      <analyse-dialog @analyse="analyse" v-if="dialogAnalyse" />
+      <analyse-dialog
+        @analyse="analyse"
+        v-if="dialogAnalyse"
+        :dataList="dataList"
+      />
     </el-dialog>
   </div>
 </template>
@@ -138,9 +67,14 @@ import { useRouter } from "vue-router";
 export default defineComponent({
   components: { AddDataDialog, AnalyseDialog },
   emits: ["returnFileList", "operateDraw", "analyse", "uploadHandle"],
-  setup(_, context) {
+  props: {
+    dataList: {
+      type: Array,
+    },
+  },
+  setup(props, context) {
     const router = useRouter();
-
+    const dataList = props.dataList
     const dialogAddData = ref(false);
     const dialogAnalyse = ref(false);
     const state = ref(0);

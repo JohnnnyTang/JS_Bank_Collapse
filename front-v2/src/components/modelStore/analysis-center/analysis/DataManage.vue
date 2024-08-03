@@ -11,7 +11,7 @@
           <el-scrollbar>
             <el-tree
               style="overflow: auto"
-              :data="treeData"
+              :data="dataList"
               :props="defaultProps"
               @node-contextmenu="rightClick"
               default-expand-all
@@ -97,7 +97,12 @@ import utils from "@/utils/CommonUtils";
 const { notice } = utils;
 export default defineComponent({
   emits: ["operateLayer"],
-  setup(_, context) {
+  props: {
+    dataList: {
+      type: Array,
+    },
+  },
+  setup(props, context) {
     let sectionTimeout;
     const defaultProps = {
       children: "children",
@@ -111,7 +116,7 @@ export default defineComponent({
     //     children: Tree[];
     //     visualType?: string;
     // }[]
-    const treeData = ref([]);
+    let dataList = props.dataList;
     const showRightMenu = ref(false);
     const skeletonFlag = ref(true);
     const menu = ref();
@@ -147,17 +152,17 @@ export default defineComponent({
       };
       param.forEach((item) => {
         let flag1 = true;
-        for (let i = 0; i < treeData.value.length; i++) {
-          if (treeData.value[i].id === item.dataListId) {
+        for (let i = 0; i < dataList.length; i++) {
+          if (dataList[i].id === item.dataListId) {
             let flag = true;
-            for (let j = 0; j < treeData.value[i].children.length; j++) {
-              if (treeData.value[i].children[j].id === item.fileId) {
+            for (let j = 0; j < dataList[i].children.length; j++) {
+              if (dataList[i].children[j].id === item.fileId) {
                 flag = false;
                 break;
               }
             }
             if (flag) {
-              treeData.value[i].children.push({
+              dataList[i].children.push({
                 id: item.fileId,
                 label: item.fileName,
                 flag: false,
@@ -174,17 +179,14 @@ export default defineComponent({
           }
         }
         if (flag1) {
-          if (
-            treeData.value.length > 0 &&
-            treeData.value[treeData.value.length - 1].id === ""
-          ) {
-            treeData.value.splice(treeData.value.length - 1, 0, {
+          if (dataList.length > 0 && dataList[dataList.length - 1].id === "") {
+            dataList.splice(dataList.length - 1, 0, {
               id: item.dataListId,
               label: item.dataListName,
               flag: true,
               children: [],
             });
-            treeData.value[treeData.value.length - 2].children.push({
+            dataList[dataList.length - 2].children.push({
               id: item.fileId,
               label: item.fileName,
               flag: false,
@@ -192,13 +194,13 @@ export default defineComponent({
               visualType: item.visualType,
             });
           } else {
-            treeData.value.push({
+            dataList.push({
               id: item.dataListId,
               label: item.dataListName,
               flag: true,
               children: [],
             });
-            treeData.value[treeData.value.length - 1].children.push({
+            dataList[dataList.length - 1].children.push({
               id: item.fileId,
               label: item.fileName,
               flag: false,
@@ -215,66 +217,52 @@ export default defineComponent({
       });
       if (jsonData.list.length > 0) {
         await addAnalysisData(jsonData);
-        //window.sessionStorage.setItem("treeData", treeData.value);
+        //window.sessionStorage.setItem("treeData", dataList);
       }
     };
 
     // param: { geoJson: any; visualType: string; fileName: string }
     const addDrawData = async (param) => {
-      //   {
-      //     caseId: string;
-      //     geoJson: any;
-      //     fileName: string;
-      //     visualType: string;
-      //   }
-      const jsonData = {
-        caseId: import.meta.env.VITE_APP_ROUTER_ID,
-        geoJson: param.geoJson,
-        fileName: param.fileName,
+      let drawData = {
+        caseid: param.id, //TODO: 区分后端和前端生成id
+        name: "",
+        label: param.fileName,
+        flag: false,
+        children: [],
         visualType: param.visualType,
+        params: { geojson: param.geoJson },
       };
-      const data = await addDraw(jsonData);
-      if (data != null && data.code === 0) {
-        if (
-          treeData.value.length != 0 &&
-          treeData.value[treeData.value.length - 1].id === ""
-        ) {
-          treeData.value[treeData.value.length - 1].children.push({
-            id: data.data,
-            label: param.fileName,
-            flag: false,
-            children: [],
-            visualType: param.visualType,
-          });
-        } else {
-          treeData.value.push({
-            id: "",
-            label: "分析结果集",
-            flag: true,
-            children: [],
-          });
-          treeData.value[treeData.value.length - 1].children.push({
-            id: data.data,
-            label: param.fileName,
-            flag: false,
-            children: [],
-            visualType: param.visualType,
-          });
-        }
 
-        //window.sessionStorage.setItem("treeData", treeData.value);
+      if (dataList.length != 0 && dataList[dataList.length - 1].id === "") {
+        dataList[dataList.length - 1].children.push(drawData);
+      } else {
+        dataList.push({
+          id: "",
+          label: "分析结果集",
+          flag: true,
+          children: [],
+        });
+        dataList[dataList.length - 1].children.push(drawData);
+      }
 
-        return {
-          id: data.data,
-          name: param.fileName,
-          visualType: param.visualType,
-        };
+      //window.sessionStorage.setItem("treeData", dataList);
+      return drawData;
+    };
+
+    const getGeomById = (id) => {
+      if (dataList.length != 0 && dataList[dataList.length - 1].id === "" && id != "") {
+        let result = dataList[dataList.length - 1].children.find(
+          (item) => item.caseid === id
+        );
+        return result.params.geojson;
+      } else {
+        return null;
       }
     };
 
     const addAnalyse = async (param) => {
+      console.log(param);
       if (param.type === "section") {
-        console.log(param);
         // addData([param.value.dem]);
         // context.emit("operateLayer", {
         //   content: {
@@ -285,45 +273,23 @@ export default defineComponent({
         //   },
         //   type: "add",
         // });
+        let sectionGeom = getGeomById(param.value.section);
+        if (sectionGeom == null) return;
         const data = await calculateSectionView({
-          "dem-id": "199801_dem/w001001.adf",
-          "section-geometry": {
-            type: "FeatureCollection",
-            name: "mzsSectionLineLong",
-            crs: { type: "name", properties: { name: "urn:ogc:def:crs:EPSG::3857" } },
-            features: [
-              {
-                type: "Feature",
-                properties: {
-                  id: 0,
-                  fid: 1,
-                  name: "JC01",
-                  label: "MZ01围堤",
-                  warn: "mid",
-                  if_important: 1,
-                },
-                geometry: {
-                  type: "LineString",
-                  coordinates: [
-                    [13413891.494620809331536, 3769073.072245586663485],
-                    [13413485.103571385145187, 3765456.449993444141001],
-                  ],
-                },
-              },
-            ],
-          },
+          "dem-id": param.value.dem.fileId,
+          "section-geometry": sectionGeom,
         });
         let result = await checkStateHandle(data.data, "断面形态");
         if (result != null) {
-          if (treeData.value[treeData.value.length - 1].id !== "") {
-            treeData.value.push({
+          if (dataList[dataList.length - 1].id !== "") {
+            dataList.push({
               id: "",
               label: "分析结果集",
               children: [],
               flag: true,
             });
           }
-          treeData.value[treeData.value.length - 1].children.push({
+          dataList[dataList.length - 1].children.push({
             caseid: result.data["case-id"],
             name: result.data["raw-json"],
             label: param.value.fileName,
@@ -359,46 +325,24 @@ export default defineComponent({
         //   type: "add",
         // });
         if (param.type === "sectionFlush") {
+          let sectionGeom = getGeomById(param.value.section);
+          if (sectionGeom == null) return;
           const data = await calculateSectionContrast({
-            "bench-id": "199801_dem/w001001.adf",
-            "ref-id": "200408_dem/w001001.adf",
-            "section-geometry": {
-              type: "FeatureCollection",
-              name: "mzsSectionLineLong",
-              crs: { type: "name", properties: { name: "urn:ogc:def:crs:EPSG::3857" } },
-              features: [
-                {
-                  type: "Feature",
-                  properties: {
-                    id: 0,
-                    fid: 1,
-                    name: "JC01",
-                    label: "MZ01围堤",
-                    warn: "mid",
-                    if_important: 1,
-                  },
-                  geometry: {
-                    type: "LineString",
-                    coordinates: [
-                      [13413891.494620809331536, 3769073.072245586663485],
-                      [13413485.103571385145187, 3765456.449993444141001],
-                    ],
-                  },
-                },
-              ],
-            },
+            "bench-id": param.value.benchmarkDem.fileId,
+            "ref-id": param.value.referDem.fileId,
+            "section-geometry": sectionGeom,
           });
           let result = await checkStateHandle(data.data, "断面冲淤");
           if (result != null) {
-            if (treeData.value[treeData.value.length - 1].id !== "") {
-              treeData.value.push({
+            if (dataList[dataList.length - 1].id !== "") {
+              dataList.push({
                 id: "",
                 label: "分析结果集",
                 children: [],
                 flag: true,
               });
             }
-            treeData.value[treeData.value.length - 1].children.push({
+            dataList[dataList.length - 1].children.push({
               caseid: result.data["case-id"],
               name: result.data["raw-txt"],
               label: param.value.fileName,
@@ -407,55 +351,38 @@ export default defineComponent({
               visualType: "sectionFlush",
               params: null,
             });
-            console.log(treeData.value);
+            console.log(dataList);
           }
         } else if (param.type === "regionFlush") {
+          let regionGeom = getGeomById(param.value.region);
+          console.log({
+            "bench-id": param.value.benchmarkDem.fileId,
+            "ref-id": param.value.referDem.fileId,
+            "region-geometry": param.value.global == true ? "NONE" : regionGeom,
+          });
           const data = await calculateRegionFlush({
-            "bench-id": "199801_dem/w001001.adf",
-            "ref-id": "200408_dem/w001001.adf",
-            "region-geometry": {
-              type: "FeatureCollection",
-              features: [
-                {
-                  type: "Feature",
-                  properties: {
-                    name: "Example Polygon",
-                  },
-                  geometry: {
-                    type: "Polygon",
-                    coordinates: [
-                      [
-                        [121.35857784308524, 31.660508611487913],
-                        [121.29264135171792, 31.576285441022137],
-                        [121.45748258013526, 31.57394482076768],
-                        [121.3860513811536, 31.508383603511106],
-                        [121.50693494865948, 31.56458175211411],
-                        [121.35857784308524, 31.660508611487913],
-                      ],
-                    ],
-                  },
-                },
-              ],
-            },
+            "bench-id": param.value.benchmarkDem.fileId,
+            "ref-id": param.value.referDem.fileId,
+            "region-geometry": param.value.global == true ? "NONE" : regionGeom,
           });
           let result = await checkStateHandle(data.data, "区域冲淤"); //将分析结果添加至结果集
           if (result != null) {
             const coordJson = await getResultData(
-              "common",
+              "json",
               result.data["case-id"],
               result.data["extent-json"]
             );
             const coords = coordJson.data;
-            const extent = [coords.ul, coords.lr, coords.ur, coords.ll];
-            if (treeData.value[treeData.value.length - 1].id !== "") {
-              treeData.value.push({
+            const extent = [coords.ul, coords.ur, coords.lr, coords.ll];
+            if (dataList[dataList.length - 1].id !== "") {
+              dataList.push({
                 id: "",
                 label: "分析结果集",
                 children: [],
                 flag: true,
               });
             }
-            treeData.value[treeData.value.length - 1].children.push({
+            dataList[dataList.length - 1].children.push({
               caseid: result.data["case-id"],
               name: result.data["visualization-png"],
               label: param.value.fileName,
@@ -464,48 +391,26 @@ export default defineComponent({
               visualType: "regionFlush",
               params: { extent },
             });
-            console.log(treeData.value);
+            console.log(dataList);
           }
         } else {
+          let regionGeom = getGeomById(param.value.region);
           const data = await calculateRegionContour({
-            "bench-id": "199801_dem/w001001.adf",
-            "ref-id": "200408_dem/w001001.adf",
-            "region-geometry": {
-              type: "FeatureCollection",
-              features: [
-                {
-                  type: "Feature",
-                  properties: {
-                    name: "Example Polygon",
-                  },
-                  geometry: {
-                    type: "Polygon",
-                    coordinates: [
-                      [
-                        [121.35857784308524, 31.660508611487913],
-                        [121.29264135171792, 31.576285441022137],
-                        [121.45748258013526, 31.57394482076768],
-                        [121.3860513811536, 31.508383603511106],
-                        [121.50693494865948, 31.56458175211411],
-                        [121.35857784308524, 31.660508611487913],
-                      ],
-                    ],
-                  },
-                },
-              ],
-            },
+            "bench-id": param.value.benchmarkDem.fileId,
+            "ref-id": param.value.referDem.fileId,
+            "region-geometry": param.value.global == true ? "NONE" : regionGeom,
           });
           let result = await checkStateHandle(data.data, "区域等深线");
           if (result != null) {
-            if (treeData.value[treeData.value.length - 1].id !== "") {
-              treeData.value.push({
+            if (dataList[dataList.length - 1].id !== "") {
+              dataList.push({
                 id: "",
                 label: "分析结果集",
                 children: [],
                 flag: true,
               });
             }
-            treeData.value[treeData.value.length - 1].children.push({
+            dataList[dataList.length - 1].children.push({
               caseid: result.data["case-id"],
               name: result.data["visualization-geojson"],
               label: param.value.fileName,
@@ -514,7 +419,6 @@ export default defineComponent({
               visualType: "flushContour",
               params: null,
             });
-            console.log(treeData.value);
           }
         }
       } else if (param.type === "volume") {
@@ -527,66 +431,43 @@ export default defineComponent({
         //   },
         //   type: "add",
         // });
+        let regionGeom = getGeomById(param.value.region);
         const data = await calculateRiverVolume({
-          "dem-id": "200408_dem/w001001.adf",
-          "region-geometry": {
-            type: "FeatureCollection",
-            features: [
-              {
-                type: "Feature",
-                properties: {
-                  name: "Example Polygon",
-                },
-                geometry: {
-                  type: "Polygon",
-                  coordinates: [
-                    [
-                      [121.35857784308524, 31.660508611487913],
-                      [121.29264135171792, 31.576285441022137],
-                      [121.45748258013526, 31.57394482076768],
-                      [121.3860513811536, 31.508383603511106],
-                      [121.50693494865948, 31.56458175211411],
-                      [121.35857784308524, 31.660508611487913],
-                    ],
-                  ],
-                },
-              },
-            ],
-          },
-          "water-depth": 10,
+          "dem-id": param.value.dem.fileId,
+          "region-geometry": regionGeom,
+          "water-depth": param.value.deep,
         });
         let result = await checkStateHandle(data.data, "河道容积");
         if (result != null) {
           const volume = await getResultData(
-            "common",
+            "txt",
             result.data["case-id"],
             result.data["volume-summary-txt"]
           );
           const coordJson = await getResultData(
-            "common",
+            "json",
             result.data["case-id"],
             result.data["extent-json"]
           );
           const coords = coordJson.data;
-          const extent = [coords.ul, coords.lr, coords.ur, coords.ll];
-          if (treeData.value[treeData.value.length - 1].id !== "") {
-            treeData.value.push({
+          const extent = [coords.ul, coords.ur, coords.lr, coords.ll];
+          if (dataList[dataList.length - 1].id !== "") {
+            dataList.push({
               id: "",
               label: "分析结果集",
               children: [],
               flag: true,
             });
           }
-          treeData.value[treeData.value.length - 1].children.push({
+          dataList[dataList.length - 1].children.push({
             caseid: result.data["case-id"],
             name: result.data["visualization-png"],
             label: param.value.fileName,
             flag: false,
             children: [],
             visualType: "volume",
-            params: { volume, extent },
+            params: { volume: parseFloat(volume.data), extent },
           });
-          console.log(treeData.value)
         }
       }
     };
@@ -598,6 +479,7 @@ export default defineComponent({
             content: {
               caseid: selectedData.value?.caseid,
               name: selectedData.value?.name,
+              label: selectedData.value?.label,
               visualType: selectedData.value?.visualType,
               params: selectedData.value?.params,
             },
@@ -616,19 +498,19 @@ export default defineComponent({
             );
           }
           if (data != null && data.code === 0) {
-            for (let i = 0; i < treeData.value.length; i++) {
-              if (treeData.value[i].id === parentId.value) {
+            for (let i = 0; i < dataList.length; i++) {
+              if (dataList[i].id === parentId.value) {
                 if (
-                  treeData.value[i].children.length === 0 ||
-                  treeData.value[i].children.length === 1
+                  dataList[i].children.length === 0 ||
+                  dataList[i].children.length === 1
                 ) {
-                  treeData.value.splice(i, 1);
+                  dataList.splice(i, 1);
                   notice("success", "成功", "数据删除成功!");
                   return;
                 } else {
-                  for (let j = 0; j < treeData.value[i].children.length; j++) {
-                    if (treeData.value[i].children[j].id === selectedData.value?.id) {
-                      treeData.value[i].children.splice(j, 1);
+                  for (let j = 0; j < dataList[i].children.length; j++) {
+                    if (dataList[i].children[j].id === selectedData.value?.id) {
+                      dataList[i].children.splice(j, 1);
                       notice("success", "成功", "数据删除成功!");
                       return;
                     }
@@ -722,16 +604,9 @@ export default defineComponent({
         },
         type: "rename",
       });
-      for (
-        let i = 0;
-        i < treeData.value[treeData.value.length - 1].children.length;
-        i++
-      ) {
-        if (
-          treeData.value[treeData.value.length - 1].children[i].id ===
-          selectedData.value?.id
-        ) {
-          treeData.value[treeData.value.length - 1].children[i].label = input.value;
+      for (let i = 0; i < dataList[dataList.length - 1].children.length; i++) {
+        if (dataList[dataList.length - 1].children[i].id === selectedData.value?.id) {
+          dataList[dataList.length - 1].children[i].label = input.value;
           break;
         }
       }
@@ -739,15 +614,15 @@ export default defineComponent({
     };
 
     const initData = async (id) => {
-      treeData.value = [];
+      dataList = [];
       const data = await getData(id);
       console.log(data);
       if (data != null && data.code === 0) {
         data.data.forEach((item) => {
           let flag = true;
-          for (let i = 0; i < treeData.value.length; i++) {
-            if (treeData.value[i].id === item.dataListId) {
-              treeData.value[i].children.push({
+          for (let i = 0; i < dataList.length; i++) {
+            if (dataList[i].id === item.dataListId) {
+              dataList[i].children.push({
                 id: item.fileId,
                 label: item.fileName,
                 flag: false,
@@ -758,13 +633,13 @@ export default defineComponent({
             }
           }
           if (flag) {
-            treeData.value.push({
+            dataList.push({
               id: item.dataListId,
               label: item.dataListName,
               flag: true,
               children: [],
             });
-            treeData.value[treeData.value.length - 1].children.push({
+            dataList[dataList.length - 1].children.push({
               id: item.fileId,
               label: item.fileName,
               flag: false,
@@ -778,14 +653,14 @@ export default defineComponent({
       console.log(analyticData);
       if (analyticData != null && data.code === 0) {
         if (analyticData.data.length > 0) {
-          treeData.value.push({
+          dataList.push({
             id: "",
             label: "分析结果集",
             flag: true,
             children: [],
           });
           analyticData.data.forEach((item) => {
-            treeData.value[treeData.value.length - 1].children.push({
+            dataList[dataList.length - 1].children.push({
               id: item.id,
               label: item.fileName,
               flag: false,
@@ -795,63 +670,65 @@ export default defineComponent({
           });
         }
       }
-      console.log(treeData.value);
+      console.log(dataList);
     };
 
     onMounted(() => {
+      //dataList = props.dataList
       //TODO: sessionstorage获取数据列表
-      treeData.value = [
-        {
-          id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
-          label: "2006年长江南京以下DEM",
-          flag: true,
-          children: [
-            {
-              id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
-              label: "w001001.adf",
-              flag: false,
-              children: [],
-              visualType: "rasterTile",
-            },
-          ],
-        },
-        {
-          id: "30c14195-bfe7-47e4-ac06-70991392409c",
-          label: "2004年长江南京以下DEM",
-          flag: true,
-          children: [
-            {
-              id: "200408_dem/w001001.adf",
-              label: "w001001.adf",
-              flag: false,
-              children: [],
-              visualType: "rasterTile",
-            },
-          ],
-        },
-        {
-          id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
-          label: "1998年长江南京以下DEM",
-          flag: true,
-          children: [
-            {
-              id: "199801_dem/w001001.adf",
-              label: "w001001.adf",
-              flag: false,
-              children: [],
-              visualType: "rasterTile",
-            },
-          ],
-        },
-      ];
+      // dataList = [
+      //   {
+      //     id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
+      //     label: "2006年长江南京以下DEM",
+      //     flag: true,
+      //     children: [
+      //       {
+      //         id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
+      //         label: "w001001.adf",
+      //         flag: false,
+      //         children: [],
+      //         visualType: "rasterTile",
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: "30c14195-bfe7-47e4-ac06-70991392409c",
+      //     label: "2004年长江南京以下DEM",
+      //     flag: true,
+      //     children: [
+      //       {
+      //         id: "200408_dem/w001001.adf",
+      //         label: "w001001.adf",
+      //         flag: false,
+      //         children: [],
+      //         visualType: "rasterTile",
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
+      //     label: "1998年长江南京以下DEM",
+      //     flag: true,
+      //     children: [
+      //       {
+      //         id: "199801_dem/w001001.adf",
+      //         label: "w001001.adf",
+      //         flag: false,
+      //         children: [],
+      //         visualType: "rasterTile",
+      //       },
+      //     ],
+      //   },
+      // ];
+
       //initData(import.meta.env.VITE_APP_ROUTER_ID);
       //const data = window.sessionStorage.getItem("dataList");
-      //if (data != null) treeData.value = JSON.parse(data);
+      //if (data != null) dataList = JSON.parse(data);
       skeletonFlag.value = false;
     });
 
     onBeforeUnmount(() => {
-      window.sessionStorage.setItem("dataList", JSON.stringify(treeData.value));
+      window.sessionStorage.setItem("dataList", JSON.stringify(dataList));
       clearTimeout(sectionTimeout);
     });
 
@@ -864,7 +741,6 @@ export default defineComponent({
       rightClick,
       showRightMenu,
       menu,
-      treeData,
       isLayerVisual,
       addDrawData,
       addAnalyse,

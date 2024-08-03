@@ -59,7 +59,8 @@ export default defineComponent({
     };
 
     const initData = async () => {
-      const data = await getResultData('common', props.chartInfo.caseid, props.chartInfo.name);
+      const result = await getResultData('json', props.chartInfo.caseid, props.chartInfo.name);
+      const data = result.data
       const interval = props.chartInfo.params.interval
       //const data = await getArrs(props.chartInfo?.id);
       if (data != null) {
@@ -67,12 +68,12 @@ export default defineComponent({
         let xdata = [];
         let xdata2 = [];
 
-        data.data.points.forEach((item, index) => {
+        data.points.forEach((item, index) => {
           hList.push(item[2]);
           xdata.push(index * interval);
         });
 
-        data.data.Sa_h.forEach((item, index) => {
+        data.Sa_h.forEach((item, index) => {
           xdata2.push(index * interval);
         });
 
@@ -281,7 +282,7 @@ export default defineComponent({
             {
               xAxisIndex: 1,
               yAxisIndex: 1,
-              data: data.data.Sa_h,
+              data: data.Sa_h,
               type: "line",
               connectNulls: true,
               symbol: "none",

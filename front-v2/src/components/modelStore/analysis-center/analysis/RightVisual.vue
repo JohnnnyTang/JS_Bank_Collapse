@@ -29,7 +29,15 @@
 import { computed, defineComponent, nextTick, onMounted, ref } from "vue";
 import mapBoxGl, { AnySourceData } from "mapbox-gl";
 import ModelRequest from "../../modelApi.js";
-const { getResultData, getCoordinates, getAnalysisGeoJson, getContent } = ModelRequest;
+import utils from "@/utils/CommonUtils";
+const { uuid } = utils;
+const {
+  getResultData,
+  getResultBlobData,
+  getCoordinates,
+  getAnalysisGeoJson,
+  getContent,
+} = ModelRequest;
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ChartVisual from "./ChartVisual.vue";
@@ -116,6 +124,7 @@ export default defineComponent({
 
     const clickHandle = () => {
       context.emit("drawHandle", {
+        id: uuid(),
         geoJson: geoJson,
         visualType: visualType.value,
         fileName: inputValue.value,
@@ -145,10 +154,19 @@ export default defineComponent({
         style: "mapbox://styles/johnnyt/cl9miecpn001t14rspop38nyk",
         center: [121.18, 31.723],
         zoom: 8,
+        transformRequest: (url, resourceType) => {
+          if (url.startsWith(import.meta.env.VITE_APP_BACK_ADDRESS)) {
+            return {
+              url: url,
+              headers: { token: localStorage.getItem("token") },
+            };
+          }
+        },
       });
       map.on("load", async () => {
         await initLayers();
       });
+
       map.doubleClickZoom.disable();
       map.on("dblclick", (e) => {
         for (let i = 0; i < volumeList.value.length; i++) {
@@ -230,15 +248,16 @@ export default defineComponent({
           //   type: type,
           //   "source-layer": param.visualId,
           // });
-          const geojsonData = await getResultData('common', param.caseid, param.name)
+          const geojsonData = await getResultData("json", param.caseid, param.name);
+          console.log(geojsonData);
           map.addSource(param.caseid, {
             type: "geojson",
-            data: geojsonData.data
+            data: geojsonData.data,
           });
           map.addLayer({
             id: param.caseid,
             source: param.caseid,
-            type: type
+            type: type,
           });
         } else if (
           param.visualType === "rasterTile" ||
@@ -248,7 +267,7 @@ export default defineComponent({
           map.addSource(param.id, {
             type: "raster",
             tiles: [
-              `${import.meta.env.VITE_APP_BACK_ADDRESS}visual/getRaster/${
+              `${import.meta.env.VITE_APP_BACK_ADDRESS}/visual/getRaster/${
                 param.visualId
               }/{x}/{y}/{z}`,
             ],
@@ -265,14 +284,10 @@ export default defineComponent({
         ) {
           map.addSource(param.caseid, {
             type: "image",
-            url: `/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
-            // 'url': 'https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif',
-            'coordinates': [
-                [120.425, 46.437],
-                [124.516, 46.437],
-                [124.516, 37.936],
-                [120.425, 37.936]
-            ]
+            url: `${
+              import.meta.env.VITE_APP_BACK_ADDRESS
+            }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            coordinates: param.params.extent,
           });
           map.addLayer({
             id: param.caseid,
@@ -280,44 +295,43 @@ export default defineComponent({
             source: param.caseid,
           });
         } else if (param.visualType === "volume") {
-          const content = await getContent(param.visualId);
-          if (content != null && content.code === 0) {
-            map.addSource(param.id, {
-              type: "image",
-              url: `${import.meta.env.VITE_APP_BACK_ADDRESS}visual/getPngResource/${
-                param.visualId
-              }`,
-              coordinates: content.data.coordinates,
-            });
-            map.addLayer({
-              id: param.id,
-              type: "raster",
-              source: param.id,
-            });
-            const description = `深度：${content.data.deep}，容积：${content.data.volume}m³`;
-            volumeList.value.push({
-              id: param.id,
-              coordinates: content.data.coordinates,
-              description: description,
-            });
-            // map.on("dblclick", (e) => {
-            //   console.log(map.getLayoutProperty(param.id, "visibility"));
+          map.addSource(param.caseid, {
+            type: "image",
+            url: `${
+              import.meta.env.VITE_APP_BACK_ADDRESS
+            }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            coordinates: param.params.extent,
+          });
+          map.addLayer({
+            id: param.caseid,
+            type: "raster",
+            source: param.caseid,
+          });
 
-            //   const description = `深度：${content.data.deep}，容积：${content.data.volume}㎡`;
-            //   console.log(description);
-            //   new mapBoxGl.Popup()
-            //     .setLngLat([
-            //       (content.data.coordinates[1][0] +
-            //         content.data.coordinates[0][0]) /
-            //         2,
-            //       (content.data.coordinates[1][1] +
-            //         content.data.coordinates[0][1]) /
-            //         2,
-            //     ])
-            //     .setHTML(description)
-            //     .addTo(map);
-            // });
-          }
+          // const description = `深度：${content.data.deep}，容积：${content.data.volume}m³`;
+          const description = `容积：${param.params.volume}m³`;
+          volumeList.value.push({
+            id: param.caseid,
+            coordinates: param.params.extent,
+            description: description,
+          });
+          // map.on("dblclick", (e) => {
+          //   console.log(map.getLayoutProperty(param.id, "visibility"));
+
+          //   const description = `深度：${content.data.deep}，容积：${content.data.volume}㎡`;
+          //   console.log(description);
+          //   new mapBoxGl.Popup()
+          //     .setLngLat([
+          //       (content.data.coordinates[1][0] +
+          //         content.data.coordinates[0][0]) /
+          //         2,
+          //       (content.data.coordinates[1][1] +
+          //         content.data.coordinates[0][1]) /
+          //         2,
+          //     ])
+          //     .setHTML(description)
+          //     .addTo(map);
+          // });
         } else if (
           param.visualType === "geoJsonLine" ||
           param.visualType === "geoJsonPoint" ||
@@ -329,17 +343,17 @@ export default defineComponent({
           } else if (param.visualType === "geoJsonPolygon") {
             type = "fill";
           }
-          const geojson = await getAnalysisGeoJson(param.id);
-          if (geojson != null && geojson.code === 0) {
-            map.addSource(param.id, {
+          const geojson = param.params.geojson;
+          if (geojson != null) {
+            map.addSource(param.caseid, {
               type: "geojson",
-              data: geojson.data,
+              data: geojson,
             });
             if (type === "fill") {
               map.addLayer({
-                id: param.id,
+                id: param.caseid,
                 type: type,
-                source: param.id,
+                source: param.caseid,
                 paint: {
                   "fill-opacity": 0.5,
                   "fill-color": "#f24545",
@@ -347,9 +361,9 @@ export default defineComponent({
               });
             } else {
               map.addLayer({
-                id: param.id,
+                id: param.caseid,
                 type: type,
-                source: param.id,
+                source: param.caseid,
               });
             }
           }
