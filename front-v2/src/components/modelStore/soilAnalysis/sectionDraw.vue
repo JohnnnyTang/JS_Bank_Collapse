@@ -26,6 +26,23 @@
                 {{ '终点：' + sectionLineLabelSec }}
             </div>
         </div>
+        <div class="section-selectior-item">
+            <el-select v-model="selectedDem" placeholder="选择地形" style="width: 10vw; height: 3.5vh"
+                @change="selectedDemChange">
+                <el-option v-for="item in sectionRasterList" :key="item.year" :label="item.year + '地形'
+                    " :value="item.year">
+                    <!-- <span>{{ item.year }}</span> -->
+                    <div style="text-align: center;">{{ item.year + '地形' }}</div>
+
+                    <!-- <span style="float: left">{{
+                        item.year
+                    }}</span>
+                    <span style="float: right">{{
+                        item.time == 'before' ? '汛前' : '汛后'
+                    }}</span> -->
+                </el-option>
+            </el-select>
+        </div>
     </div>
 </template>
 
@@ -36,7 +53,6 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { onMounted, ref, onUnmounted } from 'vue'
 import { initPureScratchMap } from '../../../utils/mapUtils'
-// import { useMultiIndexStore } from '@/store/multiIndexStore'
 import { useMapStore } from '@/store/mapStore'
 
 const mapStore = useMapStore()
@@ -44,16 +60,27 @@ const containerDom = ref()
 const sectionConfirmShow = ref(false)
 const sectionLineLabel = ref('')
 const sectionLineLabelSec = ref('')
+const selectedDem = ref('')
 const calcEnable = ref(false)
 const paramFill = [false, false]
 const sectionConfirmClose = () => { }
 const cancelSectionRese = () => {
     sectionConfirmShow.value = false
 }
+const sectionRasterList = ref([
+    // { year: 2020, time: 'before', layerName: '' },
+    // { year: 2021, time: 'before', layerName: '' },
+    // { year: 2022, time: 'before', layerName: '' },
+    // { year: 2023, time: 'before', layerName: '' },
+    { year: 1998 },
+    { year: 2004 }
+])
+
+
 // const multiIndexStore = useMultiIndexStore()
 let line = null
 let map = null
-const emit = defineEmits(['sectionDraw'])
+const emit = defineEmits(['sectionDraw', 'demSelect'])
 
 const draw = new MapboxDraw({
     displayControlsDefault: false,
@@ -161,10 +188,9 @@ const getSection = () => {
     }
 }
 
-defineExpose({
-    resizeMap,
-    getSection
-})
+const selectedDemChange = (val) => {
+    emit('demSelect', val)
+}
 
 
 
@@ -195,10 +221,7 @@ onMounted(async () => {
             lineFeature.geometry.coordinates[1],
         )
         line = lineFeature
-        emit('sectionDraw', {
-            "type": "FeatureCollection",
-            "features": [line]
-        })
+        emit('sectionDraw', line)
         paramFill[1] = true
         if (paramFill.includes(false)) {
             return
@@ -209,36 +232,17 @@ onMounted(async () => {
     })
 
 
-    // window.addEventListener('keydown', (e) => {
-    //     if (e.key == '1') {
-    //         let dom = map.getContainer()
-    //         dom.style.width = '400px'
-    //         dom.style.height = '400px'
-    //         setTimeout(() => {
-    //             map.resize()
-    //             mapFlyToRiver(map)
-    //         }, 310);
-    //     }
-    //     if (e.key == '2') {
-    //         let dom = map.getContainer()
-    //         dom.style.width = '600px'
-    //         dom.style.height = '600px'
-    //         setTimeout(() => {
-    //             map.resize()
-    //             mapFlyToRiver(map)
-    //         }, 310);
-    //     }
-    //     if (e.key == '3') {
-    //         map.resize()
-    //         mapFlyToRiver(map)
-    //     }
-    // })
-
 })
 
 onUnmounted(() => {
 
 })
+
+defineExpose({
+    resizeMap,
+    getSection
+})
+
 
 const attachBaseLayer = (map) => {
     map.addSource('mzsOverWaterSource', {
@@ -413,7 +417,6 @@ const convertToMercator = (lonLat) => {
     return xy
 }
 
-
 </script>
 
 <style lang="scss" scoped>
@@ -472,6 +475,56 @@ div.section-choose-content {
             &.two-line {
                 height: 27.5%;
                 font-size: calc(0.5vw + 0.5vh);
+            }
+        }
+    }
+
+    div.section-selectior-item {
+        position: absolute;
+        right: 4vw;
+        top: 2.4vh;
+        width: 10vw;
+        height: 3.3vh;
+
+        line-height: 3.3vh;
+        text-align: center;
+
+        // background-color: #eef3ff;
+        :deep(.el-select) {
+            height: 3.3vh;
+            box-shadow:
+                rgba(0, 132, 255, 0.8) 1px 1px,
+                rgba(0, 119, 255, 0.7) 2px 2px,
+                rgba(0, 119, 255, 0.6) 3px 4px;
+            border-radius: 6px;
+            background-color: rgba(0, 119, 255, 1);
+        }
+
+        :deep(.el-select__wrapper) {
+            height: 3.3vh;
+            line-height: 3.3vh;
+            border-radius: 6px;
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+            font-size: calc(0.5vw + 0.6vh);
+            background-color: #e6f7ff;
+        }
+
+        :deep(.el-select__placeholder) {
+            color: #738ab6;
+        }
+
+        :deep(.el-icon) {
+            width: 0.5vw;
+            height: 0.5vw;
+
+            svg {
+                width: 0.5vw;
+                height: 0.5vw;
+
+                path {
+                    fill: #001cb8;
+                }
             }
         }
     }

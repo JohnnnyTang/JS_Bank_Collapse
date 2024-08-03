@@ -11,7 +11,8 @@
                     @tab-click="tabClickCallback">
                     <el-tab-pane label="评估断面选择" name="section-tab">
                         <div class="tab-page-container">
-                            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler"></sectionDraw>
+                            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler"
+                                v-on:dem-select="demSelectHandler"></sectionDraw>
                         </div>
 
                     </el-tab-pane>
@@ -68,7 +69,7 @@
                                             </div>
                                         </div>
                                         <div class="half-block one-center">
-                                            <div class="run-button one-center" @click="runModel">
+                                            <div class="run-button one-center" @click="BSTEMModelRun">
                                                 运行模型
                                             </div>
                                         </div>
@@ -118,6 +119,7 @@ import { onMounted, ref, reactive, watch, nextTick } from 'vue';
 import { ElNotification } from 'element-plus';
 import { initPureScratchMap } from '../../../utils/mapUtils';
 import { useSoilAnalysisStore } from '../../../store/modelStore';
+import ModelRunner from '../modelRunner'
 
 const soilAnalysisStore = useSoilAnalysisStore()
 const activeTab = ref('section-tab');
@@ -127,104 +129,30 @@ const mapRef = ref(null)
 const elevationOfFlow = ref(null)
 let resultMap = null
 let chart = null
-let sectionGeojson = null
 
 const thicknessData = ref([1.93, -4.07, -11.57, -26.57, -36.57])
 const thicknessName = ['Layer1', 'Layer2', 'Layer3', 'Layer4', 'Layer5']
-const xzData = ref([
-    [
-        4.558842192636803e-11,
-        -1.2148850368295108
-    ],
-    [
-        38.10376216666087,
-        -1.2429049979040028
-    ],
-    [
-        76.20752433327615,
-        -1.2259330622439175
-    ],
-    [
-        114.31128649989144,
-        -1.259806958700206
-    ],
-    [
-        152.41504866650672,
-        -1.2611951002238697
-    ],
-    [
-        190.51881083312202,
-        -1.3152647034596443
-    ],
-    [
-        228.6225729997373,
-        -1.4663700476224946
-    ],
-    [
-        266.72633516635256,
-        -1.6060859011160848
-    ],
-    [
-        304.83009733296785,
-        -3.032057199133465
-    ],
-    [
-        342.93385949958315,
-        -3.3242398937408764
-    ],
-    [
-        381.03762166619845,
-        -3.4983403331779157
-    ],
-    [
-        419.1413838328137,
-        -4.124987050220527
-    ],
-    [
-        457.245145999429,
-        -4.851273410394535
-    ],
-    [
-        495.3489081660443,
-        -6.5910771797927366
-    ],
-    [
-        533.4526703326595,
-        -8.942828967567108
-    ],
-    [
-        571.5564324992748,
-        -12.24843115675129
-    ],
-    [
-        609.6601946658901,
-        -16.29660691373699
-    ],
-    [
-        647.7639568325054,
-        -20.083224500410033
-    ],
-    [
-        685.8677189991207,
-        -23.861599173246326
-    ],
-    [
-        723.971481165736,
-        -27.125650170028873
-    ],
-    [
-        762.0752433323513,
-        -28.320095015823984
-    ],
-    [
-        800.1790054989665,
-        -29.132909224573726
-    ],
-    [
-        838.2827676655818,
-        -29.25361011534611
-    ]
-])
+const xzData = ref(new Array(23).fill([0, 0]))
+
+// model params -- section view
+let selectedDem = null
+let sectionGeojson = null
+const sectionDrawHandler = (geojson) => {
+    console.log(' i got geojson !!', geojson)
+    sectionGeojson = geojson
+    soilAnalysisStore.updateSectionStatus(2)
+}
+const demSelectHandler = (name) => {
+    const NameList = {
+        '1998': '199801_dem/w001001.adf',
+        '2004': '200408_dem/w001001.adf'
+    }
+    selectedDem = NameList[name]
+}
+let globalSectionJson = null
+let globalFos = null
+
+
 
 const beforeTabLeave = (e) => {
     let fromTab = activeTab.value
@@ -289,9 +217,12 @@ const tabClickCallback = (tab, event) => {
     if (tab.paneName === 'section-tab') {
         sectionDrawRef.value.resizeMap()
     } else if (tab.paneName === 'chart-tab') {
-        if (!chart) chartInit()
+        if (!chart) setTimeout(() => {
+            chartInit()
+        }, 1);
         else setTimeout(() => {
-            chart.myChart.resize()
+            // chart.myChart.resize()
+            chartInit()
         }, 1);
     } else if (tab.paneName === 'result-tab') {
         console.log('result-tab')
@@ -305,34 +236,40 @@ const tabClickCallback = (tab, event) => {
                 resultMap.resize()
                 mapFlyToRiver(resultMap)
             }, 1)
-
         }
-
         setTimeout(() => {
-            updatePointer(0.67);
+            if (globalFos) {
+                updateFoSPointer(0.67);
+            }
         }, 2000)
     }
 
 }
 
-const runModel = () => {
-
-    if (elevationOfFlow.value == null) {
-        ElNotification({
-            type: 'warning',
-            message: '请完整配置参数后运行',
-            title: '警告',
-            offset: 130
-        })
-        return
+const BSTEMModelRun = async () => {
+    let BSTEMModelParams = {
+        "dem-id": selectedDem,
+        "section-geometry": sectionGeojson,
+        "x-values": xzData.value.map(item => item[0]),
+        "z-values": xzData.value.map(item => item[1]),
+        "index-toe": "",
+        "bool-tension": true,
+        "bank-layer-thickness": thicknessData.value,
     }
-
-    const check = () => {
-        //check all parameters
+    console.log(BSTEMModelParams)
+    const paramsCheck = () => {
+        if (elevationOfFlow.value == null || elevationOfFlow.value == '') {
+            ElNotification({
+                type: 'warning',
+                message: '请完整配置参数后运行',
+                title: '警告',
+                offset: 130
+            })
+            return false
+        }
         return true
     }
-
-    if (check()) {
+    if (paramsCheck()) {
         soilAnalysisStore.updateBankDetailStatus(2)
         soilAnalysisStore.updateThicknessStatus(2)
         soilAnalysisStore.updateFlowsStatus(2)
@@ -342,86 +279,108 @@ const runModel = () => {
             title: '提示',
             offset: 130
         })
-    } else {
-        ElNotification({
-            type: 'warning',
-            message: '参数校验失败，请配置合理参数',
-            title: '警告',
-            offset: 130
-        })
+
+        let BSTEMModelUrl = '/temp/taskNode/start/erosionModel/calculateBSTEM'
+        const BSTEMMR = new ModelRunner(BSTEMModelUrl, BSTEMModelParams)
+        const taskId = await BSTEMMR.modelStart()
+        console.log('task id', taskId, BSTEMMR.taskId)
+        let statusInterval = setInterval(async () => {
+            const status = await BSTEMMR.getRunningStatus()
+            console.log('status', status)
+            switch (status) {
+                case 'RUNNING':
+                    break
+                case 'COMPLETE':
+                    clearInterval(statusInterval)
+                    const result = await BSTEMMR.getModelResult()
+                    console.log('result', result)
+                    let fos = result['fos']
+                    globalFos = fos
+
+                    break
+                case 'ERROR':
+                    clearInterval(statusInterval)
+                    let errorLog = BSTEMMR.getErrorLog()
+                    console.log('error', errorLog)
+                    break
+            }
+        }, 1000)
+
+
     }
-
-
-
 }
 
-const prepare = (e) => {
-    console.log(e)
-    console.log('prepare', e.paneName)
-
-    console.log(activeTab.value)
-
-    if (e.paneName === 'chart-tab') {
-        // console.log(chart)
-        // if (!chart) chartInit()
-        // else setTimeout(() => {
-        //     chart.myChart.resize()
-        // }, 1);
-
-        if (sectionGeojson == null) {
-            alert('断面未绘制')
-            activeTab.value = 'section-tab'
-            sectionDrawRef.value.resizeMap()
-        } else {
-            if (!chart) chartInit()
-            else setTimeout(() => {
-                chart.myChart.resize()
-            }, 1);
+const sectionViewModelRun = async () => {
+    console.log('section view model run 1111111')
+    let sectionViewParams = {
+        'dem-id': selectedDem,
+        'section-geometry': sectionGeojson,
+    }
+    const paramsCheck = () => {
+        if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
+            ElNotification({
+                type: 'warning',
+                message: '请完成断面绘制和地形选择',
+                title: '警告',
+                offset: 130
+            })
+            return false
         }
+        return true
     }
-    if (e.paneName === 'section-tab') {
-        sectionDrawRef.value.resizeMap()
+    if (paramsCheck()) {
+        let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
+        const sectionViewMR = new ModelRunner(sectionViewModelUrl, sectionViewParams)
+        const taskId = await sectionViewMR.modelStart()
+        console.log('task id', taskId, sectionViewMR.taskId)
+        let statusInterval = setInterval(async () => {
+            const status = await sectionViewMR.getRunningStatus()
+            console.log('status', status)
+            switch (status) {
+                case 'RUNNING':
+                    break
+                case 'COMPLETE':
+                    clearInterval(statusInterval)
+                    const result = await sectionViewMR.getModelResult()
+                    console.log('result', result)
+                    let sectionFileName = result['raw-json']
+                    const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json')
+                    console.log('section json', sectionJson)
+                    sectionViewMR.sectionJson = sectionJson
+                    globalSectionJson = sectionJson
+                    break
+                case 'ERROR':
+                    clearInterval(statusInterval)
+                    let errorLog = sectionViewMR.getErrorLog()
+                    console.log('error', errorLog)
+                    break
+            }
+        }, 1000)
     }
 }
-const sectionDrawHandler = (geojson) => {
-    console.log(' i got geojson !!', geojson)
-    sectionGeojson = geojson
-    soilAnalysisStore.updateSectionStatus(2)
-}
 
 
 
-const updatePointer = (fos) => {
+const updateFoSPointer = (fos) => {
     const pointer = document.getElementById('pointer');
     const container = document.querySelector('.pallete');
     const containerHeight = container.clientHeight;
     let position;
-
-    // if (fos > 1.3) {
-    //     position = containerHeight * 0.85; // 85% of the container height
-    // } else if (fos > 1) {
-    //     position = containerHeight * 0.5; // 50% of the container height
-    // } else {
-    //     position = containerHeight * 0.15; // 15% of the container height
-    // }
-
     position = fos / 1.5 * containerHeight // 1.5 is the max fos value
     console.log('=================')
     console.log(position, containerHeight)
-    pointer.style.bottom = `${position}px`;
+    // pointer.style.bottom = `${position}px`;
+    pointer.style.transform = `translateY(${position * -1.0}px)`;
 }
 
 
-
-
-
-
-
-
-const chartInit = async () => {
-    let data = await getTestData()
+const chartInit = () => {
+    let data = dataGenerate(globalSectionJson)
+    // let data = dataGenerate(test)
+    thicknessData.value = data.thicknessData.sort((a, b) => b - a)
+    xzData.value = data.pointData.sort((a, b) => a[0] - b[0])
     console.log(data)
-    chart = (new sectionChart(chartdom.value, {
+    chart = reactive(new sectionChart(chartdom.value, {
         pointData: data.pointData,
         thicknessData: data.thicknessData,
         lineData: data.lineData
@@ -429,18 +388,12 @@ const chartInit = async () => {
     chart.initBaseChart()
     chart.initGraphic()
 
-
-    // watch(() => chart.newDataInfo, (e) => {
-    //     // console.log('new value!', e)
-    //     // thicknessData.value = e.thicknessData.map(item => keepFloat2(item))
-    //     // xzData.value = e.pointData.map(item => keepFloat2(item))
-
-    //     console.log(e.thicknessData)
-    //     thicknessData.value = e.thicknessData.sort((a, b) => b - a)
-    //     xzData.value = e.pointData.sort((a, b) => a[0] - b[0])
-    // }, {
-    //     deep: true
-    // })
+    watch(() => chart.newDataInfo, (e) => {
+        thicknessData.value = e.thicknessData.sort((a, b) => b - a)
+        xzData.value = e.pointData.sort((a, b) => a[0] - b[0])
+    }, {
+        deep: true
+    })
 }
 const resultMapInit = async () => {
     resultMap = await initPureScratchMap(mapRef.value)
@@ -449,194 +402,23 @@ const resultMapInit = async () => {
     let interval = addHighLightSectionLayer(resultMap, sectionGeojson)
     mapFlyToRiver(resultMap)
 }
-const addHighLightSectionLayer = (mapIns, sectionGeojson) => {
-    mapIns.addSource('sectionSource', {
-        type: 'geojson',
-        data: sectionGeojson,
-        lineMetrics: true,
-    })
-    mapIns.addLayer({
-        id: 'sectionLayer',
-        type: 'line',
-        source: 'sectionSource',
-        'paint': {
-            // 'line-color': 'rgba(255, 0, 0, 0.8)',
-            'line-width': 7,
-            "line-gradient": [
-                "interpolate",
-                [
-                    "linear"
-                ],
-                [
-                    "line-progress"
-                ],
-                0,
-                "#fa8970",
-                0.1,
-                "#fd7457",
-                0.2,
-                "#ff5c3e",
-                0.3,
-                "#ff0000",
-                0.4,
-                "#ff0000",
-                0.5,
-                "#ff0000",
-                0.6,
-                "#ff0000",
-                0.7,
-                "#ff0000",
-                0.8,
-                "#ff5c3e",
-                0.9,
-                "#fd7457",
-                1.0,
-                "#fa8970",
-            ]
-        }
-    })
-
-    const color0 = [
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-    ]
-    const color1 = [
-        "#fa8970",
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-        "#fa8970",
-    ]
-    const color2 = [
-        "#ff9785",
-        "#fa8970",
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-        "#fa8970",
-        "#ff9785",
-    ]
-    const color3 = [
-        "#ffa291",
-        "#ff9785",
-        "#fa8970",
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-        "#fa8970",
-        "#ff9785",
-        "#ffa291",
-    ]
-
-
-    // const color0 = [
-    //     "interpolate",
-    //     [
-    //         "linear"
-    //     ],
-    //     [
-    //         "line-progress"
-    //     ],
-    //     0,
-    //     "#fa8970",
-    //     0.1,
-    //     "#fd7457",
-    //     0.2,
-    //     "#ff5c3e",
-    //     0.3,
-    //     "#ff0000",
-    //     0.4,
-    //     "#ff0000",
-    //     0.5,
-    //     "#ff0000",
-    //     0.6,
-    //     "#ff0000",
-    //     0.7,
-    //     "#ff0000",
-    //     0.8,
-    //     "#ff5c3e",
-    //     0.9,
-    //     "#fd7457",
-    //     1.0,
-    //     "#fa8970",
-    // ]
-
-
-    let cnt = 0
-    let interval = setInterval(() => {
-        let map = {
-            0: color3,
-            1: color2,
-            2: color1,
-            3: color0,
-            4: color1,
-            5: color2,
-            6: color3,
-        }
-        let color = map[cnt]
-        cnt = (cnt + 1) % 7
-        mapIns.setPaintProperty('sectionLayer', 'line-gradient', [
-            "interpolate",
-            [
-                "linear"
-            ],
-            [
-                "line-progress"
-            ],
-            0,
-            color[0],
-            0.1,
-            color[1],
-            0.2,
-            color[2],
-            0.3,
-            color[3],
-            0.4,
-            color[4],
-            0.5,
-            color[5],
-            0.6,
-            color[6],
-            0.7,
-            color[7],
-            0.8,
-            color[8],
-            0.9,
-            color[9],
-            1.0,
-            color[10],
-        ])
-    }, 500)
-    return interval
-
-}
 
 
 
 onMounted(async () => {
 
-
+    window.addEventListener('keydown', (e) => {
+        if (e.key == '1') {
+            console.log(selectedDem)
+        }
+        if (e.key == '2') {
+            console.log(sectionGeojson)
+        }
+        if (e.key == '3') {
+            sectionViewModelRun()
+        }
+    })
+    // /taskNode/result/id?taskId=66ade6c2cb34b50d7075f6a4
 
 })
 
@@ -792,6 +574,1048 @@ const attachBaseLayer = (map) => {
         },
     })
 }
+const addHighLightSectionLayer = (mapIns, sectionGeojson) => {
+    mapIns.addSource('sectionSource', {
+        type: 'geojson',
+        data: sectionGeojson,
+        lineMetrics: true,
+    })
+    mapIns.addLayer({
+        id: 'sectionLayer',
+        type: 'line',
+        source: 'sectionSource',
+        'paint': {
+            // 'line-color': 'rgba(255, 0, 0, 0.8)',
+            'line-width': 7,
+            "line-gradient": [
+                "interpolate",
+                [
+                    "linear"
+                ],
+                [
+                    "line-progress"
+                ],
+                0,
+                "#fa8970",
+                0.1,
+                "#fd7457",
+                0.2,
+                "#ff5c3e",
+                0.3,
+                "#ff0000",
+                0.4,
+                "#ff0000",
+                0.5,
+                "#ff0000",
+                0.6,
+                "#ff0000",
+                0.7,
+                "#ff0000",
+                0.8,
+                "#ff5c3e",
+                0.9,
+                "#fd7457",
+                1.0,
+                "#fa8970",
+            ]
+        }
+    })
+
+    const color0 = [
+        "#fd7457",
+        "#ff5c3e",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff5c3e",
+        "#fd7457",
+    ]
+    const color1 = [
+        "#fa8970",
+        "#fd7457",
+        "#ff5c3e",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff5c3e",
+        "#fd7457",
+        "#fa8970",
+    ]
+    const color2 = [
+        "#ff9785",
+        "#fa8970",
+        "#fd7457",
+        "#ff5c3e",
+        "#ff0000",
+        "#ff0000",
+        "#ff0000",
+        "#ff5c3e",
+        "#fd7457",
+        "#fa8970",
+        "#ff9785",
+    ]
+    const color3 = [
+        "#ffa291",
+        "#ff9785",
+        "#fa8970",
+        "#fd7457",
+        "#ff5c3e",
+        "#ff0000",
+        "#ff5c3e",
+        "#fd7457",
+        "#fa8970",
+        "#ff9785",
+        "#ffa291",
+    ]
+
+    let cnt = 0
+    let interval = setInterval(() => {
+        let map = {
+            0: color3,
+            1: color2,
+            2: color1,
+            3: color0,
+            4: color1,
+            5: color2,
+            6: color3,
+        }
+        let color = map[cnt]
+        cnt = (cnt + 1) % 7
+        mapIns.setPaintProperty('sectionLayer', 'line-gradient', [
+            "interpolate",
+            [
+                "linear"
+            ],
+            [
+                "line-progress"
+            ],
+            0,
+            color[0],
+            0.1,
+            color[1],
+            0.2,
+            color[2],
+            0.3,
+            color[3],
+            0.4,
+            color[4],
+            0.5,
+            color[5],
+            0.6,
+            color[6],
+            0.7,
+            color[7],
+            0.8,
+            color[8],
+            0.9,
+            color[9],
+            1.0,
+            color[10],
+        ])
+    }, 500)
+    return interval
+
+}
+const dataGenerate = (origin) => {
+    console.log('origin', origin)
+    const lineData = []
+    const lineDataStep = origin['step']
+    const pointData = []
+    const pointDataStep = origin['step_er_verified']
+    for (let i = 0; i < origin['points'].length; i++) {
+        let point = origin['points'][i]
+        lineData.push([lineDataStep * i, point[2]])
+    }
+    let scatterStart = lineDataStep * origin['deepest_index'] - (origin['points_er_verified'].length - 1) * pointDataStep
+
+    for (let i = 0; i < origin['points_er_verified'].length; i++) {
+        let point = origin['points_er_verified'][i]
+        // pointData.push([scatterStart + i * pointDataStep, point[2]])
+        pointData.push([i * pointDataStep, point[2]])
+
+    }
+
+    return {
+        lineData,
+        pointData,
+        thicknessData: [
+            1.93, -4.07, -11.57, -26.57, -36.57
+        ]
+    }
+}
+
+const test = {
+    "points": [
+        [
+            548996.997896606,
+            3546474.3938493733,
+            -1.4753461601605866
+        ],
+        [
+            548994.6733517199,
+            3546468.599127559,
+            -1.579914643746663
+        ],
+        [
+            548992.3488068336,
+            3546462.804405745,
+            -1.679943857649389
+        ],
+        [
+            548990.0242619475,
+            3546457.009683931,
+            -1.7271396807859367
+        ],
+        [
+            548987.6997170612,
+            3546451.2149621164,
+            -1.7717713732179021
+        ],
+        [
+            548985.3751721751,
+            3546445.4202403026,
+            -1.8166420649542436
+        ],
+        [
+            548983.050627289,
+            3546439.625518488,
+            -1.8617517559996408
+        ],
+        [
+            548980.7260824027,
+            3546433.8307966744,
+            -1.907100446351496
+        ],
+        [
+            548978.4015375166,
+            3546428.03607486,
+            -1.9526881360114934
+        ],
+        [
+            548976.0769926304,
+            3546422.2413530457,
+            -2.0003751003808206
+        ],
+        [
+            548973.7524477442,
+            3546416.446631232,
+            -2.0882959778505397
+        ],
+        [
+            548971.427902858,
+            3546410.6519094175,
+            -2.1767959004019346
+        ],
+        [
+            548969.1033579719,
+            3546404.857187603,
+            -2.2658748680275402
+        ],
+        [
+            548966.7788130858,
+            3546399.0624657893,
+            -2.3555328747117605
+        ],
+        [
+            548964.4542681995,
+            3546393.267743975,
+            -2.4457699208771593
+        ],
+        [
+            548962.1297233134,
+            3546387.4730221606,
+            -2.5365860081023217
+        ],
+        [
+            548959.8051784271,
+            3546381.6783003467,
+            -2.6281020725987188
+        ],
+        [
+            548957.480633541,
+            3546375.8835785324,
+            -2.72056911919509
+        ],
+        [
+            548955.1560886549,
+            3546370.0888567185,
+            -2.8129846610349034
+        ],
+        [
+            548952.8315437686,
+            3546364.294134904,
+            -2.90534869813019
+        ],
+        [
+            548950.5069988825,
+            3546358.49941309,
+            -2.997661230473109
+        ],
+        [
+            548948.1824539963,
+            3546352.704691276,
+            -3.0899222580606893
+        ],
+        [
+            548945.8579091101,
+            3546346.9099694616,
+            -3.1821317809013134
+        ],
+        [
+            548943.5333642239,
+            3546341.1152476473,
+            -3.2673840722797474
+        ],
+        [
+            548941.2088193378,
+            3546335.3205258334,
+            -3.330270764834066
+        ],
+        [
+            548938.8842744516,
+            3546329.525804019,
+            -3.392586677965669
+        ],
+        [
+            548936.5597295654,
+            3546323.7310822047,
+            -3.4543318116726454
+        ],
+        [
+            548934.2351846793,
+            3546317.936360391,
+            -3.515506165949664
+        ],
+        [
+            548931.910639793,
+            3546312.1416385765,
+            -3.576109740805037
+        ],
+        [
+            548929.5860949069,
+            3546306.3469167626,
+            -3.636142536230439
+        ],
+        [
+            548927.2615500208,
+            3546300.5521949483,
+            -3.6946819285322765
+        ],
+        [
+            548924.9370051345,
+            3546294.757473134,
+            -3.751209666965664
+        ],
+        [
+            548922.6124602484,
+            3546288.96275132,
+            -3.8077374013807535
+        ],
+        [
+            548920.2879153622,
+            3546283.1680295058,
+            -3.8642651317853405
+        ],
+        [
+            548917.963370476,
+            3546277.3733076914,
+            -3.920792858174503
+        ],
+        [
+            548915.6388255899,
+            3546271.5785858775,
+            -3.9773205805463925
+        ],
+        [
+            548913.3142807037,
+            3546265.783864063,
+            -4.03384829890778
+        ],
+        [
+            548910.9897358175,
+            3546259.989142249,
+            -4.0956958134102495
+        ],
+        [
+            548908.6651909313,
+            3546254.194420435,
+            -4.165050979757834
+        ],
+        [
+            548906.3406460452,
+            3546248.3996986207,
+            -4.235173703389821
+        ],
+        [
+            548904.0161011589,
+            3546242.604976807,
+            -4.3060639843009545
+        ],
+        [
+            548901.6915562728,
+            3546236.8102549925,
+            -4.377721822496425
+        ],
+        [
+            548899.3670113867,
+            3546231.015533178,
+            -4.450147217973642
+        ],
+        [
+            548897.0424665004,
+            3546225.2208113642,
+            -4.523340170729979
+        ],
+        [
+            548894.7179216143,
+            3546219.42608955,
+            -4.590641072858522
+        ],
+        [
+            548892.393376728,
+            3546213.6313677356,
+            -4.6521663512086615
+        ],
+        [
+            548890.0688318419,
+            3546207.8366459217,
+            -4.713611654679192
+        ],
+        [
+            548887.7442869558,
+            3546202.0419241074,
+            -4.775284165476119
+        ],
+        [
+            548885.4197420696,
+            3546196.247202293,
+            -4.837869055628991
+        ],
+        [
+            548883.0951971834,
+            3546190.452480479,
+            -4.900909259018157
+        ],
+        [
+            548880.7706522972,
+            3546184.657758665,
+            -4.964404775652034
+        ],
+        [
+            548878.4461074111,
+            3546178.863036851,
+            -5.024566305933816
+        ],
+        [
+            548876.1215625248,
+            3546173.0683150366,
+            -5.083827585118578
+        ],
+        [
+            548873.7970176387,
+            3546167.2735932223,
+            -5.144640951748517
+        ],
+        [
+            548871.4724727526,
+            3546161.4788714084,
+            -5.207006405822006
+        ],
+        [
+            548869.1479278663,
+            3546155.684149594,
+            -5.270923947346105
+        ],
+        [
+            548866.8233829802,
+            3546149.8894277797,
+            -5.336393576315276
+        ],
+        [
+            548864.498838094,
+            3546144.094705966,
+            -5.403415292729387
+        ],
+        [
+            548862.1742932078,
+            3546138.2999841515,
+            -5.4668604681180994
+        ],
+        [
+            548859.8497483217,
+            3546132.505262337,
+            -5.528548003590279
+        ],
+        [
+            548857.5252034354,
+            3546126.7105405233,
+            -5.59020780758676
+        ],
+        [
+            548855.2006585493,
+            3546120.915818709,
+            -5.651839880109336
+        ],
+        [
+            548852.8761136631,
+            3546115.121096895,
+            -5.713444221156456
+        ],
+        [
+            548850.551568777,
+            3546109.3263750807,
+            -5.775020830729541
+        ],
+        [
+            548848.2270238907,
+            3546103.5316532664,
+            -5.836380028055483
+        ],
+        [
+            548845.9024790046,
+            3546097.7369314525,
+            -5.867835626020252
+        ],
+        [
+            548843.5779341185,
+            3546091.942209638,
+            -5.8929799977253285
+        ],
+        [
+            548841.2533892322,
+            3546086.147487824,
+            -5.917984885091808
+        ],
+        [
+            548838.9288443461,
+            3546080.35276601,
+            -5.942850288117174
+        ],
+        [
+            548836.6042994598,
+            3546074.5580441956,
+            -5.967576206803447
+        ],
+        [
+            548834.2797545737,
+            3546068.7633223813,
+            -5.99216264114812
+        ],
+        [
+            548831.9552096876,
+            3546062.9686005674,
+            -6.0166095911532
+        ],
+        [
+            548829.6306648013,
+            3546057.173878753,
+            -6.075419865050651
+        ],
+        [
+            548827.3061199152,
+            3546051.379156939,
+            -6.13573308295789
+        ],
+        [
+            548824.981575029,
+            3546045.584435125,
+            -6.194454928504952
+        ],
+        [
+            548822.6570301428,
+            3546039.7897133105,
+            -6.251585401686533
+        ],
+        [
+            548820.3324852567,
+            3546033.9949914967,
+            -6.307124502501485
+        ],
+        [
+            548818.0079403705,
+            3546028.2002696823,
+            -6.361072230955947
+        ],
+        [
+            548815.6833954843,
+            3546022.405547868,
+            -6.413014130321384
+        ],
+        [
+            548813.3588505981,
+            3546016.610826054,
+            -6.437184020155186
+        ],
+        [
+            548811.034305712,
+            3546010.81610424,
+            -6.457464381978489
+        ],
+        [
+            548808.7097608257,
+            3546005.0213824254,
+            -6.473855215793289
+        ],
+        [
+            548806.3852159396,
+            3545999.2266606116,
+            -6.479934106269031
+        ],
+        [
+            548804.0606710535,
+            3545993.4319387972,
+            -6.486157028854068
+        ],
+        [
+            548801.7361261672,
+            3545987.6372169834,
+            -6.493381696770508
+        ],
+        [
+            548799.4115812811,
+            3545981.842495169,
+            -6.494511924183193
+        ],
+        [
+            548797.0870363949,
+            3545976.0477733547,
+            -6.443597579577486
+        ],
+        [
+            548794.7624915087,
+            3545970.253051541,
+            -6.397991540238919
+        ],
+        [
+            548792.4379466226,
+            3545964.4583297265,
+            -6.357693806158241
+        ],
+        [
+            548790.1134017364,
+            3545958.663607912,
+            -6.322704377341539
+        ],
+        [
+            548787.7888568502,
+            3545952.8688860983,
+            -6.2930232537909765
+        ],
+        [
+            548785.464311964,
+            3545947.074164284,
+            -6.268650435500274
+        ],
+        [
+            548783.1397670779,
+            3545941.2794424696,
+            -6.257970832782356
+        ],
+        [
+            548780.8152221916,
+            3545935.4847206557,
+            -6.2822702109326745
+        ],
+        [
+            548778.4906773055,
+            3545929.6899988414,
+            -6.3089824923341995
+        ],
+        [
+            548776.1661324194,
+            3545923.8952770275,
+            -6.338107676988807
+        ],
+        [
+            548773.8415875331,
+            3545918.100555213,
+            -6.369645764897881
+        ],
+        [
+            548771.517042647,
+            3545912.305833399,
+            -6.403596756058461
+        ],
+        [
+            548769.1924977608,
+            3545906.511111585,
+            -6.439960650473658
+        ],
+        [
+            548766.8679528746,
+            3545900.7163897706,
+            -6.54875367733084
+        ]
+    ],
+    "step": 6.243581490734901,
+    "Sa_h": [
+        -0.016748157086000977,
+        -0.01602112730508338,
+        -0.007559094600844634,
+        -0.007148411932829923,
+        -0.007186691132794039,
+        -0.00722497033350766,
+        -0.007263249533805222,
+        -0.007301528734372533,
+        -0.007637757982352238,
+        -0.014081801863271648,
+        -0.014174544319269875,
+        -0.014267286774072454,
+        -0.014360028265390207,
+        -0.014452769824387665,
+        -0.014545511636218415,
+        -0.014657623133805711,
+        -0.014809936689957007,
+        -0.014801687457263506,
+        -0.014793438226496987,
+        -0.014785188994474572,
+        -0.014776939761976388,
+        -0.01476869053082073,
+        -0.01365438915227473,
+        -0.010072214585112507,
+        -0.009980795994106296,
+        -0.009889377402793954,
+        -0.009797958810627798,
+        -0.009706540219792933,
+        -0.009615121627624646,
+        -0.009375931488794738,
+        -0.009053735987473067,
+        -0.009053735343884496,
+        -0.009053734701544422,
+        -0.009053734058416044,
+        -0.009053733414991563,
+        -0.00905373277265163,
+        -0.009905775169948092,
+        -0.011108234344422879,
+        -0.01123116975986374,
+        -0.01135410517446288,
+        -0.011477040589893215,
+        -0.011599976004908735,
+        -0.011722911419503464,
+        -0.010779214178338726,
+        -0.009854164383285407,
+        -0.0098413552480594,
+        -0.009877745791969792,
+        -0.010023876559590647,
+        -0.01009680156857307,
+        -0.010169726578903639,
+        -0.009635740379309221,
+        -0.009491552128005684,
+        -0.009740141410852516,
+        -0.009988730693438596,
+        -0.0102373199771556,
+        -0.01048590925998536,
+        -0.010734498542794351,
+        -0.010161663699410508,
+        -0.009880152211310146,
+        -0.009875710613848808,
+        -0.009871269016674969,
+        -0.009866827419252324,
+        -0.009862385822057573,
+        -0.009827564101949496,
+        -0.005038069577765071,
+        -0.004027235288333993,
+        -0.004004894851390283,
+        -0.003982554414043282,
+        -0.0039602139770201945,
+        -0.0039378735395955225,
+        -0.003915533102492204,
+        -0.00941931709944391,
+        -0.009660035349380933,
+        -0.009405154018443041,
+        -0.009150272686655745,
+        -0.008895391354684515,
+        -0.008640510023696693,
+        -0.00831924744515886,
+        -0.0038711579034675083,
+        -0.003248193661506195,
+        -0.0026252294198648124,
+        -0.0009736223487692638,
+        -0.000996691177054616,
+        -0.0011571351999106996,
+        -0.00018102228894780508,
+        0.008154669668564592,
+        0.007304467701149403,
+        0.006454265735215795,
+        0.005604063768307316,
+        0.0047538618010524464,
+        0.0039036598348031757,
+        0.001710493045340369,
+        -0.0038918973327051235,
+        -0.0042783587338716495,
+        -0.004664820135338618,
+        -0.005051281537027219,
+        -0.005437742938241542,
+        -0.005824204339954469,
+        -0.017424778873892176
+    ],
+    "points_v": [
+        [
+            548996.997896606,
+            3546474.3938493733,
+            -1.4753461601605866
+        ],
+        [
+            548879.3953100088,
+            3546181.2292484185,
+            -5
+        ],
+        [
+            548766.8679528746,
+            3545900.7163897706,
+            -6.54875367733084
+        ]
+    ],
+    "Sa_v": [
+        -0.011158446851782572,
+        -0.005124227275453182
+    ],
+    "deepest_index": 99,
+    "slope_foot_index": 1,
+    "points_er_verified": [
+        [
+            548996.997896606,
+            3546474.3938493733,
+            -1.4753461601605866
+        ],
+        [
+            548986.5374446182,
+            3546448.3176012095,
+            -1.7941768441726258
+        ],
+        [
+            548976.0769926304,
+            3546422.2413530457,
+            -2.0003751003808206
+        ],
+        [
+            548965.6165406426,
+            3546396.165104882,
+            -2.4005790176651343
+        ],
+        [
+            548955.1560886548,
+            3546370.0888567185,
+            -2.81298466103612
+        ],
+        [
+            548944.6956366671,
+            3546344.0126085547,
+            -3.2282172280371952
+        ],
+        [
+            548934.2351846793,
+            3546317.936360391,
+            -3.515506165949664
+        ],
+        [
+            548923.7747326915,
+            3546291.860112227,
+            -3.7794735346750086
+        ],
+        [
+            548913.3142807037,
+            3546265.783864063,
+            -4.03384829890778
+        ],
+        [
+            548902.8538287159,
+            3546239.7076158994,
+            -4.341796958740412
+        ],
+        [
+            548892.3933767282,
+            3546213.6313677356,
+            -4.652166351207419
+        ],
+        [
+            548881.9329247402,
+            3546187.5551195717,
+            -4.9326001031821995
+        ],
+        [
+            548871.4724727524,
+            3546161.4788714084,
+            -5.207006405823474
+        ],
+        [
+            548861.0120207648,
+            3546135.4026232446,
+            -5.497707702287378
+        ],
+        [
+            548850.551568777,
+            3546109.3263750807,
+            -5.775020830729541
+        ],
+        [
+            548840.0911167891,
+            3546083.250126917,
+            -5.930435022146945
+        ],
+        [
+            548829.6306648013,
+            3546057.173878753,
+            -6.075419865050651
+        ],
+        [
+            548819.1702128135,
+            3546031.0976305893,
+            -6.334297288276048
+        ],
+        [
+            548808.7097608258,
+            3546005.0213824254,
+            -6.473855215792379
+        ],
+        [
+            548798.249308838,
+            3545978.945134262,
+            -6.468391213724662
+        ],
+        [
+            548787.7888568502,
+            3545952.8688860983,
+            -6.2930232537909765
+        ],
+        [
+            548777.3284048624,
+            3545926.7926379344,
+            -6.3232434717549
+        ],
+        [
+            548766.8679528746,
+            3545900.7163897706,
+            -6.54875367733084
+        ]
+    ],
+    "points_er": [
+        [
+            548996.997896606,
+            3546474.3938493733,
+            -1.4753461601605866
+        ],
+        [
+            548986.5374446182,
+            3546448.3176012095,
+            -1.7941768441726258
+        ],
+        [
+            548976.0769926304,
+            3546422.2413530457,
+            -2.0003751003808206
+        ],
+        [
+            548965.6165406426,
+            3546396.165104882,
+            -2.4005790176651343
+        ],
+        [
+            548955.1560886548,
+            3546370.0888567185,
+            -2.81298466103612
+        ],
+        [
+            548944.6956366671,
+            3546344.0126085547,
+            -3.2282172280371952
+        ],
+        [
+            548934.2351846793,
+            3546317.936360391,
+            -3.515506165949664
+        ],
+        [
+            548923.7747326915,
+            3546291.860112227,
+            -3.7794735346750086
+        ],
+        [
+            548913.3142807037,
+            3546265.783864063,
+            -4.03384829890778
+        ],
+        [
+            548902.8538287159,
+            3546239.7076158994,
+            -4.341796958740412
+        ],
+        [
+            548892.3933767282,
+            3546213.6313677356,
+            -4.652166351207419
+        ],
+        [
+            548881.9329247402,
+            3546187.5551195717,
+            -4.9326001031821995
+        ],
+        [
+            548871.4724727524,
+            3546161.4788714084,
+            -5.207006405823474
+        ],
+        [
+            548861.0120207648,
+            3546135.4026232446,
+            -5.497707702287378
+        ],
+        [
+            548850.551568777,
+            3546109.3263750807,
+            -5.775020830729541
+        ],
+        [
+            548840.0911167891,
+            3546083.250126917,
+            -5.930435022146945
+        ],
+        [
+            548829.6306648013,
+            3546057.173878753,
+            -6.075419865050651
+        ],
+        [
+            548819.1702128135,
+            3546031.0976305893,
+            -6.334297288276048
+        ],
+        [
+            548808.7097608258,
+            3546005.0213824254,
+            -6.473855215792379
+        ],
+        [
+            548798.249308838,
+            3545978.945134262,
+            -6.468391213724662
+        ],
+        [
+            548787.7888568502,
+            3545952.8688860983,
+            -6.2930232537909765
+        ],
+        [
+            548777.3284048624,
+            3545926.7926379344,
+            -6.3232434717549
+        ],
+        [
+            548766.8679528746,
+            3545900.7163897706,
+            -6.54875367733084
+        ]
+    ],
+    "step_er_verified": 28.096116708307054,
+    "step_er": 28.096116708307054
+}
+
 
 </script>
 
@@ -1268,8 +2092,8 @@ div.title2 {
 
                     .pallete-container {
                         position: relative;
-                        height: 200px;
-                        width: 50px;
+                        height: 15vh;
+                        width: 2vw;
                         // border: 1px solid #000;
 
                         .pallete {
@@ -1277,23 +2101,23 @@ div.title2 {
                             top: 0;
                             left: 0;
                             width: 100%;
-                            height: 100%;
+                            height: 15vh;
 
                             .color-section {
                                 width: 100%;
 
                                 &.green {
-                                    height: 27%;
+                                    height: 3vh;
                                     background-color: green;
                                 }
 
                                 &.orange {
-                                    height: 13%;
+                                    height: 2vh;
                                     background-color: orange;
                                 }
 
                                 &.red {
-                                    height: 60%;
+                                    height: 10vh;
                                     background-color: red;
                                 }
                             }
@@ -1303,6 +2127,7 @@ div.title2 {
                             position: absolute;
                             transition: .3s ease-in-out;
                             left: -20px;
+                            bottom: 0;
                             width: 0;
                             height: 0;
                             border-top: 10px solid transparent;

@@ -176,29 +176,6 @@ onMounted(async () => {
             calcEnable.value = true
         }
     })
-
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key == '1') {
-            let dom = map.getContainer()
-            dom.style.width = '400px'
-            dom.style.height = '400px'
-            setTimeout(() => {
-                map.resize()
-                mapFlyToRiver(map)
-            }, 310);
-        }
-        if (e.key == '2') {
-            let dom = map.getContainer()
-            dom.style.width = '600px'
-            dom.style.height = '600px'
-            setTimeout(() => {
-                map.resize()
-                mapFlyToRiver(map)
-            }, 310);
-        }
-    })
-
 })
 
 onUnmounted(() => {

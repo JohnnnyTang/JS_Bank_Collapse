@@ -221,16 +221,16 @@ const buttonText = computed(() => {
 })
 const currentDeviceType = ref('位移测量站')
 ////////DEBUG
-window.addEventListener('keydown', (e) => {
-    if (e.key === '1') {
-        // currentDeviceType.value = '位移测量站'
-        warnActive.value = true
-    } else if (e.key === '2') {
-        // currentDeviceType.value = '应力桩'
-        warnActive.value = false
-    }
+// window.addEventListener('keydown', (e) => {
+//     if (e.key === '1') {
+//         // currentDeviceType.value = '位移测量站'
+//         warnActive.value = true
+//     } else if (e.key === '2') {
+//         // currentDeviceType.value = '应力桩'
+//         warnActive.value = false
+//     }
 
-})
+// })
 
 const detailLoading = ref(false)
 const warnLoading = ref(true)

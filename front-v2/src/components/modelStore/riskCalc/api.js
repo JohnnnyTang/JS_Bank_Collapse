@@ -112,6 +112,7 @@ export const postTaskStartAPI = async (type, jsonID, condition, year) => {
         method: 'post',
         headers: new Headers({
             'Content-Type': 'application/json',
+            'token': localStorage.getItem('token'),
         }),
         body: JSON.stringify(body),
     })
