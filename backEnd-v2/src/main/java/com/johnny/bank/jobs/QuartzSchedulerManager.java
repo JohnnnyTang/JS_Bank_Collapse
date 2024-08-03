@@ -1,8 +1,10 @@
 package com.johnny.bank.jobs;
 
+import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,16 @@ import java.util.Date;
 @Component("QuartzManager")
 @Slf4j
 public class QuartzSchedulerManager {
+
+    @Value("${modelServer.url}")
+    String MODEL_SERVER_URL;
+
+    @Value("${modelServer.storageLimit}")
+    Integer STORAGE_LIMIT;
+
+    @Value("${modelServer.caseLimit}")
+    String CASE_LIMIT;
+
     @Autowired
     @Lazy
     private Scheduler scheduler;
@@ -30,6 +42,20 @@ public class QuartzSchedulerManager {
 //        startTestJob(scheduler);
         startTestRunningJob(scheduler);
 //        startGnssWarningJob(scheduler);
+        scheduler.start();
+    }
+
+    // 执行模型服务定时器
+    public void startModelTaskStatusJob(TaskNode taskNode) throws SchedulerException {
+        log.info("start Modeltaskjob "+ taskNode.getName() +" here");
+        modelRunningStatusJob(scheduler,taskNode);
+        scheduler.start();
+    }
+
+    // 执行模型计算服务定时握手
+    public void startModelServerHandShakeJob() throws SchedulerException {
+        log.info("start ModelServerHandShakeJob here");
+        modelServerHandShakeJob(scheduler);
         scheduler.start();
     }
 
@@ -128,5 +154,31 @@ public class QuartzSchedulerManager {
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("gnssWarningTrigger", "tesGroup")
                 .withSchedule(cronScheduleBuilder).build();
         scheduler.scheduleJob(jobDetail, cronTrigger);
+    }
+
+    private void modelServerHandShakeJob(Scheduler scheduler) throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(modelServerShakingHandJob.class)
+                .withIdentity("modelServerHandShake", "modelServerGroup")
+                .build();
+        jobDetail.getJobDataMap().put("modelServerUrl", MODEL_SERVER_URL);
+        jobDetail.getJobDataMap().put("storageLimit", STORAGE_LIMIT);
+        jobDetail.getJobDataMap().put("caseLimit", CASE_LIMIT);
+        // 基于表达式构建触发器
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0 0/7 * * ?");
+        // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("modelServerHandShake_trigger", "modelServerTriggerGroup")
+                .withSchedule(cronScheduleBuilder).build();
+        scheduler.scheduleJob(jobDetail, cronTrigger);
+    }
+
+    private void modelRunningStatusJob(Scheduler scheduler, TaskNode taskNode) throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(ModelRunStatusJob.class)
+                .withIdentity(taskNode.getCaseId(), "modelTaskGroup")
+                .build();
+        jobDetail.getJobDataMap().put("taskNode", taskNode);
+        jobDetail.getJobDataMap().put("modelServerUrl", MODEL_SERVER_URL);
+        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity(taskNode.getId()+"_trigger","modelTaskTriggerGroup")
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).repeatForever()).build();
+        scheduler.scheduleJob(jobDetail, simpleTrigger);
     }
 }
