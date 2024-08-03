@@ -33,6 +33,7 @@ public class QuartzListener implements ApplicationListener<ContextRefreshedEvent
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
         try {
             quartzSchedulerManager.startJob();
+            quartzSchedulerManager.startModelServerHandShakeJob();
             log.info("任务已经启动...");
         } catch (SchedulerException e) {
             log.info(e.getMessage(), e.toString());
