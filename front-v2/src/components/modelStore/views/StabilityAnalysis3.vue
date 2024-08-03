@@ -492,6 +492,7 @@ const modelRunnning = async (type) => {
         type: 'error',
       })
       modelRunnningStatusDesc.value = '运行失败'
+      globleVariable.runningStatus = 'NONE'
       clearInterval(runningStatusInterval)
 
     }
@@ -1001,6 +1002,33 @@ div.stability-analysis {
                     }
                   }
                 }
+                button.realtime-button{
+                  position: absolute;
+                  right: 3.5vw;
+                  top: 0.5vh;
+                  width: 3.5vw;
+                  height: 3vh;
+                  background: #5e86b9d0;
+                  color: #fff;
+                  font-family: inherit;
+                  font-weight: 900;
+                  font-size: calc(0.3vw + 0.7vh);
+                  border: 1px solid rgb(3, 107, 167);
+                  border-radius: 0.4em;
+                  box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+                  cursor: pointer;
+                  transition: 0.3s linear;
+
+                  &:active {
+                    scale: 1.01;
+                    background: #348cffd0;
+                  }
+                  
+                  &:hover {
+                    scale: 1.01;
+                    background: #348cffd0;
+                  }
+                }
 
                 button.condition-button {
                   position: absolute;
@@ -1021,6 +1049,10 @@ div.stability-analysis {
 
                   &:active {
                     scale: 1.01;
+                  }
+                  &:hover {
+                    scale: 1.01;
+                    background: #348cffd0;
                   }
                 }
               }

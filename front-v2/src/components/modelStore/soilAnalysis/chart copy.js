@@ -228,7 +228,7 @@ export default class sectionChart {
                     show: true,
                     position: 'insideEndBottom',
                     fontSize: 15,
-                    formatter: (params) => { return `Layer ${index + 1}` + Math.round(params.value * 100) / 100 + ' M' }
+                    formatter: (params) => { return `Layer ${index + 1} -- ` + Math.round(params.value * 100) / 100 + ' m' }
                 },
             }
             markLineData.push(item)
