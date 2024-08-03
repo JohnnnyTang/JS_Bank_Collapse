@@ -16,8 +16,8 @@ import java.util.List;
 
 @Repository("BaseNodeRepo")
 public interface IBaseNodeRepo<T extends BaseNode> extends MongoRepository<T, String> {
-    @Query("{'category' : ?0 , 'name' : ?1}")
-    T getNodeByCategoryAndName(String category, String name);
+    @Query("{'category' : ?0 , 'name' : ?1}")       // 自定义查询语句
+    T getNodeByCategoryAndName(String category, String name);   // 根据 category 和 name 查询符合条件的单个节点
 
     @Query("{'path': {$regex:?0}}")
     List<T> getNodeChildByPath(String nodePath);

@@ -6,16 +6,16 @@ spring:
     mongodb:
       database: bank
       authentication-database: admin
-      uri: mongodb://bankAdmin:20000601@localhost:27017/bank
+      uri: mongodb://localhost:27017/bank
   datasource:
     hikari:
       maxLifeTime: 120000
       idle-timeout: 0
     default:
-      url: jdbc:postgresql://localhost:5432/bank_dev?stringtype=unspecified
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
-      password: 20000601
+      password: 2001092000
   mail:
     host: smtp.qq.com
     port: 465
@@ -44,20 +44,20 @@ springfox:
       enabled: true
 
 tile:
-  mzsTilePath: D:/2024-work/shore_collapse/data/DEM/rasterTIle/
-  worldTilePath: D:/2024-work/shore_collapse/data/mbtiles/data
-  nodeServicePath: D:\2024-work\shore_collapse\code\node\index.js
-  riverTilePath: D:/2024-work/shore_collapse/data/riverRasterTile/
+  mzsTilePath: D:/WebGIS/Projects/BankCollapse/data/rasterTIle/
+  worldTilePath: D:\WebGIS\Projects\BankCollapse\data\bank_collapse\baseMap
+  nodeServicePath: D:\WebGIS\Projects\BankCollapse\data\node\index.js
+  riverTilePath: D:/WebGIS/Projects/BankCollapse/data/riverRasterTile/
   riverImagePath: D:/2024-work/shore_collapse/tiles/worldImage/tiles/
 
 video:
-  yangzhong: D:\2024-work\shore_collapse\data\video\125_1711267167.mp4
+  yangzhong: D:\WebGIS\Projects\BankCollapse\data\video\125_1711267167.mp4
 
 multiIndex:
   condaEnv: bankModel
-  dataPath: D:\2024-work\shore_collapse\model\modelData
-  wholeDataPath: D:\2024-work\shore_collapse\model\dataWhole
-  resPath: D:\2024-work\shore_collapse\model\modelRes\
+  dataPath: D:/WebGIS/Projects/BankCollapse/data/modelData
+  wholeDataPath: D:/WebGIS/Projects/BankCollapse/data/dataWhole
+  resPath: D:/WebGIS/Projects/BankCollapse/data/modelRes/
 
 sms:
   accessTokenLoc: D:\2024-work\AccessKey.json

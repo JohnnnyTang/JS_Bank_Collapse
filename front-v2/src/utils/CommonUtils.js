@@ -1,3 +1,5 @@
+import { ElNotification } from "element-plus";
+
 export default class CommonUtils {
     /*
     将大驼峰字符串添加间隔符并转换为小写，也就是转换为连字符
@@ -65,11 +67,42 @@ export default class CommonUtils {
                 "type": "FeatureCollection",
                 "features": []
             }
-            for(let item of staticInfoList) {
+            for (let item of staticInfoList) {
                 geoJsonRes["features"].push(this.staticInfoItem2GeoJsonFeature(item));
             }
         }
         console.log(geoJsonRes);
         return geoJsonRes;
+    }
+
+    static uuid = (len, radix) => {
+        //生成一段随机的uuid唯一标识符
+        const chars = "0123456789abcdefghijklmnopqrstuvwxyz".split("");
+        const uuid = [];
+        let i;
+        radix = radix || chars.length;
+        if (len) {
+          for (i = 0; i < len; i++) uuid[i] = chars[0 | (Math.random() * radix)];
+        } else {
+          let r;
+          uuid[8] = uuid[13] = uuid[18] = uuid[23] = "-";
+          uuid[14] = "4";
+          for (i = 0; i < 36; i++) {
+            if (!uuid[i]) {
+              r = 0 | (Math.random() * 16);
+              uuid[i] = chars[i == 19 ? (r & 0x3) | 0x8 : r];
+            }
+          }
+        }
+        return uuid.join("");
+      };
+
+    static notice(type, title, msg) {
+        ElNotification({
+            type: type,
+            title: title,
+            message: msg,
+            offset: 100,
+        });
     }
 }

@@ -96,6 +96,10 @@ const routes = [
                 component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
             },
             {
+                path: 'analysisCenter',
+                component: () => import('../components/modelStore/views/AnalysisCenter.vue'),
+            },
+            {
                 path: 'stabilityAnalysis',
                 component: () => import('../components/modelStore/views/StabilityAnalysis3.vue'),
             },
@@ -103,6 +107,11 @@ const routes = [
                 path: 'riskWarning',
                 component: () => import('../components/modelStore/views/RiskWarning.vue'),
             },
+            {
+                path: 'numericalModel',
+                component: () => import('../components/modelStore/views/NumericalModel.vue'),
+            }
+            
         ]
     },
     {

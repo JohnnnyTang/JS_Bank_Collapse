@@ -32,6 +32,11 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/device/, ''),
             },
+            '/model/': {
+                target: 'http://172.21.212.165:8989/api/v2',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/model/, ''),
+            }
         },
         // https:{
         //     key: fs.readFileSync('cert/192.168.1.107-key.pem'),

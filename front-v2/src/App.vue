@@ -194,6 +194,44 @@ body,
     }
 }
 
+.draw-popper {
+    .el-scrollbar__wrap {
+        width: 6vw;
+        text-align: center;
+        position: relative;
+        z-index: 9999;
+
+        ul {
+            text-align: center;
+            background-color:#2587E3;
+            padding-bottom: 1px;
+            z-index: 9999;
+        }
+
+        li {
+            // width: 10vw;
+            text-align: center;
+            line-height: 3vh;
+            justify-content: center;
+            font-size: calc(0.6vw + 0.6vh);
+            font-weight: bold;
+            color: aliceblue;
+            border-bottom: 1px solid white;
+        }
+    }
+
+    &.center {
+        .el-scrollbar__wrap {
+            width: 12vw;
+        }
+
+        li {
+            justify-content: center;
+            font-size: calc(0.8vw + 0.6vh);
+        }
+    }
+}
+
 .risk-popper {
     .el-scrollbar__wrap {
         width: 14vw;
