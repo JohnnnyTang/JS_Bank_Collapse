@@ -1,53 +1,124 @@
 <template>
     <div class="main">
-
+        <!-- <sectionDraw></sectionDraw> -->
+        <div class="table">
+            <div class="row">
+                <div class="cell" v-for="(item, index) in testData" :key="index">{{ item[0].toFixed(2) }}</div>
+            </div>
+            <div class="row">
+                <div class="cell" v-for="(item, index) in testData" :key="index">{{ item[1].toFixed(2) }}</div>
+            </div>
+        </div>
     </div>
 </template>
+
 <script setup>
-import * as dat from 'dat.gui'
-import '../../utils/WebGL/dat_gui_style.css'
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
+import sectionDraw from '../modelStore/soilAnalysis/sectionDraw.vue';
+import * as echarts from 'echarts';
+import axios from 'axios';
 
+const chartdom = ref(null)
 
-onMounted(() => {
+const testData = [
+    [
+        4.558842192636803e-11,
+        -1.2148850368295108
+    ],
+    [
+        38.10376216666087,
+        -1.2429049979040028
+    ],
+    [
+        76.20752433327615,
+        -1.2259330622439175
+    ],
+    [
+        114.31128649989144,
+        -1.259806958700206
+    ],
+    [
+        152.41504866650672,
+        -1.2611951002238697
+    ],
+    [
+        190.51881083312202,
+        -1.3152647034596443
+    ],
+    [
+        228.6225729997373,
+        -1.4663700476224946
+    ],
+    [
+        266.72633516635256,
+        -1.6060859011160848
+    ],
+    [
+        304.83009733296785,
+        -3.032057199133465
+    ],
+    [
+        342.93385949958315,
+        -3.3242398937408764
+    ],
+    [
+        381.03762166619845,
+        -3.4983403331779157
+    ],
+    [
+        419.1413838328137,
+        -4.124987050220527
+    ],
+    [
+        457.245145999429,
+        -4.851273410394535
+    ],
+    [
+        495.3489081660443,
+        -6.5910771797927366
+    ],
+    [
+        533.4526703326595,
+        -8.942828967567108
+    ],
+    [
+        571.5564324992748,
+        -12.24843115675129
+    ],
+    [
+        609.6601946658901,
+        -16.29660691373699
+    ],
+    [
+        647.7639568325054,
+        -20.083224500410033
+    ],
+    [
+        685.8677189991207,
+        -23.861599173246326
+    ],
+    [
+        723.971481165736,
+        -27.125650170028873
+    ],
+    [
+        762.0752433323513,
+        -28.320095015823984
+    ],
+    [
+        800.1790054989665,
+        -29.132909224573726
+    ],
+    [
+        838.2827676655818,
+        -29.25361011534611
+    ]
+]
+onMounted(async () => {
 
-    let gui = new dat.GUI()
-    let parameters = {
-        aaWidth: 1,
-        fillWidth: 2,
-        framePerStep: 3,
-        velocityFactor: 4,
-        arrowAngle: 5,
-        arrowLength: 6,
-        gridPerRow: 7,
-        gridPerCol: 7,
-        stop: true,
-    }
-    gui.domElement.style.position = 'absolute'
-    gui.domElement.style.top = '15vh'
-    gui.domElement.style.right = '45vw'
-    gui.add(parameters, 'stop', false).name('停止').onChange()
-    gui.add(parameters, 'aaWidth', 0, 5, 0.1).name('反走样宽度').onChange()
-    gui.add(parameters, 'fillWidth', 0, 5, 0.1).name('填充宽度').onChange()
-    gui.add(parameters, 'framePerStep', 30, 240, 10).name('帧数控制').onChange()
-    gui.add(parameters, 'velocityFactor', 1, 1000, 1).name('速度因子').onChange()
-    gui.add(parameters, 'arrowAngle', 0, 90, 1).name('箭头角度').onChange()
-    gui.add(parameters, 'arrowLength', 1, 30, 1).name('箭头长度').onChange()
-    gui.add(parameters, 'gridPerRow', 10, 200, 1).name('格网行数').onChange()
-    gui.add(parameters, 'gridPerCol', 10, 200, 1).name('格网列数').onChange()
-
-    // gui.closedText = '关闭控制面板';
-    // gui.openText = '打开控制面板';
-    dat.GUI.TEXT_OPEN = "打开控制面板";
-    dat.GUI.TEXT_CLOSED = "关闭控制面板";
-    gui.open()
-
-    //     GUI.TEXT_CLOSED = 'Close Controls';
-    // GUI.TEXT_OPEN = 'Open Controls';
-
-
+    const data =( await axios.get('/hydrodynamicList')).data
+    console.log(data)
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -55,46 +126,41 @@ onMounted(() => {
     position: absolute;
     width: 100vw;
     height: 92vh;
-    background-color: rgb(202, 248, 253);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    div.map {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-    }
+    .table {
+        position: relative;
+        width: 50vw;
+        height: 20vh;
+        display: flex;
+        flex-direction: column;
+        background-color: rgb(186, 221, 252);
 
-    canvas.GPU {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        background-color: transparent;
-    }
-
-    canvas#GPUFrame {
-        z-index: 3;
-    }
-
-    canvas#UnityCanvas {
-        z-index: 1;
-    }
-
-    .value {
-        position: absolute;
-        left: 8vw;
-        top: 10px;
-        font-size: 12px;
-        color: #000000;
-        z-index: 1;
-
-        .value-item {
-            margin-bottom: 0.2px;
+        .row {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
         }
+
+        .cell {
+            height: 2vh;
+            flex: 1;
+            border: 1px solid black;
+            display: grid;
+            place-items: center;
+            font-size: calc(0.3vw + 0.3vh);
+            background-color: antiquewhite;
+        }
+
+
     }
+
+
 }
 </style>

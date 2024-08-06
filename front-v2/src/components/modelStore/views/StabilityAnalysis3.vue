@@ -4,26 +4,14 @@
     <div class="main-content">
       <div class="map" id="map" ref="mapRef"></div>
       <div class="model-choice">
-          <div class="basemap-radio-container">
-            <input
-              type="radio"
-              id="radio-1"
-              name="tabs"
-              :checked="checky1"
-              @click="radio1Click()"
-            />
-            <label class="tab" for="radio-1">近岸动力分析</label>
-            <input
-              type="radio"
-              id="radio-2"
-              name="tabs"
-              :checked="checky2"
-              @click="radio2Click()"
-            />
-            <label class="tab" for="radio-2">近岸演变分析</label>
-            <span class="glider"></span>
-          </div>
+        <div class="basemap-radio-container">
+          <el-radio-group v-model="radio1" @change="jump2Model(radio1)">
+            <el-radio-button label="近岸动力评估" value="1" />
+            <el-radio-button label="近岸动力计算" value="2" />
+            <el-radio-button label="近岸演变分析" value="3" />
+          </el-radio-group>
         </div>
+      </div>
       <div class="model-pannel">
         <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
           <div class="real-content">
@@ -33,40 +21,68 @@
                 <div class="arrow-up"></div>
               </div>
               <div class="content">
-                <el-tabs type="border-card" class="tab-pages">
+
+                <div class="condition-card">
+                  <div class="set-icon"></div>
+                  <div class="center">
+                    实时评估
+                  </div>
+                  <div class="realtime-water-condition">
+                    <div class="water-condition-item">
+                      <span class="water-condition-title">流量：</span>
+
+                      <el-input v-model="customParams.flow" style="width: 65%; height: 70%;" placeholder="请输入流量" />
+
+                    </div>
+                    <div class="water-condition-item">
+                      <span class="water-condition-title">大潮潮位：</span>
+                      <el-input v-model="customParams.maxTide" style="width: 50%; height: 70%;" placeholder="请输入潮位" />
+                    </div>
+                    <div class="water-condition-item">
+                      <span class="water-condition-title">小潮潮位：</span>
+                      <el-input v-model="customParams.minTide" style="width: 50%; height: 70%;" placeholder="请输入潮位" />
+                    </div>
+                  </div>
+
+                  <button class="realtime-button" @click="updateRealtimeWaterCondition()">
+                    实时水文条件
+                  </button>
+
+                  <button class="condition-button" @click="conditionClickHandler('custom')" :class="{ 'active': true }">
+                    确定
+                  </button>
+                </div>
+
+                <!-- <el-tabs type="border-card" class="tab-pages" v-model="activeTab">
                   <el-tab-pane>
                     <template #label>
                       <span class="custom-tabs-label">
                         <el-icon>
                           <Histogram />
                         </el-icon>
-                        <span>实时</span>
+                        <span>匹配工况</span>
                       </span>
                     </template>
                     <div class="condition-card">
                       <div class="set-icon"></div>
-                      <div class="center">实时水文条件</div>
-                      <el-table
-                        :data="tableData"
-                        border
-                        style="width: 85%; height: 60%"
-                        :scrollbar-always-on="false"
-                      >
-                        <el-table-column prop="flow" label="流量" />
-                        <el-table-column prop="maxTide" label="大潮潮位" />
-                        <el-table-column prop="minTide" label="小潮潮位" />
-                      </el-table>
-                      <div class="last-update-time">
-                        <div class="water-condition-item">
-                          <span class="water-condition-title">上次更新：</span>
-                          <span class="water-condition-value">{{ updateTime }}</span>
-                        </div>
+                      <div class="center">
+                        匹配工况
                       </div>
-                      <button
-                        class="condition-button"
-                        @click="conditionClickHandler('realtime')"
-                        :class="{ active: true }"
-                      >
+
+                      <div class="section-selectior-item">
+                        <el-select v-model="flowSelected" placeholder="选择流量" style="width: 10vw; height: 3.5vh">
+                          <el-option v-for="item in selectableFlowList" :key="item" :label="item" :value="item">
+                          </el-option>
+                        </el-select>
+                      </div>
+                      <div class="section-selectior-item">
+                        <el-select v-model="tideSelected" placeholder="选择潮型" style="width: 10vw; height: 3.5vh">
+                          <el-option v-for="item in selectableTideList" :key="item" :label="item" :value="item">
+                          </el-option>
+                        </el-select>
+                      </div>
+                      <button class="condition-button" @click="conditionClickHandler('match')"
+                        :class="{ 'active': true }">
                         确定
                       </button>
                     </div>
@@ -77,51 +93,43 @@
                         <el-icon>
                           <Tools />
                         </el-icon>
-                        <span>自定义</span>
+                        <span>实时评估</span>
                       </span>
                     </template>
                     <div class="condition-card">
                       <div class="set-icon"></div>
-                      <div class="center">特定水文条件</div>
+                      <div class="center">
+                        实时评估
+                      </div>
                       <div class="realtime-water-condition">
                         <div class="water-condition-item">
                           <span class="water-condition-title">流量：</span>
 
-                          <el-input
-                            v-model="customParams.flow"
-                            style="width: 65%; height: 70%"
-                            placeholder="请输入流量"
-                          />
+                          <el-input v-model="customParams.flow" style="width: 65%; height: 70%;" placeholder="请输入流量" />
+
                         </div>
                         <div class="water-condition-item">
                           <span class="water-condition-title">大潮潮位：</span>
-
-                          <el-input
-                            v-model="customParams.maxTide"
-                            style="width: 50%; height: 70%"
-                            placeholder="请输入潮位"
-                          />
+                          <el-input v-model="customParams.maxTide" style="width: 50%; height: 70%;" placeholder="请输入潮位" />
                         </div>
                         <div class="water-condition-item">
                           <span class="water-condition-title">小潮潮位：</span>
-
-                          <el-input
-                            v-model="customParams.minTide"
-                            style="width: 50%; height: 70%"
-                            placeholder="请输入潮位"
-                          />
+                          <el-input v-model="customParams.minTide" style="width: 50%; height: 70%;" placeholder="请输入潮位" />
                         </div>
                       </div>
-                      <button
-                        class="condition-button"
-                        @click="conditionClickHandler('custom')"
-                        :class="{ active: true }"
-                      >
+
+                      <button class="realtime-button" @click="updateRealtimeWaterCondition()">
+                        实时水文条件
+                      </button>
+
+                      <button class="condition-button" @click="conditionClickHandler('custom')"
+                        :class="{ 'active': true }">
                         确定
                       </button>
                     </div>
                   </el-tab-pane>
-                </el-tabs>
+
+                </el-tabs> -->
               </div>
             </div>
 
@@ -129,22 +137,23 @@
               <div class="title">
                 <div class="title-div">模型计算</div>
                 <div class="arrow-up"></div>
+
               </div>
               <div class="content">
                 <div class="content-box">
                   <el-row>
                     <el-col :span="10">
                       <div class="running-status grid-content">
-                        状态：<span :style="statusStyle">{{
-                          modelRunnningStatusDesc
-                        }}</span>
+                        状态：<span :style="statusStyle">{{ modelRunnningStatusDesc }}</span>
                       </div>
                     </el-col>
 
-                    <el-col :span="6"> </el-col>
+                    <el-col :span="6">
+                    </el-col>
                     <el-col :span="8">
                       <div class="running-control grid-content">
-                        <div class="run-button" @click="runModelClickHandler">运行</div>
+                        <div class="run-button" @click="runModelClickHandler">{{ runningText }}
+                        </div>
                       </div>
                     </el-col>
                   </el-row>
@@ -152,11 +161,8 @@
                     <el-col :span="24">
                       <div class="grid-content">
                         <div class="progress-container">
-                          <el-progress
-                            :percentage="modelRunnningProgress"
-                            :stroke-width="15"
-                            striped
-                          />
+                          <el-progress :percentage="modelRunnningProgress" :stroke-width="15" striped />
+
                         </div>
                       </div>
                     </el-col>
@@ -166,21 +172,14 @@
             </div>
             <div class="visulization-result flex-row">
               <div class="title">
-                <div class="title-div">结果可视化</div>
+                <div class="title-div">结果可视化 </div>
               </div>
 
               <div class="content">
                 <div class="slide-control-block">
-                  <label
-                    class="switch"
-                    :class="{ forbbidden: globleVariable.status === false }"
-                  >
-                    <input
-                      type="checkbox"
-                      :checked="showFlow == 1"
-                      :disabled="globleVariable.status === false"
-                      @click="showFlowClickHandler(1)"
-                    />
+                  <label class="switch" :class="{ 'forbbidden': globleVariable.status === false }">
+                    <input type="checkbox" :checked="showFlow == 1" :disabled="globleVariable.status === false"
+                      @click="showFlowClickHandler(1)" />
                     <span class="slider"></span>
                   </label>
                   <div class="text-block">
@@ -189,22 +188,16 @@
                 </div>
 
                 <div class="slide-control-block">
-                  <label
-                    class="switch"
-                    :class="{ forbbidden: globleVariable.status === false }"
-                  >
-                    <input
-                      type="checkbox"
-                      :checked="showFlow == 2"
-                      :disabled="globleVariable.status === false"
-                      @click="showFlowClickHandler(2)"
-                    />
+                  <label class="switch" :class="{ 'forbbidden': globleVariable.status === false }">
+                    <input type="checkbox" :checked="showFlow == 2" :disabled="globleVariable.status === false"
+                      @click="showFlowClickHandler(2)" />
                     <span class="slider"></span>
                   </label>
                   <div class="text-block">
                     <div class="text">欧拉场</div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -212,22 +205,45 @@
       </div>
     </div>
   </div>
+
+  <el-dialog v-model="pointConfirmShow" title="潮位点绘制确认" width="25vh">
+    <span>确认使用此点位计算潮位</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="pointConfirmShow = false">取消</el-button>
+        <el-button type="primary" @click="pointFeatureConfirmHandler">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <div class="loading-container" v-show="showRunning">
+    <dv-loading class="loading-icon">
+      <div class="loading-message">{{ runningMsg }}</div>
+    </dv-loading>
+  </div>
 </template>
 
 <script setup>
-import ModelTitleVue from "../ModelTitle.vue";
-import { BorderBox12 as DvBorderBox12 } from "@kjgl77/datav-vue3";
-import { ref, reactive, onMounted, onUnmounted, computed } from "vue";
-import { initFineMap } from "../../../utils/mapUtils";
-import { useMapStore } from "../../../store/mapStore";
-import { ElNotification } from "element-plus";
-import axios from "axios";
-import dayjs from "dayjs";
-import FlowFieldLayer from "../../../utils/WebGL/flowFieldLayer";
-import { EulerFlowLayer } from "../../../utils/WebGL/eulerFlowLayer";
+import MapboxDraw from '@mapbox/mapbox-gl-draw'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import ModelTitleVue from '../ModelTitle.vue'
+import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
+import { initFineMap } from '../../../utils/mapUtils';
+import { useMapStore } from '../../../store/mapStore';
+import { ElNotification, ElMessageBox } from 'element-plus'
+import axios from 'axios';
+import dayjs from 'dayjs';
+import FlowFieldLayer from '../../../utils/WebGL/flowFieldLayer'
+import { EulerFlowLayer } from '../../../utils/WebGL/eulerFlowLayer'
+import * as dat from 'dat.gui'
 import { useRouter } from "vue-router";
-import * as dat from "dat.gui";
-import "../../../utils/WebGL/dat_gui_style.css";
+import ModelRunner from '../modelRunner'
+import '../../../utils/WebGL/dat_gui_style.css'
+
+
 
 let globleVariable = reactive({
   taskID: null,
@@ -237,23 +253,41 @@ let globleVariable = reactive({
   stationBinUrl: null,
   uvBinUrls: null,
   status: false,
-  lagrangeLayer: "flowLayer1",
-  eulerLayer: "flowLayer2",
-});
-const mapRef = ref(null);
-const checky1 = ref(true);
-const checky2 = ref(false);
-const router = useRouter();
-const mapStore = useMapStore();
-const updateTime = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-const showFlow = ref(0);
-const modelRunnningStatusDesc = ref("未运行");
-const modelRunnningProgress = ref(0);
+  runningStatus: 'NONE',
+  lagrangeLayer: 'flowLayer1',
+  eulerLayer: 'flowLayer2',
+})
+const mapRef = ref(null)
+const mapStore = useMapStore()
+const updateTime = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+const showFlow = ref(0)
+const modelRunnningStatusDesc = ref('未运行')
+const modelRunnningProgress = ref(0)
+const runningMsg = ref('')
+const showRunning = ref(false)
+const activeTab = ref('0')
 const params = ref({
   flow: null,
   maxTide: null,
   minTide: null,
-});
+  tideType: null,
+})
+const tidePointFeature = ref(null)
+
+const pointConfirmShow = ref(false)
+const router = useRouter();
+const radio1 = ref(1)
+
+const jump2Model = (value) => {
+  console.log(value == '1')
+  const routeMap = {
+    '1': "/modelStore/stabilityAnalysis",
+    '2': "/modelStore/stabilityCalc",
+    '3': "/modelStore/analysisCenter"
+  }
+  routeMap[value] && router.push(routeMap[value])
+}
+
 const customParams = ref({
   flow: null,
   maxTide: null,
@@ -268,181 +302,394 @@ const tableData = ref([
 ]);
 const statusStyle = computed(() => {
   switch (modelRunnningStatusDesc.value) {
-    case "未运行":
-      return { color: "rgb(255, 2, 2)" };
-    case "运行中":
-      return { color: "rgb(255, 165, 0)" };
-    case "运行完毕":
-      return { color: "rgb(0, 180, 0)" };
+    case '未运行':
+      return { color: 'rgb(255, 2, 2)' }
+    case '运行中':
+      return { color: 'rgb(255, 165, 0)' }
+    case '运行完毕':
+      return { color: 'rgb(0, 180, 0)' }
     default:
-      return { color: "rgb(255, 255, 255)" };
+      return { color: 'rgb(255, 255, 255)' }
   }
-});
+})
+const flowSelected = ref(null)
+const tideSelected = ref(null)
+const selectableFlowList = [10000, 13000, 16500, 205000, 35000, 45000, 62000, 84000, 10400, 92000].sort((a, b) => a - b)
+const selectableTideList = ['大潮', '中潮', '小潮']
+const runningText = computed(() => {
+  // return activeTab.value === '0' ? '匹配' : '运行'
+  return '运行'
+})
+
 
 const check = (p) => {
-  if (p.flow === null || p.flow < 5000 || p.flow > 150000) return false;
-  if (p.maxTide === null || p.maxTide < 0 || p.maxTide > 100) return false;
-  if (p.minTide === null || p.minTide < 0 || p.minTide > 100) return false;
-  return true;
-};
+  if (activeTab.value === '0') {
+    if (p.flow === null || p.flow < 5000 || p.flow > 500000) return false
+    if (p.tideType === null) return false
+  } else if (activeTab.value === '1') {
+    if (p.flow === null || p.flow < 5000 || p.flow > 500000) return false
+    if (p.maxTide === null || p.maxTide < 0 || p.maxTide > 100) return false
+    if (p.minTide === null || p.minTide < 0 || p.minTide > 100) return false
+  }
+  return true
+}
 const conditionClickHandler = (type) => {
-  if (type === "realtime") {
-    params.value = tableData.value[0];
-  } else if (type === "custom") {
+  console.log('conditionClickHandler', type)
+  // if (type === 'realtime') {
+  //     params.value = tableData.value[0]
+  // } 
+  showFlow.value = 0
+  flowLayerControl('lagrange', false)
+  flowLayerControl('euler', false)
+
+  if (type === 'match') {
+    params.value = {
+      flow: flowSelected.value,
+      tideType: tideSelected.value,
+    }
+  } else if (type === 'custom') {
     params.value = {
       flow: Number(customParams.value.flow),
       maxTide: Number(customParams.value.maxTide),
       minTide: Number(customParams.value.minTide),
-    };
+    }
   }
   if (check(params.value))
     ElNotification({
-      title: "水文条件配置成功",
-      message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
+      title: '水文条件配置成功',
+      // message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
+      // message: `流量：${params.value.flow}，潮型：${params.value.tideType}`,
       offset: 120,
-      type: "success",
-    });
+      type: 'success',
+    })
   else
     ElNotification({
-      title: "水文条件配置失败",
-      message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}，请检查输入是否合法`,
+      title: '水文条件配置失败',
+      message: `请检查输入是否合法`,
       offset: 120,
-      type: "error",
-    });
-  modelRunnningProgress.value = 0;
-  modelRunnningStatusDesc.value = "未运行";
-  globleVariable.status = false;
-};
+      type: 'error',
+    })
+  modelRunnningProgress.value = 0
+  modelRunnningStatusDesc.value = '未运行'
+  globleVariable.status = false
+}
 const runModelClickHandler = async () => {
   if (!check(params.value)) {
     ElNotification({
-      title: "运行失败",
-      message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}，请检查输入是否合法`,
+      title: '运行失败',
+      message: `请检查输入是否合法`,
       offset: 120,
-      type: "error",
-    });
-    return;
+      type: 'error',
+    })
+    return
   }
-  const modelPostUrl = "/temp/taskNode/start/numeric/hydrodynamic";
-  const modelParams = {
-    "water-qs": params.value.flow,
-    "tidal-level": [params.value.minTide, params.value.maxTide],
-  };
-  const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data;
-  console.log("TASK_ID ", TASK_ID); // 66a23664bec8e12b68c9ce86
-  modelRunnningStatusDesc.value = "运行中";
-  modelRunnningProgress.value = 0;
-  globleVariable.taskID = TASK_ID;
+  const Confirm = {
+    'NONE': () => {
+      console.log('first run', activeTab.value)
+      modelRunnning(activeTab.value)
+      // modelRunnning()
+    },
+    'RUNNING': () => {
+      ElMessageBox.confirm(
+        '模型正在运行，请勿重复提交',
+        '警告',
+        {
+          showConfirmButton: false,
+          showCancelButton: true,
+          // confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      )
+        .catch(() => {
+          console.log('do nothing')
+        })
+    },
+    'COMPLETE': () => {
+      ElMessageBox.confirm(
+        '已有运行结果，是否采用新工况重新运行？',
+        '警告',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      )
+        .then(() => {
+          console.log('run with new condition')
+          showFlow.value = 0
+          flowLayerControl('lagrange', false)
+          flowLayerControl('euler', false)
+          modelRunnning(activeTab.value)
+        })
+        .catch(() => {
+          console.log('do nothing')
+        })
+    },
+    'ERROR': () => {
+
+    }
+  }
+  Confirm[globleVariable.runningStatus]()
+}
+const pointFeatureConfirmHandler = async () => {
+  pointConfirmShow.value = false
+  console.log('pointFeatureConfirmHandler', tidePointFeature.value)
+  console.log('caseId', globleVariable.caseID)
+  // modelRunnningStatusDesc
+  const pointVelocityModelUrl = '/temp/taskNode/start/numeric/getFlowFieldVelocities'
+  const params = {
+    "case-id": globleVariable.caseID,
+    "sample-point": [
+      {
+        "lng": tidePointFeature.value.geometry.coordinates[0],
+        "lat": tidePointFeature.value.geometry.coordinates[1],
+      }
+    ]
+  }
+  const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
+  const hereTaskId = await pointVelocityMR.modelStart()
+  console.log('hereTaskId', hereTaskId)
+
+  showRunning.value = true
+  runningMsg.value = '正在计算潮位点流速...'
+  console.log('===Interval')
+  let runningInterval = setInterval(async () => {
+    let runningStatus = await pointVelocityMR.getRunningStatus()
+    switch (runningStatus) {
+      case 'RUNNING':
+        break;
+      case 'ERROR':
+        console.log('error')
+        clearInterval(runningInterval)
+        let errorLog = await pointVelocityMR.getErrorLog()
+        ElNotification({
+          title: '计算失败',
+          message: `错误原因:\n` + errorLog,
+          offset: 120,
+          type: 'error',
+        })
+        break;
+      case 'COMPLETE':
+        console.log('complete')
+        clearInterval(runningInterval)
+        ElNotification({
+          title: '计算成功',
+          offset: 120,
+          type: 'success',
+        })
+        let runningResult = await pointVelocityMR.getModelResult()
+        console.log('runningResult ', runningResult)
+        break;
+    }
+
+  }, 1000)
+
+}
+
+
+const modelRunnning = async (type) => {
+  let modelPostUrl = ''
+  let modelParams = {}
+  const mmap = {
+    '大潮': 'dc',
+    '中潮': 'zc',
+    '小潮': 'xc'
+  }
+  console.log('check0 ', type)
+  if (type === '0') {
+    modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+    modelParams = {
+      "water-qs": params.value.flow,
+      "tidal-level": mmap[params.value.tideType],
+    }
+  } else if (type === '1') {
+    modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+    modelParams = {
+      "water-qs": params.value.flow,
+      "tidal-level": [params.value.minTide, params.value.maxTide]
+    }
+  }
+  console.log('check1 ', modelPostUrl, modelParams)
+  const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+  // const TASK_ID = '1'
+  console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
+  modelRunnningStatusDesc.value = '运行中'
+  modelRunnningProgress.value = 0
+  globleVariable.taskID = TASK_ID
+  console.log('===Interval')
   let runningStatusInterval = setInterval(async () => {
-    let runningStatus = (await axios.get("/temp/taskNode/status/id?taskId=" + TASK_ID))
-      .data;
-    modelRunnningStatusDesc.value = "运行中";
-    modelRunnningProgress.value =
-      modelRunnningProgress.value + Number((Math.random() * 2.0).toFixed(2));
-    if (runningStatus === "COMPLETE") {
-      clearInterval(runningStatusInterval);
-      modelRunnningStatusDesc.value = "运行中";
-      let runningResult = (await axios.get("/temp/taskNode/result/id?taskId=" + TASK_ID))
-        .data;
-      console.log("runningResult ", runningResult);
+    console.log('runningStatusInterval')
+    let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
+    // let runningStatus = 'RUNNING'
+    modelRunnningStatusDesc.value = '运行中'
+    let randomFactor = 3.0
+    if (runningStatus === 'RUNNING') {
+      globleVariable.runningStatus = 'RUNNING'
+      if (modelRunnningProgress.value < 88) randomFactor = 1.0
+      if (modelRunnningProgress.value > 88) randomFactor = 0.5
+      if (modelRunnningProgress.value > 95) randomFactor = 0.1
 
-      globleVariable.caseID = runningResult["case-id"];
-      globleVariable.pngPrefix = `/temp/data/modelServer/file/image?caseId=${globleVariable.caseID}&name=`;
-      globleVariable.binPrefix = `/temp/data/modelServer/file/bin?caseId=${globleVariable.caseID}&name=`;
-      globleVariable.visualizationJsonUrl =
-        runningResult["visualization-description-json"];
-      globleVariable.stationBinUrl = runningResult["visualization-station-bin"];
-      globleVariable.uvBinUrls = runningResult["visualization-uv-bin"];
+      let nextProgress = Math.round((modelRunnningProgress.value + Math.random() * randomFactor) * 100) / 100
+      nextProgress = nextProgress > 95 ? 95 : nextProgress
+      modelRunnningProgress.value = nextProgress
+    }
+    else if (runningStatus === 'ERROR') {
+      globleVariable.runningStatus = 'ERROR'
 
-      let visulizationDescUrl = `/temp/data/modelServer/file/common?caseId=${runningResult["case-id"]}&name=${runningResult["visualization-description-json"]}`;
-      console.log(visulizationDescUrl);
-      const visualizationJson = (await axios.get(visulizationDescUrl)).data;
-      globleVariable.visualizationJsonUrl = visulizationDescUrl;
-      console.log("visualizationJson ", visualizationJson);
-      globleVariable.status = true;
-      modelRunnningStatusDesc.value = "运行完毕";
-      modelRunnningProgress.value = 100;
+      const url = `/temp/taskNode/result/id?taskId=${TASK_ID}`
+      // axios.get(url).then(response => {
+      //     let errorLog = response.data['error-log']
+      //     resolve(errorLog)
+      // }).catch(error => {
+      //     console.warn(error)
+      //     reject(error)
+      // })
+      const errorLog = (await axios.get(url)).data['error-log']
+
+      ElNotification({
+        title: '模型运行失败',
+        message: `错误原因:\n` + errorLog,
+        offset: 120,
+        type: 'error',
+      })
+      modelRunnningStatusDesc.value = '运行失败'
+      globleVariable.runningStatus = 'NONE'
+      clearInterval(runningStatusInterval)
+
+    }
+    else if (runningStatus === 'COMPLETE') {
+      clearInterval(runningStatusInterval)
+      let runningResult = (await axios.get('/temp/taskNode/result/id?taskId=' + TASK_ID)).data
+      console.log('runningResult ', runningResult)
+
+      globleVariable.caseID = runningResult['case-id']
+      globleVariable.pngPrefix = `/temp/data/modelServer/file/image?caseId=${globleVariable.caseID}&name=`
+      globleVariable.binPrefix = `/temp/data/modelServer/file/bin?caseId=${globleVariable.caseID}&name=`
+      globleVariable.stationBinUrl = runningResult['visualization-station-bin']
+      globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
+      let visulizationDescUrl = `/temp/data/modelServer/file/json?caseId=${runningResult['case-id']}&name=${runningResult['visualization-description-json']}`
+      globleVariable.visualizationJsonUrl = visulizationDescUrl
+      console.log('globle data info::', globleVariable)
+
+      // const visualizationJson = (await axios.get(visulizationDescUrl)).data
+      // console.log('visualizationJson ', visualizationJson)
+      globleVariable.status = true
+      globleVariable.runningStatus = 'COMPLETE'
+      modelRunnningStatusDesc.value = '运行完毕'
+      modelRunnningProgress.value = 100
 
       // showFlowClickHandler(1)
     }
-  }, 1000);
-};
+  }, 1000)
+}
+
+const draw = new MapboxDraw({
+  displayControlsDefault: false,
+  // Select which mapbox-gl-draw control buttons to add to the map.
+  controls: {
+    point: true,
+    trash: true,
+  },
+  styles: [
+    {
+      'id': 'highlight-active-points',
+      'type': 'circle',
+      'filter': ['all',
+        ['==', '$type', 'Point'],
+        ['==', 'meta', 'feature'],
+        ['==', 'active', 'true']],
+      'paint': {
+        'circle-radius': 10,
+        'circle-color': '#ff7707'
+      }
+    },
+    {
+      'id': 'points-are-blue',
+      'type': 'circle',
+      'filter': ['all',
+        ['==', '$type', 'Point'],
+        ['==', 'meta', 'feature'],
+        ['==', 'active', 'false']],
+      'paint': {
+        'circle-radius': 8,
+        'circle-color': '#00006d'
+      }
+    }
+  ]
+  // Set mapbox-gl-draw to draw by default.
+  // The user does not have to click the polygon control button first.
+  // defaultMode: '',
+})
+
+
+
 
 const flowLayerControl = (type, show) => {
-  let map = mapStore.getMap();
+  let map = mapStore.getMap()
   const controlMap = {
-    lagrange: {
+    'lagrange': {
       add: () => {
-        console.log("add lagrenge");
-        let flow = new FlowFieldLayer(
-          globleVariable.lagrangeLayer,
-          globleVariable.visualizationJsonUrl,
-          globleVariable.pngPrefix
-        );
-        mapStore.getMap().addLayer(flow, "mzsLabel");
+        console.log('add lagrenge');
+        let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix)
+        mapStore.getMap().addLayer(flow, 'mzsLabel')
       },
       remove: () => {
-        console.log("rm lagrenge");
-        map.getLayer(globleVariable.lagrangeLayer) &&
-          map.removeLayer(globleVariable.lagrangeLayer);
-      },
+        console.log('rm lagrenge');
+        map.getLayer(globleVariable.lagrangeLayer) && map.removeLayer(globleVariable.lagrangeLayer)
+      }
     },
-    euler: {
+    'euler': {
       add: () => {
-        console.log("add euler");
-        let flow = new EulerFlowLayer(
-          globleVariable.eulerLayer,
-          globleVariable.stationBinUrl,
-          globleVariable.uvBinUrls,
-          globleVariable.binPrefix
-        );
+        console.log('add euler');
+        let flow = new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix)
         // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
         // '/scratchSomething/temp/')
 
-        mapStore.getMap().addLayer(flow, "mzsLabel");
+        mapStore.getMap().addLayer(flow, 'mzsLabel')
       },
       remove: () => {
-        console.log("rm euler");
-        map.getLayer(globleVariable.eulerLayer) &&
-          map.removeLayer(globleVariable.eulerLayer);
-      },
-    },
-  };
-  controlMap[type][show ? "add" : "remove"]();
-};
+        console.log('rm euler');
+        map.getLayer(globleVariable.eulerLayer) && map.removeLayer(globleVariable.eulerLayer)
+      }
+    }
+  }
+  controlMap[type][show ? 'add' : 'remove']()
+}
 
 const showFlowClickHandler = (id) => {
-  console.log(globleVariable);
+  console.log(globleVariable)
   if (!globleVariable.status) {
     ElNotification({
-      title: "错误",
-      message: "模型尚未运行，缺乏可视化依赖数据",
+      title: '错误',
+      message: '模型尚未运行或运行未结束，缺乏可视化依赖数据',
       offset: 120,
-      type: "error",
-    });
-    showFlow.value = 0;
-    return;
+      type: 'error',
+    })
+    showFlow.value = 0
+    return
   }
   if (id === 1) {
-    showFlow.value = showFlow.value === 1 ? 0 : 1;
-    flowLayerControl("euler", false);
+    showFlow.value = showFlow.value === 1 ? 0 : 1
+    flowLayerControl('euler', false)
     if (!showFlow.value) {
-      flowLayerControl("lagrange", false);
-      return;
+      flowLayerControl('lagrange', false)
+      return
     }
-    flowLayerControl("lagrange", true);
-    return;
+    flowLayerControl('lagrange', true)
+    return
   } else if (id === 2) {
-    showFlow.value = showFlow.value === 2 ? 0 : 2;
-    flowLayerControl("lagrange", false);
+    showFlow.value = showFlow.value === 2 ? 0 : 2
+    flowLayerControl('lagrange', false)
     if (!showFlow.value) {
-      flowLayerControl("euler", false);
-      return;
+      flowLayerControl('euler', false)
+      return
     }
-    flowLayerControl("euler", true);
-    return;
+    flowLayerControl('euler', true)
+    return
   }
-};
+}
+
 
 const mapFlyToRiver = (mapIns) => {
   if (!mapIns) return;
@@ -460,42 +707,92 @@ const mapFlyToRiver = (mapIns) => {
 const updateRealtimeWaterCondition = async () => {
   // async request
   const response = {
-    flow: 84000,
+    flow: 205000,
     maxTide: 5.2,
-    minTide: 2.7,
-  };
+    minTide: 3.9,
+  }
   // update
-  tableData.value = [response];
-  updateTime.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
-};
+  tableData.value = [
+    response
+  ]
+  updateTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
-let realtimeWaterConditionIntervalID = null;
+  customParams.value = response
+  ElNotification({
+    title: '已更新实时水文条件',
+    message: `更新时间：${updateTime.value}`,
+    offset: 120,
+    type: 'success',
+  })
+}
 
-const radio2Click = () => {
-  router.push("/modelStore/analysisCenter");
-  checky2.value = true;
-  checky1.value = false;
-};
+
 
 onMounted(async () => {
-  let map = await initFineMap(mapRef.value);
-  mapStore.setMap(map);
-  mapFlyToRiver(map);
-  realtimeWaterConditionIntervalID = setInterval(() => {
-    updateRealtimeWaterCondition();
-  }, 1000 * 60 * 5);
-});
+  let map = await initFineMap(mapRef.value)
+  mapStore.setMap(map)
+  mapFlyToRiver(map)
+
+  map.addControl(draw)
+  map.on('draw.create', function (e) {
+    console.log(e.features[0])
+    pointConfirmShow.value = true
+    let feature = e.features[0]
+    tidePointFeature.value = feature
+    // line = lineFeature
+    // emit('sectionDraw', line)
+    // paramFill[1] = true
+    // if (paramFill.includes(false)) {
+    //   return
+    // } else {
+    //   // multiIndexStore.updateSectionStatus(1)
+    //   calcEnable.value = true
+    // }
+  })
+
+})
+
+
 
 onUnmounted(() => {
   if (useMapStore().getMap()) {
-    useMapStore().getMap().remove();
-    useMapStore().destroyMap();
+    flowLayerControl('lagrange', false)
+    flowLayerControl('euler', false)
+    useMapStore().getMap().remove()
+    useMapStore().destroyMap()
   }
-  clearInterval(realtimeWaterConditionIntervalID);
-});
+})
 </script>
 
 <style lang="scss" scoped>
+div.loading-container {
+  position: absolute;
+  top: 14vh;
+  right: 44vw;
+  width: 8vw;
+  height: 12vh;
+  background-color: rgba(255, 255, 255, 0.671);
+  border-radius: 5px;
+  backdrop-filter: blur(5px);
+  z-index: 5;
+
+  :deep(.dv-loading.loading-icon) {
+    position: absolute;
+  }
+
+  div.loading-message {
+    text-align: center;
+    position: relative;
+    margin-top: 1vh;
+    width: 6vw;
+    height: 6vh;
+    color: #000357;
+    // top: 7.3vh;
+    font-size: calc(0.6vw + 0.8vh);
+    font-weight: 800;
+  }
+}
+
 div.stability-analysis {
   position: absolute;
   width: 100vw;
@@ -578,7 +875,7 @@ div.stability-analysis {
 
       div.basemap-radio-container {
         z-index: 1;
-        width: 14vw;
+        width: 20vw;
         height: 4vh;
         display: flex;
         flex-flow: row nowrap;
@@ -612,7 +909,7 @@ div.stability-analysis {
 
         input[type="radio"] {
           &:checked {
-            & + label {
+            &+label {
               color: #185ee0;
             }
           }
@@ -620,7 +917,7 @@ div.stability-analysis {
 
         input[id="radio-1"] {
           &:checked {
-            & ~ .glider {
+            &~.glider {
               transform: translateX(0);
             }
           }
@@ -628,7 +925,7 @@ div.stability-analysis {
 
         input[id="radio-2"] {
           &:checked {
-            & ~ .glider {
+            &~.glider {
               transform: translateX(100%);
             }
           }
@@ -636,7 +933,7 @@ div.stability-analysis {
 
         input[id="radio-3"] {
           &:checked {
-            & ~ .glider {
+            &~.glider {
               transform: translateX(200%);
             }
           }
@@ -730,132 +1027,151 @@ div.stability-analysis {
           flex: 1;
 
           div.content {
-            .tab-pages {
-              height: 100%;
+
+            .condition-card {
+              position: relative;
               width: 100%;
+              height: 16vh;
+              margin-top: .5vh;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-evenly;
+              // align-items: center;
+              border-radius: calc(0.1vh);
+              background-color: #fff;
+              // box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+              // margin-right: 2vw;
+              // margin-left: 2vw;
+              border: 1px solid rgba(150, 150, 150, 0.308);
 
-              .custom-tabs-label {
-                vertical-align: middle;
+              .set-icon {
+                position: absolute;
+                right: 0.2vw;
+                top: 0.5vh;
+                width: 4.5vh;
+                height: 4.5vh;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-image: url("/set.png");
+              }
 
-                .el-icon {
-                  vertical-align: middle;
-                }
+              .center {
+                position: relative;
+                height: 35%;
+                // background-color: red;
+                width: 100%;
+                color: #055279;
+                font-weight: 800;
+                font-size: calc(0.8vw + 0.7vh);
+                padding-left: 0.4vw;
+                padding-top: 0.5vh;
+              }
 
-                span {
-                  margin-left: 0.2vw;
-                  vertical-align: middle;
+              .realtime-water-condition {
+                position: relative;
+                height: 100%;
+                width: 80%;
+                padding-left: 0.5vw;
+                font-size: calc(0.45vw + 0.4vh);
+
+                .water-condition-item {
+                  position: relative;
+                  width: 85%;
+                  height: 3.2vh;
+
+                  .water-condition-title {
+                    line-height: 3.2vh;
+                    font-weight: 800;
+                    font-size: calc(0.5vw + 0.6vh);
+                  }
+
+                  .water-condition-value {
+                    margin-right: 1vw;
+                    font-size: calc(0.5vw + 0.4vh);
+                  }
+
+                  input.water-condition-input {
+                    width: 50%;
+                  }
                 }
               }
 
-              .condition-card {
+              .last-update-time {
                 position: relative;
+                height: 40%;
                 width: 100%;
-                height: 14vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-evenly;
-                // align-items: center;
-                border-radius: calc(0.4vw + 0.4vh);
-                // box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-                // margin-right: 2vw;
-                // margin-left: 2vw;
+                padding-left: 0.5vw;
 
-                .set-icon {
-                  position: absolute;
-                  right: 0.2vw;
-                  top: 0.5vh;
-                  width: 4.5vh;
-                  height: 4.5vh;
-                  background-size: contain;
-                  background-repeat: no-repeat;
-                  background-image: url("/set.png");
-                }
-
-                .center {
+                .water-condition-item {
                   position: relative;
-                  height: 35%;
-                  // background-color: red;
-                  width: 100%;
-                  color: #055279;
-                  font-weight: 800;
-                  font-size: calc(0.8vw + 0.7vh);
-                  padding-left: 0.4vw;
-                  padding-top: 0.5vh;
-                }
+                  width: 85%;
+                  height: 3.5vh;
 
-                .realtime-water-condition {
-                  position: relative;
-                  height: 100%;
-                  width: 80%;
-                  padding-left: 0.5vw;
-                  font-size: calc(0.45vw + 0.4vh);
+                  .water-condition-title {
+                    line-height: 3.5vh;
+                    font-weight: 800;
+                    font-size: calc(0.5vw + 0.6vh);
+                  }
 
-                  .water-condition-item {
-                    position: relative;
-                    width: 85%;
-                    height: 3.2vh;
-
-                    .water-condition-title {
-                      line-height: 3.2vh;
-                      font-weight: 800;
-                      font-size: calc(0.5vw + 0.6vh);
-                    }
-
-                    .water-condition-value {
-                      margin-right: 1vw;
-                      font-size: calc(0.5vw + 0.4vh);
-                    }
-
-                    input.water-condition-input {
-                      width: 50%;
-                    }
+                  .water-condition-value {
+                    margin-right: 1vw;
+                    font-size: calc(0.4vw + 0.4vh);
                   }
                 }
+              }
 
-                .last-update-time {
-                  position: relative;
-                  height: 40%;
-                  width: 100%;
-                  padding-left: 0.5vw;
+              button.realtime-button {
+                position: absolute;
+                right: 3.5vw;
+                top: 0.5vh;
+                width: 4。2vw;
+                height: 3vh;
+                background: #6aa8f8d0;
+                color: #fff;
+                font-family: inherit;
+                font-weight: 900;
+                font-size: calc(0.4vw + 0.3vh);
+                border: 1px solid rgb(3, 107, 167);
+                border-radius: 0.4em;
+                box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+                cursor: pointer;
+                transition: 0.3s linear;
 
-                  .water-condition-item {
-                    position: relative;
-                    width: 85%;
-                    height: 3.5vh;
-
-                    .water-condition-title {
-                      line-height: 3.5vh;
-                      font-weight: 800;
-                      font-size: calc(0.5vw + 0.6vh);
-                    }
-
-                    .water-condition-value {
-                      margin-right: 1vw;
-                      font-size: calc(0.4vw + 0.4vh);
-                    }
-                  }
+                &:active {
+                  scale: 1.01;
+                  background: #348cffd0;
                 }
 
-                button.condition-button {
-                  position: absolute;
-                  right: 0.8vw;
-                  bottom: 0.5vh;
-                  width: 3vw;
-                  height: 3vh;
-                  background: #0254bed0;
-                  color: #fff;
-                  font-family: inherit;
-                  font-weight: 900;
-                  font-size: calc(0.3vw + 0.7vh);
-                  border: 1px solid rgb(3, 107, 167);
-                  border-radius: 0.4em;
-                  box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
-                  cursor: pointer;
-                  transition: 0.3s linear;
+                &:hover {
+                  scale: 1.01;
+                  background: #348cffd0;
+                }
+              }
 
-                  &:active {
-                    scale: 1.01;
-                  }
+              button.condition-button {
+                position: absolute;
+                right: 0.8vw;
+                bottom: 0.5vh;
+                width: 3vw;
+                height: 3vh;
+                background: #0254bed0;
+                color: #fff;
+                font-family: inherit;
+                font-weight: 900;
+                font-size: calc(0.3vw + 0.7vh);
+                border: 1px solid rgb(3, 107, 167);
+                border-radius: 0.4em;
+                box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+                cursor: pointer;
+                transition: 0.3s linear;
+
+                &:active {
+                  scale: 1.01;
+                }
+
+                &:hover {
+                  scale: 1.01;
+                  background: #348cffd0;
                 }
               }
             }
@@ -1003,11 +1319,11 @@ div.stability-analysis {
                 }
 
                 input:checked {
-                  + .slider {
+                  +.slider {
                     background-color: rgb(53, 101, 174);
                   }
 
-                  + .slider:before {
+                  +.slider:before {
                     transform: translateY(-1.5em);
                   }
                 }

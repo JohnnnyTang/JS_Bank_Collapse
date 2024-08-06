@@ -8,17 +8,11 @@
     <el-dialog v-model="chartVisual" v-if="chartVisual" width="900px" id="chart" title="可视化结果">
       <chart-visual :chartVisualInfo="chartVisualInfo"></chart-visual>
     </el-dialog>
-    <el-dialog
-      v-model="dialogVisible"
-      :width="300"
-      :title="visualType == 'geoJsonLine' ? '断面名称：' : '区域名称：'"
-    >
+    <el-dialog v-model="dialogVisible" :width="300" :title="visualType == 'geoJsonLine' ? '断面名称：' : '区域名称：'">
       <div class="name">
         <el-input v-model="inputValue" />
         <div class="btn">
-          <el-button type="primary" plain size="small" @click="clickHandle"
-            >确定</el-button
-          >
+          <el-button type="primary" plain size="small" @click="clickHandle">确定</el-button>
         </div>
       </div>
     </el-dialog>
@@ -41,6 +35,7 @@ const {
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "mapbox-gl/dist/mapbox-gl.css";
 import ChartVisual from "./ChartVisual.vue";
+import { getHighZoomStyleJson } from "../../../../utils/mapUtils";
 export default defineComponent({
   components: { ChartVisual },
   props: {
@@ -151,7 +146,8 @@ export default defineComponent({
         container: container.value,
         accessToken:
           "pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg",
-        style: "mapbox://styles/johnnyt/cl9miecpn001t14rspop38nyk",
+        // style: "mapbox://styles/johnnyt/cl9miecpn001t14rspop38nyk",
+        style: getHighZoomStyleJson(),
         center: [121.18, 31.723],
         zoom: 8,
         transformRequest: (url, resourceType) => {
@@ -182,10 +178,10 @@ export default defineComponent({
               .setLngLat([
                 (volumeList.value[i].coordinates[0][0] +
                   volumeList.value[i].coordinates[2][0]) /
-                  2,
+                2,
                 (volumeList.value[i].coordinates[0][1] +
                   volumeList.value[i].coordinates[2][1]) /
-                  2,
+                2,
               ])
               .setHTML(volumeList.value[i].description)
               .addTo(map);
@@ -267,8 +263,7 @@ export default defineComponent({
           map.addSource(param.id, {
             type: "raster",
             tiles: [
-              `${import.meta.env.VITE_APP_BACK_ADDRESS}/visual/getRaster/${
-                param.visualId
+              `${import.meta.env.VITE_APP_BACK_ADDRESS}/visual/getRaster/${param.visualId
               }/{x}/{y}/{z}`,
             ],
           });
@@ -297,9 +292,8 @@ export default defineComponent({
         } else if (param.visualType === "volume") {
           map.addSource(param.caseid, {
             type: "image",
-            url: `${
-              import.meta.env.VITE_APP_BACK_ADDRESS
-            }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            url: `${import.meta.env.VITE_APP_BACK_ADDRESS
+              }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
@@ -450,26 +444,33 @@ export default defineComponent({
       padding: 10px;
       background: #4c75a9;
       margin: 0px;
+
       .el-dialog__title {
         color: white;
       }
+
       .el-dialog__headerbtn {
         height: 40px;
+
         .el-icon {
           color: white;
         }
       }
     }
+
     .el-dialog__body {
       padding: 0px;
     }
   }
+
   .name {
     padding: 10px;
     height: 70px;
+
     .btn {
       position: relative;
       margin-top: 10px;
+
       .el-button {
         position: absolute;
         right: 0px;

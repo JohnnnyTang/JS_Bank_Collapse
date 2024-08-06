@@ -2,7 +2,7 @@
     <div class="vertical-menu-container">
         <div class="placement-container upper" @click="returnPage">
             <div class="back-icon"></div>
-            <div class="back-text">返回实时监测</div>
+            <div class="back-text">返回</div>
         </div>
         <el-scrollbar>
             <el-menu
@@ -89,7 +89,8 @@ import router from '../../router'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 
 const returnPage = () => {
-    router.push('/bankTwin')
+    // router.push('/bankTwin')
+    router.push('/modelStore/main')
 }
 
 const route = useRoute()
@@ -197,6 +198,7 @@ div.vertical-menu-container {
 
             div.back-text {
                 height: 5vh;
+                width: 7vw;
                 line-height: 5vh;
                 // background-color: rgb(206, 231, 255);
 

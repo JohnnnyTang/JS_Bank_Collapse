@@ -32,7 +32,7 @@ class JsonFileParser {
     async Parsing() {
         await axios.get(this.url)
             .then((response) => {
-
+                console.log("parsing!!!  ", this.url)
                 for (let item of response.data['flow_fields']) {
                     this.flowFieldResourceArr.push(item);
                 }
@@ -84,7 +84,7 @@ export default class FlowFieldLayer {
 
     uboMapBufferData: Float32Array = new Float32Array(12);
     phaseCount: number = 0.0;
-    timePerFrame: number = 100.0;
+    timePerFrame: number = 160.0;
     timeLast: number = 10.0;
     currentResourcePointer: number = 0;
     _timeCount: number = 0.0;

@@ -2,7 +2,8 @@ export const infoItemList = [
     {
         firstPage: false,
         picsrc:"/dataInterpretation.png",
-        routerPath: "dataInterpretation",
+        // routerPath: "dataInterpretation",
+        routerPath:"/bankManage/monitor/gnss",
         processPicSrc:"/model-process.png",
         name: "数据融合解译模型",
         description: "数据融合解译模型是一个实时数据解析系统，旨在将GNSS、孔隙水压力计、应力桩和测斜仪等部署在河岸的设备实时传输的数据进行解析入库，以监测河岸稳定性、水文地质勘测和工程安全预警。用户可以通过该模型可以获取到河岸边各设备传来的测量数据。",

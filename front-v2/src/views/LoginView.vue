@@ -64,6 +64,7 @@ const login = () => {
             loginFail()
         }
     }).catch(error => {
+        console.log(error)
         loginFail()
     })
 };
@@ -141,7 +142,7 @@ div.login-view {
 
             div.login-pic {
                 position: absolute;
-                top: 36%;
+                top: 34%;
                 left: 15%;
                 width: calc(10vw + 10vh);
                 height: calc(10vw + 10vh);

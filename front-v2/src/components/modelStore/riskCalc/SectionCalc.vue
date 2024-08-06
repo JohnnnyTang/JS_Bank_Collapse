@@ -2,12 +2,7 @@
     <div class="section-choose-content model-item-content" ref="containerDom">
         <div id="map" class="map-container"></div>
 
-        <el-dialog
-            v-model="sectionConfirmShow"
-            title="绘制断面确认"
-            width="40vh"
-            :before-close="sectionConfirmClose"
-        >
+        <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh" :before-close="sectionConfirmClose">
             <span>确认使用此断面进行计算</span>
             <template #footer>
                 <div class="dialog-footer">
@@ -19,33 +14,17 @@
             </template>
         </el-dialog>
 
-        <div
-            class="section-res-container"
-            :class="{ 'in-active': !sectionSliceChartShow }"
-        >
+        <div class="section-res-container" :class="{ 'in-active': !sectionSliceChartShow }">
             <div class="section-res-title">断面剖面图</div>
             <div class="section-res-content" ref="sectionChartDom"></div>
         </div>
-        <div
-            class="section-shrink-button"
-            :class="{ 'in-active': !sectionSliceChartShow }"
-            @click="changeSectionSliceShow"
-        ></div>
+        <div class="section-shrink-button" :class="{ 'in-active': !sectionSliceChartShow }" @click="changeSectionSliceShow">
+        </div>
         <div class="section-selectior-item">
-            <el-select
-                v-model="rasterYearSelected"
-                placeholder="选择地形"
-                style="width: 10vw; height: 3.5vh"
-                @change="sectionSelectChange"
-            >
-                <el-option
-                    v-for="item in sectionRasterList"
-                    :key="item.year"
-                    :label="
-                        item.year + (item.time == 'before' ? '汛前' : '汛后')
-                    "
-                    :value="item.year"
-                >
+            <el-select v-model="rasterYearSelected" placeholder="选择地形" style="width: 10vw; height: 3.5vh"
+                @change="sectionSelectChange">
+                <el-option v-for="item in sectionRasterList" :key="item.year" :label="item.year + (item.time == 'before' ? '汛前' : '汛后')
+                    " :value="item.year">
                     <span style="float: left" class="section-name-text">{{
                         item.year
                     }}</span>
@@ -55,49 +34,31 @@
                 </el-option>
             </el-select>
         </div>
-        <div
-            class="all-selector-item"
-            :class="[calcEnable ? 'active' : 'in-active']"
-        >
+        <div class="all-selector-item" :class="[calcEnable ? 'active' : 'in-active']">
             <div class="selector-item-text" @click="calcModel">
                 计算坡面形态
             </div>
         </div>
         <div class="current-param-container year">
             <div class="current-year-title">当前选择地形</div>
-            <div class="current-year-content">{{ rasterYearLabel === ''?'暂未选择':rasterYearLabel }}</div>
+            <div class="current-year-content">{{ rasterYearLabel === '' ? '暂未选择' : rasterYearLabel }}</div>
         </div>
         <div class="current-param-container section">
             <div class="current-year-title">当前绘制断面</div>
-            <div
-                class="current-year-content"
-                :class="{ 'two-line': sectionLineLabel != '' }"
-            >
+            <div class="current-year-content" :class="{ 'two-line': sectionLineLabel != '' }">
                 {{
                     sectionLineLabel == ''
-                        ? '暂未绘制'
-                        : '起点：' + sectionLineLabel
+                    ? '暂未绘制'
+                    : '起点：' + sectionLineLabel
                 }}
             </div>
-            <div
-                class="current-year-content two-line"
-                v-if="sectionLineLabel != ''"
-            >
+            <div class="current-year-content two-line" v-if="sectionLineLabel != ''">
                 {{ '终点：' + sectionLineLabelSec }}
             </div>
         </div>
         <div class="progress-circle-container" v-if="progressShow">
-            <el-progress
-                type="circle"
-                :percentage="calcProgress"
-                :status="progressStatus"
-            >
-                <el-button
-                    type="success"
-                    :icon="Check"
-                    circle
-                    v-if="progressStatus == 'success'"
-            /></el-progress>
+            <el-progress type="circle" :percentage="calcProgress" :status="progressStatus">
+                <el-button type="success" :icon="Check" circle v-if="progressStatus == 'success'" /></el-progress>
         </div>
     </div>
 </template>
@@ -120,6 +81,9 @@ mapboxgl.accessToken =
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
     baseURL: '/api',
+    headers: {
+        'token': localStorage.getItem('token'),
+    }
 })
 
 const calcProgress = ref(0)
@@ -193,7 +157,7 @@ const sectionSelectChange = () => {
     }
 }
 
-const sectionConfirmClose = () => {}
+const sectionConfirmClose = () => { }
 
 const cancelSectionRese = () => {
     sectionConfirmShow.value = false
@@ -378,31 +342,31 @@ onMounted(() => {
         map.addSource('mzsOverWaterSource', {
             type: 'vector',
             tiles: [
-                tileServer+'/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
+                tileServer + '/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsUnderWaterSource', {
             type: 'vector',
             tiles: [
-                tileServer+'/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
+                tileServer + '/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsPlaceLabelSource', {
             type: 'vector',
             tiles: [
-                tileServer+'/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
+                tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}',
             ],
         })
         map.addSource('mzsPlaceLineSource', {
             type: 'vector',
             tiles: [
-                tileServer+'/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
+                tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
             ],
         })
         map.addSource('mapRaster2020', {
             type: 'raster',
             tiles: [
-                tileServer+'/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
+                tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
@@ -412,7 +376,7 @@ onMounted(() => {
         map.addSource('mapRaster2021', {
             type: 'raster',
             tiles: [
-                tileServer+'/tile/raster/mzs/2021/Before/{x}/{y}/{z}',
+                tileServer + '/tile/raster/mzs/2021/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
@@ -422,7 +386,7 @@ onMounted(() => {
         map.addSource('mapRaster2022', {
             type: 'raster',
             tiles: [
-                tileServer+'/tile/raster/mzs/2022/Before/{x}/{y}/{z}',
+                tileServer + '/tile/raster/mzs/2022/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
@@ -432,7 +396,7 @@ onMounted(() => {
         map.addSource('mapRaster2023', {
             type: 'raster',
             tiles: [
-                tileServer+'/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
+                tileServer + '/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
             ],
             tileSize: 1024,
             minzoom: 10,
@@ -810,9 +774,11 @@ div.section-choose-content {
             width: 4vh;
             height: 4vh;
         }
+
         :deep(.el-icon) {
             width: 3vh;
             height: 3vh;
+
             svg {
                 width: 3vh;
                 height: 3vh;
@@ -820,6 +786,7 @@ div.section-choose-content {
         }
     }
 }
+
 :deep(.el-progress__text) {
     // color: rgba(162, 128, 15, 0.5);
     font-size: calc(0.6vw + 0.6vh) !important;

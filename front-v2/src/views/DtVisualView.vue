@@ -769,8 +769,6 @@ const resetSideBarTree = () => {
 
 const prepareMap = async () => {
 
-    await axios.get('/api/data/monitorInfo')
-
     const mapInstance = await initBaseMap(mapContainer.value)
     mapStore.setMap(mapInstance)
     mapInstance.addControl(new mapboxgl.NavigationControl({
