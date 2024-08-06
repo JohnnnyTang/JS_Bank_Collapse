@@ -36,6 +36,11 @@ export default defineConfig({
                 target: 'http://172.21.212.165:8989/api/v2',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),
+            },
+            '/hydrodynamicList': {
+                target: 'http://172.21.212.216:8000/v0/fs/resource/hydrodynamic/list',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/hydrodynamicList/, ''),
             }
         },
         // https:{

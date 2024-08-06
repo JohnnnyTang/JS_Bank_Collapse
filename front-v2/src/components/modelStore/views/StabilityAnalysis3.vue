@@ -5,11 +5,11 @@
       <div class="map" id="map" ref="mapRef"></div>
       <div class="model-choice">
         <div class="basemap-radio-container">
-          <input type="radio" id="radio-1" name="tabs" :checked="checky1" @click="radio1Click()" />
-          <label class="tab" for="radio-1">近岸动力分析</label>
-          <input type="radio" id="radio-2" name="tabs" :checked="checky2" @click="radio2Click()" />
-          <label class="tab" for="radio-2">近岸演变分析</label>
-          <span class="glider"></span>
+          <el-radio-group v-model="radio1" @change="jump2Model(radio1)">
+            <el-radio-button label="近岸动力评估" value="1" />
+            <el-radio-button label="近岸动力计算" value="2" />
+            <el-radio-button label="近岸演变分析" value="3" />
+          </el-radio-group>
         </div>
       </div>
       <div class="model-pannel">
@@ -22,7 +22,38 @@
               </div>
               <div class="content">
 
-                <el-tabs type="border-card" class="tab-pages" v-model="activeTab">
+                <div class="condition-card">
+                  <div class="set-icon"></div>
+                  <div class="center">
+                    实时评估
+                  </div>
+                  <div class="realtime-water-condition">
+                    <div class="water-condition-item">
+                      <span class="water-condition-title">流量：</span>
+
+                      <el-input v-model="customParams.flow" style="width: 65%; height: 70%;" placeholder="请输入流量" />
+
+                    </div>
+                    <div class="water-condition-item">
+                      <span class="water-condition-title">大潮潮位：</span>
+                      <el-input v-model="customParams.maxTide" style="width: 50%; height: 70%;" placeholder="请输入潮位" />
+                    </div>
+                    <div class="water-condition-item">
+                      <span class="water-condition-title">小潮潮位：</span>
+                      <el-input v-model="customParams.minTide" style="width: 50%; height: 70%;" placeholder="请输入潮位" />
+                    </div>
+                  </div>
+
+                  <button class="realtime-button" @click="updateRealtimeWaterCondition()">
+                    实时水文条件
+                  </button>
+
+                  <button class="condition-button" @click="conditionClickHandler('custom')" :class="{ 'active': true }">
+                    确定
+                  </button>
+                </div>
+
+                <!-- <el-tabs type="border-card" class="tab-pages" v-model="activeTab">
                   <el-tab-pane>
                     <template #label>
                       <span class="custom-tabs-label">
@@ -32,28 +63,6 @@
                         <span>匹配工况</span>
                       </span>
                     </template>
-                    <!-- <div class="condition-card">
-                                            <div class="set-icon"></div>
-                                            <div class="center">
-                                                实时水文条件
-                                            </div>
-                                            <el-table :data="tableData" border style="width: 85%;height: 60%;"
-                                                :scrollbar-always-on="false">
-                                                <el-table-column prop="flow" label="流量" />
-                                                <el-table-column prop="maxTide" label="大潮潮位" />
-                                                <el-table-column prop="minTide" label="小潮潮位" />
-                                            </el-table>
-                                            <div class="last-update-time">
-                                                <div class="water-condition-item">
-                                                    <span class="water-condition-title">上次更新：</span>
-                                                    <span class="water-condition-value">{{ updateTime }}</span>
-                                                </div>
-                                            </div>
-                                            <button class="condition-button" @click="conditionClickHandler('realtime')"
-                                                :class="{ 'active': true }">
-                                                确定
-                                            </button>
-                                        </div> -->
                     <div class="condition-card">
                       <div class="set-icon"></div>
                       <div class="center">
@@ -72,13 +81,6 @@
                           </el-option>
                         </el-select>
                       </div>
-
-                      <!-- <div class="last-update-time">
-                                                <div class="water-condition-item">
-                                                    <span class="water-condition-title">上次更新：</span>
-                                                    <span class="water-condition-value">{{ updateTime }}</span>
-                                                </div>
-                                            </div> -->
                       <button class="condition-button" @click="conditionClickHandler('match')"
                         :class="{ 'active': true }">
                         确定
@@ -91,13 +93,13 @@
                         <el-icon>
                           <Tools />
                         </el-icon>
-                        <span>新建工况</span>
+                        <span>实时评估</span>
                       </span>
                     </template>
                     <div class="condition-card">
                       <div class="set-icon"></div>
                       <div class="center">
-                        新建工况
+                        实时评估
                       </div>
                       <div class="realtime-water-condition">
                         <div class="water-condition-item">
@@ -117,7 +119,7 @@
                       </div>
 
                       <button class="realtime-button" @click="updateRealtimeWaterCondition()">
-                        实时工况
+                        实时水文条件
                       </button>
 
                       <button class="condition-button" @click="conditionClickHandler('custom')"
@@ -127,7 +129,7 @@
                     </div>
                   </el-tab-pane>
 
-                </el-tabs>
+                </el-tabs> -->
               </div>
             </div>
 
@@ -203,9 +205,29 @@
       </div>
     </div>
   </div>
+
+  <el-dialog v-model="pointConfirmShow" title="潮位点绘制确认" width="25vh">
+    <span>确认使用此点位计算潮位</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="pointConfirmShow = false">取消</el-button>
+        <el-button type="primary" @click="pointFeatureConfirmHandler">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <div class="loading-container" v-show="showRunning">
+    <dv-loading class="loading-icon">
+      <div class="loading-message">{{ runningMsg }}</div>
+    </dv-loading>
+  </div>
 </template>
 
 <script setup>
+import MapboxDraw from '@mapbox/mapbox-gl-draw'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import ModelTitleVue from '../ModelTitle.vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
@@ -218,6 +240,7 @@ import FlowFieldLayer from '../../../utils/WebGL/flowFieldLayer'
 import { EulerFlowLayer } from '../../../utils/WebGL/eulerFlowLayer'
 import * as dat from 'dat.gui'
 import { useRouter } from "vue-router";
+import ModelRunner from '../modelRunner'
 import '../../../utils/WebGL/dat_gui_style.css'
 
 
@@ -240,6 +263,8 @@ const updateTime = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 const showFlow = ref(0)
 const modelRunnningStatusDesc = ref('未运行')
 const modelRunnningProgress = ref(0)
+const runningMsg = ref('')
+const showRunning = ref(false)
 const activeTab = ref('0')
 const params = ref({
   flow: null,
@@ -247,44 +272,22 @@ const params = ref({
   minTide: null,
   tideType: null,
 })
-// import ModelTitleVue from "../ModelTitle.vue";
-// import { BorderBox12 as DvBorderBox12 } from "@kjgl77/datav-vue3";
-// import { ref, reactive, onMounted, onUnmounted, computed } from "vue";
-// import { initFineMap } from "../../../utils/mapUtils";
-// import { useMapStore } from "../../../store/mapStore";
-// import { ElNotification } from "element-plus";
-// import axios from "axios";
-// import dayjs from "dayjs";
-// import FlowFieldLayer from "../../../utils/WebGL/flowFieldLayer";
-// import { EulerFlowLayer } from "../../../utils/WebGL/eulerFlowLayer";
-// import * as dat from "dat.gui";
-// import "../../../utils/WebGL/dat_gui_style.css";
+const tidePointFeature = ref(null)
 
-// let globleVariable = reactive({
-//   taskID: null,
-//   caseID: null,
-//   pngPrefix: null,
-//   visualizationJsonUrl: null,
-//   stationBinUrl: null,
-//   uvBinUrls: null,
-//   status: false,
-//   lagrangeLayer: "flowLayer1",
-//   eulerLayer: "flowLayer2",
-// });
-// const mapRef = ref(null);
-const checky1 = ref(true);
-const checky2 = ref(false);
+const pointConfirmShow = ref(false)
 const router = useRouter();
-// const mapStore = useMapStore();
-// const updateTime = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-// const showFlow = ref(0);
-// const modelRunnningStatusDesc = ref("未运行");
-// const modelRunnningProgress = ref(0);
-// const params = ref({
-//   flow: null,
-//   maxTide: null,
-//   minTide: null,
-// });
+const radio1 = ref(1)
+
+const jump2Model = (value) => {
+  console.log(value == '1')
+  const routeMap = {
+    '1': "/modelStore/stabilityAnalysis",
+    '2': "/modelStore/stabilityCalc",
+    '3': "/modelStore/analysisCenter"
+  }
+  routeMap[value] && router.push(routeMap[value])
+}
+
 const customParams = ref({
   flow: null,
   maxTide: null,
@@ -314,7 +317,8 @@ const tideSelected = ref(null)
 const selectableFlowList = [10000, 13000, 16500, 205000, 35000, 45000, 62000, 84000, 10400, 92000].sort((a, b) => a - b)
 const selectableTideList = ['大潮', '中潮', '小潮']
 const runningText = computed(() => {
-  return activeTab.value === '0' ? '匹配' : '运行'
+  // return activeTab.value === '0' ? '匹配' : '运行'
+  return '运行'
 })
 
 
@@ -334,6 +338,10 @@ const conditionClickHandler = (type) => {
   // if (type === 'realtime') {
   //     params.value = tableData.value[0]
   // } 
+  showFlow.value = 0
+  flowLayerControl('lagrange', false)
+  flowLayerControl('euler', false)
+
   if (type === 'match') {
     params.value = {
       flow: flowSelected.value,
@@ -350,7 +358,7 @@ const conditionClickHandler = (type) => {
     ElNotification({
       title: '水文条件配置成功',
       // message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
-      message: `流量：${params.value.flow}，潮型：${params.value.tideType}`,
+      // message: `流量：${params.value.flow}，潮型：${params.value.tideType}`,
       offset: 120,
       type: 'success',
     })
@@ -423,6 +431,60 @@ const runModelClickHandler = async () => {
     }
   }
   Confirm[globleVariable.runningStatus]()
+}
+const pointFeatureConfirmHandler = async () => {
+  pointConfirmShow.value = false
+  console.log('pointFeatureConfirmHandler', tidePointFeature.value)
+  console.log('caseId', globleVariable.caseID)
+  // modelRunnningStatusDesc
+  const pointVelocityModelUrl = '/temp/taskNode/start/numeric/getFlowFieldVelocities'
+  const params = {
+    "case-id": globleVariable.caseID,
+    "sample-point": [
+      {
+        "lng": tidePointFeature.value.geometry.coordinates[0],
+        "lat": tidePointFeature.value.geometry.coordinates[1],
+      }
+    ]
+  }
+  const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
+  const hereTaskId = await pointVelocityMR.modelStart()
+  console.log('hereTaskId', hereTaskId)
+
+  showRunning.value = true
+  runningMsg.value = '正在计算潮位点流速...'
+  console.log('===Interval')
+  let runningInterval = setInterval(async () => {
+    let runningStatus = await pointVelocityMR.getRunningStatus()
+    switch (runningStatus) {
+      case 'RUNNING':
+        break;
+      case 'ERROR':
+        console.log('error')
+        clearInterval(runningInterval)
+        let errorLog = await pointVelocityMR.getErrorLog()
+        ElNotification({
+          title: '计算失败',
+          message: `错误原因:\n` + errorLog,
+          offset: 120,
+          type: 'error',
+        })
+        break;
+      case 'COMPLETE':
+        console.log('complete')
+        clearInterval(runningInterval)
+        ElNotification({
+          title: '计算成功',
+          offset: 120,
+          type: 'success',
+        })
+        let runningResult = await pointVelocityMR.getModelResult()
+        console.log('runningResult ', runningResult)
+        break;
+    }
+
+  }, 1000)
+
 }
 
 
@@ -521,6 +583,44 @@ const modelRunnning = async (type) => {
     }
   }, 1000)
 }
+
+const draw = new MapboxDraw({
+  displayControlsDefault: false,
+  // Select which mapbox-gl-draw control buttons to add to the map.
+  controls: {
+    point: true,
+    trash: true,
+  },
+  styles: [
+    {
+      'id': 'highlight-active-points',
+      'type': 'circle',
+      'filter': ['all',
+        ['==', '$type', 'Point'],
+        ['==', 'meta', 'feature'],
+        ['==', 'active', 'true']],
+      'paint': {
+        'circle-radius': 10,
+        'circle-color': '#ff7707'
+      }
+    },
+    {
+      'id': 'points-are-blue',
+      'type': 'circle',
+      'filter': ['all',
+        ['==', '$type', 'Point'],
+        ['==', 'meta', 'feature'],
+        ['==', 'active', 'false']],
+      'paint': {
+        'circle-radius': 8,
+        'circle-color': '#00006d'
+      }
+    }
+  ]
+  // Set mapbox-gl-draw to draw by default.
+  // The user does not have to click the polygon control button first.
+  // defaultMode: '',
+})
 
 
 
@@ -626,26 +726,29 @@ const updateRealtimeWaterCondition = async () => {
   })
 }
 
-let realtimeWaterConditionIntervalID = null;
 
-const radio2Click = () => {
-  router.push("/modelStore/analysisCenter");
-  checky2.value = true;
-  checky1.value = false;
-};
-const radio1Click = () => {
-  router.push("/modelStore/stabilityAnalysis");
-  checky2.value = true;
-  checky1.value = false;
-};
 
 onMounted(async () => {
   let map = await initFineMap(mapRef.value)
   mapStore.setMap(map)
   mapFlyToRiver(map)
-  // realtimeWaterConditionIntervalID = setInterval(() => {
-  //     updateRealtimeWaterCondition()
-  // }, 1000 * 60 * 5)
+
+  map.addControl(draw)
+  map.on('draw.create', function (e) {
+    console.log(e.features[0])
+    pointConfirmShow.value = true
+    let feature = e.features[0]
+    tidePointFeature.value = feature
+    // line = lineFeature
+    // emit('sectionDraw', line)
+    // paramFill[1] = true
+    // if (paramFill.includes(false)) {
+    //   return
+    // } else {
+    //   // multiIndexStore.updateSectionStatus(1)
+    //   calcEnable.value = true
+    // }
+  })
 
 })
 
@@ -658,11 +761,38 @@ onUnmounted(() => {
     useMapStore().getMap().remove()
     useMapStore().destroyMap()
   }
-  clearInterval(realtimeWaterConditionIntervalID)
 })
 </script>
 
 <style lang="scss" scoped>
+div.loading-container {
+  position: absolute;
+  top: 14vh;
+  right: 44vw;
+  width: 8vw;
+  height: 12vh;
+  background-color: rgba(255, 255, 255, 0.671);
+  border-radius: 5px;
+  backdrop-filter: blur(5px);
+  z-index: 5;
+
+  :deep(.dv-loading.loading-icon) {
+    position: absolute;
+  }
+
+  div.loading-message {
+    text-align: center;
+    position: relative;
+    margin-top: 1vh;
+    width: 6vw;
+    height: 6vh;
+    color: #000357;
+    // top: 7.3vh;
+    font-size: calc(0.6vw + 0.8vh);
+    font-weight: 800;
+  }
+}
+
 div.stability-analysis {
   position: absolute;
   width: 100vw;
@@ -745,7 +875,7 @@ div.stability-analysis {
 
       div.basemap-radio-container {
         z-index: 1;
-        width: 14vw;
+        width: 20vw;
         height: 4vh;
         display: flex;
         flex-flow: row nowrap;
@@ -897,163 +1027,151 @@ div.stability-analysis {
           flex: 1;
 
           div.content {
-            .tab-pages {
-              height: 100%;
+
+            .condition-card {
+              position: relative;
               width: 100%;
+              height: 16vh;
+              margin-top: .5vh;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-evenly;
+              // align-items: center;
+              border-radius: calc(0.1vh);
+              background-color: #fff;
+              // box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+              // margin-right: 2vw;
+              // margin-left: 2vw;
+              border: 1px solid rgba(150, 150, 150, 0.308);
 
-              .custom-tabs-label {
-                vertical-align: middle;
+              .set-icon {
+                position: absolute;
+                right: 0.2vw;
+                top: 0.5vh;
+                width: 4.5vh;
+                height: 4.5vh;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-image: url("/set.png");
+              }
 
-                .el-icon {
-                  vertical-align: middle;
-                }
+              .center {
+                position: relative;
+                height: 35%;
+                // background-color: red;
+                width: 100%;
+                color: #055279;
+                font-weight: 800;
+                font-size: calc(0.8vw + 0.7vh);
+                padding-left: 0.4vw;
+                padding-top: 0.5vh;
+              }
 
-                span {
-                  margin-left: 0.2vw;
-                  vertical-align: middle;
+              .realtime-water-condition {
+                position: relative;
+                height: 100%;
+                width: 80%;
+                padding-left: 0.5vw;
+                font-size: calc(0.45vw + 0.4vh);
+
+                .water-condition-item {
+                  position: relative;
+                  width: 85%;
+                  height: 3.2vh;
+
+                  .water-condition-title {
+                    line-height: 3.2vh;
+                    font-weight: 800;
+                    font-size: calc(0.5vw + 0.6vh);
+                  }
+
+                  .water-condition-value {
+                    margin-right: 1vw;
+                    font-size: calc(0.5vw + 0.4vh);
+                  }
+
+                  input.water-condition-input {
+                    width: 50%;
+                  }
                 }
               }
 
-              .condition-card {
+              .last-update-time {
                 position: relative;
+                height: 40%;
                 width: 100%;
-                height: 14vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-evenly;
-                // align-items: center;
-                border-radius: calc(0.4vw + 0.4vh);
-                // box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-                // margin-right: 2vw;
-                // margin-left: 2vw;
+                padding-left: 0.5vw;
 
-                .set-icon {
-                  position: absolute;
-                  right: 0.2vw;
-                  top: 0.5vh;
-                  width: 4.5vh;
-                  height: 4.5vh;
-                  background-size: contain;
-                  background-repeat: no-repeat;
-                  background-image: url("/set.png");
-                }
-
-                .center {
+                .water-condition-item {
                   position: relative;
-                  height: 35%;
-                  // background-color: red;
-                  width: 100%;
-                  color: #055279;
-                  font-weight: 800;
-                  font-size: calc(0.8vw + 0.7vh);
-                  padding-left: 0.4vw;
-                  padding-top: 0.5vh;
-                }
+                  width: 85%;
+                  height: 3.5vh;
 
-                .realtime-water-condition {
-                  position: relative;
-                  height: 100%;
-                  width: 80%;
-                  padding-left: 0.5vw;
-                  font-size: calc(0.45vw + 0.4vh);
+                  .water-condition-title {
+                    line-height: 3.5vh;
+                    font-weight: 800;
+                    font-size: calc(0.5vw + 0.6vh);
+                  }
 
-                  .water-condition-item {
-                    position: relative;
-                    width: 85%;
-                    height: 3.2vh;
-
-                    .water-condition-title {
-                      line-height: 3.2vh;
-                      font-weight: 800;
-                      font-size: calc(0.5vw + 0.6vh);
-                    }
-
-                    .water-condition-value {
-                      margin-right: 1vw;
-                      font-size: calc(0.5vw + 0.4vh);
-                    }
-
-                    input.water-condition-input {
-                      width: 50%;
-                    }
+                  .water-condition-value {
+                    margin-right: 1vw;
+                    font-size: calc(0.4vw + 0.4vh);
                   }
                 }
+              }
 
-                .last-update-time {
-                  position: relative;
-                  height: 40%;
-                  width: 100%;
-                  padding-left: 0.5vw;
+              button.realtime-button {
+                position: absolute;
+                right: 3.5vw;
+                top: 0.5vh;
+                width: 4。2vw;
+                height: 3vh;
+                background: #6aa8f8d0;
+                color: #fff;
+                font-family: inherit;
+                font-weight: 900;
+                font-size: calc(0.4vw + 0.3vh);
+                border: 1px solid rgb(3, 107, 167);
+                border-radius: 0.4em;
+                box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+                cursor: pointer;
+                transition: 0.3s linear;
 
-                  .water-condition-item {
-                    position: relative;
-                    width: 85%;
-                    height: 3.5vh;
-
-                    .water-condition-title {
-                      line-height: 3.5vh;
-                      font-weight: 800;
-                      font-size: calc(0.5vw + 0.6vh);
-                    }
-
-                    .water-condition-value {
-                      margin-right: 1vw;
-                      font-size: calc(0.4vw + 0.4vh);
-                    }
-                  }
-                }
-                button.realtime-button{
-                  position: absolute;
-                  right: 3.5vw;
-                  top: 0.5vh;
-                  width: 3.5vw;
-                  height: 3vh;
-                  background: #5e86b9d0;
-                  color: #fff;
-                  font-family: inherit;
-                  font-weight: 900;
-                  font-size: calc(0.3vw + 0.7vh);
-                  border: 1px solid rgb(3, 107, 167);
-                  border-radius: 0.4em;
-                  box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
-                  cursor: pointer;
-                  transition: 0.3s linear;
-
-                  &:active {
-                    scale: 1.01;
-                    background: #348cffd0;
-                  }
-                  
-                  &:hover {
-                    scale: 1.01;
-                    background: #348cffd0;
-                  }
+                &:active {
+                  scale: 1.01;
+                  background: #348cffd0;
                 }
 
-                button.condition-button {
-                  position: absolute;
-                  right: 0.8vw;
-                  bottom: 0.5vh;
-                  width: 3vw;
-                  height: 3vh;
-                  background: #0254bed0;
-                  color: #fff;
-                  font-family: inherit;
-                  font-weight: 900;
-                  font-size: calc(0.3vw + 0.7vh);
-                  border: 1px solid rgb(3, 107, 167);
-                  border-radius: 0.4em;
-                  box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
-                  cursor: pointer;
-                  transition: 0.3s linear;
+                &:hover {
+                  scale: 1.01;
+                  background: #348cffd0;
+                }
+              }
 
-                  &:active {
-                    scale: 1.01;
-                  }
-                  &:hover {
-                    scale: 1.01;
-                    background: #348cffd0;
-                  }
+              button.condition-button {
+                position: absolute;
+                right: 0.8vw;
+                bottom: 0.5vh;
+                width: 3vw;
+                height: 3vh;
+                background: #0254bed0;
+                color: #fff;
+                font-family: inherit;
+                font-weight: 900;
+                font-size: calc(0.3vw + 0.7vh);
+                border: 1px solid rgb(3, 107, 167);
+                border-radius: 0.4em;
+                box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+                cursor: pointer;
+                transition: 0.3s linear;
+
+                &:active {
+                  scale: 1.01;
+                }
+
+                &:hover {
+                  scale: 1.01;
+                  background: #348cffd0;
                 }
               }
             }

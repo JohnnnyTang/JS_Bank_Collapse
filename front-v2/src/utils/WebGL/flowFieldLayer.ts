@@ -32,7 +32,7 @@ class JsonFileParser {
     async Parsing() {
         await axios.get(this.url)
             .then((response) => {
-
+                console.log("parsing!!!  ", this.url)
                 for (let item of response.data['flow_fields']) {
                     this.flowFieldResourceArr.push(item);
                 }

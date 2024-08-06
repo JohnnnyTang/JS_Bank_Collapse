@@ -263,9 +263,11 @@ const initFineMap = (ref) => {
                 'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
             // style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
             style: getHighZoomStyleJson(),
-            center: [120.312, 31.917], // starting position [lng, lat]
+            // center: [120.312, 31.917], // starting position [lng, lat]
+            bounds: [[120.45997922676836, 32.00001616423072],
+            [120.60909640208264, 32.084171362618625],],
             maxZoom: 22,
-            zoom: 8,
+            // zoom: 8,
             projection: 'mercator',
             antialias: true,
             useWebGL2: true,

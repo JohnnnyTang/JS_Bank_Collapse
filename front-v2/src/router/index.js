@@ -85,7 +85,7 @@ const routes = [
             },
             {
                 path: 'soilAnalysis',
-                component: () => import('../components/modelStore/views/SoilAnalysis4.vue'),
+                component: () => import('../components/modelStore/views/SoilAnalysis5.vue'),
             },
             {
                 path: 'stabilityAnalysis2',
@@ -100,6 +100,10 @@ const routes = [
                 component: () => import('../components/modelStore/views/StabilityAnalysis3.vue'),
             },
             {
+                path: 'stabilityCalc',
+                component: () => import('../components/modelStore/views/StabilityCalc.vue'),
+            },
+            {
                 path: 'riskWarning',
                 component: () => import('../components/modelStore/views/RiskWarning.vue'),
             },
@@ -107,7 +111,7 @@ const routes = [
                 path: 'numericalModel',
                 component: () => import('../components/modelStore/views/NumericalModel.vue'),
             }
-            
+
         ]
     },
     {
@@ -124,7 +128,7 @@ const routes = [
                 component: () => import('../components/bankManage/BankBasicInfo.vue')
             },
             {
-                path: 'monitor/:id', // 默认子页面
+                path: '/bankManage/monitor/:id', // 默认子页面
                 component: () => import('../components/bankManage/BankMonitorInfo.vue')
             },
             {

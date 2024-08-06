@@ -23,6 +23,7 @@ export const extendFetch = async (url, option, timeout = 3000, retry = 3) => {
         response = await fetch(url, {
             ...option,
             signal: abortController.signal,
+            'token': localStorage.getItem('token'),
         })
             .then((res) => {
                 return res

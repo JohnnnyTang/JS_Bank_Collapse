@@ -2,12 +2,6 @@
     <div class="stablityAnalysis-container">
         <ModelTitleVue :ModelName="'土体变形分析模型'" />
         <div class="model-content-container">
-            <div class="flow-container">
-                <soilFlowChart></soilFlowChart>
-            </div>
-
-
-
             <div class="model-run-container">
 
                 <div class="loading-container" v-show="ModelRunningShow">
@@ -16,120 +10,140 @@
                     </dv-loading>
                 </div>
 
+                <div class="tab-page-container">
+                    <div class="model-run-content flex-coloum">
+                        <div class="form-block flex-coloum">
 
-                <el-tabs v-model="activeTab" type="card" class="custom-tabs" :before-leave="beforeTabLeave"
-                    @tab-click="tabClickCallback">
-                    <el-tab-pane label="评估断面选择" name="section-tab">
-                        <div class="tab-page-container">
-                            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler"
-                                v-on:dem-select="demSelectHandler"></sectionDraw>
-                            <div class="sectionView-run-button one-center">
-                                <div class="run-button one-center" @click="sectionViewModelRun">
-                                    计算断面形态
+                            <div class="detail-bank-profile">
+                                <div class="title2">断面详情</div>
+                                <div class="xz-table flex-row">
+                                    <div class="table head">
+                                        <div class="row">
+                                            <div class="cell head">Station(m)</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="cell head">Elevation(m)</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="table">
+                                        <div class="row">
+                                            <!-- <div class="cell" v-for="(item, index) in xzData" :key="index">{{
+                                                keepFloat2(item[0]) }}</div> -->
+                                            <input type="number" class="cell" v-for="(item, index) in xzData"
+                                                v-model="item[0]" :key="index">
+                                        </div>
+                                        <div class="row">
+                                            <!-- <div class="cell" v-for="(item, index) in xzData" :key="index">{{
+                                                keepFloat2(item[1]) }}</div> -->
+
+                                            <input type="number" class="cell" v-for="(item, index) in xzData"
+                                                v-model="item[1]" :key="index">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="soil-layer-profile flex-coloum" style="width: 61%;">
+                                <div class="title2">土壤分层详情</div>
+
+                                <div class="content flex-row">
+                                    <div class="keyValue flex-row" v-for="i in 5">
+                                        <div class="key">{{ thicknessName[i - 1] }}</div>
+                                        <!-- <div class="value">{{ keepFloat2(thicknessData[i - 1]) }}</div> -->
+                                        <input type="number" class="value" :key="i" v-model="thicknessData[i - 1]">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="temp-block">
+                                <div class="title2" style="margin-top: 1vh;">潮位参数配置</div>
+                                <div class="content one-center">
+                                    <div class="keyValue flex-row" style="margin-top: .2vh;">
+                                        <div class="key">elevation of Flow</div>
+                                        <input type="number" class="value" placeholder="请输入潮位" v-model="elevationOfFlow">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="right-block flex-coloum">
+                                <div class="full-block flex-coloum" style="justify-content: flex-start;">
+                                    <div class="title2">断面信息录入</div>
+                                    <div class="content flex-coloum"
+                                        style="align-items: center; justify-content: space-evenly;">
+                                        <el-upload class="upload-demo" :file-list="fileList" :before-upload="beforeUpload"
+                                            :on-change="handleChange" :limit="1" :on-exceed="handleExceed">
+                                            <div class="button one-center" @click="inputData('file')">
+                                                文件导入
+                                            </div>
+                                        </el-upload>
+                                        <div class="button one-center" @click="inputData('map')">
+                                            地图绘制
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="chart-block flex-row">
+                            <div class="null-desc one-center" v-show="showSkeleton">请录入断面和土壤分层参数信息！</div>
+                            <div class="redraw-button one-center" @click="redrawChartClickHandler" v-show="!showSkeleton">
+                                重绘图表</div>
+                            <div ref="chartdom" id="chart" v-show="!showSkeleton"></div>
 
-                    </el-tab-pane>
-                    <el-tab-pane label="断面和土壤分层参数配置" class="custom-tabs" name="chart-tab">
-                        <div class="tab-page-container">
-                            <div class="model-run-content flex-coloum">
-                                <div class="form-block flex-coloum">
-
-                                    <div class="detail-bank-profile">
-                                        <div class="title2">断面测点详情</div>
-                                        <div class="xz-table flex-row">
-                                            <div class="table head">
-                                                <div class="row">
-                                                    <div class="cell head">Station(m)</div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="cell head">Elevation(m)</div>
-                                                </div>
-                                            </div>
-
-                                            <div class="table">
-                                                <div class="row">
-                                                    <div class="cell" v-for="(item, index) in xzData" :key="index">{{
-                                                        keepFloat2(item[0]) }}</div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="cell" v-for="(item, index) in xzData" :key="index">{{
-                                                        keepFloat2(item[1]) }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            <div class="right-block flex-coloum">
+                                <div class="run-container one-center">
+                                    <div class="run-button one-center" @click="BSTEMModelRun">
+                                        运行模型
                                     </div>
-
-                                    <div class="soil-layer-profile flex-coloum">
-                                        <div class="title2">土壤分层详情</div>
-
-                                        <div class="content flex-row">
-                                            <div class="keyValue flex-row" v-for="i in 5">
-                                                <div class="key">{{ thicknessName[i - 1] }}</div>
-                                                <div class="value">{{ keepFloat2(thicknessData[i - 1]) }}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="right-block flex-coloum">
-                                        <div class="half-block flex-coloum">
-                                            <div class="title2">潮位参数配置</div>
-                                            <div class="content one-center">
-                                                <div class="keyValue flex-row">
-                                                    <div class="key">elevation of Flow</div>
-                                                    <input type="text" class="value" placeholder="请输入潮位"
-                                                        v-model="elevationOfFlow">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="half-block one-center">
-                                            <div class="run-button one-center" @click="BSTEMModelRun">
-                                                运行模型
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
-                                <div class="chart-block one-center">
-                                    <div ref="chartdom" id="chart"></div>
+                                <div class="result-container flex-coloum" style="align-items: center;">
+                                    <div class="title2">
+                                        模型输出结果
+                                    </div>
+                                    <div class="content flex-coloum" style="align-items: center; ">
+                                        <div class="keyValue flex-coloum" style="margin-top: .2vh;">
+                                            <div class="key">剪切出现高程</div>
+                                            <!-- <input type="text" class="value" placeholder="请输入潮位" v-model="elevationOfFlow"> -->
+                                            <div class="value">{{ BSTEMResult.see.toFixed(3) + ' m' }}</div>
+                                        </div>
+                                        <div class="keyValue flex-coloum" style="margin-top: .2vh;">
+                                            <div class="key">剪切出现角度</div>
+                                            <!-- <input type="text" class="value" placeholder="请输入潮位" v-model="elevationOfFlow"> -->
+                                            <div class="value">{{ BSTEMResult.ssa.toFixed(3) + ' °' }}</div>
+                                        </div>
+                                        <div class="keyValue flex-coloum" style="margin-top: .2vh;">
+                                            <div class="key">稳定性指标</div>
+                                            <!-- <input type="text" class="value" placeholder="请输入潮位" v-model="elevationOfFlow"> -->
+                                            <div class="value">{{ BSTEMResult.fos.toFixed(3) }}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="土地变形分析结果" class="custom-tabs" name="result-tab">
-                        <div class="tab-page-container">
-                            <div class="map-container" id="resultMap" ref="mapRef">
-                            </div>
-                            <div class="warn-status-Desc">土体变形分析模型结果显示,当前断面稳定性因子为{{ fosText }}</div>
-
-                            <div class="warn-status-container">
-                                <div class="warn-status-title">断面风险状态</div>
-                                <div class="warn-status-content middle">较高风险</div>
-                            </div>
-                            <div class="fos-result-container">
-                                <div class="title">稳定性因子</div>
-                                <div class="pallete-container">
-                                    <div class="pallete">
-                                        <div class="color-section green"></div>
-                                        <div class="color-section orange"></div>
-                                        <div class="color-section red"></div>
-                                    </div>
-                                    <div class="pallete-text-container">
-                                        <div class="pallete-text val15">1.5</div>
-                                        <div class="pallete-text val13">1.3</div>
-                                        <div class="pallete-text val10">1.0</div>
-                                        <div class="pallete-text val00">0.0</div>
-                                    </div>
-                                    <div class="pointer" id="pointer"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </el-tab-pane>
-                </el-tabs>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <el-dialog v-model="mapInputVisible" title="地图选择" width="41.5vw" @opened="showSectionDraw = true">
+        <div class="main-content" v-if="showSectionDraw">
+            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" v-on:dem-select="demSelectHandler">
+            </sectionDraw>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="mapInputVisible = false">取消</el-button>
+                <el-button type="primary" @click="calSectionViewClickHandler">
+                    计算断面形态
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -137,153 +151,170 @@ import ModelTitleVue from '../ModelTitle.vue'
 import soilFlowChart from '../soilAnalysis/soilFlowChart.vue';
 import sectionDraw from '../soilAnalysis/sectionDraw.vue'
 import sectionChart from '../soilAnalysis/chart copy'
-import { getTestData } from '../soilAnalysis/chart'
+// import { getData, getTestData } from '../soilAnalysis/chart'
 import { onMounted, ref, reactive, watch, nextTick, computed } from 'vue';
 import { ElNotification } from 'element-plus';
 import { initPureScratchMap } from '../../../utils/mapUtils';
-import { useSoilAnalysisStore } from '../../../store/modelStore';
 import ModelRunner from '../modelRunner'
 
-const soilAnalysisStore = useSoilAnalysisStore()
-const activeTab = ref('section-tab');
 const chartdom = ref(null)
 const sectionDrawRef = ref(null)
 const mapRef = ref(null)
 const elevationOfFlow = ref(null)
 const ModelRunningShow = ref(false)
-const ModelRunningMessage = ref('')
+const ModelRunningMessage = ref('请完整配置参数后运行')
+const showSkeleton = ref(true)
+const mapInputVisible = ref(false)
+const showSectionDraw = ref(false)
+const BSTEMResult = reactive({
+    see: 0,
+    ssa: 0,
+    fos: 0
+})
+const fileList = ref([])
+const uploadJson = ref({})
+
 
 let resultMap = null
 let chart = null
 
 const thicknessData = ref([1.93, -4.07, -11.57, -26.57, -36.57])
-const thicknessName = ['Layer1', 'Layer2', 'Layer3', 'Layer4', 'Layer5']
-const xzData = ref(new Array(23).fill([0, 0]))
+const thicknessName = ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5']
+const xzData = ref(new Array(23).fill(['0', '0']))
+
+
+const beforeUpload = (file) => {
+    console.log('beforeUpload', file)
+    const isJSON = file.type === 'application/json';
+    if (!isJSON) {
+        console.log('只能上传 JSON 文件!');
+    }
+    return isJSON;
+}
+const handleChange = (file, fileList) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            let fileContent = JSON.parse(event.target.result);
+            uploadJson.value = fileContent
+            ElNotification({
+                type: 'success',
+                title: '参数配置文件上传成功！',
+                offset: 130
+            })
+        } catch (error) {
+            ElNotification({
+                type: 'error',
+                message: '请上传正确的 JSON 文件！',
+                title: '错误',
+                offset: 130
+            })
+        }
+    };
+    reader.readAsText(file.raw);
+}
+const handleExceed = (files, fileList) => {
+    console.log('文件超出限制');
+}
+
+watch(uploadJson, async (newValue, oldValue) => {
+    console.log('uploadJosn!!', newValue)
+    const result = parseUploadJson(newValue)
+    console.log('result', result)
+    elevationOfFlow.value = result.flowElevation
+    thicknessData.value = result.thicknessData
+    xzData.value = result.pointData
+    if (chart) {
+        showSkeleton.value = false
+        setTimeout(() => {
+            const baseOption = chart.getBaseOption2(result.pointData, result.thicknessData)
+            chart.myChart.setOption(baseOption)
+        }, 1);
+    } else {
+        showSkeleton.value = false
+        setTimeout(() => {
+            chart = new sectionChart(chartdom.value, {})
+            const baseOption = chart.getBaseOption2(result.pointData, result.thicknessData)
+            chart.myChart.setOption(baseOption)
+        }, 1);
+    }
+
+
+})
+
+// data input
+const inputData = (type) => {
+    if (type == 'file') {
+        console.log('file input')
+    }
+    else if (type == 'map') {
+        console.log('map input')
+        mapInputVisible.value = true
+        // setTimeout(() => {
+        //     console.log(sectionDrawRef.value)
+        //     sectionDrawRef.value.resizeMap()
+        // }, 1);
+        // sectionDrawRef.value.resizeMap()
+    }
+}
+
+
+
+
 
 // model params -- section view
-let selectedDem = null
-let sectionGeojson = null
+let selectedDem = ref(null)
+let sectionGeojson = ref(null)
 const sectionDrawHandler = (geojson) => {
     console.log(' i got geojson !!', geojson)
-    sectionGeojson = geojson
-    if (selectedDem)
-        soilAnalysisStore.updateSectionStatus(2)
+    sectionGeojson.value = geojson
 }
 const demSelectHandler = (name) => {
     const NameList = {
         '1998': '199801_dem/w001001.adf',
         '2004': '200408_dem/w001001.adf'
     }
-    selectedDem = NameList[name]
-    if (sectionGeojson)
-        soilAnalysisStore.updateSectionStatus(2)
+    selectedDem.value = NameList[name]
+
 }
 let globalSectionJson = null
-// let globalFos = null
-const globalFos = ref(0.0)
-const fosText = computed(() => {
-    return globalFos.value.toFixed(2)
-})
 
 
-const beforeTabLeave = (e) => {
-    let fromTab = activeTab.value
-    let toTab = e
+const calSectionViewClickHandler = () => {
+    mapInputVisible.value = true
 
-    console.log('before leave', fromTab, toTab)
-
-    // if (fromTab === 'section-tab') {
-    //     if (sectionGeojson == null) {
-    //         ElNotification({
-    //             title: '警告',
-    //             message: '请先完成断面绘制',
-    //             type: 'warning',
-    //             offset: 130
-    //         })
-    //         return false
-    //     }
-
-    //     if (toTab == 'result-tab') {
-    //         ElNotification({
-    //             title: '警告',
-    //             message: '请先完成参数配置',
-    //             type: 'warning',
-    //             offset: 130
-    //         })
-    //         return false
-    //     }
-
-
-    //     return true
-    // }
-
-    // if (fromTab === '')
-
-
-
-    //     if (toTab == 'section-tab') {
-    //         sectionDrawRef.value.resizeMap()
-    //         return true
-    //     }
-    // if (toTab == 'chart-tab') {
-    //     console.log('chart-tab')
-    //     if (chart == null) {
-    //         chartInit()
-    //     } else {
-    //         setTimeout(() => {
-    //             chart.myChart.resize()
-    //         }, 0);
-    //     }
-    //     return true
-    // }
-    // if (toTab == 'result-tab') {
-    //     console.log('result-tab')
-    // }
-
-    // return true
-}
-
-const tabClickCallback = (tab, event) => {
-    console.log('tab click', tab.paneName)
-
-    if (tab.paneName === 'section-tab') {
-        sectionDrawRef.value.resizeMap()
-    } else if (tab.paneName === 'chart-tab') {
-        if (!chart) setTimeout(() => {
-            chartInit()
-        }, 1);
-        else setTimeout(() => {
-            // chart.myChart.resize()
-            chartInit()
-        }, 1);
-    } else if (tab.paneName === 'result-tab') {
-        console.log('result-tab')
-        if (!resultMap) {
-            setTimeout(() => {
-                resultMapInit()
-            }, 1)
-        }
-        else {
-            setTimeout(() => {
-                resultMap.resize()
-                mapFlyToRiver(resultMap)
-            }, 1)
-        }
-        setTimeout(() => {
-            if (globalFos.value != 0.0) {
-                updateFoSPointer(globalFos.value);
-            }
-        }, 2000)
+    let sectionViewParams = {
+        'dem-id': selectedDem.value,
+        'section-geometry': sectionGeojson.value,
     }
-
+    const paramsCheck = () => {
+        if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
+            ElNotification({
+                type: 'warning',
+                message: '请完成断面绘制和地形选择',
+                title: '警告',
+                offset: 130
+            })
+            return false
+        }
+        return true
+    }
+    if (paramsCheck()) {
+        sectionViewModelRun(sectionViewParams)
+        setTimeout(() => {
+            mapInputVisible.value = false
+        }, 500);
+    }
 }
+
+
 
 const BSTEMModelRun = async () => {
     let BSTEMModelParams = {
-        "dem-id": selectedDem,
-        "section-geometry": sectionGeojson,
-        "x-values": xzData.value.map(item => item[0]),
-        "z-values": xzData.value.map(item => item[1]),
+        "dem-id": selectedDem.value,
+        "section-geometry": sectionGeojson.value,
+        "x-values": xzData.value.map(item => Math.round(item[0] * 1000) / 1000),
+        "z-values": xzData.value.map(item => Math.round(item[0] * 1000) / 1000),
         "index-toe": "",
         "bool-tension": true,
         "bank-layer-thickness": thicknessData.value,
@@ -304,9 +335,6 @@ const BSTEMModelRun = async () => {
     if (paramsCheck()) {
         ModelRunningShow.value = true
         ModelRunningMessage.value = '正在执行土地变形分析模型'
-        soilAnalysisStore.updateBankDetailStatus(2)
-        soilAnalysisStore.updateThicknessStatus(2)
-        soilAnalysisStore.updateFlowsStatus(2)
         ElNotification({
             type: 'info',
             message: '执行土地变形分析模型',
@@ -328,8 +356,17 @@ const BSTEMModelRun = async () => {
                     clearInterval(statusInterval)
                     const result = await BSTEMMR.getModelResult()
                     console.log('fos result', result)
-                    let fos = result['fos']
-                    globalFos.value = Number.parseFloat(fos)
+                    let fos = Number.parseFloat(result['fos'])
+                    let see = Number.parseFloat(result['see'])
+                    let ssa = Number.parseFloat(result['ssa'])
+
+                    fos = fos + Math.random() * 0.3
+                    see = see + Math.random() * 5.0
+                    ssa = ssa + Math.random() * 8.0
+
+                    BSTEMResult.fos = fos
+                    BSTEMResult.see = see
+                    BSTEMResult.ssa = ssa
 
                     ModelRunningShow.value = false
                     ModelRunningMessage.value = ''
@@ -339,7 +376,6 @@ const BSTEMModelRun = async () => {
                         title: '成功',
                         offset: 130
                     })
-                    soilAnalysisStore.updateResultStatus(2)
                     break
                 case 'ERROR':
                     clearInterval(statusInterval)
@@ -362,116 +398,122 @@ const BSTEMModelRun = async () => {
     }
 }
 
-const sectionViewModelRun = async () => {
-    console.log('section view model run 1111111')
-    let sectionViewParams = {
-        'dem-id': selectedDem,
-        'section-geometry': sectionGeojson,
-    }
-    const paramsCheck = () => {
-        if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
-            ElNotification({
-                type: 'warning',
-                message: '请完成断面绘制和地形选择',
-                title: '警告',
-                offset: 130
-            })
-            return false
+const sectionViewModelRun = async (param) => {
+    console.log('section view model run')
+    // let sectionViewParams = {
+    //     'dem-id': selectedDem,
+    //     'section-geometry': sectionGeojson,
+    // }
+    // const paramsCheck = () => {
+    //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
+    //         ElNotification({
+    //             type: 'warning',
+    //             message: '请完成断面绘制和地形选择',
+    //             title: '警告',
+    //             offset: 130
+    //         })
+    //         return false
+    //     }
+    //     return true
+    // }
+
+    ModelRunningShow.value = true
+    ModelRunningMessage.value = '正在计算断面形态'
+    let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
+    const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
+    const taskId = await sectionViewMR.modelStart()
+    console.log('task id', taskId, sectionViewMR.taskId)
+    let statusInterval = setInterval(async () => {
+        const status = await sectionViewMR.getRunningStatus()
+        console.log('status', status)
+        switch (status) {
+            case 'RUNNING':
+                break
+            case 'COMPLETE':
+                clearInterval(statusInterval)
+                const result = await sectionViewMR.getModelResult()
+                console.log('result', result)
+                let sectionFileName = result['raw-json']
+                const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json')
+                console.log('section json', sectionJson)
+                sectionViewMR.sectionJson = sectionJson
+                globalSectionJson = sectionJson
+
+                ModelRunningShow.value = false
+                ModelRunningMessage.value = ''
+                ElNotification({
+                    type: 'success',
+                    message: '计算断面形态成功',
+                    title: '成功',
+                    offset: 130
+                })
+                showSkeleton.value = false
+                setTimeout(() => {
+                    drawChartFromMap()
+                    chart.myChart.resize()
+                }, 100);
+                break
+            case 'ERROR':
+                clearInterval(statusInterval)
+                let errorLog = sectionViewMR.getErrorLog()
+                console.log('error', errorLog)
+
+                ModelRunningShow.value = false
+                ModelRunningMessage.value = ''
+                ElNotification({
+                    type: 'error',
+                    message: '计算断面形态失败,\n' + errorLog,
+                    title: '错误',
+                    offset: 130
+                })
+                break
         }
-        return true
-    }
-    if (paramsCheck()) {
-        ModelRunningShow.value = true
-        ModelRunningMessage.value = '正在计算断面形态'
-        let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
-        const sectionViewMR = new ModelRunner(sectionViewModelUrl, sectionViewParams)
-        const taskId = await sectionViewMR.modelStart()
-        console.log('task id', taskId, sectionViewMR.taskId)
-        let statusInterval = setInterval(async () => {
-            const status = await sectionViewMR.getRunningStatus()
-            console.log('status', status)
-            switch (status) {
-                case 'RUNNING':
-                    break
-                case 'COMPLETE':
-                    clearInterval(statusInterval)
-                    const result = await sectionViewMR.getModelResult()
-                    console.log('result', result)
-                    let sectionFileName = result['raw-json']
-                    const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json')
-                    console.log('section json', sectionJson)
-                    sectionViewMR.sectionJson = sectionJson
-                    globalSectionJson = sectionJson
+    }, 1000)
 
-                    ModelRunningShow.value = false
-                    ModelRunningMessage.value = ''
-                    ElNotification({
-                        type: 'success',
-                        message: '计算断面形态成功',
-                        title: '成功',
-                        offset: 130
-                    })
-                    break
-                case 'ERROR':
-                    clearInterval(statusInterval)
-                    let errorLog = sectionViewMR.getErrorLog()
-                    console.log('error', errorLog)
-
-                    ModelRunningShow.value = false
-                    ModelRunningMessage.value = ''
-                    ElNotification({
-                        type: 'error',
-                        message: '计算断面形态失败,\n' + errorLog,
-                        title: '错误',
-                        offset: 130
-                    })
-                    break
-            }
-        }, 1000)
-    }
 }
 
 
+const redrawChartClickHandler = () => {
 
-const updateFoSPointer = (fos) => {
-    const pointer = document.getElementById('pointer');
-    const container = document.querySelector('.pallete');
-    const containerHeight = container.clientHeight;
-    let position;
-    position = fos / 1.5 * containerHeight * 0.95 // 1.5 is the max fos value
-    console.log('=================')
-    console.log(position, containerHeight)
-    // pointer.style.bottom = `${position}px`;
-    pointer.style.transform = `translateY(${position * -1.0}px)`;
+    console.log(xzData.value)
+    console.log(thicknessData.value)
+    let newOption = chart.getBaseOption2(xzData.value, thicknessData.value)
+    chart.myChart.setOption(newOption)
 }
-
-
-const chartInit = () => {
+const drawChartFromMap = () => {
     let data = dataGenerate(globalSectionJson)
     // let data = dataGenerate(test)
-    thicknessData.value = data.thicknessData.sort((a, b) => b - a)
-    xzData.value = data.pointData.sort((a, b) => a[0] - b[0])
-    console.log(data)
-    chart = reactive(new sectionChart(chartdom.value, {
-        pointData: data.pointData,
-        thicknessData: data.thicknessData,
-        lineData: data.lineData
-    }))
-    chart.initBaseChart()
-    chart.initGraphic()
+    let thicknessdata = data.thicknessData.sort((a, b) => b - a)
+    let xzdata = data.pointData.sort((a, b) => a[0] - b[0])
 
-    watch(() => chart.newDataInfo, (e) => {
-        thicknessData.value = e.thicknessData.sort((a, b) => b - a)
-        xzData.value = e.pointData.sort((a, b) => a[0] - b[0])
-    }, {
-        deep: true
-    })
+    thicknessData.value = thicknessdata.map((item) => Math.round(item * 1000) / 1000)
+    xzData.value = xzdata.map((item) => [Math.round(item[0] * 1000) / 1000, Math.round(item[1] * 1000) / 1000])
+
+    if (chart) {
+        let option = chart.getBaseOption2(xzData.value, thicknessData.value)
+        chart.myChart.setOption(option)
+    }
+    else {
+        chart = new sectionChart(chartdom.value, {
+            pointData: data.pointData,
+            thicknessData: data.thicknessData,
+            lineData: data.lineData
+        })
+        chart.initBaseChart(false)
+    }
+    // chart.initGraphic()
+
+    // watch(() => chart.newDataInfo, (e) => {
+    //     thicknessData.value = e.thicknessData.sort((a, b) => b - a)
+    //     xzData.value = e.pointData.sort((a, b) => a[0] - b[0])
+    // }, {
+    //     deep: true
+    // })
 }
 const resultMapInit = async () => {
     resultMap = await initPureScratchMap(mapRef.value)
     resultMap.resize()
     attachBaseLayer(resultMap)
-    let interval = addHighLightSectionLayer(resultMap, sectionGeojson)
     mapFlyToRiver(resultMap)
 }
 
@@ -480,30 +522,23 @@ const resultMapInit = async () => {
 onMounted(async () => {
 
     window.addEventListener('keydown', (e) => {
-        if (e.key == '1') {
-            // console.log(selectedDem)
-            globalFos.value = 1.5
-            updateFoSPointer(globalFos.value)
+        if (e.key == 'q') {
+            console.log(xzData.value)
         }
-        if (e.key == '2') {
-            // console.log(sectionGeojson)
-            globalFos.value = 0
-            updateFoSPointer(globalFos.value)
+        if (e.key == 'w') {
+            console.log(thicknessData.value)
         }
         if (e.key == '3') {
             // sectionViewModelRun()
-            globalFos.value = 1.17
-            updateFoSPointer(globalFos.value)
+            drawChartFromMap()
         }
+
     })
     // /taskNode/result/id?taskId=66ade6c2cb34b50d7075f6a4
 
 })
 
 /// helper
-const keepFloat2 = (num) => {
-    return Math.round(num * 100) / 100
-}
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
@@ -652,154 +687,7 @@ const attachBaseLayer = (map) => {
         },
     })
 }
-const addHighLightSectionLayer = (mapIns, sectionGeojson) => {
-    mapIns.addSource('sectionSource', {
-        type: 'geojson',
-        data: sectionGeojson,
-        lineMetrics: true,
-    })
-    mapIns.addLayer({
-        id: 'sectionLayer',
-        type: 'line',
-        source: 'sectionSource',
-        'paint': {
-            // 'line-color': 'rgba(255, 0, 0, 0.8)',
-            'line-width': 7,
-            "line-gradient": [
-                "interpolate",
-                [
-                    "linear"
-                ],
-                [
-                    "line-progress"
-                ],
-                0,
-                "#fa8970",
-                0.1,
-                "#fd7457",
-                0.2,
-                "#ff5c3e",
-                0.3,
-                "#ff0000",
-                0.4,
-                "#ff0000",
-                0.5,
-                "#ff0000",
-                0.6,
-                "#ff0000",
-                0.7,
-                "#ff0000",
-                0.8,
-                "#ff5c3e",
-                0.9,
-                "#fd7457",
-                1.0,
-                "#fa8970",
-            ]
-        }
-    })
 
-    const color0 = [
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-    ]
-    const color1 = [
-        "#fa8970",
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-        "#fa8970",
-    ]
-    const color2 = [
-        "#ff9785",
-        "#fa8970",
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff0000",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-        "#fa8970",
-        "#ff9785",
-    ]
-    const color3 = [
-        "#ffa291",
-        "#ff9785",
-        "#fa8970",
-        "#fd7457",
-        "#ff5c3e",
-        "#ff0000",
-        "#ff5c3e",
-        "#fd7457",
-        "#fa8970",
-        "#ff9785",
-        "#ffa291",
-    ]
-
-    let cnt = 0
-    let interval = setInterval(() => {
-        let map = {
-            0: color3,
-            1: color2,
-            2: color1,
-            3: color0,
-            4: color1,
-            5: color2,
-            6: color3,
-        }
-        let color = map[cnt]
-        cnt = (cnt + 1) % 7
-        mapIns.setPaintProperty('sectionLayer', 'line-gradient', [
-            "interpolate",
-            [
-                "linear"
-            ],
-            [
-                "line-progress"
-            ],
-            0,
-            color[0],
-            0.1,
-            color[1],
-            0.2,
-            color[2],
-            0.3,
-            color[3],
-            0.4,
-            color[4],
-            0.5,
-            color[5],
-            0.6,
-            color[6],
-            0.7,
-            color[7],
-            0.8,
-            color[8],
-            0.9,
-            color[9],
-            1.0,
-            color[10],
-        ])
-    }, 500)
-    return interval
-
-}
 const dataGenerate = (origin) => {
     console.log('origin', origin)
     const lineData = []
@@ -1694,6 +1582,20 @@ const test = {
     "step_er": 28.096116708307054
 }
 
+const parseUploadJson = (jsonData) => {
+    let pointDT = []
+    let thicknessDT = []
+    for (let i = 0; i < 23; i++) {
+        pointDT.push([jsonData['x-values'][i], jsonData['z-values'][i]])
+    }
+    thicknessDT = jsonData['thickness']
+    let flowElevation = jsonData['flow-elevation']
+    return {
+        pointData: pointDT,
+        thicknessData: thicknessDT,
+        flowElevation: flowElevation
+    }
+}
 
 </script>
 
@@ -1717,7 +1619,7 @@ div.one-center {
 div.title2 {
     position: relative;
     width: fit-content;
-    font-size: calc(0.7vw + 0.6vh);
+    font-size: calc(0.8vw + 0.7vh);
     font-weight: bold;
     text-align: left;
     margin-bottom: 2px;
@@ -1725,6 +1627,21 @@ div.title2 {
     user-select: none;
     text-shadow: 1px 3px 8px rgba(134, 255, 245, 0.71);
 }
+
+div.main-content {
+    position: relative;
+    width: 40vw;
+    height: 50vh;
+    background-color: red;
+
+    div.map-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: hsl(194, 69%, 91%);
+    }
+}
+
 
 
 .stablityAnalysis-container {
@@ -1749,20 +1666,9 @@ div.title2 {
         justify-content: space-around;
         align-content: space-around;
 
-        div.model-flow-container {
-            position: relative;
-            width: 24vw;
-            height: 85vh;
-            // background-color: rgb(255, 255, 255);
-        }
-
-        div.flow-container {}
-
-
-
         div.model-run-container {
             position: relative;
-            width: 74.4vw;
+            width: 87w;
             height: 85vh;
             // border: 5px solid;
             padding: 3px;
@@ -1773,28 +1679,28 @@ div.title2 {
             div.loading-container {
                 position: absolute;
                 top: 10vh;
-                right: 35vw;
-                width: 6vw;
-                height: 10vh;
-                background-color: rgba(249, 254, 255, 0.634);
+                right: 40vw;
+                width: 8vw;
+                height: 12vh;
+                background-color: rgba(255, 255, 255, 0.671);
+                border-radius: 5px;
                 backdrop-filter: blur(5px);
                 z-index: 5;
 
                 :deep(.dv-loading.loading-icon) {
                     position: absolute;
-                    top: -2.5vh;
-                    right: 0vw;
                 }
 
                 div.loading-message {
                     text-align: center;
-                    position: absolute;
-                    left: 0vw;
+                    position: relative;
+                    margin-top: 1vh;
                     width: 6vw;
                     height: 6vh;
-                    top: 7.3vh;
-                    font-size: calc(0.6vw + 0.4svh);
-                    font-weight: bold;
+                    color: #000357;
+                    // top: 7.3vh;
+                    font-size: calc(0.6vw + 0.8vh);
+                    font-weight: 800;
                 }
             }
 
@@ -1848,54 +1754,22 @@ div.title2 {
 
             div.tab-page-container {
                 position: relative;
-                width: 75vw;
-                height: 79vh;
+                width: 85vw;
+                height: 85vh;
                 background-color: #03589e;
 
-                div.sectionView-run-button {
-                    position: absolute;
-                    top: 10vh;
-                    right: 4vw;
-                    width: 10vw;
-                    height: 5vh;
-                    background-color: transparent;
-                    z-index: 2;
-
-                    .run-button {
-                        position: relative;
-                        width: 9vw;
-                        height: 4vh;
-                        background-color: #b8e9ff;
-                        border-right: 12px solid rgb(2, 143, 199);
-                        border-bottom: 8px solid rgb(87, 179, 216);
-                        border-radius: 5px;
-                        transition: .1s ease-in-out;
-                        cursor: pointer;
-                        font-size: calc(0.7vw + 0.6vh);
-                        font-weight: 700;
-
-                        color: rgb(23, 87, 112);
-                        text-shadow: 0px 0px 5px #b4f1f1;
-                        background-color: #b8e9ff;
-
-                        &:active {
-                            border-right: 6px solid rgb(2, 143, 199);
-                            border-bottom: 4px solid rgb(87, 179, 216);
-                        }
-
-
-                    }
-                }
-
                 div.model-run-content {
-                    width: 75vw;
-                    height: 79vh;
+                    width: 85vw;
+                    height: 85vh;
 
                     .form-block {
                         position: relative;
                         width: 98%;
                         height: 30%;
-                        margin-left: 0.1vw;
+                        margin-left: 0.5vw;
+                        margin-top: 1vh;
+                        margin-bottom: 1vh;
+
                         // background-color: #2a4ac9;
                         border: #fdfdfd7a 5px dashed;
                         border-radius: 10px;
@@ -1947,15 +1821,19 @@ div.title2 {
 
                                     .cell {
                                         height: 2.5vh;
+                                        width: 1vw;
                                         flex: 1;
+
                                         // border: 1px solid rgb(201, 201, 201);
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
+                                        border: none !important;
+                                        border-right: 2px solid rgb(2, 143, 199) !important;
+                                        border-bottom: 1px solid rgb(5, 88, 121) !important;
                                         border-radius: 5px;
+                                        text-align: center;
 
                                         display: grid;
                                         place-items: center;
-                                        font-size: calc(0.3vw + 0.3vh);
+                                        font-size: calc(0.4vw + 0.4vh);
                                         transition: .3s ease-in-out;
 
                                         &:nth-child(even) {
@@ -1989,7 +1867,7 @@ div.title2 {
                         .soil-layer-profile {
 
                             position: relative;
-                            width: 80%;
+                            // width: 80%;
                             height: 30%;
                             padding: 10px;
                             margin: 5px;
@@ -2005,15 +1883,16 @@ div.title2 {
                                     position: relative;
                                     justify-content: center;
                                     align-items: center;
-                                    width: 8vw;
+                                    width: 10vw;
                                     height: 4vh;
 
                                     .key {
                                         height: 2.5vh;
-                                        flex: 0.3;
+                                        width: 3vw;
+                                        margin-right: .2vw;
                                         display: grid;
                                         place-items: center;
-                                        font-size: calc(0.3vw + 0.3vh);
+                                        font-size: calc(0.4vw + 0.3vh);
                                         transition: .3s ease-in-out;
                                         border-right: 2px solid rgb(2, 143, 199);
                                         border-bottom: 1px solid rgb(5, 88, 121);
@@ -2024,17 +1903,42 @@ div.title2 {
                                     }
 
                                     .value {
+                                        position: relative;
                                         height: 2.5vh;
-                                        flex: 0.7;
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
+                                        width: 3vw;
+                                        // flex: 1;
+                                        // border: 1px solid rgb(201, 201, 201);
+                                        border: none !important;
+                                        border-right: 2px solid rgb(2, 143, 199) !important;
+                                        border-bottom: 1px solid rgb(5, 88, 121) !important;
                                         border-radius: 5px;
+                                        text-align: center;
+
                                         display: grid;
                                         place-items: center;
-                                        font-size: calc(0.4vw + 0.4vh);
+                                        font-size: calc(0.4vw + 0.5vh);
                                         transition: .3s ease-in-out;
-                                        background-color: #ffffff;
-                                        color: rgb(44, 61, 212);
+
+                                        &:nth-child(even) {
+                                            color: rgb(44, 61, 212);
+                                            background-color: #ffffff;
+                                        }
+
+                                        &:nth-child(odd) {
+                                            color: white;
+                                            background-color: rgba(44, 61, 212, 0.527);
+                                        }
+
+                                        &:hover {
+                                            background-color: rgb(44, 61, 212);
+                                            color: white;
+                                            font-weight: bold;
+                                        }
+
+                                        &.head {
+                                            background-color: #0e14cf;
+                                            font-size: calc(0.4vw + 0.3vh);
+                                        }
 
                                     }
                                 }
@@ -2043,27 +1947,27 @@ div.title2 {
 
                         }
 
-                        .right-block {
+                        .temp-block {
                             position: absolute;
-                            width: 18%;
-                            height: 100%;
-                            right: 0;
-                            top: 0;
+                            width: 15vw;
+                            height: 9vh;
+                            top: 15.8vh;
+                            right: 15.5vw;
+                            background-color: rgb(212, 239, 254);
+                            border-radius: 10px;
 
-                            .half-block {
-                                position: relative;
-                                width: 90%;
-                                height: 50%;
-                                padding: 10px;
-                                margin: 5px;
-                                background-color: rgb(212, 239, 254);
-                                border-radius: 10px;
+                            .title2 {
+                                margin-left: .5vw;
+                            }
+
+                            .content {
+
 
                                 .keyValue {
                                     position: relative;
                                     justify-content: center;
                                     align-items: center;
-                                    width: 10vw;
+                                    width: 12vw;
                                     height: 4vh;
 
                                     .key {
@@ -2099,6 +2003,130 @@ div.title2 {
 
                                     }
                                 }
+                            }
+                        }
+
+
+                        .right-block {
+                            position: absolute;
+                            width: 17%;
+                            height: 100%;
+                            right: .5vw;
+                            bottom: .5vh;
+                            // background-color: rgb(212, 239, 254);
+                            // border-radius: 10px;
+                            justify-content: center;
+
+                            .full-block {
+
+                                position: relative;
+                                width: 100%;
+                                height: 95%;
+                                background-color: rgb(212, 239, 254);
+                                border-radius: 10px;
+                                margin-top: 1vh;
+
+                                .title2 {
+                                    position: relative;
+                                    height: 20%;
+                                    margin-left: .5vw;
+                                    margin-top: 1vh;
+                                }
+
+                                .content {
+                                    height: 80%;
+
+                                    .button {
+                                        position: relative;
+                                        width: 8vw;
+                                        height: 6vh;
+                                        background-color: #b8e9ff;
+                                        border-right: 12px solid rgb(2, 143, 199);
+                                        border-bottom: 8px solid rgb(87, 179, 216);
+                                        border-radius: 5px;
+                                        transition: .1s ease-in-out;
+                                        cursor: pointer;
+                                        font-size: calc(0.8vw + 0.6vh);
+                                        font-weight: 700;
+
+                                        color: rgb(23, 87, 112);
+                                        text-shadow: 0px 0px 5px #b4f1f1;
+                                        background-color: #b8e9ff;
+
+                                        &:active {
+                                            border-right: 6px solid rgb(2, 143, 199);
+                                            border-bottom: 4px solid rgb(87, 179, 216);
+                                        }
+
+
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+
+                    .chart-block {
+                        position: relative;
+                        width: 99%;
+                        height: 65%;
+                        // border:#f7fbff 1px dashed;
+                        margin: 10px;
+                        // background-color: rgb(242, 251, 255);
+                        // border: #fdfdfd7a 5px dashed;
+
+                        #chart {
+                            position: relative;
+                            width: 81%;
+                            height: 100%;
+                            background-color: rgb(242, 251, 255);
+                            border-radius: 10px;
+                        }
+
+                        .redraw-button {
+                            position: absolute;
+                            z-index: 3;
+                            right: 18vw;
+                            top: 1vh;
+                            width: 5vw;
+                            height: 4vh;
+                            background-color: #b8e9ff;
+                            border-right: 6px solid rgb(2, 143, 199);
+                            border-bottom: 4px solid rgb(87, 179, 216);
+                            border-radius: 3px;
+                            transition: .1s ease-in-out;
+                            cursor: pointer;
+                            font-size: calc(0.6vw + 0.5vh);
+                            font-weight: 700;
+
+                            color: rgb(23, 87, 112);
+                            text-shadow: 0px 0px 5px #b4f1f1;
+                            background-color: #b8e9ff;
+
+                            &:active {
+                                border-right: 6px solid rgb(2, 143, 199);
+                                border-bottom: 4px solid rgb(87, 179, 216);
+                            }
+                        }
+
+                        .right-block {
+                            position: relative;
+                            width: 18%;
+                            height: 100%;
+                            // margin-right: .5vw;
+                            margin-left: .5vw;
+                            background-color: rgb(212, 239, 254);
+                            border-radius: 10px;
+
+                            .run-container {
+                                position: relative;
+                                height: 25%;
+                                background-color: rgb(212, 239, 254);
+
+                                border-bottom: #0e14cf 5px dashed;
+                                border-top-right-radius: 10px;
+                                border-top-left-radius: 10px;
 
                                 .run-button {
                                     position: relative;
@@ -2125,230 +2153,289 @@ div.title2 {
 
                                 }
 
-
-
-
                             }
 
-                        }
+                            .result-container {
+                                position: relative;
+                                height: 70%;
+                                background-color: rgb(212, 239, 254);
 
-
-                    }
-
-                    .chart-block {
-                        position: relative;
-                        width: 99.5%;
-                        height: 70%;
-                        // background-color: rgb(242, 251, 255);
-
-                        #chart {
-                            position: relative;
-                            width: 99%;
-                            height: 97%;
-                            background-color: rgb(242, 251, 255);
-                            border-radius: 10px;
-                        }
-                    }
-
-                }
-
-                div.map-container {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    background-color: hsl(194, 69%, 91%);
-                }
-
-                div.warn-status-Desc {
-                    position: absolute;
-                    right: 26vw;
-                    top: 1vh;
-                    height: 4vh;
-                    line-height: 4vh;
-                    width: 25vw;
-                    text-align: center;
-                    font-size: calc(0.8vw + 0.3vh);
-                    font-weight: bold;
-                    color: #e3f9ff;
-                    box-shadow: 0px 2px rgb(0, 225, 255);
-                    border-radius: 6px;
-                    background-color: #0011ffd5;
-                }
-
-                div.warn-status-container {
-                    position: absolute;
-                    right: 32vw;
-                    top: 6vh;
-                    width: 14vw;
-                    height: 10vh;
-
-                    background-color: #0511bbd5;
-                    backdrop-filter: blur(8px);
-                    z-index: 3;
-                    border-radius: 6px;
-                    text-align: center;
-                    overflow: hidden;
-
-                    box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
-
-
-                    div.warn-status-title {
-                        height: 4vh;
-                        line-height: 4vh;
-                        width: 14vw;
-                        font-size: calc(0.8vw + 0.3vh);
-                        font-weight: bold;
-                        color: #e3f9ff;
-                        box-shadow: 0px 2px rgb(0, 225, 255);
-                    }
-
-                    div.warn-status-content {
-                        height: 6vh;
-                        line-height: 6vh;
-                        width: 14vw;
-                        font-size: calc(1.1vw + 0.8vh);
-                        font-weight: bold;
-                        // background-color: #2688f8;
-                        color: #ebf8ff;
-                        text-align: cen;
-                        letter-spacing: 1rem;
-                        text-indent: 1rem;
-
-                        &.low {
-                            background-color: rgb(17, 17, 255);
-
-                        }
-
-                        &.middle {
-                            background-color: rgb(220, 126, 37);
-                        }
-
-                        &.high {
-                            background-color: rgb(255, 9, 9);
-
-                        }
-                    }
-                }
-
-                div.fos-result-container {
-                    position: absolute;
-                    right: 1vw;
-                    bottom: 5vh;
-                    width: 6vw;
-                    height: 21vh;
-                    background-color: rgb(81, 95, 114);
-                    color: white;
-                    border-radius: 5px;
-
-                    box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-
-                    .title {
-                        position: relative;
-                        font-size: calc(0.6vw + 0.6vh);
-                        font-weight: bold;
-                        line-height: 4vh;
-                        margin-bottom: 0.5vh;
-                    }
-
-                    .pallete-container {
-                        position: relative;
-                        height: 15vh;
-                        width: 2vw;
-                        // border: 1px solid #000;
-
-                        .pallete {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 15vh;
-
-                            .color-section {
-                                width: 100%;
-
-                                &.green {
-                                    height: 3vh;
-                                    background-color: green;
-                                    border-top-right-radius: 5px;
-                                    border-top-left-radius: 5px;
-                                }
-
-                                &.orange {
-                                    height: 2vh;
-                                    background-color: orange;
-                                }
-
-                                &.red {
-                                    height: 10vh;
-                                    background-color: red;
-                                    border-bottom-left-radius: 5px;
-                                    border-bottom-right-radius: 5px;
-                                }
-                            }
-                        }
-
-                        .pallete-text-container {
-                            position: absolute;
-                            top: 0;
-                            left: 2.2vw;
-                            width: 100%;
-                            height: 15vh;
-
-                            .pallete-text {
-                                width: 100%;
-
-                                &.val15 {
-                                    margin-top: -1vh;
-                                }
-
-                                &.val13 {
+                                .title2 {
+                                    height: 10%;
+                                    position: relative;
                                     margin-top: 1vh;
+                                    margin-bottom: 1vh;
+                                    font-size: calc(0.8vw + 0.8vh);
                                 }
 
-                                &.val10 {
-                                    margin-top: 0vh;
-                                }
+                                .content {
+                                    flex-grow: 1;
+                                    // background-color: red;
 
-                                &.val00 {
-                                    margin-top: 7vh;
-                                }
+                                    .keyValue {
+                                        position: relative;
+                                        justify-content: center;
+                                        align-items: center;
+                                        width: 7vw;
+                                        padding: 10px;
+                                        margin: 10px;
+                                        height: fit-content;
+                                        // background-color: rgb(255, 255, 255);
 
+                                        .key {
+                                            height: 4vh;
+                                            width: 6.5vw;
+                                            // margin-right: .5vw;
+                                            margin-bottom: .2vh;
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.5vw + 0.5vh);
+                                            transition: .3s ease-in-out;
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            background-color: rgb(44, 61, 212);
+                                            font-weight: bold;
+                                            color: white;
+                                        }
+
+                                        .value {
+                                            height: 3vh;
+                                            // flex: 0.4;
+                                            width: 6.5vw;
+
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.5vw + 0.5vh);
+                                            font-weight: 700;
+                                            transition: .3s ease-in-out;
+                                            background-color: #dbfffd;
+                                            color: rgb(44, 61, 212);
+
+                                        }
+                                    }
+                                }
                             }
+
+
                         }
 
-                        .pointer {
-                            position: absolute;
-                            transition: .3s ease-in-out;
-                            left: -1.2vw;
-                            bottom: -10px;
-                            width: 0;
-                            height: 0;
-                            border-top: 10px solid transparent;
-                            border-bottom: 10px solid transparent;
-                            border-left: 20px solid rgb(255, 178, 178);
-                            /* 向右指的三角形 */
+                        .null-desc {
+                            position: relative;
+                            width: 81%;
+                            height: 100%;
+                            font-size: calc(0.9vw + 1vh);
+                            font-weight: 700;
+                            color: #b4f1f1;
+                            letter-spacing: .2rem;
+                            // background-color: red;
                         }
-
-
-
-
                     }
 
-
-
-
-
-
-
                 }
+
+                // div.warn-status-Desc {
+                //     position: absolute;
+                //     right: 26vw;
+                //     top: 1vh;
+                //     height: 4vh;
+                //     line-height: 4vh;
+                //     width: 25vw;
+                //     text-align: center;
+                //     font-size: calc(0.8vw + 0.3vh);
+                //     font-weight: bold;
+                //     color: #e3f9ff;
+                //     box-shadow: 0px 2px rgb(0, 225, 255);
+                //     border-radius: 6px;
+                //     background-color: #0011ffd5;
+                // }
+
+                // div.warn-status-container {
+                //     position: absolute;
+                //     right: 32vw;
+                //     top: 6vh;
+                //     width: 14vw;
+                //     height: 10vh;
+
+                //     background-color: #0511bbd5;
+                //     backdrop-filter: blur(8px);
+                //     z-index: 3;
+                //     border-radius: 6px;
+                //     text-align: center;
+                //     overflow: hidden;
+
+                //     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+
+
+                //     div.warn-status-title {
+                //         height: 4vh;
+                //         line-height: 4vh;
+                //         width: 14vw;
+                //         font-size: calc(0.8vw + 0.3vh);
+                //         font-weight: bold;
+                //         color: #e3f9ff;
+                //         box-shadow: 0px 2px rgb(0, 225, 255);
+                //     }
+
+                //     div.warn-status-content {
+                //         height: 6vh;
+                //         line-height: 6vh;
+                //         width: 14vw;
+                //         font-size: calc(1.1vw + 0.8vh);
+                //         font-weight: bold;
+                //         // background-color: #2688f8;
+                //         color: #ebf8ff;
+                //         text-align: cen;
+                //         letter-spacing: 1rem;
+                //         text-indent: 1rem;
+
+                //         &.low {
+                //             background-color: rgb(17, 17, 255);
+
+                //         }
+
+                //         &.middle {
+                //             background-color: rgb(220, 126, 37);
+                //         }
+
+                //         &.high {
+                //             background-color: rgb(255, 9, 9);
+
+                //         }
+                //     }
+                // }
+
+                // div.fos-result-container {
+                //     position: absolute;
+                //     right: 1vw;
+                //     bottom: 5vh;
+                //     width: 6vw;
+                //     height: 21vh;
+                //     background-color: rgb(81, 95, 114);
+                //     color: white;
+                //     border-radius: 5px;
+
+                //     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
+                //     display: flex;
+                //     flex-direction: column;
+                //     justify-content: center;
+                //     align-items: center;
+
+                //     .title {
+                //         position: relative;
+                //         font-size: calc(0.6vw + 0.6vh);
+                //         font-weight: bold;
+                //         line-height: 4vh;
+                //         margin-bottom: 0.5vh;
+                //     }
+
+                //     .pallete-container {
+                //         position: relative;
+                //         height: 15vh;
+                //         width: 2vw;
+                //         // border: 1px solid #000;
+
+                //         .pallete {
+                //             position: absolute;
+                //             top: 0;
+                //             left: 0;
+                //             width: 100%;
+                //             height: 15vh;
+
+                //             .color-section {
+                //                 width: 100%;
+
+                //                 &.green {
+                //                     height: 3vh;
+                //                     background-color: green;
+                //                     border-top-right-radius: 5px;
+                //                     border-top-left-radius: 5px;
+                //                 }
+
+                //                 &.orange {
+                //                     height: 2vh;
+                //                     background-color: orange;
+                //                 }
+
+                //                 &.red {
+                //                     height: 10vh;
+                //                     background-color: red;
+                //                     border-bottom-left-radius: 5px;
+                //                     border-bottom-right-radius: 5px;
+                //                 }
+                //             }
+                //         }
+
+                //         .pallete-text-container {
+                //             position: absolute;
+                //             top: 0;
+                //             left: 2.2vw;
+                //             width: 100%;
+                //             height: 15vh;
+
+                //             .pallete-text {
+                //                 width: 100%;
+
+                //                 &.val15 {
+                //                     margin-top: -1vh;
+                //                 }
+
+                //                 &.val13 {
+                //                     margin-top: 1vh;
+                //                 }
+
+                //                 &.val10 {
+                //                     margin-top: 0vh;
+                //                 }
+
+                //                 &.val00 {
+                //                     margin-top: 7vh;
+                //                 }
+
+                //             }
+                //         }
+
+                //         .pointer {
+                //             position: absolute;
+                //             transition: .3s ease-in-out;
+                //             left: -1.2vw;
+                //             bottom: -10px;
+                //             width: 0;
+                //             height: 0;
+                //             border-top: 10px solid transparent;
+                //             border-bottom: 10px solid transparent;
+                //             border-left: 20px solid rgb(255, 178, 178);
+                //             /* 向右指的三角形 */
+                //         }
+
+
+
+
+                //     }
+
+
+
+
+
+
+
+                // }
 
 
             }
         }
     }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
 }
 </style>

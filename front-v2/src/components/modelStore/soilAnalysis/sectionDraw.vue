@@ -167,11 +167,13 @@ const draw = new MapboxDraw({
 
 const resizeMap = () => {
     setTimeout(() => {
+        console.log('resize')
         if (map) {
+            console.log('map resize')
             map.resize()
             mapFlyToRiver(map)
         }
-    }, 10);
+    }, 1);
 }
 
 const getSection = () => {
@@ -198,6 +200,7 @@ const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
 onMounted(async () => {
 
     map = await initPureScratchMap({ id: 'map' })
+    map.resize()
     mapStore.setMap(map)
     mapFlyToRiver(map)
     attachBaseLayer(map)
@@ -230,7 +233,7 @@ onMounted(async () => {
             calcEnable.value = true
         }
     })
-
+    map.resize()
 
 })
 
@@ -460,7 +463,7 @@ div.section-choose-content {
             display: grid;
             place-items: center;
             background-color: #1753ae;
-            font-size: calc(0.8vw + 0.8vh);
+            font-size: calc(0.6vw + 0.8vh);
             color: #cefffd;
         }
 
@@ -470,11 +473,11 @@ div.section-choose-content {
             place-items: center;
             background-color: #dcebf8;
             color: #001cb8;
-            font-size: calc(0.6vw + 0.6vh);
+            font-size: calc(0.4vw + 0.4vh);
 
             &.two-line {
                 height: 27.5%;
-                font-size: calc(0.5vw + 0.5vh);
+                font-size: calc(0.4vw + 0.4vh);
             }
         }
     }

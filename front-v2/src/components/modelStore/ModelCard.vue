@@ -1,11 +1,7 @@
 <template>
     <div class="model-card-container">
         <div class="model-card-wrapper">
-            <div
-                class="model-card"
-                :class="[infoItem.firstPage ? 'inactive' : 'active']"
-                @click="changeactive"
-            >
+            <div class="model-card" :class="[infoItem.firstPage ? 'inactive' : 'active']" @click="changeactive">
                 <div class="model-card-inwrapper">
                     <div class="model-title-container">
                         <div class="image-wrapper">
@@ -24,11 +20,7 @@
                     </div>
                 </div>
             </div>
-            <div
-                class="model-card"
-                :class="[infoItem.firstPage ? 'active' : 'inactive']"
-                @click="changeactive"
-            >
+            <div class="model-card" :class="[infoItem.firstPage ? 'active' : 'inactive']" @click="changeactive">
                 <div class="model-card-inwrapper second">
                     <div class="model-title-container second">
                         <div class="title-text-container second">
@@ -71,11 +63,7 @@
                     </div>
                 </div>
             </div>
-            <div 
-                class="see-more-button"
-                @click="Detail"
-                :class="[infoItem.firstPage ? 'inactive' : 'active']"
-            >
+            <div class="see-more-button" @click="Detail" :class="[infoItem.firstPage ? 'inactive' : 'active']">
                 <div class="button-text">模型详情</div>
                 <div class="button-arrow"></div>
             </div>
@@ -108,7 +96,11 @@ const changeactive = () => {
 // 路由设置
 const router = useRouter()
 const Detail = () => {
-    router.push('/modelStore/'+ infoItem.value.routerPath)
+    // console.log(infoItem.value)
+    if (infoItem.value.name === '数据融合解译模型')
+        router.push(infoItem.value.routerPath)
+    else
+        router.push('/modelStore/' + infoItem.value.routerPath)
 }
 
 </script>
@@ -124,10 +116,13 @@ div.model-card-container {
         // position: relative;
         // left: 2vw;
         // top: 0vh;
-        display: flex; /* 使用 flex 布局使卡片横向排列 */
+        display: flex;
+        /* 使用 flex 布局使卡片横向排列 */
         align-items: space-between;
-        justify-content: space-between; /* 在父容器内平均分布每个卡片 */
-        width: calc(45vw + 5vw); /* 计算容器宽度，包括卡片和间距 */
+        justify-content: space-between;
+        /* 在父容器内平均分布每个卡片 */
+        width: calc(45vw + 5vw);
+        /* 计算容器宽度，包括卡片和间距 */
         height: calc(39vh + 0.5vh);
         position: relative;
         left: 2vw;
@@ -151,9 +146,11 @@ div.model-card-container {
                 opacity: 1;
                 z-index: 2;
                 cursor: pointer;
+
                 &:hover {
                     transform: scale(1.02);
                 }
+
                 // div.image-wrapper {
                 //    opacity: 0;
                 // }
@@ -171,13 +168,14 @@ div.model-card-container {
                 &:hover {
                     transform: translate(0.1vw, -1.2vh) rotate(3deg);
                 }
+
                 div.see-more-button,
                 div.model-content-container,
                 div.image-wrapper {
-                   opacity: 1;
+                    opacity: 1;
                 }
             }
-            
+
             div.model-card-inwrapper {
                 display: flex;
                 flex-direction: row;
@@ -189,7 +187,7 @@ div.model-card-container {
                 &.second {
                     flex-direction: column;
                 }
-                
+
                 div.model-title-container {
                     display: flex;
                     flex-direction: column;
@@ -233,8 +231,7 @@ div.model-card-container {
                                 object-fit: cover;
                                 width: 100%;
                                 height: 100%;
-                                filter: contrast(1.1) hue-rotate(12deg) brightness(0.9)
-                                    saturate(0.8);
+                                filter: contrast(1.1) hue-rotate(12deg) brightness(0.9) saturate(0.8);
                                 border-radius: 10px;
                             }
                         }
@@ -269,7 +266,7 @@ div.model-card-container {
                     border-radius: 15px;
                     line-height: 3vh;
                     text-align: left;
-                    
+
                     &.second {
                         width: 100%;
                         border: 0px;
@@ -306,11 +303,9 @@ div.model-card-container {
                             margin-bottom: 10px;
                             // background-color: aquamarine;
                             // color: #0050b1;
-                            background: linear-gradient(
-                                to right,
-                                #c8beca 0%,
-                                #881096 100%
-                            );
+                            background: linear-gradient(to right,
+                                    #c8beca 0%,
+                                    #881096 100%);
                             -webkit-background-clip: text;
                             -webkit-text-fill-color: transparent;
 
@@ -357,6 +352,7 @@ div.model-card-container {
             background: linear-gradient(to right, #5467e2 0%, #71b0eb 50%, #74deec 100%);
             color: #fff;
             transition: all 0.4s cubic-bezier(0.68, -0.45, 0.265, 1.45);
+
             &:hover {
                 cursor: pointer;
                 right: 5vw;

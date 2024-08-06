@@ -16,6 +16,7 @@
 import { ref, onMounted } from 'vue'
 import sectionDraw from '../modelStore/soilAnalysis/sectionDraw.vue';
 import * as echarts from 'echarts';
+import axios from 'axios';
 
 const chartdom = ref(null)
 
@@ -115,7 +116,8 @@ const testData = [
 ]
 onMounted(async () => {
 
-
+    const data =( await axios.get('/hydrodynamicList')).data
+    console.log(data)
 })
 </script>
 

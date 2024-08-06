@@ -8,11 +8,15 @@ export default class sectionChart {
         this.dom = dom
         this.dataInfo = dataInfo
         this.newDataInfo = dataInfo
-
+        this.initChartIns()
     }
 
     resizeChart() {
         this.myChart.resize()
+    }
+
+    initChartIns(){
+        this.myChart = echarts.init(this.dom)
     }
 
 
@@ -32,12 +36,17 @@ export default class sectionChart {
 
     }
 
-    initBaseChart() {
-        this.myChart = echarts.init(this.dom)
+    initBaseChart(withLine = false) {
         let ogLineData = this.dataInfo.lineData
         let ogPointData = this.dataInfo.pointData
         let ogThicknessData = this.dataInfo.thicknessData
-        let baseOption = this.getBaseOption(ogLineData, ogPointData, ogThicknessData)
+        let baseOption
+        if (withLine) {
+            baseOption = this.getBaseOption(ogLineData, ogPointData, ogThicknessData)
+        }
+        else {
+            baseOption = this.getBaseOption2(ogPointData, ogThicknessData)
+        }
         this.myChart.setOption(baseOption)
     }
 
@@ -125,16 +134,17 @@ export default class sectionChart {
             },
             // tooltip: {
             // },
-            toolbox: {
-                right: 10,
-                feature: {
-                    // dataZoom: {
-                    //     // yAxisIndex: 'none',
-                    // },
-                    restore: {},
-                    saveAsImage: {},
-                },
-            },
+
+            // toolbox: {
+            //     right: 10,
+            //     feature: {
+            //         // dataZoom: {
+            //         //     // yAxisIndex: 'none',
+            //         // },
+            //         restore: {},
+            //         saveAsImage: {},
+            //     },
+            // },
             dataZoom: [
                 // {
                 //     type: 'slider',
@@ -191,26 +201,115 @@ export default class sectionChart {
                     }
 
                 },
-                // {
-                //     id: 'point',
-                //     type: 'scatter',
-                //     smooth: false,
-                //     data: pointData,
-                //     symbol: 'circle',
-                //     symbolSize: 15,
-                //     z: 2,
-                //     itemStyle: {
-                //         color: '#0051ff60',
-                //         opacity: 1,
-                //         borderColor: '#25f0ff7e',
-                //         borderWidth: 2,
+                {
+                    id: 'point',
+                    type: 'scatter',
+                    smooth: false,
+                    data: pointData,
+                    symbol: 'circle',
+                    symbolSize: 15,
+                    z: 2,
+                    itemStyle: {
+                        color: '#0051ffa6',
+                        opacity: 1,
+                        borderColor: '#25f0ff7e',
+                        borderWidth: 2,
 
-                //     },
-                // }
+                    },
+                }
             ]
         }
         return baseOption
     }
+
+    getBaseOption2(pointData, thicknessData) {
+        console.log(pointData, thicknessData)
+        // data 
+        let markLineData = this.getMarkLineData(thicknessData)
+        // console.log(thicknessData)
+        let baseOption = {
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                top: '10%',
+                containLabel: true,
+            },
+            tooltip: {
+            },
+
+            // toolbox: {
+            //     right: 10,
+            //     feature: {
+            //         // dataZoom: {
+            //         //     // yAxisIndex: 'none',
+            //         // },
+            //         restore: {},
+            //         saveAsImage: {},
+            //     },
+            // },
+            dataZoom: [
+                // {
+                //     type: 'slider',
+                //     height: 25,
+                //     bottom: 5,
+                // },
+                // {
+                //     type: 'inside',
+                // }
+            ],
+            xAxis: {
+                type: 'value', min: 0, max: 'dataMax',
+                name: 'Station(m)',
+                nameLocation: 'middle',
+                nameGap: 25,
+                nameTextStyle: {
+                    fontSize: 20,
+                    // align: 'left',
+                    // verticalAlign: 'top',
+                    fontWeight: 'bold',
+                },
+            },
+            yAxis: {
+                type: 'value', id: 'y',
+                min: -39,
+                max: 8,
+                name: 'Elevation(m)',
+                nameLocation: 'middle',
+                nameGap: 30,
+                nameTextStyle: {
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                    // align: 'left',
+                    // verticalAlign: 'top',
+                },
+            },
+            series: [
+                {
+                    id: 'line-point',
+                    type: 'line',
+                    smooth: true,
+                    data: pointData,
+                    symbol: 'circle',
+                    symbolSize: 10,
+                    z: 1,
+                    lineStyle: {
+                        color: '#746800',
+                        opacity: 1,
+                        width: 5,
+                    },
+                    markLine: {
+                        animation: false,
+                        symbol: ['triangle', 'arrow'],
+                        data: markLineData
+                    }
+
+                },
+            ]
+        }
+        return baseOption
+    }
+
 
 
     getMarkLineData(thicknessData) {
