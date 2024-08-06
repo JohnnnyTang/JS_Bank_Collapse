@@ -47,10 +47,6 @@ export default defineComponent({
       return props.chartVisualInfo;
     });
 
-    onMounted(() => {
-      console.log(chartInfo.value);
-    });
-
     return {
       chartInfo,
     };

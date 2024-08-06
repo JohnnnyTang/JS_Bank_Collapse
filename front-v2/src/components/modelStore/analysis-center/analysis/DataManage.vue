@@ -21,7 +21,7 @@
                   <div class="text">
                     <span
                       v-if="data.flag"
-                      :style="data.label == '分析结果集' ? 'color:#E1E1E1' : ''"
+                      :style="data.label == '分析结果集' ? 'font-weight:bold' : ''"
                       >{{ data.label }}</span
                     >
                     <span v-else>{{ data.label }}</span>
@@ -333,6 +333,7 @@ export default defineComponent({
             "section-geometry": sectionGeom,
           });
           let result = await checkStateHandle(data.data, "断面冲淤");
+          console.log(result);
           if (result != null) {
             if (dataList[dataList.length - 1].id !== "") {
               dataList.push({
@@ -349,23 +350,20 @@ export default defineComponent({
               flag: false,
               children: [],
               visualType: "sectionFlush",
-              params: null,
+              params: { interval: parseFloat(result.data["interval"]) },
             });
-            console.log(dataList);
           }
         } else if (param.type === "regionFlush") {
           let regionGeom = getGeomById(param.value.region);
-          console.log({
-            "bench-id": param.value.benchmarkDem.fileId,
-            "ref-id": param.value.referDem.fileId,
-            "region-geometry": param.value.global == true ? "NONE" : regionGeom,
-          });
           const data = await calculateRegionFlush({
             "bench-id": param.value.benchmarkDem.fileId,
             "ref-id": param.value.referDem.fileId,
-            "region-geometry": param.value.global == true ? "NONE" : regionGeom,
+            "region-geometry":
+              param.value.global == true
+                ? "NONE"
+                : { type: "FeatureCollection", features: [regionGeom] },
           });
-          let result = await checkStateHandle(data.data, "区域冲淤"); //将分析结果添加至结果集
+          let result = await checkStateHandle(data.data, "区域冲淤");
           if (result != null) {
             const coordJson = await getResultData(
               "json",
@@ -398,9 +396,13 @@ export default defineComponent({
           const data = await calculateRegionContour({
             "bench-id": param.value.benchmarkDem.fileId,
             "ref-id": param.value.referDem.fileId,
-            "region-geometry": param.value.global == true ? "NONE" : regionGeom,
+            "region-geometry":
+              param.value.global == true
+                ? "NONE"
+                : { type: "FeatureCollection", features: [regionGeom] },
           });
           let result = await checkStateHandle(data.data, "区域等深线");
+          console.log(result);
           if (result != null) {
             if (dataList[dataList.length - 1].id !== "") {
               dataList.push({
@@ -434,7 +436,7 @@ export default defineComponent({
         let regionGeom = getGeomById(param.value.region);
         const data = await calculateRiverVolume({
           "dem-id": param.value.dem.fileId,
-          "region-geometry": regionGeom,
+          "region-geometry": { type: "FeatureCollection", features: [regionGeom] },
           "water-depth": param.value.deep,
         });
         let result = await checkStateHandle(data.data, "河道容积");
@@ -539,9 +541,12 @@ export default defineComponent({
         notice("success", "成功", text + "计算成功！");
         return result;
       } else {
-        sectionTimeout = setTimeout(async () => {
-          await checkStateHandle(key, text);
-        }, 2000);
+        return new Promise((resolve) => {
+          setTimeout(async () => {
+            const result = await checkStateHandle(key, text);
+            resolve(result);
+          }, 2000);
+        });
       }
     };
 

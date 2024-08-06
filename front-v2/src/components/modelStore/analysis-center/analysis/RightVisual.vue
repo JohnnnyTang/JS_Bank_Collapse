@@ -5,7 +5,7 @@
         <div ref="container" class="container" id="map"></div>
       </div>
     </div>
-    <el-dialog v-model="chartVisual" width="900px" id="chart" title="可视化结果">
+    <el-dialog v-model="chartVisual" v-if="chartVisual" width="900px" id="chart" title="可视化结果">
       <chart-visual :chartVisualInfo="chartVisualInfo"></chart-visual>
     </el-dialog>
     <el-dialog
@@ -286,7 +286,7 @@ export default defineComponent({
             type: "image",
             url: `${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            }data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
