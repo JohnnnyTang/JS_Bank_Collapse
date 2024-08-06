@@ -64,6 +64,8 @@ import { defineComponent, ref } from "vue";
 import AddDataDialog from "./AddDataDialog.vue";
 import AnalyseDialog from "./AnalyseDialog.vue";
 import { useRouter } from "vue-router";
+import utils from "@/utils/CommonUtils";
+const { uuid } = utils;
 export default defineComponent({
   components: { AddDataDialog, AnalyseDialog },
   emits: ["returnFileList", "operateDraw", "analyse", "uploadHandle"],
@@ -127,6 +129,7 @@ export default defineComponent({
         try {
           const geojson = JSON.parse(e.target.result);
           context.emit("uploadHandle", {
+            id: uuid(),
             geoJson: geojson,
             visualType: "geoJsonLine",
             fileName: file.name,
@@ -146,6 +149,7 @@ export default defineComponent({
         try {
           const geojson = JSON.parse(e.target.result);
           context.emit("uploadHandle", {
+            id: uuid(),
             geoJson: geojson,
             visualType: "geoJsonPolygon",
             fileName: file.name,

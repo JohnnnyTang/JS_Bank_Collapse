@@ -7,7 +7,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import ModelRequest from "../../modelApi.js";
 const { getResultData } = ModelRequest;
 import * as echarts from "echarts";
-import axios from 'axios';
+import axios from "axios";
 export default defineComponent({
   props: {
     chartInfo: {
@@ -19,11 +19,14 @@ export default defineComponent({
     let myChart;
 
     let option = {};
-    
+
     const getArrs = async () => {
       try {
-        const response = await axios.get("/result.txt");
-        console.log(response)
+        const response = await getResultData(
+          "txt",
+          props.chartInfo.caseid,
+          props.chartInfo.name
+        );
         const content = response.data;
 
         const lines = content.split("\n");
@@ -38,7 +41,11 @@ export default defineComponent({
               currentArray = [];
             }
           } else {
-            currentArray.push(line.trim() === '-3.4028235e+38' || line.trim() === '-9999.0' ? '0' : line.trim());
+            currentArray.push(
+              line.trim() === "-3.4028235e+38" || line.trim() === "-9999.0"
+                ? "0"
+                : line.trim()
+            );
           }
         });
 
@@ -56,17 +63,16 @@ export default defineComponent({
     };
 
     const initData = async () => {
-      //const data = await getArrs(props.chartInfo?.id);
-      console.log(props.chartInfo)
-      const data = await getResultData('json', props.chartInfo.caseid, props.chartInfo.name);
-      console.log(data)
+      const data = await getArrs(props.chartInfo?.id);
+      const interval = props.chartInfo.params.interval;
+
       if (data != null) {
         const benchmark = data.data.benchmark;
         const refer = data.data.refer;
         const flush = data.data.flush;
         const xdata = [];
         flush.forEach((item, index) => {
-          xdata.push(index * 40);
+          xdata.push(index * interval);
         });
         option = {
           title: {
@@ -114,12 +120,21 @@ export default defineComponent({
               axisLine: {
                 onZero: false,
               },
+              axisLabel: {
+                formatter: function (value) {
+                  return Math.round(parseFloat(value));
+                },
+              },
             },
             {
               data: xdata,
               type: "category",
-
               gridIndex: 1,
+              axisLabel: {
+                formatter: function (value) {
+                  return Math.round(parseFloat(value));
+                },
+              },
             },
           ],
           yAxis: [

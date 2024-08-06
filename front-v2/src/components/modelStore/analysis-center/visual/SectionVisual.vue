@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import ModelRequest from "../../modelApi.js";
 const { getResultData } = ModelRequest;
 import * as echarts from "echarts";
@@ -59,9 +59,13 @@ export default defineComponent({
     };
 
     const initData = async () => {
-      const result = await getResultData('json', props.chartInfo.caseid, props.chartInfo.name);
-      const data = result.data
-      const interval = props.chartInfo.params.interval
+      const result = await getResultData(
+        "json",
+        props.chartInfo.caseid,
+        props.chartInfo.name
+      );
+      const data = result.data;
+      const interval = props.chartInfo.params.interval;
       //const data = await getArrs(props.chartInfo?.id);
       if (data != null) {
         let hList = [];
