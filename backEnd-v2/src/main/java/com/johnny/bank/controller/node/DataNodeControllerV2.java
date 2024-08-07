@@ -4,10 +4,7 @@ import com.johnny.bank.controller.node.base.BaseNodeController;
 import com.johnny.bank.model.node.DataNodeV2;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: Johnny T

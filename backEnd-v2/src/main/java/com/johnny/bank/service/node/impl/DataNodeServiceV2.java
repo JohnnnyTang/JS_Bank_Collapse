@@ -1,12 +1,13 @@
 package com.johnny.bank.service.node.impl;
 
-import com.johnny.bank.model.node.DataNodeV2;
+import com.johnny.bank.model.node.*;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Author: Johnny Tang
@@ -15,6 +16,13 @@ import java.util.List;
  */
 @Service("DataNodeServiceV2")
 public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
+
+    @Override
+    public String save(DataNodeV2 dataNode) {
+        return IBaseNodeRepo.save(dataNode).getId();
+    }
+
+
     private final List<String> deviceTypeList = new ArrayList<>(
             Arrays.asList("Gnss", "Stress", "Manometer", "Inclinometer", "Inclinometer_O", "Video"));
 

@@ -139,6 +139,12 @@ public class TaskNodeControllerV2 extends BaseNodeController<TaskNode> {
         return ResponseEntity.ok(taskNodeId);
     }
 
+    @PostMapping("start/erosionModel/calculateBSTEM")
+    public ResponseEntity<String> calculateBSTEM(@RequestBody JSONObject paramObj) throws Exception {
+        String taskNodeId = ((TaskNodeServiceV2) nodeServiceImpl).calculateBSTEM(paramObj);
+        return ResponseEntity.ok(taskNodeId);
+    }
+
     @GetMapping("/status/id")
     public ResponseEntity<String> findStatusById(@RequestParam String taskId) {
         return ResponseEntity.ok((nodeServiceImpl.findById(taskId)).getStatus());
