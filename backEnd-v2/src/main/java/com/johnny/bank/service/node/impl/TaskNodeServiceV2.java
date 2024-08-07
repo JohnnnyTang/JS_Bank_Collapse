@@ -54,7 +54,8 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     private final Map<String, String> riverBedEvolutionParamNodeCollection;
     private final Map<String, String> multipleIndicatorsModelNodeCollection;
     private final Map<String, String> multipleIndicatorsParamNodeCollection;
-
+    private final Map<String, String> soilErosionModelCollection;
+    private final Map<String, String> soilErosionParamCollection;
 
     @Autowired
     private QuartzSchedulerManager quartzSchedulerManager;
@@ -126,6 +127,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
                 "calculateFlowEquivalent","66a722bd0ef9a2111d513604",
                 "calculateAntiImpactSpeed","66a7241246d6a8415b5a4d6b",
                 "calculateWaterLevelFluctuation","66a7259f46974a1fb552124f"
+        );
+        soilErosionModelCollection = Map.of(
+                "calculateBSTEM","66ade169cb34b50d7075f69b"
+        );
+        soilErosionParamCollection = Map.of(
+                "calculateBSTEM","66ade45ccb34b50d7075f69d"
         );
     }
 
@@ -449,6 +456,15 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateWaterLevelFluctuation"),multipleIndicatorsParamNodeCollection.get("calculateWaterLevelFluctuation"),paramObj
+        );
+        return taskNode.getId();
+    }
+
+    // 土体变形分析模型——calculateBSTEM
+    public String calculateBSTEM(JSONObject paramObj) throws  SchedulerException {
+        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        TaskNode taskNode = createAndStartModelTask(
+                soilErosionModelCollection.get("calculateBSTEM"),soilErosionParamCollection.get("calculateBSTEM"),paramObj
         );
         return taskNode.getId();
     }

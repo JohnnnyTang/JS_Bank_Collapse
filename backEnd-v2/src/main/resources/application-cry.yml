@@ -17,6 +17,10 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: 123456
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
 mybatis:
   mapper-locations: classpath:mapper/resourceRepo/*/*.xml
   configuration:

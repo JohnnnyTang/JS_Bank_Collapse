@@ -39,6 +39,7 @@ public class MapTileController {
     public void getContourVectorTiles(@PathVariable String year, @PathVariable String tide,@PathVariable int x, @PathVariable int y, @PathVariable int z, HttpServletResponse response) throws Exception {
         byte[] tileRes = vectorTileService.getContourVectorTiles(x, y, z, year, tide);
         sendVectorTileResponse(tileRes, response);
+
     }
 
     @CrossOrigin
