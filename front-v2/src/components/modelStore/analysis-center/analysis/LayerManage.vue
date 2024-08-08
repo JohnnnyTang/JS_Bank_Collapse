@@ -24,7 +24,7 @@
                       @change="changeClick(data)"
                       >{{ data.label }}</el-checkbox
                     >
-                    <div class="close" @click="closeClick(data.id)">
+                    <div class="close" @click="closeClick(data.caseid)">
                       <el-icon><CircleClose /></el-icon>
                     </div>
                   </div>
@@ -88,7 +88,7 @@ export default defineComponent({
         visualType: val.visualType,
         children: [],
         flag: true,
-        params: val.params
+        params: val.params,
       });
       // const list = [];
       // treeData.value.forEach((item) => {
@@ -99,16 +99,8 @@ export default defineComponent({
 
     const closeClick = async (id) => {
       for (let i = 0; i < treeData.value.length; i++) {
-        if (treeData.value[i].id === id) {
+        if (treeData.value[i].caseid === id) {
           treeData.value.splice(i, 1);
-          const list = [];
-          treeData.value.forEach((item) => {
-            list.push(item.id);
-          });
-          const data = await updateLayer(import.meta.env.VITE_APP_ROUTER_ID, list);
-          if (data != null && data.code === 0) {
-            notice("success", "成功", "已移除图层");
-          }
           context.emit("closeLayer", id);
           return;
         }
@@ -117,13 +109,9 @@ export default defineComponent({
 
     const delLayer = async (param) => {
       for (let i = 0; i < treeData.value.length; i++) {
-        if (treeData.value[i].id === param) {
+        if (treeData.value[i].caseid === param) {
           treeData.value.splice(i, 1);
           const list = [];
-          treeData.value.forEach((item) => {
-            list.push(item.id);
-          });
-          await updateLayer(import.meta.env.VITE_APP_ROUTER_ID, list);
           return;
         }
       }
@@ -131,7 +119,7 @@ export default defineComponent({
 
     // Tree
     const changeClick = (val) => {
-      context.emit("hideLayer", { flag: val.flag, id: val.id });
+      context.emit("hideLayer", { flag: val.flag, id: val.caseid });
     };
 
     const allowDrop = (draggingNode, dropNode, type) => {
@@ -148,10 +136,9 @@ export default defineComponent({
 
     const dragHandle = async (node, dropNode, dropType, ev) => {
       let target = "";
-      console.log(dropType);
       if (dropType === "before") {
         for (let i = 0; i < treeData.value.length; i++) {
-          if (treeData.value[i].id === node.data.id) {
+          if (treeData.value[i].caseid === node.data.id) {
             if (i != 0) {
               target = treeData.value[i + 1].id;
             }
@@ -207,7 +194,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .layer-manage {
-  
   .custom {
     position: relative;
     width: 100%;
