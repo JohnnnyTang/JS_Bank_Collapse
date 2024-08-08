@@ -5,14 +5,26 @@
         <div ref="container" class="container" id="map"></div>
       </div>
     </div>
-    <el-dialog v-model="chartVisual" v-if="chartVisual" width="900px" id="chart" title="可视化结果">
+    <el-dialog
+      v-model="chartVisual"
+      v-if="chartVisual"
+      width="900px"
+      id="chart"
+      title="可视化结果"
+    >
       <chart-visual :chartVisualInfo="chartVisualInfo"></chart-visual>
     </el-dialog>
-    <el-dialog v-model="dialogVisible" :width="300" :title="visualType == 'geoJsonLine' ? '断面名称：' : '区域名称：'">
+    <el-dialog
+      v-model="dialogVisible"
+      :width="300"
+      :title="visualType == 'geoJsonLine' ? '断面名称：' : '区域名称：'"
+    >
       <div class="name">
         <el-input v-model="inputValue" />
         <div class="btn">
-          <el-button type="primary" plain size="small" @click="clickHandle">确定</el-button>
+          <el-button type="primary" plain size="small" @click="clickHandle"
+            >确定</el-button
+          >
         </div>
       </div>
     </el-dialog>
@@ -178,10 +190,10 @@ export default defineComponent({
               .setLngLat([
                 (volumeList.value[i].coordinates[0][0] +
                   volumeList.value[i].coordinates[2][0]) /
-                2,
+                  2,
                 (volumeList.value[i].coordinates[0][1] +
                   volumeList.value[i].coordinates[2][1]) /
-                2,
+                  2,
               ])
               .setHTML(volumeList.value[i].description)
               .addTo(map);
@@ -263,7 +275,8 @@ export default defineComponent({
           map.addSource(param.id, {
             type: "raster",
             tiles: [
-              `${import.meta.env.VITE_APP_BACK_ADDRESS}/visual/getRaster/${param.visualId
+              `${import.meta.env.VITE_APP_BACK_ADDRESS}/visual/getRaster/${
+                param.visualId
               }/{x}/{y}/{z}`,
             ],
           });
@@ -292,8 +305,9 @@ export default defineComponent({
         } else if (param.visualType === "volume") {
           map.addSource(param.caseid, {
             type: "image",
-            url: `${import.meta.env.VITE_APP_BACK_ADDRESS
-              }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            url: `${
+              import.meta.env.VITE_APP_BACK_ADDRESS
+            }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({

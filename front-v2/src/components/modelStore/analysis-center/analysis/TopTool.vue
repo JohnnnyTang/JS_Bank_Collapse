@@ -1,7 +1,8 @@
 <template>
   <div class="top-tool">
     <div class="buttons">
-      <div class="button" @click="dialogAddData = true">加载数据</div>
+      <!-- <div class="button" @click="dialogAddData = true">加载数据</div> -->
+      <div class="button" style="cursor: not-allowed">加载数据</div>
       <div class="button" @click="dialogAnalyse = true">模型计算</div>
       <el-dropdown popper-class="draw-popper">
         <div class="button btn-draw">添加断面</div>
@@ -50,11 +51,7 @@
     </el-dialog>
 
     <el-dialog v-model="dialogAnalyse" width="580px" title="模型计算">
-      <analyse-dialog
-        @analyse="analyse"
-        v-if="dialogAnalyse"
-        :dataList="dataList"
-      />
+      <analyse-dialog @analyse="analyse" v-if="dialogAnalyse" :dataList="dataList" />
     </el-dialog>
   </div>
 </template>
@@ -76,7 +73,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const router = useRouter();
-    const dataList = props.dataList
+    const dataList = props.dataList;
     const dialogAddData = ref(false);
     const dialogAnalyse = ref(false);
     const state = ref(0);

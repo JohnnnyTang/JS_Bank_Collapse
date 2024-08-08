@@ -18,7 +18,8 @@ export default defineConfig({
         host: '0.0.0.0',
         proxy: {
             '/api': {
-                target: 'http://localhost:8989/api/v1',
+                target: 'http://172.21.212.165:8989/api/v1',
+                //target: 'http://localhost:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
@@ -34,6 +35,7 @@ export default defineConfig({
             },
             '/model/': {
                 target: 'http://172.21.212.165:8989/api/v2',
+                //target: 'http://localhost:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),
             },

@@ -96,7 +96,7 @@ const {
 import utils from "@/utils/CommonUtils";
 const { notice } = utils;
 export default defineComponent({
-  emits: ["operateLayer"],
+  emits: ["operateLayer", "addCurrentModel", "updateCurrentModel"],
   props: {
     dataList: {
       type: Array,
@@ -279,6 +279,7 @@ export default defineComponent({
           "dem-id": param.value.dem.fileId,
           "section-geometry": sectionGeom,
         });
+        context.emit("addCurrentModel", "断面形态");
         let result = await checkStateHandle(data.data, "断面形态");
         if (result != null) {
           if (dataList[dataList.length - 1].id !== "") {
@@ -332,8 +333,8 @@ export default defineComponent({
             "ref-id": param.value.referDem.fileId,
             "section-geometry": sectionGeom,
           });
+          context.emit("addCurrentModel", "断面冲淤");
           let result = await checkStateHandle(data.data, "断面冲淤");
-          console.log(result);
           if (result != null) {
             if (dataList[dataList.length - 1].id !== "") {
               dataList.push({
@@ -363,6 +364,7 @@ export default defineComponent({
                 ? "NONE"
                 : { type: "FeatureCollection", features: [regionGeom] },
           });
+          context.emit("addCurrentModel", "区域冲淤");
           let result = await checkStateHandle(data.data, "区域冲淤");
           if (result != null) {
             const coordJson = await getResultData(
@@ -401,8 +403,8 @@ export default defineComponent({
                 ? "NONE"
                 : { type: "FeatureCollection", features: [regionGeom] },
           });
+          context.emit("addCurrentModel", "区域等深线");
           let result = await checkStateHandle(data.data, "区域等深线");
-          console.log(result);
           if (result != null) {
             if (dataList[dataList.length - 1].id !== "") {
               dataList.push({
@@ -439,6 +441,7 @@ export default defineComponent({
           "region-geometry": { type: "FeatureCollection", features: [regionGeom] },
           "water-depth": param.value.deep,
         });
+        context.emit("addCurrentModel", "河道容积");
         let result = await checkStateHandle(data.data, "河道容积");
         if (result != null) {
           const volume = await getResultData(
@@ -534,13 +537,16 @@ export default defineComponent({
       const res = await checkStatus(key);
       const status = res.data;
       if (status == "ERROR") {
+        context.emit("updateCurrentModel", text, -1);
         notice("error", "错误", text + "计算失败！");
         return null;
       } else if (status == "COMPLETE") {
         const result = await checkResult(key);
+        context.emit("updateCurrentModel", text, 0);
         notice("success", "成功", text + "计算成功！");
         return result;
       } else {
+        context.emit("updateCurrentModel", text, 1);
         return new Promise((resolve) => {
           setTimeout(async () => {
             const result = await checkStateHandle(key, text);
