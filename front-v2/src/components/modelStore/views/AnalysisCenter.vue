@@ -387,7 +387,7 @@ div.model-content-container {
 
       div.basemap-radio-container {
         z-index: 1;
-        width: 14vw;
+        // width: 19vw;
         height: 4vh;
         display: flex;
         flex-flow: row nowrap;
