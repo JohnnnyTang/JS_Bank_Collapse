@@ -224,7 +224,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     }
 
     // 判断是否需要进行内存清理(HandShake1)
-    public void modelServerStorageClear(Integer storageLimit, Integer CaseLimit) {
+    public boolean checkModelServerStorage(Integer storageLimit, Integer CaseLimit) {
         if (ProcessUtilV2.getModelServerDiskUsage(MODEL_SERVER_URL) > storageLimit) {
             // 执行模型服务内存清理工作（删除非常用case）
             List<String> desertedCases = ProcessUtilV2.getModelServerUnusedCases(MODEL_SERVER_URL, CaseLimit);
@@ -235,7 +235,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
                 }
             }
         }
+        return ProcessUtilV2.getModelServerDiskUsage(MODEL_SERVER_URL) <= storageLimit;
     }
+
     // 资源树与模型计算容器对齐工作(HandShake2)
     public void modelServerSerialization() throws SchedulerException {
         List<String> caseIds = ProcessUtilV2.getModelServerCases(MODEL_SERVER_URL);
@@ -306,7 +308,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 数值模型计算——计算水动力（33中选一并计算流场）
     public String calHydrodynamic(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 numericModelNodeCollection.get("calculateHydrodynamic"),numericParamNodeCollection.get("calculateHydrodynamic"),paramObj
         );
@@ -314,7 +318,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     }
     // 数值模型计算——获取多点流速
     public String getFlowFieldVelocities(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 numericModelNodeCollection.get("getFlowFieldVelocities"),numericParamNodeCollection.get("getFlowFieldVelocities"),paramObj
         );
@@ -322,7 +328,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     }
     // 数值模型计算——获取单点流速
     public String getFlowFieldVelocity(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 numericModelNodeCollection.get("getFlowFieldVelocity"),numericParamNodeCollection.get("getFlowFieldVelocity"),paramObj
         );
@@ -331,7 +339,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 河床演变模型计算——计算区域冲淤
     public String calculateRegionFlush(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateRegionFlush"),riverBedEvolutionParamNodeCollection.get("calculateRegionFlush"),paramObj
         );
@@ -339,7 +349,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     }
     // 河床演变模型计算——计算断面形态
     public String calculateSectionView(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateSectionView"),riverBedEvolutionParamNodeCollection.get("calculateSectionView"),paramObj
         );
@@ -347,7 +359,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     }
     // 河床演变模型计算——计算断面比较
     public String calculateSectionContrast(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateSectionContrast"),riverBedEvolutionParamNodeCollection.get("calculateSectionContrast"),paramObj
         );
@@ -355,7 +369,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     }
     // 河床演变模型计算——河道容积计算
     public String calculateRiverVolume(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateRiverVolume"),riverBedEvolutionParamNodeCollection.get("calculateRiverVolume"),paramObj
         );
@@ -363,7 +379,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     }
     // 河床演变模型计算——河道等深线计算
     public String calculateRegionContour(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateRegionContour"),riverBedEvolutionParamNodeCollection.get("calculateRegionContour"),paramObj
         );
@@ -372,7 +390,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——综合计算
     public String calculateRiskLevel(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateRiskLevel"),multipleIndicatorsParamNodeCollection.get("calculateRiskLevel"),paramObj
         );
@@ -381,7 +401,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——SoilComposition
     public String calculateSoilComposition(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateSoilComposition"),multipleIndicatorsParamNodeCollection.get("calculateSoilComposition"),paramObj
         );
@@ -390,7 +412,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——SlopeProtection
     public String calculateSlopeProtection(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateSlopeProtection"),multipleIndicatorsParamNodeCollection.get("calculateSlopeProtection"),paramObj
         );
@@ -399,7 +423,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——LoadControl
     public String calculateLoadControl(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateLoadControl"),multipleIndicatorsParamNodeCollection.get("calculateLoadControl"),paramObj
         );
@@ -408,7 +434,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——HeightDifference
     public String calculateHeightDifference(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateHeightDifference"),multipleIndicatorsParamNodeCollection.get("calculateHeightDifference"),paramObj
         );
@@ -417,7 +445,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——SlopeRate
     public String calculateSlopeRate(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateSlopeRate"),multipleIndicatorsParamNodeCollection.get("calculateSlopeRate"),paramObj
         );
@@ -426,7 +456,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——NearshoreFlush
     public String calculateNearshoreFlush(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateNearshoreFlush"),multipleIndicatorsParamNodeCollection.get("calculateNearshoreFlush"),paramObj
         );
@@ -435,7 +467,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——FlowEquivalent
     public String calculateFlowEquivalent(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateFlowEquivalent"),multipleIndicatorsParamNodeCollection.get("calculateFlowEquivalent"),paramObj
         );
@@ -444,7 +478,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——Anti-ImpactSpeed
     public String calculateAntiImpactSpeed(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateAntiImpactSpeed"),multipleIndicatorsParamNodeCollection.get("calculateAntiImpactSpeed"),paramObj
         );
@@ -453,7 +489,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 多指标风险模型计算——Water-LevelFluctuation
     public String calculateWaterLevelFluctuation(JSONObject paramObj) throws SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateWaterLevelFluctuation"),multipleIndicatorsParamNodeCollection.get("calculateWaterLevelFluctuation"),paramObj
         );
@@ -462,7 +500,9 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
 
     // 土体变形分析模型——calculateBSTEM
     public String calculateBSTEM(JSONObject paramObj) throws  SchedulerException {
-        modelServerStorageClear(STORAGE_LIMIT, CASE_LIMIT);
+        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+            return "系统内存不足无法计算！请清理系统内存";
+        }
         TaskNode taskNode = createAndStartModelTask(
                 soilErosionModelCollection.get("calculateBSTEM"),soilErosionParamCollection.get("calculateBSTEM"),paramObj
         );
