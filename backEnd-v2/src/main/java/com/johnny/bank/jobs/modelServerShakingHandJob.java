@@ -22,7 +22,7 @@ public class modelServerShakingHandJob implements Job {
         Integer caseLimit = dataMap.getInt("caseLimit");
         TaskNodeServiceV2 taskNodeServiceV2 = BeanUtil.getBean(TaskNodeServiceV2.class);
         try {
-            taskNodeServiceV2.modelServerStorageClear(storageLimit, caseLimit);
+            taskNodeServiceV2.checkModelServerStorage(storageLimit, caseLimit);
             taskNodeServiceV2.modelServerSerialization();
         } catch (SchedulerException e) {
             throw new RuntimeException(e);

@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Author: Johnny T
  * @Date: 2023/12/21
@@ -42,4 +44,7 @@ public interface IDataNodeRepoV2 extends IBaseNodeRepo<DataNodeV2> {
     @Query("{'apiPrefix': {'$ne': ''}, 'bank': ?0}")
     @Update("{'$set':  {'apiPrefix': ?1}}")
     void alterAllDataApiPrefixOfABank(String bankName, String newPrefix);
+
+    @Query("{'category' : ?0, 'bank': ?1, 'basicInfo.year': ?2, 'name': ?3}")
+    List<DataNodeV2> getNodeByCategoryBankYearAndName(String category, String bank, String year, String name);
 }
