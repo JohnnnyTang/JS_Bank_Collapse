@@ -1,6 +1,6 @@
 <template>
     <div class="stability-analysis">
-        <ModelTitleVue :ModelName="'近岸动力分析模型'" />
+        <ModelTitleVue :ModelName="'近岸动力分析模型'" v-on:confirm-bank="confirmBankHandler" />
         <div class="main-content">
             <div class="map" id="map" ref="mapRef"></div>
             <div class="model-choice">
@@ -21,7 +21,8 @@
                                     <span style="font-size: medium; margin-left: .5vw;margin-right: .1vs;">➤</span> 已建工况
                                 </div>
                                 <el-scrollbar height="34vh">
-                                    <div class="content" style="flex-grow: 0; height: 35vh;">
+                                    <div class="content" style="flex-grow: 0; height: 35vh;"
+                                        v-show="selectedBank != null && selectedBank != ''">
                                         <el-tree :data="treeData" :props="defaultProps" @node-click="handleNodeClick"
                                             default-expand-all :expand-on-click-node="false" ref="treeRef">
 
@@ -43,10 +44,18 @@
                                                 </span>
 
                                                 <span class="custom-tree-node case" v-if="data.type === 'case'">
-                                                    <span>{{ node.label }}</span>
+                                                    <span :style="{ 'color': data.temp ? 'black' : '#0077ff' }">{{
+                                                        node.label
+                                                    }}</span>
                                                 </span>
                                             </template>
                                         </el-tree>
+                                    </div>
+                                    <div class="content" style="flex-grow: 0; height: 35vh;"
+                                        v-show="selectedBank == null || selectedBank == ''">
+                                        <div class="card one-center">
+                                            <div class="desc one-center">选择岸段以查看岸段资源信息</div>
+                                        </div>
                                     </div>
                                 </el-scrollbar>
                             </div>
@@ -72,7 +81,7 @@
                                         </el-descriptions-item>
                                     </el-descriptions>
                                     <div class="card one-center" v-show="clickedNode.flow == 0">
-                                        <div class="desc one-center">选择工况节点以查看信息</div>
+                                        <div class="desc one-center">选择工况节点以查看工况信息</div>
                                     </div>
                                 </div>
 
@@ -115,10 +124,96 @@
                     </div>
                 </dv-border-box12>
             </div>
+
+            <div class="math-model-calculation flex-coloum" style="align-items: center;" v-show="mathModelCalcBlockShow">
+                <div class="main-title">
+                    数学模型计算
+                    <div class="minimize-btn" @click="mathModelCalcBlockShow = false"></div>
+                </div>
+                <div class="file-upload-container one-center">
+                    <div class="card border">
+                        <div class="title">
+                            <span style="font-size: medium; margin-left: 1vw; ">➤</span> 文件上传
+                        </div>
+                        <div class="content flex-coloum" style="justify-content: space-evenly; align-items: center;">
+                            <el-button type="primary" plain>网格和地形文件</el-button>
+                            <el-button type="primary" plain>边界条件</el-button>
+                            <el-button type="primary" plain>初始条件</el-button>
+                            <el-button type="primary" plain>参数文件</el-button>
+                            <el-button type="primary" plain>控制文件</el-button>
+                        </div>
+                    </div>
+                </div>
+                <div class="model-container one-center">
+                    <div class="card border">
+                        <div class="title">
+                            <span style="font-size: medium; margin-left: 1vw; ">➤</span> 模型计算
+                        </div>
+                        <div class="content flex-coloum" style="justify-content: flex-start; align-items: center;">
+                            <div class="running-container">
+                                <div class="flex-row"
+                                    style="padding:1vh 0.5vw; width: 12vw;justify-content: space-between;">
+                                    <div class="one-center">
+                                        <span>状态：<span :style="statusStyle">{{ modelRunnningStatusDesc }}</span></span>
+                                    </div>
+                                    <div class="one-center">
+                                        <el-button type="primary" plain>运行</el-button>
+                                    </div>
+                                </div>
+                                <div style="width: 13vw;height: 3vh;margin-top: 1vh;margin-left: 1vw;">
+                                    <el-progress :percentage="modelRunnningProgress" :stroke-width="15" striped />
+                                </div>
+                            </div>
+
+                            <div class="setting-container">
+                                <div class="judge-container flex-coloum"
+                                    style="justify-content: center; align-items: center;">
+                                    <div class="judge-desc">是否作为参考动力条件加入崩岸风险研判 ?</div>
+
+                                    <el-radio-group v-model="mathModelParams.addToRiskJudgeFlag">
+                                        <el-radio value="1" size="large"> 是 </el-radio>
+                                        <el-radio value="2" size="large"> 否 </el-radio>
+                                    </el-radio-group>
+
+                                    <div class="after-judge one-center" v-show="mathModelParams.addToRiskJudgeFlag == 1">
+                                        <div class="flex-coloum">
+                                            <div style="margin-bottom: 1vh;">
+                                                <span>流量：</span>
+                                                <el-input v-model="mathModelParams.flow" style="width: 8vw; height: 3.5vh"
+                                                    placeholder="请输入流量" />
+                                            </div>
+                                            <div>
+                                                <span>潮型：</span>
+                                                <el-select v-model="mathModelParams.tideType" placeholder="请选择潮型"
+                                                    style="width: 8vw; height: 3.5vh" @change="">
+                                                    <el-option v-for="(item, index ) in tideTypeList" :key="index"
+                                                        :label="item" :value="item">
+                                                        <div style="text-align: center;">{{ item }}</div>
+                                                    </el-option>
+                                                </el-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="after-judge one-center" v-show="mathModelParams.addToRiskJudgeFlag == 2">
+                                        <div class="flex-row">
+                                            <span style="line-height: 3.5vh;">自定义名称：</span>
+                                            <el-input v-model="mathModelParams.customName" style="width: 6vw; height: 3.5vh"
+                                                placeholder="请输入名称" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <el-dialog v-model="createNewCaseDialogShow" title="新建工况" width="20vw" @opened="">
+    <!-- <el-dialog v-model="mathModelCalcBlockShow" title="数学模型计算" width="20vw" @opened="">
         <div class="main-content">
             <el-form :model="newCase" label-width="auto" style="max-width: 600px">
                 <el-form-item label="流量">
@@ -144,13 +239,13 @@
         </div>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="createNewCaseDialogShow = false">取消</el-button>
+                <el-button @click="mathModelCalcBlockShow = false">取消</el-button>
                 <el-button type="primary" @click="createNewCaseConfirmHandler">
                     确定
                 </el-button>
             </div>
         </template>
-    </el-dialog>
+    </el-dialog> -->
 
     <div class="loading-container" v-show="ModelRunningShow">
         <dv-loading class="loading-icon">
@@ -178,10 +273,14 @@ const mapStore = useMapStore()
 const mapRef = ref(null)
 const radio1 = ref(2)
 const showFlow = ref(0)
+const selectedBank = ref('')
 const visulizationStatus = ref(false)
-const createNewCaseDialogShow = ref(false)
+const mathModelCalcBlockShow = ref(false)
 const ModelRunningShow = ref(false)
+// const addToRiskJudgeFlag = ref(null)
+const modelRunnningProgress = ref(30)
 const ModelRunningMessage = ref('模型正在运行中，请稍后...')
+const modelRunnningStatusDesc = ref('未运行')
 const router = useRouter()
 const defaultProps = {
     children: 'children',
@@ -206,7 +305,7 @@ const newCase = reactive({
     temp: null,
     desc: ''
 })
-
+const tideTypeList = ['小潮', '中潮', '大潮']
 const typeMap = {
     'dc': '大潮',
     'zc': '中潮',
@@ -216,6 +315,19 @@ const tempMap = {
     false: '是',
     true: '否'
 }
+const mathModelParams = reactive({
+    meshFile: null,
+    boudaryFile: null,
+    initialFile: null,
+    parameterFile: null,
+    controlFile: null,
+    addToRiskJudgeFlag: null,
+    flow: null,
+    tideType: null,
+    customName: null,
+})
+
+
 const globleVariable = reactive({
     taskID: null,
     caseID: null,
@@ -228,9 +340,45 @@ const globleVariable = reactive({
     lagrangeLayer: 'flowLayer1',
     eulerLayer: 'flowLayer2',
 })
+const statusStyle = computed(() => {
+    switch (modelRunnningStatusDesc.value) {
+        case '未运行':
+            return { color: 'rgb(124, 124, 124)' }
+        case '运行中':
+            return { color: 'rgb(255, 165, 0)' }
+        case '运行完毕':
+            return { color: 'rgb(0, 180, 0)' }
+        default:
+            return { color: 'rgb(0, 0, 0)' }
+    }
+})
+
 
 
 // handler
+const confirmBankHandler = async (bankName) => {
+    console.log('confirmBankHandler', bankName)
+    const bankNameMap = {
+        '民主沙': 'Mzs'
+    }
+    mapFlyToRiver(mapStore.getMap(map), bankName)
+    const data = (await axios.get(`/temp/dataNode/bank/dataType?dataType=Hydrodynamic&bank=${bankNameMap[bankName]}`)).data
+    // const data = t
+    const tree_Data = getTreeDataFromJson(data, '民主沙')
+    console.log(tree_Data)
+    updateTreeData(tree_Data)
+
+    selectedBank.value = bankName
+
+    ElNotification({
+        type: 'success',
+        title: '选择岸段',
+        message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
+        offset: 180
+    })
+}
+
+
 const handleNodeClick = (nodeData, nodeInfo) => {
     console.log('nodeData', nodeData)
     console.log('nodeInfo', nodeInfo)
@@ -247,7 +395,7 @@ const createNewCaseClickHandler = (nodeData, nodeInfo) => {
     clickedSet.data = nodeData
     clickedSet.node = nodeInfo
     console.log('createNewCaseClickHandler', nodeData, nodeInfo)
-    createNewCaseDialogShow.value = true
+    mathModelCalcBlockShow.value = true
 }
 const createNewCaseConfirmHandler = () => {
     newCase.temp = newCase.temp === 'true' ? true : false
@@ -262,7 +410,7 @@ const createNewCaseConfirmHandler = () => {
     console.log(treeRef.value.data)
 
     updateTreeData(treeRef.value.data)
-    createNewCaseDialogShow.value = false
+    mathModelCalcBlockShow.value = false
 }
 
 
@@ -324,8 +472,8 @@ const showFlowClickHandler = async (id) => {
                     console.log('runningResult ', runningResult)
 
                     globleVariable.caseID = runningResult['case-id']
-                    globleVariable.pngPrefix = `/temp/data/modelServer/file/image?caseId=${globleVariable.caseID}&name=`
-                    globleVariable.binPrefix = `/temp/data/modelServer/file/bin?caseId=${globleVariable.caseID}&name=`
+                    globleVariable.pngPrefix = `/temp/data/modelServer/resource/file/image?name=`
+                    globleVariable.binPrefix = `/temp/data/modelServer/resource/file/bin?name=`
                     globleVariable.stationBinUrl = runningResult['visualization-station-bin']
                     globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
                     let visulizationDescUrl = `/temp/data/modelServer/file/json?caseId=${runningResult['case-id']}&name=${runningResult['visualization-description-json']}`
@@ -417,16 +565,6 @@ const jump2Model = (value) => {
 onMounted(async () => {
     let map = await initFineMap(mapRef.value)
     mapStore.setMap(map)
-    mapFlyToRiver(map)
-    // realtimeWaterConditionIntervalID = setInterval(() => {
-    //     updateRealtimeWaterCondition()
-    // }, 1000 * 60 * 5)
-
-    // const data = (await axios.get('/hydrodynamicList')).data
-    const data = testData
-    const tree_Data = getTreeDataFromJson(data)
-    console.log(tree_Data)
-    updateTreeData(tree_Data)
 
 })
 
@@ -439,13 +577,18 @@ onUnmounted(() => {
     }
 })
 
-const mapFlyToRiver = (mapIns) => {
+const mapFlyToRiver = (mapIns, bankName) => {
     if (!mapIns) return;
-    mapIns.fitBounds(
-        [
+
+    let boundsMap = {
+        '民主沙': [
             [120.45997922676836, 32.00001616423072],
             [120.60909640208264, 32.084171362618625],
         ],
+    }
+
+    mapIns.fitBounds(
+        boundsMap[bankName],
         {
             duration: 1500,
         }
@@ -461,325 +604,64 @@ const parseFlowAndType = (name) => {
     return { flow, type }
 }
 
-const testData = {
-    "resource": [
+const t = [
+    {
+        "year": "2024",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "10000zc",
+                        "temp": "false"
+                    }
+                ],
+                "name": "test"
+            }
+        ]
+    }
+]
+
+const getTreeDataFromJson = (data, bankName) => {
+    const result = [
         {
-            "date": [
-                {
-                    "sets": [
-                        {
-                            "list": [
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "10000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "10000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "10000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "104000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "104000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "104000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "13000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "13000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "13000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "16500dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "16500xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "16500zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "20500dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "20500xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "20500zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "24500dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "24500xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "24500zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "28500dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "28500xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "28500zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "32500dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "32500xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "32500zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "35000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "35000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "35000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "40000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "40000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "40000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "45000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "45000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "45000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "51000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "51000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "51000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "57000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "57000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "57000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "62000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "62000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "62000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "74000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "74000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "74000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "84000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "84000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "84000zc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "92000dc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "92000xc",
-                                    "temp": false
-                                },
-                                {
-                                    "description": "民主沙示范岸段水动力模型",
-                                    "name": "92000zc",
-                                    "temp": false
-                                }
-                            ],
-                            "name": "示范工况集"
-                        }
-                    ],
-                    "year": "2024"
-                }
-            ],
-            "name": "民主沙"
-        }
-    ]
-}
-
-const getTreeDataFromJson = (data) => {
-    const resource = data.resource
-    const result = []
-
-    for (let i = 0; i < resource.length; i++) {
-        let bankItem = {
-            lable: resource[i]['name'],
+            lable: bankName,
             type: 'bank',
             children: []
         }
-        let years = []
-        for (let j = 0; j < resource[i]['date'].length; j++) {
-            let yearItem = {
-                lable: resource[i]['date'][j]['year'],
-                type: 'year',
-                children: [],
-            }
-            let sets = []
-            for (let k = 0; k < resource[i]['date'][j]['sets'].length; k++) {
-                let setItem = {
-                    lable: resource[i]['date'][j]['sets'][k]['name'],
-                    type: 'set',
-                    children: []
-                }
-                let cases = []
-                for (let p = 0; p < resource[i]['date'][j]['sets'][k]['list'].length; p++) {
-                    let casesItem = {
-                        lable: resource[i]['date'][j]['sets'][k]['list'][p]['name'],
-                        type: 'case',
-                        temp: resource[i]['date'][j]['sets'][k]['list'][p]['temp'],
-                        description: resource[i]['date'][j]['sets'][k]['list'][p]['description']
-                    }
-                    cases.push(casesItem)
-                }
-                setItem.children = cases
-                sets.push(setItem)
-            }
-            yearItem.children = sets
-            years.push(yearItem)
+    ]
+    let years = []
+    for (let j = 0; j < data.length; j++) {
+        let yearItem = {
+            lable: data[j]['year'],
+            type: 'year',
+            children: [],
         }
-        bankItem.children = years
-        result.push(bankItem)
+        let sets = []
+        for (let k = 0; k < data[j]['sets'].length; k++) {
+            let setItem = {
+                lable: data[j]['sets'][k]['name'],
+                type: 'set',
+                children: []
+            }
+            let cases = []
+            for (let p = 0; p < data[j]['sets'][k]['list'].length; p++) {
+                let casesItem = {
+                    lable: data[j]['sets'][k]['list'][p]['name'],
+                    type: 'case',
+                    temp: data[j]['sets'][k]['list'][p]['temp'],
+                    description: data[j]['sets'][k]['list'][p]['description']
+                }
+                cases.push(casesItem)
+            }
+            setItem.children = cases
+            sets.push(setItem)
+        }
+        yearItem.children = sets
+        years.push(yearItem)
     }
+    result[0].children = years
     return result
+
 }
 
 const flowLayerControl = (type, show) => {
@@ -852,22 +734,32 @@ div.card {
     position: relative;
     width: 99%;
     height: 97%;
-    border-radius: 8px;
+    border-radius: 2px;
     // background-color: rgb(226, 242, 255);
     display: flex;
     flex-direction: column;
+
+    &.border {
+        width: 98%;
+        border-top: #05527944 solid 1px;
+        border-left: #05527950 solid 1px;
+        border-right: #05527952 solid 2px;
+        border-bottom: #05527952 solid 2px;
+        margin-top: .5vh;
+    }
 
     div.title {
         position: relative;
         width: 100%;
         // height: 20%;
-        height: 3.5vh;
+        height: 4vh;
+        line-height: 4vh;
         font-size: calc(0.7vw + 0.7vh);
         font-weight: bold;
         text-align: left;
-        color: #3d4197;
+        color: #366ec2;
         border-bottom: #364f7ea1 solid 2px;
-        background-color: rgb(226, 242, 255);
+        background-color: rgb(243, 243, 243);
 
     }
 
@@ -1165,6 +1057,115 @@ div.stability-analysis {
 
 
             }
+        }
+
+        div.math-model-calculation {
+            position: absolute;
+            z-index: 1;
+            top: 8vh;
+            left: 20.3vw;
+            width: 15vw;
+            // height: 76vh;
+            background-color: rgb(248, 248, 248);
+            // backdrop-filter: blur(20px);
+            border-radius: calc(0.0vw + 0.5vh);
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+
+            div.main-title {
+                position: relative;
+                width: 13vw;
+                height: 5vh;
+                font-size: calc(0.8vw + 0.7vh);
+                font-weight: 800;
+                font-family: 'Microsoft YaHei';
+                text-align: center;
+                line-height: 5vh;
+                color: #054bb3;
+                // border-bottom: #055279 solid 2px;
+
+                div.minimize-btn {
+                    position: absolute;
+                    right: .1vw;
+                    top: 1.5vh;
+                    width: 2vh;
+                    height: 2vh;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-image: url('/minimize.png');
+                    z-index: 1;
+                    cursor: pointer;
+                }
+            }
+
+            div.file-upload-container {
+                position: relative;
+                width: 14.8vw;
+                height: 26vh;
+
+                :deep(.el-button, .el-button--primary, .is-plain) {
+                    width: 8vw;
+                    height: 3.7vh;
+                    font-size: calc(0.5vw + 0.6vh);
+                    font-family: 'Microsoft YaHei';
+                    margin: 0;
+                }
+            }
+
+            div.model-container {
+                position: relative;
+                width: 14.8vw;
+                // height: 44.8vh;
+                margin-bottom: .5vh;
+
+                .card {
+                    margin-bottom: .7vh;
+
+                    .content {
+
+
+                        .running-container {
+                            margin-top: .5vh;
+                            border: #0d6eff54 solid 1px;
+                            border-radius: 5px;
+                        }
+
+                        .setting-container {
+                            margin-top: 1vh;
+                            border: #0d6eff54 solid 1px;
+                            border-radius: 5px;
+
+                            .judge-container {
+                                position: relative;
+                                width: 14vw;
+
+                                .judge-desc {
+                                    position: relative;
+                                    margin-top: 1vh;
+                                    margin-bottom: 1vh;
+                                    width: 12.5vw;
+                                    font-size: calc(0.6vw + 0.4vh);
+                                    font-weight: 600;
+                                }
+
+                                .after-judge {
+                                    position: relative;
+                                    margin-top: 1vh;
+                                    margin-bottom: 1vh;
+                                    width: 12.5vw;
+                                    font-size: calc(0.6vw + 0.4vh);
+                                    font-weight: 600;
+                                }
+
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+
+
         }
 
 

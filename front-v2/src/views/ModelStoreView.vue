@@ -39,7 +39,7 @@ const navToKnowLedge = () => {
 }
 
 onMounted(()=>{
-  axios.get('/api/data/monitorInfo')
+
 })
 
 </script>

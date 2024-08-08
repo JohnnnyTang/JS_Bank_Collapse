@@ -448,33 +448,33 @@ onMounted(() => {
         //     type: 'raster',
         //     source: 'mapRaster2022',
         // })
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'mapRaster2023',
+        })
         // map.addLayer({
-        //     id: 'ras',
-        //     type: 'raster',
-        //     source: 'mapRaster2023',
+        //     id: 'mzsOverWaterBound',
+        //     type: 'fill',
+        //     source: 'mzsOverWaterSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': '#a2800f',
+        //         'fill-opacity': 0.5,
+        //         'fill-outline-color': 'rgba(162, 128, 15, 0.)'
+        //     },
         // })
-        map.addLayer({
-            id: 'mzsOverWaterBound',
-            type: 'fill',
-            source: 'mzsOverWaterSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': '#a2800f',
-                'fill-opacity': 0.5,
-                'fill-outline-color': 'rgba(162, 128, 15, 0.)'
-            },
-        })
-        map.addLayer({
-            id: 'mzsUnderWaterBound',
-            type: 'fill',
-            source: 'mzsUnderWaterSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': '#101B94',
-                'fill-opacity': 0.5,
-                'fill-outline-color': 'rgba(16, 27, 148, 0.)'
-            },
-        })
+        // map.addLayer({
+        //     id: 'mzsUnderWaterBound',
+        //     type: 'fill',
+        //     source: 'mzsUnderWaterSource',
+        //     'source-layer': 'default',
+        //     paint: {
+        //         'fill-color': '#101B94',
+        //         'fill-opacity': 0.5,
+        //         'fill-outline-color': 'rgba(16, 27, 148, 0.)'
+        //     },
+        // })
         map.addControl(draw)
 
         map.on('draw.create', function (e) {

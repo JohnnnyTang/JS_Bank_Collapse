@@ -108,6 +108,10 @@ const routes = [
                 component: () => import('../components/modelStore/views/RiskWarning.vue'),
             },
             {
+                path: 'riskWarning2',
+                component: () => import('../components/modelStore/views/RiskWarning2.vue'),
+            },
+            {
                 path: 'numericalModel',
                 component: () => import('../components/modelStore/views/NumericalModel.vue'),
             }

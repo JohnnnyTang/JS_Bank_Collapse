@@ -74,10 +74,9 @@
                 <div class="user-avatar-icon"></div>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item v-if="!statusStore.loginStatus"
-                            @click="login">登录</el-dropdown-item>
-                        <el-dropdown-item v-else="statusStore.loginStatus"
-                            @click="logout">退出登录</el-dropdown-item>
+                        <el-dropdown-item v-if="!statusStore.loginStatus" @click="login">登录</el-dropdown-item>
+                        <el-dropdown-item v-else="statusStore.loginStatus" @click="logout">退出登录</el-dropdown-item>
+                        <el-dropdown-item @click="bankManageClickHandler">岸段管理</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -274,13 +273,16 @@ const resizeObserver = new ResizeObserver((entries) => {
     })
 })
 
-const login = ()=>{
+const login = () => {
     router.push('/login')
 }
-const logout = ()=>{
+const logout = () => {
     localStorage.removeItem('token')
     statusStore.loginStatus = false
     router.push('/login')
+}
+const bankManageClickHandler = () => {
+    router.push('/bankManage')
 }
 
 onMounted(() => {

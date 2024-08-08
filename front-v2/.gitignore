@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+bankFront
 dist-ssr
 *.local
 *.rar
