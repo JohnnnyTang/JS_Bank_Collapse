@@ -70,37 +70,6 @@ const dataLoading = ref(true)
 
 const curDevice = ref(props.initDevice)
 
-const backendInstance = axios.create({
-    // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
-})
-
-backendInstance.interceptors.request.use(
-    config => {
-        const token = localStorage.getItem('token');
-        // const token = sessionStorage.getItem('token');
-        if (token) {
-            config.headers["token"] = token;
-        }
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
-backendInstance.interceptors.response.use(
-    response => {
-        if (response.data["msg"] === "token过期") {
-            ElMessage.error("用户认证过期，请重新登录");
-            router.push('/login');
-            return Promise.reject(response.data);
-        }
-        return response;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
 
 const chartDom = ref()
 
@@ -1515,8 +1484,8 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
     if (deviceDataManageMap.value[deviceType][deviceName].data.length == 0) {
         dataLoading.value = true
         deviceDataManageMap.value[deviceType][deviceName].data = (
-            await backendInstance.get(
-                `/data/${deviceType}Data/${deviceTypeTimeMap[deviceType]['timeUnit']}/${deviceTypeTimeMap[deviceType]['timeCount']}/device/${deviceIdMap[deviceType][deviceName]}`,
+            await axios.get(
+                `/api/data/${deviceType}Data/${deviceTypeTimeMap[deviceType]['timeUnit']}/${deviceTypeTimeMap[deviceType]['timeCount']}/device/${deviceIdMap[deviceType][deviceName]}`,
             )
         ).data
         deviceDataManageMap.value[deviceType][deviceName].chartData =
@@ -1590,8 +1559,8 @@ onMounted(async () => {
     )
     dataLoading.value = true
     const deviceData = (
-        await backendInstance.get(
-            `/data/${curDevice.value}Data/${deviceTypeTimeMap[curDevice.value]['timeUnit']}/${deviceTypeTimeMap[curDevice.value]['timeCount']}/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+        await axios.get(
+            `/api/data/${curDevice.value}Data/${deviceTypeTimeMap[curDevice.value]['timeUnit']}/${deviceTypeTimeMap[curDevice.value]['timeCount']}/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
         )
     ).data
     deviceDataManageMap.value[curDevice.value][

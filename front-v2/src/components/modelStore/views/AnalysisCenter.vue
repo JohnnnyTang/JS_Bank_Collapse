@@ -6,7 +6,7 @@
       <div class="model-item-container">
         <div class="model-choice">
           <div class="basemap-radio-container">
-            <input
+            <!-- <input
               type="radio"
               id="radio-1"
               name="tabs"
@@ -16,7 +16,12 @@
             <label class="tab" for="radio-1">近岸动力分析</label>
             <input type="radio" id="radio-2" name="tabs" :checked="checky2" />
             <label class="tab" for="radio-2">近岸演变分析</label>
-            <span class="glider"></span>
+            <span class="glider"></span> -->
+            <el-radio-group v-model="radio1" @change="jump2Model(radio1)">
+              <el-radio-button label="近岸动力评估" value="1" />
+              <el-radio-button label="近岸动力计算" value="2" />
+              <el-radio-button label="近岸演变分析" value="3" />
+            </el-radio-group>
           </div>
         </div>
         <div class="main-page">
@@ -25,43 +30,21 @@
               <div class="title-icon uricon"></div>
               <div class="title-text">模型配置</div>
             </div>
-            <top-tool
-              @returnFileList="returnFileList"
-              @operateDraw="operateDraw"
-              @analyse="analyse"
-              @uploadHandle="drawHandle"
-              :dataList="dataList"
-            ></top-tool>
+            <top-tool @returnFileList="returnFileList" @operateDraw="operateDraw" @analyse="analyse"
+              @uploadHandle="drawHandle" :dataList="dataList"></top-tool>
           </div>
           <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
-          <data-manage
-            class="top"
-            ref="dataManage"
-            :dataList="dataList"
-            @operateLayer="operateLayer"
-            v-else
-          ></data-manage>
+          <data-manage class="top" ref="dataManage" :dataList="dataList" @operateLayer="operateLayer"
+            v-else></data-manage>
           <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
-          <layer-manage
-            class="bottom"
-            ref="layerManage"
-            :layerList="layerList"
-            @closeLayer="closeLayer"
-            @hideLayer="hideLayer"
-            @moveLayer="moveLayer"
-            v-else
-          ></layer-manage>
+          <layer-manage class="bottom" ref="layerManage" :layerList="layerList" @closeLayer="closeLayer"
+            @hideLayer="hideLayer" @moveLayer="moveLayer" v-else></layer-manage>
         </div>
 
         <!-- <div class="left-resize" ref="leftResize"></div> -->
       </div>
       <el-skeleton :rows="5" animated v-if="skeletonFlag" />
-      <right-visual
-        :layerList="layerList"
-        ref="rightMap"
-        @drawHandle="drawHandle"
-        v-else
-      ></right-visual>
+      <right-visual :layerList="layerList" ref="rightMap" @drawHandle="drawHandle" v-else></right-visual>
     </div>
   </div>
 </template>
@@ -89,6 +72,17 @@ export default defineComponent({
     const checky1 = ref(false);
     const checky2 = ref(true);
     const router = useRouter();
+    const radio1 = ref(3)
+
+    const jump2Model = (value) => {
+      console.log(value == '1')
+      const routeMap = {
+        '1': "/modelStore/stabilityAnalysis",
+        '2': "/modelStore/stabilityCalc",
+        '3': "/modelStore/analysisCenter"
+      }
+      routeMap[value] && router.push(routeMap[value])
+    }
 
     let eventSource;
 
@@ -242,6 +236,8 @@ export default defineComponent({
       checky1,
       checky2,
       radio1Click,
+      radio1,
+      jump2Model
     };
   },
 });
