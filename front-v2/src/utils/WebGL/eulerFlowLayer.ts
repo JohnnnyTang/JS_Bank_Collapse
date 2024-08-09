@@ -127,6 +127,8 @@ export class EulerFlowLayer {
     }
 
     async onAdd(map: mapbox.Map, gl: WebGL2RenderingContext) {
+        this.initGUI()
+
         const available_extensions = gl.getSupportedExtensions();
         available_extensions?.forEach(ext => {
             gl.getExtension(ext)
@@ -195,7 +197,6 @@ export class EulerFlowLayer {
         this.map.on('pitchend', restart)
 
         this.ready = true
-        this.initGUI()
 
         // window.addEventListener('keydown', (e) => {
         //     if (e.key == 'r') {
@@ -226,7 +227,7 @@ export class EulerFlowLayer {
             this.mapExtent = getMapExtent(this.map!)
             this.randomSeed = Math.random()
 
-            if (this.steady === false && this.localFrames === 0){
+            if (this.steady === false && this.localFrames === 0) {
                 this.nextStep(gl)
             }
 
@@ -396,7 +397,9 @@ export class EulerFlowLayer {
     }
 
     async programInit_delaunay(gl: WebGL2RenderingContext) {
+        console.log(this.prefix + this.stationUrl)
         let { vertexData_station, indexData_station } = await this.getStationData(this.prefix + this.stationUrl)
+        console.log(vertexData_station, indexData_station)
         this.vertexData_station = vertexData_station as Float32Array
         this.indexData_station = indexData_station
 
@@ -550,7 +553,7 @@ export class EulerFlowLayer {
         this.Locations_point['uvTexture'] = gl.getUniformLocation(this.program_point, 'uvTexture')
         console.log(this.Locations_point)
         this.mapExtent = getMapExtent(this.map)
-        let currentExtent = this.currentExtent(this.flowExtent,this.mapExtent)
+        let currentExtent = this.currentExtent(this.flowExtent, this.mapExtent)
         let data = this.generateGrid(currentExtent, this.gridNumPerRow, this.gridNumPerCol)
 
         this.pointNum = data.gridDataArray.length / 2
@@ -752,6 +755,7 @@ export class EulerFlowLayer {
             let velocity = Math.sqrt(u * u + v * v)
             if (velocity > this.flowMaxVelocity) this.flowMaxVelocity = velocity
         }
+        console.log(url, velocityData)
         return velocityData
     }
 
@@ -793,6 +797,10 @@ export class EulerFlowLayer {
         }
 
         this.gui = new dat.GUI()
+
+        dat.GUI.TEXT_OPEN = "展开控制面板";
+        dat.GUI.TEXT_CLOSED = "收起控制面板";
+
         let parameters = {
             aaWidth: this.aaWidth,
             fillWidth: this.fillWidth,
@@ -808,9 +816,9 @@ export class EulerFlowLayer {
         }
         this.gui.domElement.style.position = 'absolute'
         this.gui.domElement.style.top = '15vh'
-        this.gui.domElement.style.right = '1vw'
+        this.gui.domElement.style.right = '3vw'
         this.gui.add(parameters, 'stop', false).name('停止').onChange(value => this.stop = value);
-        this.gui.add(parameters,'steady', false).name('稳态流场').onChange(value => this.steady = value);
+        this.gui.add(parameters, 'steady', false).name('稳态流场').onChange(value => this.steady = value);
         // this.gui.add(parameters, 'aaWidth', 0, 5, 0.1).name('反走样宽度').onChange(value => this.aaWidth = value);
         this.gui.add(parameters, 'fillWidth', 0, 5, 0.1).name('填充宽度').onChange(value => this.fillWidth = value);
         this.gui.add(parameters, 'arrowAngle', 0, 90, 1).name('箭头角度').onChange(value => this.arrowAngle = value);

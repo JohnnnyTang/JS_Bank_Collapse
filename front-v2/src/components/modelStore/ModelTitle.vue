@@ -1,12 +1,23 @@
 <template>
     <div class="model-title-container">
-        <div
-            class="return-arrow"
-            @click="returnMain"
-        >
+        <div class="return-arrow" @click="returnMain">
         </div>
         <div class="title-text">
             {{ ModelName }}
+        </div>
+        <div class="bank-select-container">
+
+            <el-select v-model="selectedBank" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
+                @change="selectedBankChangeHandler">
+                <el-option v-for="(item, index ) in bankList" :key="index" :label="item" :value="item">
+                    <div style="text-align: center; width: 7vw; font-size: calc(0.6vw + 0.7vh); font-weight: bold;">{{ item
+                    }}</div>
+                </el-option>
+                <el-option disabled :value="''">
+                    <div style="text-align: center;width: 7vw;font-size: calc(0.6vw + 0.7vh); font-weight: bold;">···</div>
+                </el-option>
+            </el-select>
+
         </div>
     </div>
 </template>
@@ -14,19 +25,43 @@
 <script setup>
 
 import { useRouter } from 'vue-router'
+import axios from 'axios';
+import { onMounted, ref } from 'vue';
 const router = useRouter()
+
+const selectedBank = ref(null)
+const bankList = ref([])
+const emit = defineEmits(['confirmBank'])
+
+const selectedBankChangeHandler = (value) => {
+    emit('confirmBank', value)
+}
+
 const returnMain = () => {
     router.push('/modelStore')
 }
-
 const props = defineProps({
     ModelName: String,
+})
+
+const getBankList = async () => {
+    return new Promise((res, rej) => {
+        res(['民主沙'])
+    }).catch(err => console.log(err))
+}
+
+onMounted(() => {
+    getBankList().then(data => {
+        console.log(data)
+        bankList.value = data
+    })
 })
 
 </script >
 
 <style lang="scss" scoped>
 div.model-title-container {
+    position: relative;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -49,6 +84,7 @@ div.model-title-container {
         transition: transform 0.25s ease;
         background-repeat: no-repeat;
         background-position: 50% 50%;
+
         &:hover {
             cursor: pointer;
             transform: scale(1.1);
@@ -63,8 +99,58 @@ div.model-title-container {
         font-size: calc(1vh + 1vw);
         font-weight: 600;
         font-family: 'Microsoft YaHei';
-        color:aliceblue;
+        color: aliceblue;
         text-shadow: #4bb0f3 1px 1px;
     }
+
+    div.bank-select-container {
+        position: absolute;
+        right: 1vw;
+        top: 0;
+        // background-color: aliceblue;
+        width: 13vw;
+        height: 5vh;
+        display: grid;
+        place-items: center;
+
+        :deep(.el-select) {
+            height: 3.5vh;
+            box-shadow:
+                rgba(0, 132, 255, 0.8) 1px 1px,
+                rgba(0, 119, 255, 0.7) 2px 2px,
+                rgba(0, 119, 255, 0.6) 3px 4px;
+            border-radius: 6px;
+        }
+
+        :deep(.el-select__wrapper) {
+            height: 3.5vh;
+            line-height: 3.3vh;
+            border-radius: 6px;
+            font-family: 'Microsoft YaHei';
+            font-weight: bold;
+            font-size: calc(0.7vw + 0.7vh);
+            background-color: #ffffff;
+        }
+
+        :deep(.el-select__placeholder) {
+            color: #011741;
+        }
+
+        :deep(.el-icon) {
+            width: 0.5vw;
+            height: 0.5vw;
+
+            svg {
+                width: 0.5vw;
+                height: 0.5vw;
+
+                path {
+                    fill: #001cb8;
+                }
+            }
+        }
+    }
+
+
 }
 </style>

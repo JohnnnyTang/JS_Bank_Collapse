@@ -1,6 +1,6 @@
 <template>
     <div class="stablityAnalysis-container">
-        <ModelTitleVue :ModelName="'土体变形分析模型'" />
+        <ModelTitleVue :ModelName="'土体变形分析模型'" v-on:confirm-bank="confirmBankHandler" />
         <div class="model-content-container">
             <div class="model-run-container">
 
@@ -75,7 +75,8 @@
                                     <div class="content flex-coloum"
                                         style="align-items: center; justify-content: space-evenly;">
                                         <el-upload class="upload-demo" :file-list="fileList" :before-upload="beforeUpload"
-                                            :on-change="handleChange" :limit="1" :on-exceed="handleExceed">
+                                            :on-change="handleChange" :limit="1" :on-exceed="handleExceed"
+                                            :http-request="handleRequest" :show-file-list="false">
                                             <div class="button one-center" @click="inputData('file')">
                                                 文件导入
                                             </div>
@@ -132,7 +133,8 @@
 
     <el-dialog v-model="mapInputVisible" title="地图选择" width="41.5vw" @opened="showSectionDraw = true">
         <div class="main-content" v-if="showSectionDraw">
-            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" v-on:dem-select="demSelectHandler">
+            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" v-on:dem-select="demSelectHandler"
+                :demResources="demResources">
             </sectionDraw>
         </div>
         <template #footer>
@@ -151,6 +153,7 @@ import ModelTitleVue from '../ModelTitle.vue'
 import soilFlowChart from '../soilAnalysis/soilFlowChart.vue';
 import sectionDraw from '../soilAnalysis/sectionDraw.vue'
 import sectionChart from '../soilAnalysis/chart copy'
+import axios from 'axios';
 // import { getData, getTestData } from '../soilAnalysis/chart'
 import { onMounted, ref, reactive, watch, nextTick, computed } from 'vue';
 import { ElNotification } from 'element-plus';
@@ -183,11 +186,12 @@ const thicknessName = ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5']
 const xzData = ref(new Array(23).fill(['0', '0']))
 
 
-const beforeUpload = (file) => {
-    console.log('beforeUpload', file)
+const beforeUpload = (file, e) => {
+    console.log('beforeUpload', file, e)
     const isJSON = file.type === 'application/json';
     if (!isJSON) {
-        console.log('只能上传 JSON 文件!');
+        console.log('请上传合法的 JSON 参数配置文件!');
+        return false;
     }
     return isJSON;
 }
@@ -214,7 +218,17 @@ const handleChange = (file, fileList) => {
     reader.readAsText(file.raw);
 }
 const handleExceed = (files, fileList) => {
-    console.log('文件超出限制');
+    ElNotification({
+        type: 'error',
+        message: '文件超出限制，请上传正确的 JSON 文件！',
+        title: '错误',
+        offset: 200
+    })
+}
+const handleRequest = (a, b) => {
+    console.log('============')
+    console.log(a)
+    console.log(b)
 }
 
 watch(uploadJson, async (newValue, oldValue) => {
@@ -242,6 +256,31 @@ watch(uploadJson, async (newValue, oldValue) => {
 
 })
 
+// first into the page, select bank and get related data
+const selectedBank = ref(null)
+const demResources = ref([])
+const confirmBankHandler = async (bankName) => {
+    console.log('confirmBankHandler', bankName)
+    const bankNameMap = {
+        '民主沙': 'Mzs'
+    }
+    // const dem = (await axios.get(`/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
+    const dem = t
+    const _demResource = getDemResource(dem)
+    console.log('demdata', _demResource)
+    demResources.value = _demResource
+    selectedBank.value = bankName
+
+    ElNotification({
+        type: 'success',
+        title: '选择岸段',
+        message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
+        offset: 180
+    })
+}
+
+
+
 // data input
 const inputData = (type) => {
     if (type == 'file') {
@@ -249,6 +288,16 @@ const inputData = (type) => {
     }
     else if (type == 'map') {
         console.log('map input')
+        if(selectedBank.value == null){
+            ElNotification({
+                type: 'info',
+                message: '请先选择岸段',
+                title: '警告',
+                offset: 130
+            })
+            return
+        }
+
         mapInputVisible.value = true
         // setTimeout(() => {
         //     console.log(sectionDrawRef.value)
@@ -256,6 +305,10 @@ const inputData = (type) => {
         // }, 1);
         // sectionDrawRef.value.resizeMap()
     }
+
+    BSTEMResult.see = 0
+    BSTEMResult.ssa = 0
+    BSTEMResult.fos = 0
 }
 
 
@@ -270,13 +323,102 @@ const sectionDrawHandler = (geojson) => {
     sectionGeojson.value = geojson
 }
 const demSelectHandler = (name) => {
-    const NameList = {
-        '1998': '199801_dem/w001001.adf',
-        '2004': '200408_dem/w001001.adf'
-    }
-    selectedDem.value = NameList[name]
+    // const NameList = {
+    //     '1998': '199801_dem/w001001.adf',
+    //     '2004': '200408_dem/w001001.adf'
+    // }
+    // selectedDem.value = NameList[name]
+    console.log(name)
+    selectedDem.value = name
+}
+
+const sectionViewModelRun = async (param) => {
+    console.log('section view model run')
+    // let sectionViewParams = {
+    //     'dem-id': selectedDem,
+    //     'section-geometry': sectionGeojson,
+    // }
+    // const paramsCheck = () => {
+    //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
+    //         ElNotification({
+    //             type: 'warning',
+    //             message: '请完成断面绘制和地形选择',
+    //             title: '警告',
+    //             offset: 130
+    //         })
+    //         return false
+    //     }
+    //     return true
+    // }
+
+
+    ModelRunningShow.value = true
+    ModelRunningMessage.value = '正在计算断面形态'
+    let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
+    const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
+    const taskId = await sectionViewMR.modelStart()
+    console.log('task id', taskId, sectionViewMR.taskId)
+    let statusInterval = setInterval(async () => {
+        const status = await sectionViewMR.getRunningStatus()
+        console.log('status', status)
+        switch (status) {
+            case 'RUNNING':
+                break
+            case 'COMPLETE':
+                clearInterval(statusInterval)
+                const result = await sectionViewMR.getModelResult()
+                console.log('result', result)
+                let sectionFileName = result['raw-json']
+                const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err) => {
+                    ElNotification({
+                        type: 'error',
+                        title: '错误',
+                        message: '断面形态计算完毕，但获取断面信息失败！',
+                        offset: 130
+                    })
+                    console.log(err)
+                })
+                console.log('section json', sectionJson)
+                sectionViewMR.sectionJson = sectionJson
+                globalSectionJson = sectionJson
+
+                ModelRunningShow.value = false
+                ModelRunningMessage.value = ''
+                ElNotification({
+                    type: 'success',
+                    message: '计算断面形态成功',
+                    title: '成功',
+                    offset: 130
+                })
+                showSkeleton.value = false
+                setTimeout(() => {
+                    drawChartFromMap()
+                    chart.myChart.resize()
+                }, 100);
+                break
+            case 'ERROR':
+                clearInterval(statusInterval)
+                let errorLog = await sectionViewMR.getErrorLog()
+                console.log('error', errorLog)
+
+                ModelRunningShow.value = false
+                ModelRunningMessage.value = ''
+                ElNotification({
+                    type: 'error',
+                    message: '计算断面形态失败,\n' + errorLog,
+                    title: '错误',
+                    offset: 130
+                })
+                break
+        }
+    }, 1000)
 
 }
+
+
+
+
+
 let globalSectionJson = null
 
 
@@ -314,9 +456,9 @@ const BSTEMModelRun = async () => {
         "dem-id": selectedDem.value,
         "section-geometry": sectionGeojson.value,
         "x-values": xzData.value.map(item => Math.round(item[0] * 1000) / 1000),
-        "z-values": xzData.value.map(item => Math.round(item[0] * 1000) / 1000),
+        "z-values": xzData.value.map(item => Math.round(item[1] * 1000) / 1000),
         "index-toe": "",
-        "bool-tension": true,
+        "bool-tension": false,
         "bank-layer-thickness": thicknessData.value,
     }
     console.log(BSTEMModelParams)
@@ -398,85 +540,15 @@ const BSTEMModelRun = async () => {
     }
 }
 
-const sectionViewModelRun = async (param) => {
-    console.log('section view model run')
-    // let sectionViewParams = {
-    //     'dem-id': selectedDem,
-    //     'section-geometry': sectionGeojson,
-    // }
-    // const paramsCheck = () => {
-    //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
-    //         ElNotification({
-    //             type: 'warning',
-    //             message: '请完成断面绘制和地形选择',
-    //             title: '警告',
-    //             offset: 130
-    //         })
-    //         return false
-    //     }
-    //     return true
-    // }
-
-    ModelRunningShow.value = true
-    ModelRunningMessage.value = '正在计算断面形态'
-    let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
-    const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
-    const taskId = await sectionViewMR.modelStart()
-    console.log('task id', taskId, sectionViewMR.taskId)
-    let statusInterval = setInterval(async () => {
-        const status = await sectionViewMR.getRunningStatus()
-        console.log('status', status)
-        switch (status) {
-            case 'RUNNING':
-                break
-            case 'COMPLETE':
-                clearInterval(statusInterval)
-                const result = await sectionViewMR.getModelResult()
-                console.log('result', result)
-                let sectionFileName = result['raw-json']
-                const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json')
-                console.log('section json', sectionJson)
-                sectionViewMR.sectionJson = sectionJson
-                globalSectionJson = sectionJson
-
-                ModelRunningShow.value = false
-                ModelRunningMessage.value = ''
-                ElNotification({
-                    type: 'success',
-                    message: '计算断面形态成功',
-                    title: '成功',
-                    offset: 130
-                })
-                showSkeleton.value = false
-                setTimeout(() => {
-                    drawChartFromMap()
-                    chart.myChart.resize()
-                }, 100);
-                break
-            case 'ERROR':
-                clearInterval(statusInterval)
-                let errorLog = sectionViewMR.getErrorLog()
-                console.log('error', errorLog)
-
-                ModelRunningShow.value = false
-                ModelRunningMessage.value = ''
-                ElNotification({
-                    type: 'error',
-                    message: '计算断面形态失败,\n' + errorLog,
-                    title: '错误',
-                    offset: 130
-                })
-                break
-        }
-    }, 1000)
-
-}
 
 
 const redrawChartClickHandler = () => {
 
-    console.log(xzData.value)
-    console.log(thicknessData.value)
+    // console.log(xzData.value)
+    // console.log(thicknessData.value)
+    BSTEMResult.see = 0
+    BSTEMResult.ssa = 0
+    BSTEMResult.fos = 0
     let newOption = chart.getBaseOption2(xzData.value, thicknessData.value)
     chart.myChart.setOption(newOption)
 }
@@ -527,10 +599,6 @@ onMounted(async () => {
         }
         if (e.key == 'w') {
             console.log(thicknessData.value)
-        }
-        if (e.key == '3') {
-            // sectionViewModelRun()
-            drawChartFromMap()
         }
 
     })
@@ -716,887 +784,145 @@ const dataGenerate = (origin) => {
     }
 }
 
-const test = {
-    "points": [
-        [
-            548996.997896606,
-            3546474.3938493733,
-            -1.4753461601605866
-        ],
-        [
-            548994.6733517199,
-            3546468.599127559,
-            -1.579914643746663
-        ],
-        [
-            548992.3488068336,
-            3546462.804405745,
-            -1.679943857649389
-        ],
-        [
-            548990.0242619475,
-            3546457.009683931,
-            -1.7271396807859367
-        ],
-        [
-            548987.6997170612,
-            3546451.2149621164,
-            -1.7717713732179021
-        ],
-        [
-            548985.3751721751,
-            3546445.4202403026,
-            -1.8166420649542436
-        ],
-        [
-            548983.050627289,
-            3546439.625518488,
-            -1.8617517559996408
-        ],
-        [
-            548980.7260824027,
-            3546433.8307966744,
-            -1.907100446351496
-        ],
-        [
-            548978.4015375166,
-            3546428.03607486,
-            -1.9526881360114934
-        ],
-        [
-            548976.0769926304,
-            3546422.2413530457,
-            -2.0003751003808206
-        ],
-        [
-            548973.7524477442,
-            3546416.446631232,
-            -2.0882959778505397
-        ],
-        [
-            548971.427902858,
-            3546410.6519094175,
-            -2.1767959004019346
-        ],
-        [
-            548969.1033579719,
-            3546404.857187603,
-            -2.2658748680275402
-        ],
-        [
-            548966.7788130858,
-            3546399.0624657893,
-            -2.3555328747117605
-        ],
-        [
-            548964.4542681995,
-            3546393.267743975,
-            -2.4457699208771593
-        ],
-        [
-            548962.1297233134,
-            3546387.4730221606,
-            -2.5365860081023217
-        ],
-        [
-            548959.8051784271,
-            3546381.6783003467,
-            -2.6281020725987188
-        ],
-        [
-            548957.480633541,
-            3546375.8835785324,
-            -2.72056911919509
-        ],
-        [
-            548955.1560886549,
-            3546370.0888567185,
-            -2.8129846610349034
-        ],
-        [
-            548952.8315437686,
-            3546364.294134904,
-            -2.90534869813019
-        ],
-        [
-            548950.5069988825,
-            3546358.49941309,
-            -2.997661230473109
-        ],
-        [
-            548948.1824539963,
-            3546352.704691276,
-            -3.0899222580606893
-        ],
-        [
-            548945.8579091101,
-            3546346.9099694616,
-            -3.1821317809013134
-        ],
-        [
-            548943.5333642239,
-            3546341.1152476473,
-            -3.2673840722797474
-        ],
-        [
-            548941.2088193378,
-            3546335.3205258334,
-            -3.330270764834066
-        ],
-        [
-            548938.8842744516,
-            3546329.525804019,
-            -3.392586677965669
-        ],
-        [
-            548936.5597295654,
-            3546323.7310822047,
-            -3.4543318116726454
-        ],
-        [
-            548934.2351846793,
-            3546317.936360391,
-            -3.515506165949664
-        ],
-        [
-            548931.910639793,
-            3546312.1416385765,
-            -3.576109740805037
-        ],
-        [
-            548929.5860949069,
-            3546306.3469167626,
-            -3.636142536230439
-        ],
-        [
-            548927.2615500208,
-            3546300.5521949483,
-            -3.6946819285322765
-        ],
-        [
-            548924.9370051345,
-            3546294.757473134,
-            -3.751209666965664
-        ],
-        [
-            548922.6124602484,
-            3546288.96275132,
-            -3.8077374013807535
-        ],
-        [
-            548920.2879153622,
-            3546283.1680295058,
-            -3.8642651317853405
-        ],
-        [
-            548917.963370476,
-            3546277.3733076914,
-            -3.920792858174503
-        ],
-        [
-            548915.6388255899,
-            3546271.5785858775,
-            -3.9773205805463925
-        ],
-        [
-            548913.3142807037,
-            3546265.783864063,
-            -4.03384829890778
-        ],
-        [
-            548910.9897358175,
-            3546259.989142249,
-            -4.0956958134102495
-        ],
-        [
-            548908.6651909313,
-            3546254.194420435,
-            -4.165050979757834
-        ],
-        [
-            548906.3406460452,
-            3546248.3996986207,
-            -4.235173703389821
-        ],
-        [
-            548904.0161011589,
-            3546242.604976807,
-            -4.3060639843009545
-        ],
-        [
-            548901.6915562728,
-            3546236.8102549925,
-            -4.377721822496425
-        ],
-        [
-            548899.3670113867,
-            3546231.015533178,
-            -4.450147217973642
-        ],
-        [
-            548897.0424665004,
-            3546225.2208113642,
-            -4.523340170729979
-        ],
-        [
-            548894.7179216143,
-            3546219.42608955,
-            -4.590641072858522
-        ],
-        [
-            548892.393376728,
-            3546213.6313677356,
-            -4.6521663512086615
-        ],
-        [
-            548890.0688318419,
-            3546207.8366459217,
-            -4.713611654679192
-        ],
-        [
-            548887.7442869558,
-            3546202.0419241074,
-            -4.775284165476119
-        ],
-        [
-            548885.4197420696,
-            3546196.247202293,
-            -4.837869055628991
-        ],
-        [
-            548883.0951971834,
-            3546190.452480479,
-            -4.900909259018157
-        ],
-        [
-            548880.7706522972,
-            3546184.657758665,
-            -4.964404775652034
-        ],
-        [
-            548878.4461074111,
-            3546178.863036851,
-            -5.024566305933816
-        ],
-        [
-            548876.1215625248,
-            3546173.0683150366,
-            -5.083827585118578
-        ],
-        [
-            548873.7970176387,
-            3546167.2735932223,
-            -5.144640951748517
-        ],
-        [
-            548871.4724727526,
-            3546161.4788714084,
-            -5.207006405822006
-        ],
-        [
-            548869.1479278663,
-            3546155.684149594,
-            -5.270923947346105
-        ],
-        [
-            548866.8233829802,
-            3546149.8894277797,
-            -5.336393576315276
-        ],
-        [
-            548864.498838094,
-            3546144.094705966,
-            -5.403415292729387
-        ],
-        [
-            548862.1742932078,
-            3546138.2999841515,
-            -5.4668604681180994
-        ],
-        [
-            548859.8497483217,
-            3546132.505262337,
-            -5.528548003590279
-        ],
-        [
-            548857.5252034354,
-            3546126.7105405233,
-            -5.59020780758676
-        ],
-        [
-            548855.2006585493,
-            3546120.915818709,
-            -5.651839880109336
-        ],
-        [
-            548852.8761136631,
-            3546115.121096895,
-            -5.713444221156456
-        ],
-        [
-            548850.551568777,
-            3546109.3263750807,
-            -5.775020830729541
-        ],
-        [
-            548848.2270238907,
-            3546103.5316532664,
-            -5.836380028055483
-        ],
-        [
-            548845.9024790046,
-            3546097.7369314525,
-            -5.867835626020252
-        ],
-        [
-            548843.5779341185,
-            3546091.942209638,
-            -5.8929799977253285
-        ],
-        [
-            548841.2533892322,
-            3546086.147487824,
-            -5.917984885091808
-        ],
-        [
-            548838.9288443461,
-            3546080.35276601,
-            -5.942850288117174
-        ],
-        [
-            548836.6042994598,
-            3546074.5580441956,
-            -5.967576206803447
-        ],
-        [
-            548834.2797545737,
-            3546068.7633223813,
-            -5.99216264114812
-        ],
-        [
-            548831.9552096876,
-            3546062.9686005674,
-            -6.0166095911532
-        ],
-        [
-            548829.6306648013,
-            3546057.173878753,
-            -6.075419865050651
-        ],
-        [
-            548827.3061199152,
-            3546051.379156939,
-            -6.13573308295789
-        ],
-        [
-            548824.981575029,
-            3546045.584435125,
-            -6.194454928504952
-        ],
-        [
-            548822.6570301428,
-            3546039.7897133105,
-            -6.251585401686533
-        ],
-        [
-            548820.3324852567,
-            3546033.9949914967,
-            -6.307124502501485
-        ],
-        [
-            548818.0079403705,
-            3546028.2002696823,
-            -6.361072230955947
-        ],
-        [
-            548815.6833954843,
-            3546022.405547868,
-            -6.413014130321384
-        ],
-        [
-            548813.3588505981,
-            3546016.610826054,
-            -6.437184020155186
-        ],
-        [
-            548811.034305712,
-            3546010.81610424,
-            -6.457464381978489
-        ],
-        [
-            548808.7097608257,
-            3546005.0213824254,
-            -6.473855215793289
-        ],
-        [
-            548806.3852159396,
-            3545999.2266606116,
-            -6.479934106269031
-        ],
-        [
-            548804.0606710535,
-            3545993.4319387972,
-            -6.486157028854068
-        ],
-        [
-            548801.7361261672,
-            3545987.6372169834,
-            -6.493381696770508
-        ],
-        [
-            548799.4115812811,
-            3545981.842495169,
-            -6.494511924183193
-        ],
-        [
-            548797.0870363949,
-            3545976.0477733547,
-            -6.443597579577486
-        ],
-        [
-            548794.7624915087,
-            3545970.253051541,
-            -6.397991540238919
-        ],
-        [
-            548792.4379466226,
-            3545964.4583297265,
-            -6.357693806158241
-        ],
-        [
-            548790.1134017364,
-            3545958.663607912,
-            -6.322704377341539
-        ],
-        [
-            548787.7888568502,
-            3545952.8688860983,
-            -6.2930232537909765
-        ],
-        [
-            548785.464311964,
-            3545947.074164284,
-            -6.268650435500274
-        ],
-        [
-            548783.1397670779,
-            3545941.2794424696,
-            -6.257970832782356
-        ],
-        [
-            548780.8152221916,
-            3545935.4847206557,
-            -6.2822702109326745
-        ],
-        [
-            548778.4906773055,
-            3545929.6899988414,
-            -6.3089824923341995
-        ],
-        [
-            548776.1661324194,
-            3545923.8952770275,
-            -6.338107676988807
-        ],
-        [
-            548773.8415875331,
-            3545918.100555213,
-            -6.369645764897881
-        ],
-        [
-            548771.517042647,
-            3545912.305833399,
-            -6.403596756058461
-        ],
-        [
-            548769.1924977608,
-            3545906.511111585,
-            -6.439960650473658
-        ],
-        [
-            548766.8679528746,
-            3545900.7163897706,
-            -6.54875367733084
-        ]
-    ],
-    "step": 6.243581490734901,
-    "Sa_h": [
-        -0.016748157086000977,
-        -0.01602112730508338,
-        -0.007559094600844634,
-        -0.007148411932829923,
-        -0.007186691132794039,
-        -0.00722497033350766,
-        -0.007263249533805222,
-        -0.007301528734372533,
-        -0.007637757982352238,
-        -0.014081801863271648,
-        -0.014174544319269875,
-        -0.014267286774072454,
-        -0.014360028265390207,
-        -0.014452769824387665,
-        -0.014545511636218415,
-        -0.014657623133805711,
-        -0.014809936689957007,
-        -0.014801687457263506,
-        -0.014793438226496987,
-        -0.014785188994474572,
-        -0.014776939761976388,
-        -0.01476869053082073,
-        -0.01365438915227473,
-        -0.010072214585112507,
-        -0.009980795994106296,
-        -0.009889377402793954,
-        -0.009797958810627798,
-        -0.009706540219792933,
-        -0.009615121627624646,
-        -0.009375931488794738,
-        -0.009053735987473067,
-        -0.009053735343884496,
-        -0.009053734701544422,
-        -0.009053734058416044,
-        -0.009053733414991563,
-        -0.00905373277265163,
-        -0.009905775169948092,
-        -0.011108234344422879,
-        -0.01123116975986374,
-        -0.01135410517446288,
-        -0.011477040589893215,
-        -0.011599976004908735,
-        -0.011722911419503464,
-        -0.010779214178338726,
-        -0.009854164383285407,
-        -0.0098413552480594,
-        -0.009877745791969792,
-        -0.010023876559590647,
-        -0.01009680156857307,
-        -0.010169726578903639,
-        -0.009635740379309221,
-        -0.009491552128005684,
-        -0.009740141410852516,
-        -0.009988730693438596,
-        -0.0102373199771556,
-        -0.01048590925998536,
-        -0.010734498542794351,
-        -0.010161663699410508,
-        -0.009880152211310146,
-        -0.009875710613848808,
-        -0.009871269016674969,
-        -0.009866827419252324,
-        -0.009862385822057573,
-        -0.009827564101949496,
-        -0.005038069577765071,
-        -0.004027235288333993,
-        -0.004004894851390283,
-        -0.003982554414043282,
-        -0.0039602139770201945,
-        -0.0039378735395955225,
-        -0.003915533102492204,
-        -0.00941931709944391,
-        -0.009660035349380933,
-        -0.009405154018443041,
-        -0.009150272686655745,
-        -0.008895391354684515,
-        -0.008640510023696693,
-        -0.00831924744515886,
-        -0.0038711579034675083,
-        -0.003248193661506195,
-        -0.0026252294198648124,
-        -0.0009736223487692638,
-        -0.000996691177054616,
-        -0.0011571351999106996,
-        -0.00018102228894780508,
-        0.008154669668564592,
-        0.007304467701149403,
-        0.006454265735215795,
-        0.005604063768307316,
-        0.0047538618010524464,
-        0.0039036598348031757,
-        0.001710493045340369,
-        -0.0038918973327051235,
-        -0.0042783587338716495,
-        -0.004664820135338618,
-        -0.005051281537027219,
-        -0.005437742938241542,
-        -0.005824204339954469,
-        -0.017424778873892176
-    ],
-    "points_v": [
-        [
-            548996.997896606,
-            3546474.3938493733,
-            -1.4753461601605866
-        ],
-        [
-            548879.3953100088,
-            3546181.2292484185,
-            -5
-        ],
-        [
-            548766.8679528746,
-            3545900.7163897706,
-            -6.54875367733084
-        ]
-    ],
-    "Sa_v": [
-        -0.011158446851782572,
-        -0.005124227275453182
-    ],
-    "deepest_index": 99,
-    "slope_foot_index": 1,
-    "points_er_verified": [
-        [
-            548996.997896606,
-            3546474.3938493733,
-            -1.4753461601605866
-        ],
-        [
-            548986.5374446182,
-            3546448.3176012095,
-            -1.7941768441726258
-        ],
-        [
-            548976.0769926304,
-            3546422.2413530457,
-            -2.0003751003808206
-        ],
-        [
-            548965.6165406426,
-            3546396.165104882,
-            -2.4005790176651343
-        ],
-        [
-            548955.1560886548,
-            3546370.0888567185,
-            -2.81298466103612
-        ],
-        [
-            548944.6956366671,
-            3546344.0126085547,
-            -3.2282172280371952
-        ],
-        [
-            548934.2351846793,
-            3546317.936360391,
-            -3.515506165949664
-        ],
-        [
-            548923.7747326915,
-            3546291.860112227,
-            -3.7794735346750086
-        ],
-        [
-            548913.3142807037,
-            3546265.783864063,
-            -4.03384829890778
-        ],
-        [
-            548902.8538287159,
-            3546239.7076158994,
-            -4.341796958740412
-        ],
-        [
-            548892.3933767282,
-            3546213.6313677356,
-            -4.652166351207419
-        ],
-        [
-            548881.9329247402,
-            3546187.5551195717,
-            -4.9326001031821995
-        ],
-        [
-            548871.4724727524,
-            3546161.4788714084,
-            -5.207006405823474
-        ],
-        [
-            548861.0120207648,
-            3546135.4026232446,
-            -5.497707702287378
-        ],
-        [
-            548850.551568777,
-            3546109.3263750807,
-            -5.775020830729541
-        ],
-        [
-            548840.0911167891,
-            3546083.250126917,
-            -5.930435022146945
-        ],
-        [
-            548829.6306648013,
-            3546057.173878753,
-            -6.075419865050651
-        ],
-        [
-            548819.1702128135,
-            3546031.0976305893,
-            -6.334297288276048
-        ],
-        [
-            548808.7097608258,
-            3546005.0213824254,
-            -6.473855215792379
-        ],
-        [
-            548798.249308838,
-            3545978.945134262,
-            -6.468391213724662
-        ],
-        [
-            548787.7888568502,
-            3545952.8688860983,
-            -6.2930232537909765
-        ],
-        [
-            548777.3284048624,
-            3545926.7926379344,
-            -6.3232434717549
-        ],
-        [
-            548766.8679528746,
-            3545900.7163897706,
-            -6.54875367733084
-        ]
-    ],
-    "points_er": [
-        [
-            548996.997896606,
-            3546474.3938493733,
-            -1.4753461601605866
-        ],
-        [
-            548986.5374446182,
-            3546448.3176012095,
-            -1.7941768441726258
-        ],
-        [
-            548976.0769926304,
-            3546422.2413530457,
-            -2.0003751003808206
-        ],
-        [
-            548965.6165406426,
-            3546396.165104882,
-            -2.4005790176651343
-        ],
-        [
-            548955.1560886548,
-            3546370.0888567185,
-            -2.81298466103612
-        ],
-        [
-            548944.6956366671,
-            3546344.0126085547,
-            -3.2282172280371952
-        ],
-        [
-            548934.2351846793,
-            3546317.936360391,
-            -3.515506165949664
-        ],
-        [
-            548923.7747326915,
-            3546291.860112227,
-            -3.7794735346750086
-        ],
-        [
-            548913.3142807037,
-            3546265.783864063,
-            -4.03384829890778
-        ],
-        [
-            548902.8538287159,
-            3546239.7076158994,
-            -4.341796958740412
-        ],
-        [
-            548892.3933767282,
-            3546213.6313677356,
-            -4.652166351207419
-        ],
-        [
-            548881.9329247402,
-            3546187.5551195717,
-            -4.9326001031821995
-        ],
-        [
-            548871.4724727524,
-            3546161.4788714084,
-            -5.207006405823474
-        ],
-        [
-            548861.0120207648,
-            3546135.4026232446,
-            -5.497707702287378
-        ],
-        [
-            548850.551568777,
-            3546109.3263750807,
-            -5.775020830729541
-        ],
-        [
-            548840.0911167891,
-            3546083.250126917,
-            -5.930435022146945
-        ],
-        [
-            548829.6306648013,
-            3546057.173878753,
-            -6.075419865050651
-        ],
-        [
-            548819.1702128135,
-            3546031.0976305893,
-            -6.334297288276048
-        ],
-        [
-            548808.7097608258,
-            3546005.0213824254,
-            -6.473855215792379
-        ],
-        [
-            548798.249308838,
-            3545978.945134262,
-            -6.468391213724662
-        ],
-        [
-            548787.7888568502,
-            3545952.8688860983,
-            -6.2930232537909765
-        ],
-        [
-            548777.3284048624,
-            3545926.7926379344,
-            -6.3232434717549
-        ],
-        [
-            548766.8679528746,
-            3545900.7163897706,
-            -6.54875367733084
-        ]
-    ],
-    "step_er_verified": 28.096116708307054,
-    "step_er": 28.096116708307054
-}
 
 const parseUploadJson = (jsonData) => {
-    let pointDT = []
-    let thicknessDT = []
-    for (let i = 0; i < 23; i++) {
-        pointDT.push([jsonData['x-values'][i], jsonData['z-values'][i]])
+    try {
+        let pointDT = []
+        let thicknessDT = []
+        for (let i = 0; i < 23; i++) {
+            pointDT.push([jsonData['x-values'][i], jsonData['z-values'][i]])
+        }
+        thicknessDT = jsonData['thickness']
+        let flowElevation = jsonData['flow-elevation']
+
+        ElNotification({
+            type: 'success',
+            message: '参数配置文件解析完毕',
+            title: '成功',
+            offset: 200
+        })
+        return {
+            pointData: pointDT,
+            thicknessData: thicknessDT,
+            flowElevation: flowElevation
+        }
     }
-    thicknessDT = jsonData['thickness']
-    let flowElevation = jsonData['flow-elevation']
-    return {
-        pointData: pointDT,
-        thicknessData: thicknessDT,
-        flowElevation: flowElevation
+    catch (e) {
+        ElNotification({
+            type: 'error',
+            message: '解析失败，请上传正确的 JSON 文件！',
+            title: '错误',
+            offset: 200
+        })
     }
 }
 
+const getDemResource = (ogSource) => {
+    const _demRes = []
+    for (let i = 0; i < ogSource.length; i++) {
+        const year = ogSource[i]['year']
+        const sets = ogSource[i]['sets']
+        for (let j = 0; j < sets.length; j++) {
+
+            const set = sets[j]
+            for (let k = 0; k < set['list'].length; k++) {
+                const item = set['list'][k]
+                // const name = item['name']
+                const demResourceNode = {
+                    year: year,
+                    name: item['name'],
+                    fileType: item['fileType'],
+                    path: item['path']
+                }
+                _demRes.push(demResourceNode)
+            }
+
+        }
+    }
+    return _demRes
+}
+const t = [
+    {
+        "year": "1999",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "199901",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/1999/standard/199901/199901.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2012",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "201210",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2012/standard/201210/201210.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2016",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "201610",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2016/standard/201610/201610.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2019",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "201904",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2019/standard/201904/201904.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2023",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "202304",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2023/standard/202304/202304.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    }
+]
 </script>
 
 <style lang="scss" scoped>

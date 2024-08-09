@@ -99,6 +99,7 @@ const Detail = () => {
     // console.log(infoItem.value)
     if (infoItem.value.name === '数据融合解译模型')
         router.push(infoItem.value.routerPath)
+    // else
     else
         router.push('/modelStore/' + infoItem.value.routerPath)
 }

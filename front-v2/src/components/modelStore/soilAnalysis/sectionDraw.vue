@@ -29,10 +29,10 @@
         <div class="section-selectior-item">
             <el-select v-model="selectedDem" placeholder="选择地形" style="width: 10vw; height: 3.5vh"
                 @change="selectedDemChange">
-                <el-option v-for="item in sectionRasterList" :key="item.year" :label="item.year + '地形'
-                    " :value="item.year">
+                <el-option v-for="(item,index) in props.demResources" :key="index" :label="item.name + '地形'
+                    " :value="item.path">
                     <!-- <span>{{ item.year }}</span> -->
-                    <div style="text-align: center;">{{ item.year + '地形' }}</div>
+                    <div style="text-align: center;">{{ item.name + '地形' }}</div>
 
                     <!-- <span style="float: left">{{
                         item.year
@@ -67,6 +67,17 @@ const sectionConfirmClose = () => { }
 const cancelSectionRese = () => {
     sectionConfirmShow.value = false
 }
+
+// demResources 
+const props = defineProps({
+    demResources: {
+        type: Array,
+        default: () => [{ year: 1998 },
+        { year: 2004 }]
+    }
+})
+
+
 const sectionRasterList = ref([
     // { year: 2020, time: 'before', layerName: '' },
     // { year: 2021, time: 'before', layerName: '' },

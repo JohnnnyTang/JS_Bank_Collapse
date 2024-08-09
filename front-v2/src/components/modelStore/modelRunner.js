@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ElNotification } from "element-plus";
 export default class ModelRunner {
 
 
@@ -14,6 +15,12 @@ export default class ModelRunner {
                 this.taskId = response.data
                 resolve(this.taskId)
             }).catch(error => {
+                ElNotification({
+                    title: '模型运行失败',
+                    message: '错误原因：\n' + error.message,
+                    type: 'error',
+                    duration: 0
+                })
                 console.warn(error)
                 reject(error)
             })
@@ -63,13 +70,13 @@ export default class ModelRunner {
         })
     }
 
-    async getModelResultFile(fileName, fileType = 'common') {
+    async getModelResultFile(fileName, fileType = 'json') {
         return new Promise((resolve, reject) => {
             const MAP = {
-                'common': `/temp/data/modelServer/file/common?caseId=${this.caseId}&name=${fileName}`,
-                'bin': `/temp/data/modelServer/file/bin?caseId=${this.caseId}&name=${fileName}`,
-                'image': `/temp/data/modelServer/file/image?caseId=${this.caseId}&name=${fileName}`,
-                'json': `/temp/data/modelServer/file/json?caseId=${this.caseId}&name=${fileName}`
+                // 'bin': `/temp/data/modelServer/down/resource/file/bin?name=&name=${fileName}`,
+                // /temp/data/modelServer/down/result/file/json?caseId=dcfa6865c911e10c44d86ef45788b5c2&name=section.json
+                'image': `/temp/data/modelServer/down/result/file/image?caseId=${this.caseId}&name=${fileName}`,
+                'json': `/temp/data/modelServer/down/result/file/json?caseId=${this.caseId}&name=${fileName}`
             }
             let url = MAP[fileType]
             axios.get(url).then(response => {
@@ -81,22 +88,4 @@ export default class ModelRunner {
             })
         })
     }
-}
-
-async function asyncTemplate(url) {
-    return new Promise((resolve, reject) => {
-        const MAP = {
-            'common': `/temp/data/modelServer/file/common?caseId=${this.caseId}&name=${fileName}`,
-            'bin': `/temp/data/modelServer/file/bin?caseId=${this.caseId}&name=${fileName}`,
-            'image': `/temp/data/modelServer/file/image?caseId=${this.caseId}&name=${fileName}`
-        }
-        let url = MAP[fileType]
-        axios.get(url).then(response => {
-            console.log('running model result file! ', response.data)
-            resolve(response.data)
-        }).catch(error => {
-            console.warn(error)
-            reject(error)
-        })
-    })
 }

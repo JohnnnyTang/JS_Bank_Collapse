@@ -105,7 +105,12 @@ const routes = [
             },
             {
                 path: 'riskWarning',
-                component: () => import('../components/modelStore/views/RiskWarning.vue'),
+                // component: () => import('../components/modelStore/views/RiskWarning.vue'),
+                component: () => import('../components/modelStore/views/EmptyPage.vue'),
+            },
+            {
+                path: 'riskWarning2',
+                component: () => import('../components/modelStore/views/RiskWarning2.vue'),
             },
             {
                 path: 'numericalModel',

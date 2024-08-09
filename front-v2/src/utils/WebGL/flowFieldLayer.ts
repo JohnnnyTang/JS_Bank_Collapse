@@ -737,10 +737,10 @@ export default class FlowFieldLayer {
     async onAdd(map: mapboxgl.Map, gl: WebGL2RenderingContext) {
         this.GL = gl;
         // console.log('Custom flow field layer is being added...');
+        this.initGUI()
 
         this.map = map;
         await this.prepare(gl);
-        this.initGUI()
 
     }
 
@@ -760,10 +760,12 @@ export default class FlowFieldLayer {
     }
 
     initGUI = () => {
-        this.gui = new dat.GUI()
+
+        dat.GUI.TEXT_OPEN = "展开控制面板";
+        dat.GUI.TEXT_CLOSED = "收起控制面板";        this.gui = new dat.GUI()
         this.gui.domElement.style.position = 'absolute'
         this.gui.domElement.style.top = '15vh'
-        this.gui.domElement.style.right = '1vw'
+        this.gui.domElement.style.right = '3vw'
         this.gui.add(this.controller, 'isUnsteady', true).name('非稳态流场').onChange(value => this.controller.isUnsteady = value);
         this.gui.add(this.controller, 'lineNum', 0, 65536).name('流线数量').onChange(value => this.controller.lineNum = value);
         this.gui.add(this.controller, 'segmentNum', 1, 64).name('流线分段数').onChange(value => this.controller.segmentNum = value);

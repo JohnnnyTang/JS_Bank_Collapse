@@ -1,7 +1,6 @@
 <template>
   <div class="risk-warn-container">
     <div class="map-container" id="map" ref="mapContainer"></div>
-    <canvas id="GPUFrame"></canvas>
     <!-- <div class="selector-container">
             <div class="place-selector-container selector-item-container">
                 <div class="place-title selector-title">岸段选择：</div> -->
@@ -104,6 +103,17 @@
             </div>
         </div> -->
 
+
+    <!-- <div class="test" style="
+      position: absolute;
+      top: 2vh;
+      left: 2vh;
+      background-color: red;
+      width: 10vw;
+      height: 20vh;
+    ">
+      123123123
+    </div> -->
     <div class="basic-info-container">
       <div class="basic-info-content">
         <div class="title-container">民主沙右缘示范段</div>
@@ -128,19 +138,14 @@
       </div>
       <div class="risk-item" :class="{ active: showRiverBed }">
         <div class="risk-main-index riverbed" @click="showRiverBedFunc">
-          <dv-border-box-12
-            :color="['rgb(73, 164, 101)', '#9cf3e0']"
-            v-if="showRiverBed"
-          ></dv-border-box-12>
+          <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
           <div class="risk-item-text">河床演变</div>
         </div>
       </div>
       <div class="risk-item" :class="{ active: showGeologyAndProject }">
         <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
-          <dv-border-box-12
-            :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
-            v-if="showGeologyAndProject"
-          ></dv-border-box-12>
+          <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
+            v-if="showGeologyAndProject"></dv-border-box-12>
           <div class="risk-item-text">地质与工程治理</div>
         </div>
       </div>
@@ -165,11 +170,7 @@
 
     <div class="bankLine-control-block">
       <label class="switch">
-        <input
-          type="checkbox"
-          :checked="showBankLine"
-          @click="BankLineControlHandler()"
-        />
+        <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
         <span class="slider"></span>
       </label>
       <div class="text-block">
@@ -229,71 +230,36 @@
             <button @click="showGeologyAndProjectFunc">地质条件</button>
         </div> -->
 
-    <profileInfoVue
-      v-if="showProfileInfo"
-      @profile-value-change="changeProfileValue"
-      :profileData="profileData"
-      :profileList="profileList"
-      :shapeChartLoad="shapeChartLoad"
-      :erosionChartLoad="erosionChartLoad"
-    />
+    <profileInfoVue v-if="showProfileInfo" @profile-value-change="changeProfileValue" :profileData="profileData"
+      :profileList="profileList" :shapeChartLoad="shapeChartLoad" :erosionChartLoad="erosionChartLoad" />
 
-    <profileShapeYearlyVue
-      v-if="false"
-      @profile-value-change="changeProfileValue"
-      :profileData="profileData"
-      :profileList="profileList"
-      :shapeYearlyChartLoad="shapeYearlyChartLoad"
-    />
+    <profileShapeYearlyVue v-if="false" @profile-value-change="changeProfileValue" :profileData="profileData"
+      :profileList="profileList" :shapeYearlyChartLoad="shapeYearlyChartLoad" />
 
-    <profileShapeVue
-      v-if="showProfileShape"
-      @profile-value-change="changeProfileValue"
-      :profileData="profileData"
-      :profileDataCompare="profileDataCompare"
-      :profileList="profileList"
-      :shapeChartLoad="shapeChartLoad"
-    />
+    <profileShapeVue v-if="showProfileShape" @profile-value-change="changeProfileValue" :profileData="profileData"
+      :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
 
     <!-- <div class="drag profileSlope" v-if="showProfileSlope" v-draggable="{ bounds: 'body', cancel: 'div.content' }"> -->
-    <profileSlopeVue
-      v-if="showProfileSlope"
-      @profile-value-change="changeProfileValue"
-      :profileData="profileData"
-      :profileList="profileList"
-      :slopeChartLoad="slopeChartLoad"
-    />
+    <profileSlopeVue v-if="showProfileSlope" @profile-value-change="changeProfileValue" :profileData="profileData"
+      :profileList="profileList" :slopeChartLoad="slopeChartLoad" />
     <!-- </div> -->
 
-    <profileErosionVue
-      v-if="showProfileErosion"
-      @profile-value-change="changeProfileValue"
-      :profileData="profileData"
-      :profileList="profileList"
-      :slopeChartLoad="erosionChartLoad"
-    />
+    <profileErosionVue v-if="showProfileErosion" @profile-value-change="changeProfileValue" :profileData="profileData"
+      :profileList="profileList" :slopeChartLoad="erosionChartLoad" />
 
-    <div
-      v-if="showBedFlowChart"
-      style="
+    <div v-if="showBedFlowChart" style="
         position: absolute;
         top: 16.25vh;
         left: 0.3vw;
         width: 26vw;
         height: 23.5vh;
         z-index: 10;
-      "
-    >
+      ">
       <bedFlowChartVue />
     </div>
 
-    <flowspeedInfoVue
-      v-if="showFlowSpeed"
-      :profileList="profileList"
-      :flowspeedChartLoad="flowspeedChartLoad"
-      :type="nowWaterConditionType"
-      @condition-change="conditionChangeHandler"
-    />
+    <flowspeedInfoVue v-if="showFlowSpeed" :profileList="profileList" :flowspeedChartLoad="flowspeedChartLoad"
+      :type="nowWaterConditionType" @condition-change="conditionChangeHandler" />
     <div v-if="showFlowSpeed" class="flow-control-block">
       <label class="switch" style="transform: rotateZ(90deg)">
         <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
@@ -304,24 +270,17 @@
       </div>
     </div>
     <div v-if="showFlowSpeed" class="time-shower-block">
-      <flowTimeShower
-        :type="'exp'"
-        :time-step="timeStep"
-        :total-count="25"
-      ></flowTimeShower>
+      <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
     </div>
 
-    <div
-      v-if="showWaterProcessChart"
-      style="
+    <div v-if="showWaterProcessChart" style="
         position: absolute;
         top: 66vh;
         left: 0.3vw;
         width: 26vw;
         height: 25vh;
         z-index: 10;
-      "
-    >
+      ">
       <waterProcessChartVue :timeStep="timeStep" :type="nowWaterConditionType" />
     </div>
 
@@ -332,11 +291,7 @@
             :showRiskResult="showRiskResult"
         /> -->
 
-    <div
-      class="drag riskResult"
-      v-if="showRiskResult"
-      v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-    >
+    <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
       <riskResultVue :profileList="profileList" />
     </div>
 
@@ -404,12 +359,8 @@
 
     <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh">
       <span>确认使用此断面进行计算</span>
-      <el-input
-        v-model="tempProfileName"
-        style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
-        placeholder="请输入断面名称"
-        clearable
-      />
+      <el-input v-model="tempProfileName" style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
+        placeholder="请输入断面名称" clearable />
       <template #footer>
         <div class="dialog-footer">
           <div style="text-align: right">
@@ -445,25 +396,61 @@
     <div class="hydro-pannel">
       <div class="title">
         实时水文信息
-        <el-icon
-          @click="showHydroPannel = !showHydroPannel"
-          style="margin-left: 50%"
-          class="iconn"
-        >
+        <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%" class="iconn">
           <More />
         </el-icon>
       </div>
 
-      <el-table
-        :data="waterTableData"
-        border
-        style="width: 15vw"
-        v-show="showHydroPannel"
-      >
+      <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
         <el-table-column prop="station" label="站点" />
         <el-table-column prop="flow" label="流量" />
         <el-table-column prop="level" label="水位" />
       </el-table>
+    </div>
+
+
+
+    <div class="condition-pannel flex-column">
+      <!-- <HideDomButtom :direction="conditionPannelShow? 'right' : 'left'"></HideDomButtom> -->
+      <div class="title">
+        综合研判条件配置
+      </div>
+      <div class="card flex-column">
+        <div class="flex-row">
+          <div class="flex-row" style="margin-right: 1vw;">
+            <span class="desc">流量：</span>
+            <el-input v-model="conditionConfigureData.flow" style="width: 5.0vw; height: 3.5vh" placeholder="请输入流量" />
+          </div>
+          <div class="flex-row">
+            <span class="desc">潮差：</span>
+            <el-input v-model="conditionConfigureData.tideDif" style="width: 5.0vw; height: 3.5vh" placeholder="请输入潮差" />
+          </div>
+        </div>
+        <div class="flex-column">
+          <div class="flex-row" style="margin-bottom: .8vh;margin-top: 1vh;">
+            <span class="desc">判别计算地形：</span>
+            <el-select v-model="conditionConfigureData.judgeTerrain" placeholder="请选择地形" style="width: 7vw; height: 3.5vh"
+              @change="">
+              <el-option v-for="(item, index ) in  ['1998年地形', '2004年地形']" :key="index" :label="item" :value="item">
+                <div style="text-align: center;">{{ item }}</div>
+              </el-option>
+            </el-select>
+          </div>
+          <div class="flex-row">
+            <span class="desc">冲淤起算地形：</span>
+            <el-select v-model="conditionConfigureData.siltationTerrain" placeholder="请选择地形"
+              style="width: 7vw; height: 3.5vh" @change="">
+              <el-option v-for="(item, index ) in  ['1998年地形', '2004年地形']" :key="index" :label="item" :value="item">
+                <div style="text-align: center;">{{ item }}</div>
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+        <div class="one-center" style="position: absolute; bottom: 2.6vh; right: 1vw;">
+          <el-button type="primary" style="width:calc(2vw + 2vh); height: calc(2vw + 2vh); font-size:medium;"
+            @click="conditionConfigureDataResetHandler">确定</el-button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -501,6 +488,7 @@ import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import { convertToMercator } from "../components/bankRiskWarn/coordConvert.js";
 import { rasterMM } from "../components/bankRiskWarn/rasterMM";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
 import { connectionExists } from "@vue-flow/core";
 import {
   defaultWarnLayerDataInput,
@@ -557,6 +545,7 @@ const loading_message = ref("自定义断面信息计算中...");
 const mapContainer = ref();
 const timeStep = ref(0);
 const showHydroPannel = ref(false);
+const conditionPannelShow = ref(false)
 const timeStepFloat = ref(0);
 // const timeStepFloat = computed(()=>{
 //     return timeStep.value
@@ -566,6 +555,14 @@ const showRaster = ref(false);
 const showBankLine = ref(true);
 const showTerrain = ref(false);
 const infoTreeData = ref(InfoTree);
+const conditionConfigureData = reactive({
+  flow: null,
+  // tideType: null,
+  tideDif: null,
+  judgeTerrain: null,
+  siltationTerrain: null,
+})
+
 const nowWaterConditionType = ref("洪季");
 let DryflowLayer;
 let FloodflowLayer;
@@ -670,6 +667,15 @@ const mapJumpToRiver = (mapIns) => {
   // )
 };
 
+
+// reset condition data 
+const conditionConfigureDataResetHandler = () => {
+  console.log("reset condition data!", conditionConfigureData)
+}
+
+
+
+
 // 数据
 const profileList = ref(profileListInput);
 const sceneList = ref(sceneListInput);
@@ -691,9 +697,9 @@ const riskDataAll = ref([
 const placeValue = ref("mzs");
 
 // 场景与地形选择
-const sceneBeforeSelectChange = () => {};
+const sceneBeforeSelectChange = () => { };
 
-const sceneNowSelectChange = () => {};
+const sceneNowSelectChange = () => { };
 
 const confirmProfileTime = () => {
   sceneConfirmShow.value = true;
@@ -890,7 +896,7 @@ const CalProfile = async (before, now) => {
 const CalProfileById = async (before, now, id) => {
   const taskId = await bankRiskWarn.runProfileModel_long(before, now, id + 1);
   let RunStatus;
-  for (;;) {
+  for (; ;) {
     try {
       RunStatus = await bankRiskWarn.getRunStatus(taskId.data);
     } catch (error) {
@@ -941,7 +947,7 @@ const CalProfileList = (profileData) => {
     }
     try {
       profileList.value[index].flowspeed = value.deepestPoint[2];
-    } catch (error) {}
+    } catch (error) { }
   });
   // let map = useMapStore().getMap()
   // if (map) {
@@ -962,7 +968,7 @@ const CalProfileListForShow = (profileData) => {
     }
     try {
       profileList.value[index].flowspeed = value.deepestPoint[2];
-    } catch (error) {}
+    } catch (error) { }
   });
   let map = useMapStore().getMap();
   if (map) {
@@ -972,13 +978,13 @@ const CalProfileListForShow = (profileData) => {
   }
 };
 
-const sceneSelectChange = () => {};
+const sceneSelectChange = () => { };
 
-const onAddOption = () => {};
+const onAddOption = () => { };
 
-const onAddProfileOption = () => {};
+const onAddProfileOption = () => { };
 
-const onAddProfile = () => {};
+const onAddProfile = () => { };
 
 let floodWatcher = null;
 let dryWatcher = null;
@@ -1370,7 +1376,7 @@ const sureSectionRese = async () => {
     EndPtY
   );
   let RunStatus = "";
-  for (;;) {
+  for (; ;) {
     try {
       RunStatus = await bankRiskWarn.getRunStatus(taskId.data);
     } catch (error) {
@@ -2003,6 +2009,28 @@ $geoEndColor: rgba(78, 0, 122, 0.8);
 $proOriColor: rgba(228, 143, 16, 0.6);
 $proEndColor: rgba(189, 114, 1, 0.6);
 
+div.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+div.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+div.one-center {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+div.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 div.risk-warn-container {
   position: absolute;
   width: 100vw;
@@ -2013,19 +2041,514 @@ div.risk-warn-container {
 
   background: rgb(51, 51, 51);
 
+  div.condition-pannel {
+    position: absolute;
+    right: 1vw;
+    top: 5vh;
+    width: 19vw;
+
+    div.title {
+      position: relative;
+      width: calc(100% - 1vw);
+      // height: 4vh;
+      background-color: rgb(240, 248, 255);
+      height: 4vh;
+      line-height: 4vh;
+      padding-left: 1vw;
+      font-size: calc(0.7vw + 0.6vh);
+      font-weight: bold;
+      box-shadow: 0px 3px rgb(49, 121, 255);
+      color: rgb(0, 138, 218);
+      border-radius: 5px;
+    }
+
+    div.card {
+      padding: 2vh .7vw;
+      background-color: rgb(208, 236, 254);
+      box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+      border-radius: 5px;
+      overflow: hidden;
+
+      span.desc {
+        position: relative;
+        height: 3.5vh;
+        letter-spacing: .05vw;
+        line-height: 3.5vh;
+        font-family: 'Microsoft YaHei', 'sans-serif';
+        font-size: calc(0.6vw + 0.5vh);
+        font-weight: 700;
+        color: #444;
+      }
+    }
+  }
+
+
   div.map-container {
     width: 100vw;
     height: 92vh;
     background-color: hsl(194, 69%, 91%);
   }
 
-  canvas#GPUFrame {
+
+  div.basic-info-container {
     position: absolute;
-    top: 0;
-    width: 100vw;
-    height: 92vh;
-    z-index: 1;
-    pointer-events: none;
+    z-index: 5;
+    left: 0.3vw;
+    top: 0.5vh;
+    // width: 31.2vw;
+    width: 26vw;
+    height: 15vh;
+    background-color: rgba(146, 190, 228, 0.5);
+    backdrop-filter: blur(5px);
+    border: #0a59ec 2px solid;
+    border-radius: 6px;
+
+    div.basic-info-content {
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      display: flex;
+      flex-flow: row wrap;
+      align-content: flex-start;
+      justify-content: center;
+
+      div.title-container {
+        height: 3vh;
+        line-height: 3vh;
+        width: 100%;
+        background-color: transparent;
+        text-align: center;
+        font-size: calc(0.8vw + 0.8vh);
+        font-weight: bold;
+        color: #003bfd;
+        text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
+        letter-spacing: 0.4rem;
+      }
+
+      div.key-val-container {
+        width: 48%;
+        height: 4vh;
+        display: flex;
+        flex-flow: row wrap;
+        // background-color: #0446a8;
+        text-align: center;
+        border-bottom: 2px solid rgb(0, 32, 175);
+
+        &.right {
+          justify-content: flex-end;
+        }
+
+        div.key-text {
+          width: fit-content;
+          line-height: 3.5vh;
+          background-color: transparent;
+          font-size: calc(0.7vw + 0.6vh);
+          color: #0043fd;
+        }
+
+        div.val-text {
+          line-height: 3.5vh;
+          font-size: calc(0.7vw + 0.5vh);
+          font-weight: bold;
+          color: #1d00be;
+          // text-align: center;
+        }
+      }
+    }
+  }
+
+  div.risk-item-title {
+    position: absolute;
+    top: 8vh;
+    height: 2.6vh;
+    line-height: 2.6vh;
+    left: 0.4vw;
+    z-index: 8;
+    width: 26vw;
+    font-weight: bold;
+    font-size: calc(0.6vw + 0.8vh);
+    text-shadow: #eef3ff 1px 1px;
+    // box-shadow: 0px 2px rgb(0, 26, 255);
+    color: #0011ff;
+    text-align: center;
+  }
+
+  div.risk-item-container {
+    position: absolute;
+    top: 11.2vh;
+    left: 0.4vw;
+    height: 4.5vh;
+    width: 26vw;
+    // background-color: rgba(197, 211, 228, 0.6);
+    // border: rgba(0, 119, 255, 0.6) 2px solid;
+    border-radius: 6px;
+    z-index: 20;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    // background-color: red;
+    backdrop-filter: blur(8px);
+
+    div.risk-item {
+      flex: 1 1 0;
+      position: relative;
+      display: flex;
+      margin-bottom: 0.5vh;
+      margin-left: 0.5vw;
+      margin-right: 0.5vw;
+
+      @keyframes colorSlide {
+        0% {
+          background-position: 0% 50%;
+        }
+
+        // 50% {
+        //     background-position: 200% 50%;
+        // }
+        100% {
+          background-position: 300% 50%;
+        }
+      }
+
+      &.active {
+        div.risk-main-index {
+          &.waterpower {
+            animation: colorSlide ease-in-out 2s;
+            animation-fill-mode: forwards;
+          }
+
+          &.riverbed {
+            animation: colorSlide ease-in-out 2s;
+            animation-fill-mode: forwards;
+          }
+
+          &.bankGeology {
+            animation: colorSlide ease-in-out 2s;
+            animation-fill-mode: forwards;
+          }
+
+          &.outproject {
+            animation: colorSlide ease-in-out 2s;
+            animation-fill-mode: forwards;
+          }
+        }
+      }
+    }
+
+    div.risk-main-index {
+      width: 6.8vw;
+      cursor: pointer;
+      position: relative;
+      flex: 1 1 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 5px;
+      transition: 0.3s linear;
+
+      &:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+      }
+
+      :deep(.dv-border-box-12) {
+        position: absolute;
+        width: 7vw;
+        height: 98%;
+      }
+
+      // background-position: 0% 50%;
+
+      &.waterpower {
+        // transition: all ease-in-out;
+        background: linear-gradient(90deg,
+            rgba(33, 100, 182, 0.35),
+            // rgba(33, 100, 182, 1),
+            // rgba(0, 34, 215, 1),
+            // rgba(0, 34, 215, 1),
+            rgba(0, 34, 215, 1),
+            rgba(0, 34, 215, 1));
+        background-size: 400% 100%;
+        // background-color: rgba(28, 85, 156, 0.6);
+      }
+
+      &.riverbed {
+        background: linear-gradient(90deg,
+            rgba(39, 145, 87, 0.35),
+            // rgba(39, 145, 87, 1),
+            // rgb(0, 121, 16, 1),
+            // rgba(0, 121, 16, 1),
+            rgba(0, 121, 16, 1),
+            rgba(0, 121, 16, 1));
+        background-size: 400% 100%;
+      }
+
+      &.bankGeology {
+        background: linear-gradient(90deg,
+            rgba(95, 21, 138, 0.35),
+            // rgba(95, 21, 138, 1),
+            // rgb(63, 0, 121, 1),
+            // rgba(63, 0, 121, 1),
+            rgba(63, 0, 121, 1),
+            rgba(63, 0, 121, 1));
+        background-size: 400% 100%;
+      }
+
+      &.outproject {
+        background: linear-gradient(90deg,
+            rgba(228, 143, 16, 0.35),
+            // rgba(228, 143, 16, 1),
+            // rgba(121, 83, 0, 1),
+            // rgba(121, 83, 0, 1),
+            rgba(121, 83, 0, 1),
+            rgba(121, 83, 0, 1));
+        background-size: 400% 100%;
+      }
+
+      div.risk-item-text {
+        text-align: center;
+        font-size: calc(0.6vw + 0.4vh);
+        color: white;
+        font-family: "Microsoft YaHei";
+        font-weight: bolder;
+        text-shadow: #101113 2px 2px, #767779 2px 2px, #6493ff 3px 3px;
+      }
+    }
+  }
+
+
+  div.raster-control-block {
+    position: absolute;
+    top: 79vh;
+    left: 55vw;
+    height: 13vh;
+    width: 6vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+
+    .switch {
+      font-size: 20px;
+      position: relative;
+      display: inline-block;
+      width: 2em;
+      height: 3.5em;
+
+      input {
+        display: none;
+      }
+
+      /* The slider */
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgb(165, 219, 253);
+        transition: 0.4s;
+        border-radius: 10px;
+
+        &:before {
+          position: absolute;
+          content: "";
+          height: 1.4em;
+          width: 1.4em;
+          border-radius: 5px;
+          left: 0.3em;
+          bottom: 0.3em;
+          background-color: white;
+          transition: 0.4s;
+        }
+      }
+
+      input:checked {
+        +.slider {
+          background-color: rgb(73, 90, 250);
+        }
+
+        +.slider:before {
+          transform: translateY(-1.5em);
+        }
+      }
+    }
+
+    .text-block {
+      font-size: 20px;
+      width: 3em;
+      height: 5em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .text {
+        writing-mode: vertical-lr;
+        color: rgb(3, 45, 90);
+        color-scheme: light;
+        font-family: "Microsoft YaHei";
+        font-weight: 700;
+        user-select: none;
+      }
+    }
+  }
+
+  div.bankLine-control-block {
+    position: absolute;
+    top: 79vh;
+    left: 63vw;
+    height: 13vh;
+    width: 6vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+
+    .switch {
+      font-size: 20px;
+      position: relative;
+      display: inline-block;
+      width: 2em;
+      height: 3.5em;
+
+      input {
+        display: none;
+      }
+
+      /* The slider */
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgb(165, 219, 253);
+        transition: 0.4s;
+        border-radius: 10px;
+
+        &:before {
+          position: absolute;
+          content: "";
+          height: 1.4em;
+          width: 1.4em;
+          border-radius: 5px;
+          left: 0.3em;
+          bottom: 0.3em;
+          background-color: white;
+          transition: 0.4s;
+        }
+      }
+
+      input:checked {
+        +.slider {
+          background-color: rgb(73, 90, 250);
+        }
+
+        +.slider:before {
+          transform: translateY(-1.5em);
+        }
+      }
+    }
+
+    .text-block {
+      font-size: 20px;
+      width: 3em;
+      height: 5em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .text {
+        writing-mode: vertical-lr;
+        color: rgb(3, 45, 90);
+        color-scheme: light;
+        font-family: "Microsoft YaHei";
+        font-weight: 700;
+        user-select: none;
+      }
+    }
+  }
+
+  div.terrain-control-block {
+    position: absolute;
+    top: 79vh;
+    left: 57.5vw;
+    height: 13vh;
+    width: 6vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+
+    .switch {
+      font-size: 20px;
+      position: relative;
+      display: inline-block;
+      width: 2em;
+      height: 3.5em;
+
+      input {
+        display: none;
+      }
+
+      /* The slider */
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgb(165, 219, 253);
+        transition: 0.4s;
+        border-radius: 10px;
+
+        &:before {
+          position: absolute;
+          content: "";
+          height: 1.4em;
+          width: 1.4em;
+          border-radius: 5px;
+          left: 0.3em;
+          bottom: 0.3em;
+          background-color: white;
+          transition: 0.4s;
+        }
+      }
+
+      input:checked {
+        +.slider {
+          background-color: rgb(73, 90, 250);
+        }
+
+        +.slider:before {
+          transform: translateY(-1.5em);
+        }
+      }
+    }
+
+    .text-block {
+      font-size: 20px;
+      width: 3em;
+      height: 5em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .text {
+        writing-mode: vertical-lr;
+        color: rgb(3, 45, 90);
+        color-scheme: light;
+        font-family: "Microsoft YaHei";
+        font-weight: 700;
+        user-select: none;
+      }
+    }
   }
 
   div.selector-container {
@@ -2382,12 +2905,10 @@ div.risk-warn-container {
       border-radius: 20px;
       // border:#0f1011 2px solid;
       z-index: 5;
-      background-image: linear-gradient(
-        to right,
-        rgb(17, 17, 255),
-        rgb(220, 126, 37),
-        rgb(255, 9, 9)
-      );
+      background-image: linear-gradient(to right,
+          rgb(17, 17, 255),
+          rgb(220, 126, 37),
+          rgb(255, 9, 9));
       box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
     }
 
@@ -2477,7 +2998,7 @@ div.risk-warn-container {
 
   div.flow-control-block {
     position: absolute;
-    top: 46.5vh;
+    top: 47vh;
     left: 20.5vw;
     height: 10vh;
     width: 5vw;
@@ -2524,11 +3045,11 @@ div.risk-warn-container {
       }
 
       input:checked {
-        + .slider {
+        +.slider {
           background-color: rgb(73, 90, 250);
         }
 
-        + .slider:before {
+        +.slider:before {
           transform: translateY(-1.5em);
         }
       }
@@ -2541,6 +3062,7 @@ div.risk-warn-container {
       display: flex;
       justify-content: center;
       align-items: center;
+      margin-left: 1vw;
 
       .text {
         // writing-mode: vertical-lr;
@@ -2566,12 +3088,6 @@ div.risk-warn-container {
           }
         }
       }
-    }
-
-    div.time-shower-block {
-      position: absolute;
-      top: 55vh;
-      left: 20vw;
     }
 
     div.risk-year-container {
@@ -2612,473 +3128,7 @@ div.risk-warn-container {
       }
     }
 
-    div.risk-item-title {
-      position: absolute;
-      top: 8vh;
-      height: 2.6vh;
-      line-height: 2.6vh;
-      left: 0.4vw;
-      z-index: 8;
-      width: 26vw;
-      font-weight: bold;
-      font-size: calc(0.6vw + 0.8vh);
-      text-shadow: #eef3ff 1px 1px;
-      // box-shadow: 0px 2px rgb(0, 26, 255);
-      color: #0011ff;
-      text-align: center;
-    }
 
-    div.risk-item-container {
-      position: absolute;
-      top: 11.2vh;
-      left: 0.4vw;
-      height: 4.5vh;
-      width: 26vw;
-      // background-color: rgba(197, 211, 228, 0.6);
-      // border: rgba(0, 119, 255, 0.6) 2px solid;
-      border-radius: 6px;
-      z-index: 20;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-evenly;
-      // background-color: red;
-      backdrop-filter: blur(8px);
-
-      div.risk-item {
-        flex: 1 1 0;
-        position: relative;
-        display: flex;
-        margin-bottom: 0.5vh;
-        margin-left: 0.5vw;
-        margin-right: 0.5vw;
-
-        @keyframes colorSlide {
-          0% {
-            background-position: 0% 50%;
-          }
-
-          // 50% {
-          //     background-position: 200% 50%;
-          // }
-          100% {
-            background-position: 300% 50%;
-          }
-        }
-
-        &.active {
-          div.risk-main-index {
-            &.waterpower {
-              animation: colorSlide ease-in-out 2s;
-              animation-fill-mode: forwards;
-            }
-
-            &.riverbed {
-              animation: colorSlide ease-in-out 2s;
-              animation-fill-mode: forwards;
-            }
-
-            &.bankGeology {
-              animation: colorSlide ease-in-out 2s;
-              animation-fill-mode: forwards;
-            }
-
-            &.outproject {
-              animation: colorSlide ease-in-out 2s;
-              animation-fill-mode: forwards;
-            }
-          }
-        }
-      }
-
-      div.risk-main-index {
-        width: 6.8vw;
-        cursor: pointer;
-        position: relative;
-        flex: 1 1 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 5px;
-        transition: 0.3s linear;
-
-        &:hover {
-          transform: scale(1.05);
-          cursor: pointer;
-        }
-
-        :deep(.dv-border-box-12) {
-          position: absolute;
-          width: 7vw;
-          height: 98%;
-        }
-
-        // background-position: 0% 50%;
-
-        &.waterpower {
-          // transition: all ease-in-out;
-          background: linear-gradient(
-            90deg,
-            rgba(33, 100, 182, 0.35),
-            // rgba(33, 100, 182, 1),
-            // rgba(0, 34, 215, 1),
-            // rgba(0, 34, 215, 1),
-            rgba(0, 34, 215, 1),
-            rgba(0, 34, 215, 1)
-          );
-          background-size: 400% 100%;
-          // background-color: rgba(28, 85, 156, 0.6);
-        }
-
-        &.riverbed {
-          background: linear-gradient(
-            90deg,
-            rgba(39, 145, 87, 0.35),
-            // rgba(39, 145, 87, 1),
-            // rgb(0, 121, 16, 1),
-            // rgba(0, 121, 16, 1),
-            rgba(0, 121, 16, 1),
-            rgba(0, 121, 16, 1)
-          );
-          background-size: 400% 100%;
-        }
-
-        &.bankGeology {
-          background: linear-gradient(
-            90deg,
-            rgba(95, 21, 138, 0.35),
-            // rgba(95, 21, 138, 1),
-            // rgb(63, 0, 121, 1),
-            // rgba(63, 0, 121, 1),
-            rgba(63, 0, 121, 1),
-            rgba(63, 0, 121, 1)
-          );
-          background-size: 400% 100%;
-        }
-
-        &.outproject {
-          background: linear-gradient(
-            90deg,
-            rgba(228, 143, 16, 0.35),
-            // rgba(228, 143, 16, 1),
-            // rgba(121, 83, 0, 1),
-            // rgba(121, 83, 0, 1),
-            rgba(121, 83, 0, 1),
-            rgba(121, 83, 0, 1)
-          );
-          background-size: 400% 100%;
-        }
-
-        div.risk-item-text {
-          text-align: center;
-          font-size: calc(0.6vw + 0.4vh);
-          color: white;
-          font-family: "Microsoft YaHei";
-          font-weight: bolder;
-          text-shadow: #101113 2px 2px, #767779 2px 2px, #6493ff 3px 3px;
-        }
-      }
-    }
-
-    div.basic-info-container {
-      position: absolute;
-      z-index: 5;
-      left: 0.3vw;
-      top: 0.5vh;
-      // width: 31.2vw;
-      width: 26vw;
-      height: 15vh;
-      background-color: rgba(146, 190, 228, 0.5);
-      backdrop-filter: blur(5px);
-      border: #0a59ec 2px solid;
-      border-radius: 6px;
-
-      div.basic-info-content {
-        width: 100%;
-        height: 100%;
-        border-radius: 16px;
-        display: flex;
-        flex-flow: row wrap;
-        align-content: flex-start;
-        justify-content: center;
-
-        div.title-container {
-          height: 3vh;
-          line-height: 3vh;
-          width: 100%;
-          background-color: transparent;
-          text-align: center;
-          font-size: calc(0.8vw + 0.8vh);
-          font-weight: bold;
-          color: #003bfd;
-          text-shadow: #eef3ff 1px 1px, #eef3ff 2px 2px, #6493ff 3px 3px;
-          letter-spacing: 0.4rem;
-        }
-
-        div.key-val-container {
-          width: 48%;
-          height: 4vh;
-          display: flex;
-          flex-flow: row wrap;
-          // background-color: #0446a8;
-          text-align: center;
-          border-bottom: 2px solid rgb(0, 32, 175);
-
-          &.right {
-            justify-content: flex-end;
-          }
-
-          div.key-text {
-            width: fit-content;
-            line-height: 3.5vh;
-            background-color: transparent;
-            font-size: calc(0.7vw + 0.6vh);
-            color: #0043fd;
-          }
-
-          div.val-text {
-            line-height: 3.5vh;
-            font-size: calc(0.7vw + 0.5vh);
-            font-weight: bold;
-            color: #1d00be;
-            // text-align: center;
-          }
-        }
-      }
-    }
-
-    div.raster-control-block {
-      position: absolute;
-      top: 79vh;
-      left: 55vw;
-      height: 13vh;
-      width: 6vw;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      z-index: 3;
-
-      .switch {
-        font-size: 20px;
-        position: relative;
-        display: inline-block;
-        width: 2em;
-        height: 3.5em;
-
-        input {
-          display: none;
-        }
-
-        /* The slider */
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgb(165, 219, 253);
-          transition: 0.4s;
-          border-radius: 10px;
-
-          &:before {
-            position: absolute;
-            content: "";
-            height: 1.4em;
-            width: 1.4em;
-            border-radius: 5px;
-            left: 0.3em;
-            bottom: 0.3em;
-            background-color: white;
-            transition: 0.4s;
-          }
-        }
-
-        input:checked {
-          + .slider {
-            background-color: rgb(73, 90, 250);
-          }
-
-          + .slider:before {
-            transform: translateY(-1.5em);
-          }
-        }
-      }
-
-      .text-block {
-        font-size: 20px;
-        width: 3em;
-        height: 5em;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .text {
-          writing-mode: vertical-lr;
-          color: rgb(3, 45, 90);
-          color-scheme: light;
-          font-family: "Microsoft YaHei";
-          font-weight: 700;
-          user-select: none;
-        }
-      }
-    }
-
-    div.bankLine-control-block {
-      position: absolute;
-      top: 79vh;
-      left: 63vw;
-      height: 13vh;
-      width: 6vw;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      z-index: 3;
-
-      .switch {
-        font-size: 20px;
-        position: relative;
-        display: inline-block;
-        width: 2em;
-        height: 3.5em;
-
-        input {
-          display: none;
-        }
-
-        /* The slider */
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgb(165, 219, 253);
-          transition: 0.4s;
-          border-radius: 10px;
-
-          &:before {
-            position: absolute;
-            content: "";
-            height: 1.4em;
-            width: 1.4em;
-            border-radius: 5px;
-            left: 0.3em;
-            bottom: 0.3em;
-            background-color: white;
-            transition: 0.4s;
-          }
-        }
-
-        input:checked {
-          + .slider {
-            background-color: rgb(73, 90, 250);
-          }
-
-          + .slider:before {
-            transform: translateY(-1.5em);
-          }
-        }
-      }
-
-      .text-block {
-        font-size: 20px;
-        width: 3em;
-        height: 5em;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .text {
-          writing-mode: vertical-lr;
-          color: rgb(3, 45, 90);
-          color-scheme: light;
-          font-family: "Microsoft YaHei";
-          font-weight: 700;
-          user-select: none;
-        }
-      }
-    }
-
-    div.terrain-control-block {
-      position: absolute;
-      top: 79vh;
-      left: 59vw;
-      height: 13vh;
-      width: 6vw;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      z-index: 3;
-
-      .switch {
-        font-size: 20px;
-        position: relative;
-        display: inline-block;
-        width: 2em;
-        height: 3.5em;
-
-        input {
-          display: none;
-        }
-
-        /* The slider */
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgb(165, 219, 253);
-          transition: 0.4s;
-          border-radius: 10px;
-
-          &:before {
-            position: absolute;
-            content: "";
-            height: 1.4em;
-            width: 1.4em;
-            border-radius: 5px;
-            left: 0.3em;
-            bottom: 0.3em;
-            background-color: white;
-            transition: 0.4s;
-          }
-        }
-
-        input:checked {
-          + .slider {
-            background-color: rgb(73, 90, 250);
-          }
-
-          + .slider:before {
-            transform: translateY(-1.5em);
-          }
-        }
-      }
-
-      .text-block {
-        font-size: 20px;
-        width: 3em;
-        height: 5em;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .text {
-          writing-mode: vertical-lr;
-          color: rgb(3, 45, 90);
-          color-scheme: light;
-          font-family: "Microsoft YaHei";
-          font-weight: 700;
-          user-select: none;
-        }
-      }
-    }
 
     div.raster-legend-container {
       position: absolute;
@@ -3265,6 +3315,14 @@ div.risk-warn-container {
     }
   }
 
+  div.time-shower-block {
+    position: absolute;
+    top: 53.5vh;
+    left: 18.5vw;
+    z-index: 3;
+    transform: scale(0.8);
+  }
+
   @keyframes border-dance {
     0% {
       background-position: 0 0, 100% 100%, 0 100%, 100% 0;
@@ -3365,5 +3423,4 @@ div.risk-warn-container {
   :deep(.el-table tbody tr.highLight-row:hover > td) {
     cursor: pointer;
   }
-}
-</style>
+}</style>
