@@ -79,7 +79,7 @@ public class DataNodeUtil {
             dataNodeObj.put("path",path);
             if (year.equals(currentYearListObj.get("year"))) {
                 // 若year与之前相同，则判断set
-                if (set.equals(currentSetListObj.get("set"))) {
+                if (set.equals(currentSetListObj.get("name"))) {
                     currentSetList.add(dataNodeObj);
                 } else {
                     currentSetListObj = new JSONObject();
