@@ -17,7 +17,7 @@ export default class ModelRunner {
             }).catch(error => {
                 ElNotification({
                     title: '模型运行失败',
-                    message: '错误原因：\n'+error.message,
+                    message: '错误原因：\n' + error.message,
                     type: 'error',
                     duration: 0
                 })
@@ -73,10 +73,10 @@ export default class ModelRunner {
     async getModelResultFile(fileName, fileType = 'json') {
         return new Promise((resolve, reject) => {
             const MAP = {
-                // 'common': `/temp/data/modelServer/file/common?caseId=${this.caseId}&name=${fileName}`,
-                'bin': `/temp/data/modelServer/down/resource/file/bin?name=&name=${fileName}`,
-                'image': `/temp/data/modelServer/down/resource/file/image?name=${fileName}`,
-                'json': `/temp/data/modelServer/down/resource/file/json?name=${fileName}`
+                // 'bin': `/temp/data/modelServer/down/resource/file/bin?name=&name=${fileName}`,
+                // /temp/data/modelServer/down/result/file/json?caseId=dcfa6865c911e10c44d86ef45788b5c2&name=section.json
+                'image': `/temp/data/modelServer/down/result/file/image?caseId=${this.caseId}&name=${fileName}`,
+                'json': `/temp/data/modelServer/down/result/file/json?caseId=${this.caseId}&name=${fileName}`
             }
             let url = MAP[fileType]
             axios.get(url).then(response => {

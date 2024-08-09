@@ -22,7 +22,7 @@ export class FlowFieldController{
         this.segmentNum = 64;
         this.fullLife = this.segmentNum * 10;
         this.progressRate = 0.0;
-        this.speedFactor = 1.2;
+        this.speedFactor = 2.0;
         this.dropRate = 0.01;
         this.dropRateBump = 0.002;
         this.fillWidth = 3;

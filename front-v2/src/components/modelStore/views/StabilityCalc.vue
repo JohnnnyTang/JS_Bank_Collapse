@@ -93,12 +93,20 @@
                             <div class="card">
                                 <div class="title">
                                     <span style="font-size: medium; margin-left: .5vw;margin-right: .1vw;">➤</span> 工况可视化
+                                    <el-button style="margin-left: 3vw; 
+                                    background-color: rgb(197,232,252); 
+                                    color: rgb(7,82,119);
+                                    font-weight: 700;
+                                    border: 0;
+                                    font-size: calc(0.65vw + 0.5vh);
+                                    padding: 3px 10px;
+                                    " type="info" plane @click="visulizationPrepare">加载可视化资源</el-button>
                                 </div>
                                 <div class="content">
                                     <div class="slide-control-block">
-                                        <label class="switch">
-                                            <input type="checkbox" :checked="showFlow == 1"
-                                                @click="showFlowClickHandler(1)" />
+                                        <label class="switch" :class="{ 'forbbidden': globleVariable.status === false }">
+                                            <input type="checkbox" :checked="showFlow == 1" @click="showFlowClickHandler(1)"
+                                                :disabled="globleVariable.status === false" />
                                             <span class="slider"></span>
                                         </label>
                                         <div class="text-block">
@@ -107,9 +115,9 @@
                                     </div>
 
                                     <div class="slide-control-block">
-                                        <label class="switch">
-                                            <input type="checkbox" :checked="showFlow == 2"
-                                                @click="showFlowClickHandler(2)" />
+                                        <label class="switch" :class="{ 'forbbidden': globleVariable.status === false }">
+                                            <input type="checkbox" :checked="showFlow == 2" @click="showFlowClickHandler(2)"
+                                                :disabled="globleVariable.status === false" />
                                             <span class="slider"></span>
                                         </label>
                                         <div class="text-block">
@@ -135,11 +143,11 @@
                             <span style="font-size: medium; margin-left: 1vw; ">➤</span> 文件上传
                         </div>
                         <div class="content flex-coloum" style="justify-content: space-evenly; align-items: center;">
-                            <el-button type="primary" plain>网格和地形文件</el-button>
-                            <el-button type="primary" plain>边界条件</el-button>
-                            <el-button type="primary" plain>初始条件</el-button>
-                            <el-button type="primary" plain>参数文件</el-button>
-                            <el-button type="primary" plain>控制文件</el-button>
+                            <el-button type="primary" plain @click="fileUpload">网格和地形文件</el-button>
+                            <el-button type="primary" plain @click="fileUpload">边界条件</el-button>
+                            <el-button type="primary" plain @click="fileUpload">初始条件</el-button>
+                            <el-button type="primary" plain @click="fileUpload">参数文件</el-button>
+                            <el-button type="primary" plain @click="fileUpload">控制文件</el-button>
                         </div>
                     </div>
                 </div>
@@ -156,7 +164,7 @@
                                         <span>状态：<span :style="statusStyle">{{ modelRunnningStatusDesc }}</span></span>
                                     </div>
                                     <div class="one-center">
-                                        <el-button type="primary" plain>运行</el-button>
+                                        <el-button type="primary" plain @click="runMathModel">运行</el-button>
                                     </div>
                                 </div>
                                 <div style="width: 13vw;height: 3vh;margin-top: 1vh;margin-left: 1vw;">
@@ -200,6 +208,11 @@
                                                 placeholder="请输入名称" />
                                         </div>
                                     </div>
+                                    <div class="confirm-container one-center"
+                                        v-show="mathModelParams.addToRiskJudgeFlag != null">
+                                        <el-button style="width: 5vw; font-size: calc(0.7vw + 0.5vh);" type="primary" plain
+                                            @click="createNewCaseConfirmHandler">确认</el-button>
+                                    </div>
 
                                 </div>
                             </div>
@@ -211,41 +224,6 @@
             </div>
         </div>
     </div>
-
-    <!-- <el-dialog v-model="mathModelCalcBlockShow" title="数学模型计算" width="20vw" @opened="">
-        <div class="main-content">
-            <el-form :model="newCase" label-width="auto" style="max-width: 600px">
-                <el-form-item label="流量">
-                    <el-input v-model="newCase.flow" placeholeder="请输入流量" />
-                </el-form-item>
-                <el-form-item label="潮型">
-                    <el-select v-model="newCase.type" placeholder="请选择潮型">
-                        <el-option label="大潮" value="dc" />
-                        <el-option label="中潮" value="zc" />
-                        <el-option label="小潮" value="zc" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="加入研判">
-                    <el-radio-group v-model="newCase.temp">
-                        <el-radio value=false>是</el-radio>
-                        <el-radio value=true>否</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="备注">
-                    <el-input v-model="newCase.desc" type="textarea" />
-                </el-form-item>
-            </el-form>
-        </div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="mathModelCalcBlockShow = false">取消</el-button>
-                <el-button type="primary" @click="createNewCaseConfirmHandler">
-                    确定
-                </el-button>
-            </div>
-        </template>
-    </el-dialog> -->
-
     <div class="loading-container" v-show="ModelRunningShow">
         <dv-loading class="loading-icon">
             <div class="loading-message">{{ ModelRunningMessage }}</div>
@@ -276,9 +254,8 @@ const selectedBank = ref('')
 const visulizationStatus = ref(false)
 const mathModelCalcBlockShow = ref(false)
 const ModelRunningShow = ref(false)
-// const addToRiskJudgeFlag = ref(null)
 const modelRunnningProgress = ref(30)
-const ModelRunningMessage = ref('模型正在运行中，请稍后...')
+const ModelRunningMessage = ref('')
 const modelRunnningStatusDesc = ref('未运行')
 const router = useRouter()
 const defaultProps = {
@@ -298,12 +275,6 @@ const clickedSet = reactive({
     data: {},
     node: {}
 })
-const newCase = reactive({
-    flow: 0,
-    type: '',
-    temp: null,
-    desc: ''
-})
 const tideTypeList = ['小潮', '中潮', '大潮']
 const typeMap = {
     'dc': '大潮',
@@ -314,31 +285,9 @@ const tempMap = {
     false: '是',
     true: '否'
 }
-const mathModelParams = reactive({
-    meshFile: null,
-    boudaryFile: null,
-    initialFile: null,
-    parameterFile: null,
-    controlFile: null,
-    addToRiskJudgeFlag: null,
-    flow: null,
-    tideType: null,
-    customName: null,
-})
 
 
-const globleVariable = reactive({
-    taskID: null,
-    caseID: null,
-    pngPrefix: null,
-    visualizationJsonUrl: null,
-    stationBinUrl: null,
-    uvBinUrls: null,
-    status: false,
-    runningStatus: 'NONE',
-    lagrangeLayer: 'flowLayer1',
-    eulerLayer: 'flowLayer2',
-})
+
 const statusStyle = computed(() => {
     switch (modelRunnningStatusDesc.value) {
         case '未运行':
@@ -354,7 +303,7 @@ const statusStyle = computed(() => {
 
 
 
-// handler
+/////////////////// 岸段选择
 const confirmBankHandler = async (bankName) => {
     console.log('confirmBankHandler', bankName)
     const bankNameMap = {
@@ -378,6 +327,10 @@ const confirmBankHandler = async (bankName) => {
 }
 
 
+
+
+
+/////////////////// 资源节点信息记录
 const handleNodeClick = (nodeData, nodeInfo) => {
     console.log('nodeData', nodeData)
     console.log('nodeInfo', nodeInfo)
@@ -388,132 +341,235 @@ const handleNodeClick = (nodeData, nodeInfo) => {
         clickedNode.temp = nodeData.temp
         clickedNode.desc = nodeData.description
         clickedNode.info = nodeInfo
+
     }
 }
+
+
+
+
+///////////////////////// 新建工况 + 数模计算
+const mathModelParams = reactive({
+    meshFile: null,
+    boudaryFile: null,
+    initialFile: null,
+    parameterFile: null,
+    controlFile: null,
+    addToRiskJudgeFlag: null,
+    flow: null,
+    tideType: null,
+    customName: null,
+})
+
 const createNewCaseClickHandler = (nodeData, nodeInfo) => {
     clickedSet.data = nodeData
     clickedSet.node = nodeInfo
     console.log('createNewCaseClickHandler', nodeData, nodeInfo)
     mathModelCalcBlockShow.value = true
 }
+
+const fileUpload = (type) => {
+    ElNotification({
+        type: 'info',
+        title: '模块正在开发中....'
+    })
+}
+const runMathModel = async () => {
+    ElNotification({
+        type: 'info',
+        title: '模块正在开发中....'
+    })
+}
 const createNewCaseConfirmHandler = () => {
-    newCase.temp = newCase.temp === 'true' ? true : false
-    console.log('createNewCaseConfirmHandler', newCase)
-    console.log(clickedSet)
 
-    const parentNode = treeRef.value.getNode(clickedSet.data)
-    const newChild = { lable: `${newCase.flow}${newCase.type}`, type: 'case', temp: newCase.temp, description: newCase.desc }
+    // console.log(mathModelParams)
 
+    // const parentNode = treeRef.value.getNode(clickedSet.data)
+    // const newChild = {
+    //     lable: mathModelParams.addToRiskJudgeFlag === '1' ? `${mathModelParams.flow}${mathModelParams.type}` : `${mathModelParams.customName}`,
+    //     type: 'case',
+    //     temp: mathModelParams.addToRiskJudgeFlag === '1' ? false : true,
+    //     description: ''
+    // }
 
-    treeRef.value.append(newChild, parentNode)
-    console.log(treeRef.value.data)
+    // // console.log(parentNode, newChild)
+    // treeRef.value.append(newChild, parentNode)
+    // // console.log(treeRef.value.data)
 
-    updateTreeData(treeRef.value.data)
-    mathModelCalcBlockShow.value = false
+    // updateTreeData(treeRef.value.data)
+    // mathModelCalcBlockShow.value = false
+    ElNotification({
+        type: 'info',
+        title: '模块正在开发中....'
+    })
 }
 
 
+
+
+
+////////////////////////// 结果可视化
+const globleVariable = reactive({
+    taskID: null,
+    caseID: null,
+    pngPrefix: null,
+    visualizationJsonUrl: null,
+    stationBinUrl: null,
+    uvBinUrls: null,
+    status: false,
+    runningStatus: 'NONE',
+    lagrangeLayer: 'flowLayer1',
+    eulerLayer: 'flowLayer2',
+})
+
+const visulizationPrepare = async () => {
+    const modelRunnning = async () => {
+
+        let params = {
+            flow: clickedNode.flow,
+            tideType: clickedNode.type
+        }
+
+        ElNotification({
+            type: 'info',
+            title: '加载可视化资源',
+            message: `流量${params.flow}，潮型${params.tideType}`,
+            offset: 120
+        })
+
+
+        let modelPostUrl = ''
+        let modelParams = {}
+
+        modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+        modelParams = {
+            "water-qs": params.flow,
+            "tidal-level": params.tideType,
+            "segment": "Mzs",
+            "set": "standard",
+            "year": "2023",
+        }
+
+        console.log('check1 ', modelPostUrl, modelParams)
+        ModelRunningShow.value = true
+        ModelRunningMessage.value = '正在加载可视化资源...'
+        globleVariable.runningStatus = 'start'
+
+        const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+        // const TASK_ID = '1'
+        console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
+        globleVariable.taskID = TASK_ID
+        console.log('===Interval')
+        let runningStatusInterval = setInterval(async () => {
+            console.log('runningStatusInterval')
+            let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
+            ModelRunningMessage.value = '正在加载可视化资源...'
+            let randomFactor = 3.0
+            if (runningStatus === 'RUNNING') {
+                globleVariable.runningStatus = 'RUNNING'
+                globleVariable.status = false
+            }
+            else if (runningStatus === 'ERROR') {
+                globleVariable.runningStatus = 'ERROR'
+
+                const url = `/temp/taskNode/result/id?taskId=${TASK_ID}`
+                const errorLog = (await axios.get(url)).data['error-log']
+                ElNotification({
+                    title: '模型运行失败',
+                    message: `错误原因:\n` + errorLog,
+                    offset: 120,
+                    type: 'error',
+                })
+                ModelRunningShow.value = false
+                ModelRunningMessage.value = ''
+                globleVariable.runningStatus = 'NONE'
+                globleVariable.status = false
+                clearInterval(runningStatusInterval)
+            }
+            else if (runningStatus === 'COMPLETE') {
+                clearInterval(runningStatusInterval)
+                let runningResult = (await axios.get('/temp/taskNode/result/id?taskId=' + TASK_ID)).data
+                console.log('runningResult ', runningResult)
+
+                globleVariable.caseID = runningResult['case-id']
+                globleVariable.pngPrefix = `/temp/data/modelServer/down/resource/file/image?name=`
+                globleVariable.binPrefix = `/temp/data/modelServer/down/resource/file/bin?name=`
+                globleVariable.stationBinUrl = runningResult['visualization-station-bin']
+                globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
+                let visulizationDescUrl = `/temp/data/modelServer/down/resource/file/json?name=${runningResult['visualization-description-json']}`
+
+                globleVariable.visualizationJsonUrl = visulizationDescUrl
+                console.log('globle data info::', globleVariable)
+
+                ModelRunningShow.value = false
+                globleVariable.status = true
+                visulizationStatus.value = true
+                globleVariable.runningStatus = 'COMPLETE'
+
+                ElNotification({
+                    title: '可视化资源加载完毕',
+                    offset: 120,
+                    type: 'success',
+                })
+            }
+        }, 1000)
+    }
+
+    if (globleVariable.runningStatus === 'start' || globleVariable.runningStatus === 'RUNNING') {
+        ElNotification({
+            type: 'warning',
+            title: '请等待资源加载...',
+            offset: 120
+        })
+        return
+    } else {
+        globleVariable.status = false
+        showFlow.value = 0
+        flowLayerControl('lagrange', false)
+        flowLayerControl('euler', false)
+        modelRunnning()
+    }
+
+}
+const flowLayerControl = (type, show) => {
+    let map = mapStore.getMap()
+    const controlMap = {
+        'lagrange': {
+            add: () => {
+                console.log('add lagrenge');
+                let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix)
+                mapStore.getMap().addLayer(flow, 'mzsLabel')
+            },
+            remove: () => {
+                console.log('rm lagrenge');
+                map.getLayer(globleVariable.lagrangeLayer) && map.removeLayer(globleVariable.lagrangeLayer)
+            }
+        },
+        'euler': {
+            add: () => {
+                console.log('add euler');
+                let flow = new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix)
+                // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
+                // '/scratchSomething/temp/')
+
+                mapStore.getMap().addLayer(flow, 'mzsLabel')
+            },
+            remove: () => {
+                console.log('rm euler');
+                map.getLayer(globleVariable.eulerLayer) && map.removeLayer(globleVariable.eulerLayer)
+            }
+        }
+    }
+    controlMap[type][show ? 'add' : 'remove']()
+}
 const showFlowClickHandler = async (id) => {
     console.log(globleVariable)
     if (!visulizationStatus.value) {
-
-        const modelRunnning = async () => {
-
-            let params = {
-                flow: clickedNode.flow,
-                tideType: clickedNode.type
-            }
-            let modelPostUrl = ''
-            let modelParams = {}
-
-            modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
-            modelParams = {
-                "water-qs": params.flow,
-                "tidal-level": params.tideType,
-            }
-
-            console.log('check1 ', modelPostUrl, modelParams)
-
-            const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
-            // const TASK_ID = '1'
-            console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
-            ModelRunningShow.value = true
-            ModelRunningMessage.value = '模型正在运行中，请稍后...'
-            globleVariable.taskID = TASK_ID
-            console.log('===Interval')
-            let runningStatusInterval = setInterval(async () => {
-                console.log('runningStatusInterval')
-                let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
-                ModelRunningMessage.value = '模型正在运行中，请稍后...'
-                let randomFactor = 3.0
-                if (runningStatus === 'RUNNING') {
-                    globleVariable.runningStatus = 'RUNNING'
-
-                }
-                else if (runningStatus === 'ERROR') {
-                    globleVariable.runningStatus = 'ERROR'
-
-                    const url = `/temp/taskNode/result/id?taskId=${TASK_ID}`
-                    const errorLog = (await axios.get(url)).data['error-log']
-                    ElNotification({
-                        title: '模型运行失败',
-                        message: `错误原因:\n` + errorLog,
-                        offset: 120,
-                        type: 'error',
-                    })
-                    ModelRunningShow.value = false
-                    globleVariable.runningStatus = 'NONE'
-                    clearInterval(runningStatusInterval)
-                }
-                else if (runningStatus === 'COMPLETE') {
-                    clearInterval(runningStatusInterval)
-                    let runningResult = (await axios.get('/temp/taskNode/result/id?taskId=' + TASK_ID)).data
-                    console.log('runningResult ', runningResult)
-
-                    globleVariable.caseID = runningResult['case-id']
-                    globleVariable.pngPrefix = `/temp/data/modelServer/resource/file/image?name=`
-                    globleVariable.binPrefix = `/temp/data/modelServer/resource/file/bin?name=`
-                    globleVariable.stationBinUrl = runningResult['visualization-station-bin']
-                    globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
-                    let visulizationDescUrl = `/temp/data/modelServer/file/json?caseId=${runningResult['case-id']}&name=${runningResult['visualization-description-json']}`
-                    globleVariable.visualizationJsonUrl = visulizationDescUrl
-                    console.log('globle data info::', globleVariable)
-
-                    ModelRunningShow.value = false
-                    globleVariable.status = true
-                    visulizationStatus.value = true
-                    globleVariable.runningStatus = 'COMPLETE'
-
-                    ElNotification({
-                        title: '模型运行完毕',
-                        offset: 120,
-                        type: 'success',
-                    })
-
-                    if (id === 1) {
-                        showFlow.value = showFlow.value === 1 ? 0 : 1
-                        flowLayerControl('euler', false)
-                        if (!showFlow.value) {
-                            flowLayerControl('lagrange', false)
-                            return
-                        }
-                        flowLayerControl('lagrange', true)
-                        return
-                    } else if (id === 2) {
-                        showFlow.value = showFlow.value === 2 ? 0 : 2
-                        flowLayerControl('lagrange', false)
-                        if (!showFlow.value) {
-                            flowLayerControl('euler', false)
-                            return
-                        }
-                        flowLayerControl('euler', true)
-                        return
-                    }
-                    // showFlowClickHandler(1)
-                }
-            }, 1000)
-        }
-        modelRunnning()
+        ElNotification({
+            type: 'warning',
+            title: '请先加载可视化资源',
+            offset: 120
+        })
         return;
     }
     else {
@@ -603,22 +659,6 @@ const parseFlowAndType = (name) => {
     return { flow, type }
 }
 
-const t = [
-    {
-        "year": "2024",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "10000zc",
-                        "temp": "false"
-                    }
-                ],
-                "name": "test"
-            }
-        ]
-    }
-]
 
 const getTreeDataFromJson = (data, bankName) => {
     const result = [
@@ -663,37 +703,7 @@ const getTreeDataFromJson = (data, bankName) => {
 
 }
 
-const flowLayerControl = (type, show) => {
-    let map = mapStore.getMap()
-    const controlMap = {
-        'lagrange': {
-            add: () => {
-                console.log('add lagrenge');
-                let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix)
-                mapStore.getMap().addLayer(flow, 'mzsLabel')
-            },
-            remove: () => {
-                console.log('rm lagrenge');
-                map.getLayer(globleVariable.lagrangeLayer) && map.removeLayer(globleVariable.lagrangeLayer)
-            }
-        },
-        'euler': {
-            add: () => {
-                console.log('add euler');
-                let flow = new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix)
-                // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
-                // '/scratchSomething/temp/')
 
-                mapStore.getMap().addLayer(flow, 'mzsLabel')
-            },
-            remove: () => {
-                console.log('rm euler');
-                map.getLayer(globleVariable.eulerLayer) && map.removeLayer(globleVariable.eulerLayer)
-            }
-        }
-    }
-    controlMap[type][show ? 'add' : 'remove']()
-}
 
 const findNodesByLabel = (tree, label, accumulator = []) => {
     for (let node of tree) {
@@ -1153,6 +1163,14 @@ div.stability-analysis {
                                     width: 12.5vw;
                                     font-size: calc(0.6vw + 0.4vh);
                                     font-weight: 600;
+                                }
+
+                                .confirm-container {
+                                    position: relative;
+                                    margin-top: 1vh;
+                                    margin-bottom: 1vh;
+                                    width: 12.5vw;
+                                    font-size: calc(0.6vw + 0.4vh);
                                 }
 
                             }
