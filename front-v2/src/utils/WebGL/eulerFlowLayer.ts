@@ -796,6 +796,10 @@ export class EulerFlowLayer {
         }
 
         this.gui = new dat.GUI()
+
+        dat.GUI.TEXT_OPEN = "展开控制面板";
+        dat.GUI.TEXT_CLOSED = "收起控制面板";
+
         let parameters = {
             aaWidth: this.aaWidth,
             fillWidth: this.fillWidth,
@@ -811,7 +815,7 @@ export class EulerFlowLayer {
         }
         this.gui.domElement.style.position = 'absolute'
         this.gui.domElement.style.top = '15vh'
-        this.gui.domElement.style.right = '1vw'
+        this.gui.domElement.style.right = '3vw'
         this.gui.add(parameters, 'stop', false).name('停止').onChange(value => this.stop = value);
         this.gui.add(parameters, 'steady', false).name('稳态流场').onChange(value => this.steady = value);
         // this.gui.add(parameters, 'aaWidth', 0, 5, 0.1).name('反走样宽度').onChange(value => this.aaWidth = value);

@@ -1,6 +1,6 @@
 <template>
     <div class="stablityAnalysis-container">
-        <ModelTitleVue :ModelName="'土体变形分析模型'" />
+        <ModelTitleVue :ModelName="'土体变形分析模型'" v-on:confirm-bank="confirmBankHandler" />
         <div class="model-content-container">
             <div class="model-run-container">
 
@@ -133,7 +133,8 @@
 
     <el-dialog v-model="mapInputVisible" title="地图选择" width="41.5vw" @opened="showSectionDraw = true">
         <div class="main-content" v-if="showSectionDraw">
-            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" v-on:dem-select="demSelectHandler">
+            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" v-on:dem-select="demSelectHandler"
+                :demResources="demResources">
             </sectionDraw>
         </div>
         <template #footer>
@@ -152,6 +153,7 @@ import ModelTitleVue from '../ModelTitle.vue'
 import soilFlowChart from '../soilAnalysis/soilFlowChart.vue';
 import sectionDraw from '../soilAnalysis/sectionDraw.vue'
 import sectionChart from '../soilAnalysis/chart copy'
+import axios from 'axios';
 // import { getData, getTestData } from '../soilAnalysis/chart'
 import { onMounted, ref, reactive, watch, nextTick, computed } from 'vue';
 import { ElNotification } from 'element-plus';
@@ -254,6 +256,31 @@ watch(uploadJson, async (newValue, oldValue) => {
 
 })
 
+// first into the page, select bank and get related data
+const selectedBank = ref(null)
+const demResources = ref([])
+const confirmBankHandler = async (bankName) => {
+    console.log('confirmBankHandler', bankName)
+    const bankNameMap = {
+        '民主沙': 'Mzs'
+    }
+    // const dem = (await axios.get(`/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
+    const dem = t
+    const _demResource = getDemResource(dem)
+    console.log('demdata', _demResource)
+    demResources.value = _demResource
+    selectedBank.value = bankName
+
+    ElNotification({
+        type: 'success',
+        title: '选择岸段',
+        message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
+        offset: 180
+    })
+}
+
+
+
 // data input
 const inputData = (type) => {
     if (type == 'file') {
@@ -282,13 +309,102 @@ const sectionDrawHandler = (geojson) => {
     sectionGeojson.value = geojson
 }
 const demSelectHandler = (name) => {
-    const NameList = {
-        '1998': '199801_dem/w001001.adf',
-        '2004': '200408_dem/w001001.adf'
-    }
-    selectedDem.value = NameList[name]
+    // const NameList = {
+    //     '1998': '199801_dem/w001001.adf',
+    //     '2004': '200408_dem/w001001.adf'
+    // }
+    // selectedDem.value = NameList[name]
+    console.log(name)
+    selectedDem.value = name
+}
+
+const sectionViewModelRun = async (param) => {
+    console.log('section view model run')
+    // let sectionViewParams = {
+    //     'dem-id': selectedDem,
+    //     'section-geometry': sectionGeojson,
+    // }
+    // const paramsCheck = () => {
+    //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
+    //         ElNotification({
+    //             type: 'warning',
+    //             message: '请完成断面绘制和地形选择',
+    //             title: '警告',
+    //             offset: 130
+    //         })
+    //         return false
+    //     }
+    //     return true
+    // }
+
+
+    ModelRunningShow.value = true
+    ModelRunningMessage.value = '正在计算断面形态'
+    let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
+    const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
+    const taskId = await sectionViewMR.modelStart()
+    console.log('task id', taskId, sectionViewMR.taskId)
+    let statusInterval = setInterval(async () => {
+        const status = await sectionViewMR.getRunningStatus()
+        console.log('status', status)
+        switch (status) {
+            case 'RUNNING':
+                break
+            case 'COMPLETE':
+                clearInterval(statusInterval)
+                const result = await sectionViewMR.getModelResult()
+                console.log('result', result)
+                let sectionFileName = result['raw-json']
+                const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err)=>{
+                    ElNotification({
+                        type: 'error',
+                        title: '错误',
+                        message: '断面形态计算完毕，但获取断面信息失败！',
+                        offset: 130
+                    })
+                    console.log(err)
+                })
+                console.log('section json', sectionJson)
+                sectionViewMR.sectionJson = sectionJson
+                globalSectionJson = sectionJson
+
+                ModelRunningShow.value = false
+                ModelRunningMessage.value = ''
+                ElNotification({
+                    type: 'success',
+                    message: '计算断面形态成功',
+                    title: '成功',
+                    offset: 130
+                })
+                showSkeleton.value = false
+                setTimeout(() => {
+                    drawChartFromMap()
+                    chart.myChart.resize()
+                }, 100);
+                break
+            case 'ERROR':
+                clearInterval(statusInterval)
+                let errorLog = await sectionViewMR.getErrorLog()
+                console.log('error', errorLog)
+
+                ModelRunningShow.value = false
+                ModelRunningMessage.value = ''
+                ElNotification({
+                    type: 'error',
+                    message: '计算断面形态失败,\n' + errorLog,
+                    title: '错误',
+                    offset: 130
+                })
+                break
+        }
+    }, 1000)
 
 }
+
+
+
+
+
 let globalSectionJson = null
 
 
@@ -410,79 +526,6 @@ const BSTEMModelRun = async () => {
     }
 }
 
-const sectionViewModelRun = async (param) => {
-    console.log('section view model run')
-    // let sectionViewParams = {
-    //     'dem-id': selectedDem,
-    //     'section-geometry': sectionGeojson,
-    // }
-    // const paramsCheck = () => {
-    //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
-    //         ElNotification({
-    //             type: 'warning',
-    //             message: '请完成断面绘制和地形选择',
-    //             title: '警告',
-    //             offset: 130
-    //         })
-    //         return false
-    //     }
-    //     return true
-    // }
-
-    ModelRunningShow.value = true
-    ModelRunningMessage.value = '正在计算断面形态'
-    let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
-    const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
-    const taskId = await sectionViewMR.modelStart()
-    console.log('task id', taskId, sectionViewMR.taskId)
-    let statusInterval = setInterval(async () => {
-        const status = await sectionViewMR.getRunningStatus()
-        console.log('status', status)
-        switch (status) {
-            case 'RUNNING':
-                break
-            case 'COMPLETE':
-                clearInterval(statusInterval)
-                const result = await sectionViewMR.getModelResult()
-                console.log('result', result)
-                let sectionFileName = result['raw-json']
-                const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json')
-                console.log('section json', sectionJson)
-                sectionViewMR.sectionJson = sectionJson
-                globalSectionJson = sectionJson
-
-                ModelRunningShow.value = false
-                ModelRunningMessage.value = ''
-                ElNotification({
-                    type: 'success',
-                    message: '计算断面形态成功',
-                    title: '成功',
-                    offset: 130
-                })
-                showSkeleton.value = false
-                setTimeout(() => {
-                    drawChartFromMap()
-                    chart.myChart.resize()
-                }, 100);
-                break
-            case 'ERROR':
-                clearInterval(statusInterval)
-                let errorLog = await sectionViewMR.getErrorLog()
-                console.log('error', errorLog)
-
-                ModelRunningShow.value = false
-                ModelRunningMessage.value = ''
-                ElNotification({
-                    type: 'error',
-                    message: '计算断面形态失败,\n' + errorLog,
-                    title: '错误',
-                    offset: 130
-                })
-                break
-        }
-    }, 1000)
-
-}
 
 
 const redrawChartClickHandler = () => {
@@ -757,6 +800,112 @@ const parseUploadJson = (jsonData) => {
     }
 }
 
+const getDemResource = (ogSource) => {
+    const _demRes = []
+    for (let i = 0; i < ogSource.length; i++) {
+        const year = ogSource[i]['year']
+        const sets = ogSource[i]['sets']
+        for (let j = 0; j < sets.length; j++) {
+
+            const set = sets[j]
+            for (let k = 0; k < set['list'].length; k++) {
+                const item = set['list'][k]
+                // const name = item['name']
+                const demResourceNode = {
+                    year: year,
+                    name: item['name'],
+                    fileType: item['fileType'],
+                    path: item['path']
+                }
+                _demRes.push(demResourceNode)
+            }
+
+        }
+    }
+    return _demRes
+}
+const t = [
+    {
+        "year": "1999",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "199901",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/1999/standard/199901/199901.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2012",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "201210",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2012/standard/201210/201210.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2016",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "201610",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2016/standard/201610/201610.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2019",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "201904",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2019/standard/201904/201904.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    },
+    {
+        "year": "2023",
+        "sets": [
+            {
+                "list": [
+                    {
+                        "name": "202304",
+                        "temp": "",
+                        "fileType": "tiff",
+                        "path": "tiff/Mzs/2023/standard/202304/202304.tif"
+                    }
+                ],
+                "name": "standard"
+            }
+        ]
+    }
+]
 </script>
 
 <style lang="scss" scoped>
