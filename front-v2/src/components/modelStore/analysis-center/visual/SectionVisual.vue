@@ -61,7 +61,7 @@ export default defineComponent({
     const initData = async () => {
       const result = await getResultData(
         "json",
-        props.chartInfo.caseid,
+        props.chartInfo.id,
         props.chartInfo.name
       );
       const data = result.data;

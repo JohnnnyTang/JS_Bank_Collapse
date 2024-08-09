@@ -1,6 +1,6 @@
 <template>
   <div class="all">
-    <ModelTitleVue :ModelName="'近岸演变分析模型'" />
+    <ModelTitleVue @confirmBank="confirmBankHandler" :ModelName="'近岸演变分析模型'" />
 
     <div class="model-content-container">
       <div class="model-item-container">
@@ -30,46 +30,72 @@
               <div class="title-icon uricon"></div>
               <div class="title-text">模型配置</div>
             </div>
-            <top-tool @returnFileList="returnFileList" @operateDraw="operateDraw" @analyse="analyse"
-              @uploadHandle="drawHandle" :dataList="dataList"></top-tool>
+            <top-tool
+              @returnFileList="returnFileList"
+              @operateDraw="operateDraw"
+              @analyse="analyse"
+              @uploadHandle="drawHandle"
+              :dataList="dataList"
+              :key="selectedBank"
+            ></top-tool>
           </div>
-          <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
           <data-manage
             class="top"
             ref="dataManage"
             :dataList="dataList"
+            :key="selectedBank"
             @operateLayer="operateLayer"
             @addCurrentModel="addCurrentModel"
             @updateCurrentModel="updateCurrentModel"
-            v-else
           ></data-manage>
-          <el-skeleton :rows="5" animated class="bottom" v-if="skeletonFlag" />
-          <layer-manage class="bottom" ref="layerManage" :layerList="layerList" @closeLayer="closeLayer"
-            @hideLayer="hideLayer" @moveLayer="moveLayer" v-else></layer-manage>
+          <layer-manage
+            class="bottom"
+            ref="layerManage"
+            :layerList="layerList"
+            @closeLayer="closeLayer"
+            @hideLayer="hideLayer"
+            @moveLayer="moveLayer"
+          ></layer-manage>
         </div>
 
         <!-- <div class="left-resize" ref="leftResize"></div> -->
       </div>
-      <el-skeleton :rows="5" animated v-if="skeletonFlag" />
       <right-visual
         :layerList="layerList"
         ref="rightMap"
         @drawHandle="drawHandle"
-        v-else
       ></right-visual>
-      <div class="model-status">
-        <div class="show-model-status">模型运行</div>
+      <div class="model-status" :class="{ 'model-status-hide': !showModelStatus }">
+        <div class="show-model-status" @click="showModelStatus = !showModelStatus">
+          模型运行
+        </div>
         <div class="model-status-main" v-if="totalPages != 0">
           <div class="model-status-title">
-            正在运行：{{ currentKey }}
-            <div @click="prevPage" :disabled="currentIndex === 0">&lt;</div>
-            <span>{{ currentIndex + 1 }}/{{ totalPages }}</span>
-            <div @click="nextPage" :disabled="currentIndex === totalPages - 1">&gt;</div>
+            正在运行：<span class="current-model-name">{{ currentKey }}</span>
+            <div class="pagination">
+              <span
+                class="page-change"
+                @click="prevPage"
+                :class="{ 'page-change-disabled': currentIndex === 0 }"
+              >
+                &lt;
+              </span>
+              <span class="page-num">{{ currentIndex + 1 }}/{{ totalPages }}</span>
+              <span
+                class="page-change"
+                @click="nextPage"
+                :class="{ 'page-change-disabled': currentIndex === totalPages - 1 }"
+              >
+                &gt;
+              </span>
+            </div>
           </div>
           <div class="model-progress">
             <el-progress
               :percentage="modelProgressList[currentKey]"
               :stroke-width="15"
+              :duration="5"
+              striped-flow
               striped
             />
           </div>
@@ -89,6 +115,7 @@ import DataManage from "../analysis-center/analysis/DataManage.vue";
 import LayerManage from "../analysis-center/analysis/LayerManage.vue";
 import RightVisual from "../analysis-center/analysis/RightVisual.vue";
 import { useRouter } from "vue-router";
+import utils from "@/utils/CommonUtils";
 
 export default defineComponent({
   components: { ModelTitleVue, TopTool, RightVisual, DataManage, LayerManage },
@@ -96,6 +123,9 @@ export default defineComponent({
 </script>
 
 <script setup>
+const { getDataList } = ModelRequest;
+const { notice } = utils;
+const selectedBank = ref("");
 const skeletonFlag = ref(true);
 const dataList = ref([]);
 const layerList = ref([]);
@@ -106,20 +136,109 @@ const layerManage = ref();
 const checky1 = ref(false);
 const checky2 = ref(true);
 const router = useRouter();
-const radio1 = ref(3)
-
-const jump2Model = (value) => {
-  console.log(value == '1')
-  const routeMap = {
-    '1': "/modelStore/stabilityAnalysis",
-    '2': "/modelStore/stabilityCalc",
-    '3': "/modelStore/analysisCenter"
-  }
-  routeMap[value] && router.push(routeMap[value])
-}
+const radio1 = ref(3);
 
 const modelProgressList = ref({});
 const currentIndex = ref(0);
+const showModelStatus = ref(false);
+
+const jump2Model = (value) => {
+  console.log(value == "1");
+  const routeMap = {
+    1: "/modelStore/stabilityAnalysis",
+    2: "/modelStore/stabilityCalc",
+    3: "/modelStore/analysisCenter",
+  };
+  routeMap[value] && router.push(routeMap[value]);
+};
+
+const confirmBankHandler = async (bankName) => {
+  const bankNameMap = {
+    民主沙: "Mzs",
+  };
+  rightMap.value.mapFlyToRiver(bankName);
+  const result = await getDataList("DEM", bankNameMap[bankName]);
+  const baseData = result.data;
+  const formedData = baseData.map((yearData) => {
+    // TODO: 优化数据组织
+    return {
+      id: yearData.year,
+      label: `${yearData.year}年长江南京以下DEM`,
+      flag: true,
+      children: yearData.sets.flatMap((set) => {
+        return set.list.map((item) => {
+          return {
+            id: item.path,
+            label: item.name,
+            flag: false,
+            children: [],
+            visualType: "rasterTile",
+          };
+        });
+      }),
+    };
+  });
+  // dataList.value = [
+  //   {
+  //     id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
+  //     label: "2006年长江南京以下DEM",
+  //     flag: true,
+  //     children: [
+  //       {
+  //         id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
+  //         label: "w001001.adf",
+  //         flag: false,
+  //         children: [],
+  //         visualType: "rasterTile",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "30c14195-bfe7-47e4-ac06-70991392409c",
+  //     label: "2004年长江南京以下DEM",
+  //     flag: true,
+  //     children: [
+  //       {
+  //         id: "200408_dem/w001001.adf",
+  //         label: "w001001.adf",
+  //         flag: false,
+  //         children: [],
+  //         visualType: "rasterTile",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
+  //     label: "1998年长江南京以下DEM",
+  //     flag: true,
+  //     children: [
+  //       {
+  //         id: "199801_dem/w001001.adf",
+  //         label: "w001001.adf",
+  //         flag: false,
+  //         children: [],
+  //         visualType: "rasterTile",
+  //       },
+  //     ],
+  //   },
+  // ];
+
+  //TODO: 获取数据放在datamanage?
+  // 添加已有的分析结果集
+  let allData = dataManage.value.dataList;
+  if (allData.length != 0 && allData[allData.length - 1].id === "") {
+    formedData.push(allData[allData.length - 1]);
+  }
+  dataList.value = formedData;
+  selectedBank.value = bankName;
+
+  notice(
+    "success",
+    "选择岸段",
+    `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
+    180
+  );
+};
 // {
 //     fileId: string;
 //     fileName: string;
@@ -193,17 +312,27 @@ const radio1Click = () => {
 };
 
 const addCurrentModel = (name) => {
+  if (modelProgressList.value[name] !== undefined) {
+    notice("info", "错误", "当前模型正在运行中，请等待其运行完毕。");
+    return;
+  }
   modelProgressList.value[name] = 0;
-  console.log(modelProgressList.value);
+  showModelStatus.value = true;
 };
 
 const updateCurrentModel = (name, status) => {
   if (status == 0) {
-    delete modelProgressList.value[name];
+    modelProgressList.value[name] = 100;
+    setTimeout(async () => {
+      delete modelProgressList.value[name];
+      if (currentIndex.value > 0) currentIndex.value--;
+    }, 1000);
   } else if (status == -1) {
     delete modelProgressList.value[name];
   } else if (status == 1) {
-    modelProgressList.value[name] += 5;
+    if (modelProgressList.value[name] < 90) {
+      modelProgressList.value[name] += Math.floor(Math.random() * (10 - 5 + 1)) + 5;
+    }
   }
 };
 
@@ -232,50 +361,6 @@ const nextPage = () => {
 };
 
 onMounted(async () => {
-  dataList.value = [
-    {
-      id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
-      label: "2006年长江南京以下DEM",
-      flag: true,
-      children: [
-        {
-          id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
-          label: "w001001.adf",
-          flag: false,
-          children: [],
-          visualType: "rasterTile",
-        },
-      ],
-    },
-    {
-      id: "30c14195-bfe7-47e4-ac06-70991392409c",
-      label: "2004年长江南京以下DEM",
-      flag: true,
-      children: [
-        {
-          id: "200408_dem/w001001.adf",
-          label: "w001001.adf",
-          flag: false,
-          children: [],
-          visualType: "rasterTile",
-        },
-      ],
-    },
-    {
-      id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
-      label: "1998年长江南京以下DEM",
-      flag: true,
-      children: [
-        {
-          id: "199801_dem/w001001.adf",
-          label: "w001001.adf",
-          flag: false,
-          children: [],
-          visualType: "rasterTile",
-        },
-      ],
-    },
-  ];
   // TODO: sessionstorage获得图层列表
   // const res = await ModelRequest.getLayersInfo(import.meta.env.VITE_APP_ROUTER_ID);
   // if (res != null && res.code === 0) {
@@ -283,15 +368,11 @@ onMounted(async () => {
   // }
   // const data = window.sessionStorage.getItem("layerList");
   // if (data != null) layerList.value = JSON.parse(data);
-  skeletonFlag.value = false;
-
   // let runningStatusInterval = setInterval(async () => {
   //   let randomFactor = 3.0;
-
   //   if (modelRunnningProgress.value < 88) randomFactor = 1.0;
   //   if (modelRunnningProgress.value > 88) randomFactor = 0.5;
   //   if (modelRunnningProgress.value > 95) randomFactor = 0.1;
-
   //   let nextProgress =
   //     Math.round((modelRunnningProgress.value + Math.random() * randomFactor) * 100) /
   //     100;
@@ -504,7 +585,7 @@ div.model-content-container {
       }
 
       div.user-react {
-        height: 15vh;
+        height: 12vh;
         width: 100%;
         background-color: aliceblue;
 
@@ -523,10 +604,12 @@ div.model-content-container {
         }
 
         .buttons {
+          height: 7vh;
           display: flex;
           flex-direction: row;
           flex-wrap: wrap;
           justify-content: space-evenly;
+          align-items: center;
 
           .button {
             background-color: #4c97fa;
@@ -534,8 +617,8 @@ div.model-content-container {
             border-radius: 0.5vh;
             border-color: white;
             border-width: 0.5vh;
-            height: 3vh;
-            width: 8vw;
+            height: 4vh;
+            width: 5vw;
             color: white;
             font-size: calc(0.8vw + 0.5vh);
             font-weight: 600;
@@ -681,44 +764,52 @@ div.model-content-container {
 
   div.model-status {
     position: absolute;
-    right: 0;
-    width: 22vw;
+    right: -2px;
+    width: 25vw;
     top: 5vh;
     height: 12vh;
-    background: white;
     z-index: 1000;
-    border-radius: 15px 0 0 15px;
+    border-radius: 10px 0 0 10px;
     overflow: hidden;
     display: flex;
-    border: 2px solid #1735ae;
+    border: 2px solid #3175ff;
+    transition: right 1s;
 
     .show-model-status {
       height: 100%;
-      width: 1.7vw;
-      background: #1753ae;
+      width: 2vw;
+      // background: #1753ae;
+      background: #3175ff;
       font-size: calc(0.6vw + 0.8vh);
       display: flex;
       text-align: center;
       align-items: center;
       line-height: 2.5vh;
       color: white;
+      cursor: pointer;
+    }
+
+    .show-model-status:hover {
+      color: #62f8ff;
     }
 
     .model-status-empty {
       height: 100%;
       width: 100%;
       background-color: #dcebf8;
+      background-image: linear-gradient(to left, #ccffff 0%, #baddf3 100%);
       display: grid;
       place-items: center;
       font-size: calc(0.85vw + 0.85vh);
       font-weight: 600;
-      color: #566573;
+      color: #909090;
     }
 
     .model-status-main {
       height: 100%;
       width: 100%;
       background-color: #dcebf8;
+      background-image: linear-gradient(to left, #ccffff 0%, #baddf3 100%);
       color: #566573;
 
       .model-status-title {
@@ -728,12 +819,42 @@ div.model-content-container {
         padding: 1vh 0.8vw;
         font-size: calc(0.85vw + 0.85vh);
         font-weight: 600;
+
+        .current-model-name {
+          color: #366fe1;
+        }
+
+        .pagination {
+          position: absolute;
+          right: 1vw;
+
+          .page-change {
+            font-size: calc(0.85vw + 0.85vh);
+          }
+
+          .page-change:not(.page-change-disabled):hover {
+            cursor: pointer;
+            color: #3498db;
+          }
+
+          .page-change-disabled {
+            color: #979a9a;
+          }
+
+          .page-num {
+            font-size: calc(0.7vw + 0.7vh);
+          }
+        }
       }
 
       .model-progress {
         padding: 0.2vh 0.8vw;
       }
     }
+  }
+
+  div.model-status-hide {
+    right: calc(2vw - 25vw - 4px);
   }
 }
 

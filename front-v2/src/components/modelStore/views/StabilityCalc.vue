@@ -59,7 +59,6 @@
                                     </div>
                                 </el-scrollbar>
                             </div>
-
                         </div>
                         <div class="case-item-info flex-coloum">
                             <div class="card">

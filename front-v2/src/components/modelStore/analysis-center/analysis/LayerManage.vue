@@ -11,6 +11,7 @@
             <div>
               <el-tree
                 :data="treeData"
+                node-key="id"
                 :props="defaultProps"
                 draggable
                 :allow-drop="allowDrop"
@@ -24,7 +25,7 @@
                       @change="changeClick(data)"
                       >{{ data.label }}</el-checkbox
                     >
-                    <div class="close" @click="closeClick(data.caseid)">
+                    <div class="close" @click="closeClick(data.id)">
                       <el-icon><CircleClose /></el-icon>
                     </div>
                   </div>
@@ -78,12 +79,12 @@ export default defineComponent({
     // }
     const addLayer = async (val) => {
       for (let i = 0; i < treeData.value.length; i++) {
-        if (treeData.value[i].caseid === val.caseid) {
+        if (treeData.value[i].id === val.id) {
           return;
         }
       }
       treeData.value.unshift({
-        caseid: val.caseid,
+        id: val.id,
         label: val.label,
         visualType: val.visualType,
         children: [],
@@ -99,7 +100,7 @@ export default defineComponent({
 
     const closeClick = async (id) => {
       for (let i = 0; i < treeData.value.length; i++) {
-        if (treeData.value[i].caseid === id) {
+        if (treeData.value[i].id === id) {
           treeData.value.splice(i, 1);
           context.emit("closeLayer", id);
           return;
@@ -109,7 +110,7 @@ export default defineComponent({
 
     const delLayer = async (param) => {
       for (let i = 0; i < treeData.value.length; i++) {
-        if (treeData.value[i].caseid === param) {
+        if (treeData.value[i].id === param) {
           treeData.value.splice(i, 1);
           const list = [];
           return;
@@ -119,7 +120,7 @@ export default defineComponent({
 
     // Tree
     const changeClick = (val) => {
-      context.emit("hideLayer", { flag: val.flag, id: val.caseid });
+      context.emit("hideLayer", { flag: val.flag, id: val.id });
     };
 
     const allowDrop = (draggingNode, dropNode, type) => {
@@ -138,7 +139,7 @@ export default defineComponent({
       let target = "";
       if (dropType === "before") {
         for (let i = 0; i < treeData.value.length; i++) {
-          if (treeData.value[i].caseid === node.data.id) {
+          if (treeData.value[i].id === node.data.id) {
             if (i != 0) {
               target = treeData.value[i + 1].id;
             }
@@ -156,7 +157,6 @@ export default defineComponent({
       treeData.value.forEach((item) => {
         list.push(item.id);
       });
-      await updateLayer(import.meta.env.VITE_APP_ROUTER_ID, list);
     };
 
     const getLayers = () => {
@@ -166,7 +166,7 @@ export default defineComponent({
     onMounted(() => {
       props.layerList?.forEach((item) => {
         treeData.value.push({
-          caseid: item.id,
+          id: item.id,
           label: item.fileName,
           visualType: item.visualType,
           flag: true,
