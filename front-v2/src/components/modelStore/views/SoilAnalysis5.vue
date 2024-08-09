@@ -288,6 +288,16 @@ const inputData = (type) => {
     }
     else if (type == 'map') {
         console.log('map input')
+        if(selectedBank.value == null){
+            ElNotification({
+                type: 'info',
+                message: '请先选择岸段',
+                title: '警告',
+                offset: 130
+            })
+            return
+        }
+
         mapInputVisible.value = true
         // setTimeout(() => {
         //     console.log(sectionDrawRef.value)
@@ -295,6 +305,10 @@ const inputData = (type) => {
         // }, 1);
         // sectionDrawRef.value.resizeMap()
     }
+
+    BSTEMResult.see = 0
+    BSTEMResult.ssa = 0
+    BSTEMResult.fos = 0
 }
 
 
@@ -355,7 +369,7 @@ const sectionViewModelRun = async (param) => {
                 const result = await sectionViewMR.getModelResult()
                 console.log('result', result)
                 let sectionFileName = result['raw-json']
-                const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err)=>{
+                const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err) => {
                     ElNotification({
                         type: 'error',
                         title: '错误',
@@ -532,6 +546,9 @@ const redrawChartClickHandler = () => {
 
     // console.log(xzData.value)
     // console.log(thicknessData.value)
+    BSTEMResult.see = 0
+    BSTEMResult.ssa = 0
+    BSTEMResult.fos = 0
     let newOption = chart.getBaseOption2(xzData.value, thicknessData.value)
     chart.myChart.setOption(newOption)
 }

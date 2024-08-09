@@ -737,10 +737,10 @@ export default class FlowFieldLayer {
     async onAdd(map: mapboxgl.Map, gl: WebGL2RenderingContext) {
         this.GL = gl;
         // console.log('Custom flow field layer is being added...');
+        this.initGUI()
 
         this.map = map;
         await this.prepare(gl);
-        this.initGUI()
 
     }
 

@@ -127,6 +127,8 @@ export class EulerFlowLayer {
     }
 
     async onAdd(map: mapbox.Map, gl: WebGL2RenderingContext) {
+        this.initGUI()
+
         const available_extensions = gl.getSupportedExtensions();
         available_extensions?.forEach(ext => {
             gl.getExtension(ext)
@@ -195,7 +197,6 @@ export class EulerFlowLayer {
         this.map.on('pitchend', restart)
 
         this.ready = true
-        this.initGUI()
 
         // window.addEventListener('keydown', (e) => {
         //     if (e.key == 'r') {

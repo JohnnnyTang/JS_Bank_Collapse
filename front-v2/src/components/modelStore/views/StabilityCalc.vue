@@ -342,7 +342,7 @@ const handleNodeClick = (nodeData, nodeInfo) => {
         clickedNode.temp = nodeData.temp
         clickedNode.desc = nodeData.description
         clickedNode.info = nodeInfo
-        ModelRunningMessage.value = ''
+
     }
 }
 
@@ -383,22 +383,26 @@ const runMathModel = async () => {
 }
 const createNewCaseConfirmHandler = () => {
 
-    console.log(mathModelParams)
+    // console.log(mathModelParams)
 
-    const parentNode = treeRef.value.getNode(clickedSet.data)
-    const newChild = {
-        lable: mathModelParams.addToRiskJudgeFlag === '1' ? `${mathModelParams.flow}${mathModelParams.type}` : `${mathModelParams.customName}`,
-        type: 'case',
-        temp: mathModelParams.addToRiskJudgeFlag === '1' ? false : true,
-        description: ''
-    }
+    // const parentNode = treeRef.value.getNode(clickedSet.data)
+    // const newChild = {
+    //     lable: mathModelParams.addToRiskJudgeFlag === '1' ? `${mathModelParams.flow}${mathModelParams.type}` : `${mathModelParams.customName}`,
+    //     type: 'case',
+    //     temp: mathModelParams.addToRiskJudgeFlag === '1' ? false : true,
+    //     description: ''
+    // }
 
-    // console.log(parentNode, newChild)
-    treeRef.value.append(newChild, parentNode)
-    // console.log(treeRef.value.data)
+    // // console.log(parentNode, newChild)
+    // treeRef.value.append(newChild, parentNode)
+    // // console.log(treeRef.value.data)
 
-    updateTreeData(treeRef.value.data)
-    mathModelCalcBlockShow.value = false
+    // updateTreeData(treeRef.value.data)
+    // mathModelCalcBlockShow.value = false
+    ElNotification({
+        type: 'info',
+        title: '模块正在开发中....'
+    })
 }
 
 
@@ -428,7 +432,7 @@ const visulizationPrepare = async () => {
         }
 
         ElNotification({
-            type:'info',
+            type: 'info',
             title: '加载可视化资源',
             message: `流量${params.flow}，潮型${params.tideType}`,
             offset: 120
@@ -450,6 +454,7 @@ const visulizationPrepare = async () => {
         console.log('check1 ', modelPostUrl, modelParams)
         ModelRunningShow.value = true
         ModelRunningMessage.value = '正在加载可视化资源...'
+        globleVariable.runningStatus = 'start'
 
         const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
         // const TASK_ID = '1'
@@ -463,7 +468,7 @@ const visulizationPrepare = async () => {
             let randomFactor = 3.0
             if (runningStatus === 'RUNNING') {
                 globleVariable.runningStatus = 'RUNNING'
-
+                globleVariable.status = false
             }
             else if (runningStatus === 'ERROR') {
                 globleVariable.runningStatus = 'ERROR'
@@ -479,6 +484,7 @@ const visulizationPrepare = async () => {
                 ModelRunningShow.value = false
                 ModelRunningMessage.value = ''
                 globleVariable.runningStatus = 'NONE'
+                globleVariable.status = false
                 clearInterval(runningStatusInterval)
             }
             else if (runningStatus === 'COMPLETE') {
@@ -510,7 +516,7 @@ const visulizationPrepare = async () => {
         }, 1000)
     }
 
-    if (ModelRunningMessage.value === '正在加载可视化资源...') {
+    if (globleVariable.runningStatus === 'start' || globleVariable.runningStatus === 'RUNNING') {
         ElNotification({
             type: 'warning',
             title: '请等待资源加载...',
