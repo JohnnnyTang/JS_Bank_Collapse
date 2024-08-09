@@ -24,7 +24,7 @@ export default defineComponent({
       try {
         const response = await getResultData(
           "txt",
-          props.chartInfo.caseid,
+          props.chartInfo.id,
           props.chartInfo.name
         );
         const content = response.data;

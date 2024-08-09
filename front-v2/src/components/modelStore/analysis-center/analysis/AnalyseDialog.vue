@@ -63,7 +63,7 @@ export default defineComponent({
         value: "flushContour",
       },
       {
-        name: "河道容积计算",
+        name: "河道容积",
         src: "/analyse/河道容积.png",
         value: "volume",
       },
@@ -116,7 +116,15 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      analyticDataList.value = props.dataList[props.dataList.length - 1].children;
+      console.log(props.dataList);
+      if (
+        props.dataList.length != 0 &&
+        props.dataList[props.dataList.length - 1].id === ""
+      ) {
+        analyticDataList.value = props.dataList[props.dataList.length - 1].children;
+      } else {
+        analyticDataList.value = [];
+      }
       demDataList.value = getDemList();
     });
 

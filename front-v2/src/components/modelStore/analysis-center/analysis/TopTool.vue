@@ -2,7 +2,7 @@
   <div class="top-tool">
     <div class="buttons">
       <!-- <div class="button" @click="dialogAddData = true">加载数据</div> -->
-      <div class="button" style="cursor: not-allowed">加载数据</div>
+      <!-- <div class="button" style="cursor: not-allowed">加载数据</div> -->
       <div class="button" @click="dialogAnalyse = true">模型计算</div>
       <el-dropdown popper-class="draw-popper">
         <div class="button btn-draw">添加断面</div>

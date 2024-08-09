@@ -334,11 +334,11 @@ export default class ModelRequest {
   }
 
   static async getResultData(type, caseid, name) {
-    return await get(`/data/modelServer/file/${type}?caseId=${caseid}&name=${name}`, true)
+    return await get(`/data/modelServer/down/result/file/${type}?caseId=${caseid}&name=${name}`, true)
   }
 
-  static async getResultBlobData(type, caseid, name) {
-    return await getBlob(`/data/modelServer/file/${type}?caseId=${caseid}&name=${name}`, true)
+  static async getDataList(datatype, bank) {
+    return await get(`/dataNode/bank/dataType?dataType=${datatype}&bank=${bank}`, true)
   }
 
   /**

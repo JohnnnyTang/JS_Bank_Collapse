@@ -192,7 +192,7 @@ export default defineComponent({
       } else if (props.analyseType === "flushContour") {
         return "冲淤等深线";
       } else if (props.analyseType === "volume") {
-        return "河道容积计算";
+        return "河道容积";
       }
     });
     const placeholder = computed(() => {
@@ -447,7 +447,7 @@ export default defineComponent({
         analyticDataList.value.forEach((item) => {
           if (item.visualType === "geoJsonLine") {
             options.value.push({
-              id: item.caseid,
+              id: item.id,
               name: item.label,
             });
           }
@@ -457,7 +457,7 @@ export default defineComponent({
         analyticDataList.value.forEach((item) => {
           if (item.visualType === "geoJsonPolygon") {
             options.value.push({
-              id: item.caseid,
+              id: item.id,
               name: item.label,
             });
           }

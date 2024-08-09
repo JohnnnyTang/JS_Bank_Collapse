@@ -6,8 +6,7 @@
         <div class="title-text">数据面板</div>
       </div>
       <div class="dp-content" style="height: 27vh">
-        <el-skeleton :rows="5" animated v-if="skeletonFlag" />
-        <div class="scroll" v-else>
+        <div class="scroll">
           <el-scrollbar>
             <el-tree
               style="overflow: auto"
@@ -51,12 +50,12 @@
         <li class="menu-item" @click="operateLayer('rename', true)">
           <span>重命名</span>
         </li>
-        <li
+        <!-- <li
           :class="downloadAble ? 'menu-item' : 'menu-item disabled'"
           @click="operateLayer('download', downloadAble)"
         >
           <span>下载</span>
-        </li>
+        </li> -->
         <li class="menu-item" @click="operateLayer('del', true)">
           <span>删除</span>
         </li>
@@ -223,8 +222,9 @@ export default defineComponent({
 
     // param: { geoJson: any; visualType: string; fileName: string }
     const addDrawData = async (param) => {
+      console.log(param);
       let drawData = {
-        caseid: param.id, //TODO: 区分后端和前端生成id
+        id: param.id, //TODO: 区分后端和前端生成id
         name: "",
         label: param.fileName,
         flag: false,
@@ -232,7 +232,6 @@ export default defineComponent({
         visualType: param.visualType,
         params: { geojson: param.geoJson },
       };
-
       if (dataList.length != 0 && dataList[dataList.length - 1].id === "") {
         dataList[dataList.length - 1].children.push(drawData);
       } else {
@@ -252,7 +251,7 @@ export default defineComponent({
     const getGeomById = (id) => {
       if (dataList.length != 0 && dataList[dataList.length - 1].id === "" && id != "") {
         let result = dataList[dataList.length - 1].children.find(
-          (item) => item.caseid === id
+          (item) => item.id === id
         );
         return result.params.geojson;
       } else {
@@ -275,11 +274,11 @@ export default defineComponent({
         // });
         let sectionGeom = getGeomById(param.value.section);
         if (sectionGeom == null) return;
+        context.emit("addCurrentModel", "断面形态");
         const data = await calculateSectionView({
           "dem-id": param.value.dem.fileId,
           "section-geometry": sectionGeom,
         });
-        context.emit("addCurrentModel", "断面形态");
         let result = await checkStateHandle(data.data, "断面形态");
         if (result != null) {
           if (dataList[dataList.length - 1].id !== "") {
@@ -291,7 +290,7 @@ export default defineComponent({
             });
           }
           dataList[dataList.length - 1].children.push({
-            caseid: result.data["case-id"],
+            id: result.data["case-id"],
             name: result.data["raw-json"],
             label: param.value.fileName,
             flag: false,
@@ -328,12 +327,12 @@ export default defineComponent({
         if (param.type === "sectionFlush") {
           let sectionGeom = getGeomById(param.value.section);
           if (sectionGeom == null) return;
+          context.emit("addCurrentModel", "断面冲淤");
           const data = await calculateSectionContrast({
             "bench-id": param.value.benchmarkDem.fileId,
             "ref-id": param.value.referDem.fileId,
             "section-geometry": sectionGeom,
           });
-          context.emit("addCurrentModel", "断面冲淤");
           let result = await checkStateHandle(data.data, "断面冲淤");
           if (result != null) {
             if (dataList[dataList.length - 1].id !== "") {
@@ -345,7 +344,7 @@ export default defineComponent({
               });
             }
             dataList[dataList.length - 1].children.push({
-              caseid: result.data["case-id"],
+              id: result.data["case-id"],
               name: result.data["raw-txt"],
               label: param.value.fileName,
               flag: false,
@@ -356,6 +355,7 @@ export default defineComponent({
           }
         } else if (param.type === "regionFlush") {
           let regionGeom = getGeomById(param.value.region);
+          context.emit("addCurrentModel", "区域冲淤");
           const data = await calculateRegionFlush({
             "bench-id": param.value.benchmarkDem.fileId,
             "ref-id": param.value.referDem.fileId,
@@ -364,7 +364,6 @@ export default defineComponent({
                 ? "NONE"
                 : { type: "FeatureCollection", features: [regionGeom] },
           });
-          context.emit("addCurrentModel", "区域冲淤");
           let result = await checkStateHandle(data.data, "区域冲淤");
           if (result != null) {
             const coordJson = await getResultData(
@@ -383,7 +382,7 @@ export default defineComponent({
               });
             }
             dataList[dataList.length - 1].children.push({
-              caseid: result.data["case-id"],
+              id: result.data["case-id"],
               name: result.data["visualization-png"],
               label: param.value.fileName,
               flag: false,
@@ -395,6 +394,7 @@ export default defineComponent({
           }
         } else {
           let regionGeom = getGeomById(param.value.region);
+          context.emit("addCurrentModel", "区域等深线");
           const data = await calculateRegionContour({
             "bench-id": param.value.benchmarkDem.fileId,
             "ref-id": param.value.referDem.fileId,
@@ -403,7 +403,6 @@ export default defineComponent({
                 ? "NONE"
                 : { type: "FeatureCollection", features: [regionGeom] },
           });
-          context.emit("addCurrentModel", "区域等深线");
           let result = await checkStateHandle(data.data, "区域等深线");
           if (result != null) {
             if (dataList[dataList.length - 1].id !== "") {
@@ -415,7 +414,7 @@ export default defineComponent({
               });
             }
             dataList[dataList.length - 1].children.push({
-              caseid: result.data["case-id"],
+              id: result.data["case-id"],
               name: result.data["visualization-geojson"],
               label: param.value.fileName,
               flag: false,
@@ -436,12 +435,12 @@ export default defineComponent({
         //   type: "add",
         // });
         let regionGeom = getGeomById(param.value.region);
+        context.emit("addCurrentModel", "河道容积");
         const data = await calculateRiverVolume({
           "dem-id": param.value.dem.fileId,
           "region-geometry": { type: "FeatureCollection", features: [regionGeom] },
           "water-depth": param.value.deep,
         });
-        context.emit("addCurrentModel", "河道容积");
         let result = await checkStateHandle(data.data, "河道容积");
         if (result != null) {
           const volume = await getResultData(
@@ -465,7 +464,7 @@ export default defineComponent({
             });
           }
           dataList[dataList.length - 1].children.push({
-            caseid: result.data["case-id"],
+            id: result.data["case-id"],
             name: result.data["visualization-png"],
             label: param.value.fileName,
             flag: false,
@@ -478,11 +477,16 @@ export default defineComponent({
     };
 
     const operateLayer = async (keyword, flag) => {
+      // TODO: 添加基础数据
+      if (selectedData.value?.visualType == "rasterTile") {
+        notice("error", "错误", "无法添加该图层！");
+        return;
+      }
       if (flag) {
         if (keyword != "rename" && keyword != "download") {
           context.emit("operateLayer", {
             content: {
-              caseid: selectedData.value?.caseid,
+              id: selectedData.value?.id,
               name: selectedData.value?.name,
               label: selectedData.value?.label,
               visualType: selectedData.value?.visualType,
@@ -492,33 +496,21 @@ export default defineComponent({
           });
         }
         if (keyword === "del") {
-          let data;
-          if (parentId.value === "") {
-            data = await delAnalysisResult(selectedData.value?.id);
-          } else {
-            data = await delData(
-              import.meta.env.VITE_APP_ROUTER_ID,
-              parentId.value,
-              selectedData.value?.id
-            );
-          }
-          if (data != null && data.code === 0) {
-            for (let i = 0; i < dataList.length; i++) {
-              if (dataList[i].id === parentId.value) {
-                if (
-                  dataList[i].children.length === 0 ||
-                  dataList[i].children.length === 1
-                ) {
-                  dataList.splice(i, 1);
-                  notice("success", "成功", "数据删除成功!");
-                  return;
-                } else {
-                  for (let j = 0; j < dataList[i].children.length; j++) {
-                    if (dataList[i].children[j].id === selectedData.value?.id) {
-                      dataList[i].children.splice(j, 1);
-                      notice("success", "成功", "数据删除成功!");
-                      return;
-                    }
+          for (let i = 0; i < dataList.length; i++) {
+            if (dataList[i].id === parentId.value) {
+              if (
+                dataList[i].children.length === 0 ||
+                dataList[i].children.length === 1
+              ) {
+                dataList.splice(i, 1);
+                notice("success", "成功", "数据删除成功!");
+                return;
+              } else {
+                for (let j = 0; j < dataList[i].children.length; j++) {
+                  if (dataList[i].children[j].id === selectedData.value?.id) {
+                    dataList[i].children.splice(j, 1);
+                    notice("success", "成功", "数据删除成功!");
+                    return;
                   }
                 }
               }
@@ -537,6 +529,8 @@ export default defineComponent({
       const res = await checkStatus(key);
       const status = res.data;
       if (status == "ERROR") {
+        const result = await checkResult(key);
+        console.error(result.data);
         context.emit("updateCurrentModel", text, -1);
         notice("error", "错误", text + "计算失败！");
         return null;
@@ -683,60 +677,6 @@ export default defineComponent({
       }
       console.log(dataList);
     };
-
-    onMounted(() => {
-      //dataList = props.dataList
-      //TODO: sessionstorage获取数据列表
-      // dataList = [
-      //   {
-      //     id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
-      //     label: "2006年长江南京以下DEM",
-      //     flag: true,
-      //     children: [
-      //       {
-      //         id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
-      //         label: "w001001.adf",
-      //         flag: false,
-      //         children: [],
-      //         visualType: "rasterTile",
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     id: "30c14195-bfe7-47e4-ac06-70991392409c",
-      //     label: "2004年长江南京以下DEM",
-      //     flag: true,
-      //     children: [
-      //       {
-      //         id: "200408_dem/w001001.adf",
-      //         label: "w001001.adf",
-      //         flag: false,
-      //         children: [],
-      //         visualType: "rasterTile",
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
-      //     label: "1998年长江南京以下DEM",
-      //     flag: true,
-      //     children: [
-      //       {
-      //         id: "199801_dem/w001001.adf",
-      //         label: "w001001.adf",
-      //         flag: false,
-      //         children: [],
-      //         visualType: "rasterTile",
-      //       },
-      //     ],
-      //   },
-      // ];
-
-      //initData(import.meta.env.VITE_APP_ROUTER_ID);
-      //const data = window.sessionStorage.getItem("dataList");
-      //if (data != null) dataList = JSON.parse(data);
-      skeletonFlag.value = false;
-    });
 
     onBeforeUnmount(() => {
       window.sessionStorage.setItem("dataList", JSON.stringify(dataList));

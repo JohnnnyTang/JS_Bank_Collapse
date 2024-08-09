@@ -37,15 +37,10 @@ import mapBoxGl, { AnySourceData } from "mapbox-gl";
 import ModelRequest from "../../modelApi.js";
 import utils from "@/utils/CommonUtils";
 const { uuid } = utils;
-const {
-  getResultData,
-  getResultBlobData,
-  getCoordinates,
-  getAnalysisGeoJson,
-  getContent,
-} = ModelRequest;
+const { getResultData, getCoordinates, getAnalysisGeoJson, getContent } = ModelRequest;
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "mapbox-gl/dist/mapbox-gl.css";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import ChartVisual from "./ChartVisual.vue";
 import { getHighZoomStyleJson } from "../../../../utils/mapUtils";
 export default defineComponent({
@@ -68,6 +63,21 @@ export default defineComponent({
     //{ id: string; coordinates: number[][]; description: string }[]
     const volumeList = ref([]);
     let geoJson;
+
+    const mapFlyToRiver = (bankName) => {
+      if (!map) return;
+
+      let boundsMap = {
+        民主沙: [
+          [120.45997922676836, 32.00001616423072],
+          [120.60909640208264, 32.084171362618625],
+        ],
+      };
+
+      map.fitBounds(boundsMap[bankName], {
+        duration: 1500,
+      });
+    };
 
     const lineDraw = new MapboxDraw({
       controls: {
@@ -214,7 +224,7 @@ export default defineComponent({
     //   visualType: string;
     // }
     const addMapLayer = async (param) => {
-      if (map.getLayer(param.caseid) === undefined) {
+      if (map.getLayer(param.id) === undefined) {
         let type;
         if (
           param.visualType === "lineVectorTile3D" ||
@@ -256,15 +266,15 @@ export default defineComponent({
           //   type: type,
           //   "source-layer": param.visualId,
           // });
-          const geojsonData = await getResultData("json", param.caseid, param.name);
+          const geojsonData = await getResultData("json", param.id, param.name);
           console.log(geojsonData);
-          map.addSource(param.caseid, {
+          map.addSource(param.id, {
             type: "geojson",
             data: geojsonData.data,
           });
           map.addLayer({
-            id: param.caseid,
-            source: param.caseid,
+            id: param.id,
+            source: param.id,
             type: type,
           });
         } else if (
@@ -290,36 +300,36 @@ export default defineComponent({
           param.visualType === "movePng" ||
           param.visualType === "regionFlush"
         ) {
-          map.addSource(param.caseid, {
+          map.addSource(param.id, {
             type: "image",
             url: `${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            }data/modelServer/down/result/file/image?caseId=${param.id}&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
-            id: param.caseid,
+            id: param.id,
             type: "raster",
-            source: param.caseid,
+            source: param.id,
           });
         } else if (param.visualType === "volume") {
-          map.addSource(param.caseid, {
+          map.addSource(param.id, {
             type: "image",
             url: `${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }/data/modelServer/file/image?caseId=${param.caseid}&name=${param.name}`,
+            }/data/modelServer/down/result/file/image?caseId=${param.id}&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
-            id: param.caseid,
+            id: param.id,
             type: "raster",
-            source: param.caseid,
+            source: param.id,
           });
 
           // const description = `深度：${content.data.deep}，容积：${content.data.volume}m³`;
           const description = `容积：${param.params.volume}m³`;
           volumeList.value.push({
-            id: param.caseid,
+            id: param.id,
             coordinates: param.params.extent,
             description: description,
           });
@@ -353,15 +363,15 @@ export default defineComponent({
           }
           const geojson = param.params.geojson;
           if (geojson != null) {
-            map.addSource(param.caseid, {
+            map.addSource(param.id, {
               type: "geojson",
               data: geojson,
             });
             if (type === "fill") {
               map.addLayer({
-                id: param.caseid,
+                id: param.id,
                 type: type,
-                source: param.caseid,
+                source: param.id,
                 paint: {
                   "fill-opacity": 0.5,
                   "fill-color": "#f24545",
@@ -369,9 +379,9 @@ export default defineComponent({
               });
             } else {
               map.addLayer({
-                id: param.caseid,
+                id: param.id,
                 type: type,
-                source: param.caseid,
+                source: param.id,
               });
             }
           }
@@ -444,12 +454,25 @@ export default defineComponent({
       inputValue,
       visualType,
       clickHandle,
+      mapFlyToRiver
     };
   },
 });
 </script>
 
 <style lang="scss" scoped>
+// :deep(.mapbox-gl-draw_line) {
+//   background: url("/analyse/line_symbol.svg");
+//   background-repeat: no-repeat;
+//   background-position: center;
+// }
+
+// :deep(.mapbox-gl-draw_polygon) {
+//   background: url("/analyse/polygon_symbol.svg");
+//   background-repeat: no-repeat;
+//   background-position: center;
+// }
+
 .right-visual {
   :deep() .el-dialog {
     padding: 0;
