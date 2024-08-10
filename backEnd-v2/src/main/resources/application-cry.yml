@@ -49,6 +49,6 @@ flowData:
 
 modelServer:
   url: http://172.21.212.216:8000
-  storageLimit: 30
-  caseLimit: 20
+  storageLimit: 50
+  caseLimit: 50
 

@@ -98,8 +98,9 @@ public class ModelServerController {
                 .body(imageData);
     }
 
-    @PostMapping("/up/resource/file/dem")
-    public ResponseEntity<String> uploadResourceDEMData(@RequestParam("file")MultipartFile file, @RequestParam("info") String info) {
-        return ResponseEntity.ok(modelServerService.uploadResourceDEMData(file, JSONObject.parse(info)));
+    @PostMapping("/up/resource/file")
+    public ResponseEntity<String> uploadResourceHydrodynamicData(@RequestParam("file")MultipartFile file, @RequestParam("info") String info) {
+        return ResponseEntity.ok(modelServerService.uploadCalculateResourceData(file, JSONObject.parse(info)));
     }
+
 }

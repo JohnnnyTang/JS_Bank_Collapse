@@ -21,5 +21,6 @@ public interface IModelServerService {
 
     byte[] getResourceByteDataByCaseIdAndFileName(String name);
 
-    String uploadResourceDEMData(MultipartFile file, JSONObject info);
+    String uploadCalculateResourceData(MultipartFile file, JSONObject info);
+
 }

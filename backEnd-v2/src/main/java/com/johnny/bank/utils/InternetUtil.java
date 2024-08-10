@@ -209,8 +209,8 @@ public class InternetUtil {
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
             // 设置超时时间为10s
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(10000);
+            connection.setConnectTimeout(180000);
+            connection.setReadTimeout(180000);
 
             // 创建请求体的边界
             String boundary = UUID.randomUUID().toString();

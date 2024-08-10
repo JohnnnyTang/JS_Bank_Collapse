@@ -1,13 +1,13 @@
 package com.johnny.bank.service.node.impl;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.*;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
+import com.johnny.bank.utils.DataNodeUtil;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @Author: Johnny Tang
@@ -49,11 +49,31 @@ public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
         );
     }
 
+    public DataNodeV2 getStaticDataGroupNode(String dataType, String bank) {
+        return ((IDataNodeRepoV2)IBaseNodeRepo).getNodeByCategoryAndBank(
+                dataType + "DataGroup",
+                bank
+        );
+    }
+
+    public JSONArray getStaticDataList(String path) {
+
+        List<DataNodeV2> dataNodeList = IBaseNodeRepo.getNodeChildByPath(path);
+        if (dataNodeList.isEmpty()) {
+            return new JSONArray();
+        }
+        return DataNodeUtil.transferToFolderList(dataNodeList);
+    }
+
     public static String getDataNodeStringValueOfUsage(DataNodeV2 dataNode, String key) {
         return dataNode.getUsage().getString(key);
     }
 
     public static Integer getDataNodeIntValueOfUsage(DataNodeV2 dataNode, String key) {
         return dataNode.getUsage().getInteger(key);
+    }
+
+    public List<DataNodeV2> getModelServerResourceNode(String category, String bank, String year, String name) {
+        return ((IDataNodeRepoV2)IBaseNodeRepo).getNodeByCategoryBankYearAndName(category, bank, year, name);
     }
 }

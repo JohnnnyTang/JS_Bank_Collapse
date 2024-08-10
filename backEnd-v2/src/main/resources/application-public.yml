@@ -15,7 +15,7 @@ spring:
       url: jdbc:postgresql://localhost:5432/bank_new?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
-      password: 123456
+      password: nhri_admin123456
   mail:
     host: smtp.qq.com
     port: 465
@@ -66,3 +66,8 @@ sms:
 
 flowData:
   texturePath: E:/bankAppData/flowData/flowFieldResourceArchive/
+
+modelServer:
+  url: http://127.0.0.1:8000
+  storageLimit: 50
+  caseLimit: 50
