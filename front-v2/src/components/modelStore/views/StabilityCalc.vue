@@ -245,6 +245,7 @@ import { EulerFlowLayer } from '../../../utils/WebGL/eulerFlowLayer'
 import * as dat from 'dat.gui'
 import { useRouter } from "vue-router";
 import '../../../utils/WebGL/dat_gui_style.css'
+import { uuid } from '../../../utils/CommonUtils'
 
 const mapStore = useMapStore()
 const mapRef = ref(null)
