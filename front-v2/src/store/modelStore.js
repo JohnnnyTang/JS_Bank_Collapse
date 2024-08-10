@@ -113,6 +113,46 @@ const useSoilAnalysisStore = defineStore('soilAnalysisStore', () => {
 })
 
 
+const useHydrodynamicStore = defineStore('hydrodynamicStore', () => {
+    // const markerInfos = ref({})
+    const markerInfos = new Map()
+    const calculatingMarkerDom = ref(null)
+    const focusingMarkerDom = ref(null)
+
+    const showingOption = ref({})
+
+    const addMarkerInfo = (markerIns, markerDom, lng, lat) => {
+        markerInfos.set(markerDom, {
+            markerIns,
+            markerDom,
+            lng,
+            lat
+        })
+    }
+    const appendMarkerInfo = (markerDom, info) => {
+        const nowInfo = markerInfos.get(markerDom)
+        let totalInfo = { ...nowInfo, ...info }
+        markerInfos.set(markerDom, totalInfo)
+    }
+
+    const getMarkerInfo = (markerDom) => {
+        return markerInfos.get(markerDom)
+    }
+
+    const removeMarkerInfo = (markerDom) => {
+        let markerInfo = markerInfos.get(markerDom)
+        if (markerInfo) {
+            markerInfo.markerIns.remove()
+        }
+        markerInfos.delete(markerDom)
+    }
+
+    return {
+        focusingMarkerDom,showingOption,
+        markerInfos, addMarkerInfo, appendMarkerInfo, getMarkerInfo, calculatingMarkerDom, removeMarkerInfo
+    }
+})
+
 export {
-    useSoilAnalysisStore
+    useSoilAnalysisStore, useHydrodynamicStore
 }

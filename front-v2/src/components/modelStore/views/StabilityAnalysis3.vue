@@ -208,7 +208,8 @@
             <div class="flex-coloum" style="width: 18.7vw; height: 23vh;">
               <div class="title">● 潮位过程线提取
                 <div class="button" @click="drawButtonClickHandler"
-                  :class="{ 'forbbidden': globleVariable.status === false }">绘制</div>
+                  :class="{ 'forbbidden': globleVariable.status === false }">测点绘制</div>
+                <!-- <div class="button" @click="drawButtonClickHandler">测点绘制</div> -->
               </div>
               <div class="content flex-center" ref="tideLineChartDom" v-show="globleVariable.status">
               </div>
@@ -223,17 +224,17 @@
     </div>
   </div>
 
-  <el-dialog v-model="pointConfirmShow" title="潮位点绘制确认" width="25vh">
+  <!-- <el-dialog v-model="pointConfirmShow" title="潮位点绘制确认" width="25vh">
     <span>确认使用此点位计算潮位</span>
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="pointConfirmShow = false">取消</el-button>
-        <el-button type="primary" @click="pointFeatureConfirmHandler">
+        <el-button type="primary" @click="tidePointVelocityCalc">
           确认
         </el-button>
       </div>
     </template>
-  </el-dialog>
+  </el-dialog> -->
 
   <div class="loading-container" v-show="showRunning">
     <dv-loading class="loading-icon">
@@ -247,10 +248,13 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import ModelTitleVue from '../ModelTitle.vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch, createApp } from 'vue'
 import { initFineMap } from '../../../utils/mapUtils';
 import { useMapStore } from '../../../store/mapStore';
-import { ElNotification, ElMessageBox } from 'element-plus'
+import { useHydrodynamicStore } from '../../../store/modelStore'
+import { ElNotification, ElMessageBox, ElPopconfirm } from 'element-plus'
+import ElementPlus from 'element-plus'
+import popover from './popover.vue'
 import axios from 'axios';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts'
@@ -260,7 +264,7 @@ import * as dat from 'dat.gui'
 import { useRouter } from "vue-router";
 import ModelRunner from '../modelRunner'
 import '../../../utils/WebGL/dat_gui_style.css'
-
+import mapboxGl from 'mapbox-gl'
 
 
 let globleVariable = reactive({
@@ -279,6 +283,7 @@ const selectedBank = ref('')
 const mapRef = ref(null)
 const tideLineChartDom = ref(null)
 const mapStore = useMapStore()
+const hydrodynamicStore = useHydrodynamicStore()
 const updateTime = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 const showFlow = ref(0)
 const modelRunnningStatusDesc = ref('未运行')
@@ -292,8 +297,8 @@ const params = ref({
   minTide: null,
   tideType: null,
 })
-const tidePointFeature = ref(null)
-const pointConfirmShow = ref(false)
+// const tidePointFeature = ref(null)
+// const pointConfirmShow = ref(false)
 const router = useRouter();
 const radio1 = ref(1)
 
@@ -706,74 +711,111 @@ const showFlowClickHandler = (id) => {
 
 
 /////////////////// 潮位点绘制
-const draw = new MapboxDraw({
-  displayControlsDefault: false,
-  // Select which mapbox-gl-draw control buttons to add to the map.
-  controls: {
-    point: true,
-    trash: true,
-  },
-  styles: [
-    {
-      'id': 'highlight-active-points',
-      'type': 'circle',
-      'filter': ['all',
-        ['==', '$type', 'Point'],
-        ['==', 'meta', 'feature'],
-        ['==', 'active', 'true']],
-      'paint': {
-        'circle-radius': 10,
-        'circle-color': '#ff7707'
-      }
-    },
-    {
-      'id': 'points-are-blue',
-      'type': 'circle',
-      'filter': ['all',
-        ['==', '$type', 'Point'],
-        ['==', 'meta', 'feature'],
-        ['==', 'active', 'false']],
-      'paint': {
-        'circle-radius': 8,
-        'circle-color': '#00006d'
-      }
-    }
-  ]
-  // Set mapbox-gl-draw to draw by default.
-  // The user does not have to click the polygon control button first.
-  // defaultMode: '',
-})
-const drawButtonClickHandler = () => {
-  if (globleVariable.status) {
-    let map = mapStore.getMap()
-    if (map.hasControl(draw)) {
-
-    } else {
-      map.addControl(draw)
-      map.on('draw.create', function (e) {
-        console.log(e.features[0])
-        pointConfirmShow.value = true
-        let feature = e.features[0]
-        tidePointFeature.value = feature
-      })
-    }
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'v') {
+    console.log(hydrodynamicStore.markerInfos)
   }
+})
+
+// popover vue
+const createDom = () => {
+  const div = document.createElement('div')
+  const app = createApp(popover).use(ElementPlus)
+  app.mount(div)
+  return div
+}
+let drawingStatus = false
+
+const drawButtonClickHandler = () => {
+
+  if (!globleVariable.status) {
+    ElNotification({
+      title: '警告',
+      message: '水动力模型计算完成后方可提取潮位过程线',
+      type: 'warning',
+      offset: 120,
+    })
+    return
+  }
+  if (runningMsg.value === '正在提取潮位线...') {
+    ElNotification({
+      title: '警告',
+      message: '请等待当前任务完成，请稍后...',
+      type: 'warning',
+      offset: 120,
+    })
+    return
+  }
+
+  ElNotification({
+    title: '提示',
+    message: '进入绘制状态，点击地图以添加潮位点',
+    type: 'info',
+    offset: 120,
+  })
+  let map = mapStore.getMap()
+  let dom = map.getCanvasContainer()
+  dom.style.cursor = 'crosshair'
+  if (drawingStatus === false) {
+    map.once('click', (e) => {
+      console.log(e.lngLat)
+      // add marker
+
+      const popoverDom = createDom()
+      const popup = new mapboxGl.Popup().setDOMContent(popoverDom)
+
+      const marker = new mapboxGl.Marker({
+        color: '#ff6804ff',
+      })
+        .setLngLat(e.lngLat)
+        .setPopup(popup)
+        .addTo(map)
+
+      // marker click callback
+      const markerDom = marker.getElement()
+      hydrodynamicStore.addMarkerInfo(marker, markerDom, e.lngLat.lng, e.lngLat.lat)
+
+      markerDom.addEventListener('click', function (e) {
+        console.log('click marker!!', this)
+        const _markerDom = this
+        hydrodynamicStore.focusingMarkerDom = _markerDom
+      })
+
+      ElNotification({
+        type: 'info',
+        title: '新添潮位点',
+        message: `经度：${e.lngLat.lng.toFixed(4)}，纬度：${e.lngLat.lat.toFixed(4)}`,
+        offset: 120,
+      })
+
+      // run model
+      hydrodynamicStore.calculatingMarkerDom = markerDom
+      tidePointVelocityCalc(e.lngLat.lng, e.lngLat.lat)
+      dom.style.cursor = 'grab'
+    })
+    drawingStatus = true
+  }
+  else{
+    return
+  }
+
 }
 
 
 /////////////////// 潮位过程线获取
-const pointFeatureConfirmHandler = async () => {
-  pointConfirmShow.value = false
-  console.log('pointFeature::', tidePointFeature.value)
+const tidePointVelocityCalc = async (lng, lat) => {
+  // pointConfirmShow.value = false
+  // console.log('pointFeature::', tidePointFeature.value)
   console.log('getVelocity caseId::', globleVariable.caseID)
   // modelRunnningStatusDesc
   const pointVelocityModelUrl = '/temp/taskNode/start/numeric/getFlowFieldVelocities'
   const params = {
     "case-id": globleVariable.caseID,
+    // "case-id": '6c6496ca7c80adbbff129da890894990',
     "sample-points": [
       {
-        "lng": tidePointFeature.value.geometry.coordinates[0],
-        "lat": tidePointFeature.value.geometry.coordinates[1],
+        "lng": lng,
+        "lat": lat,
       }
     ]
   }
@@ -802,6 +844,7 @@ const pointFeatureConfirmHandler = async () => {
         })
         showRunning.value = false
         runningMsg.value = ''
+        drawingStatus = false
         break;
       case 'COMPLETE':
         console.log('complete')
@@ -813,13 +856,23 @@ const pointFeatureConfirmHandler = async () => {
         })
         let runningResult = await pointVelocityMR.getModelResult()
 
-
         let testOption = getTideLineDataOption(runningResult)
-        chartIns.setOption(testOption)
+
+        hydrodynamicStore.showingOption = testOption
+        // chartIns.setOption(testOption)
+
+        // 在store中补充result
+        let newInfo = {
+          option: testOption
+        }
+        hydrodynamicStore.appendMarkerInfo(hydrodynamicStore.calculatingMarkerDom, newInfo)
+
+        hydrodynamicStore.calculatingMarkerDom = null
 
         console.log('runningResult ', runningResult)
         showRunning.value = false
         runningMsg.value = ''
+        drawingStatus = false
         break;
     }
 
@@ -881,7 +934,6 @@ const getTideLineDataOption = (data) => {
 
 
 
-
 const mapFlyToRiver = (mapIns, bankName) => {
   if (!mapIns) return;
 
@@ -930,6 +982,11 @@ onMounted(async () => {
   let map = await initFineMap(mapRef.value)
   mapStore.setMap(map)
   chartIns = echarts.init(tideLineChartDom.value)
+
+  watch(() => hydrodynamicStore.showingOption, (newVal) => {
+    console.log('newVal', newVal)
+    chartIns.setOption(newVal)
+  })
 })
 
 
@@ -947,6 +1004,43 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+div.my-popover {
+
+  position: absolute;
+  z-index: 5;
+  width: auto;
+  height: auto;
+  top: 0vh;
+  left: 0vw;
+  background-color: #faf8f8;
+  padding: 1vh 1vw;
+  border-radius: 10px;
+  box-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
+
+  .view-button {
+    position: relative;
+
+  }
+
+  .delete-button {
+    position: relative;
+  }
+
+  // .arrow-down {
+  //   position: absolute;
+  //   left: 50%;
+  //   top: 50%;
+  //   transform: translateX(-50%) translateY(200%);
+  //   border-left: 10px solid transparent;
+  //   border-right: 10px solid transparent;
+  //   border-top: 10px solid #000;
+  //   /* 你可以根据需要更改颜色 */
+  // }
+
+}
+
+
+
 div.flex-coloum {
   display: flex;
   flex-direction: column;
