@@ -43,6 +43,11 @@ export default defineConfig({
                 target: 'http://172.21.212.216:8000/v0/fs/resource/hydrodynamic/list',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/hydrodynamicList/, ''),
+            },
+            '/mutilIndexTemplate': {
+                target: 'http://172.21.212.216:8000/v0/fs/resource/file?name=json/Mzs/2023/standard/RiskLevel/template.json',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/hydrodynamicList/, ''),
             }
         },
         // https:{

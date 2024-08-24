@@ -26,10 +26,10 @@
                 {{ '终点：' + sectionLineLabelSec }}
             </div>
         </div>
-        <div class="section-selectior-item">
+        <div class="section-selectior-item" v-show="demListShow">
             <el-select v-model="selectedDem" placeholder="选择地形" style="width: 10vw; height: 3.5vh"
                 @change="selectedDemChange">
-                <el-option v-for="(item,index) in props.demResources" :key="index" :label="item.name + '地形'
+                <el-option v-for="(item, index) in props.demResources" :key="index" :label="item.name + '地形'
                     " :value="item.path">
                     <!-- <span>{{ item.year }}</span> -->
                     <div style="text-align: center;">{{ item.name + '地形' }}</div>
@@ -74,6 +74,10 @@ const props = defineProps({
         type: Array,
         default: () => [{ year: 1998 },
         { year: 2004 }]
+    },
+    demListShow: {
+        type: Boolean,
+        default: true
     }
 })
 

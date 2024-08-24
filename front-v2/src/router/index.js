@@ -105,13 +105,13 @@ const routes = [
             },
             {
                 path: 'riskWarning',
-                // component: () => import('../components/modelStore/views/RiskWarning.vue'),
-                component: () => import('../components/modelStore/views/EmptyPage.vue'),
+                component: () => import('../components/modelStore/views/RiskWarning3.vue'),
+                // component: () => import('../components/modelStore/views/EmptyPage.vue'),
             },
-            {
-                path: 'riskWarning2',
-                component: () => import('../components/modelStore/views/RiskWarning2.vue'),
-            },
+            // {
+            //     path: 'riskWarning2',
+            //     component: () => import('../components/modelStore/views/RiskWarning2.vue'),
+            // },
             // {
             //     path: 'numericalModel',
             //     component: () => import('../components/modelStore/views/NumericalModel.vue'),

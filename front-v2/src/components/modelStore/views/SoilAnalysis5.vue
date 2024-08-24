@@ -264,8 +264,8 @@ const confirmBankHandler = async (bankName) => {
     const bankNameMap = {
         '民主沙': 'Mzs'
     }
-    // const dem = (await axios.get(`/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
-    const dem = t
+    const dem = (await axios.get(`/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
+    // const dem = t
     const _demResource = getDemResource(dem)
     console.log('demdata', _demResource)
     demResources.value = _demResource
@@ -288,7 +288,7 @@ const inputData = (type) => {
     }
     else if (type == 'map') {
         console.log('map input')
-        if(selectedBank.value == null){
+        if (selectedBank.value == null) {
             ElNotification({
                 type: 'info',
                 message: '请先选择岸段',
@@ -449,7 +449,21 @@ const calSectionViewClickHandler = () => {
     }
 }
 
+const findIndexOfMin = (arr) => {
+    if (arr.length === 0) {
+        return -1; // 如果数组为空，返回 -1 表示没有最小值
+    }
 
+    return arr.reduce((minIndex, currentValue, currentIndex, array) => {
+        return currentValue < array[minIndex] ? currentIndex : minIndex;
+    }, 0);
+}
+
+// // 示例数组
+// const numbers = [10, 5, 8, 3, 7];
+
+// // 找到最小值的索引
+// const minIndex = findIndexOfMin(numbers);
 
 const BSTEMModelRun = async () => {
     let BSTEMModelParams = {
@@ -457,8 +471,9 @@ const BSTEMModelRun = async () => {
         "section-geometry": sectionGeojson.value,
         "x-values": xzData.value.map(item => Math.round(item[0] * 1000) / 1000),
         "z-values": xzData.value.map(item => Math.round(item[1] * 1000) / 1000),
-        "index-toe": "",
-        "bool-tension": false,
+        "index-toe": findIndexOfMin(xzData.value.map(item => Math.round(item[1] * 1000) / 1000)),
+        "flow-elevation": elevationOfFlow.value,
+        // "bool-tension": false,
         "bank-layer-thickness": thicknessData.value,
     }
     console.log(BSTEMModelParams)
@@ -502,9 +517,9 @@ const BSTEMModelRun = async () => {
                     let see = Number.parseFloat(result['see'])
                     let ssa = Number.parseFloat(result['ssa'])
 
-                    fos = fos + Math.random() * 0.3
-                    see = see + Math.random() * 5.0
-                    ssa = ssa + Math.random() * 8.0
+                    // fos = fos + Math.random() * 0.3
+                    // see = see + Math.random() * 5.0
+                    // ssa = ssa + Math.random() * 8.0
 
                     BSTEMResult.fos = fos
                     BSTEMResult.see = see
@@ -761,15 +776,19 @@ const dataGenerate = (origin) => {
     const lineData = []
     const lineDataStep = origin['step']
     const pointData = []
-    const pointDataStep = origin['step_er_verified']
+    // const pointDataStep = origin['step_er_verified']
+    const pointDataStep = origin['step_er']
     for (let i = 0; i < origin['points'].length; i++) {
         let point = origin['points'][i]
         lineData.push([lineDataStep * i, point[2]])
     }
-    let scatterStart = lineDataStep * origin['deepest_index'] - (origin['points_er_verified'].length - 1) * pointDataStep
+    // let scatterStart = lineDataStep * origin['deepest_index'] - (origin['points_er_verified'].length - 1) * pointDataStep
+    let scatterStart = lineDataStep * origin['deepest_index'] - (origin['points_er'].length - 1) * pointDataStep
 
-    for (let i = 0; i < origin['points_er_verified'].length; i++) {
-        let point = origin['points_er_verified'][i]
+    // for (let i = 0; i < origin['points_er_verified'].length; i++) {
+    for (let i = 0; i < origin['points_er'].length; i++) {
+        // let point = origin['points_er_verified'][i]
+        let point = origin['points_er'][i]
         // pointData.push([scatterStart + i * pointDataStep, point[2]])
         pointData.push([i * pointDataStep, point[2]])
 
@@ -1562,194 +1581,6 @@ div.main-content {
                     }
 
                 }
-
-                // div.warn-status-Desc {
-                //     position: absolute;
-                //     right: 26vw;
-                //     top: 1vh;
-                //     height: 4vh;
-                //     line-height: 4vh;
-                //     width: 25vw;
-                //     text-align: center;
-                //     font-size: calc(0.8vw + 0.3vh);
-                //     font-weight: bold;
-                //     color: #e3f9ff;
-                //     box-shadow: 0px 2px rgb(0, 225, 255);
-                //     border-radius: 6px;
-                //     background-color: #0011ffd5;
-                // }
-
-                // div.warn-status-container {
-                //     position: absolute;
-                //     right: 32vw;
-                //     top: 6vh;
-                //     width: 14vw;
-                //     height: 10vh;
-
-                //     background-color: #0511bbd5;
-                //     backdrop-filter: blur(8px);
-                //     z-index: 3;
-                //     border-radius: 6px;
-                //     text-align: center;
-                //     overflow: hidden;
-
-                //     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
-
-
-                //     div.warn-status-title {
-                //         height: 4vh;
-                //         line-height: 4vh;
-                //         width: 14vw;
-                //         font-size: calc(0.8vw + 0.3vh);
-                //         font-weight: bold;
-                //         color: #e3f9ff;
-                //         box-shadow: 0px 2px rgb(0, 225, 255);
-                //     }
-
-                //     div.warn-status-content {
-                //         height: 6vh;
-                //         line-height: 6vh;
-                //         width: 14vw;
-                //         font-size: calc(1.1vw + 0.8vh);
-                //         font-weight: bold;
-                //         // background-color: #2688f8;
-                //         color: #ebf8ff;
-                //         text-align: cen;
-                //         letter-spacing: 1rem;
-                //         text-indent: 1rem;
-
-                //         &.low {
-                //             background-color: rgb(17, 17, 255);
-
-                //         }
-
-                //         &.middle {
-                //             background-color: rgb(220, 126, 37);
-                //         }
-
-                //         &.high {
-                //             background-color: rgb(255, 9, 9);
-
-                //         }
-                //     }
-                // }
-
-                // div.fos-result-container {
-                //     position: absolute;
-                //     right: 1vw;
-                //     bottom: 5vh;
-                //     width: 6vw;
-                //     height: 21vh;
-                //     background-color: rgb(81, 95, 114);
-                //     color: white;
-                //     border-radius: 5px;
-
-                //     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
-                //     display: flex;
-                //     flex-direction: column;
-                //     justify-content: center;
-                //     align-items: center;
-
-                //     .title {
-                //         position: relative;
-                //         font-size: calc(0.6vw + 0.6vh);
-                //         font-weight: bold;
-                //         line-height: 4vh;
-                //         margin-bottom: 0.5vh;
-                //     }
-
-                //     .pallete-container {
-                //         position: relative;
-                //         height: 15vh;
-                //         width: 2vw;
-                //         // border: 1px solid #000;
-
-                //         .pallete {
-                //             position: absolute;
-                //             top: 0;
-                //             left: 0;
-                //             width: 100%;
-                //             height: 15vh;
-
-                //             .color-section {
-                //                 width: 100%;
-
-                //                 &.green {
-                //                     height: 3vh;
-                //                     background-color: green;
-                //                     border-top-right-radius: 5px;
-                //                     border-top-left-radius: 5px;
-                //                 }
-
-                //                 &.orange {
-                //                     height: 2vh;
-                //                     background-color: orange;
-                //                 }
-
-                //                 &.red {
-                //                     height: 10vh;
-                //                     background-color: red;
-                //                     border-bottom-left-radius: 5px;
-                //                     border-bottom-right-radius: 5px;
-                //                 }
-                //             }
-                //         }
-
-                //         .pallete-text-container {
-                //             position: absolute;
-                //             top: 0;
-                //             left: 2.2vw;
-                //             width: 100%;
-                //             height: 15vh;
-
-                //             .pallete-text {
-                //                 width: 100%;
-
-                //                 &.val15 {
-                //                     margin-top: -1vh;
-                //                 }
-
-                //                 &.val13 {
-                //                     margin-top: 1vh;
-                //                 }
-
-                //                 &.val10 {
-                //                     margin-top: 0vh;
-                //                 }
-
-                //                 &.val00 {
-                //                     margin-top: 7vh;
-                //                 }
-
-                //             }
-                //         }
-
-                //         .pointer {
-                //             position: absolute;
-                //             transition: .3s ease-in-out;
-                //             left: -1.2vw;
-                //             bottom: -10px;
-                //             width: 0;
-                //             height: 0;
-                //             border-top: 10px solid transparent;
-                //             border-bottom: 10px solid transparent;
-                //             border-left: 20px solid rgb(255, 178, 178);
-                //             /* 向右指的三角形 */
-                //         }
-
-
-
-
-                //     }
-
-
-
-
-
-
-
-                // }
-
 
             }
         }
