@@ -1,18 +1,26 @@
 <template>
     <div class="threshold-form">
         <div class="form-container">
-            <el-row style="height: 4vh;line-height: 4vh; font-size: calc(0.7vw + 0.7vh); font-weight: 700;">
+            <el-row>
                 <el-col :span="6">
-                    <div class="full ep-bg-purple" style="height: 100%;">一级指标</div>
+                    <div class="title">
+                        <div class="title-text">一级指标</div>
+                    </div>
                 </el-col>
                 <el-col :span="5">
-                    <div class="full ep-bg-purple" style="height: 100%;">二级指标</div>
+                    <div class="title">
+                        <div class="title-text">二级指标</div>
+                    </div>
                 </el-col>
                 <el-col :span="10">
-                    <div class="full ep-bg-purple" style="height: 100%;">风险阈值</div>
+                    <div class="title">
+                        <div class="title-text">风险阈值</div>
+                    </div>
                 </el-col>
                 <el-col :span="3">
-                    <div class="full ep-bg-purple" style="height: 100%;">权重</div>
+                    <div class="title">
+                        <div class="title-text">权重</div>
+                    </div>
                 </el-col>
             </el-row>
             <el-row style="height: 15vh;">
@@ -23,7 +31,7 @@
                         <div class="indecator-weight">
                             <div class="desc">准则权重</div>
                             <div class="weight">
-                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['all'][0]">
+                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['wRL'][0]">
                             </div>
                         </div>
                     </div>
@@ -31,17 +39,23 @@
                 <el-col :span="5">
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">抗冲流速指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">抗冲流速指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">造床流量当量</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">造床流量当量</div>
+                            </div>
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">水位变幅指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">水位变幅指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                 </el-col>
@@ -129,7 +143,7 @@
                         <div class="indecator-weight">
                             <div class="desc">准则权重</div>
                             <div class="weight">
-                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['all'][1]">
+                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['wRL'][1]">
                             </div>
                         </div>
                     </div>
@@ -137,17 +151,23 @@
                 <el-col :span="5">
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">岸坡坡比指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">岸坡坡比指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">近岸冲刷指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">近岸冲刷指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">滩槽高差指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">滩槽高差指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                 </el-col>
@@ -235,7 +255,7 @@
                         <div class="indecator-weight">
                             <div class="desc">准则权重</div>
                             <div class="weight">
-                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['all'][2]">
+                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['wRL'][2]">
                             </div>
                         </div>
                     </div>
@@ -243,17 +263,23 @@
                 <el-col :span="5">
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">土体组成指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">土体组成指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">岸坡防护指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">岸坡防护指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="24">
-                            <div class="full ep-bg-purple">荷载控制指标</div>
+                            <div class="indicator-2">
+                                <div class="indicator-text">荷载控制指标</div>
+                            </div>
                         </el-col>
                     </el-row>
                 </el-col>
@@ -438,6 +464,27 @@ onMounted(() => {
             // border: solid 1px #020000;
         }
 
+
+        .title {
+            position: relative;
+            width: 100%;
+            height: 4vh;
+            line-height: 4vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .title-text {
+                width: 98%;
+                background-color: rgb(40, 113, 159);
+                border-radius: 2px;
+                text-align: center;
+                color: aliceblue;
+                font-size: calc(0.7vw + 0.7vh);
+                font-weight: 600;
+            }
+        }
+
         .full {
             position: relative;
             width: 100%;
@@ -484,7 +531,7 @@ onMounted(() => {
                 transition: .3s ease-in-out;
 
                 &:focus {
-                    background-color: rgb(236,245,254);
+                    background-color: rgb(236, 245, 254);
                     color: rgb(3, 99, 177);
                     font-weight: bold;
                 }
@@ -493,9 +540,10 @@ onMounted(() => {
 
         .indicator-1 {
             position: relative;
-            width: 100%;
+            width: 99%;
             height: 100%;
-            // background-color: rgb(5, 88, 121);
+            background-color: rgb(211, 232, 249);
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -506,7 +554,8 @@ onMounted(() => {
                 height: 3.5vh;
                 line-height: 3.5vh;
                 font-weight: 700;
-                font-size: calc(0.8vw + 0.7vh);
+                font-size: calc(0.7vw + 0.7vh);
+                color: rgb(0, 40, 170);
 
                 margin-top: 1vh;
                 margin-bottom: .2vh;
@@ -552,6 +601,30 @@ onMounted(() => {
                 }
 
             }
+        }
+
+        .indicator-2 {
+            position: relative;
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            .indicator-text {
+                color: rgb(0, 79, 170);
+                background-color: rgb(211, 232, 249);
+                height: 4.2vh;
+                line-height: 4.5vh;
+                text-align: center;
+                width: 95%;
+                font-size: calc(0.5vw + 0.7vh);
+                font-weight: 400;
+                border-radius: 5px;
+            }
+
         }
 
 
