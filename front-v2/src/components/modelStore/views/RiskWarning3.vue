@@ -329,7 +329,19 @@
                                     align-items: center;
                                 "
                             >
-                                <div class="button one-center">文件上传</div>
+                                <el-upload
+                                    class="upload-demo"
+                                    :file-list="fileList"
+                                    :before-upload="beforeUpload"
+                                    :on-change="handleChange"
+                                    :limit="1"
+                                    :http-request="handleRequest"
+                                    :show-file-list="false"
+                                >
+                                    <div class="button one-center">
+                                        文件上传
+                                    </div>
+                                </el-upload>
                                 <div
                                     class="button one-center"
                                     @click="mapInputVisible = true"
@@ -624,6 +636,55 @@ const PROTECTION_VALUE = ['systemic', 'normal', 'low', 'no']
 const CONTROL_LEVEL = ['严格控制', '一般控制', '宽松控制', '无控制']
 const CONTROL_VALUE = ['strict', 'normal', 'loose', 'no']
 
+////////////// 断面geojson文件上传
+const fileList = ref([])
+const beforeUpload = (file, e) => {
+    // console.log('beforeUpload', file, e)
+    // const isJSON = file.type === 'application/json'
+    // if (!isJSON) {
+    //     ElMessage({
+    //         type: 'warning',
+    //         message: '请上传正确的断面几何Geojson-feature文件！',
+    //         offset: 130,
+    //     })
+    // }
+    // console.log(isJSON)
+    // return isJSON
+}
+const handleChange = (file, fileList) => {
+    const reader = new FileReader()
+    reader.onload = (event) => {
+        try {
+            const isJSON = file.type === 'application/json'
+            if (!isJSON) {
+                throw new Error('not a geojson feature')
+            }
+
+            let fileContent = JSON.parse(event.target.result)
+            if (isGeoJSONFeature(fileContent)) {
+                basicParams['section-geometry'] = fileContent
+                ElMessage({
+                    type: 'success',
+                    message: '断面几何形态上传成功！',
+                    offset: 130,
+                })
+            } else throw new Error('not a geojson feature')
+        } catch (error) {
+            ElMessage({
+                type: 'warning',
+                message: '请上传正确的断面几何Geojson-feature文件！',
+                offset: 130,
+            })
+        }
+    }
+    reader.readAsText(file.raw)
+}
+const handleRequest = (a, b) => {
+    console.log('============')
+    console.log(a)
+    console.log(b)
+}
+
 // 阈值 \ 权重
 const thresholdFormRef = ref(null)
 const getThresholdParams = () => {
@@ -666,17 +727,6 @@ watch(parametersInputStatus, (newval) => {
 //// 模型结果
 const riskModelFinalResultNumber = ref(null)
 const riskModelFinalResultStatus = ref(null)
-const riskModelIndicatorsResult = reactive({
-    Dsed: '',
-    Ky: '',
-    LC: '',
-    Ln: '',
-    PL: '',
-    PQ: '',
-    Sa: '',
-    Zb: '',
-    Zd: '',
-})
 
 const run = async () => {
     /// parameters prepare
@@ -719,24 +769,6 @@ const run = async () => {
         },
     }
     console.log(requestBody)
-
-    const resExp = {
-        result: '0.075',
-        'risk-level': [1, 0, 0, 0],
-        'multi-indicator-ids': {
-            Dsed: '2f6b1ffb898b5da7fa8d9e81020ff108',
-            Ky: 'd1832adff16a2db3fff40d593a63e699',
-            LC: '2fb85e3ca4979508b36c5df5bf7c5cc9',
-            Ln: '07cb5a493dc41f327eedd61cbfa43500',
-            PL: 'd3715a2bd5d4337f1665533a9d00851e',
-            PQ: '1ddb6dfdf1974fcff993073a02c900d4',
-            Sa: '4a555d185e3cda541b72825986de298c',
-            Zb: '447be207cc51cf0af4aea769ce249db9',
-            Zd: '7eea4cf0371f1d6c20412e774042c240',
-        },
-        'case-id': 'a22d5a4beff853cea30215022f8c1a63',
-        model: 'Risk Level',
-    }
 
     const riskVec4Parse = (vec4) => {
         let riskLevelIndex
@@ -1131,6 +1163,20 @@ function debounce(fn, delay = 2000) {
 }
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max)
+}
+function isGeoJSONFeature(json) {
+    // 检查是否为对象
+    if (typeof json !== 'object' || json === null) {
+        return false
+    }
+
+    // 检查必要的属性
+    return (
+        json.type === 'Feature' &&
+        typeof json.geometry === 'object' &&
+        json.geometry.type === 'LineString' &&
+        json.geometry.coordinates.length > 1
+    )
 }
 
 // const t = [

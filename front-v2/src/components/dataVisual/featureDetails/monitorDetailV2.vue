@@ -196,16 +196,17 @@ onMounted(async () => {
     position: relative;
     display: block;
     // width: 25vw;
-    width: 32vw;
-    height: 38vh;
-    transform: scale(0.8) translateY(20%);
+    width: 24vw;
+    height: 30vh;
+    transform: scale(0.7) translateY(15%);
+    background-color: #ffffff;
 }
 
 div.info-content-container {
     user-select: none;
-    width: 32vw;
+    width: 24vw;
+    height: 30vh;
     position: relative;
-    height: 38vh;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -315,17 +316,18 @@ div.info-content-container {
     }
 
     div.detail-info-container {
-        width: 22vw;
-        height: 36vh;
+        width: 20vw;
+        height: 33vh;
         background-color: rgb(163, 206, 245);
         box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.35);
         position: relative;
         padding-left: .5vw;
+        padding-right: .5vw;
         padding-top: 0vh;
         color: rgb(47, 94, 211);
 
         div.detail-info-flex {
-            width: 23vw;
+            width: 21.5vw;
             height: 29vh;
             margin-top: 2vh;
             // background-color: aliceblue;
