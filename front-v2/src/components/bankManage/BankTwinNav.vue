@@ -73,7 +73,7 @@
                         <span>岸段资源管理</span>
                     </template>
                     <el-sub-menu index="4-1">
-                        <template #title>岸段资源预览</template>
+                        <template #title>岸段资源</template>
                         <el-menu-item index="preview/mzs">民主沙右缘</el-menu-item>
                     </el-sub-menu>
                     <el-menu-item index="create" style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item>
