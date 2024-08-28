@@ -350,8 +350,9 @@ const statusStyle = computed(() => {
 const confirmBankHandler = async (bankName) => {
   console.log('confirmBankHandler', bankName)
   const bankNameMap = {
-    '民主沙': 'Mzs'
-  }
+    民主沙: "Mzs",
+    民主沙右缘: "Mzs",
+  };
   mapFlyToRiver(mapStore.getMap(map), bankName)
 
   selectedBank.value = bankName
@@ -795,7 +796,7 @@ const drawButtonClickHandler = () => {
     })
     drawingStatus = true
   }
-  else{
+  else {
     return
   }
 
@@ -939,6 +940,10 @@ const mapFlyToRiver = (mapIns, bankName) => {
 
   let boundsMap = {
     '民主沙': [
+      [120.45997922676836, 32.00001616423072],
+      [120.60909640208264, 32.084171362618625],
+    ],
+    '民主沙右缘': [
       [120.45997922676836, 32.00001616423072],
       [120.60909640208264, 32.084171362618625],
     ],
@@ -1125,54 +1130,6 @@ div.stability-analysis {
       align-items: center;
       z-index: 1;
 
-      .title-icon {
-        z-index: 0;
-        width: 4.5vh;
-        height: 4.5vh;
-        background-size: contain;
-      }
-
-      .el-popper.is-customized {
-        z-index: 3;
-        padding: 6px 12px;
-        background: linear-gradient(90deg, rgb(179, 255, 171), rgb(204, 229, 129));
-      }
-
-      .el-popper.is-customized .el-popper__arrow::before {
-        background: linear-gradient(45deg, #b2e68d, #bce689);
-        right: 0;
-        z-index: 3;
-      }
-
-      .detailIcon {
-        width: 4.5vh;
-        height: 4.5vh;
-        background-size: contain;
-        margin-left: 2.5vw;
-        background-image: url("/icons/searching.png");
-        z-index: 0;
-
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.03);
-          transition: 500ms;
-        }
-      }
-
-      .returnIcon {
-        width: 4.5vh;
-        height: 4.5vh;
-        background-size: contain;
-        margin-left: 2.5vw;
-        background-image: url("/back.png");
-
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.03);
-          transition: 500ms;
-        }
-      }
-
       div.basemap-radio-container {
         z-index: 1;
         width: 20vw;
@@ -1180,81 +1137,32 @@ div.stability-analysis {
         display: flex;
         flex-flow: row nowrap;
         background-color: #fff;
-        box-shadow: 0 0 4px 1px rgba(#0642b1, 0.55), 0 6px 12px 0 rgba(#0642b1, 0.55);
+        box-shadow:
+          0 0 4px 1px rgba(#0642b1, 0.55),
+          0 6px 12px 0 rgba(#0642b1, 0.55);
         padding: 0.6vh;
         border-radius: 0.6vw; // just a high number to create pill effect
         margin-right: auto;
         margin-left: 8px;
 
-        * {
-          z-index: 7;
-        }
-
-        input[type="radio"] {
-          display: none;
-        }
-
-        .tab {
+        :deep(.el-radio-group) {
+          // background-color: red;
+          width: 18.8vw;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 4vh;
-          width: 7vw;
-          font-size: calc(0.8vw + 0.5vh);
-          font-weight: 600;
-          border-radius: 1.6rem; // just a high number to create pill effect
-          cursor: pointer;
-          transition: color 0.15s ease-in;
-        }
+          flex-direction: row;
+          justify-content: space-evenly;
 
-        input[type="radio"] {
-          &:checked {
-            &+label {
-              color: #185ee0;
+          .el-radio-button {
+            width: 6vw;
+
+            .el-radio-button__inner {
+              width: 6vw;
+              font-size: calc(0.6vw + 0.6vh);
+              font-weight: 800;
+              padding: 1vh 0vw;
             }
           }
         }
-
-        input[id="radio-1"] {
-          &:checked {
-            &~.glider {
-              transform: translateX(0);
-            }
-          }
-        }
-
-        input[id="radio-2"] {
-          &:checked {
-            &~.glider {
-              transform: translateX(100%);
-            }
-          }
-        }
-
-        input[id="radio-3"] {
-          &:checked {
-            &~.glider {
-              transform: translateX(200%);
-            }
-          }
-        }
-
-        .glider {
-          position: absolute;
-          display: flex;
-          height: 4vh;
-          width: 7vw;
-          background-color: #bcd8fc;
-          z-index: 5;
-          border-radius: 0.6vw; // just a high number to create pill effect
-          transition: 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
-        }
-
-        // @media (max-width: 700px) {
-        //     .tabs {
-        //         transform: scale(0.6);
-        //     }
-        // }
       }
     }
 

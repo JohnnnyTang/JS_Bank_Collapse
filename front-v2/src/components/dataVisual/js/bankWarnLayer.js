@@ -79,7 +79,7 @@ export default class BankWarnLayer {
             vec3 blue = vec3(0.0, 0.0, 1.0);
             vec3 orange = vec3(240.0, 120.0, 0.0) / 255.0;
             vec3 red = vec3(1.0, 0.0, 0.0);
-            float v_warnValueP = clamp(v_warnValue*1.4, 0.0, 1.0);
+            float v_warnValueP = clamp(v_warnValue*1.3, 0.0, 1.0);
 
 
             vec3 greenToBlue = mix(blue, orange, smoothstep(0.0, 0.5, v_warnValueP));

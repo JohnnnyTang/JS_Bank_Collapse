@@ -166,7 +166,8 @@ const mapStore = useMapStore()
 
 /////////////// 初始 断面选择
 const bankEnName = {
-    '民主沙': 'Mzs'
+    '民主沙': 'Mzs',
+    '民主沙右缘':'Mzs'
 }
 const demResources = ref([])
 const selectedBank = ref('')
@@ -183,7 +184,7 @@ const confirmBankHandler = async (bankName) => {
     })
 }
 const getDemResource = async () => {
-    // const ogSource = (await axios.get(`/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankEnName[selectedBank.value]}`)).data
+    // const ogSource = (await axios.get(`/temp/data/bankResource/bank/dataType?dataType=DEM&bank=${bankEnName[selectedBank.value]}`)).data
     const ogSource = t
     const _demRes = []
     for (let i = 0; i < ogSource.length; i++) {

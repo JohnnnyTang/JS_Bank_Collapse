@@ -139,6 +139,14 @@ const routes = [
             {
                 path: 'warn/:id', // 默认子页面
                 component: () => import('../components/bankManage/BankWarnTable.vue')
+            },
+            {
+                path: '/bankManage/preview/:id',
+                component: () => import('../components/bankManage/BankResourcePreview.vue')
+            },
+            {
+                path: '/bankManage/create',
+                component: () => import('../components/bankManage/BankResourceCreate.vue')
             }
         ]
     },

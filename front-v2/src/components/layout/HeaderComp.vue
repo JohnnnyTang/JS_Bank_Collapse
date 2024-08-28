@@ -180,7 +180,7 @@ const routerPathIndexMap = {
     '/modelStore': 4,
     '/knowledgeStore': 4,
     '/bankTwin': 1,
-    '/bankManage': 1,
+    '/bankManage': 2,
     '/': 2,
 }
 
@@ -304,7 +304,7 @@ onMounted(() => {
     watch(
         () => router.currentRoute.value.path,
         (newPath, oldPath) => {
-            // console.log(newPath, oldPath)
+            console.log(newPath, oldPath)
             // console.log(newPath.split('/'), oldPath)
             let parentPath = newPath
             let splitPath = newPath.split('/')

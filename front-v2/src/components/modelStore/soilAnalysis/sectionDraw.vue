@@ -263,18 +263,42 @@ defineExpose({
 
 
 const attachBaseLayer = (map) => {
-    map.addSource('mzsOverWaterSource', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
-        ],
+
+    map.addSource('mzsDemBoundArea', {
+        type: 'geojson',
+        data: {
+            "type": "FeatureCollection",
+            "name": "demBound",
+            "features": [
+                { "type": "Feature", "properties": { "id": 0 }, "geometry": { "type": "MultiPolygon", "coordinates": [[[[120.461319752169942, 32.082961734598221], [120.589359165748846, 32.082811477933781], [120.589359165748846, 31.987198228623438], [120.461319752169942, 31.987198228623438], [120.461319752169942, 32.082961734598221]]]] } }
+            ]
+        }
     })
-    map.addSource('mzsUnderWaterSource', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
-        ],
+    map.addSource('mzsDemBoundLine', {
+        type: 'geojson',
+        data: {
+            "type": "FeatureCollection",
+            "name": "demBoundLine",
+            "features": [
+                { "type": "Feature", "properties": { "id": 0 }, "geometry": { "type": "MultiLineString", "coordinates": [[[120.461319752169942, 32.082961734598221], [120.589359165748846, 32.082811477933781], [120.589359165748846, 31.987198228623438], [120.461319752169942, 31.987198228623438], [120.461319752169942, 32.082961734598221]]] } }
+            ]
+        }
     })
+
+
+
+    // map.addSource('mzsOverWaterSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsUnderWaterSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
+    //     ],
+    // })
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [
@@ -286,46 +310,6 @@ const attachBaseLayer = (map) => {
         tiles: [
             tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
         ],
-    })
-    map.addSource('mapRaster2020', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.509, 32.023, 120.555, 32.0402],
-    })
-    map.addSource('mapRaster2021', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2021/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.5116, 32.02316, 120.555, 32.0402],
-    })
-    map.addSource('mapRaster2022', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2022/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.51, 32.02, 120.552, 32.04046],
-    })
-    map.addSource('mapRaster2023', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.50548, 32.0224, 120.55304, 32.0415],
     })
     map.addSource('riverBeachSource', {
         type: 'vector',
@@ -371,28 +355,49 @@ const attachBaseLayer = (map) => {
             'text-color': 'rgba(31, 14, 126, 0.75)',
         },
     })
+    // map.addLayer({
+    //     id: 'mzsOverWaterBound',
+    //     type: 'fill',
+    //     source: 'mzsOverWaterSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': '#a2800f',
+    //         'fill-opacity': 0.5,
+    //         'fill-outline-color': 'rgba(162, 128, 15, 0.)'
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsUnderWaterBound',
+    //     type: 'fill',
+    //     source: 'mzsUnderWaterSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': '#101B94',
+    //         'fill-opacity': 0.5,
+    //         'fill-outline-color': 'rgba(16, 27, 148, 0.)'
+    //     },
+    // })
     map.addLayer({
-        id: 'mzsOverWaterBound',
+        id: 'mzsDemBoundLayerArea',
         type: 'fill',
-        source: 'mzsOverWaterSource',
-        'source-layer': 'default',
+        source: 'mzsDemBoundArea',
         paint: {
-            'fill-color': '#a2800f',
-            'fill-opacity': 0.5,
-            'fill-outline-color': 'rgba(162, 128, 15, 0.)'
+            'fill-color': 'rgb(16, 27, 148)',
+            'fill-opacity': 0.1,
         },
     })
     map.addLayer({
-        id: 'mzsUnderWaterBound',
-        type: 'fill',
-        source: 'mzsUnderWaterSource',
-        'source-layer': 'default',
+        id: 'mzsDemBoundLayerLine',
+        type: 'line',
+        source: 'mzsDemBoundLine',
         paint: {
-            'fill-color': '#101B94',
-            'fill-opacity': 0.5,
-            'fill-outline-color': 'rgba(16, 27, 148, 0.)'
+            'line-color': 'rgba(16, 27, 148, 1.0)',
+            'line-dasharray': [2, 2],
+            'line-width': 1,
+        
         },
     })
+
     map.addControl(draw)
 }
 const mapFlyToRiver = (mapIns) => {

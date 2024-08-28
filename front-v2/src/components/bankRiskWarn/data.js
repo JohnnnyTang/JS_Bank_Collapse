@@ -5,7 +5,7 @@ export const defaultWarnLayerDataInput = [
             [120.49989610501109, 32.044845778820694],
             [120.49965852902085, 32.043054010465546],
         ],
-        warnValue: 0.49,
+        warnValue: 0.25,
     },
     {
         name: 'JC02',

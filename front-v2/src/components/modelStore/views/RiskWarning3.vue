@@ -1,85 +1,42 @@
 <template>
     <div class="risk-warning-3">
-        <ModelTitleVue
-            :ModelName="'风险预警模型'"
-            v-on:confirm-bank="confirmBankHandler"
-        />
+        <ModelTitleVue :ModelName="'风险预警模型'" v-on:confirm-bank="confirmBankHandler" />
         <div class="flex-row main">
             <div class="left-container one-center">
                 <div class="pannel parameters">
                     <div class="title">
                         <span style="margin-left: 1vw"></span>模型基本参数
                     </div>
-                    <div
-                        class="content flex-coloum"
-                        style="justify-content: space-evenly"
-                    >
+                    <div class="content flex-coloum" style="justify-content: space-evenly">
                         <div class="parameter-card">
                             <div class="title flex-row between">
-                                <span
-                                    ><span style="margin-left: 1vw"></span
-                                    >土壤参数</span
-                                >
-                                <el-tag
-                                    type="success"
-                                    style="margin-right: 1vw"
-                                    v-if="
-                                        basicParams['hs'] && basicParams['hc']
-                                    "
-                                    >已录入</el-tag
-                                >
-                                <el-tag
-                                    type="primary"
-                                    style="margin-right: 1vw"
-                                    v-else
-                                    >待录入</el-tag
-                                >
+                                <span><span style="margin-left: 1vw"></span>土壤参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['hs'] && basicParams['hc']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
                             </div>
-                            <div
-                                class="content flex-coloum"
-                                style="
+                            <div class="content flex-coloum" style="
                                     justify-content: space-evenly;
                                     align-items: center;
-                                "
-                            >
+                                ">
                                 <div class="key-value">
-                                    <div class="key">下伏沙土层厚度</div>
-                                    <div
-                                        class="value flex-row"
-                                        style="margin-left: 0.5vw"
-                                    >
-                                        <input
-                                            type="number"
-                                            name=""
-                                            :step="0.0001"
-                                            v-model="basicParams['hs']"
-                                        /><span
+                                    <div class="key">下卧砂土层厚度</div>
+                                    <div class="value flex-row" style="margin-left: 0.5vw">
+                                        <input type="number" name="" :step="0.0001" v-model="basicParams['hs']" /><span
                                             style="
                                                 width: 1.5vw;
                                                 padding-left: 0.3vw;
-                                            "
-                                            >m</span
-                                        >
+                                            ">m</span>
                                     </div>
                                 </div>
                                 <div class="key-value">
                                     <div class="key">上覆粘土层厚度</div>
-                                    <div
-                                        class="value flex-row"
-                                        style="margin-left: 0.5vw"
-                                    >
-                                        <input
-                                            type="number"
-                                            name=""
-                                            :step="0.0001"
-                                            v-model="basicParams['hc']"
-                                        /><span
+                                    <div class="value flex-row" style="margin-left: 0.5vw">
+                                        <input type="number" name="" :step="0.0001" v-model="basicParams['hc']" /><span
                                             style="
                                                 width: 1.5vw;
                                                 padding-left: 0.3vw;
-                                            "
-                                            >m</span
-                                        >
+                                            ">m</span>
                                     </div>
                                 </div>
                             </div>
@@ -87,52 +44,26 @@
 
                         <div class="parameter-card">
                             <div class="title flex-row between">
-                                <span
-                                    ><span style="margin-left: 1vw"></span
-                                    >地质工程参数</span
-                                >
-                                <el-tag
-                                    type="success"
-                                    style="margin-right: 1vw"
-                                    v-if="
-                                        basicParams['protection-level'] &&
-                                        basicParams['control-level']
-                                    "
-                                    >已录入</el-tag
-                                >
-                                <el-tag
-                                    type="primary"
-                                    style="margin-right: 1vw"
-                                    v-else
-                                    >待录入</el-tag
-                                >
+                                <span><span style="margin-left: 1vw"></span>地质工程参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['protection-level'] &&
+                                    basicParams['control-level']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
                             </div>
 
-                            <div
-                                class="content flex-coloum"
-                                style="
+                            <div class="content flex-coloum" style="
                                     justify-content: space-evenly;
                                     align-items: center;
-                                "
-                            >
+                                ">
                                 <div class="key-value">
                                     <div class="key">岸坡护岸程度</div>
                                     <div class="value">
-                                        <el-select
-                                            style="width: 6.5vw; height: 3.5vh"
-                                            @change=""
-                                            v-model="
-                                                basicParams['protection-level']
-                                            "
-                                        >
-                                            <el-option
-                                                v-for="(
+                                        <el-select style="width: 6.5vw; height: 3.5vh" @change="" v-model="basicParams['protection-level']
+                                            ">
+                                            <el-option v-for="(
                                                     item, index
-                                                ) in PROTECTION_VALUE"
-                                                :key="index"
-                                                :label="PROTECTION_LEVEL[index]"
-                                                :value="item"
-                                            >
+                                                ) in PROTECTION_VALUE" :key="index" :label="PROTECTION_LEVEL[index]"
+                                                :value="item">
                                                 <div style="text-align: center">
                                                     {{
                                                         PROTECTION_LEVEL[index]
@@ -145,21 +76,12 @@
                                 <div class="key-value">
                                     <div class="key">突加荷载指标</div>
                                     <div class="value">
-                                        <el-select
-                                            style="width: 6.5vw; height: 3.5vh"
-                                            @change=""
-                                            v-model="
-                                                basicParams['control-level']
-                                            "
-                                        >
-                                            <el-option
-                                                v-for="(
+                                        <el-select style="width: 6.5vw; height: 3.5vh" @change="" v-model="basicParams['control-level']
+                                            ">
+                                            <el-option v-for="(
                                                     item, index
-                                                ) in CONTROL_VALUE"
-                                                :key="index"
-                                                :label="CONTROL_LEVEL[index]"
-                                                :value="item"
-                                            >
+                                                ) in CONTROL_VALUE" :key="index" :label="CONTROL_LEVEL[index]"
+                                                :value="item">
                                                 <div style="text-align: center">
                                                     {{ CONTROL_LEVEL[index] }}
                                                 </div>
@@ -172,66 +94,33 @@
 
                         <div class="parameter-card">
                             <div class="title flex-row between">
-                                <span
-                                    ><span style="margin-left: 1vw"></span
-                                    >地形参数</span
-                                >
-                                <el-tag
-                                    type="success"
-                                    style="margin-right: 1vw"
-                                    v-if="
-                                        basicParams['bench-id'] &&
-                                        basicParams['ref-id']
-                                    "
-                                    >已录入</el-tag
-                                >
-                                <el-tag
-                                    type="primary"
-                                    style="margin-right: 1vw"
-                                    v-else
-                                    >待录入</el-tag
-                                >
+                                <span><span style="margin-left: 1vw"></span>地形参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['bench-id'] &&
+                                    basicParams['ref-id']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
                             </div>
-                            <div
-                                class="content flex-coloum"
-                                style="
+                            <div class="content flex-coloum" style="
                                     justify-content: space-evenly;
                                     align-items: center;
-                                "
-                            >
+                                ">
                                 <div class="key-value">
                                     <div class="key">冲淤起算地形</div>
-                                    <el-select
-                                        style="width: 6.5vw; height: 3.5vh"
-                                        v-model="basicParams['bench-id']"
-                                        value-key="name"
-                                    >
-                                        <el-option
-                                            v-for="(
+                                    <el-select style="width: 6.5vw; height: 3.5vh" v-model="basicParams['bench-id']"
+                                        value-key="name">
+                                        <el-option v-for="(
                                                 item, index
-                                            ) in demResources"
-                                            :key="index"
-                                            :value="item"
-                                            :label="item.name + '地形'"
-                                        >
+                                            ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
                                         </el-option>
                                     </el-select>
                                 </div>
                                 <div class="key-value">
                                     <div class="key">判别计算地形</div>
-                                    <el-select
-                                        style="width: 6.5vw; height: 3.5vh"
-                                        v-model="basicParams['ref-id']"
-                                        value-key="name"
-                                    >
-                                        <el-option
-                                            v-for="(
+                                    <el-select style="width: 6.5vw; height: 3.5vh" v-model="basicParams['ref-id']"
+                                        value-key="name">
+                                        <el-option v-for="(
                                                 item, index
-                                            ) in demResources"
-                                            :key="index"
-                                            :value="item"
-                                            :label="item.name + '地形'"
-                                        >
+                                            ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
                                         </el-option>
                                     </el-select>
                                 </div>
@@ -240,64 +129,33 @@
 
                         <div class="parameter-card">
                             <div class="title flex-row between">
-                                <span
-                                    ><span style="margin-left: 1vw"></span
-                                    >水文参数</span
-                                >
-                                <el-tag
-                                    type="success"
-                                    style="margin-right: 1vw"
-                                    v-if="
-                                        basicParams['water-qs'] &&
-                                        basicParams['tidal-level']
-                                    "
-                                    >已录入</el-tag
-                                >
-                                <el-tag
-                                    type="primary"
-                                    style="margin-right: 1vw"
-                                    v-else
-                                    >待录入</el-tag
-                                >
+                                <span><span style="margin-left: 1vw"></span>水文参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['water-qs'] &&
+                                    basicParams['tidal-level']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
                             </div>
-                            <div
-                                class="content flex-coloum"
-                                style="
+                            <div class="content flex-coloum" style="
                                     justify-content: space-evenly;
                                     align-items: center;
-                                "
-                            >
+                                ">
                                 <div class="key-value">
                                     <div class="key">流量</div>
                                     <div class="value flex-row">
-                                        <input
-                                            type="number"
-                                            name=""
-                                            v-model="basicParams['water-qs']"
-                                        /><span
-                                            style="
+                                        <input type="number" name="" v-model="basicParams['water-qs']" /><span style="
                                                 width: 1.5vw;
                                                 padding-left: 0.5vw;
-                                            "
-                                            >m³/s</span
-                                        >
+                                            ">m³/s</span>
                                     </div>
                                 </div>
                                 <div class="key-value">
                                     <div class="key">潮差</div>
                                     <div class="value flex-row">
-                                        <input
-                                            type="number"
-                                            name=""
-                                            :step="0.001"
-                                            v-model="basicParams['tidal-level']"
-                                        /><span
-                                            style="
+                                        <input type="number" name="" :step="0.001"
+                                            v-model="basicParams['tidal-level']" /><span style="
                                                 width: 1.5vw;
                                                 padding-left: 0.5vw;
-                                            "
-                                            >m</span
-                                        >
+                                            ">m</span>
                                     </div>
                                 </div>
                             </div>
@@ -305,47 +163,23 @@
 
                         <div class="parameter-card">
                             <div class="title flex-row between">
-                                <span
-                                    ><span style="margin-left: 1vw"></span
-                                    >断面几何参数</span
-                                >
-                                <el-tag
-                                    type="success"
-                                    style="margin-right: 1vw"
-                                    v-if="basicParams['section-geometry']"
-                                    >已录入</el-tag
-                                >
-                                <el-tag
-                                    type="primary"
-                                    style="margin-right: 1vw"
-                                    v-else
-                                    >待录入</el-tag
-                                >
+                                <span><span style="margin-left: 1vw"></span>断面几何参数</span>
+                                <el-tag type="success" style="margin-right: 1vw"
+                                    v-if="basicParams['section-geometry']">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
                             </div>
-                            <div
-                                class="content flex-row"
-                                style="
+                            <div class="content flex-row" style="
                                     justify-content: space-evenly;
                                     align-items: center;
-                                "
-                            >
-                                <el-upload
-                                    class="upload-demo"
-                                    :file-list="fileList"
-                                    :before-upload="beforeUpload"
-                                    :on-change="handleChange"
-                                    :limit="1"
-                                    :http-request="handleRequest"
-                                    :show-file-list="false"
-                                >
+                                ">
+                                <el-upload class="upload-demo" :file-list="fileList" :before-upload="beforeUpload"
+                                    :on-change="handleChange" :limit="1" :http-request="handleRequest"
+                                    :show-file-list="false">
                                     <div class="button one-center">
                                         文件上传
                                     </div>
                                 </el-upload>
-                                <div
-                                    class="button one-center"
-                                    @click="mapInputVisible = true"
-                                >
+                                <div class="button one-center" @click="mapInputVisible = true">
                                     地图绘制
                                 </div>
                             </div>
@@ -358,24 +192,14 @@
                     <div class="title">
                         <span style="margin-left: 1vw"></span>风险阈值和指标权重
                     </div>
-                    <div
-                        class="content flex-coloum"
-                        style="background-color: rgb(217, 237, 254)"
-                    >
+                    <div class="content flex-coloum" style="background-color: rgb(217, 237, 254)">
                         <ThresholdForm ref="thresholdFormRef" />
-                        <div
-                            class=""
-                            style="height: 20vh; width: 100%; flex-grow: 1"
-                        >
-                            <div
-                                id="weight-chart"
-                                ref="weightChartRef"
-                                style="
+                        <div class="" style="height: 20vh; width: 100%; flex-grow: 1">
+                            <div id="weight-chart" ref="weightChartRef" style="
                                     height: 100%;
                                     width: 100%;
                                     background-color: rgb(217, 237, 254);
-                                "
-                            ></div>
+                                "></div>
                         </div>
                     </div>
                 </div>
@@ -389,48 +213,33 @@
                         <div class="top-block one-center">
                             <div class="card" style="width: 23vw; height: 23vh">
                                 <div class="title">
-                                    <span style="margin-left: 1vw"></span
-                                    >模型运行状态
+                                    <span style="margin-left: 1vw"></span>模型运行状态
                                 </div>
                                 <div class="content flex-coloum">
-                                    <div
-                                        class="flex-row"
-                                        style="
+                                    <div class="flex-row" style="
                                             justify-content: space-between;
                                             align-items: center;
                                             height: 4vh;
                                             width: 90%;
-                                        "
-                                    >
+                                        ">
                                         <div class="flex-row">
                                             <div class="status">状态</div>
-                                            <div class="statustext">
+                                            <div class="statustext" :class="statusClass[modelStatus]">
                                                 {{ statusText[modelStatus] }}
                                             </div>
                                         </div>
-                                        <div
-                                            class="button one-center"
-                                            style="width: 5vw; height: 4vh"
-                                            @click="runModelClickHandler"
-                                        >
+                                        <div class="button one-center" style="width: 5vw; height: 4vh"
+                                            @click="runModelClickHandler">
                                             运行模型
                                         </div>
                                     </div>
-                                    <div
-                                        style="
+                                    <div style="
                                             width: 90%;
                                             height: 4vh;
                                             margin-top: 4vh;
-                                        "
-                                    >
-                                        <el-progress
-                                            :percentage="modelRunnningProgress"
-                                            :stroke-width="27"
-                                            :format="progressFormat"
-                                            striped
-                                            striped-flow
-                                            :duration="25"
-                                        />
+                                        ">
+                                        <el-progress :percentage="modelRunnningProgress" :stroke-width="27"
+                                            :format="progressFormat" striped striped-flow :duration="25" />
                                     </div>
                                 </div>
                             </div>
@@ -439,47 +248,36 @@
                         <div class="bottom-block one-center">
                             <div class="card" style="width: 23vw; height: 52vh">
                                 <div class="title">
-                                    <span style="margin-left: 1vw"></span
-                                    >模型运行结果
+                                    <span style="margin-left: 1vw"></span>模型运行结果
                                 </div>
                                 <div class="content flex-coloum">
                                     <div class="flex-row">
-                                        <div
-                                            class="keyValue flex-coloum"
-                                            style="margin-top: 0.2vh"
-                                        >
+                                        <div class="keyValue flex-coloum" style="margin-top: 0.2vh">
                                             <div class="key">风险计算结果</div>
                                             <div class="value">
                                                 {{
                                                     riskModelFinalResultNumber
-                                                        ? riskModelFinalResultNumber
-                                                        : '暂无'
+                                                    ? riskModelFinalResultNumber
+                                                    : '暂无'
                                                 }}
                                             </div>
                                         </div>
-                                        <div
-                                            class="keyValue flex-coloum"
-                                            style="margin-top: 0.2vh"
-                                        >
+                                        <div class="keyValue flex-coloum" style="margin-top: 0.2vh">
                                             <div class="key">评估断面状态</div>
                                             <div class="value">
                                                 {{
                                                     riskModelFinalResultStatus
-                                                        ? riskModelFinalResultStatus
-                                                        : '暂无'
+                                                    ? riskModelFinalResultStatus
+                                                    : '暂无'
                                                 }}
                                             </div>
                                         </div>
                                     </div>
-                                    <div
-                                        id="result-chart"
-                                        ref="chartRef"
-                                        style="
+                                    <div id="result-chart" ref="chartRef" style="
                                             width: 100%;
                                             flex-grow: 1;
                                             background-color: aliceblue;
-                                        "
-                                    ></div>
+                                        "></div>
                                 </div>
                             </div>
                         </div>
@@ -489,18 +287,10 @@
         </div>
     </div>
 
-    <el-dialog
-        v-model="mapInputVisible"
-        title="基于地图绘制断面"
-        width="41.5vw"
-    >
+    <el-dialog v-model="mapInputVisible" title="基于地图绘制断面" width="41.5vw">
         <div class="main-content">
-            <sectionDraw
-                ref="sectionDrawRef"
-                v-on:section-draw="sectionDrawHandler"
-                :demResources="demResources"
-                :demListShow="false"
-            >
+            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" :demResources="demResources"
+                :demListShow="false">
             </sectionDraw>
         </div>
         <template #footer>
@@ -538,7 +328,8 @@ const mapStore = useMapStore()
 
 /////////////// 初始 断面选择
 const bankEnName = {
-    民主沙: 'Mzs',
+    '民主沙': 'Mzs',
+    '民主沙右缘':'Mzs'
 }
 const demResources = ref([])
 const selectedBank = ref('')
@@ -559,7 +350,8 @@ const confirmBankHandler = async (bankName) => {
 const getDemResource = async () => {
     const ogSource = (
         await axios.get(
-            `/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankEnName[selectedBank.value]}`,
+            `/temp/data/bankResource/bank/dataType?dataType=DEM&bank=${bankEnName[selectedBank.value]}`,
+
         )
     ).data
     // const ogSource = t
@@ -616,8 +408,8 @@ const confirmSectionDraw = () => {
 
 ////////////// 基本参数
 const basicParams = reactive({
-    hs: 1,
-    hc: 2,
+    hs: 42,
+    hc: 13.5,
     'protection-level': 'low',
     'control-level': 'strict',
     'section-geometry': null,
@@ -629,6 +421,7 @@ const basicParams = reactive({
     'tidal-level': 1.5,
     'risk-thresholds': 'NONE',
 })
+
 //岸坡护岸程度
 const PROTECTION_LEVEL = ['系统防护', '一般防护', '较弱防护', '无防护']
 const PROTECTION_VALUE = ['systemic', 'normal', 'low', 'no']
@@ -639,28 +432,20 @@ const CONTROL_VALUE = ['strict', 'normal', 'loose', 'no']
 ////////////// 断面geojson文件上传
 const fileList = ref([])
 const beforeUpload = (file, e) => {
-    // console.log('beforeUpload', file, e)
-    // const isJSON = file.type === 'application/json'
-    // if (!isJSON) {
-    //     ElMessage({
-    //         type: 'warning',
-    //         message: '请上传正确的断面几何Geojson-feature文件！',
-    //         offset: 130,
-    //     })
-    // }
-    // console.log(isJSON)
-    // return isJSON
+    fileList.value = []
 }
 const handleChange = (file, fileList) => {
+    console.log('change')
     const reader = new FileReader()
     reader.onload = (event) => {
         try {
-            const isJSON = file.type === 'application/json'
+            const isJSON = file.raw.type === 'application/json'
             if (!isJSON) {
                 throw new Error('not a geojson feature')
             }
 
             let fileContent = JSON.parse(event.target.result)
+            console.log(fileContent)
             if (isGeoJSONFeature(fileContent)) {
                 basicParams['section-geometry'] = fileContent
                 ElMessage({
@@ -681,8 +466,6 @@ const handleChange = (file, fileList) => {
 }
 const handleRequest = (a, b) => {
     console.log('============')
-    console.log(a)
-    console.log(b)
 }
 
 // 阈值 \ 权重
@@ -711,10 +494,11 @@ const parametersInputStatus = computed(() => {
     return true
 })
 const modelStatus = ref(0)
-const statusText = ['参数配置中', '待运行', '运行中', '运行成功', '运行失败']
+const statusText = ['参数配置中', '待运行', '运行中...', '运行成功', '运行失败']
+const statusClass = ['', 'ready', 'running', 'success', 'error']
 const modelRunnningProgress = ref(0)
 const progressFormat = (percentage) =>
-    percentage === 100 ? 'Full' : `${percentage.toFixed(2)}%`
+    percentage === 100 ? '100%' : `${percentage.toFixed(2)}%`
 watch(parametersInputStatus, (newval) => {
     if (newval) {
         modelStatus.value = 1
@@ -808,10 +592,15 @@ const run = async () => {
     const rrr = async () => {
         const modelUrl =
             '/temp/taskNode/start/multipleIndicators/calculateRiskLevel'
-
-        const TASK_ID = (await axios.post(modelUrl, requestBody)).data
         modelRunnningProgress.value = 0
 
+        let TASK_ID
+        try {
+            TASK_ID = (await axios.post(modelUrl, requestBody)).data
+        } catch (error) {
+            console.log('task ID error')
+            console.log(error)
+        }
         console.log('TASK_ID', TASK_ID)
         const interval = setInterval(async () => {
             const status = (
@@ -822,9 +611,8 @@ const run = async () => {
             switch (status) {
                 case 'RUNNING':
                 case 'LOCK':
-                    let progress =
-                        modelRunnningProgress.value +
-                        Math.round(Math.random() * 30) / 10
+                case 'UNLOCK':
+                    let progress = modelRunnningProgress.value + Math.random() * 2
                     modelRunnningProgress.value = clamp(progress, 0, 98)
 
                     break
@@ -848,20 +636,20 @@ const run = async () => {
                     modelStatus.value = 3
                     ElNotification({
                         type: 'success',
-                        message: '成功',
-                        title: '成功',
+                        message: '计算成功',
                         offset: 130,
                         position: 'top-left',
                     })
                     break
-                case 'UNLOCK':
-                    clearInterval(interval)
-                    modelRunnningProgress.value = 0
-                    ElMessage({
-                        message: '运行失败 ' + err.data,
-                        type: 'error',
-                    })
-                    break
+                // case 'UNLOCK':
+                //     clearInterval(interval)
+                //     modelRunnningProgress.value = 0
+                //     ElMessage({
+                //         message: '运行失败 ' + err.data,
+                //         type: 'error',
+                //         offset: 130,
+                //     })
+                //     break
                 case 'ERROR':
                     clearInterval(interval)
                     modelRunnningProgress.value = 0
@@ -871,8 +659,9 @@ const run = async () => {
                     console.log('err result', err)
                     modelStatus.value = 4
                     ElMessage({
-                        message: '运行失败 ' + err.data,
+                        message: '运行失败 ' + err.data['error-log'],
                         type: 'error',
+                        offset: 130,
                     })
                     break
                 default:
@@ -890,27 +679,35 @@ const runModelClickHandler = async () => {
             ElMessage({
                 message: '请先完成参数配置',
                 type: 'warning',
+                offset: 130,
             })
             break
         case 2:
             ElMessage({
                 message: '模型运行中，请勿重复操作',
                 type: 'warning',
+                offset: 130,
             })
             break
         case 1:
-            ElMessage('运行模型')
+            ElMessage({
+                message: '运行模型', offset: 130,
+            })
             modelStatus.value = 2
             run()
             break
 
         case 3:
-            ElMessage('运行模型')
+            ElMessage({
+                message: '运行模型', offset: 130,
+            })
             modelStatus.value = 2
             run()
             break
         case 4:
-            ElMessage('运行模型')
+            ElMessage({
+                message: '运行模型', offset: 130,
+            })
             modelStatus.value = 2
             run()
             break
@@ -1042,7 +839,25 @@ const drawChartBase = () => {
             },
         },
         legend: {},
-        tooltip: {},
+        tooltip: {
+            formatter: function (params) {
+                console.log(this)
+                console.log(params)
+                const riskLevels = {
+                    0.25: '低风险',
+                    0.5: '较低风险',
+                    0.75: '较高风险',
+                    1: '高风险'
+                };
+                let riskText = '';
+                params.value.forEach((value, index) => {
+                    const indicatorName = params.encode[`indicator_${index}`].map(i => params.dimensionNames[i]).join(', ');
+                    const riskLevel = riskLevels[parseFloat(value.toFixed(2))];
+                    riskText += `【${indicatorName}】: ${riskLevel}<br/>`;
+                });
+                return `${params.seriesName}<br/>${riskText}`;
+            }
+        },
         radar: {
             indicator: baseIndicators.map((name) => ({
                 name: IndicatorNameMap[name],
@@ -1149,7 +964,7 @@ onMounted(() => {
         })
     })
 })
-onUnmounted(() => {})
+onUnmounted(() => { })
 
 ///////////// tools
 let timeoutId = null
@@ -1301,14 +1116,11 @@ div.pannel {
     height: 97%;
     border-radius: 3px;
 
-    &.parameters {
-    }
+    &.parameters {}
 
-    &.weights {
-    }
+    &.weights {}
 
-    &.results {
-    }
+    &.results {}
 
     .title {
         position: relative;
@@ -1388,8 +1200,7 @@ div.parameter-card {
             }
 
             div.value {
-                div {
-                }
+                div {}
 
                 input {
                     height: 2.8vh;
@@ -1549,6 +1360,26 @@ div.parameter-card {
                             border-right: 2px solid rgb(2, 143, 199);
                             border-bottom: 1px solid rgb(5, 88, 121);
                             transition: 0.3s ease-in-out;
+
+                            &.ready {
+                                color: rgb(68, 159, 251);
+                                background-color: rgb(236, 245, 254);
+                            }
+
+                            &.running {
+                                color: rgb(230, 162, 71);
+                                background-color: rgb(253, 246, 237);
+                            }
+
+                            &.success {
+                                color: rgb(99, 194, 70);
+                                background-color: rgb(240, 249, 236);
+                            }
+
+                            &.error {
+                                color: rgb(255, 81, 83);
+                                background-color: rgb(254, 240, 240);
+                            }
                         }
                     }
 

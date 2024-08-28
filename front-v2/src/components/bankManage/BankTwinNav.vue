@@ -5,43 +5,37 @@
             <div class="back-text">返回</div>
         </div>
         <el-scrollbar>
-            <el-menu
-                class="el-menu-vertical-demo"
-                :default-active="defaultActive"
-                @select="handleSelect"
-            >
+            <el-menu class="el-menu-vertical-demo" :default-active="defaultActive" @select="handleSelect">
                 <el-sub-menu index="basic">
                     <template #title>
-                        <el-icon><InfoFilled /></el-icon>
+                        <el-icon>
+                            <InfoFilled />
+                        </el-icon>
                         <span>基础信息</span>
                     </template>
                     <el-menu-item index="basic/mzs">民主沙右缘</el-menu-item>
                 </el-sub-menu>
                 <el-sub-menu index="2">
                     <template #title>
-                        <el-icon><View /></el-icon>
+                        <el-icon>
+                            <View />
+                        </el-icon>
                         <span>岸坡监测</span>
                     </template>
                     <el-sub-menu index="2-1">
                         <template #title>民主沙右缘</template>
-                        <el-menu-item index="monitor/video"
-                            >视频监测</el-menu-item
-                        >
+                        <el-menu-item index="monitor/video">视频监测</el-menu-item>
                         <el-menu-item index="monitor/gnss">GNSS</el-menu-item>
-                        <el-menu-item index="monitor/inclinometer"
-                            >测斜仪</el-menu-item
-                        >
-                        <el-menu-item index="monitor/manometer"
-                            >孔隙水压力计</el-menu-item
-                        >
-                        <el-menu-item index="monitor/stress"
-                            >应力桩</el-menu-item
-                        >
+                        <el-menu-item index="monitor/inclinometer">测斜仪</el-menu-item>
+                        <el-menu-item index="monitor/manometer">孔隙水压力计</el-menu-item>
+                        <el-menu-item index="monitor/stress">应力桩</el-menu-item>
                     </el-sub-menu>
                 </el-sub-menu>
                 <el-sub-menu index="3">
                     <template #title>
-                        <el-icon><WarningFilled /></el-icon>
+                        <el-icon>
+                            <WarningFilled />
+                        </el-icon>
                         <span>风险预警</span>
                     </template>
                     <el-sub-menu index="3-1">
@@ -71,6 +65,19 @@
                     <el-menu-item index="report/week">周报</el-menu-item>
                     <el-menu-item index="4-3">月报</el-menu-item>
                 </el-sub-menu> -->
+                <el-sub-menu index="4">
+                    <template #title>
+                        <el-icon>
+                            <FolderOpened />
+                        </el-icon>
+                        <span>岸段资源管理</span>
+                    </template>
+                    <el-sub-menu index="4-1">
+                        <template #title>岸段资源预览</template>
+                        <el-menu-item index="preview/mzs">民主沙右缘</el-menu-item>
+                    </el-sub-menu>
+                    <el-menu-item index="create" style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item>
+                </el-sub-menu>
             </el-menu>
         </el-scrollbar>
         <div class="placement-container down"></div>
@@ -80,6 +87,7 @@
 <script setup>
 import {
     Document,
+    FolderOpened,
     InfoFilled,
     WarningFilled,
     View,
@@ -106,11 +114,11 @@ const defaultActive = ref('')
 // }
 
 const handleSelect = (index, indexPath) => {
-    // console.log('select', index, indexPath)
+    console.log('select', index, indexPath)
     router.push('/bankManage/' + index)
 }
 
-const updateSelection = (curRoute) =>{
+const updateSelection = (curRoute) => {
     let pathSplit = curRoute.fullPath.split('/')
     let selectIndex =
         pathSplit[pathSplit.length - 2] + '/' + pathSplit[pathSplit.length - 1]
@@ -131,6 +139,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 $openMenuColor: rgba(28, 59, 163, 0.6);
+
 div.vertical-menu-container {
     position: relative;
     left: 0vw;
@@ -181,6 +190,7 @@ div.vertical-menu-container {
                     background-size: 70%;
                 }
             }
+
             div.back-icon {
                 height: 5vh;
                 width: 3vw;
@@ -212,6 +222,7 @@ div.vertical-menu-container {
         }
     }
 }
+
 :deep(.el-menu) {
     border-bottom-right-radius: 12px;
     border-bottom-left-radius: 12px;
@@ -234,12 +245,14 @@ div.vertical-menu-container {
     &.is-opened {
         background-color: $openMenuColor;
         border-right: 2px solid #38d7ff;
+
         .el-sub-menu__title,
         li {
             color: #ffff;
             background-color: $openMenuColor;
             border-right: 2px solid #38d7ff;
         }
+
         &.is-active,
         li.is-active {
             background-color: rgb(18, 98, 247);

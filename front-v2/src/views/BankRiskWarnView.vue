@@ -216,7 +216,7 @@
             <!-- <div class="risk-line-arrow" :class="riskDataAll[riskDataIndex-1].value">
                 <img src="/up_triangle.png" alt="图例标记">
             </div> -->
-            <div class="risk-line-arrow high">
+            <div class="risk-line-arrow" :class="styleMap[totalResult.desc]">
                 <img src="/down_triangle.png" alt="图例标记" />
             </div>
             <div class="risk-line-mark low">低风险</div>
@@ -229,9 +229,9 @@
             <!-- <div class="warn-status-content" :class="riskDataAll[riskDataIndex-1].value">
                 {{ riskDataAll[riskDataIndex-1].label }}
             </div> -->
-            <div class="warn-status-content high">高风险</div>
+            <div class="warn-status-content" :class="styleMap[totalResult.desc]">{{ totalResult.desc }}</div>
         </div>
-        <div v-if="showRiskStatus" class="warn-detail-container high">
+        <div v-if="showRiskStatus" class="warn-detail-container" :class="styleMap[totalResult.desc]">
             <div class="warn-detail-profile">
                 <div class="warn-detail-text">
                     <span class="warn-detail-span"> </span>
@@ -529,17 +529,33 @@
                         <span class="desc">流量：</span>
                         <el-input
                             v-model="conditionConfigureData.flow"
-                            style="width: 5vw; height: 3.5vh"
-                            placeholder="请输入流量"
+                            style="width: 4vw; height: 3.5vh"
+                            placeholder="请输入"
                         />
+                        <span
+                            style="
+                                height: 3.5vh;
+                                line-height: 3.5vh;
+                                margin-left: 0.2vw;
+                            "
+                            >m³/s</span
+                        >
                     </div>
                     <div class="flex-row">
                         <span class="desc">潮差：</span>
                         <el-input
                             v-model="conditionConfigureData.tideDif"
-                            style="width: 5vw; height: 3.5vh"
-                            placeholder="请输入潮差"
+                            style="width: 3.5vw; height: 3.5vh"
+                            placeholder="请输入"
                         />
+                        <span
+                            style="
+                                height: 3.5vh;
+                                line-height: 3.5vh;
+                                margin-left: 0.2vw;
+                            "
+                            >m</span
+                        >
                     </div>
                 </div>
                 <div class="flex-column">
@@ -553,18 +569,17 @@
                             placeholder="请选择地形"
                             style="width: 7vw; height: 3.5vh"
                             @change=""
+                            value-key="name"
                         >
-                            <el-option
-                                v-for="(item, index) in [
-                                    '1998年地形',
-                                    '2004年地形',
-                                ]"
-                                :key="index"
-                                :label="item"
-                                :value="item"
-                            >
-                                <div style="text-align: center">{{ item }}</div>
-                            </el-option>
+                          <el-option
+                              v-for="(
+                                  item, index
+                              ) in demResources"
+                              :key="index"
+                              :value="item"
+                              :label="item.name + '地形'"
+                          >
+                          </el-option>
                         </el-select>
                     </div>
                     <div class="flex-row">
@@ -574,17 +589,16 @@
                             placeholder="请选择地形"
                             style="width: 7vw; height: 3.5vh"
                             @change=""
+                            value-key="name"
                         >
-                            <el-option
-                                v-for="(item, index) in [
-                                    '1998年地形',
-                                    '2004年地形',
-                                ]"
+                          <el-option
+                                v-for="(
+                                    item, index
+                                ) in demResources"
                                 :key="index"
-                                :label="item"
                                 :value="item"
+                                :label="item.name + '地形'"
                             >
-                                <div style="text-align: center">{{ item }}</div>
                             </el-option>
                         </el-select>
                     </div>
@@ -712,13 +726,7 @@ const showRaster = ref(false)
 const showBankLine = ref(true)
 const showTerrain = ref(false)
 const infoTreeData = ref(InfoTree)
-const conditionConfigureData = reactive({
-    flow: null,
-    // tideType: null,
-    tideDif: null,
-    judgeTerrain: null,
-    siltationTerrain: null,
-})
+
 
 const nowWaterConditionType = ref('洪季')
 let DryflowLayer
@@ -824,9 +832,60 @@ const mapJumpToRiver = (mapIns) => {
     // )
 }
 
-// reset condition data
+/////////////// 初始岸段资源获取
+const demResources = ref([])
+const getDemResource = async () => {
+    const _bank = 'Mzs'
+    const ogSource = (
+        await axios.get(
+            `/temp/data/bankResource/bank/dataType?dataType=DEM&bank=${_bank}`,
+        )
+    ).data
+    // const ogSource = t
+    const _demRes = []
+    for (let i = 0; i < ogSource.length; i++) {
+        const year = ogSource[i]['year']
+        const sets = ogSource[i]['sets']
+        for (let j = 0; j < sets.length; j++) {
+            const set = sets[j]
+            for (let k = 0; k < set['list'].length; k++) {
+                const item = set['list'][k]
+                const demResourceNode = {
+                    year: year,
+                    name: item['name'],
+                    fileType: item['fileType'],
+                    path: item['path'],
+                    month: item['month'],
+                }
+                _demRes.push(demResourceNode)
+            }
+        }
+    }
+    console.log(_demRes)
+    return _demRes
+}
+
+
+// totalResult
+const styleMap = {
+  '低风险':'low',
+  '中风险':'middle',
+  '高风险':'high'
+}
+const totalResult = reactive({
+  desc:'高风险'
+})
+////////////// 重置水文条件
+const conditionConfigureData = reactive({
+    flow: null,
+    // tideType: null,
+    tideDif: null,
+    judgeTerrain: null,
+    siltationTerrain: null,
+})
 const conditionConfigureDataResetHandler = () => {
     console.log('reset condition data!', conditionConfigureData)
+    totalResult.desc = '低风险'
 }
 
 // 数据
@@ -1754,7 +1813,7 @@ const addBankLineRiskLayer = (map, profileList) => {
 }
 
 onMounted(async () => {
-    await axios.get('/api/data/monitorInfo')
+    demResources.value = await getDemResource()
 
     await initPureScratchMap(mapContainer.value).then(async (map) => {
         mapInstance = map
@@ -2294,7 +2353,7 @@ div.risk-warn-container {
         transition: 0.5s ease-in-out;
 
         &.translate {
-          right: -20vw;
+            right: -20vw;
         }
 
         div.title {
@@ -3064,15 +3123,19 @@ div.risk-warn-container {
             text-indent: 1rem;
 
             &.low {
-                background-color: rgb(17, 17, 255);
+                background-color: rgb(51,33,234);
+            }
+
+            &.low2 {
+                background-color: rgb(113, 199, 0);
             }
 
             &.middle {
-                background-color: rgb(220, 126, 37);
+                background-color: rgb(211,121,60);
             }
 
             &.high {
-                background-color: rgb(255, 9, 9);
+                background-color: rgb(254,15,31);
             }
         }
     }

@@ -202,12 +202,14 @@ const handleChange = (file, fileList) => {
             let fileContent = JSON.parse(event.target.result);
             uploadJson.value = fileContent
             ElNotification({
+                position: 'top-left',
                 type: 'success',
                 title: '参数配置文件上传成功！',
                 offset: 130
             })
         } catch (error) {
             ElNotification({
+                position: 'top-left',
                 type: 'error',
                 message: '请上传正确的 JSON 文件！',
                 title: '错误',
@@ -219,6 +221,7 @@ const handleChange = (file, fileList) => {
 }
 const handleExceed = (files, fileList) => {
     ElNotification({
+        position: 'top-left',
         type: 'error',
         message: '文件超出限制，请上传正确的 JSON 文件！',
         title: '错误',
@@ -262,9 +265,10 @@ const demResources = ref([])
 const confirmBankHandler = async (bankName) => {
     console.log('confirmBankHandler', bankName)
     const bankNameMap = {
-        '民主沙': 'Mzs'
-    }
-    const dem = (await axios.get(`/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
+        民主沙: "Mzs",
+        民主沙右缘: "Mzs",
+    };
+    const dem = (await axios.get(`/temp/data/bankResource/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
     // const dem = t
     const _demResource = getDemResource(dem)
     console.log('demdata', _demResource)
@@ -272,6 +276,7 @@ const confirmBankHandler = async (bankName) => {
     selectedBank.value = bankName
 
     ElNotification({
+        position: 'top-left',
         type: 'success',
         title: '选择岸段',
         message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
@@ -290,6 +295,7 @@ const inputData = (type) => {
         console.log('map input')
         if (selectedBank.value == null) {
             ElNotification({
+                position: 'top-left',
                 type: 'info',
                 message: '请先选择岸段',
                 title: '警告',
@@ -340,7 +346,7 @@ const sectionViewModelRun = async (param) => {
     // }
     // const paramsCheck = () => {
     //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
-    //         ElNotification({
+    //         ElNotification({position: 'top-left',
     //             type: 'warning',
     //             message: '请完成断面绘制和地形选择',
     //             title: '警告',
@@ -371,6 +377,7 @@ const sectionViewModelRun = async (param) => {
                 let sectionFileName = result['raw-json']
                 const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err) => {
                     ElNotification({
+                        position: 'top-left',
                         type: 'error',
                         title: '错误',
                         message: '断面形态计算完毕，但获取断面信息失败！',
@@ -385,6 +392,7 @@ const sectionViewModelRun = async (param) => {
                 ModelRunningShow.value = false
                 ModelRunningMessage.value = ''
                 ElNotification({
+                    position: 'top-left',
                     type: 'success',
                     message: '计算断面形态成功',
                     title: '成功',
@@ -404,6 +412,7 @@ const sectionViewModelRun = async (param) => {
                 ModelRunningShow.value = false
                 ModelRunningMessage.value = ''
                 ElNotification({
+                    position: 'top-left',
                     type: 'error',
                     message: '计算断面形态失败,\n' + errorLog,
                     title: '错误',
@@ -432,6 +441,7 @@ const calSectionViewClickHandler = () => {
     const paramsCheck = () => {
         if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
             ElNotification({
+                position: 'top-left',
                 type: 'warning',
                 message: '请完成断面绘制和地形选择',
                 title: '警告',
@@ -480,6 +490,7 @@ const BSTEMModelRun = async () => {
     const paramsCheck = () => {
         if (elevationOfFlow.value == null || elevationOfFlow.value == '') {
             ElNotification({
+                position: 'top-left',
                 type: 'warning',
                 message: '请完整配置参数后运行',
                 title: '警告',
@@ -493,6 +504,7 @@ const BSTEMModelRun = async () => {
         ModelRunningShow.value = true
         ModelRunningMessage.value = '正在执行土地变形分析模型'
         ElNotification({
+            position: 'top-left',
             type: 'info',
             message: '执行土地变形分析模型',
             title: '提示',
@@ -528,6 +540,7 @@ const BSTEMModelRun = async () => {
                     ModelRunningShow.value = false
                     ModelRunningMessage.value = ''
                     ElNotification({
+                        position: 'top-left',
                         type: 'success',
                         message: '土地变形分析模型执行成功',
                         title: '成功',
@@ -542,6 +555,7 @@ const BSTEMModelRun = async () => {
                     ModelRunningShow.value = false
                     ModelRunningMessage.value = ''
                     ElNotification({
+                        position: 'top-left',
                         type: 'error',
                         message: '土地变形分析模型执行失败,\n' + errorLog,
                         title: '错误',
@@ -815,6 +829,7 @@ const parseUploadJson = (jsonData) => {
         let flowElevation = jsonData['flow-elevation']
 
         ElNotification({
+            position: 'top-left',
             type: 'success',
             message: '参数配置文件解析完毕',
             title: '成功',
@@ -828,6 +843,7 @@ const parseUploadJson = (jsonData) => {
     }
     catch (e) {
         ElNotification({
+            position: 'top-left',
             type: 'error',
             message: '解析失败，请上传正确的 JSON 文件！',
             title: '错误',
