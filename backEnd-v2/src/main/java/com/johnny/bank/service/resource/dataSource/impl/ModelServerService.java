@@ -2,21 +2,19 @@ package com.johnny.bank.service.resource.dataSource.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNodeV2;
+import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.repository.nodeRepo.base.IBaseNodeRepo;
-import com.johnny.bank.service.node.impl.DataNodeService;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
-import com.johnny.bank.service.node.impl.NodeService;
 import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import com.johnny.bank.service.resource.dataSource.IModelServerService;
 import com.johnny.bank.utils.BeanUtil;
 import com.johnny.bank.utils.InternetUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.crypto.agreement.srp.SRP6Client;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -29,7 +27,10 @@ import java.util.List;
 
 @Service("modelServerService")
 @Slf4j
-public class ModelServerServiceImpl implements IModelServerService {
+public class ModelServerService implements IModelServerService {
+
+    @Autowired
+    IDataNodeRepoV2 dataNodeRepoV2;
 
     @Value("${modelServer.url}")
     String baseUrl;
@@ -39,6 +40,18 @@ public class ModelServerServiceImpl implements IModelServerService {
 
     @Value("${modelServer.caseLimit}")
     Integer CASE_LIMIT;
+
+    public List<DataNodeV2> getModelServerResourceNode(String category, String bank, String year, String name) {
+        return dataNodeRepoV2.getNodeByCategoryBankYearAndName(category, bank, year, name);
+    }
+
+    @Override
+    public String getResultByCaseId(String caseId) {
+        String url = baseUrl + "/v0/mc/result";
+        JSONObject body = new JSONObject();
+        body.put("id",caseId);
+        return InternetUtil.doGet(url, body);
+    }
 
     @Override
     public String getJsonDataByCaseIdAndFileName(String caseId, String name) {
@@ -140,6 +153,7 @@ public class ModelServerServiceImpl implements IModelServerService {
         }
         String resourceName = "tiff";
         // TODO: 解析Tiff成为栅格瓦片
+
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
 
@@ -180,6 +194,7 @@ public class ModelServerServiceImpl implements IModelServerService {
         JSONObject dataNodeBasicInfo = new JSONObject();
         dataNodeBasicInfo.put("fileType",info.getString("fileType"));
         dataNodeBasicInfo.put("year",info.getString("year"));
+        dataNodeBasicInfo.put("month",info.getString("month"));
         dataNodeBasicInfo.put("set",info.getString("set"));
         dataNodeBasicInfo.put("type","calculate");
         if (info.containsKey("description")) {
@@ -201,7 +216,8 @@ public class ModelServerServiceImpl implements IModelServerService {
         JSONObject response = JSONObject.parseObject(InternetUtil.doPost_File(url, file, info));
         dataNodeBasicInfo.put("path",response.getString("directory"));
         dataNode.setBasicInfo(dataNodeBasicInfo);
-        List<DataNodeV2> dataNodeListBefore = dataNodeServiceV2.getModelServerResourceNode(dataNode.getCategory(),dataNode.getBank(),dataNode.getBasicInfo().getString("year"),dataNode.getName());
+        List<DataNodeV2> dataNodeListBefore = getModelServerResourceNode(dataNode.getCategory(),dataNode.getBank(),dataNode.getBasicInfo().getString("year"),dataNode.getName());
+//        List<DataNodeV2> dataNodeListBefore = dataNodeServiceV2.getModelServerResourceNode(dataNode.getCategory(),dataNode.getBank(),dataNode.getBasicInfo().getString("year"),dataNode.getName());
         // 若资源重复，则删除后重新挂载资源
         if (!dataNodeListBefore.isEmpty()) {
             for (DataNodeV2 dataNodeBefore : dataNodeListBefore) {

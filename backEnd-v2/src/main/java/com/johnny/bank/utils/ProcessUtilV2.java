@@ -2,20 +2,13 @@ package com.johnny.bank.utils;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.johnny.bank.model.ProcessCmdOutput;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -31,7 +24,7 @@ import java.util.*;
 public class ProcessUtilV2 {
 
     // 模型服务运行
-    public static String runModelTaskService(String modelServerUrl, TaskNode taskNode) {
+    public static String runModelTaskService(String modelServerUrl, TaskNode taskNode, Optional<List<MultipartFile>> optionalFileList) {
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
         String modelRunApi = modelServerUrl + modelUsage.getJSONObject("api").getJSONObject("run").getString("url");
@@ -40,7 +33,11 @@ public class ProcessUtilV2 {
         JSONObject modelRunApiBody = paramNode.getParams();
         JSONObject response;
         if (modelRunType.equals("post")) {
-            response = JSONObject.parseObject(InternetUtil.doPost(modelRunApi, modelRunApiBody));
+            if (optionalFileList.isPresent()) {
+                response = JSONObject.parseObject(InternetUtil.doPost_Hydro(modelRunApi, optionalFileList, modelRunApiBody));
+            } else {
+                response = JSONObject.parseObject(InternetUtil.doPost(modelRunApi, modelRunApiBody));
+            }
         } else {
             response = JSONObject.parseObject(InternetUtil.doGet(modelRunApi, modelRunApiBody));
         }

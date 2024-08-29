@@ -5,6 +5,7 @@ import com.johnny.bank.controller.node.base.BaseNodeController;
 import com.johnny.bank.model.node.DataNodeV2;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
+import com.johnny.bank.utils.DataNodeUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +25,5 @@ public class DataNodeControllerV2 extends BaseNodeController<DataNodeV2> {
             @PathVariable("category") String category, @PathVariable("tableName") String tableName) {
         boolean res = ((DataNodeServiceV2)nodeServiceImpl).updateDataNodeTableNameOfOneCategory(category, tableName);
         return ResponseEntity.ok(res);
-    }
-
-    @GetMapping("/bank/dataType")
-    public ResponseEntity<JSONArray> getBankStaticDataNode(@RequestParam String dataType, @RequestParam String bank) {
-        DataNodeV2 dataGroupNode = ((DataNodeServiceV2)nodeServiceImpl).getStaticDataGroupNode(dataType, bank);
-        String path = dataGroupNode.getPath()+dataGroupNode.getName() + ",";
-        JSONArray dataList = ((DataNodeServiceV2)nodeServiceImpl).getStaticDataList(path);
-        return ResponseEntity.ok(dataList);
     }
 }
