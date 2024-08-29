@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,7 +106,7 @@ public class InternetUtil {
                 return "连接超时！";
             } else {
                 log.error("Error during POST request: " + e.getMessage(), e);
-                throw new RuntimeException("Error during POST request", e);
+                throw new RuntimeException("Error during GET request", e);
             }
         }
     }
@@ -228,6 +230,77 @@ public class InternetUtil {
                     IOUtils.copy(fileInputStream, wr);
                 }
                 wr.write("\r\n".getBytes(StandardCharsets.UTF_8));
+                // 添加JSON部分
+                String jsonPart = "--" + boundary + "\r\n" +
+                        "Content-Disposition: form-data; name=\"json\"\r\n\r\n";
+                wr.write(jsonPart.getBytes(StandardCharsets.UTF_8));
+                wr.write(body.toString().getBytes(StandardCharsets.UTF_8));
+                wr.write("\r\n".getBytes(StandardCharsets.UTF_8));
+                // 添加结束边界
+                wr.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
+                wr.flush();
+            }
+
+            int responseCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                }
+            } else {
+                log.error("POST request failed with response code " + responseCode);
+                throw new RuntimeException("POST request failed with response code " + responseCode);
+            }
+
+            connection.disconnect();
+            return response.toString();
+
+        } catch (Exception e) {
+            if (e instanceof java.net.SocketTimeoutException) {
+                log.error("Connection timed out: " + e.getMessage());
+                return "连接超时！";
+            } else {
+                log.error("Error during POST request: " + e.getMessage(), e);
+                throw new RuntimeException("Error during POST request", e);
+            }
+        }
+    }
+
+    public static String doPost_Hydro(String url, Optional<List<MultipartFile>> optionalFileList, JSONObject body) {
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+            List<MultipartFile> fileList = optionalFileList.orElseThrow();
+            // 设置超时时间为10s
+            connection.setConnectTimeout(180000);
+            connection.setReadTimeout(180000);
+
+            // 创建请求体的边界
+            String boundary = UUID.randomUUID().toString();
+            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+            // Send post request
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                // 添加文件部分
+                for (MultipartFile file : fileList) {
+                    String fileName = file.getOriginalFilename();
+                    String filePart = "--" + boundary + "\r\n" +
+                            "Content-Disposition: form-data; name=\"" + fileName + "\"; filename=\"" + fileName + "\"\r\n" +
+                            "Content-Type: " + file.getContentType() + "\r\n\r\n";
+                    wr.write(filePart.getBytes(StandardCharsets.UTF_8));
+                    try (InputStream fileInputStream = file.getInputStream()) {
+                        IOUtils.copy(fileInputStream, wr);
+                    }
+                    wr.write("\r\n".getBytes(StandardCharsets.UTF_8));
+                }
+
                 // 添加JSON部分
                 String jsonPart = "--" + boundary + "\r\n" +
                         "Content-Disposition: form-data; name=\"json\"\r\n\r\n";

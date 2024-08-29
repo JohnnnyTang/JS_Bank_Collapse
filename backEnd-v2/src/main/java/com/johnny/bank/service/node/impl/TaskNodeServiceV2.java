@@ -17,8 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -81,12 +83,14 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         numericModelNodeCollection = Map.of(
                 "calculateHydrodynamic", "66a06b4e7a3c330cb6ff84ff",
                 "getFlowFieldVelocities","66a07bca71c68c4cea8c9767",
-                "getFlowFieldVelocity","66a0b5a5a72d42473f2442c3"
+                "getFlowFieldVelocity","66a0b5a5a72d42473f2442c3",
+                "calculateRealHydrodynamic", "66cf190d7965ee56bc04ebf9"
         );
         numericParamNodeCollection = Map.of(
                 "calculateHydrodynamic","66a06ef372c7d048fbb68287",
                 "getFlowFieldVelocities","66a0a82871c68c4cea8c9768",
-                "getFlowFieldVelocity","66a0b5bea72d42473f2442c4"
+                "getFlowFieldVelocity","66a0b5bea72d42473f2442c4",
+                "calculateRealHydrodynamic","66cf1a4b7965ee56bc04ebfa"
         );
         // 河床演变
         riverBedEvolutionModelNodeCollection = Map.of(
@@ -267,7 +271,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         }
     }
 
-    private TaskNode createAndStartModelTask(String modelNodeId, String paramNodeId, JSONObject paramObj) throws SchedulerException {
+    private TaskNode createAndStartModelTask(String modelNodeId, String paramNodeId, JSONObject paramObj, Optional<List<MultipartFile>> optionalFileList) throws SchedulerException {
         Optional<ModelNode> modelNode = modelNodeRepo.findById(modelNodeId);
         assert modelNode.orElse(null) != null;
         ParamNode paramNode = paramNodeRepo.findParamNodeById(paramNodeId);
@@ -287,7 +291,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
                 .category(modelNode.orElse(null).getCategory()).path(",taskNode,"+modelNode.orElse(null).getName()+"Group,")
                 .auth("all").build();
         // 启动任务并返回caseId
-        String caseId = ProcessUtilV2.runModelTaskService(MODEL_SERVER_URL,taskNodeRun);
+        String caseId = ProcessUtilV2.runModelTaskService(MODEL_SERVER_URL, taskNodeRun, optionalFileList);
         // 根据caseId查询是否已有taskNode
         List<TaskNode> taskNodeList = getSingleTaskNodeByCaseId(caseId);
         if (taskNodeList.isEmpty()) {
@@ -306,13 +310,30 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         }
     }
 
+    // 数值模型计算——真实计算水动力模型
+    public String calRealHydrodynamic(
+            JSONObject paramObj, MultipartFile fort13, MultipartFile fort14,
+            MultipartFile fort15, MultipartFile fort19, MultipartFile fort20) throws SchedulerException {
+//        if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
+//            return "系统内存不足无法计算！请清理系统内存";
+//        }
+        List<MultipartFile> fileList = new ArrayList<>();
+        fileList.add(fort13);fileList.add(fort14);fileList.add(fort15);fileList.add(fort19);fileList.add(fort20);
+        Optional<List<MultipartFile>> optionalFileList = Optional.of(fileList);
+        TaskNode taskNode = createAndStartModelTask(
+                numericModelNodeCollection.get("calculateRealHydrodynamic"),numericParamNodeCollection.get("calculateRealHydrodynamic"), paramObj, optionalFileList
+        );
+        return taskNode.getId();
+    }
+
+
     // 数值模型计算——计算水动力（33中选一并计算流场）
     public String calHydrodynamic(JSONObject paramObj) throws SchedulerException {
         if (!checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                numericModelNodeCollection.get("calculateHydrodynamic"),numericParamNodeCollection.get("calculateHydrodynamic"),paramObj
+                numericModelNodeCollection.get("calculateHydrodynamic"),numericParamNodeCollection.get("calculateHydrodynamic"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -322,7 +343,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                numericModelNodeCollection.get("getFlowFieldVelocities"),numericParamNodeCollection.get("getFlowFieldVelocities"),paramObj
+                numericModelNodeCollection.get("getFlowFieldVelocities"),numericParamNodeCollection.get("getFlowFieldVelocities"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -332,7 +353,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                numericModelNodeCollection.get("getFlowFieldVelocity"),numericParamNodeCollection.get("getFlowFieldVelocity"),paramObj
+                numericModelNodeCollection.get("getFlowFieldVelocity"),numericParamNodeCollection.get("getFlowFieldVelocity"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -343,7 +364,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                riverBedEvolutionModelNodeCollection.get("calculateRegionFlush"),riverBedEvolutionParamNodeCollection.get("calculateRegionFlush"),paramObj
+                riverBedEvolutionModelNodeCollection.get("calculateRegionFlush"),riverBedEvolutionParamNodeCollection.get("calculateRegionFlush"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -353,7 +374,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                riverBedEvolutionModelNodeCollection.get("calculateSectionView"),riverBedEvolutionParamNodeCollection.get("calculateSectionView"),paramObj
+                riverBedEvolutionModelNodeCollection.get("calculateSectionView"),riverBedEvolutionParamNodeCollection.get("calculateSectionView"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -363,7 +384,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                riverBedEvolutionModelNodeCollection.get("calculateSectionContrast"),riverBedEvolutionParamNodeCollection.get("calculateSectionContrast"),paramObj
+                riverBedEvolutionModelNodeCollection.get("calculateSectionContrast"),riverBedEvolutionParamNodeCollection.get("calculateSectionContrast"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -373,7 +394,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                riverBedEvolutionModelNodeCollection.get("calculateRiverVolume"),riverBedEvolutionParamNodeCollection.get("calculateRiverVolume"),paramObj
+                riverBedEvolutionModelNodeCollection.get("calculateRiverVolume"),riverBedEvolutionParamNodeCollection.get("calculateRiverVolume"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -383,7 +404,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                riverBedEvolutionModelNodeCollection.get("calculateRegionContour"),riverBedEvolutionParamNodeCollection.get("calculateRegionContour"),paramObj
+                riverBedEvolutionModelNodeCollection.get("calculateRegionContour"),riverBedEvolutionParamNodeCollection.get("calculateRegionContour"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -394,7 +415,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateRiskLevel"),multipleIndicatorsParamNodeCollection.get("calculateRiskLevel"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateRiskLevel"),multipleIndicatorsParamNodeCollection.get("calculateRiskLevel"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -405,7 +426,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateSoilComposition"),multipleIndicatorsParamNodeCollection.get("calculateSoilComposition"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateSoilComposition"),multipleIndicatorsParamNodeCollection.get("calculateSoilComposition"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -416,7 +437,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateSlopeProtection"),multipleIndicatorsParamNodeCollection.get("calculateSlopeProtection"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateSlopeProtection"),multipleIndicatorsParamNodeCollection.get("calculateSlopeProtection"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -427,7 +448,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateLoadControl"),multipleIndicatorsParamNodeCollection.get("calculateLoadControl"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateLoadControl"),multipleIndicatorsParamNodeCollection.get("calculateLoadControl"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -438,7 +459,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateHeightDifference"),multipleIndicatorsParamNodeCollection.get("calculateHeightDifference"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateHeightDifference"),multipleIndicatorsParamNodeCollection.get("calculateHeightDifference"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -449,7 +470,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateSlopeRate"),multipleIndicatorsParamNodeCollection.get("calculateSlopeRate"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateSlopeRate"),multipleIndicatorsParamNodeCollection.get("calculateSlopeRate"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -460,7 +481,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateNearshoreFlush"),multipleIndicatorsParamNodeCollection.get("calculateNearshoreFlush"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateNearshoreFlush"),multipleIndicatorsParamNodeCollection.get("calculateNearshoreFlush"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -471,7 +492,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateFlowEquivalent"),multipleIndicatorsParamNodeCollection.get("calculateFlowEquivalent"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateFlowEquivalent"),multipleIndicatorsParamNodeCollection.get("calculateFlowEquivalent"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -482,7 +503,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateAntiImpactSpeed"),multipleIndicatorsParamNodeCollection.get("calculateAntiImpactSpeed"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateAntiImpactSpeed"),multipleIndicatorsParamNodeCollection.get("calculateAntiImpactSpeed"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -493,7 +514,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                multipleIndicatorsModelNodeCollection.get("calculateWaterLevelFluctuation"),multipleIndicatorsParamNodeCollection.get("calculateWaterLevelFluctuation"),paramObj
+                multipleIndicatorsModelNodeCollection.get("calculateWaterLevelFluctuation"),multipleIndicatorsParamNodeCollection.get("calculateWaterLevelFluctuation"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
@@ -504,7 +525,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             return "系统内存不足无法计算！请清理系统内存";
         }
         TaskNode taskNode = createAndStartModelTask(
-                soilErosionModelCollection.get("calculateBSTEM"),soilErosionParamCollection.get("calculateBSTEM"),paramObj
+                soilErosionModelCollection.get("calculateBSTEM"),soilErosionParamCollection.get("calculateBSTEM"), paramObj, Optional.empty()
         );
         return taskNode.getId();
     }
