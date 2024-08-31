@@ -53,11 +53,9 @@ public class InternetUtil {
             return response.toString();
         } catch (Exception e) {
             if (e instanceof java.net.SocketTimeoutException) {
-                log.error("Connection timed out: " + e.getMessage());
-                return "连接超时！";
+                return "Connection timed out: " + e.getMessage();
             } else {
-                log.error("Error during POST request: " + e.getMessage(), e);
-                throw new RuntimeException("Error during GET request", e);
+                return "Error during POST request: " + e.getMessage();
             }
         }
     }
@@ -102,11 +100,9 @@ public class InternetUtil {
 
         } catch (Exception e) {
             if (e instanceof java.net.SocketTimeoutException) {
-                log.error("Connection timed out: " + e.getMessage());
-                return "连接超时！";
+                return "Connection timed out: " + e.getMessage();
             } else {
-                log.error("Error during POST request: " + e.getMessage(), e);
-                throw new RuntimeException("Error during GET request", e);
+                return "Error during GET request: " + e.getMessage();
             }
         }
     }
@@ -163,8 +159,8 @@ public class InternetUtil {
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
             // 设置超时时间为10s
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(10000);
+            connection.setConnectTimeout(60000);
+            connection.setReadTimeout(60000);
 
             // Send post request
             try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
@@ -184,7 +180,6 @@ public class InternetUtil {
                 }
             } else {
                 log.error("POST request failed with response code " + responseCode);
-                throw new RuntimeException("POST request failed with response code " + responseCode);
             }
 
             connection.disconnect();
@@ -192,11 +187,9 @@ public class InternetUtil {
 
         } catch (Exception e) {
             if (e instanceof java.net.SocketTimeoutException) {
-                log.error("Connection timed out: " + e.getMessage());
-                return "连接超时！";
+                return "Connection timed out: " + e.getMessage();
             } else {
-                log.error("Error during POST request: " + e.getMessage(), e);
-                throw new RuntimeException("Error during POST request", e);
+                return "Error during POST request: " + e.getMessage();
             }
         }
     }
@@ -253,7 +246,6 @@ public class InternetUtil {
                 }
             } else {
                 log.error("POST request failed with response code " + responseCode);
-                throw new RuntimeException("POST request failed with response code " + responseCode);
             }
 
             connection.disconnect();
@@ -261,11 +253,9 @@ public class InternetUtil {
 
         } catch (Exception e) {
             if (e instanceof java.net.SocketTimeoutException) {
-                log.error("Connection timed out: " + e.getMessage());
-                return "连接超时！";
+                return "Connection timed out: " + e.getMessage();
             } else {
-                log.error("Error during POST request: " + e.getMessage(), e);
-                throw new RuntimeException("Error during POST request", e);
+                return "Error during POST request: " + e.getMessage();
             }
         }
     }
@@ -324,7 +314,6 @@ public class InternetUtil {
                 }
             } else {
                 log.error("POST request failed with response code " + responseCode);
-                throw new RuntimeException("POST request failed with response code " + responseCode);
             }
 
             connection.disconnect();
@@ -332,11 +321,9 @@ public class InternetUtil {
 
         } catch (Exception e) {
             if (e instanceof java.net.SocketTimeoutException) {
-                log.error("Connection timed out: " + e.getMessage());
-                return "连接超时！";
+                return "Connection timed out: " + e.getMessage();
             } else {
-                log.error("Error during POST request: " + e.getMessage(), e);
-                throw new RuntimeException("Error during POST request", e);
+                return "Error during POST request: " + e.getMessage();
             }
         }
     }
@@ -415,11 +402,9 @@ public class InternetUtil {
 
         } catch (Exception e) {
             if (e instanceof java.net.SocketTimeoutException) {
-                log.error("Connection timed out: " + e.getMessage());
-                return "连接超时！";
+                return "Connection timed out: " + e.getMessage();
             } else {
-                log.error("Error during DELETE request: " + e.getMessage(), e);
-                throw new RuntimeException("Error during DELETE request", e);
+                return "Error during DELETE request: " + e.getMessage();
             }
         }
     }

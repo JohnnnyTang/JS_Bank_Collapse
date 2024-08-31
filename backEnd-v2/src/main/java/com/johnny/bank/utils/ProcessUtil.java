@@ -123,11 +123,11 @@ public class ProcessUtil {
         commands.add("node");
         commands.add(nodeServicePath);
         commands.add(worldTilePath);
-//        String test = "node E://Data//bankProjectData//node//index.js E://Data//bankProjectData//2020-10-planet-14";
+//        String test = "node E:/Data/bankProjectData/node/index.js E:/Data/bankProjectData/baseMap";
         processBuilder.command(commands);
 //        processBuilder.command(test);
+//        processBuilder.command("cmd.exe","/c","node","E:/Data/bankProjectData/node/index.js","E:/Data/bankProjectData/baseMap");
         System.out.println(processBuilder);
-
         return processBuilder.start();
     }
 

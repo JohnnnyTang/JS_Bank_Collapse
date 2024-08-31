@@ -177,8 +177,9 @@ public class QuartzSchedulerManager {
                 .build();
         jobDetail.getJobDataMap().put("taskNode", taskNode);
         jobDetail.getJobDataMap().put("modelServerUrl", MODEL_SERVER_URL);
+        int interval = Integer.parseInt(taskNode.getModelNode().getUsage().getJSONObject("api").getJSONObject("status").getString("interval"));
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity(taskNode.getId()+"_trigger","modelTaskTriggerGroup")
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).repeatForever()).build();
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(interval).repeatForever()).build();
         scheduler.scheduleJob(jobDetail, simpleTrigger);
     }
 }

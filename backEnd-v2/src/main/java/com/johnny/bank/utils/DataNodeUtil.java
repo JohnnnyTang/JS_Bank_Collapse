@@ -48,6 +48,9 @@ public class DataNodeUtil {
             }
         };
         JSONArray dataList = new JSONArray();
+        if (dataNodeList.isEmpty()) {
+            return dataList;
+        }
         // 首先做dataNode的排序
         dataNodeList.sort(DatanodeComparator);
         // 排序完成后新建dataList，向其中以此插入dataNode数据

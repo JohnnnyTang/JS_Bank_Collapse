@@ -66,6 +66,9 @@ public class BankResourceService {
 
     public String addNewBank(String bank, JSONObject info) {
         // 新建岸段
+        if (dataNodeServiceV2.getDataNodeByCategoryName("BankNode", bank + "BankNode") != null) {
+                return "该岸段已存在！";
+        }
         JSONObject dataNodeBasicInfo = new JSONObject();
         dataNodeBasicInfo.put("riskLevel",info.getString("riskLevel"));
         dataNodeBasicInfo.put("introduction",info.getString("introduction"));
@@ -88,7 +91,7 @@ public class BankResourceService {
     }
 
     public String deleteBank(String bank) {
-        DataNodeV2 bankDataNode = dataNodeServiceV2.getDataNodeByName("BankNode",bank+"BankNode");
+        DataNodeV2 bankDataNode = dataNodeServiceV2.getDataNodeByCategoryName("BankNode",bank+"BankNode");
         String path = "^(?i),?DataNodeHead," + bank + "BankNode,.*";
         List<DataNodeV2> deleteDataNodes = dataNodeRepoV2.getNodeChildByPath(path);
         deleteDataNodes.add(bankDataNode);
@@ -110,7 +113,7 @@ public class BankResourceService {
                 .bank(bank).name(bank+"BankNode").dataOrigin("Local")
                 .category("BankNode").path(",DataNodeHead,").basicInfo(dataNodeBasicInfo)
                 .build();
-        String bankDataNodeId = dataNodeServiceV2.getDataNodeByName("BankNode",bank+"BankNode").getId();
+        String bankDataNodeId = dataNodeServiceV2.getDataNodeByCategoryName("BankNode",bank+"BankNode").getId();
         dataNodeServiceV2.updateNodeById(bankDataNodeId, dataNode);
         return "岸段 " + info.getString("name") + " 信息更新成功！";
     }

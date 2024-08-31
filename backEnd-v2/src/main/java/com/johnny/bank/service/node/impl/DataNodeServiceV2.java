@@ -24,7 +24,7 @@ public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
         return IBaseNodeRepo.save(dataNode).getId();
     }
 
-    public DataNodeV2 getDataNodeByName(String category, String name) {
+    public DataNodeV2 getDataNodeByCategoryName(String category, String name) {
         return IBaseNodeRepo.getNodeByCategoryAndName(category, name);
     }
 

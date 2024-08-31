@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -245,6 +242,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     // 资源树与模型计算容器对齐工作(HandShake2)
     public void modelServerSerialization() throws SchedulerException {
         List<String> caseIds = ProcessUtilV2.getModelServerCases(MODEL_SERVER_URL);
+        if (caseIds.isEmpty()) return;
         Optional<ModelNode> serializationModelNode = modelNodeRepo.findById("66ab45e5d481ef22a5545c3b"); // 获取对齐所用modelNode
         assert serializationModelNode.orElse(null) != null;
         for (String caseId : caseIds) {
@@ -292,6 +290,11 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
                 .auth("all").build();
         // 启动任务并返回caseId
         String caseId = ProcessUtilV2.runModelTaskService(MODEL_SERVER_URL, taskNodeRun, optionalFileList);
+        // temp
+        if (caseId.equals("WRONG")) {
+            taskNodeRun.setCaseId("WRONG");
+            return taskNodeRun;
+        }
         // 根据caseId查询是否已有taskNode
         List<TaskNode> taskNodeList = getSingleTaskNodeByCaseId(caseId);
         if (taskNodeList.isEmpty()) {
@@ -323,7 +326,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 numericModelNodeCollection.get("calculateRealHydrodynamic"),numericParamNodeCollection.get("calculateRealHydrodynamic"), paramObj, optionalFileList
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
 
@@ -335,7 +343,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 numericModelNodeCollection.get("calculateHydrodynamic"),numericParamNodeCollection.get("calculateHydrodynamic"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
     // 数值模型计算——获取多点流速
     public String getFlowFieldVelocities(JSONObject paramObj) throws SchedulerException {
@@ -345,7 +358,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 numericModelNodeCollection.get("getFlowFieldVelocities"),numericParamNodeCollection.get("getFlowFieldVelocities"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
     // 数值模型计算——获取单点流速
     public String getFlowFieldVelocity(JSONObject paramObj) throws SchedulerException {
@@ -355,7 +373,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 numericModelNodeCollection.get("getFlowFieldVelocity"),numericParamNodeCollection.get("getFlowFieldVelocity"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 河床演变模型计算——计算区域冲淤
@@ -366,7 +389,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateRegionFlush"),riverBedEvolutionParamNodeCollection.get("calculateRegionFlush"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
     // 河床演变模型计算——计算断面形态
     public String calculateSectionView(JSONObject paramObj) throws SchedulerException {
@@ -376,7 +404,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateSectionView"),riverBedEvolutionParamNodeCollection.get("calculateSectionView"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
     // 河床演变模型计算——计算断面比较
     public String calculateSectionContrast(JSONObject paramObj) throws SchedulerException {
@@ -386,7 +419,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateSectionContrast"),riverBedEvolutionParamNodeCollection.get("calculateSectionContrast"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
     // 河床演变模型计算——河道容积计算
     public String calculateRiverVolume(JSONObject paramObj) throws SchedulerException {
@@ -396,7 +434,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateRiverVolume"),riverBedEvolutionParamNodeCollection.get("calculateRiverVolume"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
     // 河床演变模型计算——河道等深线计算
     public String calculateRegionContour(JSONObject paramObj) throws SchedulerException {
@@ -406,7 +449,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 riverBedEvolutionModelNodeCollection.get("calculateRegionContour"),riverBedEvolutionParamNodeCollection.get("calculateRegionContour"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——综合计算
@@ -417,7 +465,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateRiskLevel"),multipleIndicatorsParamNodeCollection.get("calculateRiskLevel"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——SoilComposition
@@ -428,7 +481,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateSoilComposition"),multipleIndicatorsParamNodeCollection.get("calculateSoilComposition"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——SlopeProtection
@@ -439,7 +497,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateSlopeProtection"),multipleIndicatorsParamNodeCollection.get("calculateSlopeProtection"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——LoadControl
@@ -450,7 +513,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateLoadControl"),multipleIndicatorsParamNodeCollection.get("calculateLoadControl"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——HeightDifference
@@ -461,7 +529,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateHeightDifference"),multipleIndicatorsParamNodeCollection.get("calculateHeightDifference"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——SlopeRate
@@ -472,7 +545,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateSlopeRate"),multipleIndicatorsParamNodeCollection.get("calculateSlopeRate"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——NearshoreFlush
@@ -483,7 +561,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateNearshoreFlush"),multipleIndicatorsParamNodeCollection.get("calculateNearshoreFlush"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——FlowEquivalent
@@ -494,7 +577,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateFlowEquivalent"),multipleIndicatorsParamNodeCollection.get("calculateFlowEquivalent"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——Anti-ImpactSpeed
@@ -505,7 +593,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateAntiImpactSpeed"),multipleIndicatorsParamNodeCollection.get("calculateAntiImpactSpeed"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 多指标风险模型计算——Water-LevelFluctuation
@@ -516,7 +609,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 multipleIndicatorsModelNodeCollection.get("calculateWaterLevelFluctuation"),multipleIndicatorsParamNodeCollection.get("calculateWaterLevelFluctuation"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
     // 土体变形分析模型——calculateBSTEM
@@ -527,7 +625,12 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         TaskNode taskNode = createAndStartModelTask(
                 soilErosionModelCollection.get("calculateBSTEM"),soilErosionParamCollection.get("calculateBSTEM"), paramObj, Optional.empty()
         );
-        return taskNode.getId();
+        if (taskNode.getCaseId().equals("WRONG")) {
+            return "WRONG";
+        } else {
+            return taskNode.getId();
+        }
+//        return taskNode.getId();
     }
 
 }

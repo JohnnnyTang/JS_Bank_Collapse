@@ -44,7 +44,7 @@ public class BankResourceController {
         return ResponseEntity.ok(DataNodeUtil.transferToJsonArray(bankList));
     }
 
-    @PutMapping("/bank/{bank}")
+    @GetMapping("/bank/{bank}")
     public ResponseEntity<String> getBankInfo(@PathVariable String bank) {
         String category = "BankNode";
         String name = bank + "BankNode";
