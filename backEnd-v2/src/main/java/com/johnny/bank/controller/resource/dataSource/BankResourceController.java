@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -144,7 +145,7 @@ public class BankResourceController {
     // 资源上载
     // modelServer
     @PostMapping("/up/modelServer/resource/file")
-    public ResponseEntity<String> uploadResourceHydrodynamicData(@RequestParam("file") MultipartFile file, @RequestParam("info") String info) {
+    public ResponseEntity<String> uploadResourceHydrodynamicData(@RequestParam("file") MultipartFile file, @RequestParam("info") String info) throws IOException, InterruptedException {
         return ResponseEntity.ok(modelServerService.uploadCalculateResourceData(file, JSONObject.parse(info)));
     }
 

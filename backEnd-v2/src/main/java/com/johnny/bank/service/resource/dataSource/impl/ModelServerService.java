@@ -9,12 +9,14 @@ import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import com.johnny.bank.service.resource.dataSource.IModelServerService;
 import com.johnny.bank.utils.BeanUtil;
 import com.johnny.bank.utils.InternetUtil;
+import com.johnny.bank.utils.TifUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -93,7 +95,7 @@ public class ModelServerService implements IModelServerService {
     }
 
     @Override
-    public String uploadCalculateResourceData(MultipartFile file, JSONObject info) {
+    public String uploadCalculateResourceData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
         String fileType = info.getString("fileType");
         return switch (fileType) {
             case "shapefile" -> uploadCalculateResourceShapefileData(file, info);
@@ -143,7 +145,7 @@ public class ModelServerService implements IModelServerService {
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
 
-    public String uploadCalculateResourceTiffData(MultipartFile file, JSONObject info) {
+    public String uploadCalculateResourceTiffData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -153,7 +155,7 @@ public class ModelServerService implements IModelServerService {
         }
         String resourceName = "tiff";
         // TODO: 解析Tiff成为栅格瓦片
-
+        TifUtil.tif2tile(file, info);
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
 
