@@ -159,11 +159,12 @@ import { onMounted, ref, reactive, watch, nextTick, computed } from 'vue';
 import { ElNotification } from 'element-plus';
 import { initPureScratchMap } from '../../../utils/mapUtils';
 import ModelRunner from '../modelRunner'
+import BankResourceHelper from './bankResourceHelper';
 
 const chartdom = ref(null)
 const sectionDrawRef = ref(null)
 const mapRef = ref(null)
-const elevationOfFlow = ref(null)
+const elevationOfFlow = ref(2.8)
 const ModelRunningShow = ref(false)
 const ModelRunningMessage = ref('请完整配置参数后运行')
 const showSkeleton = ref(true)
@@ -185,7 +186,7 @@ const thicknessData = ref([1.93, -4.07, -11.57, -26.57, -36.57])
 const thicknessName = ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5']
 const xzData = ref(new Array(23).fill(['0', '0']))
 
-
+////////////////// json 模型参数信息上传
 const beforeUpload = (file, e) => {
     console.log('beforeUpload', file, e)
     const isJSON = file.type === 'application/json';
@@ -259,28 +260,27 @@ watch(uploadJson, async (newValue, oldValue) => {
 
 })
 
-// first into the page, select bank and get related data
-const selectedBank = ref(null)
+///////////////// 初始，岸段选择
 const demResources = ref([])
-const confirmBankHandler = async (bankName) => {
-    console.log('confirmBankHandler', bankName)
-    const bankNameMap = {
-        民主沙: "Mzs",
-        民主沙右缘: "Mzs",
-    };
-    const dem = (await axios.get(`/temp/data/bankResource/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
-    // const dem = t
-    const _demResource = getDemResource(dem)
-    console.log('demdata', _demResource)
-    demResources.value = _demResource
-    selectedBank.value = bankName
+const selectedBank = reactive({
+    name: null,
+    bankEnName: null
+})
+const confirmBankHandler = async (bank) => {
+
+    selectedBank.name = bank.name
+    selectedBank.bankEnName = bank.bankEnName
+
+    let demData = (await BankResourceHelper.getBankResourceList('DEM', selectedBank.bankEnName)).data
+    let demList = BankResourceHelper.DEMResourcetoList(demData)
+    demResources.value = demList
 
     ElNotification({
-        position: 'top-left',
         type: 'success',
         title: '选择岸段',
-        message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
-        offset: 180
+        message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
+        position: 'top-left',
+        offset: 180,
     })
 }
 
@@ -293,7 +293,7 @@ const inputData = (type) => {
     }
     else if (type == 'map') {
         console.log('map input')
-        if (selectedBank.value == null) {
+        if (selectedBank.name == null) {
             ElNotification({
                 position: 'top-left',
                 type: 'info',
@@ -303,7 +303,6 @@ const inputData = (type) => {
             })
             return
         }
-
         mapInputVisible.value = true
         // setTimeout(() => {
         //     console.log(sectionDrawRef.value)
@@ -360,7 +359,7 @@ const sectionViewModelRun = async (param) => {
 
     ModelRunningShow.value = true
     ModelRunningMessage.value = '正在计算断面形态'
-    let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
+    let sectionViewModelUrl = '/model/taskNode/start/riverbedEvolution/calculateSectionView'
     const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
     const taskId = await sectionViewMR.modelStart()
     console.log('task id', taskId, sectionViewMR.taskId)
@@ -511,7 +510,7 @@ const BSTEMModelRun = async () => {
             offset: 130
         })
 
-        let BSTEMModelUrl = '/temp/taskNode/start/erosionModel/calculateBSTEM'
+        let BSTEMModelUrl = '/model/taskNode/start/erosionModel/calculateBSTEM'
         const BSTEMMR = new ModelRunner(BSTEMModelUrl, BSTEMModelParams)
         const taskId = await BSTEMMR.modelStart()
         console.log('task id', taskId, BSTEMMR.taskId)
@@ -852,112 +851,6 @@ const parseUploadJson = (jsonData) => {
     }
 }
 
-const getDemResource = (ogSource) => {
-    const _demRes = []
-    for (let i = 0; i < ogSource.length; i++) {
-        const year = ogSource[i]['year']
-        const sets = ogSource[i]['sets']
-        for (let j = 0; j < sets.length; j++) {
-
-            const set = sets[j]
-            for (let k = 0; k < set['list'].length; k++) {
-                const item = set['list'][k]
-                // const name = item['name']
-                const demResourceNode = {
-                    year: year,
-                    name: item['name'],
-                    fileType: item['fileType'],
-                    path: item['path']
-                }
-                _demRes.push(demResourceNode)
-            }
-
-        }
-    }
-    return _demRes
-}
-const t = [
-    {
-        "year": "1999",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "199901",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/1999/standard/199901/199901.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2012",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "201210",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2012/standard/201210/201210.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2016",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "201610",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2016/standard/201610/201610.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2019",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "201904",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2019/standard/201904/201904.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2023",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "202304",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2023/standard/202304/202304.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    }
-]
 </script>
 
 <style lang="scss" scoped>

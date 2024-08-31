@@ -152,13 +152,15 @@ const jump2Model = (value) => {
   routeMap[value] && router.push(routeMap[value]);
 };
 
-const confirmBankHandler = async (bankName) => {
+const confirmBankHandler = async (bank) => {
   const bankNameMap = {
     民主沙: "Mzs",
     民主沙右缘: "Mzs",
   };
-  rightMap.value.mapFlyToRiver(bankName);
-  const result = await getDataList("DEM", bankNameMap[bankName]);
+  console.log(bank)
+  // rightMap.value.mapFlyToRiver(bank.name);
+  const result = await getDataList("DEM", bank.bankEnName);
+  consol.log(result);
   const baseData = result.data;
   const formedData = baseData.map((yearData) => {
     // TODO: 优化数据组织

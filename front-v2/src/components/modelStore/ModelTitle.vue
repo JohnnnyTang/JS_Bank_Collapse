@@ -7,9 +7,9 @@
         </div>
         <div class="bank-select-container">
 
-            <el-select v-model="selectedBank" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
+            <el-select v-model="selectedBank" placeholder="选择岸段" style="width: 10vw; height: 3.5vh" :value-key="'name'"
                 @change="selectedBankChangeHandler">
-                <el-option v-for="(item, index ) in bankList" :key="index" :label="item.name" :value="item.name">
+                <el-option v-for="(item, index ) in bankList" :key="index" :label="item.name" :value="item">
                     <div style="text-align: center; width: 7vw; font-size: calc(0.6vw + 0.7vh); font-weight: bold;">{{
                         item.name
                     }}</div>
@@ -29,6 +29,7 @@ import { useRouter } from 'vue-router'
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { useBankInfoStore } from '../../store/bankInfoStore'
+import BankResourceHelper from './views/bankResourceHelper';
 const router = useRouter()
 const bankInfoStore = useBankInfoStore()
 
@@ -53,12 +54,12 @@ const getBankList = async () => {
     }
 
     try {
-        const bankResource = (await axios.get('/temp/data/bankResource/bank')).data
+        const bankResource = (await BankResourceHelper.getBankNamesList()).data
         let _bankList = []
         bankResource.forEach(item => {
             _bankList.push({
-                name: item.basicInfo.name,
-                nameCode: item.bank,
+                name: item.name,
+                bankEnName: item.bank,
             })
         })
         bankInfoStore.bankList = _bankList
@@ -74,6 +75,7 @@ const getBankList = async () => {
 
 onMounted(() => {
     getBankList().then(data => {
+        console.log(data)
         bankList.value = data
     })
 })

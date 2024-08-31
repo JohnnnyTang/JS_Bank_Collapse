@@ -26,9 +26,7 @@
                                     已建工况
                                 </div>
                                 <el-scrollbar height="34vh">
-                                    <div class="content" style="flex-grow: 0; height: 35vh" v-show="selectedBank != null &&
-                                        selectedBank != ''
-                                        ">
+                                    <div class="content" style="flex-grow: 0; height: 35vh" v-if="selectedBank.name">
                                         <el-tree :data="treeData" :props="defaultProps" @node-click="handleNodeClick"
                                             default-expand-all :expand-on-click-node="false" ref="treeRef">
                                             <template #default="{ node, data }">
@@ -74,9 +72,7 @@
                                             </template>
                                         </el-tree>
                                     </div>
-                                    <div class="content" style="flex-grow: 0; height: 35vh" v-show="selectedBank == null ||
-                                        selectedBank == ''
-                                        ">
+                                    <div class="content" style="flex-grow: 0; height: 35vh" v-else>
                                         <div class="card one-center">
                                             <div class="desc one-center">
                                                 选择岸段以查看岸段资源信息
@@ -391,12 +387,13 @@ import { EulerFlowLayer } from '../../../utils/WebGL/eulerFlowLayer'
 import * as dat from 'dat.gui'
 import { useRouter } from 'vue-router'
 import '../../../utils/WebGL/dat_gui_style.css'
+import BankResourceHelper from './bankResourceHelper'
 
 const mapStore = useMapStore()
 const mapRef = ref(null)
 const radio1 = ref(2)
 const showFlow = ref(0)
-const selectedBank = ref('')
+
 const visulizationStatus = ref(false)
 const mathModelCalcBlockShow = ref(false)
 const ModelRunningShow = ref(false)
@@ -408,8 +405,7 @@ const defaultProps = {
     children: 'children',
     label: 'lable',
 }
-const treeData = ref([])
-const treeRef = ref(null)
+
 const clickedNode = reactive({
     flow: 0,
     type: '',
@@ -447,29 +443,28 @@ const statusStyle = computed(() => {
 })
 
 /////////////////// 岸段选择
-const confirmBankHandler = async (bankName) => {
-    console.log('confirmBankHandler', bankName)
-    const bankNameMap = {
-        民主沙: "Mzs",
-        民主沙右缘: "Mzs",
-    };
-    mapFlyToRiver(mapStore.getMap(map), bankName)
-    const data = (
-        await axios.get(
-            `/temp/data/bankResource/bank/dataType?dataType=Hydrodynamic&bank=${bankNameMap[bankName]}`,
-        )
-    ).data
-    // const data = t
-    const tree_Data = getTreeDataFromJson(data, '民主沙')
-    console.log(tree_Data)
-    updateTreeData(tree_Data)
+const selectedBank = reactive({
+    name: null,
+    bankEnName: null
+})
+const treeData = ref([])
+const treeRef = ref(null)
 
-    selectedBank.value = bankName
+const confirmBankHandler = async (bank) => {
+    selectedBank.name = bank.name
+    selectedBank.bankEnName = bank.bankEnName
+
+    const hydroData = (await BankResourceHelper.getBankResourceList('Hydrodynamic', selectedBank.bankEnName)).data
+    const _treeData = getTreeDataFromJson(hydroData, selectedBank.bankEnName)
+
+    updateTreeData(_treeData)
+    mapFlyToRiver(mapStore.getMap(map), bank.name)
 
     ElNotification({
         type: 'success',
         title: '选择岸段',
-        message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
+        message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
+        position: 'top-right',
         offset: 180,
     })
 }
@@ -619,7 +614,7 @@ const visulizationPrepare = async () => {
         let modelPostUrl = ''
         let modelParams = {}
 
-        modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+        modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
@@ -641,7 +636,7 @@ const visulizationPrepare = async () => {
         let runningStatusInterval = setInterval(async () => {
             console.log('runningStatusInterval')
             let runningStatus = (
-                await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)
+                await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)
             ).data
             ModelRunningMessage.value = '正在加载可视化资源...'
             let randomFactor = 3.0
@@ -651,7 +646,7 @@ const visulizationPrepare = async () => {
             } else if (runningStatus === 'ERROR') {
                 globleVariable.runningStatus = 'ERROR'
 
-                const url = `/temp/taskNode/result/id?taskId=${TASK_ID}`
+                const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
                 const errorLog = (await axios.get(url)).data['error-log']
                 ElNotification({
                     title: '模型运行失败',
@@ -668,18 +663,18 @@ const visulizationPrepare = async () => {
                 clearInterval(runningStatusInterval)
                 let runningResult = (
                     await axios.get(
-                        '/temp/taskNode/result/id?taskId=' + TASK_ID,
+                        '/model/taskNode/result/id?taskId=' + TASK_ID,
                     )
                 ).data
                 console.log('runningResult ', runningResult)
 
                 globleVariable.caseID = runningResult['case-id']
-                globleVariable.pngPrefix = `/temp/data/modelServer/down/resource/file/image?name=`
-                globleVariable.binPrefix = `/temp/data/modelServer/down/resource/file/bin?name=`
-                globleVariable.stationBinUrl =
-                    runningResult['visualization-station-bin']
+                globleVariable.pngPrefix = `/model/data/bankResource/down/modelServer/resource/file/image?name=`
+                globleVariable.binPrefix = `/model/data/bankResource/down/modelServer/resource/file/bin?name=`
+                globleVariable.stationBinUrl = runningResult['visualization-station-bin']
                 globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
-                let visulizationDescUrl = `/temp/data/modelServer/down/resource/file/json?name=${runningResult['visualization-description-json']}`
+
+                let visulizationDescUrl = `/model/data/bankResource/down/modelServer/resource/file/json?name=${runningResult['visualization-description-json']}`
 
                 globleVariable.visualizationJsonUrl = visulizationDescUrl
                 console.log('globle data info::', globleVariable)
@@ -744,8 +739,6 @@ const flowLayerControl = (type, show) => {
                     globleVariable.uvBinUrls,
                     globleVariable.binPrefix,
                 )
-                // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
-                // '/scratchSomething/temp/')
 
                 mapStore.getMap().addLayer(flow, 'mzsLabel')
             },
@@ -827,22 +820,26 @@ onUnmounted(() => {
 })
 
 const mapFlyToRiver = (mapIns, bankName) => {
-    if (!mapIns) return
+    if (!mapIns) return;
 
     let boundsMap = {
-        民主沙: [
+        '民主沙': [
             [120.45997922676836, 32.00001616423072],
             [120.60909640208264, 32.084171362618625],
         ],
-        民主沙右缘: [
+        '民主沙右缘': [
             [120.45997922676836, 32.00001616423072],
             [120.60909640208264, 32.084171362618625],
         ],
     }
-
-    mapIns.fitBounds(boundsMap[bankName], {
-        duration: 1500,
-    })
+    if (boundsMap[bankName]) {
+        mapIns.fitBounds(
+            boundsMap[bankName],
+            {
+                duration: 1500,
+            }
+        );
+    }
 }
 
 /////////////////// helper functions
@@ -869,6 +866,9 @@ const parseFlowAndType = (name) => {
 }
 
 const getTreeDataFromJson = (data, bankName) => {
+    // const Map = {
+    //     'Mzs':''
+    // }
     const result = [
         {
             lable: bankName,
@@ -908,6 +908,7 @@ const getTreeDataFromJson = (data, bankName) => {
         years.push(yearItem)
     }
     result[0].children = years
+    console.log(result)
     return result
 }
 </script>
@@ -1496,8 +1497,9 @@ div.drawer-content {
             .v {
                 position: relative;
                 width: 4vw;
-                height: 3.3vh;
-                line-height: 3.3vh;
+                margin-top: 0.3vh;
+                height: 3vh;
+                line-height: 3vh;
                 border-radius: 5px;
                 background-color: #ffffff;
                 border: rgba(36, 124, 255, 0.479) solid 1px;

@@ -6,7 +6,23 @@
         </div>
         <el-scrollbar>
             <el-menu class="el-menu-vertical-demo" :default-active="defaultActive" @select="handleSelect">
-                <el-sub-menu index="basic">
+                <el-sub-menu index="4">
+                    <template #title>
+                        <el-icon>
+                            <FolderOpened />
+                        </el-icon>
+                        <span>岸段资源管理</span>
+                    </template>
+                    <el-sub-menu index="4-1">
+                        <template #title>岸段资源</template>
+                        <el-menu-item v-for="bankItem in bankList" :index="'preview/' + bankItem.bank">{{ bankItem.name
+                        }}</el-menu-item>
+                        <!-- <el-menu-item index="preview/mzs">民主沙右缘</el-menu-item> -->
+                    </el-sub-menu>
+                    <el-menu-item index="create"
+                        style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item>
+                </el-sub-menu>
+                <!-- <el-sub-menu index="basic">
                     <template #title>
                         <el-icon>
                             <InfoFilled />
@@ -14,7 +30,7 @@
                         <span>基础信息</span>
                     </template>
                     <el-menu-item index="basic/mzs">民主沙右缘</el-menu-item>
-                </el-sub-menu>
+                </el-sub-menu> -->
                 <el-sub-menu index="2">
                     <template #title>
                         <el-icon>
@@ -65,19 +81,7 @@
                     <el-menu-item index="report/week">周报</el-menu-item>
                     <el-menu-item index="4-3">月报</el-menu-item>
                 </el-sub-menu> -->
-                <el-sub-menu index="4">
-                    <template #title>
-                        <el-icon>
-                            <FolderOpened />
-                        </el-icon>
-                        <span>岸段资源管理</span>
-                    </template>
-                    <el-sub-menu index="4-1">
-                        <template #title>岸段资源</template>
-                        <el-menu-item index="preview/mzs">民主沙右缘</el-menu-item>
-                    </el-sub-menu>
-                    <el-menu-item index="create" style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item>
-                </el-sub-menu>
+
             </el-menu>
         </el-scrollbar>
         <div class="placement-container down"></div>
@@ -92,14 +96,28 @@ import {
     WarningFilled,
     View,
 } from '@element-plus/icons-vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import router from '../../router'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import BankResourceHelper from '../modelStore/views/bankResourceHelper'
+
+
+const updateBankList = async () => {
+    console.log('updateBankList')
+    let _bankList = (await BankResourceHelper.getBankNamesList()).data
+    bankList.value = _bankList
+}
+defineExpose({
+    updateBankList
+})
+
+
 
 const returnPage = () => {
     // router.push('/bankTwin')
     router.push('/modelStore/main')
 }
+const bankList = ref([])
 
 const route = useRoute()
 
@@ -131,9 +149,15 @@ onBeforeRouteUpdate((to, from) => {
     updateSelection(to)
 })
 
-onMounted(() => {
+onMounted(async () => {
     // console.log(route.params)
     updateSelection(route)
+    let _bankList = (await BankResourceHelper.getBankNamesList()).data
+    _bankList.forEach(bank => {
+        bankList.value.push(bank)
+    })
+    // console.log(bankList.value)
+
 })
 </script>
 

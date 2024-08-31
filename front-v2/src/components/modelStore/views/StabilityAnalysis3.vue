@@ -279,7 +279,7 @@ let globleVariable = reactive({
   lagrangeLayer: 'flowLayer1',
   eulerLayer: 'flowLayer2',
 })
-const selectedBank = ref('')
+
 const mapRef = ref(null)
 const tideLineChartDom = ref(null)
 const mapStore = useMapStore()
@@ -347,21 +347,22 @@ const statusStyle = computed(() => {
 // const selectableTideList = ['大潮', '中潮', '小潮']
 
 ///////////////////// 岸段选择
-const confirmBankHandler = async (bankName) => {
-  console.log('confirmBankHandler', bankName)
-  const bankNameMap = {
-    民主沙: "Mzs",
-    民主沙右缘: "Mzs",
-  };
-  mapFlyToRiver(mapStore.getMap(map), bankName)
+const selectedBank = reactive({
+  name: null,
+  bankEnName: null
+})
+const confirmBankHandler = async (bank) => {
+  selectedBank.name = bank.name
+  selectedBank.bankEnName = bank.bankEnName
 
-  selectedBank.value = bankName
+  mapFlyToRiver(mapStore.getMap(map), bank.name)
 
   ElNotification({
     type: 'success',
     title: '选择岸段',
-    message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
-    offset: 180
+    message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
+    position: 'top-left',
+    offset: 180,
   })
 }
 
@@ -519,7 +520,7 @@ const modelRunnning = async (type) => {
   }
   // console.log('check0 ', type)
   if (type === '0') {
-    modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+    modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": mmap[params.value.tideType],
@@ -528,7 +529,7 @@ const modelRunnning = async (type) => {
       "year": "2023",
     }
   } else if (type === '1') {
-    modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+    modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": params.value.diffTide,
@@ -538,100 +539,99 @@ const modelRunnning = async (type) => {
     }
   }
   // console.log('check1 ', modelPostUrl, modelParams)
-  // try {
+  try {
 
-  const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
-  // ElNotification({
-  //   title: '开始运行水动力模型',
-  //   offset: 120,
-  //   type: 'info',
-  // })
-  // const TASK_ID = '1'
-  console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
-  modelRunnningStatusDesc.value = '运行中'
-  modelRunnningProgress.value = 0
-  globleVariable.taskID = TASK_ID
-  console.log('===Interval')
-  let runningStatusInterval = setInterval(async () => {
-    console.log('runningStatusInterval')
-    let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
-    // let runningStatus = 'RUNNING'
+    const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+    // ElNotification({
+    //   title: '开始运行水动力模型',
+    //   offset: 120,
+    //   type: 'info',
+    // })
+    // const TASK_ID = '1'
+    console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
     modelRunnningStatusDesc.value = '运行中'
-    let randomFactor = 3.0
-    if (runningStatus === 'RUNNING') {
-      globleVariable.runningStatus = 'RUNNING'
-      if (modelRunnningProgress.value < 88) randomFactor = 1.0
-      if (modelRunnningProgress.value > 88) randomFactor = 0.5
-      if (modelRunnningProgress.value > 95) randomFactor = 0.1
+    modelRunnningProgress.value = 0
+    globleVariable.taskID = TASK_ID
+    console.log('===Interval')
+    let runningStatusInterval = setInterval(async () => {
+      console.log('runningStatusInterval')
+      let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
+      // let runningStatus = 'RUNNING'
+      modelRunnningStatusDesc.value = '运行中'
+      let randomFactor = 3.0
+      if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
+        globleVariable.runningStatus = 'RUNNING'
+        if (modelRunnningProgress.value < 88) randomFactor = 1.0
+        if (modelRunnningProgress.value > 88) randomFactor = 0.5
+        if (modelRunnningProgress.value > 95) randomFactor = 0.1
 
-      let nextProgress = Math.round((modelRunnningProgress.value + Math.random() * randomFactor) * 100) / 100
-      nextProgress = nextProgress > 95 ? 95 : nextProgress
-      modelRunnningProgress.value = nextProgress
-    }
-    else if (runningStatus === 'ERROR') {
-      globleVariable.runningStatus = 'ERROR'
-      runningMsg.value = ''
-      showRunning.value = false
-      const url = `/temp/taskNode/result/id?taskId=${TASK_ID}`
-      axios.get(url).then(response => {
-        let errorLog = response.data['error-log']
-        resolve(errorLog)
-      }).catch(error => {
-        console.warn(error)
-        reject(error)
-      })
-      const errorLog = (await axios.get(url)).data['error-log']
+        let nextProgress = Math.round((modelRunnningProgress.value + Math.random() * randomFactor) * 100) / 100
+        nextProgress = nextProgress > 95 ? 95 : nextProgress
+        modelRunnningProgress.value = nextProgress
+      }
+      else if (runningStatus === 'ERROR') {
+        globleVariable.runningStatus = 'ERROR'
+        runningMsg.value = ''
+        showRunning.value = false
+        const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
+        axios.get(url).then(response => {
+          let errorLog = response.data['error-log']
+          resolve(errorLog)
+        }).catch(error => {
+          console.warn(error)
+          reject(error)
+        })
+        const errorLog = (await axios.get(url)).data['error-log']
 
-      ElNotification({
-        title: '模型运行失败',
-        message: `错误原因:\n` + errorLog,
-        offset: 120,
-        type: 'error',
-      })
-      modelRunnningStatusDesc.value = '运行失败'
-      globleVariable.runningStatus = 'NONE'
-      clearInterval(runningStatusInterval)
+        ElNotification({
+          title: '模型运行失败',
+          message: `错误原因:\n` + errorLog,
+          offset: 120,
+          type: 'error',
+        })
+        modelRunnningStatusDesc.value = '运行失败'
+        globleVariable.runningStatus = 'NONE'
+        clearInterval(runningStatusInterval)
 
-    }
-    else if (runningStatus === 'COMPLETE') {
-      runningMsg.value = ''
-      showRunning.value = false
-      clearInterval(runningStatusInterval)
-      let runningResult = (await axios.get('/temp/taskNode/result/id?taskId=' + TASK_ID)).data
-      console.log('runningResult ', runningResult)
+      }
+      else if (runningStatus === 'COMPLETE') {
+        runningMsg.value = ''
+        showRunning.value = false
+        clearInterval(runningStatusInterval)
+        let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data
+        console.log('runningResult ', runningResult)
 
-      globleVariable.caseID = runningResult['case-id']
+        globleVariable.caseID = runningResult['case-id']
 
-      globleVariable.pngPrefix = `/temp/data/modelServer/down/resource/file/image?name=`
-      globleVariable.binPrefix = `/temp/data/modelServer/down/resource/file/bin?name=`
-      globleVariable.stationBinUrl = runningResult['visualization-station-bin']
-      globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
+        globleVariable.pngPrefix = `/model/data/bankResource/down/modelServer/resource/file/image?name=`
+        globleVariable.binPrefix = `/model/data/bankResource/down/modelServer/resource/file/bin?name=`
+        globleVariable.stationBinUrl = runningResult['visualization-station-bin']
+        globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
 
-      ///temp/data/modelServer/down/resource/file/json?name=hydrodynamic/MZS/2024/test/104000xc/renderResource/flow_field_description.json
-      let visulizationDescUrl = `/temp/data/modelServer/down/resource/file/json?name=${runningResult['visualization-description-json']}`
+        ///model/data/modelServer/down/resource/file/json?name=hydrodynamic/MZS/2024/test/104000xc/renderResource/flow_field_description.json
+        let visulizationDescUrl = `/model/data/bankResource/down/modelServer/resource/file/json?name=${runningResult['visualization-description-json']}`
 
-      globleVariable.visualizationJsonUrl = visulizationDescUrl
-      console.log('globle data info::', globleVariable)
+        globleVariable.visualizationJsonUrl = visulizationDescUrl
+        console.log('globle data info::', globleVariable)
 
-      // const visualizationJson = (await axios.get(visulizationDescUrl)).data
-      // console.log('visualizationJson ', visualizationJson)
-      globleVariable.status = true
-      globleVariable.runningStatus = 'COMPLETE'
-      modelRunnningStatusDesc.value = '运行完毕'
-      modelRunnningProgress.value = 100
+        // const visualizationJson = (await axios.get(visulizationDescUrl)).data
+        // console.log('visualizationJson ', visualizationJson)
+        globleVariable.status = true
+        globleVariable.runningStatus = 'COMPLETE'
+        modelRunnningStatusDesc.value = '运行完毕'
+        modelRunnningProgress.value = 100
 
-      // showFlowClickHandler(1)
-    }
-  }, 500)
-  // } catch (error) {
-  //   console.log('error', error)
-  //   ElNotification({
-  //     title: '模型运行失败',
-  //     message: `错误原因:\n` + error.message,
-  //     offset: 120,
-  //     type: 'error',
-  //   })
-  // }
+        // showFlowClickHandler(1)
+      }
+    }, 500)
+  } catch (error) {
+    ElNotification({
+      title: '模型运行失败',
+      message: `错误原因:\n` + error.message,
+      offset: 120,
+      type: 'error',
+    })
+  }
 }
 
 //////////////////// 流场控制
@@ -809,7 +809,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
   // console.log('pointFeature::', tidePointFeature.value)
   console.log('getVelocity caseId::', globleVariable.caseID)
   // modelRunnningStatusDesc
-  const pointVelocityModelUrl = '/temp/taskNode/start/numeric/getFlowFieldVelocities'
+  const pointVelocityModelUrl = '/model/taskNode/start/numeric/getFlowFieldVelocities'
   const params = {
     "case-id": globleVariable.caseID,
     // "case-id": '6c6496ca7c80adbbff129da890894990',
@@ -948,13 +948,14 @@ const mapFlyToRiver = (mapIns, bankName) => {
       [120.60909640208264, 32.084171362618625],
     ],
   }
-
-  mapIns.fitBounds(
-    boundsMap[bankName],
-    {
-      duration: 1500,
-    }
-  );
+  if (boundsMap[bankName]) {
+    mapIns.fitBounds(
+      boundsMap[bankName],
+      {
+        duration: 1500,
+      }
+    );
+  }
 }
 
 

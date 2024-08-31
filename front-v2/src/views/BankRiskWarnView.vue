@@ -130,32 +130,21 @@
 
         <div class="risk-item-container">
             <div class="risk-item" :class="{ active: showWaterPower }">
-                <div
-                    class="risk-main-index waterpower"
-                    @click="showWaterPowerFunc"
-                >
+                <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
                     <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
                     <div class="risk-item-text">水流动力</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showRiverBed }">
                 <div class="risk-main-index riverbed" @click="showRiverBedFunc">
-                    <dv-border-box-12
-                        :color="['rgb(73, 164, 101)', '#9cf3e0']"
-                        v-if="showRiverBed"
-                    ></dv-border-box-12>
+                    <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
                     <div class="risk-item-text">河床演变</div>
                 </div>
             </div>
             <div class="risk-item" :class="{ active: showGeologyAndProject }">
-                <div
-                    class="risk-main-index bankGeology"
-                    @click="showGeologyAndProjectFunc"
-                >
-                    <dv-border-box-12
-                        :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
-                        v-if="showGeologyAndProject"
-                    ></dv-border-box-12>
+                <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
+                    <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
+                        v-if="showGeologyAndProject"></dv-border-box-12>
                     <div class="risk-item-text">地质与工程治理</div>
                 </div>
             </div>
@@ -170,11 +159,7 @@
 
         <div class="raster-control-block" v-if="showRasterControl">
             <label class="switch">
-                <input
-                    type="checkbox"
-                    :checked="showRaster"
-                    @click="RasterControlHandler()"
-                />
+                <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -184,11 +169,7 @@
 
         <div class="bankLine-control-block">
             <label class="switch">
-                <input
-                    type="checkbox"
-                    :checked="showBankLine"
-                    @click="BankLineControlHandler()"
-                />
+                <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -198,11 +179,7 @@
 
         <div class="terrain-control-block">
             <label class="switch">
-                <input
-                    type="checkbox"
-                    :checked="showTerrain"
-                    @click="TerrainControlHandler()"
-                />
+                <input type="checkbox" :checked="showTerrain" @click="TerrainControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -237,7 +214,7 @@
                     <span class="warn-detail-span"> </span>
                     高风险区域集中在：
                     <span class="warn-detail-span">{{
-                        getRiskAreas('high')
+                        riskAreas
                     }}</span>
                 </div>
             </div>
@@ -254,78 +231,39 @@
             <button @click="showGeologyAndProjectFunc">地质条件</button>
         </div> -->
 
-        <profileInfoVue
-            v-if="showProfileInfo"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :shapeChartLoad="shapeChartLoad"
-            :erosionChartLoad="erosionChartLoad"
-        />
+        <profileInfoVue v-if="showProfileInfo" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :shapeChartLoad="shapeChartLoad" :erosionChartLoad="erosionChartLoad" />
 
-        <profileShapeYearlyVue
-            v-if="false"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :shapeYearlyChartLoad="shapeYearlyChartLoad"
-        />
+        <profileShapeYearlyVue v-if="false" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :shapeYearlyChartLoad="shapeYearlyChartLoad" />
 
-        <profileShapeVue
-            v-if="showProfileShape"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileDataCompare="profileDataCompare"
-            :profileList="profileList"
-            :shapeChartLoad="shapeChartLoad"
-        />
+        <profileShapeVue v-if="showProfileShape" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
 
         <!-- <div class="drag profileSlope" v-if="showProfileSlope" v-draggable="{ bounds: 'body', cancel: 'div.content' }"> -->
-        <profileSlopeVue
-            v-if="showProfileSlope"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :slopeChartLoad="slopeChartLoad"
-        />
+        <profileSlopeVue v-if="showProfileSlope" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :slopeChartLoad="slopeChartLoad" />
         <!-- </div> -->
 
-        <profileErosionVue
-            v-if="showProfileErosion"
-            @profile-value-change="changeProfileValue"
-            :profileData="profileData"
-            :profileList="profileList"
-            :slopeChartLoad="erosionChartLoad"
-        />
+        <profileErosionVue v-if="showProfileErosion" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :slopeChartLoad="erosionChartLoad" />
 
-        <div
-            v-if="showBedFlowChart"
-            style="
+        <div v-if="showBedFlowChart" style="
                 position: absolute;
                 top: 16.25vh;
                 left: 0.3vw;
                 width: 26vw;
                 height: 23.5vh;
                 z-index: 10;
-            "
-        >
+            ">
             <bedFlowChartVue />
         </div>
 
-        <flowspeedInfoVue
-            v-if="showFlowSpeed"
-            :profileList="profileList"
-            :flowspeedChartLoad="flowspeedChartLoad"
-            :type="nowWaterConditionType"
-            @condition-change="conditionChangeHandler"
-        />
+        <flowspeedInfoVue v-if="showFlowSpeed" :profileList="profileList" :flowspeedChartLoad="flowspeedChartLoad"
+            :type="nowWaterConditionType" @condition-change="conditionChangeHandler" />
         <div v-if="showFlowSpeed" class="flow-control-block">
             <label class="switch" style="transform: rotateZ(90deg)">
-                <input
-                    type="checkbox"
-                    :checked="showFlow"
-                    @click="flowControlHandler()"
-                />
+                <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -333,28 +271,18 @@
             </div>
         </div>
         <div v-if="showFlowSpeed" class="time-shower-block">
-            <flowTimeShower
-                :type="'exp'"
-                :time-step="timeStep"
-                :total-count="25"
-            ></flowTimeShower>
+            <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
         </div>
 
-        <div
-            v-if="showWaterProcessChart"
-            style="
+        <div v-if="showWaterProcessChart" style="
                 position: absolute;
                 top: 66vh;
                 left: 0.3vw;
                 width: 26vw;
                 height: 25vh;
                 z-index: 10;
-            "
-        >
-            <waterProcessChartVue
-                :timeStep="timeStep"
-                :type="nowWaterConditionType"
-            />
+            ">
+            <waterProcessChartVue :timeStep="timeStep" :type="nowWaterConditionType" />
         </div>
 
         <geologyAndProjectVue v-if="showGeologyAndProject" />
@@ -364,18 +292,11 @@
             :showRiskResult="showRiskResult"
         /> -->
 
-        <div
-            class="drag riskResult"
-            v-if="showRiskResult"
-            v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-        >
+        <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <riskResultVue :profileList="profileList" />
         </div>
 
-        <div
-            class="raster-legend-container"
-            v-if="showRaster && showRasterControl"
-        >
+        <div class="raster-legend-container" v-if="showRaster && showRasterControl">
             <img src="/rasterLegend1.png" alt="比例尺" />
         </div>
 
@@ -437,18 +358,10 @@
             </div>
         </div> -->
 
-        <el-dialog
-            v-model="sectionConfirmShow"
-            title="绘制断面确认"
-            width="40vh"
-        >
+        <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh">
             <span>确认使用此断面进行计算</span>
-            <el-input
-                v-model="tempProfileName"
-                style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
-                placeholder="请输入断面名称"
-                clearable
-            />
+            <el-input v-model="tempProfileName" style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
+                placeholder="请输入断面名称" clearable />
             <template #footer>
                 <div class="dialog-footer">
                     <div style="text-align: right">
@@ -488,135 +401,74 @@
         <div class="hydro-pannel">
             <div class="title">
                 实时水文信息
-                <el-icon
-                    @click="showHydroPannel = !showHydroPannel"
-                    style="margin-left: 50%"
-                    class="iconn"
-                >
+                <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%" class="iconn">
                     <More />
                 </el-icon>
             </div>
 
-            <el-table
-                :data="waterTableData"
-                border
-                style="width: 15vw"
-                v-show="showHydroPannel"
-            >
+            <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
                 <el-table-column prop="station" label="站点" />
                 <el-table-column prop="flow" label="流量" />
                 <el-table-column prop="level" label="水位" />
             </el-table>
         </div>
 
-        <div
-            class="hide-dom-container"
-            :class="{ translate: !conditionPannelShow }"
-            @click="hideDomClickHandler()"
-        >
-            <HideDomButtom
-                :direction="conditionPannelShow ? 'right' : 'left'"
-            ></HideDomButtom>
+        <div class="hide-dom-container" :class="{ translate: !conditionPannelShow }" @click="hideDomClickHandler()">
+            <HideDomButtom :direction="conditionPannelShow ? 'right' : 'left'"></HideDomButtom>
         </div>
-        <div
-            class="condition-pannel flex-column"
-            :class="{ translate: !conditionPannelShow }"
-        >
+        <div class="condition-pannel flex-column" :class="{ translate: !conditionPannelShow }">
             <div class="title" style="text-align: center">综合研判条件配置</div>
             <div class="card flex-column">
                 <div class="flex-row">
                     <div class="flex-row" style="margin-right: 1vw">
                         <span class="desc">流量：</span>
-                        <el-input
-                            v-model="conditionConfigureData.flow"
-                            style="width: 4vw; height: 3.5vh"
-                            placeholder="请输入"
-                        />
-                        <span
-                            style="
+                        <el-input v-model="conditionConfigureData.flow" style="width: 4vw; height: 3.5vh"
+                            placeholder="请输入" />
+                        <span style="
                                 height: 3.5vh;
                                 line-height: 3.5vh;
                                 margin-left: 0.2vw;
-                            "
-                            >m³/s</span
-                        >
+                            ">m³/s</span>
                     </div>
                     <div class="flex-row">
                         <span class="desc">潮差：</span>
-                        <el-input
-                            v-model="conditionConfigureData.tideDif"
-                            style="width: 3.5vw; height: 3.5vh"
-                            placeholder="请输入"
-                        />
-                        <span
-                            style="
+                        <el-input v-model="conditionConfigureData.tideDif" style="width: 3.5vw; height: 3.5vh"
+                            placeholder="请输入" />
+                        <span style="
                                 height: 3.5vh;
                                 line-height: 3.5vh;
                                 margin-left: 0.2vw;
-                            "
-                            >m</span
-                        >
+                            ">m</span>
                     </div>
                 </div>
                 <div class="flex-column">
-                    <div
-                        class="flex-row"
-                        style="margin-bottom: 0.8vh; margin-top: 1vh"
-                    >
-                        <span class="desc">判别计算地形：</span>
-                        <el-select
-                            v-model="conditionConfigureData.judgeTerrain"
-                            placeholder="请选择地形"
-                            style="width: 7vw; height: 3.5vh"
-                            @change=""
-                            value-key="name"
-                        >
-                          <el-option
-                              v-for="(
+                    <div class="flex-row" style="margin-bottom: 0.8vh; margin-top: 1vh">
+                        <span class="desc">冲淤起算地形：</span>
+                        <el-select v-model="conditionConfigureData.refDEM" placeholder="请选择地形"
+                            style="width: 7vw; height: 3.5vh" @change="" value-key="name">
+                            <el-option v-for="(
                                   item, index
-                              ) in demResources"
-                              :key="index"
-                              :value="item"
-                              :label="item.name + '地形'"
-                          >
-                          </el-option>
+                              ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
+                            </el-option>
                         </el-select>
                     </div>
                     <div class="flex-row">
-                        <span class="desc">冲淤起算地形：</span>
-                        <el-select
-                            v-model="conditionConfigureData.siltationTerrain"
-                            placeholder="请选择地形"
-                            style="width: 7vw; height: 3.5vh"
-                            @change=""
-                            value-key="name"
-                        >
-                          <el-option
-                                v-for="(
+                        <span class="desc">判别计算地形：</span>
+                        <el-select v-model="conditionConfigureData.benchDEM" placeholder="请选择地形"
+                            style="width: 7vw; height: 3.5vh" @change="" value-key="name">
+                            <el-option v-for="(
                                     item, index
-                                ) in demResources"
-                                :key="index"
-                                :value="item"
-                                :label="item.name + '地形'"
-                            >
+                                ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
                             </el-option>
                         </el-select>
                     </div>
                 </div>
-                <div
-                    class="one-center"
-                    style="position: absolute; bottom: 2.6vh; right: 1vw"
-                >
-                    <el-button
-                        type="primary"
-                        style="
+                <div class="one-center" style="position: absolute; bottom: 2.6vh; right: 1vw">
+                    <el-button type="primary" style="
                             width: calc(2vw + 2vh);
                             height: calc(2vw + 2vh);
                             font-size: medium;
-                        "
-                        @click="conditionConfigureDataResetHandler"
-                        >确定</el-button
-                    >
+                        " @click="conditionConfigureDataResetHandler">确定</el-button>
                 </div>
             </div>
         </div>
@@ -660,6 +512,7 @@ import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
 import { connectionExists } from '@vue-flow/core'
 import {
     defaultWarnLayerDataInput,
+    defaultWarnLayerDataInput2,
     profileListInput,
     sceneListInput,
     placeList,
@@ -667,6 +520,8 @@ import {
     waterCondition,
 } from '../components/bankRiskWarn/data'
 import { loadImage } from '../utils/mapUtils'
+import BankResourceHelper from '../components/modelStore/views/bankResourceHelper';
+import { runRiskLevelForAll, riskWarnResultParse } from '../components/bankRiskWarn/runRiskLevelForAll'
 // import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 // import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
@@ -835,58 +690,119 @@ const mapJumpToRiver = (mapIns) => {
 /////////////// 初始岸段资源获取
 const demResources = ref([])
 const getDemResource = async () => {
-    const _bank = 'Mzs'
-    const ogSource = (
-        await axios.get(
-            `/temp/data/bankResource/bank/dataType?dataType=DEM&bank=${_bank}`,
-        )
-    ).data
-    // const ogSource = t
-    const _demRes = []
-    for (let i = 0; i < ogSource.length; i++) {
-        const year = ogSource[i]['year']
-        const sets = ogSource[i]['sets']
-        for (let j = 0; j < sets.length; j++) {
-            const set = sets[j]
-            for (let k = 0; k < set['list'].length; k++) {
-                const item = set['list'][k]
-                const demResourceNode = {
-                    year: year,
-                    name: item['name'],
-                    fileType: item['fileType'],
-                    path: item['path'],
-                    month: item['month'],
-                }
-                _demRes.push(demResourceNode)
-            }
-        }
-    }
-    console.log(_demRes)
-    return _demRes
+    const _bankEnName = 'Mzs'
+    const _demData = (await BankResourceHelper.getBankResourceList('DEM', _bankEnName)).data
+    return BankResourceHelper.DEMResourcetoList(_demData)
+    // return [{ name: '1' }, { name: '2' }]
 }
 
 
 // totalResult
 const styleMap = {
-  '低风险':'low',
-  '中风险':'middle',
-  '高风险':'high'
+    '低风险': 'low',
+    '中风险': 'middle',
+    '高风险': 'high'
 }
 const totalResult = reactive({
-  desc:'高风险'
+    desc: '高风险'
 })
-////////////// 重置水文条件
+////////////// 重置水文条件，12个断面执行多指标模型
 const conditionConfigureData = reactive({
-    flow: null,
-    // tideType: null,
-    tideDif: null,
-    judgeTerrain: null,
-    siltationTerrain: null,
+    flow: 93000,
+    tideDif: 3.8,
+    refDEM: null,
+    benchDEM: null,
 })
-const conditionConfigureDataResetHandler = () => {
+let bankWarnLayer = null
+let runningStatus = ref(false)
+const conditionConfigureDataResetHandler = async () => {
+
+    ///////////////////////  check  /////////////////////// 
+
+    const nullCheck = (val) => {
+        if (val === null || val === undefined || val === 'null' || val === 'undefined' || val === 'NaN' || val === '')
+            return false
+        return true
+    }
+    for (let key in conditionConfigureData) {
+        if (!nullCheck(conditionConfigureData[key])) {
+            ElMessage({
+                type: 'error',
+                offset: 120,
+                message: '请正确配置条件！'
+            })
+            return
+        }
+    }
+    if (runningStatus.value) {
+        ElMessage({
+            type: 'info',
+            offset: 120,
+            message: '模型正在运行，请等待！'
+        })
+        return
+    }
+
     console.log('reset condition data!', conditionConfigureData)
-    totalResult.desc = '低风险'
+
+
+
+    ///////////////////////  Run  /////////////////////// 
+    const result = await runRiskLevelForAll({
+        waterQS: conditionConfigureData.flow,
+        tidalLevel: conditionConfigureData.tideDif,
+        refDEM: conditionConfigureData.refDEM,
+        benchDEM: conditionConfigureData.benchDEM,
+    }, {}, {
+        bankEnName: 'Mzs',
+        setName: 'standard'
+    })
+
+    console.log('runRiskLevelForAll result:', result)
+
+
+    ///////////////////// result ////////////////////////
+
+    const { warnLayerData, highRiskSections, finalResult } = riskWarnResultParse(result)
+    console.log('highRiskSections:', highRiskSections)
+
+    totalResult.desc = finalResult
+    riskAreas.value = highRiskSections.join('; ')
+    let map = useMapStore().getMap()
+    if (bankWarnLayer && map) {
+        bankWarnLayer.update(warnLayerData)
+        map.triggerRepaint()
+    }
+
+
+    ///////////////////// test ////////////////////////
+    ///////////// 评估结果 and 高风险区域
+    // totalResult.desc = '低风险'
+    // riskAreas.value = 'risk areas1 ; risk areas2 ; risk areas3'
+
+    // ///////////// warn layer 操作
+    // let map = useMapStore().getMap()
+    // if (bankWarnLayer && map) {
+    //     bankWarnLayer.update(defaultWarnLayerDataInput2)
+    //     map.triggerRepaint()
+    // }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // 数据
 const profileList = ref(profileListInput)
@@ -909,9 +825,9 @@ const riskDataAll = ref([
 const placeValue = ref('mzs')
 
 // 场景与地形选择
-const sceneBeforeSelectChange = () => {}
+const sceneBeforeSelectChange = () => { }
 
-const sceneNowSelectChange = () => {}
+const sceneNowSelectChange = () => { }
 
 const confirmProfileTime = () => {
     sceneConfirmShow.value = true
@@ -1132,7 +1048,7 @@ const CalProfile = async (before, now) => {
 const CalProfileById = async (before, now, id) => {
     const taskId = await bankRiskWarn.runProfileModel_long(before, now, id + 1)
     let RunStatus
-    for (;;) {
+    for (; ;) {
         try {
             RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
         } catch (error) {
@@ -1183,7 +1099,7 @@ const CalProfileList = (profileData) => {
         }
         try {
             profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) {}
+        } catch (error) { }
     })
     // let map = useMapStore().getMap()
     // if (map) {
@@ -1204,7 +1120,7 @@ const CalProfileListForShow = (profileData) => {
         }
         try {
             profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) {}
+        } catch (error) { }
     })
     let map = useMapStore().getMap()
     if (map) {
@@ -1214,13 +1130,13 @@ const CalProfileListForShow = (profileData) => {
     }
 }
 
-const sceneSelectChange = () => {}
+const sceneSelectChange = () => { }
 
-const onAddOption = () => {}
+const onAddOption = () => { }
 
-const onAddProfileOption = () => {}
+const onAddProfileOption = () => { }
 
-const onAddProfile = () => {}
+const onAddProfile = () => { }
 
 let floodWatcher = null
 let dryWatcher = null
@@ -1635,7 +1551,7 @@ const sureSectionRese = async () => {
         EndPtY,
     )
     let RunStatus = ''
-    for (;;) {
+    for (; ;) {
         try {
             RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
         } catch (error) {
@@ -2146,8 +2062,8 @@ onMounted(async () => {
             },
             'chaoWeiPoint',
         )
-
-        map.addLayer(new BankWarnLayer(defaultWarnLayerData), 'chaoWeiPoint')
+        bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+        map.addLayer(bankWarnLayer, 'chaoWeiPoint')
 
         map.addLayer(
             {
@@ -2269,7 +2185,9 @@ onMounted(async () => {
         sceneCompareNow,
     )
 
-    showWaterPowerFunc()
+    riskAreas.value = getRiskAreas('high')
+
+    // showWaterPowerFunc()
 })
 
 onUnmounted(() => {
@@ -2335,6 +2253,7 @@ div.risk-warn-container {
         border-radius: 50%;
         z-index: 3;
         transition: 0.5s ease-in-out;
+
         &.translate {
             right: 0vw;
         }
@@ -2345,6 +2264,7 @@ div.risk-warn-container {
             filter: drop-shadow(2px 2px 1px rgb(73, 182, 255));
         }
     }
+
     div.condition-pannel {
         position: absolute;
         right: 1vw;
@@ -2573,55 +2493,47 @@ div.risk-warn-container {
 
             &.waterpower {
                 // transition: all ease-in-out;
-                background: linear-gradient(
-                    90deg,
-                    rgba(33, 100, 182, 0.35),
-                    // rgba(33, 100, 182, 1),
-                    // rgba(0, 34, 215, 1),
-                    // rgba(0, 34, 215, 1),
-                    rgba(0, 34, 215, 1),
-                    rgba(0, 34, 215, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(33, 100, 182, 0.35),
+                        // rgba(33, 100, 182, 1),
+                        // rgba(0, 34, 215, 1),
+                        // rgba(0, 34, 215, 1),
+                        rgba(0, 34, 215, 1),
+                        rgba(0, 34, 215, 1));
                 background-size: 400% 100%;
                 // background-color: rgba(28, 85, 156, 0.6);
             }
 
             &.riverbed {
-                background: linear-gradient(
-                    90deg,
-                    rgba(39, 145, 87, 0.35),
-                    // rgba(39, 145, 87, 1),
-                    // rgb(0, 121, 16, 1),
-                    // rgba(0, 121, 16, 1),
-                    rgba(0, 121, 16, 1),
-                    rgba(0, 121, 16, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(39, 145, 87, 0.35),
+                        // rgba(39, 145, 87, 1),
+                        // rgb(0, 121, 16, 1),
+                        // rgba(0, 121, 16, 1),
+                        rgba(0, 121, 16, 1),
+                        rgba(0, 121, 16, 1));
                 background-size: 400% 100%;
             }
 
             &.bankGeology {
-                background: linear-gradient(
-                    90deg,
-                    rgba(95, 21, 138, 0.35),
-                    // rgba(95, 21, 138, 1),
-                    // rgb(63, 0, 121, 1),
-                    // rgba(63, 0, 121, 1),
-                    rgba(63, 0, 121, 1),
-                    rgba(63, 0, 121, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(95, 21, 138, 0.35),
+                        // rgba(95, 21, 138, 1),
+                        // rgb(63, 0, 121, 1),
+                        // rgba(63, 0, 121, 1),
+                        rgba(63, 0, 121, 1),
+                        rgba(63, 0, 121, 1));
                 background-size: 400% 100%;
             }
 
             &.outproject {
-                background: linear-gradient(
-                    90deg,
-                    rgba(228, 143, 16, 0.35),
-                    // rgba(228, 143, 16, 1),
-                    // rgba(121, 83, 0, 1),
-                    // rgba(121, 83, 0, 1),
-                    rgba(121, 83, 0, 1),
-                    rgba(121, 83, 0, 1)
-                );
+                background: linear-gradient(90deg,
+                        rgba(228, 143, 16, 0.35),
+                        // rgba(228, 143, 16, 1),
+                        // rgba(121, 83, 0, 1),
+                        // rgba(121, 83, 0, 1),
+                        rgba(121, 83, 0, 1),
+                        rgba(121, 83, 0, 1));
                 background-size: 400% 100%;
             }
 
@@ -2688,11 +2600,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                + .slider {
+                +.slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                + .slider:before {
+                +.slider:before {
                     transform: translateY(-1.5em);
                 }
             }
@@ -2766,11 +2678,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                + .slider {
+                +.slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                + .slider:before {
+                +.slider:before {
                     transform: translateY(-1.5em);
                 }
             }
@@ -2844,11 +2756,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                + .slider {
+                +.slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                + .slider:before {
+                +.slider:before {
                     transform: translateY(-1.5em);
                 }
             }
@@ -3123,7 +3035,7 @@ div.risk-warn-container {
             text-indent: 1rem;
 
             &.low {
-                background-color: rgb(51,33,234);
+                background-color: rgb(51, 33, 234);
             }
 
             &.low2 {
@@ -3131,11 +3043,11 @@ div.risk-warn-container {
             }
 
             &.middle {
-                background-color: rgb(211,121,60);
+                background-color: rgb(211, 121, 60);
             }
 
             &.high {
-                background-color: rgb(254,15,31);
+                background-color: rgb(254, 15, 31);
             }
         }
     }
@@ -3239,12 +3151,10 @@ div.risk-warn-container {
             border-radius: 20px;
             // border:#0f1011 2px solid;
             z-index: 5;
-            background-image: linear-gradient(
-                to right,
-                rgb(17, 17, 255),
-                rgb(220, 126, 37),
-                rgb(255, 9, 9)
-            );
+            background-image: linear-gradient(to right,
+                    rgb(17, 17, 255),
+                    rgb(220, 126, 37),
+                    rgb(255, 9, 9));
             box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
         }
 
@@ -3384,11 +3294,11 @@ div.risk-warn-container {
             }
 
             input:checked {
-                + .slider {
+                +.slider {
                     background-color: rgb(73, 90, 250);
                 }
 
-                + .slider:before {
+                +.slider:before {
                     transform: translateY(-1.5em);
                 }
             }

@@ -195,7 +195,6 @@ export class EulerFlowLayer {
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.drawElements(gl.TRIANGLES, this.maskIndexLength, gl.UNSIGNED_SHORT, 0);
-            console.log('gl.drawElements(gl.TRIANGLES, this.maskIndexLength, gl.UNSIGNED_SHORT, 0)');
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             ////////// 1st::: delaunay program to get uv texture
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo_delaunay);
@@ -276,7 +275,7 @@ export class EulerFlowLayer {
             gl.drawArraysInstanced(gl.LINES, 0, 4, this.pointNum);
         }
         else {
-            console.log('layer not readydd');
+            // console.log('layer not readydd');
         }
         this.map.triggerRepaint();
     }
@@ -297,7 +296,7 @@ export class EulerFlowLayer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         this.Locations_mask['a_postion'] = gl.getAttribLocation(this.program_mask, 'a_position');
         this.Locations_mask['u_matrix'] = gl.getUniformLocation(this.program_mask, 'u_matrix');
-        console.log(this.Locations_mask);
+        // // console.log(this.Locations_mask);
         this.maskPosBuffer = util.createVBO(gl, vertexData);
         this.maskIndexBuffer = util.createIBO(gl, indexData);
         this.maskIndexLength = indexData.length;
@@ -309,12 +308,12 @@ export class EulerFlowLayer {
         gl.enableVertexAttribArray(this.Locations_mask['a_postion']);
         gl.vertexAttribPointer(this.Locations_mask['a_postion'], 2, gl.FLOAT, false, 0, 0);
         gl.bindVertexArray(null);
-        console.log('mask program init done');
+        // console.log('mask program init done');
     }
     async programInit_delaunay(gl) {
-        console.log(this.prefix + this.stationUrl);
+        // // console.log(this.prefix + this.stationUrl);
         let { vertexData_station, indexData_station } = await this.getStationData(this.prefix + this.stationUrl);
-        console.log(vertexData_station, indexData_station);
+        // // console.log(vertexData_station, indexData_station);
         this.vertexData_station = vertexData_station;
         this.indexData_station = indexData_station;
         this.velocityData_Array.push(await this.getVelocityData(this.prefix + this.uvUrls[0]));
@@ -325,12 +324,12 @@ export class EulerFlowLayer {
         let fromIndex = (this.uvResourcePointer + 2) % 3;
         this.velocityData_from = this.velocityData_Array[fromIndex];
         this.velocityData_to = this.velocityData_Array[toIndex];
-        // console.log('vertexData', vertexData_station)
-        // console.log('velocityData', velocityData)
+        // // console.log('vertexData', vertexData_station)
+        // // console.log('velocityData', velocityData)
         ////////// 1st::: delaunay program to get uv texture
         const vsSource_delaunay = (await axios.get('/scratchSomething/eulerWebGL/delaunay.vert.glsl')).data;
         const fsSource_delaunay = (await axios.get('/scratchSomething/eulerWebGL/delaunay.frag.glsl')).data;
-        // console.log(vsSource_delaunay, fsSource_delaunay)
+        // // console.log(vsSource_delaunay, fsSource_delaunay)
         const vs_delaunay = util.createShader(gl, gl.VERTEX_SHADER, vsSource_delaunay);
         const fs_delaunay = util.createShader(gl, gl.FRAGMENT_SHADER, fsSource_delaunay);
         this.programe_delaunay = util.createProgram(gl, vs_delaunay, fs_delaunay);
@@ -341,7 +340,7 @@ export class EulerFlowLayer {
         this.Locations_delaunay['u_flowExtent'] = gl.getUniformLocation(this.programe_delaunay, 'u_flowExtent');
         this.Locations_delaunay['u_matrix'] = gl.getUniformLocation(this.programe_delaunay, 'u_matrix');
         this.Locations_delaunay['u_mask'] = gl.getUniformLocation(this.programe_delaunay, 'u_mask');
-        // console.log(this.Locations_delaunay)
+        // // console.log(this.Locations_delaunay)
         ///// vertex data
         this.vao_delaunay = gl.createVertexArray();
         gl.bindVertexArray(this.vao_delaunay);
@@ -377,7 +376,7 @@ export class EulerFlowLayer {
         this.Locations_showing['a_texCoord'] = gl.getAttribLocation(this.program_showing, 'a_texCoord');
         this.Locations_showing['uv_texture'] = gl.getUniformLocation(this.program_showing, 'uv_texture');
         this.Locations_showing['mask'] = gl.getUniformLocation(this.program_showing, 'mask');
-        // console.log(this.Locations_showing)
+        // // console.log(this.Locations_showing)
         this.vao_showing = gl.createVertexArray();
         gl.bindVertexArray(this.vao_showing);
         const positionData_showing = [
@@ -413,12 +412,12 @@ export class EulerFlowLayer {
         this.Locations_point['a_pos'] = gl.getAttribLocation(this.program_point, 'a_pos');
         this.Locations_point['u_matrix'] = gl.getUniformLocation(this.program_point, 'u_matrix');
         this.Locations_point['uvTexture'] = gl.getUniformLocation(this.program_point, 'uvTexture');
-        console.log(this.Locations_point);
+        // // console.log(this.Locations_point);
         this.mapExtent = getMapExtent(this.map);
         let currentExtent = this.currentExtent(this.flowExtent, this.mapExtent);
         let data = this.generateGrid(currentExtent, this.gridNumPerRow, this.gridNumPerCol);
         this.pointNum = data.gridDataArray.length / 2;
-        console.log('init pos data', data);
+        // // console.log('init pos data', data);
         this.vao_startPoint = gl.createVertexArray();
         gl.bindVertexArray(this.vao_startPoint);
         this.startPosBuffer = util.createVBO(gl, data.gridDataArray);
@@ -428,7 +427,7 @@ export class EulerFlowLayer {
         gl.bindVertexArray(null);
         this.vao_endPoint = gl.createVertexArray();
         gl.bindVertexArray(this.vao_endPoint);
-        console.log(' init endpos buffer');
+        // // console.log(' init endpos buffer');
         this.endPosBuffer = util.createVBO(gl, data.gridDataArray);
         gl.enableVertexAttribArray(this.Locations_point['a_pos']);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.endPosBuffer);
@@ -456,7 +455,7 @@ export class EulerFlowLayer {
         gl.bindVertexArray(null);
         this.xfo_simulate_1 = gl.createTransformFeedback();
         gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, this.xfo_simulate_1);
-        console.log('use enpos buffer as transform feedback buffer');
+        // console.log('use enpos buffer as transform feedback buffer');
         gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, this.endPosBuffer);
         gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
     }
@@ -473,7 +472,7 @@ export class EulerFlowLayer {
         this.Locations_segmentShowing['aaWidth'] = gl.getUniformLocation(this.program_segmentShowing, 'aaWidth');
         this.Locations_segmentShowing['fillWidth'] = gl.getUniformLocation(this.program_segmentShowing, 'fillWidth');
         this.Locations_segmentShowing['u_arrowColor'] = gl.getUniformLocation(this.program_segmentShowing, 'u_arrowColor');
-        console.log(this.Locations_segmentShowing);
+        // console.log(this.Locations_segmentShowing);
         this.vao_segmentShowing1 = gl.createVertexArray();
         gl.bindVertexArray(this.vao_segmentShowing1);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.startPosBuffer);
@@ -499,7 +498,7 @@ export class EulerFlowLayer {
         this.Locations_arrowShowing['u_arrowLength'] = gl.getUniformLocation(this.program_arrowShowing, 'u_arrowLength');
         this.Locations_arrowShowing['u_canvasSize'] = gl.getUniformLocation(this.program_arrowShowing, 'u_canvasSize');
         this.Locations_arrowShowing['u_arrowColor'] = gl.getUniformLocation(this.program_arrowShowing, 'u_arrowColor');
-        console.log(this.Locations_arrowShowing);
+        // console.log(this.Locations_arrowShowing);
         this.vao_arrowShowing = gl.createVertexArray();
         gl.bindVertexArray(this.vao_arrowShowing);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.startPosBuffer);
@@ -544,7 +543,7 @@ export class EulerFlowLayer {
             if (velocity > this.flowMaxVelocity)
                 this.flowMaxVelocity = velocity;
         }
-        console.log(url, velocityData);
+        // console.log(url, velocityData);
         return velocityData;
     }
     nextStep(gl) {
@@ -559,16 +558,16 @@ export class EulerFlowLayer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.velocityBuffer_to);
         gl.bufferData(gl.ARRAY_BUFFER, this.velocityData_to, gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        // console.log('///////// TIME STEP UPDATE //////////')
-        // console.log('this.uvResourcePointer', this.uvResourcePointer)
-        // console.log('globalFrames', this.globalFrames)
+        // // console.log('///////// TIME STEP UPDATE //////////')
+        // // console.log('this.uvResourcePointer', this.uvResourcePointer)
+        // // console.log('globalFrames', this.globalFrames)
         this.getVelocityData(this.prefix + this.uvUrls[this.uvResourcePointer]).then(data => {
             this.velocityData_Array[updateIndex] = data;
         });
     }
     initGUI() {
         const restart = () => {
-            console.log('restart');
+            // console.log('restart');
             let gl = this.gl;
             let data = this.generateGrid(this.validExtent, this.gridNumPerRow, this.gridNumPerCol);
             this.pointNum = data.gridDataArray.length / 2;
@@ -626,7 +625,7 @@ export class EulerFlowLayer {
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         const debugArr = new Float32Array(size);
         gl.getBufferSubData(gl.ARRAY_BUFFER, 0, debugArr);
-        console.log(`${label}`, debugArr);
+        // console.log(`${label}`, debugArr);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
         return debugArr;
     }
@@ -643,7 +642,7 @@ export class EulerFlowLayer {
                 gridDataArray.push(x, y);
             }
         }
-        // console.log('new grid data!  length::', gridDataArray.length / 2)
+        // // console.log('new grid data!  length::', gridDataArray.length / 2)
         return {
             gridDataArray,
         };
@@ -690,7 +689,7 @@ export class EulerFlowLayer {
         let x = (180 + lng) / 360;
         let y = (180 -
             (180 / Math.PI) *
-                Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))) /
+            Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))) /
             360;
         return [x, y];
     }
@@ -758,7 +757,7 @@ export const initMap = () => {
         maxZoom: 18,
         zoom: 9 //10.496958973488436, // 16
     }).on('load', () => {
-        console.log('map load!');
+        // console.log('map load!');
         // const flowTextureLayer = new EulerFlowLayer('flow')
         // map.addLayer(flowTextureLayer as mapbox.AnyLayer)
         // const upLineLayer = new upLine('upLine')
@@ -791,7 +790,7 @@ export const simpleArrow = async () => {
     let rotateMatrixLocation = gl.getUniformLocation(program2, 'rotateMatrix');
     let arrowLengthLocation = gl.getUniformLocation(program2, 'arrowLength');
     let canvasSizeLocation = gl.getUniformLocation(program2, 'canvasSize');
-    console.log(rotateMatrixLocation, arrowLengthLocation);
+    // console.log(rotateMatrixLocation, arrowLengthLocation);
     let rotateAngle = 45.0;
     // let rotateMatrix = //逆时针 45°
     let arrowLength = 50.0; //pixel
