@@ -338,7 +338,8 @@ export default class ModelRequest {
   }
 
   static async getDataList(datatype, bank) {
-    return await get(`/dataNode/bank/dataType?dataType=${datatype}&bank=${bank}`, true)
+    // return await get(`/dataNode/bank/dataType?dataType=${datatype}&bank=${bank}`, true)
+    return await get(`/data/bankResource/bank/dataType?dataType=${datatype}&bank=${bank}`, true)
   }
 
   /**

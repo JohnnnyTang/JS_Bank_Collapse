@@ -13,10 +13,10 @@ export default class BankWarnLayer {
         console.log('contruictasd12312', this.jsonData)
     }
     async onAdd(map, gl) {
+        this.gl = gl
         // const data = JsonData
         this.map = map
         this.vertexData = []
-        this.warnValues = []
         this.vertexCount = 0
         this.jsonData.forEach(element => {
             //coords 1
@@ -141,6 +141,33 @@ export default class BankWarnLayer {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.vertexCount);
 
+    }
+
+    update(jsonData) {
+        this.jsonData = jsonData
+        this.vertexData = []
+        this.vertexCount = 0
+        this.jsonData.forEach(element => {
+            //coords 1
+            let pos1 = mapboxgl.MercatorCoordinate.fromLngLat({
+                lng: element.coords[0][0],
+                lat: element.coords[0][1],
+            })
+            let pos2 = mapboxgl.MercatorCoordinate.fromLngLat({
+                lng: element.coords[1][0],
+                lat: element.coords[1][1],
+            })
+
+            this.vertexData.push(pos1.x, pos1.y, element.warnValue, pos2.x, pos2.y, element.warnValue)
+            this.vertexCount += 2
+        });
+        let gl = this.gl
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array(this.vertexData),// 3 points (x,y)
+            gl.STATIC_DRAW
+        );
     }
 
 

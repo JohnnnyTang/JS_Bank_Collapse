@@ -72,24 +72,13 @@ const cancelSectionRese = () => {
 const props = defineProps({
     demResources: {
         type: Array,
-        default: () => [{ year: 1998 },
-        { year: 2004 }]
+        default: []
     },
     demListShow: {
         type: Boolean,
         default: true
     }
 })
-
-
-const sectionRasterList = ref([
-    // { year: 2020, time: 'before', layerName: '' },
-    // { year: 2021, time: 'before', layerName: '' },
-    // { year: 2022, time: 'before', layerName: '' },
-    // { year: 2023, time: 'before', layerName: '' },
-    { year: 1998 },
-    { year: 2004 }
-])
 
 
 // const multiIndexStore = useMultiIndexStore()
@@ -394,7 +383,7 @@ const attachBaseLayer = (map) => {
             'line-color': 'rgba(16, 27, 148, 1.0)',
             'line-dasharray': [2, 2],
             'line-width': 1,
-        
+
         },
     })
 

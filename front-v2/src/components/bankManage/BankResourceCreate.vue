@@ -1,89 +1,270 @@
 <template>
     <div class="bank-resouce-create-container">
-        <div class="main-title">新建岸段</div>
+        <div class="main-title">新建岸段 </div>
         <div class="desc-box-container">
-            <div class="title-container">岸段基本信息</div>
+            <div class="title-container">岸段基本信息
+                <div class="upload-btn" @click="createNewBankClickHandler">新建</div>
+            </div>
             <div class="detail-content-container">
 
                 <div class="bank-name">
                     <div class="bankName-key">岸段名称</div>
                     <div class="bankName-val">
-                        <el-input v-model="bankName" style="
-                                width: 100%;
+                        <el-input v-model="bank.name" style="
+                                width: 50%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
-                            " placeholder="请输入" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
+                            " placeholder="请输入岸段名称" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
+                        <el-input v-model="bank.bankEnName" style="
+                                width: 50%;
+                                height: 100%;
+                                font-size: calc(0.6vw + 0.6vh);
+                            " placeholder="请输入名称编码" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
                     </div>
                 </div>
 
-                <div class="detail-box-item" v-for="(item, index) in mzsInfo" :key="index" :class="item.type">
+                <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type">
                     <div class="detail-key">{{ item.key }}</div>
-                    <div class="detail-val" v-if="changeStatus">
+                    <div class="detail-val">
                         <el-input v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
-                            " placeholder="请输入" :type="item.type.includes('long-text')
+                            " :placeholder="item.key === '中心坐标' ? '请输入坐标: [经度,维度]' : '请输入' + item.key" :type="item.type.includes('long-text')
                                 ? 'textarea'
                                 : 'text'
                                 " :autosize="{ minRows: 4, maxRows: 6 }" />
                     </div>
-                    <div class="detail-val" v-else-if="item.type.includes('two-row')">
-                        <div class="detail-val-row">
-                            {{ item.val.split(item.splitter)[0] }}
-                        </div>
-                        <div class="detail-val-row">
-                            {{ item.val.split(item.splitter)[1] }}
-                        </div>
-                    </div>
-                    <div class="detail-val" v-else>{{ item.val }}</div>
                 </div>
+
 
             </div>
         </div>
 
         <div class="resource-box-container">
             <div class="title-container">岸段资源上传</div>
+            <div class="resource-content-container">
+                <el-scrollbar height="75vh">
+                    <div class="resource-box-item" v-for="(item, resourceTypeIndex) in resourceInfo"
+                        :key="resourceTypeIndex">
+                        <div class="resource-title">
+                            {{ resourceTypeIndex + 1 + ' ' + item.key }}
+                            <div class="resource-upload-btn" @click="resourceUploadClickHandler(resourceTypeIndex)">上传</div>
+                        </div>
+                        <div class="resource-content">
+
+                            <el-table :data="item.resourceList" style="width: 100%" max-height="25vh">
+                                <el-table-column v-for="(column, index) in tableColumnInfo" :key="index" :prop="column.prop"
+                                    :label="column.label" :min-width="column['min-width']" align="center">
+                                    <template #default="scope" v-if="column.asTag">
+                                        <div style="display: flex; align-items: center;justify-content: center;">
+                                            <el-tag>{{ scope.row.fileType }}</el-tag>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                </el-scrollbar>
+            </div>
         </div>
     </div>
+
+    <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
+        <template #header="{ titleId, titleClass }">
+            <div class="form-header" style="">
+                {{ '● ' + dialogFormTitle }}
+            </div>
+        </template>
+        <el-form :model="dialogInfo">
+            <!-- <el-form-item label="Promotion name">
+                <el-input v-model="form.name" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="Zones">
+                <el-select v-model="form.region" placeholder="Please select a zone">
+                    <el-option label="Zone No.1" value="shanghai" />
+                    <el-option label="Zone No.2" value="beijing" />
+                </el-select>
+            </el-form-item> -->
+            <el-form-item v-for="(item, index) in dialogInfo" :key="index" :label="item.label">
+                <el-input v-model="item.value" autocomplete="off" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="dialogFormVisible = false">
+                    确定
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import * as testData from './basicBankInfo.json'
+import { defaultBankBasicInfo, defaultBankResouceList } from './bankResource'
+import BankResourceHelper from '../modelStore/views/bankResourceHelper';
+import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
 
 
-//////////////// bank resource form
-const changeStatus = ref(true)
-const bankName = ref('测试岸段')
-const mzsInfo = ref([
-    { key: '预警级别', val: 'Ⅰ级', type: ['half', 'left'] },
+//////////////////////////// bank basic info
+const bank = reactive({
+    name: '',
+    bankEnName: ''
+})
+const bankBasicInfo = ref(defaultBankBasicInfo)
+
+const createNewBankClickHandler = async () => {
+    const haveNULL = Object.values(bank).some(item => item === '' || item === null || item === undefined)
+    if (haveNULL) {
+        ElMessage({
+            type: 'error',
+            message: '请填写完整的岸段信息',
+            offset: 120
+        })
+        return
+    }
+
+
+    ElMessageBox.confirm(
+        '确认创建新的岸段？',
+        '提示',
+        {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'info',
+        }
+    ).then(async () => {
+        console.log(bankBasicInfo.value)
+        const parseLonLat = (inputStr) => {
+            const coordinates = inputStr.slice(1, -1).split(',');
+            const longitude = parseFloat(coordinates[0]);
+            const latitude = parseFloat(coordinates[1]);
+            return [longitude, latitude]
+        }
+        let nowBasicInfo = bankBasicInfo.value
+        let ReqBody = {
+            "bank": bank.bankEnName,
+            "name": bank.name,
+            "riskLevel": nowBasicInfo[0].val,
+            "center": parseLonLat(nowBasicInfo[1].val),
+            "introduction": nowBasicInfo[2].val,
+            "management": {
+                "department": nowBasicInfo[3].val,
+                "contact": nowBasicInfo[4].val,
+            }
+        }
+        const createMsg = (await BankResourceHelper.createNewBank(bank.bankEnName, ReqBody)).data
+        ElNotification.success({
+            'title': createMsg,
+            'offset': 120
+        })
+        ElMessage({
+            type: 'success',
+            offset: 120,
+            message: '创建成功',
+        })
+    }).catch(() => {
+        console.log('取消创建岸段');
+    })
+}
+
+
+
+
+
+
+
+
+
+/////////////////////////// bank resource info
+const resourceInfo = defaultBankResouceList
+const tableColumnInfo = [
     {
-        key: '中心坐标',
-        val: '120.55,32.04',
-        type: ['half', 'two-row', 'right'],
-        splitter: ' ',
+        prop: "name",
+        label: "名称",
+        "min-width": "25%",
+        asTag: false
     },
     {
-        key: '情况介绍',
-        val: '民主沙右缘位于长江澄通河段，分属泰州市的靖江市和南通市的如皋市，是水利部长江委、省市县的Ⅰ级预警岸段。近年民主沙南侧的浏海沙水道深槽坐弯、深泓左偏，致来民主沙右缘持续冲退，影响局部河势稳定。同时民主沙为张皋过江通道拟建桥址所在地。',
-        type: ['single', 'long-text'],
+        prop: "sets",
+        label: "工况集",
+        "min-width": "25%",
+        asTag: false
     },
     {
-        key: '管理单位',
-        val: '靖江市水利局/如皋市水利局',
-        type: ['half', 'left'],
+        prop: "year",
+        label: "年份",
+        "min-width": "25%",
+        asTag: false
     },
     {
-        key: '管理单位联系方式',
-        val: 'xxxxxxxxxxx',
-        type: ['half', 'right'],
+        prop: "fileType",
+        label: "文件类型",
+        "min-width": "25%",
+        asTag: true
     },
+]
+
+///////////// bank resource upload
+const dialogFormVisible = ref(false)
+const dialogFormTitle = ref('资源上传')
+const dialogInfo = ref([
+    {
+        label: '岸段',
+        enName: 'segment',
+        value: bank.name
+    },
+    {
+        label: '年份',
+        enName: 'year',
+        value: '2023'
+    },
+    {
+        label: '工况集',
+        enName: 'set',
+        value: 'standard'
+    },
+    // {
+    //     label: '文件类型',
+    //     enName: 'category',
+    //     value: 'DEM'    (DEM|Hydrodynamic|Boundary|Config)
+    // }
+    {
+        label: '备注',
+        enName: 'description',
+        value: ''
+    },
+    {
+        label: '边界',
+        enName: '',
+        value: ''
+    },
+    // {
+    //     label: '其他',
+    //     enName: 'temp',
+    //     value: ''
+    // },
+
 ])
 
 
+const resourceUploadClickHandler = (resourceTypeIndex) => {
+    const type = ['地形', '水动力', '边界', '配置']
+    dialogFormTitle.value = `${type[resourceTypeIndex]}资源上传`
+    dialogFormVisible.value = true
+}
+
+
+
+
+
+
+
+
+
 onMounted(() => {
-    console.log(testData)
 })
 
 
@@ -166,6 +347,28 @@ div.bank-resouce-create-container {
 
             border-bottom: 4px solid #0040a0;
             color: #001d7a;
+
+            .upload-btn {
+                position: absolute;
+                right: 1vw;
+                top: .5vh;
+                width: 5vw;
+                height: 5vh;
+                line-height: 5vh;
+                text-align: center;
+                font-size: calc(0.9vw + 0.7vh);
+                font-weight: bold;
+                background-color: rgb(184, 235, 255);
+                color: #002d70;
+                border-radius: 5px;
+                transition: .3s ease-in-out;
+
+                &:hover {
+                    cursor: pointer;
+                    background-color: rgb(133, 220, 255);
+                }
+
+            }
         }
 
         div.detail-content-container {
@@ -350,6 +553,7 @@ div.bank-resouce-create-container {
         overflow: hidden;
 
         div.title-container {
+            position: relative;
             width: 42vw;
             height: 7vh;
             margin-left: 0.5vw;
@@ -364,6 +568,75 @@ div.bank-resouce-create-container {
             border-bottom: 4px solid #0040a0;
             color: #001d7a;
         }
+
+        div.resource-content-container {
+            position: relative;
+            width: 42vw;
+            margin-left: 0.5vw;
+            height: 75vh;
+
+            div.resource-box-item {
+                position: relative;
+                width: 41vw;
+                margin-left: 0.5vw;
+                height: 30vh;
+
+                div.resource-title {
+                    position: relative;
+                    width: 41vw;
+                    height: 5vh;
+                    line-height: 5vh;
+                    text-align: left;
+                    font-size: calc(0.9vw + 0.7vh);
+                    font-weight: bold;
+                    border-bottom: 2px solid #5b9dff;
+                    color: #001d7a;
+
+                    div.resource-upload-btn {
+                        position: absolute;
+                        right: 1vw;
+                        top: .5vh;
+                        width: 5vw;
+                        height: 4vh;
+                        line-height: 4vh;
+                        text-align: center;
+                        font-size: calc(0.8vw + 0.7vh);
+                        font-weight: bold;
+                        background-color: rgb(64, 102, 206);
+                        color: #ffffff;
+                        border-radius: 5px;
+                        transition: .3s ease-in-out;
+
+                        &:hover {
+                            cursor: pointer;
+                            background-color: rgb(93, 169, 255);
+                        }
+                    }
+                }
+
+                div.resource-content {
+                    position: relative;
+                    width: 41vw;
+                    height: 25vh;
+                    // background-color: aquamarine;
+
+
+                }
+            }
+        }
     }
+}
+
+div.form-header {
+    position: relative;
+    height: 4vh;
+    margin-top: -1vh;
+    text-align: center;
+    font-size: calc(0.9vw + 0.8vh);
+    color: #0a56fa;
+    font-weight: 800;
+    background-color: #b1e0ff;
+    width: 108%;
+    margin-left: -4%;
 }
 </style>

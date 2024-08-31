@@ -125,7 +125,7 @@ const routes = [
     },
     {
         path: '/bankManage',
-        redirect: '/bankManage/basic/mzs',
+        redirect: '/bankManage/preview/Mzs',
         component: () => import('../views/BankTwinManageView.vue'),
         children: [
             {

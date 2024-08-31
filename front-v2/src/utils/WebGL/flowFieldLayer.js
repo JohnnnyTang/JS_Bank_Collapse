@@ -196,7 +196,6 @@ export default class FlowFieldLayer {
         };
     }
     async FillTextureByImage(gl, Tex, format, filter, width, height, imgSrc, type) {
-        // /temp/data/modelServer/file?caseId=35580981ae885d6d4d92bd22d453816d&name=visualization/mask_0.png
         let imgSrc_backEnd = this.resourcePrefix + imgSrc;
         // console.log(imgSrc_backEnd)
         //reparsing 

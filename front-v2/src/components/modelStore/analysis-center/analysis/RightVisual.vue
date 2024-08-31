@@ -68,7 +68,7 @@ export default defineComponent({
       if (!map) return;
 
       let boundsMap = {
-        民主沙: [
+        民主沙右缘: [
           [120.45997922676836, 32.00001616423072],
           [120.60909640208264, 32.084171362618625],
         ],
