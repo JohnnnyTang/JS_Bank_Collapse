@@ -12,9 +12,7 @@
 import bottomWaveVue from './BottomWave.vue';
 import VerticalNavVue from './VerticalNav.vue';
 import { onMounted } from 'vue';
-import axios from 'axios';
 onMounted(()=>{
-  axios.get('/api/data/monitorInfo')
 })
 </script>
 

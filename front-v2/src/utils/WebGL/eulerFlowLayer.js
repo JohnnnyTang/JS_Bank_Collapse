@@ -87,7 +87,7 @@ export class EulerFlowLayer {
     /// dynamic data
     globalFrames = 0;
     randomSeed = Math.random();
-    framePerStep = 60; //frame
+    framePerStep = 120; //frame
     localFrames = 0;
     progressRatio = 0;
     mapExtent = [9999, 9999, -9999, -9999]; //xmin, ymin, xmax, ymax
@@ -605,7 +605,7 @@ export class EulerFlowLayer {
         this.gui.addColor(parameters, 'color').name('箭头颜色').onChange(value => { this.arrowColor = parseRGB(value); });
         this.gui.add(parameters, 'gridPerRow', 10, 200, 1).name('格网行数').onChange(value => { this.gridNumPerRow = value; restart(); });
         this.gui.add(parameters, 'gridPerCol', 10, 200, 1).name('格网列数').onChange(value => { this.gridNumPerCol = value; restart(); });
-        this.gui.add(parameters, 'framePerStep', 30, 240, 10).name('帧数控制').onChange(value => this.framePerStep = value);
+        // this.gui.add(parameters, 'framePerStep', 30, 240, 10).name('帧数控制').onChange(value => this.framePerStep = value);
         this.gui.add(parameters, 'velocityFactor', 1, 1000, 1).name('速度因子').onChange(value => this.velocityFactor = value);
         const parseRGB = (rgbString) => {
             const regex = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/;

@@ -366,7 +366,7 @@ const confirmSectionDraw = () => {
                 type: 'warning',
                 message: '请完成断面绘制后确认',
                 title: '警告',
-                offset: 130,
+                offset: 140,
             })
             return false
         }
@@ -390,7 +390,7 @@ const basicParams = reactive({
     'ref-id': null,
     'current-timepoint': 'yyyy-mm-dd',
     'comparison-timepoint': 'yyyy-mm-dd',
-    'water-qs': 45000,
+    'water-qs': 57500,
     'tidal-level': 3.1,
     'risk-thresholds': 'NONE',
 })
@@ -423,14 +423,14 @@ const handleChange = (file, fileList) => {
                 ElMessage({
                     type: 'success',
                     message: '断面几何形态上传成功！',
-                    offset: 130,
+                    offset: 140,
                 })
             } else throw new Error('not a geojson feature')
         } catch (error) {
             ElMessage({
                 type: 'warning',
                 message: '请上传正确的断面几何Geojson-feature文件！',
-                offset: 130,
+                offset: 140,
             })
         }
     }
@@ -596,7 +596,7 @@ const run = async () => {
             ElMessage({
                 message: '运行失败,模型任务创建失败',
                 type: 'error',
-                offset: 130,
+                offset: 140,
             })
             modelStatus.value = 4
             return;
@@ -637,7 +637,7 @@ const run = async () => {
                     ElNotification({
                         type: 'success',
                         message: '计算成功',
-                        offset: 130,
+                        offset: 140,
                         position: 'top-left',
                     })
                     break
@@ -647,7 +647,7 @@ const run = async () => {
                 //     ElMessage({
                 //         message: '运行失败 ' + err.data,
                 //         type: 'error',
-                //         offset: 130,
+                //         offset: 140,
                 //     })
                 //     break
                 case 'ERROR':
@@ -661,7 +661,7 @@ const run = async () => {
                     ElMessage({
                         message: '运行失败 ' + err.data['error-log'],
                         type: 'error',
-                        offset: 130,
+                        offset: 140,
                     })
                     break
                 default:
@@ -672,6 +672,36 @@ const run = async () => {
 
     rrr()
 }
+const modelParamsCheck = () => {
+    let flag = true
+    const weightandthreshold = getThresholdParams()
+    const weights = {
+        wRE: weightandthreshold['wRE'],
+        wNM: weightandthreshold['wNM'],
+        wGE: weightandthreshold['wGE'],
+        wRL: weightandthreshold['wRL'],
+    }
+    const weightsNameDict = {
+        "wRE": "河床演变指标",
+        "wNM": "水流动力指标",
+        "wGE": "地质工程指标",
+        "wRL": "一级指标"
+    }
+    for (let key in weights) {
+        let _3weight = weights[key]
+        if (_3weight[0] + _3weight[1] + _3weight[2] !== 1) {
+            ElMessage.error({
+                offset: 140,
+                message: `权重总和不为1，请重置${weightsNameDict[key]}权重`,
+            })
+            flag = false
+            break
+        }
+    }
+    return flag
+}
+
+
 const runModelClickHandler = async () => {
     console.log('runModelClickHandler')
     switch (modelStatus.value) {
@@ -679,27 +709,29 @@ const runModelClickHandler = async () => {
             ElMessage({
                 message: '请先完成参数配置',
                 type: 'warning',
-                offset: 130,
+                offset: 140,
             })
             break
         case 2:
             ElMessage({
                 message: '模型运行中，请勿重复操作',
                 type: 'warning',
-                offset: 130,
+                offset: 140,
             })
             break
         case 1:
         case 3:
         case 4:
-            riskModelFinalResultNumber.value = null
-            riskModelFinalResultStatus.value = null
-            drawChartBase()
-            ElMessage({
-                message: '运行模型', offset: 130,
-            })
-            modelStatus.value = 2
-            run()
+            if (modelParamsCheck()) {
+                riskModelFinalResultNumber.value = null
+                riskModelFinalResultStatus.value = null
+                drawChartBase()
+                ElMessage({
+                    message: '运行模型', offset: 140,
+                })
+                modelStatus.value = 2
+                run()
+            }
             break
         default:
             break

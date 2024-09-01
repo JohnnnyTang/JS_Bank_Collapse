@@ -66,7 +66,7 @@
         </div>
 
         <div class="resource-box-container">
-            <div class="title-container">岸段资源管理</div>
+            <div class="title-container">模型资源管理</div>
             <div class="resource-content-container">
                 <el-scrollbar height="75vh">
                     <div class="resource-box-item" v-for="(item, resourceTypeIndex) in resourceInfo"
@@ -110,24 +110,23 @@
             </div>
         </template>
         <el-form :model="dialogInfo">
-            <!-- <el-form-item label="Promotion name">
-                <el-input v-model="form.name" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Zones">
-                <el-select v-model="form.region" placeholder="Please select a zone">
-                    <el-option label="Zone No.1" value="shanghai" />
-                    <el-option label="Zone No.2" value="beijing" />
-                </el-select>
-            </el-form-item> -->
             <el-form-item v-for="(item, index) in dialogInfo" :key="index" :label="item.label">
                 <el-input v-model="item.value" autocomplete="off" />
             </el-form-item>
         </el-form>
+        <el-upload style="height: fit-content;" drag action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            :multiple="false" :show-file-list="true">
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">
+                <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+            </div>
+        </el-upload>
+
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">Cancel</el-button>
+                <el-button @click="dialogFormVisible = false">取消</el-button>
                 <el-button type="primary" @click="dialogFormVisible = false">
-                    Confirm
+                    确认
                 </el-button>
             </div>
         </template>
@@ -139,7 +138,7 @@ import { ref, onMounted, reactive, toRaw } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
-
+import { UploadFilled } from '@element-plus/icons-vue'
 
 //////////////////////////// global
 const route = useRoute();
@@ -229,12 +228,12 @@ const commitModify = () => {
 
 
 window.addEventListener('keydown', e => {
-    console.log(originalBankBasicInfo, originalBank)
+    // console.log(originalBankBasicInfo, originalBank)
 })
 
 /////////////////////////// bank resource info ///////////////////////////
 const resourceInfo = ref()
-
+const resourceManageTypeList = ['模型资源管理', '可视化资源管理', '设备资源管理']
 
 ///////////// bank resource upload
 const dialogFormVisible = ref(false)
@@ -243,7 +242,7 @@ const dialogInfo = ref([
     {
         label: '岸段',
         enName: 'segment',
-        value: bank.name
+        value: ''
     },
     {
         label: '年份',
@@ -265,11 +264,11 @@ const dialogInfo = ref([
         enName: 'description',
         value: ''
     },
-    {
-        label: '边界',
-        enName: '',
-        value: ''
-    },
+    // {
+    //     label: '边界',
+    //     enName: '',
+    //     value: ''
+    // },
     // {
     //     label: '其他',
     //     enName: 'temp',
@@ -327,7 +326,9 @@ const deleteRow = (rowIndex, resourceTypeIndex) => {
 const loading = ref(false)
 onMounted(async () => {
     const _thisBankEnName = route.params.id
-    initOneBank(_thisBankEnName)
+    await initOneBank(_thisBankEnName)
+    console.log(bank.name)
+    dialogInfo.value[0].value = bank.name
 })
 
 /////////////////// helper
