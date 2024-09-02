@@ -39,7 +39,7 @@ multiIndex:
 
 tile:
   mzsTilePath: E:/Data/bankProjectData/mzsTile/
-  worldTilePath: E:/Data/bankProjectData/baseMap
+  worldTilePath: E:\Data\bankProjectData\baseMap
   nodeServicePath: E:/Data/bankProjectData/node/index.js
   riverTilePath: E:/Data/bankProjectData/riverRasterTile/
   riverImagePath: E:/Project/bankProjectData/imageTiles/tiles/
