@@ -47,10 +47,18 @@ public class BankResourceService {
         }
     }
 
-    public DataNodeV2 getStaticDataGroupNode(String dataType, String bank) {
+    public DataNodeV2 getCalculateDataGroupNode(String dataType, String bank) {
         // 获取指定岸段的某种类型数据
         return dataNodeRepoV2.getNodeByCategoryAndBank(
                 dataType + "DataGroup",
+                bank
+        );
+    }
+
+    public DataNodeV2 getVisualDataGroupNode(String dataType, String bank) {
+        // 获取指定岸段的某种类型数据
+        return dataNodeRepoV2.getNodeByCategoryAndBank(
+                dataType + "TileDataGroup",
                 bank
         );
     }

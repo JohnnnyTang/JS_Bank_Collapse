@@ -53,12 +53,20 @@ public class BankResourceController {
         return ResponseEntity.ok(bankInfo);
     }
 
-    @GetMapping("/bank/dataType")
-    public ResponseEntity<JSONArray> getBankStaticDataNode(@RequestParam String dataType, @RequestParam String bank) {
-        DataNodeV2 dataGroupNode = bankResourceService.getStaticDataGroupNode(dataType, bank);
+    @GetMapping("/bank/calculate/dataType")
+    public ResponseEntity<JSONArray> getBankStaticCalculateDataNode(@RequestParam String dataType, @RequestParam String bank) {
+        DataNodeV2 dataGroupNode = bankResourceService.getCalculateDataGroupNode(dataType, bank);
         String path = dataGroupNode.getPath()+dataGroupNode.getName() + ",";
         List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
-        return ResponseEntity.ok(DataNodeUtil.transferToFolderList(dataList));
+        return ResponseEntity.ok(DataNodeUtil.transferToFolderList_calculateDEM(dataList));
+    }
+
+    @GetMapping("/bank/visual/dataType")
+    public ResponseEntity<JSONArray> getBankStaticDataNode(@RequestParam String dataType, @RequestParam String bank) {
+        DataNodeV2 dataGroupNode = bankResourceService.getVisualDataGroupNode(dataType, bank);
+        String path = dataGroupNode.getPath()+dataGroupNode.getName() + ",";
+        List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
+        return ResponseEntity.ok(DataNodeUtil.transferToFolderList_visualDEM(dataList));
     }
 
     // 资源获取
@@ -145,7 +153,7 @@ public class BankResourceController {
     // 资源上载
     // modelServer
     @PostMapping("/up/modelServer/resource/file")
-    public ResponseEntity<String> uploadResourceHydrodynamicData(@RequestParam("file") MultipartFile file, @RequestParam("info") String info) throws IOException, InterruptedException {
+    public ResponseEntity<String> uploadResourceCalculateData(@RequestParam("file") MultipartFile file, @RequestParam("info") String info) throws IOException, InterruptedException {
         return ResponseEntity.ok(modelServerService.uploadCalculateResourceData(file, JSONObject.parse(info)));
     }
 

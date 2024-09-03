@@ -28,6 +28,10 @@ public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
         return IBaseNodeRepo.getNodeByCategoryAndName(category, name);
     }
 
+    public DataNodeV2 getDataNodeByCategoryBankName(String category, String bank, String name) {
+        return IBaseNodeRepo.getNodeByCategoryBankAndName(category, bank, name);
+    }
+
     public void addDataGroupNode(String bank, String name, String category, String path) {
         DataNodeV2 dataNodeV2 = DataNodeV2.dataNodeBuilder()
                 .bank(bank).name(name).dataOrigin("Local")

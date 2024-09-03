@@ -42,7 +42,8 @@ tile:
   worldTilePath: E:/Data/bankProjectData/baseMap
   nodeServicePath: E:/Data/bankProjectData/node/index.js
   riverTilePath: E:/Data/bankProjectData/riverRasterTile/
-  riverImagePath: E:/Project/bankProjectData/imageTiles/tiles/
+  riverImagePath: E:/Data/bankProjectData/imageTiles/tiles/
+  tifTilePath: E:/Data/bankProjectData/tifTile
 
 flowData:
   texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/
