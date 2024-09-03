@@ -1,308 +1,12 @@
 <template>
     <div class="main">
-        <!-- <sectionDraw></sectionDraw> -->
-        <div class="form-container">
-            <el-row style="height: 15vh;">
-                <el-col :span="6" style="height: 13.8vh;">
-                    <div class="full ep-bg-purple" style="height: 100%;">水流动力指标</div>
-                </el-col>
-                <el-col :span="5">
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">抗冲流速指标</div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">造床流量当量</div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">水位变幅指标</div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-                <el-col :span="10">
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Ky'][0]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Ky'][1]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Ky'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['PQ'][0]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['PQ'][1]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['PQ'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Zd'][2]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Zd'][2]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Zd'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-                <el-col :span="3">
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wNM'][0]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wNM'][1]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wNM'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-            </el-row>
-            <el-row style="height: 15vh;">
-                <el-col :span="6" style="height: 13.8vh;">
-                    <div class="full ep-bg-purple" style="height: 100%;">河床演变指标</div>
-                </el-col>
-                <el-col :span="5">
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">岸坡坡比指标</div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">近岸冲刷指标</div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">滩槽高差指标</div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-                <el-col :span="10">
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Sa'][0]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Sa'][1]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Sa'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Ln'][0]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Ln'][0]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Ln'][0]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Zb'][0]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Zb'][1]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Zb'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-                <el-col :span="3">
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wRE'][0]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wRE'][1]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wRE'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-            </el-row>
-
-            <el-row style="height: 15vh;">
-                <el-col :span="6" style="height: 13.8vh;">
-                    <div class="full ep-bg-purple" style="height: 100%;">地质工程指标</div>
-                </el-col>
-                <el-col :span="5">
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">土体组成指标</div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">岸坡防护指标</div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full ep-bg-purple">荷载控制指标</div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-                <el-col :span="10">
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Dsed'][0]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Dsed'][1]">
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['Dsed'][2]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <div class="NA">N/A</div>
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <div class="NA">N/A</div>
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <div class="NA">N/A</div>
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="8">
-                            <div class="full">
-                                <div class="NA">N/A</div>
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <div class="NA">N/A</div>
-                            </div>
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="full">
-                                <div class="NA">N/A</div>
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-                <el-col :span="3">
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wGE'][0]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wGE'][0]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <el-row>
-                        <el-col :span="24">
-                            <div class="full">
-                                <input type="number" name="" v-model="thresholdParmas['wGE'][0]">
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-col>
-            </el-row>
-        </div>
+        <div class="map" ref="mapRef"></div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
+import mapboxgl from "mapbox-gl"
 
 const thresholdParmas = reactive({
     "Zb": [0, 0, 0],
@@ -335,9 +39,70 @@ const json = {
     "wRL": [0.32, 0.43, 0.25]
 }
 
+const mapRef = ref(null)
 
 onMounted(async () => {
 
+     const map = new mapboxgl.Map({
+        container: mapRef.value, // container ID
+        accessToken:
+            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+        style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+        center: [120.312, 31.917], // starting position [lng, lat]
+        zoom: 8,
+        maxZoom: 22,
+        projection: 'mercator',
+        antialias: true,
+        transformRequest: (url) => {
+            if (url.startsWith(import.meta.env.VITE_APP_BACK_ADDRESS)) {
+                return {
+                    url: url,
+                    headers: { token: localStorage.getItem("token") },
+                };
+            }
+        },
+
+    }).on('load', async () => {
+        map.showTileBoundaries = true;
+        console.log('PureScratchMap init!')
+
+        let tileInfo = {
+            "name": "199901",
+            "bank": "Mzs"
+        }
+        const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+
+//         map.addSource('mapRaster2020', {
+//             type: 'raster',
+//             tiles: [
+//                 tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
+//             ],
+//             // tileSize: 1024,
+//             // minzoom: 10,
+//             // maxzoom: 20,
+//             // bounds: [120.509, 32.023, 120.555, 32.0402],
+//         })
+//         map.addLayer({
+//             id: 'ras',
+//             type: 'raster',
+//             source: 'mapRaster2020',
+//         })
+         map.addSource('demTile', {
+             type: 'raster',
+             tiles: [tileServer + '/tile/raster/dem/Mzs/199901/{x}/{y}/{z}'],
+//              tileSize: 1024,
+//              minzoom: 10,
+//              maxzoom: 20,
+//              bounds: [120.509, 32.023, 120.555, 32.0402],
+         })
+         map.addLayer({
+             id: 'ras',
+             type: 'raster',
+             source: 'demTile',
+        })
+
+    })
+    
     const res = await new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve(json)
@@ -370,99 +135,9 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
 
-    .form-container {
-        position: relative;
-        width: 39vw;
-        height: 47vh;
-        padding: calc(0.5vw + 0.5vh);
-        border-radius: 10px;
-        background-color: #e5fdffff;
-        user-select: none;
-        box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-
-        .el-row {
-            margin-bottom: 5px;
-            align-items: center;
-            position: relative;
-        }
-
-        .el-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .el-col {
-            border-radius: 4px;
-            border: solid 1px #020000;
-        }
-
-        .full {
-            position: relative;
-            width: 100%;
-            height: 4vh;
-            background-color: aliceblue;
-            border-radius: 4px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            .NA {
-                position: relative;
-                height: 3.5vh;
-                width: 90%;
-
-                border: none !important;
-                border-right: 2px solid rgb(2, 143, 199) !important;
-                border-bottom: 1px solid rgb(5, 88, 121) !important;
-                border-radius: 5px;
-                text-align: center;
-                background-color: rgb(212, 213, 255);
-
-                display: grid;
-                place-items: center;
-                font-size: calc(0.5vw + 0.5vh);
-                transition: .3s ease-in-out;
-            }
-
-            input {
-                position: relative;
-                height: 3.5vh;
-                width: 90%;
-
-                border: none !important;
-                border-right: 2px solid rgb(2, 143, 199) !important;
-                border-bottom: 1px solid rgb(5, 88, 121) !important;
-                border-radius: 5px;
-                text-align: center;
-                background-color: rgb(212, 213, 255);
-
-                display: grid;
-                place-items: center;
-                font-size: calc(0.6vw + 0.5vh);
-                transition: .3s ease-in-out;
-
-                // &:hover {
-                //     background-color: rgb(44, 61, 212);
-                //     color: white;
-                //     font-weight: bold;
-                // }
-                &:focus {
-                    background-color: rgb(182, 183, 255);
-                    color: white;
-                    font-weight: bold;
-                }
-            }
-
-            input::-webkit-outer-spin-button,
-            input::-webkit-inner-spin-button {
-                -webkit-appearance: none;
-            }
-
-            input[type="number"] {
-                -moz-appearance: textfield;
-            }
-        }
-
-
+    .map {
+        width: 100%;
+        height: 100%;
     }
 
 

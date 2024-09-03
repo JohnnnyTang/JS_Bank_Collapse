@@ -49,12 +49,13 @@ public class TifUtil {
         condaEnv = condaEnvValue;
     }
 
-    public static void tif2tile(MultipartFile srcFile, JSONObject info) throws IOException, InterruptedException {
+    public static void tif2tile(MultipartFile srcFile, JSONObject info, String bank) throws IOException, InterruptedException {
 
         String originBasicName = srcFile.getOriginalFilename().substring(0, srcFile.getOriginalFilename().lastIndexOf("."));
         String tempFolderPath = tifTilePath + File.separator + "temp" + File.separator + originBasicName;
         String tempFilePath = tempFolderPath + File.separator + srcFile.getOriginalFilename();
-        String tileFolderPath = tifTilePath + File.separator + "tile" + File.separator + "DEM" + File.separator + originBasicName;
+        String tileFolderPath = tifTilePath + File.separator + "tile" + File.separator + bank + File.separator + "DEM" + File.separator + originBasicName;
+        String relativeTileFolderPath = File.separator + "tile" + File.separator + bank + File.separator + "DEM" + File.separator + originBasicName;
 
         System.out.println(tempFolderPath);
 
@@ -115,7 +116,7 @@ public class TifUtil {
         Process cmdProcess = ProcessUtil.buildTif2TileServiceProcess(taskNode, condaEnv);
         ProcessCmdOutput cmdOutput = ProcessUtil.getProcessCmdOutput(cmdProcess.getInputStream());
         if(cmdOutput.getStatusCode() == 0) {
-            System.out.println("tile service start wrong");
+            System.out.println("tif2tile service start wrong");
             //update taskNode status
             taskNodeService.updateNodeStatusById(taskNodeId, "ERROR");
         }
@@ -124,19 +125,24 @@ public class TifUtil {
         if (code == 0) {
             System.out.println("tile service end");
             JSONObject usage = new JSONObject();
-            usage.put("path", tileFolderPath);
+            usage.put("path", relativeTileFolderPath);
             DataNodeV2 dataNode = DataNodeV2.dataNodeBuilder()
                     .bank(info.getString("segment")).auth("all").name(originBasicName).category("DEMTileDataItem")
                     .usage(usage)
-                    .path(",DataNodeHead,MzsBankNode,StaticDataGroupOfMzs,VisualizationDataGroupOfMzs,DEMTileDataGroupOfMzs,")
+                    .path(",DataNodeHead,MzsBankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",DEMTileDataGroupOf"+bank+",")
                     .build();
+            DataNodeV2 dataNodeBefore = dataNodeServiceV2.getDataNodeByCategoryBankName(dataNode.getCategory(),dataNode.getBank(),dataNode.getName());
+            // 若资源重复，则删除后重新挂载资源
+            if (dataNodeBefore != null) {
+                dataNodeServiceV2.delete(dataNodeBefore.getId());
+            }
             dataNodeServiceV2.save(dataNode);
 
             //update taskNode status
             taskNodeService.updateNodeStatusById(taskNodeId, "COMPLETE");
         }
         else {
-            System.out.println("tile service end error");
+            System.out.println("tif2tile service end error");
             //update taskNode status
             taskNodeService.updateNodeStatusById(taskNodeId, "ERROR");
         }
