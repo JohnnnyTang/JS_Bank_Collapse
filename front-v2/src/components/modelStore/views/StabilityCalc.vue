@@ -693,6 +693,16 @@ const visulizationPrepare = async () => {
         }, 1000)
     }
 
+    if(clickedNode.info.data.tag==='计算中'){
+        ElNotification({
+            type: 'warning',
+            title: '工况尚未计算完毕，无可视化资源',
+            offset: 120,
+        })
+        return
+    }
+
+
     if (
         globleVariable.runningStatus === 'start' ||
         globleVariable.runningStatus === 'RUNNING'

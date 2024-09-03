@@ -447,8 +447,8 @@
                             height: 5vh;
                             font-size: medium;
                         " @click="realtimeConditionHandler">
-                            <span style="line-height: 2.5vh;">实时<br>条件</span>
-                        </el-button>
+                        <span style="line-height: 2.5vh;">实时<br>条件</span>
+                    </el-button>
                 </div>
                 <div class="flex-column">
                     <div class="flex-row" style="margin-bottom: 0.8vh; margin-top: .5vh">
@@ -499,6 +499,7 @@ import {
     onUnmounted,
     defineAsyncComponent,
     computed,
+    toRaw,
 } from 'vue'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
@@ -540,6 +541,7 @@ import { runRiskLevelForAll, riskWarnResultParse } from '../components/bankRiskW
 // import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 // import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
+import ClientStorageHelper from '../utils/ClientStorageHelper';
 
 const curActiveIndex = ref(-1)
 
@@ -707,6 +709,7 @@ const demResources = ref([])
 const getDemResource = async () => {
     const _bankEnName = 'Mzs'
     const _demData = (await BankResourceHelper.getBankResourceList('DEM', _bankEnName)).data
+    console.log('getDemResource', _demData)
     return BankResourceHelper.DEMResourcetoList(_demData)
     // return [{ name: '1' }, { name: '2' }]
 }
@@ -728,7 +731,7 @@ const conditionConfigureData = reactive({
     refDEM: null,
     benchDEM: null,
 })
-const realtimeConditionHandler = ()=>{
+const realtimeConditionHandler = () => {
     conditionConfigureData.flow = 63000
     conditionConfigureData.tideDif = 2.4
 }
@@ -738,6 +741,32 @@ let bankWarnLayer = null
 const isRunningMan = ref(false)
 const RunningManSays = ref('')
 const conditionConfigureDataResetHandler = async () => {
+    console.log(window.location.pathname)
+    //// debug ////
+
+    // 模型参数
+    // const kkey = ClientStorageHelper.generateKey(window.location.pathname)
+    // const paramsValue = toRaw(conditionConfigureData)
+    // ClientStorageHelper.save(kkey, paramsValue)
+
+    // // 模型结果
+    // const key = ClientStorageHelper.generateKey(paramsValue)
+
+    // if (ClientStorageHelper.get(key)) {
+    //     let result = ClientStorageHelper.get(key)
+    //     console.log('get result from client storage and show', result)
+    //     return
+    // }
+    // else {
+    //     console.log('run model and show result')
+    //     const result = 'result'
+    //     ClientStorageHelper.save(key, result)
+    //     return
+    // }
+
+
+    // return
+
 
     ///////////////////////  check  /////////////////////// 
 

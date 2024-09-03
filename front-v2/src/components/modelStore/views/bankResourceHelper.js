@@ -58,7 +58,8 @@ export default class BankResourceHelper {
             dataType: dataType,
             bank: bankEnName
         }
-        return axiosIns.get(`/bank/dataType`, { params: params })
+        //  todo 区分不同类别
+        return axiosIns.get(`/bank/calculate/dataType`, { params: params })
     }
     /**
      * 
