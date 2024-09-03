@@ -164,6 +164,16 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         return IBaseNodeRepo.save(taskNode).getId();
     }
 
+    public String deletePreparing() throws SchedulerException {
+        modelServerSerialization();
+        quartzSchedulerManager.startModelCaseDeletePreparingJob();
+        if (!quartzSchedulerManager.isJobExist("modelCaseDeletePreparingJob", "modelDeleteGroup")) {
+            return "LOCKED";
+        } else {
+            return "UNLOCKED";
+        }
+    }
+
     public String deleteById(String id) {
         TaskNode taskNode = IBaseNodeRepo.findById(id).orElse(null);
         if (taskNode == null) return "TaskNode不存在！";
@@ -179,11 +189,16 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         return "TaskNode删除成功！";
     }
 
-    public void deleteAll() throws SchedulerException {
-        modelServerSerialization();
-        List<TaskNode> taskNodeList = IBaseNodeRepo.findAll();
-        for (TaskNode taskNode : taskNodeList) {
-            deleteById(taskNode.getId());
+    public String deleteAll() throws SchedulerException {
+        String deletePreparingStatus = deletePreparing();
+        if (deletePreparingStatus.equals("LOCKED")) {
+            return deletePreparingStatus;
+        } else {
+            List<TaskNode> taskNodeList = IBaseNodeRepo.findAll();
+            for (TaskNode taskNode : taskNodeList) {
+                deleteById(taskNode.getId());
+            }
+            return  "DELETED ALL";
         }
     }
 
@@ -242,7 +257,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     // 资源树与模型计算容器对齐工作(HandShake2)
     public void modelServerSerialization() throws SchedulerException {
         List<String> caseIds = ProcessUtilV2.getModelServerCases(MODEL_SERVER_URL);
-        if (caseIds.isEmpty()) return;
+        if (caseIds == null) return;
         Optional<ModelNode> serializationModelNode = modelNodeRepo.findById("66ab45e5d481ef22a5545c3b"); // 获取对齐所用modelNode
         assert serializationModelNode.orElse(null) != null;
         for (String caseId : caseIds) {

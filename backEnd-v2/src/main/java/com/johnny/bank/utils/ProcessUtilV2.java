@@ -89,11 +89,17 @@ public class ProcessUtilV2 {
     }
 
     // 删除模型计算容器的case
-    public static void deleteModelCaseById(String modelServerUrl, String caseId) {
+    public static String deleteModelCaseById(String modelServerUrl, String caseId) {
         JSONObject deleteBody = new JSONObject();
         deleteBody.put("id",caseId);
-        InternetUtil.doDelete(modelServerUrl + "/v0/mc", deleteBody);
-        log.info("case " + caseId + " has been deleted!");
+        String deleteRes = InternetUtil.doDelete(modelServerUrl + "/v0/mc", deleteBody);
+        if (deleteRes.equals("DELETED")) {
+            log.info("case " + caseId + " has been deleted!");
+            return "DELETED";
+        } else {
+            log.info("case " + caseId + " does not exist!");
+            return "NOT DELETED";
+        }
     }
 
     // 批量删除模型计算容器的case

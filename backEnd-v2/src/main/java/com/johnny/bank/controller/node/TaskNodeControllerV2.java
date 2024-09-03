@@ -2,9 +2,11 @@ package com.johnny.bank.controller.node;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.controller.node.base.BaseNodeController;
+import com.johnny.bank.jobs.QuartzSchedulerManager;
 import com.johnny.bank.model.node.TaskNode;
 import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import org.quartz.SchedulerException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +31,9 @@ public class TaskNodeControllerV2 extends BaseNodeController<TaskNode> {
     }
 
     @DeleteMapping("delete/all")
-    public ResponseEntity<String> deleteTaskNodeById() throws SchedulerException {
-        ((TaskNodeServiceV2) nodeServiceImpl).deleteAll();
-        return ResponseEntity.ok("all");
+    public ResponseEntity<String> deleteAllTaskNode() throws SchedulerException {
+        String deleteAllStatus = ((TaskNodeServiceV2) nodeServiceImpl).deleteAll();
+        return ResponseEntity.ok(deleteAllStatus);
     }
 
     @PostMapping("start/numeric/hydrodynamic/real")
