@@ -728,8 +728,22 @@ const totalResult = reactive({
 const conditionConfigureData = reactive({
     flow: 57500,
     tideDif: 3.1,
-    refDEM: null,
-    benchDEM: null,
+    refDEM: {
+        "sets": "standard",
+        "year": "2012",
+        "name": "201210",
+        "fileType": "tiff",
+        "path": "tiff/Mzs/2012/standard/201210/201210.tif",
+        "month": "10"
+    },
+    benchDEM: {
+        "sets": "standard",
+        "year": "2023",
+        "name": "202304",
+        "fileType": "tiff",
+        "path": "tiff/Mzs/2023/standard/202304/202304.tif",
+        "month": "04"
+    },
 })
 const realtimeConditionHandler = () => {
     conditionConfigureData.flow = 63000
@@ -746,6 +760,10 @@ const conditionConfigureDataResetHandler = async () => {
 
     // 模型参数
     // const kkey = ClientStorageHelper.generateKey(window.location.pathname)
+    // if(ClientStorageHelper.get(kkey)){
+    //     let paramsValue = ClientStorageHelper.get(kkey)
+    // }
+
     // const paramsValue = toRaw(conditionConfigureData)
     // ClientStorageHelper.save(kkey, paramsValue)
 
@@ -800,7 +818,7 @@ const conditionConfigureDataResetHandler = async () => {
 
 
     ///////////////////////  Run  /////////////////////// 
-    const result = await runRiskLevelForAll({
+    runRiskLevelForAll({
         waterQS: conditionConfigureData.flow,
         tidalLevel: conditionConfigureData.tideDif,
         refDEM: conditionConfigureData.refDEM,
@@ -808,38 +826,29 @@ const conditionConfigureDataResetHandler = async () => {
     }, {}, {
         bankEnName: 'Mzs',
         setName: 'standard'
+    }).then((result) => {
+        console.log('runRiskLevelForAll result:', result)
+
+        isRunningMan.value = false
+        RunningManSays.value = ''
+        ///////////////////// result ////////////////////////
+
+        const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result)
+        console.log('riskAreassss:', riskAreassss)
+
+        totalResult.desc = finalResult
+        riskAreas.value = riskAreassss.join('; ')
+        let map = useMapStore().getMap()
+        if (bankWarnLayer && map) {
+            bankWarnLayer.update(warnLayerData)
+            map.triggerRepaint()
+        }
+
+    }).catch((error) => {
+        isRunningMan.value = false
+        return
     })
 
-    console.log('runRiskLevelForAll result:', result)
-
-
-    isRunningMan.value = false
-    RunningManSays.value = ''
-    ///////////////////// result ////////////////////////
-
-    const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result)
-    console.log('riskAreassss:', riskAreassss)
-
-    totalResult.desc = finalResult
-    riskAreas.value = riskAreassss.join('; ')
-    let map = useMapStore().getMap()
-    if (bankWarnLayer && map) {
-        bankWarnLayer.update(warnLayerData)
-        map.triggerRepaint()
-    }
-
-
-    ///////////////////// test ////////////////////////
-    ///////////// 评估结果 and 高风险区域
-    // totalResult.desc = '低风险'
-    // riskAreas.value = 'risk areas1 ; risk areas2 ; risk areas3'
-
-    // ///////////// warn layer 操作
-    // let map = useMapStore().getMap()
-    // if (bankWarnLayer && map) {
-    //     bankWarnLayer.update(defaultWarnLayerDataInput2)
-    //     map.triggerRepaint()
-    // }
 
 }
 
@@ -1746,35 +1755,36 @@ const addBankLineRiskLayer = (map, profileList) => {
             },
             paint: {
                 'line-opacity': 1,
-                'line-color': [
-                    'match',
-                    ['get', 'name'],
-                    'JC01',
-                    `${profileList.value[0].color}`,
-                    'JC02',
-                    `${profileList.value[1].color}`,
-                    'JC03',
-                    `${profileList.value[2].color}`,
-                    'JC04',
-                    `${profileList.value[3].color}`,
-                    'JC05',
-                    `${profileList.value[4].color}`,
-                    'JC06',
-                    `${profileList.value[5].color}`,
-                    'JC07',
-                    `${profileList.value[6].color}`,
-                    'JC08',
-                    `${profileList.value[7].color}`,
-                    'JC09',
-                    `${profileList.value[8].color}`,
-                    'JC10',
-                    `${profileList.value[9].color}`,
-                    'JC11',
-                    `${profileList.value[10].color}`,
-                    'JC12',
-                    `${profileList.value[11].color}`,
-                    'rgb(255, 255, 255)',
-                ],
+                // 'line-color': [
+                //     'match',
+                //     ['get', 'name'],
+                //     'JC01',
+                //     `${profileList.value[0].color}`,
+                //     'JC02',
+                //     `${profileList.value[1].color}`,
+                //     'JC03',
+                //     `${profileList.value[2].color}`,
+                //     'JC04',
+                //     `${profileList.value[3].color}`,
+                //     'JC05',
+                //     `${profileList.value[4].color}`,
+                //     'JC06',
+                //     `${profileList.value[5].color}`,
+                //     'JC07',
+                //     `${profileList.value[6].color}`,
+                //     'JC08',
+                //     `${profileList.value[7].color}`,
+                //     'JC09',
+                //     `${profileList.value[8].color}`,
+                //     'JC10',
+                //     `${profileList.value[9].color}`,
+                //     'JC11',
+                //     `${profileList.value[10].color}`,
+                //     'JC12',
+                //     `${profileList.value[11].color}`,
+                //     'rgb(255, 255, 255)',
+                // ],
+                'line-color': 'rgba(255, 0, 0, 1)',
                 'line-width': 3,
             },
         },

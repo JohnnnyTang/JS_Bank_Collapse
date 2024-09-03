@@ -465,7 +465,7 @@ const confirmBankHandler = async (bank) => {
         title: '选择岸段',
         message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
         position: 'top-right',
-        offset: 180,
+        offset: 250,
     })
 }
 
@@ -519,14 +519,6 @@ const fileUpload = (type) => {
     //     title: '模块正在开发中....',
     // })
 }
-
-window.addEventListener('keydown', e => {
-    if (e.key === 't') {
-        console.log(treeRef.value.data)
-        // debugger;
-        console.log(findByLable(treeRef.value.data[0], '10000dc'))
-    }
-})
 const runMathModel = async () => {
     console.log(mathModelParams)
 
@@ -543,7 +535,7 @@ const runMathModel = async () => {
             type: 'warning',
             title: '警告',
             message: `工况【${newChild.lable}】已存在，请勿重复计算`,
-            offset: 120,
+            offset: 250,
         })
         return
     }
@@ -558,7 +550,7 @@ const runMathModel = async () => {
         type: 'success',
         title: '开始运行',
         message: `计算数学模型 ${newChild.lable}`,
-        offset: 120,
+        offset: 250,
     })
 }
 
@@ -599,7 +591,7 @@ const visulizationPrepare = async () => {
             ElNotification({
                 type: 'info',
                 title: '请选择工况',
-                offset: 120,
+                offset: 250,
             })
             return
         }
@@ -608,7 +600,7 @@ const visulizationPrepare = async () => {
             type: 'info',
             title: '加载可视化资源',
             message: `流量${params.flow}，潮型${params.tideType}`,
-            offset: 120,
+            offset: 250,
         })
 
         let modelPostUrl = ''
@@ -651,7 +643,7 @@ const visulizationPrepare = async () => {
                 ElNotification({
                     title: '模型运行失败',
                     message: `错误原因:\n` + errorLog,
-                    offset: 120,
+                    offset: 250,
                     type: 'error',
                 })
                 ModelRunningShow.value = false
@@ -686,18 +678,27 @@ const visulizationPrepare = async () => {
 
                 ElNotification({
                     title: '可视化资源加载完毕',
-                    offset: 120,
+                    offset: 250,
                     type: 'success',
                 })
             }
         }, 1000)
     }
 
-    if(clickedNode.info.data.tag==='计算中'){
+    try {
+        if (clickedNode.info.data.tag === '计算中') {
+            ElNotification({
+                type: 'warning',
+                title: '工况尚未计算完毕，无可视化资源',
+                offset: 250,
+            })
+            return
+        }
+    } catch (error) {
         ElNotification({
             type: 'warning',
-            title: '工况尚未计算完毕，无可视化资源',
-            offset: 120,
+            title: '尚未选择工况节点，无可视化资源',
+            offset: 250,
         })
         return
     }
@@ -710,7 +711,7 @@ const visulizationPrepare = async () => {
         ElNotification({
             type: 'warning',
             title: '请等待资源加载...',
-            offset: 120,
+            offset: 250,
         })
         return
     } else {
@@ -767,7 +768,7 @@ const showFlowClickHandler = async (id) => {
         ElNotification({
             type: 'warning',
             title: '请先加载可视化资源',
-            offset: 120,
+            offset: 250,
         })
         return
     } else {
