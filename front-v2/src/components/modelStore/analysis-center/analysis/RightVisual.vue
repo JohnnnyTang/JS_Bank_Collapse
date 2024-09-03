@@ -304,7 +304,9 @@ export default defineComponent({
             type: "image",
             url: `${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }data/modelServer/down/result/file/image?caseId=${param.id}&name=${param.name}`,
+            }data/bankResource/down/modelServer/result/file/image?caseId=${
+              param.id
+            }&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
@@ -317,7 +319,9 @@ export default defineComponent({
             type: "image",
             url: `${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }/data/modelServer/down/result/file/image?caseId=${param.id}&name=${param.name}`,
+            }/data/bankResource/down/modelServer/result/file/image?caseId=${
+              param.id
+            }&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
@@ -454,7 +458,7 @@ export default defineComponent({
       inputValue,
       visualType,
       clickHandle,
-      mapFlyToRiver
+      mapFlyToRiver,
     };
   },
 });

@@ -329,6 +329,7 @@ const updateCurrentModel = (name, status) => {
     }, 1000);
   } else if (status == -1) {
     delete modelProgressList.value[name];
+    if (currentIndex.value > 0) currentIndex.value--;
   } else if (status == 1) {
     if (modelProgressList.value[name] < 90) {
       modelProgressList.value[name] += Math.floor(Math.random() * (10 - 5 + 1)) + 5;
