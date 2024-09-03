@@ -642,7 +642,6 @@ onMounted(async () => {
     //     ],
     // })
     //////////return loaded Map
-    // await axios.get('/api/data/monitorInfo')
     map = await initPureScratchMap(mapDom.value)
     // map = await initBaseMap(mapDom.value)
     map.on('render', () => {

@@ -24,37 +24,58 @@ export const defaultBankBasicInfo = [
     },
 ]
 
-export const mzsBankBasicInfo = [
-    { key: '预警级别', val: 'Ⅰ级', type: ['half', 'left'] },
-    {
-        key: '中心坐标',
-        val: '120.54064,32.04179',
-        type: ['half', 'two-row', 'right'],
-        splitter: ' ',
-    },
-    {
-        key: '情况介绍',
-        val: '民主沙右缘位于长江澄通河段，分属泰州市的靖江市和南通市的如皋市，是水利部长江委、省市县的Ⅰ级预警岸段。近年民主沙南侧的浏海沙水道深槽坐弯、深泓左偏，致来民主沙右缘持续冲退，影响局部河势稳定。同时民主沙为张皋过江通道拟建桥址所在地。',
-        type: ['single', 'long-text'],
-    },
-    {
-        key: '管理单位',
-        val: '靖江市水利局/如皋市水利局',
-        type: ['half', 'left'],
-    },
-    {
-        key: '管理单位联系方式',
-        val: 'xxxxxxxxxxx',
-        type: ['half', 'right'],
-    },
-]
-
-
-
-
-
-
-
+export const defaultBankResource = {
+    '模型资源管理': [
+        {
+            key: '岸段地形资源',
+            resourceList: []
+        },
+        {
+            key: '水动力模型资源',
+            resourceList: []
+        },
+        {
+            key: '岸段边界资源',
+            resourceList: []
+        },
+        {
+            key: '岸段配置资源',
+            resourceList: []
+        },
+    ],
+    '可视化资源管理': [
+        {
+            key: '栅格可视化资源',
+            resourceList: []
+        },
+        {
+            key: '矢量可视化资源',
+            resourceList: []
+        },
+        {
+            key: '其他',
+            resourceList: []
+        },
+    ],
+    '设备资源管理': [
+        {
+            key: 'GNSS设备',
+            resourceList: []
+        },
+        {
+            key: '孔隙水压力计设备',
+            resourceList: []
+        },
+        {
+            key: '应力桩设备',
+            resourceList: []
+        },
+        {
+            key: '测斜仪设备',
+            resourceList: []
+        },
+    ]
+}
 
 export const defaultBankResouceList = [
     {
@@ -74,3 +95,72 @@ export const defaultBankResouceList = [
         resourceList: []
     },
 ]
+
+export const defaultTableColumns = {
+    '模型资源管理': [
+        {
+            prop: "name",
+            label: "名称",
+            "min-width": "20%",
+            asTag: false
+        },
+        {
+            prop: "sets",
+            label: "工况集",
+            "min-width": "20%",
+            asTag: false
+        },
+        {
+            prop: "year",
+            label: "年份",
+            "min-width": "20%",
+            asTag: false
+        },
+        {
+            prop: "fileType",
+            label: "文件类型",
+            "min-width": "20%",
+            asTag: true
+        },
+    ],
+    '可视化资源管理': [
+        {
+            prop: "name",
+            label: "名称",
+            "min-width": "24%",
+            asTag: false
+        },
+        {
+            prop: "type",
+            label: "类型",
+            "min-width": "23%",
+            asTag: true
+        },
+        {
+            prop: "uploadTime",
+            label: "上传时间",
+            "min-width": "23%",
+            asTag: false
+        },
+    ],
+    '设备资源管理': [
+        {
+            prop: "name",
+            label: "设备名",
+            "min-width": "24%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "经度",
+            "min-width": "23%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "纬度",
+            "min-width": "23%",
+            asTag: false
+        },
+    ]
+}

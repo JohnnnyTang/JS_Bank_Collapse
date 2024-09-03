@@ -368,6 +368,8 @@ const sectionViewModelRun = async (param) => {
         console.log('status', status)
         switch (status) {
             case 'RUNNING':
+            case 'LOCK':
+            case 'UNLOCK':
                 break
             case 'COMPLETE':
                 clearInterval(statusInterval)
@@ -436,6 +438,7 @@ const calSectionViewClickHandler = () => {
     let sectionViewParams = {
         'dem-id': selectedDem.value,
         'section-geometry': sectionGeojson.value,
+        // 'section-geometry':{ "type": "Feature", "properties": { "id": 7, "label": "MZ08海事码头" }, "geometry": { "type": "LineString", "coordinates": [ [ 120.541607142803116, 32.03073986301149 ], [ 120.529324527677801, 31.999868738955477 ] ] } }
     }
     const paramsCheck = () => {
         if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
