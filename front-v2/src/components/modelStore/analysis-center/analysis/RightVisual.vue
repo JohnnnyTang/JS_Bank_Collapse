@@ -74,9 +74,11 @@ export default defineComponent({
         ],
       };
 
-      map.fitBounds(boundsMap[bankName], {
-        duration: 1500,
-      });
+      if (boundsMap[bankName]) {
+        map.fitBounds(boundsMap[bankName], {
+          duration: 1500,
+        });
+      }
     };
 
     const lineDraw = new MapboxDraw({

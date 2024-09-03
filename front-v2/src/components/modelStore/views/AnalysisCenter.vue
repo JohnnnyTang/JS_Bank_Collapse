@@ -116,6 +116,7 @@ import LayerManage from "../analysis-center/analysis/LayerManage.vue";
 import RightVisual from "../analysis-center/analysis/RightVisual.vue";
 import { useRouter } from "vue-router";
 import utils from "@/utils/CommonUtils";
+import BankResourceHelper from "./bankResourceHelper";
 
 export default defineComponent({
   components: { ModelTitleVue, TopTool, RightVisual, DataManage, LayerManage },
@@ -157,12 +158,15 @@ const confirmBankHandler = async (bank) => {
     民主沙: "Mzs",
     民主沙右缘: "Mzs",
   };
-  console.log(bank)
-  // rightMap.value.mapFlyToRiver(bank.name);
-  const result = await getDataList("DEM", bank.bankEnName);
-  consol.log(result);
-  const baseData = result.data;
-  const formedData = baseData.map((yearData) => {
+  console.log(bank);
+  rightMap.value.mapFlyToRiver(bank.name);
+
+  const demData = (await BankResourceHelper.getBankResourceList("DEM", bank.bankEnName))
+    .data;
+
+  //const result = await getDataList("DEM", bank.bankEnName);
+  console.log(demData);
+  const formedData = demData.map((yearData) => {
     // TODO: 优化数据组织
     return {
       id: yearData.year,
@@ -181,50 +185,6 @@ const confirmBankHandler = async (bank) => {
       }),
     };
   });
-  // dataList.value = [
-  //   {
-  //     id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
-  //     label: "2006年长江南京以下DEM",
-  //     flag: true,
-  //     children: [
-  //       {
-  //         id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
-  //         label: "w001001.adf",
-  //         flag: false,
-  //         children: [],
-  //         visualType: "rasterTile",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "30c14195-bfe7-47e4-ac06-70991392409c",
-  //     label: "2004年长江南京以下DEM",
-  //     flag: true,
-  //     children: [
-  //       {
-  //         id: "200408_dem/w001001.adf",
-  //         label: "w001001.adf",
-  //         flag: false,
-  //         children: [],
-  //         visualType: "rasterTile",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
-  //     label: "1998年长江南京以下DEM",
-  //     flag: true,
-  //     children: [
-  //       {
-  //         id: "199801_dem/w001001.adf",
-  //         label: "w001001.adf",
-  //         flag: false,
-  //         children: [],
-  //         visualType: "rasterTile",
-  //       },
-  //     ],
-  //   },
-  // ];
 
   //TODO: 获取数据放在datamanage?
   // 添加已有的分析结果集
@@ -233,12 +193,12 @@ const confirmBankHandler = async (bank) => {
     formedData.push(allData[allData.length - 1]);
   }
   dataList.value = formedData;
-  selectedBank.value = bankName;
+  selectedBank.value = bank.name;
 
   notice(
     "success",
     "选择岸段",
-    `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
+    `已选择岸段——${bank.name},模型计算将默认采用${bank.name}相关资源`,
     180
   );
 };
@@ -411,7 +371,7 @@ div.model-content-container {
     height: 87.4vh;
     position: relative;
     display: flex;
-    flex-direction: column;;
+    flex-direction: column;
 
     div.model-choice {
       position: relative;
@@ -477,9 +437,7 @@ div.model-content-container {
         display: flex;
         flex-flow: row nowrap;
         background-color: #fff;
-        box-shadow:
-          0 0 4px 1px rgba(#0642b1, 0.55),
-          0 6px 12px 0 rgba(#0642b1, 0.55);
+        box-shadow: 0 0 4px 1px rgba(#0642b1, 0.55), 0 6px 12px 0 rgba(#0642b1, 0.55);
         padding: 0.6vh;
         border-radius: 0.6vw; // just a high number to create pill effect
         // margin-right: auto;
@@ -505,7 +463,6 @@ div.model-content-container {
         }
       }
     }
-
 
     div.main-page {
       width: 20vw;
