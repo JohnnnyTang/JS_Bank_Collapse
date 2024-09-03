@@ -362,7 +362,7 @@ const confirmBankHandler = async (bank) => {
     title: '选择岸段',
     message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
     position: 'top-right',
-    offset: 180,
+    offset: 250,
   })
 }
 
@@ -405,14 +405,14 @@ const conditionClickHandler = (type) => {
       title: '水文条件配置成功',
       // message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
       // message: `流量：${params.value.flow}，潮型：${params.value.tideType}`,
-      offset: 180,
+      offset: 250,
       type: 'success',
     })
   else
     ElNotification({
       title: '水文条件配置失败',
       message: `请检查输入是否合法`,
-      offset: 180,
+      offset: 250,
       type: 'error',
     })
   modelRunnningProgress.value = 0
@@ -425,7 +425,7 @@ const runModelClickHandler = async () => {
     ElNotification({
       title: '提示',
       message: `请先选择岸段，获取岸段绑定的相关资源`,
-      offset: 180,
+      offset: 250,
       type: 'info',
     })
     return;
@@ -435,7 +435,7 @@ const runModelClickHandler = async () => {
     ElNotification({
       title: '运行失败',
       message: `请检查输入是否合法`,
-      offset: 180,
+      offset: 250,
       type: 'error',
     })
     return
@@ -446,7 +446,7 @@ const runModelClickHandler = async () => {
       type: 'info',
       title: '模型正在运行',
       message: '请勿重复提交',
-      offset: 180,
+      offset: 250,
     })
     return
   }
@@ -500,7 +500,7 @@ const runModelClickHandler = async () => {
         })
     },
     'ERROR': () => {
-
+      // showRunning.value = false
     }
   }
   Confirm[globleVariable.runningStatus]()
@@ -541,18 +541,14 @@ const modelRunnning = async (type) => {
     const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
     // ElNotification({
     //   title: '开始运行水动力模型',
-    //   offset: 180,
+    //   offset: 250,
     //   type: 'info',
     // })
     // const TASK_ID = '1'
     console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
 
     if (TASK_ID === 'WRONG') {
-      ElNotification({
-        title: '模型运行失败',
-        offset: 180,
-        type: 'error',
-      })
+      throw new Error('缺乏相关资源文件')
     }
 
     modelRunnningStatusDesc.value = '运行中'
@@ -591,7 +587,7 @@ const modelRunnning = async (type) => {
         ElNotification({
           title: '模型运行失败',
           message: `错误原因:\n` + errorLog,
-          offset: 180,
+          offset: 250,
           type: 'error',
         })
         modelRunnningStatusDesc.value = '运行失败'
@@ -633,9 +629,13 @@ const modelRunnning = async (type) => {
     ElNotification({
       title: '模型运行失败',
       message: `错误原因:\n` + error.message,
-      offset: 180,
+      offset: 250,
       type: 'error',
     })
+    modelRunnningStatusDesc.value = '运行失败'
+    globleVariable.runningStatus = 'NONE'
+    showRunning.value = false
+    console.log(modelRunnningStatusDesc)
   }
 }
 
@@ -701,7 +701,7 @@ const showFlowClickHandler = (id) => {
     ElNotification({
       title: '错误',
       message: '模型尚未运行或运行未结束，缺乏可视化依赖数据',
-      offset: 180,
+      offset: 250,
       type: 'error',
     })
     showFlow.value = 0
@@ -754,7 +754,7 @@ const drawButtonClickHandler = () => {
       title: '警告',
       message: '水动力模型计算完成后方可提取潮位过程线',
       type: 'warning',
-      offset: 180,
+      offset: 250,
     })
     return
   }
@@ -763,7 +763,7 @@ const drawButtonClickHandler = () => {
       title: '警告',
       message: '请等待当前任务完成，请稍后...',
       type: 'warning',
-      offset: 180,
+      offset: 250,
     })
     return
   }
@@ -772,7 +772,7 @@ const drawButtonClickHandler = () => {
     title: '提示',
     message: '进入绘制状态，点击地图以添加潮位点',
     type: 'info',
-    offset: 180,
+    offset: 250,
   })
   let map = mapStore.getMap()
   let dom = map.getCanvasContainer()
@@ -806,7 +806,7 @@ const drawButtonClickHandler = () => {
         type: 'info',
         title: '新添潮位点',
         message: `经度：${e.lngLat.lng.toFixed(4)}，纬度：${e.lngLat.lat.toFixed(4)}`,
-        offset: 180,
+        offset: 250,
       })
 
       // run model
@@ -860,7 +860,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
         ElNotification({
           title: '计算失败',
           message: `错误原因:\n` + errorLog,
-          offset: 180,
+          offset: 250,
           type: 'error',
         })
         showRunning.value = false
@@ -872,7 +872,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
         clearInterval(runningInterval)
         ElNotification({
           title: '计算成功',
-          offset: 180,
+          offset: 250,
           type: 'success',
         })
         let runningResult = await pointVelocityMR.getModelResult()
@@ -997,7 +997,7 @@ const updateRealtimeWaterCondition = async () => {
   ElNotification({
     title: '已更新实时水文条件',
     message: `更新时间：${updateTime.value}`,
-    offset: 180,
+    offset: 250,
     type: 'success',
   })
 }

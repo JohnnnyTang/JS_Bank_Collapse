@@ -29,7 +29,7 @@ function notice(message, type) {
     ElMessage({
         type: type,
         message: message,
-        offset: 120
+        offset: 260
     })
 }
 
@@ -118,9 +118,6 @@ const runRiskLevelForAll = (data, refs, info) => {
         Promise.all(startModelPromises).then(async (res) => {
 
             if (res.some(item => item.data === 'WRONG')) {
-                // reject('获取模型状态失败')
-                // notice('模型运行失败', 'error')
-                // console.warn('taskId获取失败::', err)
                 throw new Error('TaskID is WRONG')
             }
 
@@ -171,39 +168,32 @@ const runRiskLevelForAll = (data, refs, info) => {
                             console.log(result)
 
                             // TODO: write into local storage
-                            
+
 
                             resolve(result)
                         }).catch(_ => {
                             throw new Error('获取模型结果失败')
                         })
-                    } else if (statusList.some(item => item === 'NOT FOUND' || item === 'ERROR')) {
+                    }
+                    else if (statusList.every(item => item === 'ERROR' || item === 'NOT FOUND' || item === 'NONE' || item === 'COMPLETE')) {
                         clearInterval(statusInterval)
-
-                        const resultPromises = []
+                        const deletePromises = []
                         statusList.forEach((item, index) => {
-                            if (item === 'ERROR') {
+                            if (item === 'ERROR' || item === 'NOT FOUND' || item === 'NONE') {
                                 let resultUrl = RiskLevelResultUrlPrefix + taskIdList[index]
-                                resultPromises.push(axios.get(resultUrl))
+                                deletePromises.push(axios.get(resultUrl))
                             }
                         })
-
-                        Promise.all(resultPromises).then(async (res) => {
-
+                        Promise.all(deletePromises).then(async (res) => {
                             console.log('/////////清除结果//////////')
-                            console.log(res)
-                            throw new Error('清除结果')
-
+                            console.log(res.data)
                         }).catch(_ => {
-
                             throw new Error('清除结果失败')
-
                         })
-                    }
 
+                    }
                 }).catch(err => {
-                    console.warn(err.message)
-                    notice('模型运行失败', 'error')
+                    throw new Error('模型运行失败')
                 })
 
             }, 3000)
@@ -211,8 +201,8 @@ const runRiskLevelForAll = (data, refs, info) => {
 
         ).catch(err => {
             console.warn(err.message)
-
-            notice('模型运行失败', err.message)
+            notice('模型运行失败', 'error')
+            reject(false)
         })
     })
 
