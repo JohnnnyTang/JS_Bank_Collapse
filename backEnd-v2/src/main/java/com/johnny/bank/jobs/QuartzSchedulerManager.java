@@ -36,6 +36,11 @@ public class QuartzSchedulerManager {
     @Lazy
     private Scheduler scheduler;
 
+    public boolean isJobExist(String name, String group) throws SchedulerException {
+        JobKey jobKey = new JobKey(name, group);
+        return scheduler.checkExists(jobKey);
+    }
+
     // 开始执行定时器
     public void startJob() throws SchedulerException {
         log.info("start job here");
@@ -49,6 +54,13 @@ public class QuartzSchedulerManager {
     public void startModelTaskStatusJob(TaskNode taskNode) throws SchedulerException {
         log.info("start Modeltaskjob "+ taskNode.getName() +" here");
         modelRunningStatusJob(scheduler,taskNode);
+        scheduler.start();
+    }
+
+    // 执行modelCase删除准备过程
+    public void startModelCaseDeletePreparingJob() throws SchedulerException {
+        log.info("start ModelCaseDeletePreparingJob here");
+        modelCaseDeletePreparingJob(scheduler);
         scheduler.start();
     }
 
@@ -180,6 +192,15 @@ public class QuartzSchedulerManager {
         int interval = Integer.parseInt(taskNode.getModelNode().getUsage().getJSONObject("api").getJSONObject("status").getString("interval"));
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity(taskNode.getId()+"_trigger","modelTaskTriggerGroup")
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(interval).repeatForever()).build();
+        scheduler.scheduleJob(jobDetail, simpleTrigger);
+    }
+
+    private void modelCaseDeletePreparingJob(Scheduler scheduler) throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(ModelCaseDeletePreparingJob.class)
+                .withIdentity("modelCaseDeletePreparingJob", "modelDeleteGroup")
+                .build();
+        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity("modelCaseDeletePreparing_trigger","modelDeleteTriggerGroup")
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).repeatForever()).build();
         scheduler.scheduleJob(jobDetail, simpleTrigger);
     }
 }

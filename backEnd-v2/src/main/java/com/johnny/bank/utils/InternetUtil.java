@@ -47,7 +47,7 @@ public class InternetUtil {
                 }
                 in.close();
             } else {
-                System.out.println(("Get request failed with response code " + responseCode));
+                log.info("Get request failed with response code " + responseCode);
             }
             connection.disconnect();
             return response.toString();
@@ -93,7 +93,7 @@ public class InternetUtil {
                 }
                 in.close();
             } else {
-                System.out.println(("Get request failed with response code " + responseCode));
+                log.info("Get request failed with response code " + responseCode);
             }
             connection.disconnect();
             return response.toString();
@@ -136,7 +136,7 @@ public class InternetUtil {
                     return inputStream.readAllBytes();
                 }
             } else {
-                System.out.println("Get request failed with response code " + responseCode);
+                log.info("Get request failed with response code " + responseCode);
                 return null;
             }
         } catch (Exception e) {
@@ -353,7 +353,7 @@ public class InternetUtil {
                     return inputStream.readAllBytes();
                 }
             } else {
-                System.out.println("Get request failed with response code " + responseCode);
+                log.info("Get request failed with response code " + responseCode);
                 return null;
             }
         } catch (Exception e) {
@@ -391,20 +391,21 @@ public class InternetUtil {
 
             int responseCode = connection.getResponseCode();
             InputStream responseStream;
-            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+            if (responseCode == HttpURLConnection.HTTP_OK ) {
                 // 成功的响应，读取响应体
-                responseStream = connection.getInputStream();
+                return "DELETED";
             } else {
                 // 错误的响应，读取错误流
-                responseStream = connection.getErrorStream();
+                return "NOT DELETED";
             }
-            return responseStream.toString();
 
         } catch (Exception e) {
             if (e instanceof java.net.SocketTimeoutException) {
-                return "Connection timed out: " + e.getMessage();
+                log.info("Connection timed out: " + e.getMessage());
+                return "NOT DELETED";
             } else {
-                return "Error during DELETE request: " + e.getMessage();
+                log.info("Error during DELETE request: " + e.getMessage());
+                return "NOT DELETED";
             }
         }
     }
