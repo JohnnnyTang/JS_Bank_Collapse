@@ -13,6 +13,7 @@ import com.johnny.bank.utils.TifUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,8 +44,8 @@ public class ModelServerService implements IModelServerService {
     @Value("${modelServer.caseLimit}")
     Integer CASE_LIMIT;
 
-    public List<DataNodeV2> getModelServerResourceNode(String category, String bank, String year, String name) {
-        return dataNodeRepoV2.getNodeByCategoryBankYearAndName(category, bank, year, name);
+    public List<DataNodeV2> getModelServerResourceNode(String category, String bank, String set, String year, String name) {
+        return dataNodeRepoV2.getNodeByCategoryBankSetYearAndName(category, bank, set, year, name);
     }
 
     @Override
@@ -154,9 +155,13 @@ public class ModelServerService implements IModelServerService {
             return "无法上传此数据类别";
         }
         String resourceName = "tiff";
+        String fileName = file.getOriginalFilename();
+        String contentType = file.getContentType();
+        byte[] fileContent = file.getBytes();
+        MultipartFile upLoadFile = new MockMultipartFile("file", fileName, contentType, fileContent);
         // TODO: 解析Tiff成为栅格瓦片
-        TifUtil.tif2tile(file, info);
-        return uploadModelServerData(file, info, categoryName, resourceName);
+        TifUtil.tif2tile(file, info, info.getString("segment"));
+        return uploadModelServerData(upLoadFile, info, categoryName, resourceName);
     }
 
     public String uploadCalculateResourceAdfData(MultipartFile file, JSONObject info) {
@@ -218,7 +223,7 @@ public class ModelServerService implements IModelServerService {
         JSONObject response = JSONObject.parseObject(InternetUtil.doPost_File(url, file, info));
         dataNodeBasicInfo.put("path",response.getString("directory"));
         dataNode.setBasicInfo(dataNodeBasicInfo);
-        List<DataNodeV2> dataNodeListBefore = getModelServerResourceNode(dataNode.getCategory(),dataNode.getBank(),dataNode.getBasicInfo().getString("year"),dataNode.getName());
+        List<DataNodeV2> dataNodeListBefore = getModelServerResourceNode(dataNode.getCategory(),dataNode.getBank(),dataNode.getBasicInfo().getString("set"),dataNode.getBasicInfo().getString("year"),dataNode.getName());
 //        List<DataNodeV2> dataNodeListBefore = dataNodeServiceV2.getModelServerResourceNode(dataNode.getCategory(),dataNode.getBank(),dataNode.getBasicInfo().getString("year"),dataNode.getName());
         // 若资源重复，则删除后重新挂载资源
         if (!dataNodeListBefore.isEmpty()) {

@@ -196,6 +196,16 @@
             <artifactId>java-jwt</artifactId>
             <version>3.18.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>6.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>6.1.1</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>

@@ -24,7 +24,18 @@ public class DataNodeUtil {
         return dataList;
     }
 
-    public static JSONArray transferToFolderList(List<DataNodeV2> dataNodeList) {
+    public static JSONArray transferToFolderList_visualDEM(List<DataNodeV2> dataNodeList) {
+        JSONArray dataList = new JSONArray();
+        for (DataNodeV2 dataNode : dataNodeList) {
+            JSONObject dataNodeObj = new JSONObject();
+            dataNodeObj.put("name",dataNode.getName());
+            dataNodeObj.put("bank",dataNode.getBank());
+            dataList.add(dataNodeObj);
+        }
+        return dataList;
+    }
+
+    public static JSONArray transferToFolderList_calculateDEM(List<DataNodeV2> dataNodeList) {
 
         Comparator<DataNodeV2> DatanodeComparator = new Comparator<DataNodeV2>() {
             @Override

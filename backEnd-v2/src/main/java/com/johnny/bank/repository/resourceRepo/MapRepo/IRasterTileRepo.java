@@ -30,7 +30,7 @@ public class IRasterTileRepo {
         if(!file.exists()) {
             fullPath = tilePathConfig.getMzsTilePath() + "blank.png";
         }
-//        System.out.println(mzsRasterPath);
+//        System.out.println(fullPath);
         try (FileInputStream in = new FileInputStream(fullPath)){
             return IOUtils.toByteArray(in);
         } catch (Exception e) {
@@ -64,6 +64,11 @@ public class IRasterTileRepo {
 
     public byte[] getMzsFloodRasterFile(String tilePath) throws Exception {
         String fullPath = tilePathConfig.getMzsTilePath() + "floodTile/" + tilePath;
+        return  getRasterDataAsByteArray(fullPath);
+    }
+
+    public byte[] getDEMRasterFile(String tilePath) throws Exception {
+        String fullPath = tilePathConfig.getTifTilePath() + tilePath;
         return  getRasterDataAsByteArray(fullPath);
     }
 

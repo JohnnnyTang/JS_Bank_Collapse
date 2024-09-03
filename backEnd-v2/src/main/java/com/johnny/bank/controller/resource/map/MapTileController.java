@@ -1,12 +1,15 @@
 package com.johnny.bank.controller.resource.map;
 
 import com.johnny.bank.model.common.SimpleBboxInfo;
+import com.johnny.bank.model.node.DataNodeV2;
+import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.service.resource.map.impl.RasterTileService;
 import com.johnny.bank.service.resource.map.impl.VectorTileService;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +27,10 @@ import java.util.Map;
 @Slf4j
 public class MapTileController {
 
+    @Autowired
+    DataNodeServiceV2 dataNodeServiceV2;
     private final VectorTileService vectorTileService;
     private final RasterTileService rasterTileService;
-
 
     @Autowired
     public MapTileController(VectorTileService vectorTileService, RasterTileService rasterTileService) {
@@ -159,6 +163,19 @@ public class MapTileController {
             @PathVariable String name, @PathVariable String x, @PathVariable String y, @PathVariable String z
     ) throws Exception {
         return rasterTileService.getMzsFloodRasterInByte(name, Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
+    }
+
+    @CrossOrigin
+    @RequestMapping(
+            value = "/raster/dem/{bank}/{name}/{x}/{y}/{z}",
+            method = RequestMethod.GET
+    )
+    public @ResponseBody byte[] getDEMRasterTiles(
+            @PathVariable String bank, @PathVariable String name, @PathVariable String x, @PathVariable String y, @PathVariable String z
+    ) throws Exception {
+        DataNodeV2 dataNodeV2 = dataNodeServiceV2.getDataNodeByCategoryBankName("DEMTileDataItem", bank, name);
+        String path = dataNodeV2.getUsage().getString("path");
+        return rasterTileService.getDEMRasterInByte(path, Integer.parseInt(z), Integer.parseInt(x), Integer.parseInt(y));
     }
 
     @CrossOrigin
