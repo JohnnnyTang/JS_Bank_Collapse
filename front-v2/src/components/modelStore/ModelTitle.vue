@@ -7,10 +7,11 @@
         </div>
         <div class="bank-select-container">
 
-            <el-select v-model="selectedBank" placeholder="选择岸段" style="width: 10vw; height: 3.5vh"
+            <el-select v-model="selectedBank" placeholder="选择岸段" style="width: 10vw; height: 3.5vh" :value-key="'name'"
                 @change="selectedBankChangeHandler">
-                <el-option v-for="(item, index ) in bankList" :key="index" :label="item" :value="item">
-                    <div style="text-align: center; width: 7vw; font-size: calc(0.6vw + 0.7vh); font-weight: bold;">{{ item
+                <el-option v-for="(item, index ) in bankList" :key="index" :label="item.name" :value="item">
+                    <div style="text-align: center; width: 7vw; font-size: calc(0.6vw + 0.7vh); font-weight: bold;">{{
+                        item.name
                     }}</div>
                 </el-option>
                 <el-option disabled :value="''">
@@ -27,7 +28,10 @@
 import { useRouter } from 'vue-router'
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
+import { useBankInfoStore } from '../../store/bankInfoStore'
+import BankResourceHelper from './views/bankResourceHelper';
 const router = useRouter()
+const bankInfoStore = useBankInfoStore()
 
 const selectedBank = ref(null)
 const bankList = ref([])
@@ -45,9 +49,28 @@ const props = defineProps({
 })
 
 const getBankList = async () => {
-    return new Promise((res, rej) => {
-        res(['民主沙'])
-    }).catch(err => console.log(err))
+    if (bankInfoStore.bankList.length > 0) {
+        return bankInfoStore.bankList
+    }
+
+    try {
+        const bankResource = (await BankResourceHelper.getBankNamesList()).data
+        let _bankList = []
+        bankResource.forEach(item => {
+            _bankList.push({
+                name: item.name,
+                bankEnName: item.bank,
+            })
+        })
+        bankInfoStore.bankList = _bankList
+        return _bankList
+
+    } catch (err) {
+        console.log(err)
+    }
+
+
+
 }
 
 onMounted(() => {
@@ -116,9 +139,9 @@ div.model-title-container {
         :deep(.el-select) {
             height: 3.5vh;
             box-shadow:
-                rgba(0, 132, 255, 0.8) 1px 1px,
-                rgba(0, 119, 255, 0.7) 2px 2px,
-                rgba(0, 119, 255, 0.6) 3px 4px;
+                rgba(173, 255, 251, 0.8) 1px 1px,
+                rgba(173, 255, 251, 0.7) 2px 2px,
+                rgba(173, 255, 251, 0.6) 3px 4px;
             border-radius: 6px;
         }
 
@@ -133,7 +156,7 @@ div.model-title-container {
         }
 
         :deep(.el-select__placeholder) {
-            color: #011741;
+            color: #0956ad;
         }
 
         :deep(.el-icon) {

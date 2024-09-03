@@ -66,7 +66,7 @@ public class ZipUtil {
                     File targetFile = new File(destDirPath + File.separator + entry.getName());
                     // 保证这个文件的父文件夹必须要存在
                     log.info(destDirPath + entry.getName());
-                    list.add(destDirPath + entry.getName());
+                    list.add(destDirPath + File.separator + entry.getName());
                     if (!targetFile.getParentFile().exists()) {
                         log.info("父文件不存在");
                     }

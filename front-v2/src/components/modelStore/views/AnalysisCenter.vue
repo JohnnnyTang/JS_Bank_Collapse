@@ -152,12 +152,15 @@ const jump2Model = (value) => {
   routeMap[value] && router.push(routeMap[value]);
 };
 
-const confirmBankHandler = async (bankName) => {
+const confirmBankHandler = async (bank) => {
   const bankNameMap = {
     民主沙: "Mzs",
+    民主沙右缘: "Mzs",
   };
-  rightMap.value.mapFlyToRiver(bankName);
-  const result = await getDataList("DEM", bankNameMap[bankName]);
+  console.log(bank)
+  // rightMap.value.mapFlyToRiver(bank.name);
+  const result = await getDataList("DEM", bank.bankEnName);
+  consol.log(result);
   const baseData = result.data;
   const formedData = baseData.map((yearData) => {
     // TODO: 优化数据组织
@@ -408,7 +411,7 @@ div.model-content-container {
     height: 87.4vh;
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;;
 
     div.model-choice {
       position: relative;
@@ -469,88 +472,40 @@ div.model-content-container {
 
       div.basemap-radio-container {
         z-index: 1;
-        // width: 19vw;
+        width: 18.8vw;
         height: 4vh;
         display: flex;
         flex-flow: row nowrap;
         background-color: #fff;
-        box-shadow: 0 0 4px 1px rgba(#0642b1, 0.55), 0 6px 12px 0 rgba(#0642b1, 0.55);
+        box-shadow:
+          0 0 4px 1px rgba(#0642b1, 0.55),
+          0 6px 12px 0 rgba(#0642b1, 0.55);
         padding: 0.6vh;
         border-radius: 0.6vw; // just a high number to create pill effect
-        margin-right: auto;
+        // margin-right: auto;
         margin-left: 8px;
 
-        * {
-          z-index: 7;
-        }
-
-        input[type="radio"] {
-          display: none;
-        }
-
-        .tab {
+        .el-radio-group {
+          // background-color: red;
+          width: 18.8vw;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 4vh;
-          width: 7vw;
-          font-size: calc(0.8vw + 0.5vh);
-          font-weight: 600;
-          border-radius: 1.6rem; // just a high number to create pill effect
-          cursor: pointer;
-          transition: color 0.15s ease-in;
-        }
+          flex-direction: row;
+          justify-content: space-evenly;
 
-        input[type="radio"] {
-          &:checked {
-            & + label {
-              color: #185ee0;
+          .el-radio-button {
+            width: 6vw;
+
+            .el-radio-button__inner {
+              width: 6vw;
+              font-size: calc(0.6vw + 0.6vh);
+              font-weight: 800;
+              padding: 1vh 0vw;
             }
           }
         }
-
-        input[id="radio-1"] {
-          &:checked {
-            & ~ .glider {
-              transform: translateX(0);
-            }
-          }
-        }
-
-        input[id="radio-2"] {
-          &:checked {
-            & ~ .glider {
-              transform: translateX(100%);
-            }
-          }
-        }
-
-        input[id="radio-3"] {
-          &:checked {
-            & ~ .glider {
-              transform: translateX(200%);
-            }
-          }
-        }
-
-        .glider {
-          position: absolute;
-          display: flex;
-          height: 4vh;
-          width: 7vw;
-          background-color: #bcd8fc;
-          z-index: 5;
-          border-radius: 0.6vw; // just a high number to create pill effect
-          transition: 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
-        }
-
-        // @media (max-width: 700px) {
-        //     .tabs {
-        //         transform: scale(0.6);
-        //     }
-        // }
       }
     }
+
 
     div.main-page {
       width: 20vw;

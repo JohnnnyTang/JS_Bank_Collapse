@@ -2,20 +2,13 @@ package com.johnny.bank.utils;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.johnny.bank.model.ProcessCmdOutput;
 import com.johnny.bank.model.node.ModelNode;
 import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.node.TaskNode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -31,7 +24,7 @@ import java.util.*;
 public class ProcessUtilV2 {
 
     // 模型服务运行
-    public static String runModelTaskService(String modelServerUrl, TaskNode taskNode) {
+    public static String runModelTaskService(String modelServerUrl, TaskNode taskNode, Optional<List<MultipartFile>> optionalFileList) {
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
         String modelRunApi = modelServerUrl + modelUsage.getJSONObject("api").getJSONObject("run").getString("url");
@@ -39,13 +32,23 @@ public class ProcessUtilV2 {
         ParamNode paramNode = taskNode.getParamNode();
         JSONObject modelRunApiBody = paramNode.getParams();
         JSONObject response;
-        if (modelRunType.equals("post")) {
-            response = JSONObject.parseObject(InternetUtil.doPost(modelRunApi, modelRunApiBody));
-        } else {
-            response = JSONObject.parseObject(InternetUtil.doGet(modelRunApi, modelRunApiBody));
+        try {
+            if (modelRunType.equals("post")) {
+                if (optionalFileList.isPresent()) {
+                    response = JSONObject.parseObject(InternetUtil.doPost_Hydro(modelRunApi, optionalFileList, modelRunApiBody));
+                } else {
+                    response = JSONObject.parseObject(InternetUtil.doPost(modelRunApi, modelRunApiBody));
+                }
+            } else {
+                response = JSONObject.parseObject(InternetUtil.doGet(modelRunApi, modelRunApiBody));
+            }
+            // 获取返回结果编码
+            return response.getString("case-id");
         }
-        // 获取返回结果编码
-        return response.getString("case-id");
+        catch (Exception e) {
+            log.info("由于 "+e+" 原因未能实现模型运行！");
+            return "WRONG";
+        }
     }
 
     // 获取模型服务运行状态
@@ -56,9 +59,15 @@ public class ProcessUtilV2 {
         String modelStatusApi = modelServerUrl + modelUsage.getJSONObject("api").getJSONObject("status").getString("url");
         JSONObject body = new JSONObject();
         body.put("id",caseId);
-        JSONObject response = JSONObject.parseObject(InternetUtil.doGet(modelStatusApi, body));
-        // 获取返回结果编码
-        return response.getString("status");
+        try {
+            String responseStr = InternetUtil.doGet(modelStatusApi, body);
+            JSONObject response = JSONObject.parseObject(responseStr);
+            // 获取返回结果编码
+            return response.getString("status");
+        } catch (Exception e) {
+            log.info("由于 "+e+" 原因未能实现模型状态获取！");
+            return "NOT FOUND";
+        }
     }
 
     // 获取模型服务结果
@@ -69,8 +78,14 @@ public class ProcessUtilV2 {
         String modelResultApi = modelServerUrl + modelUsage.getJSONObject("api").getJSONObject("result").getString("url");
         JSONObject body = new JSONObject();
         body.put("id",caseId);
-        JSONObject response = JSONObject.parseObject(InternetUtil.doGet(modelResultApi, body));
-        return response.getJSONObject("result");
+        String modelResult = null;
+        try {
+            modelResult = InternetUtil.doGet(modelResultApi, body);
+            return JSONObject.parseObject(modelResult).getJSONObject("result");
+        } catch (Exception e) {
+            log.info("由于 "+e+" 原因未获取到模型运行结果！");
+            return new JSONObject();
+        }
     }
 
     // 删除模型计算容器的case
@@ -78,7 +93,7 @@ public class ProcessUtilV2 {
         JSONObject deleteBody = new JSONObject();
         deleteBody.put("id",caseId);
         InternetUtil.doDelete(modelServerUrl + "/v0/mc", deleteBody);
-        log.info("taskNode " + caseId + " has been deleted!");
+        log.info("case " + caseId + " has been deleted!");
     }
 
     // 批量删除模型计算容器的case
@@ -105,7 +120,11 @@ public class ProcessUtilV2 {
     // 获取当前模型计算容器中所有的caseid
     public static List<String> getModelServerCases(String modelServerUrl) {
         ArrayList<String> caseIds = new ArrayList<>();
-        JSONArray serverCases = getModelCaseCallTime(modelServerUrl).getJSONArray("timestamps");
+        JSONObject serverCasesObj = getModelCaseCallTime(modelServerUrl);
+        if (serverCasesObj == null) {
+            return null;
+        }
+        JSONArray serverCases = serverCasesObj.getJSONArray("timestamps");
         for (int i = 0; i < serverCases.size() ; i++) {
             JSONObject serverCase = (JSONObject) serverCases.get(i);
             caseIds.add(serverCase.getString("id"));
@@ -116,7 +135,11 @@ public class ProcessUtilV2 {
     // 获取在保留num个case情况下的模型计算容器中所有非常用caseid
     public static List<String> getModelServerUnusedCases(String modelServerUrl, int num) {
         ArrayList<String> desertedCaseIds = new ArrayList<>();
-        JSONArray serverCases = getModelCaseCallTime(modelServerUrl).getJSONArray("timestamps");
+        JSONObject serverCasesObj = getModelCaseCallTime(modelServerUrl);
+        if (serverCasesObj == null) {
+            return null;
+        }
+        JSONArray serverCases = serverCasesObj.getJSONArray("timestamps");
         int desertedNum = serverCases.size() - num;
         // 若不足num个，则全部删除
         if (desertedNum <= 0) {

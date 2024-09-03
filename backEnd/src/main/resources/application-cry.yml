@@ -42,3 +42,6 @@ tile:
 
 flowData:
   texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/
+
+#sms:
+#  allowSendingMessage: no

@@ -105,17 +105,17 @@ const routes = [
             },
             {
                 path: 'riskWarning',
-                // component: () => import('../components/modelStore/views/RiskWarning.vue'),
-                component: () => import('../components/modelStore/views/EmptyPage.vue'),
+                component: () => import('../components/modelStore/views/RiskWarning3.vue'),
+                // component: () => import('../components/modelStore/views/EmptyPage.vue'),
             },
-            {
-                path: 'riskWarning2',
-                component: () => import('../components/modelStore/views/RiskWarning2.vue'),
-            },
-            {
-                path: 'numericalModel',
-                component: () => import('../components/modelStore/views/NumericalModel.vue'),
-            }
+            // {
+            //     path: 'riskWarning2',
+            //     component: () => import('../components/modelStore/views/RiskWarning2.vue'),
+            // },
+            // {
+            //     path: 'numericalModel',
+            //     component: () => import('../components/modelStore/views/NumericalModel.vue'),
+            // }
 
         ]
     },
@@ -125,7 +125,7 @@ const routes = [
     },
     {
         path: '/bankManage',
-        redirect: '/bankManage/basic/mzs',
+        redirect: '/bankManage/preview/Mzs',
         component: () => import('../views/BankTwinManageView.vue'),
         children: [
             {
@@ -139,6 +139,14 @@ const routes = [
             {
                 path: 'warn/:id', // 默认子页面
                 component: () => import('../components/bankManage/BankWarnTable.vue')
+            },
+            {
+                path: '/bankManage/preview/:id',
+                component: () => import('../components/bankManage/BankResourcePreview.vue')
+            },
+            {
+                path: '/bankManage/create',
+                component: () => import('../components/bankManage/BankResourceCreate.vue')
             }
         ]
     },

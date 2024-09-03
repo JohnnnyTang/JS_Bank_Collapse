@@ -531,4 +531,14 @@ body,
     font-weight: bold;;
 }
 
+
+.el-overlay{
+    .el-drawer{
+        margin-top: 13vh;
+        background-color: rgb(244,244,244);
+        width: 18% !important;
+        height: 87vh !important;
+    }
+}
+
 </style>

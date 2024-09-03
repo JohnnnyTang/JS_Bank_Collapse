@@ -30,7 +30,7 @@ export default class ModelRunner {
 
     getRunningStatus() {
         return new Promise((resolve, reject) => {
-            const url = `/temp/taskNode/status/id?taskId=${this.taskId}`
+            const url = `/model/taskNode/status/id?taskId=${this.taskId}`
             axios.get(url).then(response => {
                 console.log('running status response! ', response)
                 this.runningStatus = response.data
@@ -44,7 +44,7 @@ export default class ModelRunner {
 
     getModelResult() {
         return new Promise((resolve, reject) => {
-            const url = `/temp/taskNode/result/id?taskId=${this.taskId}`
+            const url = `/model/taskNode/result/id?taskId=${this.taskId}`
             axios.get(url).then(response => {
                 console.log('running model result! ', response.data)
                 this.runningResult = response.data
@@ -59,7 +59,7 @@ export default class ModelRunner {
 
     getErrorLog() {
         return new Promise((resolve, reject) => {
-            const url = `/temp/taskNode/result/id?taskId=${this.taskId}`
+            const url = `/model/taskNode/result/id?taskId=${this.taskId}`
             axios.get(url).then(response => {
                 let errorLog = response.data['error-log']
                 resolve(errorLog)
@@ -73,10 +73,11 @@ export default class ModelRunner {
     async getModelResultFile(fileName, fileType = 'json') {
         return new Promise((resolve, reject) => {
             const MAP = {
-                // 'bin': `/temp/data/modelServer/down/resource/file/bin?name=&name=${fileName}`,
-                // /temp/data/modelServer/down/result/file/json?caseId=dcfa6865c911e10c44d86ef45788b5c2&name=section.json
-                'image': `/temp/data/modelServer/down/result/file/image?caseId=${this.caseId}&name=${fileName}`,
-                'json': `/temp/data/modelServer/down/result/file/json?caseId=${this.caseId}&name=${fileName}`
+                // 'bin': `/model/data/modelServer/down/resource/file/bin?name=&name=${fileName}`,
+                // /model/data/modelServer/down/result/file/json?caseId=dcfa6865c911e10c44d86ef45788b5c2&name=section.json
+                'image': `/model/data/bankResource/down/modelServer/result/file/image?caseId=${this.caseId}&name=${fileName}`,
+
+                'json': `/model/data/bankResource/down/modelServer/result/file/json?caseId=${this.caseId}&name=${fileName}`
             }
             let url = MAP[fileType]
             axios.get(url).then(response => {

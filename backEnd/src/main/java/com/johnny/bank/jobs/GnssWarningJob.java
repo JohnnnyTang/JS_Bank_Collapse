@@ -14,6 +14,7 @@ import net.jodah.expiringmap.ExpirationPolicy;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.sql.Timestamp;
