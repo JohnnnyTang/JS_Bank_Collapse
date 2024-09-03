@@ -14,7 +14,7 @@
                         <span>岸段资源管理</span>
                     </template>
                     <el-sub-menu index="4-1">
-                        <template #title>岸段资源</template>
+                        <template #title>岸段列表</template>
                         <el-menu-item v-for="bankItem in bankList" :index="'preview/' + bankItem.bank">{{ bankItem.name
                         }}</el-menu-item>
                         <!-- <el-menu-item index="preview/mzs">民主沙右缘</el-menu-item> -->

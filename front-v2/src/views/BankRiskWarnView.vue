@@ -819,8 +819,8 @@ const conditionConfigureDataResetHandler = async () => {
 
     ///////////////////////  Run  /////////////////////// 
     runRiskLevelForAll({
-        waterQS: conditionConfigureData.flow,
-        tidalLevel: conditionConfigureData.tideDif,
+        waterQS: parseFloat(conditionConfigureData.flow),
+        tidalLevel: parseFloat(conditionConfigureData.tideDif),
         refDEM: conditionConfigureData.refDEM,
         benchDEM: conditionConfigureData.benchDEM,
     }, {}, {

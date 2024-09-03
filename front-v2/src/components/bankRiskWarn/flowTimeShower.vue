@@ -23,7 +23,7 @@ const props = defineProps({
 // const percentage = 100;
 
 const percentage = computed(() => {
-    return Math.ceil((props.timeStep! / props.totalCount!) * 100);
+    return Math.ceil((props.timeStep! / props.totalCount!) * 100) > 100 ? 100 : Math.ceil((props.timeStep! / props.totalCount!) * 100);
 })
 
 const timee = computed(() => {
