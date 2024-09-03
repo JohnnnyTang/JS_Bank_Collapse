@@ -212,7 +212,7 @@
             <div class="warn-detail-profile">
                 <div class="warn-detail-text">
                     <span class="warn-detail-span"> </span>
-                    高风险区域集中在：
+                    {{ totalResult.desc }}区域 :
                     <span class="warn-detail-span">{{
                         riskAreas
                     }}</span>
@@ -420,9 +420,9 @@
             <div class="title" style="text-align: center">综合研判条件配置</div>
             <div class="card flex-column">
                 <div class="flex-row">
-                    <div class="flex-row" style="margin-right: 1vw">
+                    <div class="flex-row" style="margin-right: .5vw">
                         <span class="desc">流量：</span>
-                        <el-input v-model="conditionConfigureData.flow" style="width: 4vw; height: 3.5vh"
+                        <el-input v-model="conditionConfigureData.flow" style="width: 3.2vw; height: 3.5vh"
                             placeholder="请输入" />
                         <span style="
                                 height: 3.5vh;
@@ -432,7 +432,7 @@
                     </div>
                     <div class="flex-row">
                         <span class="desc">潮差：</span>
-                        <el-input v-model="conditionConfigureData.tideDif" style="width: 3.5vw; height: 3.5vh"
+                        <el-input v-model="conditionConfigureData.tideDif" style="width: 2.2vw; height: 3.5vh"
                             placeholder="请输入" />
                         <span style="
                                 height: 3.5vh;
@@ -440,9 +440,18 @@
                                 margin-left: 0.2vw;
                             ">m</span>
                     </div>
+                    <el-button type="primary" style="
+                            margin-left: .2vw;
+                            margin-top: -.5vh;
+                            width: 2.8vw;
+                            height: 5vh;
+                            font-size: medium;
+                        " @click="realtimeConditionHandler">
+                        <span style="line-height: 2.5vh;">实时<br>条件</span>
+                    </el-button>
                 </div>
                 <div class="flex-column">
-                    <div class="flex-row" style="margin-bottom: 0.8vh; margin-top: 1vh">
+                    <div class="flex-row" style="margin-bottom: 0.8vh; margin-top: .5vh">
                         <span class="desc">冲淤起算地形：</span>
                         <el-select v-model="conditionConfigureData.refDEM" placeholder="请选择地形"
                             style="width: 7vw; height: 3.5vh" @change="" value-key="name">
@@ -473,6 +482,12 @@
             </div>
         </div>
     </div>
+
+    <div class="loading-container2" v-show="isRunningMan">
+        <dv-loading class="loading-icon">
+            <div class="loading-message2">{{ RunningManSays }}</div>
+        </dv-loading>
+    </div>
 </template>
 
 <script setup>
@@ -484,6 +499,7 @@ import {
     onUnmounted,
     defineAsyncComponent,
     computed,
+    toRaw,
 } from 'vue'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
@@ -525,6 +541,7 @@ import { runRiskLevelForAll, riskWarnResultParse } from '../components/bankRiskW
 // import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
 // import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
+import ClientStorageHelper from '../utils/ClientStorageHelper';
 
 const curActiveIndex = ref(-1)
 
@@ -692,6 +709,7 @@ const demResources = ref([])
 const getDemResource = async () => {
     const _bankEnName = 'Mzs'
     const _demData = (await BankResourceHelper.getBankResourceList('DEM', _bankEnName)).data
+    console.log('getDemResource', _demData)
     return BankResourceHelper.DEMResourcetoList(_demData)
     // return [{ name: '1' }, { name: '2' }]
 }
@@ -708,14 +726,47 @@ const totalResult = reactive({
 })
 ////////////// 重置水文条件，12个断面执行多指标模型
 const conditionConfigureData = reactive({
-    flow: 93000,
-    tideDif: 3.8,
+    flow: 57500,
+    tideDif: 3.1,
     refDEM: null,
     benchDEM: null,
 })
+const realtimeConditionHandler = () => {
+    conditionConfigureData.flow = 63000
+    conditionConfigureData.tideDif = 2.4
+}
+
+
 let bankWarnLayer = null
-let runningStatus = ref(false)
+const isRunningMan = ref(false)
+const RunningManSays = ref('')
 const conditionConfigureDataResetHandler = async () => {
+    console.log(window.location.pathname)
+    //// debug ////
+
+    // 模型参数
+    // const kkey = ClientStorageHelper.generateKey(window.location.pathname)
+    // const paramsValue = toRaw(conditionConfigureData)
+    // ClientStorageHelper.save(kkey, paramsValue)
+
+    // // 模型结果
+    // const key = ClientStorageHelper.generateKey(paramsValue)
+
+    // if (ClientStorageHelper.get(key)) {
+    //     let result = ClientStorageHelper.get(key)
+    //     console.log('get result from client storage and show', result)
+    //     return
+    // }
+    // else {
+    //     console.log('run model and show result')
+    //     const result = 'result'
+    //     ClientStorageHelper.save(key, result)
+    //     return
+    // }
+
+
+    // return
+
 
     ///////////////////////  check  /////////////////////// 
 
@@ -734,7 +785,7 @@ const conditionConfigureDataResetHandler = async () => {
             return
         }
     }
-    if (runningStatus.value) {
+    if (isRunningMan.value) {
         ElMessage({
             type: 'info',
             offset: 120,
@@ -742,7 +793,8 @@ const conditionConfigureDataResetHandler = async () => {
         })
         return
     }
-
+    isRunningMan.value = true
+    RunningManSays.value = '模型正在运行，请稍候...'
     console.log('reset condition data!', conditionConfigureData)
 
 
@@ -761,13 +813,15 @@ const conditionConfigureDataResetHandler = async () => {
     console.log('runRiskLevelForAll result:', result)
 
 
+    isRunningMan.value = false
+    RunningManSays.value = ''
     ///////////////////// result ////////////////////////
 
-    const { warnLayerData, highRiskSections, finalResult } = riskWarnResultParse(result)
-    console.log('highRiskSections:', highRiskSections)
+    const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result)
+    console.log('riskAreassss:', riskAreassss)
 
     totalResult.desc = finalResult
-    riskAreas.value = highRiskSections.join('; ')
+    riskAreas.value = riskAreassss.join('; ')
     let map = useMapStore().getMap()
     if (bankWarnLayer && map) {
         bankWarnLayer.update(warnLayerData)
@@ -2187,7 +2241,7 @@ onMounted(async () => {
 
     riskAreas.value = getRiskAreas('high')
 
-    // showWaterPowerFunc()
+    showWaterPowerFunc()
 })
 
 onUnmounted(() => {
@@ -2210,6 +2264,35 @@ $geoEndColor: rgba(78, 0, 122, 0.8);
 
 $proOriColor: rgba(228, 143, 16, 0.6);
 $proEndColor: rgba(189, 114, 1, 0.6);
+
+div.loading-container2 {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8vw;
+    height: 12vh;
+    background-color: rgba(255, 255, 255, 0.877);
+    z-index: 5;
+
+    :deep(.dv-loading.loading-icon) {
+        position: absolute;
+        top: 0vh;
+        right: 0vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    div.loading-message2 {
+        text-align: center;
+        width: 7vw;
+        height: 6vh;
+        font-size: calc(0.8vw + 0.4svh);
+        font-weight: bold;
+    }
+}
+
 
 div.flex-column {
     display: flex;
@@ -3086,7 +3169,8 @@ div.risk-warn-container {
 
             div.warn-detail-text {
                 position: relative;
-                width: 100vw;
+                // width: 100vw;
+                width: fit-content;
                 font-size: calc(0.8vw + 0.4vh);
                 white-space: nowrap;
                 overflow: hidden;
@@ -3096,7 +3180,7 @@ div.risk-warn-container {
                     #d7d8dd 1px 1px,
                     #161618 1px 1px;
                 animation-name: marquee;
-                animation-duration: 50s;
+                animation-duration: 30s;
                 animation-timing-function: linear;
                 animation-iteration-count: infinite;
 

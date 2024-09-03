@@ -66,40 +66,51 @@
         </div>
 
         <div class="resource-box-container">
-            <div class="title-container">岸段资源管理</div>
-            <div class="resource-content-container">
-                <el-scrollbar height="75vh">
-                    <div class="resource-box-item" v-for="(item, resourceTypeIndex) in resourceInfo"
-                        :key="resourceTypeIndex">
-                        <div class="resource-title">
-                            {{ item.key }}
-                            <div class="resource-upload-btn" @click="resourceUploadClickHandler(resourceTypeIndex)">上传
+            <div class="one-type-resource-container" v-for="key in   Object.keys(resourceInfo)  " :ref=handleRef>
+                <div class="title-container">
+                    <span @click="typeIndexChange(0)" class="page left" :class="{ ban: nowTypeIndex === 0 }">上一页</span>
+                    <span>{{ key }}</span>
+                    <span @click="typeIndexChange(1)" class="page right"
+                        :class="{ ban: nowTypeIndex === Object.keys(resourceInfo).length - 1 }">下一页</span>
+                </div>
+                <div class="resource-content-container">
+                    <el-scrollbar height="75vh">
+                        <div class="resource-box-item" v-for="(  item, resourceTypeIndex  ) in   resourceInfo[key]  "
+                            :key="resourceTypeIndex">
+                            <div class="resource-title">
+                                {{ item.key }}
+                                <div class="resource-upload-btn" v-show="key==='模型资源管理'"  @click="resourceUploadClickHandler(resourceTypeIndex)">上传
+                                </div>
+                            </div>
+                            <div class="resource-content">
+
+                                <el-table :data="item.resourceList" style="width: 95%; margin-left: 2.5%;"
+                                    max-height="25vh">
+                                    <el-table-column v-for="(  column, index  ) in  tableColumnInfo[key]  " :key="index"
+                                        :prop="column.prop" :label="column.label" :min-width="column['min-width']"
+                                        align="center">
+                                        <template #default="scope" v-if="column.asTag">
+                                            <div style="display: flex; align-items: center;justify-content: center;">
+                                                <el-tag>{{ scope.row.fileType }}</el-tag>
+                                            </div>
+                                        </template>
+                                    </el-table-column>
+                                    <!-- <el-table-column fixed="right" label="Operations" min-width="20%" align="center">
+                                        <template #default="scope">
+                                            <el-button link type="primary" size="small"
+                                                @click.prevent="deleteRow(scope.$index, resourceTypeIndex)">
+                                                删除
+                                            </el-button>
+                                        </template>
+                                    </el-table-column> -->
+                                </el-table>
                             </div>
                         </div>
-                        <div class="resource-content">
-
-                            <el-table :data="item.resourceList" style="width: 100%" max-height="25vh">
-                                <el-table-column v-for="(column, index) in tableColumnInfo" :key="index" :prop="column.prop"
-                                    :label="column.label" :min-width="column['min-width']" align="center">
-                                    <template #default="scope" v-if="column.asTag">
-                                        <div style="display: flex; align-items: center;justify-content: center;">
-                                            <el-tag>{{ scope.row.fileType }}</el-tag>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column fixed="right" label="Operations" min-width="20%" align="center">
-                                    <template #default="scope">
-                                        <el-button link type="primary" size="small"
-                                            @click.prevent="deleteRow(scope.$index, resourceTypeIndex)">
-                                            删除
-                                        </el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </div>
-                </el-scrollbar>
+                    </el-scrollbar>
+                </div>
             </div>
+
+
         </div>
     </div>
 
@@ -110,24 +121,23 @@
             </div>
         </template>
         <el-form :model="dialogInfo">
-            <!-- <el-form-item label="Promotion name">
-                <el-input v-model="form.name" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Zones">
-                <el-select v-model="form.region" placeholder="Please select a zone">
-                    <el-option label="Zone No.1" value="shanghai" />
-                    <el-option label="Zone No.2" value="beijing" />
-                </el-select>
-            </el-form-item> -->
-            <el-form-item v-for="(item, index) in dialogInfo" :key="index" :label="item.label">
+            <el-form-item v-for="(  item, index  ) in   dialogInfo  " :key="index" :label="item.label">
                 <el-input v-model="item.value" autocomplete="off" />
             </el-form-item>
         </el-form>
+        <el-upload style="height: fit-content;" drag action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            :multiple="false" :show-file-list="true">
+            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+            <div class="el-upload__text">
+                <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+            </div>
+        </el-upload>
+
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">Cancel</el-button>
+                <el-button @click="dialogFormVisible = false">取消</el-button>
                 <el-button type="primary" @click="dialogFormVisible = false">
-                    Confirm
+                    确认
                 </el-button>
             </div>
         </template>
@@ -135,11 +145,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, toRaw } from 'vue'
+import { ref, onMounted, reactive, toRaw, watch } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
-
+import { UploadFilled } from '@element-plus/icons-vue'
+import axios from 'axios';
+import { defaultTableColumns } from './bankResource'
 
 //////////////////////////// global
 const route = useRoute();
@@ -228,13 +240,37 @@ const commitModify = () => {
 }
 
 
-window.addEventListener('keydown', e => {
-    console.log(originalBankBasicInfo, originalBank)
-})
+
 
 /////////////////////////// bank resource info ///////////////////////////
-const resourceInfo = ref()
+///////// page change /////////
+const resourceTypeRefs = ref([])
+const handleRef = (el) => {
+    resourceTypeRefs.value.push(el)
+}
+const nowTypeIndex = ref(0)
+const typeIndexWatcher = watch(nowTypeIndex, (newVal, oldVal) => {
+    const transfromDict = {
+        0: 'translateX(0%)',
+        1: 'translateX(-100%)',
+        2: 'translateX(-200%)'
+    }
+    resourceTypeRefs.value.forEach(refItem => {
+        refItem.style.transform = transfromDict[newVal];
+    })
+})
+const typeIndexChange = (add) => {
+    if (add) {
+        if (nowTypeIndex.value === - 1 + Object.keys(resourceInfo.value).length) return
+        nowTypeIndex.value = (nowTypeIndex.value + 1) % Object.keys(resourceInfo.value).length
+    } else {
+        if (nowTypeIndex.value === 0) return
+        nowTypeIndex.value = (nowTypeIndex.value - 1 + Object.keys(resourceInfo.value).length) % Object.keys(resourceInfo.value).length
+    }
+}
 
+
+const resourceInfo = ref({})
 
 ///////////// bank resource upload
 const dialogFormVisible = ref(false)
@@ -243,7 +279,7 @@ const dialogInfo = ref([
     {
         label: '岸段',
         enName: 'segment',
-        value: bank.name
+        value: ''
     },
     {
         label: '年份',
@@ -265,11 +301,11 @@ const dialogInfo = ref([
         enName: 'description',
         value: ''
     },
-    {
-        label: '边界',
-        enName: '',
-        value: ''
-    },
+    // {
+    //     label: '边界',
+    //     enName: '',
+    //     value: ''
+    // },
     // {
     //     label: '其他',
     //     enName: 'temp',
@@ -288,32 +324,7 @@ const resourceUploadClickHandler = (resourceTypeIndex) => {
 
 
 ///////////// bank resource table operation
-const tableColumnInfo = [
-    {
-        prop: "name",
-        label: "名称",
-        "min-width": "20%",
-        asTag: false
-    },
-    {
-        prop: "sets",
-        label: "工况集",
-        "min-width": "20%",
-        asTag: false
-    },
-    {
-        prop: "year",
-        label: "年份",
-        "min-width": "20%",
-        asTag: false
-    },
-    {
-        prop: "fileType",
-        label: "文件类型",
-        "min-width": "20%",
-        asTag: true
-    },
-]
+const tableColumnInfo = defaultTableColumns
 
 
 const deleteRow = (rowIndex, resourceTypeIndex) => {
@@ -327,16 +338,23 @@ const deleteRow = (rowIndex, resourceTypeIndex) => {
 const loading = ref(false)
 onMounted(async () => {
     const _thisBankEnName = route.params.id
-    initOneBank(_thisBankEnName)
+    await initOneBank(_thisBankEnName)
+    console.log(bank.name)
+    dialogInfo.value[0].value = bank.name
 })
 
-/////////////////// helper
 
+
+
+
+////////////////// helper ///////////////////
 const initOneBank = async (bankEnName) => {
     loading.value = true
     const _thisBankEnName = bankEnName
     const _thisBankBasicInfo = (await BankResourceHelper.getOneBankBasicInfo(_thisBankEnName)).data
     console.log(_thisBankBasicInfo)
+
+    // bank resource init
     const _ogDEM = (await BankResourceHelper.getBankResourceList('DEM', _thisBankEnName)).data
     const _ogHydro = (await BankResourceHelper.getBankResourceList('Hydrodynamic', _thisBankEnName)).data
     const _ogBound = (await BankResourceHelper.getBankResourceList('Boundary', _thisBankEnName)).data
@@ -360,10 +378,77 @@ const initOneBank = async (bankEnName) => {
         },
     ]
 
+    // visual resource init
+    ///////// fake data
+    const _thisVisualResourceInfo = [
+        {
+            key: '栅格可视化资源',
+            resourceList: [
+                {
+                    name: '示例栅格资源',
+                    fileType: '地形切片',
+                    uploadTime: '2024-09-01',
+                }
+            ]
+        },
+        {
+            key: '矢量可视化资源',
+            resourceList: [
+                {
+                    name: '示例矢量资源',
+                    fileType: 'geojson',
+                    uploadTime: '2024-09-01',
+                }
+            ]
+        },
+        {
+            key: '其他',
+            resourceList: [
+                {
+                    name: '示例资源',
+                    fileType: 'config.json',
+                    uploadTime: '2024-09-01',
+                }
+            ]
+        },
+    ]
+
+    // device resource init
+    const monitorInfo = (await axios.get('/api/data/monitorInfo')).data
+    const { _GNSS, _Incline, _Stress, _Menometer, _Vedio } = parseMonitorInfo(monitorInfo)
+    const _thisDeviceResourceInfo = [
+        {
+            key: 'GNSS设备',
+            resourceList: _GNSS
+        },
+        {
+            key: '孔隙水压力计设备',
+            resourceList: _Menometer
+        },
+        {
+            key: '应力桩设备',
+            resourceList: _Stress
+        },
+        {
+            key: '测斜仪设备',
+            resourceList: _Incline
+        },
+        {
+            key: '监控摄像设备',
+            resourceList: _Vedio
+        },
+    ]
+
+
+    //////////////////
     bank.name = _thisBankBasicInfo.name
     bank.bankEnName = _thisBankEnName
     bankBasicInfo.value = parseBasicInfo(_thisBankBasicInfo)
-    resourceInfo.value = _thisBankResourceInfo
+    resourceInfo.value = {
+        '模型资源管理': _thisBankResourceInfo,
+        '可视化资源管理': _thisVisualResourceInfo,
+        '设备资源管理': _thisDeviceResourceInfo
+    }
     loading.value = false
 }
 
@@ -393,6 +478,40 @@ const parseBasicInfo = (basicInfo) => {
         },
     ]
 }
+
+const parseMonitorInfo = (monitorInfo) => {
+    const _GNSS = []
+    const _Incline = []
+    const _Stress = []
+    const _Menometer = []
+    const _Vedio = []
+    monitorInfo.forEach(item => {
+        switch (item.type) {
+            case '1':
+                _GNSS.push(item)
+                break;
+            case '2':
+                _Stress.push(item)
+                break;
+            case '3':
+                _Menometer.push(item)
+                break;
+            case '4':
+                _Incline.push(item)
+                break;
+            case '6':
+                _Vedio.push(item)
+                break;
+            default:
+                break;
+        }
+    })
+    return { _GNSS, _Incline, _Stress, _Menometer, _Vedio }
+}
+
+
+
+
 
 </script>
 
@@ -658,80 +777,115 @@ div.bank-resouce-create-container {
         border-right: 2px solid #7aa8ff;
 
         overflow: hidden;
+        display: flex;
+        flex-direction: row;
 
-        div.title-container {
+        div.one-type-resource-container {
+
             position: relative;
-            width: 42vw;
-            height: 7vh;
-            margin-left: 0.5vw;
+            width: 100%;
+            height: 100%;
+            transition: .4s ease-in-out;
 
-            line-height: 7vh;
-
-            text-align: center;
-
-            font-size: calc(1vw + 1vh);
-            font-weight: bold;
-
-            border-bottom: 4px solid #0040a0;
-            color: #001d7a;
-        }
-
-        div.resource-content-container {
-            position: relative;
-            width: 42vw;
-            margin-left: 0.5vw;
-            height: 75vh;
-
-            div.resource-box-item {
+            div.title-container {
                 position: relative;
-                width: 41vw;
+                width: 42vw;
+                height: 7vh;
                 margin-left: 0.5vw;
-                height: 30vh;
 
-                div.resource-title {
-                    position: relative;
-                    width: 41vw;
-                    height: 5vh;
-                    line-height: 5vh;
-                    text-align: left;
-                    font-size: calc(0.9vw + 0.7vh);
-                    font-weight: bold;
-                    border-bottom: 2px solid #5b9dff;
+                line-height: 7vh;
+
+                text-align: center;
+
+                font-size: calc(1vw + 1vh);
+                font-weight: bold;
+
+                border-bottom: 4px solid #0040a0;
+                color: #001d7a;
+                // transition: .3s ease-in-out;
+
+                .page {
+                    position: absolute;
+                    top: 0;
+                    width: 5vw;
+                    height: 7vh;
+                    line-height: 7vh;
+                    font-size: calc(0.8vw + 0.8vh);
                     color: #001d7a;
+                    cursor: pointer;
 
-                    div.resource-upload-btn {
-                        position: absolute;
+                    &.left {
+                        left: 1vw;
+                    }
+
+                    &.right {
                         right: 1vw;
-                        top: .5vh;
-                        width: 5vw;
-                        height: 4vh;
-                        line-height: 4vh;
-                        text-align: center;
-                        font-size: calc(0.8vw + 0.7vh);
-                        font-weight: bold;
-                        background-color: rgb(64, 102, 206);
-                        color: #ffffff;
-                        border-radius: 5px;
-                        transition: .3s ease-in-out;
+                    }
 
-                        &:hover {
-                            cursor: pointer;
-                            background-color: rgb(93, 169, 255);
-                        }
+                    &.ban {
+                        color: #969696;
+                        cursor: not-allowed;
                     }
                 }
+            }
 
-                div.resource-content {
+            div.resource-content-container {
+                position: relative;
+                width: 42vw;
+                margin-left: 0.5vw;
+                height: 75vh;
+
+                div.resource-box-item {
                     position: relative;
                     width: 41vw;
-                    height: 25vh;
-                    // background-color: aquamarine;
+                    margin-left: 0.5vw;
+                    height: 30vh;
 
-                    letter-spacing: 0.1rem;
+                    div.resource-title {
+                        position: relative;
+                        width: 41vw;
+                        height: 5vh;
+                        line-height: 5vh;
+                        text-align: left;
+                        font-size: calc(0.9vw + 0.7vh);
+                        font-weight: bold;
+                        border-bottom: 2px solid #5b9dff;
+                        color: #001d7a;
 
+                        div.resource-upload-btn {
+                            position: absolute;
+                            right: 1vw;
+                            top: .5vh;
+                            width: 5vw;
+                            height: 4vh;
+                            line-height: 4vh;
+                            text-align: center;
+                            font-size: calc(0.8vw + 0.7vh);
+                            font-weight: bold;
+                            background-color: rgb(64, 102, 206);
+                            color: #ffffff;
+                            border-radius: 5px;
+
+                            &:hover {
+                                cursor: pointer;
+                                background-color: rgb(93, 169, 255);
+                            }
+                        }
+                    }
+
+                    div.resource-content {
+                        position: relative;
+                        width: 41vw;
+                        height: 25vh;
+                        // background-color: aquamarine;
+
+                        letter-spacing: 0.1rem;
+
+                    }
                 }
             }
         }
+
     }
 }
 

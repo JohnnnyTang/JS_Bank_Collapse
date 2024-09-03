@@ -244,11 +244,11 @@
 </template>
 
 <script setup>
-import MapboxDraw from '@mapbox/mapbox-gl-draw'
+// import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import ModelTitleVue from '../ModelTitle.vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { ref, reactive, onMounted, onUnmounted, computed, watch, createApp } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch, createApp, toRaw } from 'vue'
 import { initFineMap } from '../../../utils/mapUtils';
 import { useMapStore } from '../../../store/mapStore';
 import { useHydrodynamicStore } from '../../../store/modelStore'
@@ -361,7 +361,7 @@ const confirmBankHandler = async (bank) => {
     type: 'success',
     title: '选择岸段',
     message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
-    position: 'top-left',
+    position: 'top-right',
     offset: 180,
   })
 }
@@ -405,14 +405,14 @@ const conditionClickHandler = (type) => {
       title: '水文条件配置成功',
       // message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
       // message: `流量：${params.value.flow}，潮型：${params.value.tideType}`,
-      offset: 120,
+      offset: 180,
       type: 'success',
     })
   else
     ElNotification({
       title: '水文条件配置失败',
       message: `请检查输入是否合法`,
-      offset: 120,
+      offset: 180,
       type: 'error',
     })
   modelRunnningProgress.value = 0
@@ -420,36 +420,33 @@ const conditionClickHandler = (type) => {
   globleVariable.status = false
 }
 const runModelClickHandler = async () => {
+
+  if (selectedBank.name === null) {
+    ElNotification({
+      title: '提示',
+      message: `请先选择岸段，获取岸段绑定的相关资源`,
+      offset: 180,
+      type: 'info',
+    })
+    return;
+  }
+
   if (!check(params.value)) {
     ElNotification({
       title: '运行失败',
       message: `请检查输入是否合法`,
-      offset: 120,
+      offset: 180,
       type: 'error',
     })
     return
   }
-  // ElMessageBox.confirm(
-  //   '模型正在运行，请稍后...',
-  //   {
-  //     showConfirmButton: false,
-  //     showCancelButton: true,
-  //     // confirmButtonText: '确定',
-  //     cancelButtonText: '取消',
-  //     type: 'warning',
-  //   }
-  // )
-  // ElNotification({
-  //   title: '模型正在运行，请稍后...',
-  //   type: 'info',
-  //   offset: 120,
-  // })
+
   if (runningMsg.value === '模型正在运行，请稍后...') {
     ElNotification({
       type: 'info',
       title: '模型正在运行',
       message: '请勿重复提交',
-      offset: 120,
+      offset: 180,
     })
     return
   }
@@ -524,7 +521,7 @@ const modelRunnning = async (type) => {
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": mmap[params.value.tideType],
-      "segment": "Mzs",
+      "segment": selectedBank.bankEnName,
       "set": "standard",
       "year": "2023",
     }
@@ -533,7 +530,7 @@ const modelRunnning = async (type) => {
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": params.value.diffTide,
-      "segment": "Mzs",
+      "segment": selectedBank.bankEnName,
       "set": "standard",
       "year": "2023",
     }
@@ -544,18 +541,26 @@ const modelRunnning = async (type) => {
     const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
     // ElNotification({
     //   title: '开始运行水动力模型',
-    //   offset: 120,
+    //   offset: 180,
     //   type: 'info',
     // })
     // const TASK_ID = '1'
     console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
+
+    if (TASK_ID === 'WRONG') {
+      ElNotification({
+        title: '模型运行失败',
+        offset: 180,
+        type: 'error',
+      })
+    }
+
     modelRunnningStatusDesc.value = '运行中'
     modelRunnningProgress.value = 0
     globleVariable.taskID = TASK_ID
-    console.log('===Interval')
     let runningStatusInterval = setInterval(async () => {
-      console.log('runningStatusInterval')
       let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
+      console.log('runningResult ', runningStatus)
       // let runningStatus = 'RUNNING'
       modelRunnningStatusDesc.value = '运行中'
       let randomFactor = 3.0
@@ -586,7 +591,7 @@ const modelRunnning = async (type) => {
         ElNotification({
           title: '模型运行失败',
           message: `错误原因:\n` + errorLog,
-          offset: 120,
+          offset: 180,
           type: 'error',
         })
         modelRunnningStatusDesc.value = '运行失败'
@@ -628,39 +633,52 @@ const modelRunnning = async (type) => {
     ElNotification({
       title: '模型运行失败',
       message: `错误原因:\n` + error.message,
-      offset: 120,
+      offset: 180,
       type: 'error',
     })
   }
 }
 
 //////////////////// 流场控制
+let flowWatcher = null
+
 const flowLayerControl = (type, show) => {
   let map = mapStore.getMap()
   const controlMap = {
     'lagrange': {
       add: () => {
-        console.log('add lagrenge');
+        console.log('add lagrenge')
+        flowWatcher && flowWatcher() // rm watcher
 
-        let backEndJsonUrl2 = "/api/data/flow/configJson/flood";
-        let imageSrcPrefix2 = "/api/data/flow/texture/flood/";
+        // let backEndJsonUrl2 = "/api/data/flow/configJson/flood";
+        // let imageSrcPrefix2 = "/api/data/flow/texture/flood/";
         // let floodFlow = reactive(
         //   new FlowFieldLayer("floodFlow", backEndJsonUrl2, imageSrcPrefix2)
         // );
-        let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix)
+        let flow = reactive(new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix))
         // let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, backEndJsonUrl2, imageSrcPrefix2)
+        flowWatcher = watch(() => flow.currentResourcePointer, (newVal) => {
+          hydrodynamicStore.flowFieldCurrentTimeStep = newVal
+        })
+
         mapStore.getMap().addLayer(flow, 'mzsLabel')
       },
       remove: () => {
-        console.log('rm lagrenge');
+        console.log('rm lagrenge')
+        flowWatcher && flowWatcher() // rm watcher
+        hydrodynamicStore.flowFieldCurrentTimeStep = 0
         map.getLayer(globleVariable.lagrangeLayer) && map.removeLayer(globleVariable.lagrangeLayer)
       }
     },
     'euler': {
       add: () => {
-        console.log('add euler');
-        let flow = new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix)
+        console.log('add euler')
+        flowWatcher && flowWatcher() // rm watcher
+        let flow = reactive(new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix))
 
+        flowWatcher = watch(() => flow.uvResourcePointer, (newVal) => {
+          hydrodynamicStore.flowFieldCurrentTimeStep = newVal
+        })
         // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
         // '/bin/')
 
@@ -668,6 +686,8 @@ const flowLayerControl = (type, show) => {
       },
       remove: () => {
         console.log('rm euler');
+        flowWatcher && flowWatcher() // rm watcher
+        hydrodynamicStore.flowFieldCurrentTimeStep = 0
         map.getLayer(globleVariable.eulerLayer) && map.removeLayer(globleVariable.eulerLayer)
       }
     }
@@ -676,12 +696,12 @@ const flowLayerControl = (type, show) => {
 }
 
 const showFlowClickHandler = (id) => {
-  console.log(globleVariable)
+  // console.log(globleVariable)
   if (!globleVariable.status) {
     ElNotification({
       title: '错误',
       message: '模型尚未运行或运行未结束，缺乏可视化依赖数据',
-      offset: 120,
+      offset: 180,
       type: 'error',
     })
     showFlow.value = 0
@@ -712,11 +732,11 @@ const showFlowClickHandler = (id) => {
 
 
 /////////////////// 潮位点绘制
-window.addEventListener('keydown', (event) => {
-  if (event.key === 'v') {
-    console.log(hydrodynamicStore.markerInfos)
-  }
-})
+// window.addEventListener('keydown', (event) => {
+//   if (event.key === 'v') {
+//     console.log(hydrodynamicStore.markerInfos)
+//   }
+// })
 
 // popover vue
 const createDom = () => {
@@ -734,7 +754,7 @@ const drawButtonClickHandler = () => {
       title: '警告',
       message: '水动力模型计算完成后方可提取潮位过程线',
       type: 'warning',
-      offset: 120,
+      offset: 180,
     })
     return
   }
@@ -743,7 +763,7 @@ const drawButtonClickHandler = () => {
       title: '警告',
       message: '请等待当前任务完成，请稍后...',
       type: 'warning',
-      offset: 120,
+      offset: 180,
     })
     return
   }
@@ -752,14 +772,14 @@ const drawButtonClickHandler = () => {
     title: '提示',
     message: '进入绘制状态，点击地图以添加潮位点',
     type: 'info',
-    offset: 120,
+    offset: 180,
   })
   let map = mapStore.getMap()
   let dom = map.getCanvasContainer()
   dom.style.cursor = 'crosshair'
   if (drawingStatus === false) {
     map.once('click', (e) => {
-      console.log(e.lngLat)
+      // console.log(e.lngLat)
       // add marker
 
       const popoverDom = createDom()
@@ -777,7 +797,7 @@ const drawButtonClickHandler = () => {
       hydrodynamicStore.addMarkerInfo(marker, markerDom, e.lngLat.lng, e.lngLat.lat)
 
       markerDom.addEventListener('click', function (e) {
-        console.log('click marker!!', this)
+        // console.log('click marker!!', this)
         const _markerDom = this
         hydrodynamicStore.focusingMarkerDom = _markerDom
       })
@@ -786,7 +806,7 @@ const drawButtonClickHandler = () => {
         type: 'info',
         title: '新添潮位点',
         message: `经度：${e.lngLat.lng.toFixed(4)}，纬度：${e.lngLat.lat.toFixed(4)}`,
-        offset: 120,
+        offset: 180,
       })
 
       // run model
@@ -807,7 +827,7 @@ const drawButtonClickHandler = () => {
 const tidePointVelocityCalc = async (lng, lat) => {
   // pointConfirmShow.value = false
   // console.log('pointFeature::', tidePointFeature.value)
-  console.log('getVelocity caseId::', globleVariable.caseID)
+  // console.log('getVelocity caseId::', globleVariable.caseID)
   // modelRunnningStatusDesc
   const pointVelocityModelUrl = '/model/taskNode/start/numeric/getFlowFieldVelocities'
   const params = {
@@ -824,7 +844,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
   runningMsg.value = '正在提取潮位线...'
   const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
   const hereTaskId = await pointVelocityMR.modelStart()
-  console.log('hereTaskId', hereTaskId)
+  // console.log('hereTaskId', hereTaskId)
 
 
   console.log('===Interval')
@@ -840,7 +860,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
         ElNotification({
           title: '计算失败',
           message: `错误原因:\n` + errorLog,
-          offset: 120,
+          offset: 180,
           type: 'error',
         })
         showRunning.value = false
@@ -852,19 +872,19 @@ const tidePointVelocityCalc = async (lng, lat) => {
         clearInterval(runningInterval)
         ElNotification({
           title: '计算成功',
-          offset: 120,
+          offset: 180,
           type: 'success',
         })
         let runningResult = await pointVelocityMR.getModelResult()
 
-        let testOption = getTideLineDataOption(runningResult)
+        let _tideLineOption = getTideLineDataOption(runningResult)
 
-        hydrodynamicStore.showingOption = testOption
-        // chartIns.setOption(testOption)
+        hydrodynamicStore.showingOption = _tideLineOption
+        // chartIns.setOption(_tideLineOption)
 
         // 在store中补充result
         let newInfo = {
-          option: testOption
+          option: _tideLineOption
         }
         hydrodynamicStore.appendMarkerInfo(hydrodynamicStore.calculatingMarkerDom, newInfo)
 
@@ -977,7 +997,7 @@ const updateRealtimeWaterCondition = async () => {
   ElNotification({
     title: '已更新实时水文条件',
     message: `更新时间：${updateTime.value}`,
-    offset: 120,
+    offset: 180,
     type: 'success',
   })
 }
@@ -989,10 +1009,24 @@ onMounted(async () => {
   mapStore.setMap(map)
   chartIns = echarts.init(tideLineChartDom.value)
 
-  watch(() => hydrodynamicStore.showingOption, (newVal) => {
-    console.log('newVal', newVal)
-    chartIns.setOption(newVal)
+  let tidePointWatcher = null
+  let markLineWatcher = null
+
+  tidePointWatcher = watch(() => hydrodynamicStore.showingOption, (newVal) => {
+
+    markLineWatcher && markLineWatcher() // rm watcher
+
+    let option = JSON.parse(JSON.stringify(toRaw(newVal)))// deep copy
+    chartIns.setOption(option)
+
+    markLineWatcher = watch(() => hydrodynamicStore.flowFieldCurrentTimeStep, (newVal) => {
+      let showingOption = JSON.parse(JSON.stringify(toRaw(hydrodynamicStore.showingOption)))// deep copy
+      let markLineOption = hydrodynamicStore.getMarkLineOption()
+      showingOption.series[0].markLine = markLineOption
+      chartIns.setOption(showingOption)
+    })
   })
+
 })
 
 

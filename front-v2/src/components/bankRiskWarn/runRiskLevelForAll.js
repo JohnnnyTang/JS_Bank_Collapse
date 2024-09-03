@@ -146,7 +146,6 @@ const runRiskLevelForAll = (data, refs, info) => {
 
                     if (statusList.every(item => item === 'COMPLETE')) {
                         clearInterval(statusInterval)
-                        notice('模型运行成功', 'success')
                         console.log('模型运行成功!')
 
                         /////// query Result , get Model Result ///////
@@ -157,7 +156,8 @@ const runRiskLevelForAll = (data, refs, info) => {
                         })
 
                         Promise.all(resultPromises).then(async (res) => {
-                            notice('获取模型结果成功', 'success')
+                            notice('模型运行成功', 'success')
+
                             const resultList = res.map(item => item.data)
 
                             let keys = ['JC01', 'JC02', 'JC03', 'JC04', 'JC05', 'JC06', 'JC07', 'JC08', 'JC09', 'JC10', 'JC11', 'JC12']
@@ -169,18 +169,16 @@ const runRiskLevelForAll = (data, refs, info) => {
 
                             console.log('/////////result//////////')
                             console.log(result)
+
+                            // TODO: write into local storage
+                            
+
                             resolve(result)
-                        }).catch(err => {
-                            // reject('获取模型结果失败')
-                            // notice('模型运行失败', 'error')
-                            // console.warn('获取模型结果失败::', err)
-                            // throw '获取模型结果失败'
+                        }).catch(_ => {
                             throw new Error('获取模型结果失败')
                         })
                     } else if (statusList.some(item => item === 'NOT FOUND' || item === 'ERROR')) {
                         clearInterval(statusInterval)
-                        // throw new Error('模型状态异常')
-
 
                         const resultPromises = []
                         statusList.forEach((item, index) => {
@@ -192,55 +190,20 @@ const runRiskLevelForAll = (data, refs, info) => {
 
                         Promise.all(resultPromises).then(async (res) => {
 
-                            console.log('/////////清楚结果//////////')
+                            console.log('/////////清除结果//////////')
                             console.log(res)
-                            // resolve(result)
-                        }).catch(err => {
-                            // reject('获取模型结果失败')
-                            // notice('模型运行失败', 'error')
-                            // console.warn('获取模型结果失败::', err)
-                            // throw '获取模型结果失败'
-                            // throw new Error('获取模型结果失败')
+                            throw new Error('清除结果')
+
+                        }).catch(_ => {
+
+                            throw new Error('清除结果失败')
+
                         })
-
-
-                    }
-                    else if (statusList.some(item => item === 'ERROR')) {
-
-                        // reject('模型运行失败')
-                        clearInterval(statusInterval)
-                        // notice('模型运行失败', 'error')
-                        // console.warn('模型运行失败::', item)
-                        // throw new Error('模型状态异常')
-
-                        const resultPromises = []
-                        taskIdList.forEach(taskId => {
-                            let resultUrl = RiskLevelResultUrlPrefix + taskId
-                            resultPromises.push(axios.get(resultUrl))
-                        })
-
-                        Promise.all(resultPromises).then(async (res) => {
-                            // notice('清楚结果', 'success')
-
-                            console.log('/////////清楚结果//////////')
-                            console.log(res)
-                            // resolve(result)
-                        }).catch(err => {
-                            // reject('获取模型结果失败')
-                            // notice('模型运行失败', 'error')
-                            // console.warn('获取模型结果失败::', err)
-                            // throw '获取模型结果失败'
-                            // throw new Error('获取模型结果失败')
-                        })
-
-
                     }
 
                 }).catch(err => {
-                    // reject('获取模型状态失败')
-                    // notice('模型运行失败', 'error')
                     console.warn(err.message)
-                    // throw new Error('模型启动失败')
+                    notice('模型运行失败', 'error')
                 })
 
             }, 3000)
@@ -249,7 +212,6 @@ const runRiskLevelForAll = (data, refs, info) => {
         ).catch(err => {
             console.warn(err.message)
 
-            // reject('模型运行失败')
             notice('模型运行失败', err.message)
         })
     })
@@ -528,33 +490,14 @@ const runRiskLevelForAll = (data, refs, info) => {
 
 */
 
-/* element of resultList
-{
-    "case-id": "{ case-id }",
-        "model": "{ model-name }",
-    "multi-indicator-ids": {
-      "Dsed": "{ case-id }",
-      "PL": "{ case-id }",
-      "LC": "{ case-id }",
-      "Zb": "{ case-id }",
-      "Sa": "{ case-id }",
-      "Ln": "{ case-id }",
-      "PQ": "{ case-id }",
-      "Ky": "{ case-id }",
-      "Zd": "{ case-id }"
-    },
-    "result": "{ number }",
-    "risk-level": "{ vec4 }" || "NONE"
-}
-*/
 const riskWarnResultParse = (resultDict) => {
     // 函数实现
     let warnLayerData = getWarnLayerData(resultDict)
-    let highRiskSections = getHighRiskSections(resultDict)
     let finalResult = getFinalRiskLevel(resultDict)
+    let riskAreassss = getRiskSections(resultDict, finalResult)
     return {
         warnLayerData,
-        highRiskSections,
+        riskAreassss,
         finalResult
     }
 }
@@ -674,19 +617,37 @@ const getWarnLayerData = (result) => {
         },
     ]
 }
-const getHighRiskSections = (result) => {
+const getRiskSections = (result, type) => {
+
+
+
     let _highRiskSections = []
+    let _middleRiskSections = []
+    let _lowRiskSections = []
+
+
 
     let sections = ["MZ01围堤", "MZ02顺堤", "MZ03顺堤尾", "MZ04江滩办", "MZ05小港池", "MZ06张靖皋桥位", "MZ07桥位下游", "MZ08海事码头", "MZ09码头下游", "MZ10雷达站", "MZ11主路", "MZ12沙尾"]
     let keys = Object.keys(result)
     keys.forEach((key, index) => {
         let sectionName = sections[index]
-        let riskLevel = riskVec4Parse(result[key]["risk-level"])
-        if (riskLevel === "高风险") {
+        let riskLevelValue = result[key]["result"]
+        if (riskLevelValue < 0.25) {
+            _lowRiskSections.push(sectionName)
+        } else if (riskLevelValue < 0.5) {
+            _middleRiskSections.push(sectionName)
+        } else {
             _highRiskSections.push(sectionName)
         }
     })
-    return _highRiskSections
+
+    if (type === '高风险') {
+        return _highRiskSections
+    } else if (type === '中风险') {
+        return _middleRiskSections
+    } else {
+        return _lowRiskSections
+    }
 }
 const riskVec4Parse = (vec4) => {
     let riskLevelIndex
@@ -699,8 +660,30 @@ const riskVec4Parse = (vec4) => {
     return dict[riskLevelIndex]
 }
 const getFinalRiskLevel = (result) => {
-
-
-
-    return "中风险"
+    let lowNum = 0
+    let middleNum = 0
+    let highNum = 0
+    let finalRiskLevel = null
+    for (let key in result) {
+        let item = result[key]
+        let resultValue = item["result"]
+        if (resultValue < 0.25) {
+            lowNum++
+        } else if (resultValue < 0.5) {
+            middleNum++
+        } else {
+            highNum++
+        }
+        if (highNum > 0) {
+            finalRiskLevel = '高风险'
+            break
+        } else if (middleNum > 0) {
+            finalRiskLevel = '中风险'
+            break
+        } else {
+            finalRiskLevel = '低风险'
+            break
+        }
+    }
+    return finalRiskLevel
 }
