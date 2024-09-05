@@ -23,7 +23,7 @@ onMounted(async () => {
         projection: 'mercator',
         antialias: true,
         transformRequest: (url) => {
-            if (url.startsWith(import.meta.env.VITE_APP_BACK_ADDRESS)) {
+            if (url.startsWith(import.meta.env.VITE_APP_TEMP_ADDRESS)) {
                 return {
                     url: url,
                     headers: { token: localStorage.getItem("token") },
@@ -38,7 +38,7 @@ onMounted(async () => {
             "name": "199901",
             "bank": "Mzs"
         }
-        const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+        const tileServer = import.meta.env.VITE_APP_TEMP_ADDRESS
 
         map.addSource('mapRaster2020', {
             type: 'raster',
@@ -50,25 +50,28 @@ onMounted(async () => {
             // maxzoom: 20,
             // bounds: [120.509, 32.023, 120.555, 32.0402],
         })
-        map.addLayer({
-            id: 'ras',
-            type: 'raster',
-            source: 'mapRaster2020',
-        })
-
-        // map.addSource('demTile', {
-        //     type: 'raster',
-        //     tiles: [tileServer + '/tile/raster/dem/Mzs/199901/{x}/{y}/{z}'],
-        //     tileSize: 1024,
-        //     minzoom: 10,
-        //     maxzoom: 20,
-        //     bounds: [120.509, 32.023, 120.555, 32.0402],
-        // })
         // map.addLayer({
         //     id: 'ras',
         //     type: 'raster',
-        //     source: 'demTile',
+        //     source: 'mapRaster2020',
         // })
+
+        map.addSource('demTile', {
+            type: 'raster',
+            tiles: [tileServer + '/tile/raster/dem/Mzs/199901/{x}/{y}/{z}'],
+            tileSize: 1024,
+            minzoom: 10,
+            maxzoom: 20,
+            bounds: [120.509, 32.023, 120.555, 32.0402],
+        })
+        map.addLayer({
+            id: 'ras',
+            type: 'raster',
+            source: 'demTile',
+            paint: {
+                'raster-opacity': 1.0,
+            }
+        })
 
     })
 

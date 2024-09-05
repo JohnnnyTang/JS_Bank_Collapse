@@ -398,7 +398,7 @@
             </dv-loading>
         </div>
 
-        <div class="hydro-pannel">
+        <!-- <div class="hydro-pannel">
             <div class="title">
                 实时水文信息
                 <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%" class="iconn">
@@ -411,7 +411,7 @@
                 <el-table-column prop="flow" label="流量" />
                 <el-table-column prop="level" label="水位" />
             </el-table>
-        </div>
+        </div> -->
 
         <div class="hide-dom-container" :class="{ translate: !conditionPannelShow }" @click="hideDomClickHandler()">
             <HideDomButtom :direction="conditionPannelShow ? 'right' : 'left'"></HideDomButtom>
@@ -419,10 +419,10 @@
         <div class="condition-pannel flex-column" :class="{ translate: !conditionPannelShow }">
             <div class="title" style="text-align: center">综合研判条件配置</div>
             <div class="card flex-column">
-                <div class="flex-row">
+                <div class="flex-row" style="justify-content: space-between; align-items: center;">
                     <div class="flex-row" style="margin-right: .5vw">
-                        <span class="desc">流量：</span>
-                        <el-input v-model="conditionConfigureData.flow" style="width: 3.2vw; height: 3.5vh"
+                        <span class="desc">流量:</span>
+                        <el-input v-model="conditionConfigureData.flow" style="width: 3.5vw; height: 3.5vh"
                             placeholder="请输入" />
                         <span style="
                                 height: 3.5vh;
@@ -431,8 +431,8 @@
                             ">m³/s</span>
                     </div>
                     <div class="flex-row">
-                        <span class="desc">潮差：</span>
-                        <el-input v-model="conditionConfigureData.tideDif" style="width: 2.2vw; height: 3.5vh"
+                        <span class="desc">潮差:</span>
+                        <el-input v-model="conditionConfigureData.tideDif" style="width: 2.1vw; height: 3.5vh"
                             placeholder="请输入" />
                         <span style="
                                 height: 3.5vh;
@@ -441,44 +441,47 @@
                             ">m</span>
                     </div>
                     <el-button type="primary" style="
-                            margin-left: .2vw;
-                            margin-top: -.5vh;
-                            width: 2.8vw;
-                            height: 5vh;
+                            /* margin-left: 1.1vw;
+                            margin-top: -.5vh; */
+                            width:3vw;
+                            height: 4.5vh;
                             font-size: medium;
                         " @click="realtimeConditionHandler">
-                        <span style="line-height: 2.5vh;">实时<br>条件</span>
+                        <span style="line-height: 2.25vh;">实时<br>条件</span>
                     </el-button>
                 </div>
-                <div class="flex-column">
-                    <div class="flex-row" style="margin-bottom: 0.8vh; margin-top: .5vh">
-                        <span class="desc">冲淤起算地形：</span>
-                        <el-select v-model="conditionConfigureData.refDEM" placeholder="请选择地形"
-                            style="width: 7vw; height: 3.5vh" @change="" value-key="name">
-                            <el-option v-for="(
+                <div class="flex-row" style="justify-content: space-between; align-items: center;">
+                    <div class="flex-column">
+                        <div class="flex-row" style="margin-bottom: 0.8vh; margin-top: .5vh">
+                            <span class="desc">冲淤起算地形：</span>
+                            <el-select v-model="conditionConfigureData.refDEM" placeholder="请选择地形"
+                                style="width: 7vw; height: 3.5vh" @change="" value-key="name">
+                                <el-option v-for="(
                                   item, index
                               ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
-                            </el-option>
-                        </el-select>
-                    </div>
-                    <div class="flex-row">
-                        <span class="desc">判别计算地形：</span>
-                        <el-select v-model="conditionConfigureData.benchDEM" placeholder="请选择地形"
-                            style="width: 7vw; height: 3.5vh" @change="" value-key="name">
-                            <el-option v-for="(
+                                </el-option>
+                            </el-select>
+                        </div>
+                        <div class="flex-row">
+                            <span class="desc">判别计算地形：</span>
+                            <el-select v-model="conditionConfigureData.benchDEM" placeholder="请选择地形"
+                                style="width: 7vw; height: 3.5vh" @change="" value-key="name">
+                                <el-option v-for="(
                                     item, index
                                 ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
-                            </el-option>
-                        </el-select>
+                                </el-option>
+                            </el-select>
+                        </div>
                     </div>
-                </div>
-                <div class="one-center" style="position: absolute; bottom: 2.6vh; right: 1vw">
+
                     <el-button type="primary" style="
-                            width: calc(2vw + 2vh);
-                            height: calc(2vw + 2vh);
+                            width:3vw;
+                            height: 6vh;
                             font-size: medium;
                         " @click="conditionConfigureDataResetHandler">确定</el-button>
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -542,6 +545,7 @@ import { runRiskLevelForAll, riskWarnResultParse } from '../components/bankRiskW
 // import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
 import ClientStorageHelper from '../utils/ClientStorageHelper';
+import { getRealTimeFlowAndLevelData } from '../api/realtimeWaterCondition';
 
 const curActiveIndex = ref(-1)
 
@@ -708,7 +712,7 @@ const mapJumpToRiver = (mapIns) => {
 const demResources = ref([])
 const getDemResource = async () => {
     const _bankEnName = 'Mzs'
-    const _demData = (await BankResourceHelper.getBankResourceList('DEM', _bankEnName)).data
+    const _demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', _bankEnName)).data
     console.log('getDemResource', _demData)
     return BankResourceHelper.DEMResourcetoList(_demData)
     // return [{ name: '1' }, { name: '2' }]
@@ -745,9 +749,12 @@ const conditionConfigureData = reactive({
         "month": "04"
     },
 })
-const realtimeConditionHandler = () => {
-    conditionConfigureData.flow = 63000
-    conditionConfigureData.tideDif = 2.4
+const realtimeConditionHandler = async () => {
+
+    const realTimeCond = await getRealTimeFlowAndLevelData()
+
+    conditionConfigureData.flow = realTimeCond.flow
+    conditionConfigureData.tideDif = realTimeCond.level
 }
 
 

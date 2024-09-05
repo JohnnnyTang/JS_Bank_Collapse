@@ -1,6 +1,6 @@
 <template>
     <div class="timestep-shower">
-        <el-progress type="dashboard" :percentage="percentage">
+        <el-progress type="dashboard" :percentage="percentage" :width="110" :height="110">
             <template #default="{ percentage }">
                 <!-- <span class="percentage-value">{{ hour + '时' }}</span> -->
                 <span class="percentage-value">{{ Math.floor(props.timeStep!) + '时' }}</span>
@@ -62,13 +62,13 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
 .timestep-shower {
     /* position: absolute;
     right: 4vw;
     bottom: 28vh; */
     position: relative;
     z-index: 3;
-    scale: 0.9;
 }
 
 .percentage-value {

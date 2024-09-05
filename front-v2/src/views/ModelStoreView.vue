@@ -37,10 +37,10 @@ const navToKnowLedge = () => {
 
 onMounted(async () => {
 
-  // let demData = (await BankResourceHelper.getBankResourceList('DEM', 'Mzs')).data
+  // let demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', 'Mzs')).data
   // let demList = BankResourceHelper.DEMResourcetoList(demData)
   // console.log(demList)
-  let hydroData = (await BankResourceHelper.getBankResourceList('Hydrodynamic', 'Mzs')).data
+  let hydroData = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', 'Mzs')).data
   let hydroTreeData = BankResourceHelper.HydroResourceToTree(hydroData, 'Mzs')
   console.log(hydroTreeData)
   // console.log('---------------')
@@ -48,11 +48,11 @@ onMounted(async () => {
   // console.log('---------------')
   // console.log(await BankResourceHelper.getOneBankBasicInfo('Mzs'))
   // console.log('---------------')
-  // console.log(await BankResourceHelper.getBankResourceList('Hydrodynamic', 'Mzs'))
+  // console.log(await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', 'Mzs'))
   // console.log('---------------')
-  // console.log(await BankResourceHelper.getBankResourceList('DEM', 'Mzs'))
+  // console.log(await BankResourceHelper.getBankCalculateResourceList('DEM', 'Mzs'))
   // console.log('---------------')
-  // console.log(await BankResourceHelper.getBankResourceList('Boundary', 'Mzs'))
+  // console.log(await BankResourceHelper.getBankCalculateResourceList('Boundary', 'Mzs'))
   // console.log('---------------')
 })
 

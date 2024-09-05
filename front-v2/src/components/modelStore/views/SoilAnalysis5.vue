@@ -271,7 +271,7 @@ const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
 
-    let demData = (await BankResourceHelper.getBankResourceList('DEM', selectedBank.bankEnName)).data
+    let demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', selectedBank.bankEnName)).data
     let demList = BankResourceHelper.DEMResourcetoList(demData)
     demResources.value = demList
 

@@ -11,7 +11,7 @@
                         <el-icon>
                             <FolderOpened />
                         </el-icon>
-                        <span>岸段资源管理</span>
+                        <span>岸段管理</span>
                     </template>
                     <el-sub-menu index="4-1">
                         <template #title>岸段列表</template>

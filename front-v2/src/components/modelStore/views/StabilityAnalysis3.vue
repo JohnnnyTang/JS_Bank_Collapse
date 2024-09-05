@@ -265,6 +265,7 @@ import { useRouter } from "vue-router";
 import ModelRunner from '../modelRunner'
 import '../../../utils/WebGL/dat_gui_style.css'
 import mapboxGl from 'mapbox-gl'
+import { getRealTimeFlowAndLevelData } from '../../../api/realtimeWaterCondition';
 
 
 let globleVariable = reactive({
@@ -321,14 +322,14 @@ const customParams = ref({
   // minTide: null,
   diffTide: null,
 });
-const tableData = ref([
-  {
-    flow: 98000,
-    // maxTide: 5.2,
-    // minTide: 2.7,
-    diffTide: 2.4,
-  },
-]);
+// const tableData = ref([
+//   {
+//     flow: 98000,
+//     // maxTide: 5.2,
+//     // minTide: 2.7,
+//     diffTide: 2.4,
+//   },
+// ]);
 const statusStyle = computed(() => {
   switch (modelRunnningStatusDesc.value) {
     case '未运行':
@@ -650,16 +651,11 @@ const flowLayerControl = (type, show) => {
         console.log('add lagrenge')
         flowWatcher && flowWatcher() // rm watcher
 
-        // let backEndJsonUrl2 = "/api/data/flow/configJson/flood";
-        // let imageSrcPrefix2 = "/api/data/flow/texture/flood/";
-        // let floodFlow = reactive(
-        //   new FlowFieldLayer("floodFlow", backEndJsonUrl2, imageSrcPrefix2)
-        // );
         let flow = reactive(new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix))
-        // let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, backEndJsonUrl2, imageSrcPrefix2)
-        flowWatcher = watch(() => flow.currentResourcePointer, (newVal) => {
+        flowWatcher = watch(() => flow.stepProgressRate, (newVal) => {
           hydrodynamicStore.flowFieldCurrentTimeStep = newVal
         })
+
 
         mapStore.getMap().addLayer(flow, 'mzsLabel')
       },
@@ -676,7 +672,7 @@ const flowLayerControl = (type, show) => {
         flowWatcher && flowWatcher() // rm watcher
         let flow = reactive(new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix))
 
-        flowWatcher = watch(() => flow.uvResourcePointer, (newVal) => {
+        flowWatcher = watch(() => flow.stepProgressRate, (newVal) => {
           hydrodynamicStore.flowFieldCurrentTimeStep = newVal
         })
         // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
@@ -904,7 +900,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
 const getTideLineDataOption = (data) => {
   const usData = data.result[0].us
   const vsData = data.result[0].vs
-  const timeData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+  const timeData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
 
   const tideLineOption = {
     grid: {
@@ -981,19 +977,17 @@ const mapFlyToRiver = (mapIns, bankName) => {
 
 const updateRealtimeWaterCondition = async () => {
   // async request
-  const response = {
-    flow: 85000,
-    // maxTide: 5.2,
-    // minTide: 3.9,
-    diffTide: 3.9
-  }
+  const response = await getRealTimeFlowAndLevelData()
   // update
-  tableData.value = [
-    response
-  ]
+  // tableData.value = [
+  //   response
+  // ]
   updateTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
-  customParams.value = response
+  customParams.value = {
+    flow: response.flow,
+    diffTide: response.level
+  }
   ElNotification({
     title: '已更新实时水文条件',
     message: `更新时间：${updateTime.value}`,
@@ -1017,9 +1011,11 @@ onMounted(async () => {
     markLineWatcher && markLineWatcher() // rm watcher
 
     let option = JSON.parse(JSON.stringify(toRaw(newVal)))// deep copy
+    console.log('showing option change!::', option)
     chartIns.setOption(option)
 
     markLineWatcher = watch(() => hydrodynamicStore.flowFieldCurrentTimeStep, (newVal) => {
+      console.log('newVal::', newVal)
       let showingOption = JSON.parse(JSON.stringify(toRaw(hydrodynamicStore.showingOption)))// deep copy
       let markLineOption = hydrodynamicStore.getMarkLineOption()
       showingOption.series[0].markLine = markLineOption

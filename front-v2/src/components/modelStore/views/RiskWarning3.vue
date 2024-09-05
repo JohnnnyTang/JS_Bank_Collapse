@@ -335,7 +335,7 @@ const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
 
-    let demData = (await BankResourceHelper.getBankResourceList('DEM', selectedBank.bankEnName)).data
+    let demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', selectedBank.bankEnName)).data
     let demList = BankResourceHelper.DEMResourcetoList(demData)
 
     demResources.value = demList
@@ -612,7 +612,7 @@ const run = async () => {
                 case 'RUNNING':
                 case 'LOCK':
                 case 'UNLOCK':
-                    let progress = modelRunnningProgress.value + Math.random() * 0.8
+                    let progress = modelRunnningProgress.value + Math.random() * 8
                     modelRunnningProgress.value = clamp(progress, 0, 98)
 
                     break

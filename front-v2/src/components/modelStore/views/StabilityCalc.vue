@@ -454,7 +454,7 @@ const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
 
-    const hydroData = (await BankResourceHelper.getBankResourceList('Hydrodynamic', selectedBank.bankEnName)).data
+    const hydroData = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', selectedBank.bankEnName)).data
     const _treeData = getTreeDataFromJson(hydroData, selectedBank.bankEnName)
 
     updateTreeData(_treeData)
@@ -814,7 +814,7 @@ onMounted(async () => {
     progressInterval = setInterval(() => {
         for (let key in fakeProgressMap.value) {
             if (fakeProgressMap.value[key] < 99) {
-                fakeProgressMap.value[key] += Math.random() * 0.008
+                fakeProgressMap.value[key] += Math.random() * 0.004
             }
         }
     }, 1000)

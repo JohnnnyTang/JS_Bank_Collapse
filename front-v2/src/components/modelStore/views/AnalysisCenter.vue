@@ -161,7 +161,7 @@ const confirmBankHandler = async (bank) => {
   console.log(bank);
   rightMap.value.mapFlyToRiver(bank.name);
 
-  const demData = (await BankResourceHelper.getBankResourceList("DEM", bank.bankEnName))
+  const demData = (await BankResourceHelper.getBankCalculateResourceList("DEM", bank.bankEnName))
     .data;
 
   //const result = await getDataList("DEM", bank.bankEnName);
