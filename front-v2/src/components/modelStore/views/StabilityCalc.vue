@@ -180,7 +180,7 @@
                 </dv-border-box12>
             </div>
 
-            <div class="math-model-calculation flex-coloum" style="align-items: center" v-show="mathModelCalcBlockShow">
+            <div class="math-model-calculation flex-coloum" style="align-items: center" v-show="true">
                 <div class="main-title">
                     数学模型计算
                     <div class="minimize-btn" @click="mathModelCalcBlockShow = false"></div>
@@ -196,11 +196,12 @@
                                 justify-content: space-evenly;
                                 align-items: center;
                             ">
-                            <el-upload v-model:file-list="fileList" action="#" :show-file-list="false"
-                                v-for="item in Object.keys(fileListNeedUpload)" style="height: 4vh">
-                                <el-button type="primary" plain @click="
-                                    fileUpload(fileListNeedUpload[item])
-                                    ">{{ item }}
+                            <el-upload v-model:file-list="fileLists[index]" action="#" :show-file-list="false" :limit="1"
+                                ref="uploadRef" :http-request="handleUpload" v-for="(item, index) in filesNeedUpload
+                            " style="height: 4vh">
+                                <el-button type="primary" plain>
+                                    {{ item }}
+                                    <span>({{ exampleFileLists[index] }})</span>
                                 </el-button>
                             </el-upload>
                         </div>
@@ -281,50 +282,10 @@
                                                 " placeholder="请输入名称" />
                                         </div>
                                     </div>
-                                    <!-- <div
-                                        class="confirm-container one-center"
-                                        v-show="
-                                            mathModelParams.addToRiskJudgeFlag !=
-                                            null
-                                        "
-                                    >
-                                        <el-button
-                                            style="
-                                                width: 5vw;
-                                                font-size: calc(0.7vw + 0.5vh);
-                                            "
-                                            type="primary"
-                                            plain
-                                            @click="createNewCaseConfirmHandler"
-                                            >确认</el-button
-                                        >
-                                    </div> -->
                                 </div>
                             </div>
                             <div class="running-container">
                                 <el-button type="primary" plain @click="runMathModel">确认并运行</el-button>
-                                <!-- <div class="flex-row" style="
-                                        padding: 1vh 0.5vw;
-                                        width: 12vw;
-                                        justify-content: space-between;
-                                    ">
-                                    <div class="one-center">
-                                        <span>状态：<span :style="statusStyle">{{
-                                            modelRunnningStatusDesc
-                                        }}</span></span>
-                                    </div>
-                                    <div class="one-center">
-                                        <el-button type="primary" plain @click="runMathModel">确认运行</el-button>
-                                    </div>
-                                </div>
-                                <div style="
-                                        width: 13vw;
-                                        height: 3vh;
-                                        margin-top: 1vh;
-                                        margin-left: 1vw;
-                                    ">
-                                    <el-progress :percentage="modelRunnningProgress" :stroke-width="15" striped />
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -397,28 +358,13 @@ const showFlow = ref(0)
 const visulizationStatus = ref(false)
 const mathModelCalcBlockShow = ref(false)
 const ModelRunningShow = ref(false)
-const modelRunnningProgress = ref(30)
 const ModelRunningMessage = ref('')
-const modelRunnningStatusDesc = ref('未运行')
 const router = useRouter()
 const defaultProps = {
     children: 'children',
     label: 'lable',
 }
 
-const clickedNode = reactive({
-    flow: 0,
-    type: '',
-    temp: false,
-    desc: '',
-    info: {},
-})
-const clickedSet = reactive({
-    data: {},
-    node: {},
-})
-const tideTypeList = ['小潮', '中潮', '大潮']
-const tideValue = ['xc', 'zc', 'dc']
 const typeMap = {
     dc: '大潮',
     zc: '中潮',
@@ -429,27 +375,13 @@ const tempMap = {
     true: '否',
 }
 
-const statusStyle = computed(() => {
-    switch (modelRunnningStatusDesc.value) {
-        case '未运行':
-            return { color: 'rgb(124, 124, 124)' }
-        case '运行中':
-            return { color: 'rgb(255, 165, 0)' }
-        case '运行完毕':
-            return { color: 'rgb(0, 180, 0)' }
-        default:
-            return { color: 'rgb(0, 0, 0)' }
-    }
-})
-
-/////////////////// 岸段选择
+/////////////////// 岸段选择 /////////////////// 
 const selectedBank = reactive({
     name: null,
     bankEnName: null
 })
 const treeData = ref([])
 const treeRef = ref(null)
-
 const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
@@ -469,7 +401,11 @@ const confirmBankHandler = async (bank) => {
     })
 }
 
-/////////////////// 资源节点信息记录
+
+
+
+/////////////////// 资源节点信息记录 /////////////////// 
+const clickedNode = reactive({ flow: 0, type: '', temp: false, desc: '', info: {}, })
 const handleNodeClick = (nodeData, nodeInfo) => {
     console.log('nodeData', nodeData)
     console.log('nodeInfo', nodeInfo)
@@ -483,76 +419,83 @@ const handleNodeClick = (nodeData, nodeInfo) => {
     }
 }
 
-///////////////////////// 新建工况 + 数模计算
 
-///////// 文件上传
-const fileListNeedUpload = {
-    网格和地形文件: 'meshFile',
-    边界条件: 'boudaryFile',
-    初始条件: 'initialFile',
-    参数文件: 'parameterFile',
-    控制文件: 'controlFile',
-}
-const fileList = ref([])
-const mathModelParams = reactive({
-    meshFile: null,
-    boudaryFile: null,
-    initialFile: null,
-    parameterFile: null,
-    controlFile: null,
-    addToRiskJudgeFlag: null,
-    flow: null,
-    tideType: null,
-    customName: null,
+//////////////////// 新建工况 + 数模计算 ////////////////////START
+////////////// 新建工况
+const clickedSet = reactive({
+    data: {},
+    node: {},
 })
-
 const createNewCaseClickHandler = (nodeData, nodeInfo) => {
     clickedSet.data = nodeData
     clickedSet.node = nodeInfo
     console.log('createNewCaseClickHandler', nodeData, nodeInfo)
     mathModelCalcBlockShow.value = true
 }
-const fileUpload = (type) => {
-    // console.log('fileUpload', type)
-    // ElNotification({
-    //     type: 'info',
-    //     title: '模块正在开发中....',
-    // })
+
+
+////////////// 数模计算
+const uploadRef = ref(null)
+const filesNeedUpload = ['属性文件', '网格文件', '控制文件', '径流边界', '潮位边界']
+const exampleFileLists = ['fort.13', 'fort.14', 'fort.15', 'fort.19', 'fort.20']
+const fileLists = ref([[], [], [], [], []])
+const mathModelParams = reactive({
+    addToRiskJudgeFlag: null,
+    flow: null,
+    tideType: null,
+    customName: null,
+})
+const tideTypeList = ['小潮', '中潮', '大潮']
+const tideValue = ['xc', 'zc', 'dc']
+const handleUpload = (file) => {
+    console.log('user upload file -- ', file)
 }
-const runMathModel = async () => {
+const runMathModel = () => {
+    console.log('mathModelParams')
     console.log(mathModelParams)
+    console.log('file lists')
+    console.log(fileLists.value)
 
-    const parentNode = treeRef.value.getNode(clickedSet.data)
-    const newChild = {
-        lable: mathModelParams.addToRiskJudgeFlag === '1' ? `${mathModelParams.flow}${mathModelParams.tideType}` : `${mathModelParams.customName}`,
-        type: 'case',
-        tag: '计算中',
-        temp: mathModelParams.addToRiskJudgeFlag === '1' ? false : true,
-        description: ''
+    const formData = new FormData()
+    for (let i = 0; i < fileLists.value.length; i++) {
+        const fileList = fileLists.value[i]
+        const key = exampleFileLists[i]
+        if (fileList.length > 0) {
+            const file = fileList[0].raw
+            formData.append(key, file)
+        } else {
+            alert('文件未完全上传！')
+            return
+        }
     }
-    if (findByLable(treeRef.value.data[0], newChild.lable)) {
-        ElNotification({
-            type: 'warning',
-            title: '警告',
-            message: `工况【${newChild.lable}】已存在，请勿重复计算`,
-            offset: 250,
+    const name = mathModelParams.addToRiskJudgeFlag == 1 ? '' + mathModelParams.flow + mathModelParams.tideType : mathModelParams.customName
+    const mathModelInfo = {
+        "segment": selectedBank.bankEnName,
+        "year": clickedSet.data.year,//clickedSet.data.year,
+        "set": clickedSet.data.set,//clickedSet.data.set,
+        "name": name,
+        "temp": mathModelParams.addToRiskJudgeFlag == 1,
+        "boundary": "geojson/Mzs/2023/standard/boundary/boundary.geojson"
+    }
+    formData.append("info", JSON.stringify(mathModelInfo))
+
+    axios.post('/model/taskNode/start/numeric/hydrodynamic/real', formData).then(res => {
+        ElNotification.success({
+            message: '模型开始计算',
+            offset: 130
         })
-        return
-    }
-
-    treeRef.value.append(newChild, parentNode)
-    updateTreeData(treeRef.value.data)
-
-    fakeProgressMap.value[newChild.lable] = 0
-    // mathModelCalcBlockShow.value = false
-
-    ElNotification({
-        type: 'success',
-        title: '开始运行',
-        message: `计算数学模型 ${newChild.lable}`,
-        offset: 250,
+    }).catch(err => {
+        ElNotification.success({
+            message: '模型计算失败',
+            offset: 130
+        })
+        console.error('数模计算失败', err)
     })
 }
+//////////////////// 新建工况 + 数模计算 ////////////////////END
+
+
+
 
 //////// 进度查询
 const fakeProgressMap = ref({})

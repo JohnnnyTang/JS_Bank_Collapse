@@ -172,23 +172,24 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.path === '/login') {
-        next()
-    } else {
-        const isLoggedIn = localStorage.getItem('token');
-        if (isLoggedIn) {
-            axios.get('/api/data/monitorInfo').then(res => {
-                // as token check
-                next()
-            }).catch(err => {
-                console.log(err)
-                next('/login');
-            })
-            // next()
-        } else {
-            next('/login');
-        }
-    }
+    // if (to.path === '/login') {
+    //     next()
+    // } else {
+    //     const isLoggedIn = localStorage.getItem('token');
+    //     if (isLoggedIn) {
+    //         axios.get('/api/data/monitorInfo').then(res => {
+    //             // as token check
+    //             next()
+    //         }).catch(err => {
+    //             console.log(err)
+    //             next('/login');
+    //         })
+    //         // next()
+    //     } else {
+    //         next('/login');
+    //     }
+    // }
+    next()
 })
 
 export default router

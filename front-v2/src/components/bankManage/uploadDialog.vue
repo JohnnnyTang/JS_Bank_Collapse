@@ -34,7 +34,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
-import { ElLoading } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus'
 import axios from 'axios'
 
 const props = defineProps({
@@ -133,37 +133,37 @@ const handleRemove = (file, fileList) => {
     console.log('remove! ', file, fileList)
     console.log('Cancel the transfer! ', file.name)
 }
+let formData = null
 const handleFileUpload = (file) => {
-    // post info to server
-    upLoading.value = true
+
     // file info 
     const fileInfo = parseInfoFromArray(dialogInfo.value[props.type])
     console.log('fileInfo!!', fileInfo)
     // build form data
-    const formData = new FormData()
+    formData = new FormData()
     formData.append('file', file.file)
     formData.append('info', JSON.stringify(fileInfo))
     console.log('formData!!', formData)
-
-
-    axios.post('/model/data/bankResource/up/modelServer/resource/file', formData).then(res => {
-        console.log('上传成功！', res)
-        dialogFormVisible.value = false
-        upLoading.value = false
-    }).catch(err => {
-        console.error('上传失败！', err)
-    })
-    setTimeout(() => {
-        upLoading.value = false
-        // dialogFormVisible.value = false
-    }, 1000)
 }
 const cancleUploadHandler = () => {
     dialogFormVisible.value = false
 }
 const confirmUploadHandler = (res) => {
-    uploadRef.value.submit()
-    // dialogFormVisible.value = false
+    console.log('confirmUploadHandler!!', formData)
+    if (formData && formData.has('file') && formData.has('info')) {
+        // post info to server
+        upLoading.value = true
+        axios.post('/model/data/bankResource/up/modelServer/resource/file', formData).then(res => {
+            console.log('上传成功！', res)
+            dialogFormVisible.value = false
+            upLoading.value = false
+        }).catch(err => {
+            console.error('上传失败！', err)
+        })
+    }
+    else {
+        ElMessage.error('请选择文件后上传')
+    }
 }
 
 
