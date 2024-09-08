@@ -110,7 +110,7 @@ const runRiskLevelForAll = (data, refs, info) => {
     const startModelPromises = []
     return new Promise((resolve, reject) => {
 
-        /////// start Model , get task ID list ///////
+        /////// 001 start Model , get task ID list ///////
         for (let i = 0; i < requestBodies.length; i++) {
             const requestBody = requestBodies[i]
             startModelPromises.push(axios.post(RiskLevelModelUrl, requestBody))
@@ -128,7 +128,7 @@ const runRiskLevelForAll = (data, refs, info) => {
 
             let statusInterval = setInterval(() => {
 
-                /////// query Status , get task Status ///////
+                /////// 002 query Status , get task Status ///////
                 const taskStatusPromises = []
                 taskIdList.forEach(taskId => {
                     let url = RiskLevelStatusUrlPrefix + taskId
@@ -145,7 +145,7 @@ const runRiskLevelForAll = (data, refs, info) => {
                         clearInterval(statusInterval)
                         console.log('模型运行成功!')
 
-                        /////// query Result , get Model Result ///////
+                        /////// 003 query Result , get Model Result ///////
                         const resultPromises = []
                         taskIdList.forEach(taskId => {
                             let resultUrl = RiskLevelResultUrlPrefix + taskId
@@ -157,20 +157,56 @@ const runRiskLevelForAll = (data, refs, info) => {
 
                             const resultList = res.map(item => item.data)
 
-                            let keys = ['JC01', 'JC02', 'JC03', 'JC04', 'JC05', 'JC06', 'JC07', 'JC08', 'JC09', 'JC10', 'JC11', 'JC12']
+
+
+                            /////result no BSTEM////
                             let result = {}
+                            const keys = ['JC01', 'JC02', 'JC03', 'JC04', 'JC05', 'JC06', 'JC07', 'JC08', 'JC09', 'JC10', 'JC11', 'JC12']
                             resultList.forEach((item, index) => {
-                                // result[Geojson.features[index].properties.label] = item
                                 result[keys[index]] = item
                             })
 
-                            console.log('/////////result//////////')
+                            console.log('/////////result no BSTEM//////////')
                             console.log(result)
 
-                            // TODO: write into local storage
 
 
-                            resolve(result)
+                            /////// 004 check Result , run BSTEM if low risk ///////
+                            const BSTEMPromises = []
+                            const lowLevelIndexes = []
+                            resultList.forEach(async (item, index) => {
+                                if (item["result"] < 0.25) {
+                                    const demID = requestBodies[index]['bench-id']
+                                    const sectionGeometry = requestBodies[index]['section-geometry']
+                                    const flowElevation = requestBodies[index]['tidalLevel']
+                                    const reqBody = {
+                                        "dem-id": demID,
+                                        "section-geometry": sectionGeometry,
+                                        "x-values": null,
+                                        "z-values": null,
+                                        "index-toe": null,
+                                        "flow-elevation": flowElevation,
+                                        "bank-layer-thickness": null
+                                    }
+                                    BSTEMPromises.push(axios.post('/model/taskNode/start/erosionModel/calculateBSTEM', reqBody))
+                                    lowLevelIndexes.push(index)
+                                }
+                            })
+                            Promise.all(BSTEMPromises).then(async (res) => {
+                                for (let i = 0; i < res.length; i++) {
+                                    let realIndex = lowLevelIndexes[i]
+                                    let thisResult = res[i].data
+                                    result[keys[realIndex]] = thisResult
+                                }
+
+                                console.log('/////////result with BSTEM//////////')
+                                console.log(result)
+                                resolve(result)
+                            }).catch(_ => {
+                                throw new Error('土体变形分析校核计算失败')
+                            })
+
+                            
                         }).catch(_ => {
                             throw new Error('获取模型结果失败')
                         })
