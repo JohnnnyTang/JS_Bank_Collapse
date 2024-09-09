@@ -12,25 +12,10 @@ import router from './router/index'
 import { useDeviceNameStore } from './store/mapStore';
 
 onMounted(async () => {
-
-    // const tileServerInfo = await axios.get('/api/service')
-    // const tileServer = `http://` + tileServerInfo.data.ip + ':' + tileServerInfo.data.port+`/api/v1`
-    // console.log('TILE_SERVER::', tileServer)
-    // window.tileServer = tileServer
     
     const infoBoxDiv = document.createElement('div')
     infoBoxDiv.style.position = 'absolute'
     infoBoxDiv.style.zIndex = '999'
-    // infoBoxDiv.style.backgroundColor = 'red'
-    // infoBoxDiv.style.pointerEvents = 'none'
-    // infoBoxDiv.style.textAlign = 'center'
-    // infoBoxDiv.style.lineHeight = '50px'
-    // infoBoxDiv.style.fontSize = '20px'
-    // infoBoxDiv.style.display = 'none'
-    // infoBoxDiv.style.height = '50px'
-    // infoBoxDiv.style.opacity = '0.8'
-    // infoBoxDiv.style.color = 'white'
-    // infoBoxDiv.style.width = '50px'
     infoBoxDiv.id = 'DeviceInfoBox'
     document.body.appendChild(infoBoxDiv)
 

@@ -53,7 +53,11 @@ const routes = [
         name: 'home',
         // redirect: '/dataVisual'
         redirect: _ => {
-            return localStorage.getItem('token') ? '/dataVisual' : '/login';
+            const login = import.meta.env.VITE_LOGIN
+            if (login === 'YES')
+                return localStorage.getItem('token') ? '/dataVisual' : '/login';
+            else if (login === 'NOT')
+                return '/dataVisual';
         }
         // component: () => import("../views/BankMainView.vue")
     },
@@ -171,23 +175,26 @@ const router = createRouter({
     routes: routes,
 })
 
+const login = import.meta.env.VITE_LOGIN
 router.beforeEach((to, from, next) => {
-    if (to.path === '/login') {
-        next()
-    } else {
-        const isLoggedIn = localStorage.getItem('token');
-        if (isLoggedIn) {
-            axios.get('/api/data/monitorInfo').then(res => {
-                // as token check
-                next()
-            }).catch(err => {
-                console.log(err)
-                next('/login');
-            })
-            // next()
+    if (login === 'YES') {
+        if (to.path === '/login') {
+            next()
         } else {
-            next('/login');
+            const isLoggedIn = localStorage.getItem('token');
+            if (isLoggedIn) {
+                axios.get('/model/data/bank').then(res => {
+                    next()
+                }).catch(err => {
+                    console.log(err)
+                    next('/login');
+                })
+            } else {
+                next('/login');
+            }
         }
+    } else if (login === 'NOT') {
+        next()
     }
 })
 

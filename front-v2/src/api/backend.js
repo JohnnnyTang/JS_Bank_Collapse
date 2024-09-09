@@ -8,32 +8,36 @@ const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
     baseURL: '/api',
 })
-backendInstance.interceptors.request.use(
-    config => {
-        const token = localStorage.getItem('token');
-        // const token = sessionStorage.getItem('token');
-        if (token) {
-            config.headers["token"] = token;
+const login = import.meta.env.VITE_LOGIN
+if (login === 'YSE') {
+    backendInstance.interceptors.request.use(
+        config => {
+            const token = localStorage.getItem('token');
+            // const token = sessionStorage.getItem('token');
+            if (token) {
+                config.headers["token"] = token;
+            }
+            return config;
+        },
+        error => {
+            return Promise.reject(error);
         }
-        return config;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
-backendInstance.interceptors.response.use(
-    response => {
-        if (response.data["msg"] === "token过期") {
-            ElMessage.error("用户认证过期，请重新登录");
-            router.push('/login');
-            return Promise.reject(response.data);
+    );
+    backendInstance.interceptors.response.use(
+        response => {
+            if (response.data["msg"] === "token过期") {
+                ElMessage.error("用户认证过期，请重新登录");
+                router.push('/login');
+                return Promise.reject(response.data);
+            }
+            return response;
+        },
+        error => {
+            return Promise.reject(error);
         }
-        return response;
-    },
-    error => {
-        return Promise.reject(error);
-    }
-);
+    );
+}
+
 
 
 export default class BackEndRequest {
@@ -201,8 +205,8 @@ export default class BackEndRequest {
     static getVideoToken() {
         return axios.post(`https://open.ys7.com/api/lapp/token/get`, null, {
             params: {
-                appKey: 'd228a2fab09d4c879b4449c356bbd90d',
-                appSecret: '0c46042ef59aed43c4eddbb80d637369',
+                appKey: '2f4ba8e320884836a7c7b0cb292b5f03',
+                appSecret: '5c3a2c8bf600b6107fa2f6135cc0f1cd',
             },
         })
     }

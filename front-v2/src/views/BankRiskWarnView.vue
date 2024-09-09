@@ -836,6 +836,17 @@ const conditionConfigureDataResetHandler = async () => {
     }).then((result) => {
         console.log('runRiskLevelForAll result:', result)
 
+        if (result === null) {
+            ElMessage({
+                type: 'error',
+                message: '模型运行失败',
+                offset: 260
+            })
+            isRunningMan.value = false
+            RunningManSays.value = ''
+            return
+        }
+
         isRunningMan.value = false
         RunningManSays.value = ''
         ///////////////////// result ////////////////////////

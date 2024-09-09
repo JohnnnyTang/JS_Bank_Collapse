@@ -14,33 +14,39 @@ import { useStatusStore } from './store/statusStore'
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
-// interceptors config
-axios.interceptors.request.use(
-    config => {
-        const token = localStorage.getItem('token')
-        if (token) {
-            config.headers["token"] = token
+const login = import.meta.env.VITE_LOGIN
+if (login === 'NOT') {
+    // nothing
+} else if (login === 'YES') {
+    // interceptors config
+    axios.interceptors.request.use(
+        config => {
+            const token = localStorage.getItem('token')
+            if (token) {
+                config.headers["token"] = token
+            }
+            return config
+        },
+        error => {
+            return Promise.reject(error);
         }
-        return config
-    },
-    error => {
-        return Promise.reject(error);
-    }
-)
-axios.interceptors.response.use(
-    response => {
-        if (response.data["state"] === false) {
-            ElMessage.error("用户认证未通过，请重新登录")
-            router.push('/login')
-            useStatusStore().loginStatus = false
-            return Promise.reject(response.data)
+    )
+    axios.interceptors.response.use(
+        response => {
+            if (response.data["state"] === false) {
+                ElMessage.error("用户认证未通过，请重新登录")
+                router.push('/login')
+                useStatusStore().loginStatus = false
+                return Promise.reject(response.data)
+            }
+            return response
+        },
+        error => {
+            return Promise.reject(error)
         }
-        return response
-    },
-    error => {
-        return Promise.reject(error)
-    }
-)
+    )
+}
+
 
 
 const app = createApp(App)

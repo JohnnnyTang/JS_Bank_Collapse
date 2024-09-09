@@ -375,30 +375,58 @@ const initOneBank = async (bankEnName) => {
     ]
 
     // device resource init
-    const monitorInfo = (await axios.get('/api/data/monitorInfo')).data
-    const { _GNSS, _Incline, _Stress, _Menometer, _Vedio } = parseMonitorInfo(monitorInfo)
-    const _thisDeviceResourceInfo = [
-        {
-            key: 'GNSS设备',
-            resourceList: _GNSS
-        },
-        {
-            key: '孔隙水压力计设备',
-            resourceList: _Menometer
-        },
-        {
-            key: '应力桩设备',
-            resourceList: _Stress
-        },
-        {
-            key: '测斜仪设备',
-            resourceList: _Incline
-        },
-        {
-            key: '监控摄像设备',
-            resourceList: _Vedio
-        },
-    ]
+    let _thisDeviceResourceInfo = []
+    if (bankEnName === 'Mzs') {
+        const monitorInfo = (await axios.get('/api/data/monitorInfo')).data
+        const { _GNSS, _Incline, _Stress, _Menometer, _Vedio } = parseMonitorInfo(monitorInfo)
+        _thisDeviceResourceInfo = [
+            {
+                key: 'GNSS设备',
+                resourceList: _GNSS
+            },
+            {
+                key: '孔隙水压力计设备',
+                resourceList: _Menometer
+            },
+            {
+                key: '应力桩设备',
+                resourceList: _Stress
+            },
+            {
+                key: '测斜仪设备',
+                resourceList: _Incline
+            },
+            {
+                key: '监控摄像设备',
+                resourceList: _Vedio
+            },
+        ]
+    }
+    else {
+        _thisDeviceResourceInfo = [
+            {
+                key: 'GNSS设备',
+                resourceList: []
+            },
+            {
+                key: '孔隙水压力计设备',
+                resourceList: []
+            },
+            {
+                key: '应力桩设备',
+                resourceList: []
+            },
+            {
+                key: '测斜仪设备',
+                resourceList: []
+            },
+            {
+                key: '监控摄像设备',
+                resourceList: []
+            },
+        ]
+    }
+
 
 
     //////////////////
