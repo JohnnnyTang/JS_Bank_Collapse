@@ -153,6 +153,28 @@ public class ProcessUtil {
         return processBuilder.start();
     }
 
+    public static Process buildShpVector2pgServiceProcess(TaskNode taskNode, String condaEnv) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        commands.add(sysCmdExeStr);
+        commands.add(sysLinkStr);
+        commands.add(condaStr + condaEnv + " &&");
+        ModelNode modelNode = taskNode.getModelNode();
+        JSONObject modelUsage = modelNode.getUsage();
+        commands.add((String) modelUsage.get("exePrefix"));
+        commands.add(taskNode.getModelNode().getProgram());
+        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
+        JSONObject paramObject = taskNode.getParamNode().getParams();
+        for(String paramKey: paramKeys) {
+            if(Objects.equals(paramKey, "jsonId")) continue;
+            commands.add(paramObject.get(paramKey).toString());
+        }
+        processBuilder.command(commands);
+        System.out.println(commands);
+        processBuilder.inheritIO(); // 继承标准输入输出
+        return processBuilder.start();
+    }
+
     public static void logProcessOutput(InputStream inputStream) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("GBK")));

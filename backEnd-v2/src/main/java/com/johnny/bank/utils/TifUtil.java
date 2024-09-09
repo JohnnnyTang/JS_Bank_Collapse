@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 public class TifUtil {
 
-    @Value("${tile.tifTilePath}")
+    @Value("${staticData.tifTilePath}")
     private String tifTilePathValue;
 
     @Value("${multiIndex.condaEnv}")
@@ -41,7 +41,7 @@ public class TifUtil {
     private static String condaEnv;
 
     private static final String category = "OutsideModelNodeItem";
-    private static final String name = "tif2tile";
+    private static final String name = "tif2tile_nongradation";
 
     @PostConstruct
     public void init() {
@@ -129,7 +129,7 @@ public class TifUtil {
             DataNodeV2 dataNode = DataNodeV2.dataNodeBuilder()
                     .bank(info.getString("segment")).auth("all").name(originBasicName).category("DEMTileDataItem")
                     .usage(usage)
-                    .path(",DataNodeHead,MzsBankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",DEMTileDataGroupOf"+bank+",")
+                    .path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",DEMTileDataGroupOf"+bank+",")
                     .build();
             DataNodeV2 dataNodeBefore = dataNodeServiceV2.getDataNodeByCategoryBankName(dataNode.getCategory(),dataNode.getBank(),dataNode.getName());
             // 若资源重复，则删除后重新挂载资源

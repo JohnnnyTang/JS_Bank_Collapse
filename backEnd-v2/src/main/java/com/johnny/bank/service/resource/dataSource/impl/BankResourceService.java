@@ -1,13 +1,20 @@
 package com.johnny.bank.service.resource.dataSource.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNodeV2;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.repository.nodeRepo.base.IBaseNodeRepo;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
+import com.johnny.bank.utils.FileUtil;
+import com.johnny.bank.utils.VectorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +28,12 @@ import java.util.List;
 
 @Service("BankResourceService")
 public class BankResourceService {
+
+    @Value("${staticData.tifTilePath}")
+    String tifTilePath;
+
+    @Value("${staticData.waterConditionPath}")
+    String waterConditionPath;
 
     @Autowired
     IDataNodeRepoV2 dataNodeRepoV2;
@@ -72,6 +85,11 @@ public class BankResourceService {
         return dataNodeList;
     }
 
+    public JSONArray getWaterCondition(String bank) {
+        String waterCondition = waterConditionPath + File.separator + bank + File.separator + "water.json";
+        return JSONArray.parseArray(FileUtil.getFileContent(waterCondition));
+    }
+
     public String addNewBank(String bank, JSONObject info) {
         // 新建岸段
         if (dataNodeServiceV2.getDataNodeByCategoryName("BankNode", bank + "BankNode") != null) {
@@ -88,9 +106,18 @@ public class BankResourceService {
                 .category("BankNode").path(",DataNodeHead,").basicInfo(dataNodeBasicInfo)
                 .build();
         dataNodeServiceV2.save(dataNode);
+        // 根节点(1)
         dataNodeServiceV2.addDataGroupNode(bank, "RealtimeDeviceGroupOf"+bank, "RealtimeDeviceGroup", ",DataNodeHead,"+bank+"BankNode,");
+        // 静态数据节点(2)
         dataNodeServiceV2.addDataGroupNode(bank, "StaticDataGroupOf"+bank, "StaticDataGroup", ",DataNodeHead,"+bank+"BankNode,");
+        // 可视化数据节点(3)
+        dataNodeServiceV2.addDataGroupNode(bank, "VisualizationDataGroupOf"+bank, "VisualizationDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
+        // 瓦片数据节点(4)
+        dataNodeServiceV2.addDataGroupNode(bank, "DEMTileDataGroupOf"+bank, "DEMTileDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",");
+        dataNodeServiceV2.addDataGroupNode(bank, "VectorDataGroupOf"+bank, "VectorDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",");
+        // 模型计算数据节点(3)
         dataNodeServiceV2.addDataGroupNode(bank, "ModelDataGroupOf"+bank, "ModelDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
+        // 水动力，边界，dem，配置数据节点(4)
         dataNodeServiceV2.addDataGroupNode(bank, "HydrodynamicDataGroupOf"+bank, "HydrodynamicDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
         dataNodeServiceV2.addDataGroupNode(bank, "BoundaryDataGroupOf"+bank, "BoundaryDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
         dataNodeServiceV2.addDataGroupNode(bank, "DEMDataGroupOf"+bank, "DEMDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
@@ -107,6 +134,8 @@ public class BankResourceService {
             String id = dataNode.getId();
             dataNodeRepoV2.deleteById(id);
         }
+        File deleteFolder = new File(tifTilePath + "/tile/" + bank);
+        FileUtil.deleteFolder(deleteFolder);
         return "岸段 " + bankDataNode.getBasicInfo().getString("name") + " 删除成功！";
     }
 
@@ -124,5 +153,16 @@ public class BankResourceService {
         String bankDataNodeId = dataNodeServiceV2.getDataNodeByCategoryName("BankNode",bank+"BankNode").getId();
         dataNodeServiceV2.updateNodeById(bankDataNodeId, dataNode);
         return "岸段 " + info.getString("name") + " 信息更新成功！";
+    }
+
+    public String uploadVisualizationResourceData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
+//        String category = info.getString("category");
+        String name = info.getString("name");
+        String bank = info.getString("segment");
+//        if (dataNodeServiceV2.getDataNodeByCategoryName(category, name) != null) {
+//            return "该数据资源已存在！";
+//        }
+        VectorUtil.shpVector2pg(file, info, bank);
+        return "test successfully";
     }
 }

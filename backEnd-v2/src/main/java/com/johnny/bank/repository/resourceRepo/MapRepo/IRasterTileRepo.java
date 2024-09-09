@@ -4,6 +4,7 @@ import com.johnny.bank.model.configuration.TilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -17,6 +18,9 @@ import java.io.FileInputStream;
 @Repository("RasterTileRepo")
 @Slf4j
 public class IRasterTileRepo {
+
+    @Value("${staticData.tifTilePath}")
+    private String tifTilePathValue;
 
     private final TilePath tilePathConfig;
 
@@ -68,7 +72,7 @@ public class IRasterTileRepo {
     }
 
     public byte[] getDEMRasterFile(String tilePath) throws Exception {
-        String fullPath = tilePathConfig.getTifTilePath() + tilePath;
+        String fullPath = tifTilePathValue + tilePath;
         return  getRasterDataAsByteArray(fullPath);
     }
 

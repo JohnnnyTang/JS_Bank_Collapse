@@ -148,7 +148,10 @@ public class BankResourceController {
 
     // 资源获取
     // local
-
+    @GetMapping("/down/local/resource/{bank}/waterCondition")
+    public ResponseEntity<JSONArray> getResourceWaterCondition(@PathVariable String bank) {
+        return ResponseEntity.ok(bankResourceService.getWaterCondition(bank));
+    }
 
     // 资源上载
     // modelServer
@@ -162,6 +165,11 @@ public class BankResourceController {
     @PostMapping("/up/local/resource/bank/{bank}")
     public ResponseEntity<String> addNewBank(@PathVariable String bank, @RequestBody JSONObject info) {
         return ResponseEntity.ok(bankResourceService.addNewBank(bank, info));
+    }
+
+    @PostMapping("/up/local/resource/file")
+    public ResponseEntity<String> uploadResourceVisualizationData(@RequestParam("file") MultipartFile file, @RequestParam("info") String info) throws IOException, InterruptedException {
+        return ResponseEntity.ok(bankResourceService.uploadVisualizationResourceData(file, JSONObject.parse(info)));
     }
 
     // 资源删除

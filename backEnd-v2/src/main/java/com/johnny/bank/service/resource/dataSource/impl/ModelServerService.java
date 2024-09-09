@@ -35,6 +35,9 @@ public class ModelServerService implements IModelServerService {
     @Autowired
     IDataNodeRepoV2 dataNodeRepoV2;
 
+    @Autowired
+    DataNodeServiceV2 dataNodeServiceV2;
+
     @Value("${modelServer.url}")
     String baseUrl;
 
@@ -98,6 +101,10 @@ public class ModelServerService implements IModelServerService {
     @Override
     public String uploadCalculateResourceData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
         String fileType = info.getString("fileType");
+        String bank = info.getString("segment");
+        if (dataNodeServiceV2.getDataNodeByCategoryName("BankNode", bank + "BankNode") == null) {
+            return "该岸段不存在！";
+        }
         return switch (fileType) {
             case "shapefile" -> uploadCalculateResourceShapefileData(file, info);
             case "geojson" -> uploadCalculateResourceGeojsonData(file, info);
@@ -217,7 +224,7 @@ public class ModelServerService implements IModelServerService {
         DataNodeV2 dataNode = DataNodeV2.dataNodeBuilder()
                 .bank(info.getString("segment")).basicInfo(null)
                 .name(info.getString("name")).dataOrigin("ModelServer")
-                .category(typeName + "DataItem").path(",DataNodeHead,MzsBankNode,StaticDataGroupOf" + bank + ",ModelServerDataGroupOf" + bank + "," + typeName + "DataGroupOf" + bank + ",")
+                .category(typeName + "DataItem").path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf" + bank + ",ModelServerDataGroupOf" + bank + "," + typeName + "DataGroupOf" + bank + ",")
                 .build();
         DataNodeServiceV2 dataNodeServiceV2 = BeanUtil.getBean(DataNodeServiceV2.class);
         JSONObject response = JSONObject.parseObject(InternetUtil.doPost_File(url, file, info));
@@ -233,6 +240,6 @@ public class ModelServerService implements IModelServerService {
         }
         dataNodeServiceV2.save(dataNode);
         log.info(typeName + "Data " + dataNode.getName() + " uploaded" + "("+resourceName+")");
-        return "Uploaded " + typeName + "Data" + "("+resourceName+")";
+        return "Uploaded " + typeName + "Data" + "("+resourceName+") of "+bank;
     }
 }

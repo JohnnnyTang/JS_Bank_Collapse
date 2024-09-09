@@ -19,5 +19,4 @@ public class TilePath {
     private String nodeServicePath;
     private String riverTilePath;
     private String riverImagePath;
-    private String tifTilePath;
 }
