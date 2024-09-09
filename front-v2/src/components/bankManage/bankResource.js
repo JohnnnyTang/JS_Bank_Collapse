@@ -127,20 +127,14 @@ export const defaultTableColumns = {
         {
             prop: "name",
             label: "名称",
-            "min-width": "24%",
+            "min-width": "40%",
             asTag: false
         },
         {
             prop: "type",
             label: "类型",
-            "min-width": "23%",
+            "min-width": "40%",
             asTag: true
-        },
-        {
-            prop: "uploadTime",
-            label: "上传时间",
-            "min-width": "23%",
-            asTag: false
         },
     ],
     '设备资源管理': [
@@ -163,4 +157,12 @@ export const defaultTableColumns = {
             asTag: false
         },
     ]
+}
+
+export const typeDict = ['model', 'visual', 'device']
+
+export const resourceTypeDict = {
+    'model': ['DEM', 'Hydrodynamic', 'Boundary', 'Config'],
+    'visual': ['DEM', 'Vector', 'Other'],
+    'device': []
 }

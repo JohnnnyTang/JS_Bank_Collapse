@@ -111,6 +111,9 @@ export default class FlowFieldLayer {
     //     this.renderingMode = '2d';
     //     this.ffManager = ffManager;
     // }
+
+    stepProgressRate = 0.0
+
     constructor(layerID, jsonUrl, resourcePrefix) {
         this.id = layerID;
         this.type = 'custom';
@@ -135,6 +138,7 @@ export default class FlowFieldLayer {
             this.now_SeedTextureArr[1] = this.seedingTextureArr[nextPhase % this.textureArraySize];
         let temp = value * this.phaseCount;
         this.uboMapBufferData[0] = temp - Math.floor(temp);
+        this.stepProgressRate = this.currentResourcePointer + Math.round(this.uboMapBufferData[0] * 10) / 10;
         if (currentPhase != lastPhase) {
             this.currentResourcePointer = (this.currentResourcePointer + 1) % this.phaseCount;
             // //console.log('now time step :: ', this.currentResourcePointer)

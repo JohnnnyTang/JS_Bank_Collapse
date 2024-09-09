@@ -1,32 +1,34 @@
 <template>
     <div class="bank-resouce-create-container">
         <div class="main-title">新建岸段 </div>
-        <div class="desc-box-container">
-            <div class="title-container">岸段基本信息
-                <div class="upload-btn" @click="createNewBankClickHandler">新建</div>
-            </div>
-            <div class="detail-content-container">
+        <div class="content">
 
-                <div class="bank-name">
-                    <div class="bankName-key">岸段名称</div>
-                    <div class="bankName-val">
-                        <el-input v-model="bank.name" style="
+            <div class="desc-box-container">
+                <div class="title-container">岸段基本信息
+                    <div class="upload-btn" @click="createNewBankClickHandler">新建</div>
+                </div>
+                <div class="detail-content-container">
+
+                    <div class="bank-name">
+                        <div class="bankName-key">岸段名称</div>
+                        <div class="bankName-val">
+                            <el-input v-model="bank.name" style="
                                 width: 50%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
                             " placeholder="请输入岸段名称" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
-                        <el-input v-model="bank.bankEnName" style="
+                            <el-input v-model="bank.bankEnName" style="
                                 width: 50%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
                             " placeholder="请输入名称编码" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
+                        </div>
                     </div>
-                </div>
 
-                <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type">
-                    <div class="detail-key">{{ item.key }}</div>
-                    <div class="detail-val">
-                        <el-input v-model="item.val" style="
+                    <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type">
+                        <div class="detail-key">{{ item.key }}</div>
+                        <div class="detail-val">
+                            <el-input v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
@@ -34,14 +36,16 @@
                                 ? 'textarea'
                                 : 'text'
                                 " :autosize="{ minRows: 4, maxRows: 6 }" />
+                        </div>
                     </div>
+
+
                 </div>
-
-
             </div>
         </div>
 
-        <div class="resource-box-container">
+
+        <!-- <div class="resource-box-container">
             <div class="title-container">岸段资源上传</div>
             <div class="resource-content-container">
                 <el-scrollbar height="75vh">
@@ -67,25 +71,16 @@
                     </div>
                 </el-scrollbar>
             </div>
-        </div>
+        </div> -->
     </div>
 
-    <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
+    <!-- <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
         <template #header="{ titleId, titleClass }">
             <div class="form-header" style="">
                 {{ '● ' + dialogFormTitle }}
             </div>
         </template>
         <el-form :model="dialogInfo">
-            <!-- <el-form-item label="Promotion name">
-                <el-input v-model="form.name" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="Zones">
-                <el-select v-model="form.region" placeholder="Please select a zone">
-                    <el-option label="Zone No.1" value="shanghai" />
-                    <el-option label="Zone No.2" value="beijing" />
-                </el-select>
-            </el-form-item> -->
             <el-form-item v-for="(item, index) in dialogInfo" :key="index" :label="item.label">
                 <el-input v-model="item.value" autocomplete="off" />
             </el-form-item>
@@ -98,7 +93,7 @@
                 </el-button>
             </div>
         </template>
-    </el-dialog>
+    </el-dialog> -->
 </template>
 
 <script setup>
@@ -310,226 +305,241 @@ div.bank-resouce-create-container {
         // border-bottom: 4px solid #0040a0;
     }
 
-    div.desc-box-container {
-        // position: relative;
+    div.content {
         position: absolute;
+        width: 100%;
+        height: 84.5vh;
         top: 6vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #0040a037;
 
-        width: 43vw;
-        height: 82vh;
+        div.desc-box-container {
+            position: relative;
+            // position: absolute;
+            // top: 6vh;
 
-        margin-top: 1vh;
-        margin-bottom: 1vh;
-        margin-left: 0.5vw;
-        margin-right: 0.5vw;
+            width: 43vw;
+            height: 84.5vh;
 
-        background-color: aliceblue;
-        border-right: 2px solid #7aa8ff;
-        // border: 2px solid #7aa8ff;
-
-        // border-radius: 12px;
-
-        // box-shadow: 10px 12px 20px -10px rgba(0, 0, 0, 0.8);
-
-        overflow: hidden;
-
-        div.title-container {
-            width: 42vw;
-            height: 7vh;
+            margin-top: 1vh;
+            margin-bottom: 1vh;
             margin-left: 0.5vw;
+            margin-right: 0.5vw;
 
-            line-height: 7vh;
+            background-color: aliceblue;
+            border-right: 5px solid #6399ff;
+            border-left: 5px solid #6399ff;
 
-            text-align: center;
+            // border: 2px solid #7aa8ff;
 
-            font-size: calc(1vw + 1vh);
-            font-weight: bold;
+            // border-radius: 12px;
 
-            border-bottom: 4px solid #0040a0;
-            color: #001d7a;
+            // box-shadow: 10px 12px 20px -10px rgba(0, 0, 0, 0.8);
 
-            .upload-btn {
-                position: absolute;
-                right: 1vw;
-                top: .5vh;
-                width: 5vw;
-                height: 5vh;
-                line-height: 5vh;
-                text-align: center;
-                font-size: calc(0.9vw + 0.7vh);
-                font-weight: bold;
-                background-color: rgb(184, 235, 255);
-                color: #002d70;
-                border-radius: 5px;
-                transition: .3s ease-in-out;
+            overflow: hidden;
 
-                &:hover {
-                    cursor: pointer;
-                    background-color: rgb(133, 220, 255);
-                }
+            div.title-container {
+                width: 42vw;
+                height: 7vh;
+                margin-left: 0.5vw;
 
-            }
-        }
-
-        div.detail-content-container {
-            width: 38vw;
-            margin-left: 2.5vw;
-            // padding-right: 0.5vw;
-            height: calc(83vh - 4px);
-
-            display: flex;
-            flex-flow: row wrap;
-            justify-content: space-between;
-            align-content: flex-start;
-            row-gap: 3vh;
-
-            div.bank-name {
-                width: 38vw;
-                height: 8vh;
-                font-size: calc(0.8vw + 0.8vh);
-                border-bottom: 3px solid rgb(31, 123, 209);
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-
-                div.bankName-key {
-                    height: 8vh;
-                    line-height: 8vh;
-                    font-weight: bold;
-                    font-size: calc(0.8vw + 1vh);
-                    color: #002397;
-                }
-
-                div.bankName-val {
-                    height: 8vh;
-                    line-height: 8vh;
-                    width: 50%;
-                }
-            }
-
-            div.detail-box-item {
-                width: 19vw;
-                height: 16vh;
-                font-size: calc(0.8vw + 0.8vh);
-                border-bottom: 3px solid rgb(31, 123, 209);
-
-                div.detail-key {
-                    height: 8vh;
-                    line-height: 8vh;
-                    font-weight: bold;
-                    font-size: calc(0.8vw + 1vh);
-                    color: #002397;
-                }
-
-                div.detail-val {
-                    height: 8vh;
-                    line-height: 8vh;
-
-                    div.detail-val-row {
-                        height: 4vh;
-                        line-height: 4vh;
-                    }
-                }
-
-                &.single {
-                    width: 38vw;
-                }
-
-                &.long-text {
-                    height: 24vh;
-
-                    div.detail-val {
-                        line-height: normal;
-                        height: 16vh;
-                    }
-                }
-
-                &.left {
-                    text-align: left;
-                }
-
-                &.right {
-                    text-align: right;
-                }
-            }
-
-            div.change-button-container {
-                position: relative;
-                width: 8vw;
-                height: 4vh;
-                top: 2vh;
-                left: 30vw;
-
-                // background-color: #0040a0;
-
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: space-between;
+                line-height: 7vh;
 
                 text-align: center;
+
+                font-size: calc(1vw + 1vh);
                 font-weight: bold;
-                font-size: calc(0.8vw + 0.4vh);
 
-                div.change-button {
-                    width: 8vw;
-                    height: 4vh;
-                    line-height: 4vh;
-                    border-radius: 6px;
+                border-bottom: 4px solid #0040a0;
+                color: #001d7a;
 
-                    background-color: #b4ddff;
-                    transition: all 0.2s ease-in-out;
-
-                    box-shadow:
-                        rgba(0, 132, 255, 0.8) 1px 1px,
-                        rgba(0, 119, 255, 0.7) 2px 2px,
-                        rgba(0, 119, 255, 0.6) 3px 3px;
-
-                    &.modify {
-                        width: 3.2vw;
-                    }
+                .upload-btn {
+                    position: absolute;
+                    right: 1vw;
+                    top: .5vh;
+                    width: 5vw;
+                    height: 5vh;
+                    line-height: 5vh;
+                    text-align: center;
+                    font-size: calc(0.9vw + 0.7vh);
+                    font-weight: bold;
+                    background-color: rgb(184, 235, 255);
+                    color: #002d70;
+                    border-radius: 5px;
+                    transition: .3s ease-in-out;
 
                     &:hover {
                         cursor: pointer;
-                        transform: translate3d(2px, 2px, 2px);
-                        color: #0539a8;
+                        background-color: rgb(133, 220, 255);
+                    }
+
+                }
+            }
+
+            div.detail-content-container {
+                width: 38vw;
+                margin-left: 2.5vw;
+                // padding-right: 0.5vw;
+                height: calc(83vh - 4px);
+
+                display: flex;
+                flex-flow: row wrap;
+                justify-content: space-between;
+                align-content: flex-start;
+                row-gap: 3vh;
+
+                div.bank-name {
+                    width: 38vw;
+                    height: 8vh;
+                    font-size: calc(0.8vw + 0.8vh);
+                    border-bottom: 3px solid rgb(31, 123, 209);
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+
+                    div.bankName-key {
+                        height: 8vh;
+                        line-height: 8vh;
+                        font-weight: bold;
+                        font-size: calc(0.8vw + 1vh);
+                        color: #002397;
+                    }
+
+                    div.bankName-val {
+                        height: 8vh;
+                        line-height: 8vh;
+                        width: 50%;
+                    }
+                }
+
+                div.detail-box-item {
+                    width: 19vw;
+                    height: 16vh;
+                    font-size: calc(0.8vw + 0.8vh);
+                    border-bottom: 3px solid rgb(31, 123, 209);
+
+                    div.detail-key {
+                        height: 8vh;
+                        line-height: 8vh;
+                        font-weight: bold;
+                        font-size: calc(0.8vw + 1vh);
+                        color: #002397;
+                    }
+
+                    div.detail-val {
+                        height: 8vh;
+                        line-height: 8vh;
+
+                        div.detail-val-row {
+                            height: 4vh;
+                            line-height: 4vh;
+                        }
+                    }
+
+                    &.single {
+                        width: 38vw;
+                    }
+
+                    &.long-text {
+                        height: 24vh;
+
+                        div.detail-val {
+                            line-height: normal;
+                            height: 16vh;
+                        }
+                    }
+
+                    &.left {
+                        text-align: left;
+                    }
+
+                    &.right {
+                        text-align: right;
+                    }
+                }
+
+                div.change-button-container {
+                    position: relative;
+                    width: 8vw;
+                    height: 4vh;
+                    top: 2vh;
+                    left: 30vw;
+
+                    // background-color: #0040a0;
+
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: space-between;
+
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: calc(0.8vw + 0.4vh);
+
+                    div.change-button {
+                        width: 8vw;
+                        height: 4vh;
+                        line-height: 4vh;
+                        border-radius: 6px;
+
+                        background-color: #b4ddff;
+                        transition: all 0.2s ease-in-out;
+
                         box-shadow:
                             rgba(0, 132, 255, 0.8) 1px 1px,
                             rgba(0, 119, 255, 0.7) 2px 2px,
-                            rgba(0, 119, 255, 0.6) 3px 3px,
-                            rgba(0, 119, 255, 0.4) 4px 4px;
+                            rgba(0, 119, 255, 0.6) 3px 3px;
+
+                        &.modify {
+                            width: 3.2vw;
+                        }
+
+                        &:hover {
+                            cursor: pointer;
+                            transform: translate3d(2px, 2px, 2px);
+                            color: #0539a8;
+                            box-shadow:
+                                rgba(0, 132, 255, 0.8) 1px 1px,
+                                rgba(0, 119, 255, 0.7) 2px 2px,
+                                rgba(0, 119, 255, 0.6) 3px 3px,
+                                rgba(0, 119, 255, 0.4) 4px 4px;
+                        }
                     }
-                }
 
-                div.cancel-button {
-                    width: 3.2vw;
-                    height: 4vh;
-                    line-height: 4vh;
-                    transition: all 0.6s ease-in-out;
+                    div.cancel-button {
+                        width: 3.2vw;
+                        height: 4vh;
+                        line-height: 4vh;
+                        transition: all 0.6s ease-in-out;
 
-                    border-radius: 6px;
-                    color: #f0f8ff;
-                    background-color: #2358eb;
-                    box-shadow:
-                        rgba(29, 142, 248, 0.8) 1px 1px,
-                        rgba(26, 133, 255, 0.7) 2px 2px,
-                        rgba(25, 132, 255, 0.6) 3px 3px;
-
-                    &:hover {
-                        cursor: pointer;
-                        color: #85f7ff;
-                        transform: translate3d(2px, 2px, 2px);
+                        border-radius: 6px;
+                        color: #f0f8ff;
+                        background-color: #2358eb;
                         box-shadow:
                             rgba(29, 142, 248, 0.8) 1px 1px,
                             rgba(26, 133, 255, 0.7) 2px 2px,
-                            rgba(25, 132, 255, 0.6) 3px 3px,
-                            rgba(35, 138, 255, 0.4) 4px 4px;
+                            rgba(25, 132, 255, 0.6) 3px 3px;
+
+                        &:hover {
+                            cursor: pointer;
+                            color: #85f7ff;
+                            transform: translate3d(2px, 2px, 2px);
+                            box-shadow:
+                                rgba(29, 142, 248, 0.8) 1px 1px,
+                                rgba(26, 133, 255, 0.7) 2px 2px,
+                                rgba(25, 132, 255, 0.6) 3px 3px,
+                                rgba(35, 138, 255, 0.4) 4px 4px;
+                        }
                     }
                 }
-            }
 
-            // background-color: antiquewhite;
+                // background-color: antiquewhite;
+            }
         }
     }
+
+
 
     div.resource-box-container {
 

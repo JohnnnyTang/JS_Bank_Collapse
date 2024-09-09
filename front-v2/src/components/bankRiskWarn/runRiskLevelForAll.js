@@ -19,9 +19,10 @@ const Geojson = {
         { "type": "Feature", "properties": { "id": 11, "label": "MZ12沙尾" }, "geometry": { "type": "LineString", "coordinates": [[120.564634835598596, 32.024005776133073], [120.556805942576688, 31.997794491370112]] } }
     ]
 }
+const BSTEMModelUrl = '/model/taskNode/start/erosionModel/calculateBSTEM'
 const RiskLevelModelUrl = '/model/taskNode/start/multipleIndicators/calculateRiskLevel'
-const RiskLevelStatusUrlPrefix = '/model/taskNode/status/id?taskId='
-const RiskLevelResultUrlPrefix = '/model/taskNode/result/id?taskId='
+const modelStatusUrlPrefix = '/model/taskNode/status/id?taskId='
+const modelResultUrlPrefix = '/model/taskNode/result/id?taskId='
 
 const ModelInfoMap = new Map()
 
@@ -110,7 +111,7 @@ const runRiskLevelForAll = (data, refs, info) => {
     const startModelPromises = []
     return new Promise((resolve, reject) => {
 
-        /////// start Model , get task ID list ///////
+        /////// 001 start Model , get task ID list ///////
         for (let i = 0; i < requestBodies.length; i++) {
             const requestBody = requestBodies[i]
             startModelPromises.push(axios.post(RiskLevelModelUrl, requestBody))
@@ -128,10 +129,10 @@ const runRiskLevelForAll = (data, refs, info) => {
 
             let statusInterval = setInterval(() => {
 
-                /////// query Status , get task Status ///////
+                /////// 002 query Status , get task Status ///////
                 const taskStatusPromises = []
                 taskIdList.forEach(taskId => {
-                    let url = RiskLevelStatusUrlPrefix + taskId
+                    let url = modelStatusUrlPrefix + taskId
                     taskStatusPromises.push(axios.get(url))
                 })
 
@@ -145,10 +146,10 @@ const runRiskLevelForAll = (data, refs, info) => {
                         clearInterval(statusInterval)
                         console.log('模型运行成功!')
 
-                        /////// query Result , get Model Result ///////
+                        /////// 003 query Result , get Model Result ///////
                         const resultPromises = []
                         taskIdList.forEach(taskId => {
-                            let resultUrl = RiskLevelResultUrlPrefix + taskId
+                            let resultUrl = modelResultUrlPrefix + taskId
                             resultPromises.push(axios.get(resultUrl))
                         })
 
@@ -157,20 +158,120 @@ const runRiskLevelForAll = (data, refs, info) => {
 
                             const resultList = res.map(item => item.data)
 
-                            let keys = ['JC01', 'JC02', 'JC03', 'JC04', 'JC05', 'JC06', 'JC07', 'JC08', 'JC09', 'JC10', 'JC11', 'JC12']
+
+
+                            /////result no BSTEM////
                             let result = {}
+                            const keys = ['JC01', 'JC02', 'JC03', 'JC04', 'JC05', 'JC06', 'JC07', 'JC08', 'JC09', 'JC10', 'JC11', 'JC12']
                             resultList.forEach((item, index) => {
-                                // result[Geojson.features[index].properties.label] = item
                                 result[keys[index]] = item
                             })
 
-                            console.log('/////////result//////////')
+                            console.log('/////////result no BSTEM//////////')
+                            console.log('全部结果高风险，无需运行土体变形分析')
                             console.log(result)
-
-                            // TODO: write into local storage
-
-
                             resolve(result)
+
+
+                            /////// 004 check Result , run BSTEM if low risk ///////
+
+                            ////////////// 0041 start BSTEM Model //////////////
+                            // const BSTEMPromises = []
+                            // const lowLevelIndexes = []
+                            // let flag = 1
+                            // resultList.forEach(async (item, index) => {
+                            //     if (item["result"] < 0.25) {
+                            //         flag = 0
+                            //         const demID = requestBodies[index]['bench-id']
+                            //         const sectionGeometry = requestBodies[index]['section-geometry']
+                            //         const flowElevation = requestBodies[index]['tidal-level']
+                            //         const reqBody = {
+                            //             "dem-id": 'NONE',
+                            //             "section-geometry": sectionGeometry,
+                            //             "x-values": null,
+                            //             "z-values": null,
+                            //             "index-toe": null,
+                            //             "flow-elevation": flowElevation,
+                            //             "bank-layer-thickness": [1.93, -4.07, -11.57, -26.57, -36.57]
+                            //         }
+                            //         BSTEMPromises.push(axios.post(BSTEMModelUrl, reqBody))
+                            //         lowLevelIndexes.push(index)
+                            //     }
+                            // })
+                            // if (flag) {
+                            //     console.log('全部结果高风险，无需运行土体变形分析')
+                            //     resolve(result)
+                            //     return
+                            // }
+
+                            // Promise.all(BSTEMPromises).then(async (res) => {
+                            //     const BSTEMtaskIDList = res.map(item => item.data)
+                            //     // console.log('/////////BSTEMtaskIDList//////////')
+                            //     console.log('BSTEMtaskIDList', BSTEMtaskIDList)
+
+
+                            //     let BSTEMstatusInterval = setInterval(() => {
+                            //         const BSTEMStatusPromises = []
+                            //         for (let i = 0; i < res.length; i++) {
+                            //             let taskId = res[i].data
+                            //             BSTEMStatusPromises.push(axios.get(modelStatusUrlPrefix + taskId))
+                            //         }
+
+                            //         Promise.all(BSTEMStatusPromises).then(async (res) => {
+                            //             const BSTEMstatusList = res.map(item => item.data)
+                            //             console.log('BSTEMstatusList', BSTEMstatusList)
+                            //             if (BSTEMstatusList.every(item => item === 'COMPLETE')) {
+                            //                 // stop loop , get result
+                            //                 BSTEMstatusInterval && clearInterval(BSTEMstatusInterval)
+                            //                 const BSTEMresultPromises = []
+                            //                 BSTEMtaskIDList.forEach(taskId => {
+                            //                     let resultUrl = modelResultUrlPrefix + taskId
+                            //                     BSTEMresultPromises.push(axios.get(resultUrl))
+                            //                 })
+
+                            //                 Promise.all(BSTEMresultPromises).then(async (res) => {
+                            //                     // const BSTEMresultList = res.map(item => item.data)
+                            //                     for (let i = 0; i < res.length; i++) {
+                            //                         let thisResult = res[i].data
+                            //                         result[keys[lowLevelIndexes[i]]] = thisResult
+                            //                     }
+
+                            //                     console.log('/////////result with BSTEM//////////')
+                            //                     console.log(result)
+                            //                     resolve(result)
+                            //                 })
+                            //             }
+                            //             else if (BSTEMstatusList.every(item => item === 'ERROR' || item === 'NOT FOUND' || item === 'NONE' || item === 'COMPLETE')) {
+                            //                 // stop loop , delete result
+                            //                 clearInterval(BSTEMstatusInterval)
+                            //                 const BSTEMdeletePromises = []
+                            //                 statusList.forEach((item, index) => {
+                            //                     if (item === 'ERROR' || item === 'NOT FOUND' || item === 'NONE') {
+                            //                         let resultUrl = modelResultUrlPrefix + BSTEMtaskIDList[index]
+                            //                         BSTEMdeletePromises.push(axios.get(resultUrl))
+                            //                     }
+                            //                 })
+                            //                 Promise.all(BSTEMdeletePromises).then(async (res) => {
+                            //                     console.log('/////////BSTEM清除结果//////////')
+                            //                     console.log(res.data)
+                            //                     resolve(null)
+                            //                 }).catch(_ => {
+                            //                     throw new Error('清除结果失败')
+                            //                 })
+                            //             }
+
+                            //         }).catch(_ => {
+
+                            //         })
+                            //     }, 1000)
+
+
+
+                            // }).catch(_ => {
+                            //     throw new Error('土体变形分析校核计算失败')
+                            // })
+
+
                         }).catch(_ => {
                             throw new Error('获取模型结果失败')
                         })
@@ -180,13 +281,14 @@ const runRiskLevelForAll = (data, refs, info) => {
                         const deletePromises = []
                         statusList.forEach((item, index) => {
                             if (item === 'ERROR' || item === 'NOT FOUND' || item === 'NONE') {
-                                let resultUrl = RiskLevelResultUrlPrefix + taskIdList[index]
+                                let resultUrl = modelResultUrlPrefix + taskIdList[index]
                                 deletePromises.push(axios.get(resultUrl))
                             }
                         })
                         Promise.all(deletePromises).then(async (res) => {
                             console.log('/////////清除结果//////////')
                             console.log(res.data)
+                            resolve(null)
                         }).catch(_ => {
                             throw new Error('清除结果失败')
                         })

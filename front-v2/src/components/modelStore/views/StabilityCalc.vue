@@ -67,6 +67,7 @@
                                                             }}</el-tag>
                                                     </el-tooltip>
 
+                                                    <el-tag type="error" v-if="data.tag === '错误'">{{ data.tag }}</el-tag>
 
                                                 </div>
                                             </template>
@@ -180,7 +181,8 @@
                 </dv-border-box12>
             </div>
 
-            <div class="math-model-calculation flex-coloum" style="align-items: center" v-show="mathModelCalcBlockShow">
+            <div class="math-model-calculation flex-coloum" style="align-items: center" v-show="mathModelCalcBlockShow"
+                v-loading="modelStartLoading">
                 <div class="main-title">
                     数学模型计算
                     <div class="minimize-btn" @click="mathModelCalcBlockShow = false"></div>
@@ -196,11 +198,12 @@
                                 justify-content: space-evenly;
                                 align-items: center;
                             ">
-                            <el-upload v-model:file-list="fileList" action="#" :show-file-list="false"
-                                v-for="item in Object.keys(fileListNeedUpload)" style="height: 4vh">
-                                <el-button type="primary" plain @click="
-                                    fileUpload(fileListNeedUpload[item])
-                                    ">{{ item }}
+                            <el-upload v-model:file-list="fileLists[index]" action="#" :show-file-list="false" :limit="1"
+                                ref="uploadRef" :http-request="handleUpload" v-for="(item, index) in filesNeedUpload
+                            " style="height: 4vh">
+                                <el-button type="primary" plain>
+                                    {{ item }}
+                                    <span>({{ exampleFileLists[index] }})</span>
                                 </el-button>
                             </el-upload>
                         </div>
@@ -281,50 +284,10 @@
                                                 " placeholder="请输入名称" />
                                         </div>
                                     </div>
-                                    <!-- <div
-                                        class="confirm-container one-center"
-                                        v-show="
-                                            mathModelParams.addToRiskJudgeFlag !=
-                                            null
-                                        "
-                                    >
-                                        <el-button
-                                            style="
-                                                width: 5vw;
-                                                font-size: calc(0.7vw + 0.5vh);
-                                            "
-                                            type="primary"
-                                            plain
-                                            @click="createNewCaseConfirmHandler"
-                                            >确认</el-button
-                                        >
-                                    </div> -->
                                 </div>
                             </div>
                             <div class="running-container">
                                 <el-button type="primary" plain @click="runMathModel">确认并运行</el-button>
-                                <!-- <div class="flex-row" style="
-                                        padding: 1vh 0.5vw;
-                                        width: 12vw;
-                                        justify-content: space-between;
-                                    ">
-                                    <div class="one-center">
-                                        <span>状态：<span :style="statusStyle">{{
-                                            modelRunnningStatusDesc
-                                        }}</span></span>
-                                    </div>
-                                    <div class="one-center">
-                                        <el-button type="primary" plain @click="runMathModel">确认运行</el-button>
-                                    </div>
-                                </div>
-                                <div style="
-                                        width: 13vw;
-                                        height: 3vh;
-                                        margin-top: 1vh;
-                                        margin-left: 1vw;
-                                    ">
-                                    <el-progress :percentage="modelRunnningProgress" :stroke-width="15" striped />
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -337,24 +300,13 @@
             <div class="loading-message">{{ ModelRunningMessage }}</div>
         </dv-loading>
     </div>
-    <!-- <div class="calc-progress-container" v-show="showProgress" :class="{ translate: !conditionPannelShow }"
-        @click="hideDomClickHandler()">
-        <HideDomButtom :direction="conditionPannelShow ? 'right' : 'left'"></HideDomButtom>
-        <div class="head">
-            <div>{{ queryCase.lable }}</div>
-        </div>
-        <div class="main">
-            <el-progress :percentage="fakeProgressMap[queryCase.lable] || 0" :stroke-width="27" :format="progressFormat"
-                striped striped-flow :duration="25" />
-        </div>
-    </div> -->
     <el-drawer v-model="progressDrawerShow" :with-header="false" direction="rtl">
         <div class="drawer-header">
             <div class="icon"></div>
             <span class="text">模型计算进度</span>
         </div>
         <div class="drawer-content">
-            <div class="progress-card" v-for="(item, index) in Object.keys(fakeProgressMap)" :key="index">
+            <div class="progress-card" v-for="(item, index) in Object.keys(calcCaseInfo)" :key="index">
                 <div class="top-block">
                     <div class="flex-row">
                         <div class="k">工况：</div>
@@ -363,8 +315,8 @@
                     <el-tag type="info">运行中</el-tag>
                 </div>
                 <div class="bot-block">
-                    <el-progress :percentage="fakeProgressMap[item] || 0" :stroke-width="20" :format="progressFormat"
-                        striped striped-flow :duration="25" />
+                    <el-progress :percentage="calcCaseInfo[item]['progress'] || 0" :stroke-width="20"
+                        :format="progressFormat" striped striped-flow :duration="25" />
                 </div>
             </div>
         </div>
@@ -379,6 +331,7 @@ import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import { initFineMap } from '../../../utils/mapUtils'
 import { useMapStore } from '../../../store/mapStore'
+import { useMathModelStore } from '../../../store/modelStore'
 import { ElNotification, ElMessageBox } from 'element-plus'
 import axios from 'axios'
 import dayjs from 'dayjs'
@@ -397,28 +350,13 @@ const showFlow = ref(0)
 const visulizationStatus = ref(false)
 const mathModelCalcBlockShow = ref(false)
 const ModelRunningShow = ref(false)
-const modelRunnningProgress = ref(30)
 const ModelRunningMessage = ref('')
-const modelRunnningStatusDesc = ref('未运行')
 const router = useRouter()
 const defaultProps = {
     children: 'children',
     label: 'lable',
 }
 
-const clickedNode = reactive({
-    flow: 0,
-    type: '',
-    temp: false,
-    desc: '',
-    info: {},
-})
-const clickedSet = reactive({
-    data: {},
-    node: {},
-})
-const tideTypeList = ['小潮', '中潮', '大潮']
-const tideValue = ['xc', 'zc', 'dc']
 const typeMap = {
     dc: '大潮',
     zc: '中潮',
@@ -429,35 +367,18 @@ const tempMap = {
     true: '否',
 }
 
-const statusStyle = computed(() => {
-    switch (modelRunnningStatusDesc.value) {
-        case '未运行':
-            return { color: 'rgb(124, 124, 124)' }
-        case '运行中':
-            return { color: 'rgb(255, 165, 0)' }
-        case '运行完毕':
-            return { color: 'rgb(0, 180, 0)' }
-        default:
-            return { color: 'rgb(0, 0, 0)' }
-    }
-})
-
-/////////////////// 岸段选择
+/////////////////// 岸段选择 /////////////////// 
 const selectedBank = reactive({
     name: null,
     bankEnName: null
 })
 const treeData = ref([])
 const treeRef = ref(null)
-
 const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
 
-    const hydroData = (await BankResourceHelper.getBankResourceList('Hydrodynamic', selectedBank.bankEnName)).data
-    const _treeData = getTreeDataFromJson(hydroData, selectedBank.bankEnName)
-
-    updateTreeData(_treeData)
+    updateTreeFromBack(selectedBank.bankEnName)
     mapFlyToRiver(mapStore.getMap(map), bank.name)
 
     ElNotification({
@@ -468,8 +389,15 @@ const confirmBankHandler = async (bank) => {
         offset: 250,
     })
 }
+const updateTreeFromBack = async (bankEnName) => {
+    const hydroData = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
+    const _treeData = await getTreeDataFromJson(hydroData, bankEnName)
+    updateTreeData(_treeData)
+}
 
-/////////////////// 资源节点信息记录
+
+/////////////////// 资源节点信息记录 /////////////////// 
+const clickedNode = reactive({ flow: 0, type: '', temp: false, desc: '', info: {}, })
 const handleNodeClick = (nodeData, nodeInfo) => {
     console.log('nodeData', nodeData)
     console.log('nodeInfo', nodeInfo)
@@ -483,44 +411,72 @@ const handleNodeClick = (nodeData, nodeInfo) => {
     }
 }
 
-///////////////////////// 新建工况 + 数模计算
 
-///////// 文件上传
-const fileListNeedUpload = {
-    网格和地形文件: 'meshFile',
-    边界条件: 'boudaryFile',
-    初始条件: 'initialFile',
-    参数文件: 'parameterFile',
-    控制文件: 'controlFile',
-}
-const fileList = ref([])
-const mathModelParams = reactive({
-    meshFile: null,
-    boudaryFile: null,
-    initialFile: null,
-    parameterFile: null,
-    controlFile: null,
-    addToRiskJudgeFlag: null,
-    flow: null,
-    tideType: null,
-    customName: null,
+//////////////////// 新建工况 + 数模计算 ////////////////////START
+////////////// 新建工况
+const clickedSet = reactive({
+    data: {},
+    node: {},
 })
-
 const createNewCaseClickHandler = (nodeData, nodeInfo) => {
     clickedSet.data = nodeData
     clickedSet.node = nodeInfo
     console.log('createNewCaseClickHandler', nodeData, nodeInfo)
     mathModelCalcBlockShow.value = true
 }
-const fileUpload = (type) => {
-    // console.log('fileUpload', type)
-    // ElNotification({
-    //     type: 'info',
-    //     title: '模块正在开发中....',
-    // })
+
+
+////////////// 数模计算
+const mathModelStore = useMathModelStore()
+const modelStartLoading = ref(false)
+const dataNeedStorage = {
 }
-const runMathModel = async () => {
+
+const uploadRef = ref(null)
+const filesNeedUpload = ['属性文件', '网格文件', '控制文件', '径流边界', '潮位边界']
+const exampleFileLists = ['fort.13', 'fort.14', 'fort.15', 'fort.19', 'fort.20']
+const fileLists = ref([[], [], [], [], []])
+const mathModelParams = reactive({
+    addToRiskJudgeFlag: null,
+    flow: null,
+    tideType: null,
+    customName: null,
+})
+const tideTypeList = ['小潮', '中潮', '大潮']
+const tideValue = ['xc', 'zc', 'dc']
+const handleUpload = (file) => {
+    console.log('user upload file -- ', file)
+}
+const runMathModel = () => {
+    console.log('mathModelParams')
     console.log(mathModelParams)
+    console.log('file lists')
+    console.log(fileLists.value)
+
+    modelStartLoading.value = true
+    const formData = new FormData()
+    for (let i = 0; i < fileLists.value.length; i++) {
+        const fileList = fileLists.value[i]
+        const key = exampleFileLists[i]
+        if (fileList.length > 0) {
+            const file = fileList[0].raw
+            formData.append(key, file)
+        } else {
+            alert('文件未完全上传！')
+            return
+        }
+    }
+    const name = mathModelParams.addToRiskJudgeFlag == 1 ? '' + mathModelParams.flow + mathModelParams.tideType : mathModelParams.customName
+    const mathModelInfo = {
+        "segment": selectedBank.bankEnName,
+        "year": clickedSet.data.year,//clickedSet.data.year,
+        "set": clickedSet.data.set,//clickedSet.data.set,
+        "name": name,
+        "temp": mathModelParams.addToRiskJudgeFlag == 1,
+        "boundary": "geojson/Mzs/2023/standard/boundary/boundary.geojson"
+    }
+    formData.append("info", JSON.stringify(mathModelInfo))
+
 
     const parentNode = treeRef.value.getNode(clickedSet.data)
     const newChild = {
@@ -528,7 +484,8 @@ const runMathModel = async () => {
         type: 'case',
         tag: '计算中',
         temp: mathModelParams.addToRiskJudgeFlag === '1' ? false : true,
-        description: ''
+        description: '',
+        segment: 'Mzs'
     }
     if (findByLable(treeRef.value.data[0], newChild.lable)) {
         ElNotification({
@@ -540,24 +497,64 @@ const runMathModel = async () => {
         return
     }
 
-    treeRef.value.append(newChild, parentNode)
-    updateTreeData(treeRef.value.data)
+    axios.post('/model/taskNode/start/numeric/hydrodynamic/real', formData).then(res => {
+        console.log('model start res::', res.data)
+        ElNotification.success({
+            message: '模型开始计算',
+            offset: 130
+        })
+        modelStartLoading.value = false
+        mathModelCalcBlockShow.value = false
 
-    fakeProgressMap.value[newChild.lable] = 0
-    // mathModelCalcBlockShow.value = false
+        treeRef.value.append(newChild, parentNode)
+        updateTreeData(treeRef.value.data)
 
-    ElNotification({
-        type: 'success',
-        title: '开始运行',
-        message: `计算数学模型 ${newChild.lable}`,
-        offset: 250,
+        const taskId = res.data
+        if (taskId === 'WRONG') throw new Error('模型计算失败')
+
+        const newCalculatingCase = {
+            'name': name,
+            'taskId': taskId,
+            'treeNode': newChild,
+            'treeNodeFather': clickedSet.data,
+            'progress': 0,
+        }
+        mathModelStore.addCalculatingCase(name, newCalculatingCase)
+
+        const interval = setInterval(async () => {
+            const status = (await axios.get('/model/taskNode/status/id?taskId=' + taskId)).data
+            console.log('status : ', status)
+            if (status === 'ERROR' || status === 'UNLOCK' || status === "NOT FOUND") {
+                await axios.get('/model/taskNode/result/id?taskId=' + taskId) // clear case
+                clearInterval(interval)
+                timeout && clearTimeout(timeout)//提前结束
+                throw new Error('模型计算失败')
+            }
+        }, 2000)
+        const timeout = setTimeout(() => {
+            // 轮询30S，保证模型开始运行，30s内失败则删除这个Case
+            interval && clearInterval(interval)
+        }, 1000 * 30)
+
+    }).catch(err => {
+        ElNotification.error({
+            message: '模型计算失败--工况 ' + name,
+            offset: 130
+        })
+        delete calcCaseInfo.value[name]
+        console.error('数模计算失败', err)
     })
 }
+//////////////////// 新建工况 + 数模计算 ////////////////////END
+
+
+
 
 //////// 进度查询
-const fakeProgressMap = ref({})
+const calcCaseInfo = mathModelStore.calculatingCases
 const progressDrawerShow = ref(false)
 let progressInterval = null
+let statusInterval = null
 const progressFormat = (percentage) =>
     percentage >= 100 ? '100%' : `${percentage.toFixed(2)}%`
 const calcStatusClickHandler = (data, node) => {
@@ -805,19 +802,66 @@ const jump2Model = (value) => {
     }
     routeMap[value] && router.push(routeMap[value])
 }
-
 onMounted(async () => {
     let map = await initFineMap(mapRef.value)
     mapStore.setMap(map)
 
 
     progressInterval = setInterval(() => {
-        for (let key in fakeProgressMap.value) {
-            if (fakeProgressMap.value[key] < 99) {
-                fakeProgressMap.value[key] += Math.random() * 0.008
+        // 持续给progress++，模拟进度条
+        for (let key in calcCaseInfo) {
+            if (calcCaseInfo[key]['progress'] < 99) {
+                calcCaseInfo[key]['progress'] += Math.random() * 0.003
             }
         }
     }, 1000)
+
+    // 10分钟轮询一次数学模型运行状态
+    for (let key in calcCaseInfo) {
+        let name = key
+        let taskID = calcCaseInfo[name]['taskId']
+        ////////// right now
+        axios.get('/model/taskNode/status/id?taskId=' + taskID).then(res => {
+            console.log(name, '  ', res.data)
+            if (res.data === 'COMPLETE') {
+                // 运行成功，结束状态轮询，更新进度条，更新树
+                calcCaseInfo[name]['progress'] = 100
+                updateTreeFromBack()
+            } else if (res.data === 'ERROR' || res.data === 'UNLOCK' || res.data === "NOT FOUND") {
+                // 运行失败，结束状态轮询，删除这个Case
+                ElNotification.error({
+                    message: '模型计算失败--工况 ' + name,
+                    offset: 130
+                })
+                delete calcCaseInfo[name]
+                updateTreeFromBack()
+            }
+        })
+        ////////// interval
+        let I = setInterval(() => {
+            axios.get('/model/taskNode/status/id?taskId=' + taskID).then(res => {
+
+                console.log(name, '  ', res.data)
+                if (res.data === 'COMPLETE') {
+                    // 运行成功，结束状态轮询，更新进度条，更新树
+                    I && clearInterval(I)
+                    calcCaseInfo[name]['progress'] = 100
+                    updateTreeFromBack()
+                } else if (res.data === 'ERROR' || res.data === 'UNLOCK' || res.data === "NOT FOUND") {
+                    // 运行失败，结束状态轮询，删除这个Case
+                    ElNotification.error({
+                        message: '模型计算失败--工况 ' + name,
+                        offset: 130
+                    })
+                    delete calcCaseInfo[name]
+                    updateTreeFromBack()
+                    I && clearInterval(I)
+                }
+            })
+        }, 10 * 60 * 1000)
+    }
+
+
 
 })
 
@@ -876,10 +920,8 @@ const parseFlowAndType = (name) => {
     return { flow, type }
 }
 
-const getTreeDataFromJson = (data, bankName) => {
-    // const Map = {
-    //     'Mzs':''
-    // }
+const getTreeDataFromJson = async (data, bankName) => {
+
     const result = [
         {
             lable: bankName,
@@ -912,6 +954,12 @@ const getTreeDataFromJson = (data, bankName) => {
                 }
                 cases.push(casesItem)
             }
+            for (let key in mathModelStore.calculatingCases) {
+                if (setItem.lable === mathModelStore.calculatingCases[key]['treeNodeFather'].lable) {
+                    cases.push(mathModelStore.calculatingCases[key]['treeNode'])
+                }
+            }
+
             setItem.children = cases
             sets.push(setItem)
         }

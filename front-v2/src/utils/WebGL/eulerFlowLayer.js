@@ -97,6 +97,8 @@ export class EulerFlowLayer {
     gridNumPerRow = 50;
     gridNumPerCol = 30;
     arrowColor = [255, 255, 255];
+
+    stepProgressRate = 0.0
     constructor(id, stationUrl, uvUrls, prefix) {
         this.id = id;
         this.stationUrl = stationUrl;
@@ -179,6 +181,7 @@ export class EulerFlowLayer {
                 this.globalFrames += 1;
                 this.localFrames = (this.localFrames + 1) % this.framePerStep;
                 this.progressRatio = this.localFrames / this.framePerStep;
+                this.stepProgressRate = Math.round((this.uvResourcePointer + this.progressRatio) * 10) / 10
             }
             this.mapExtent = getMapExtent(this.map);
             this.randomSeed = Math.random();

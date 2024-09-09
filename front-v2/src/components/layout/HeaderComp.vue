@@ -74,8 +74,8 @@
                 <div class="user-avatar-icon"></div>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item v-if="!statusStore.loginStatus" @click="login">登录</el-dropdown-item>
-                        <el-dropdown-item v-else="statusStore.loginStatus" @click="logout">退出登录</el-dropdown-item>
+                        <el-dropdown-item v-if="LOGIN==='YES'&&!statusStore.loginStatus" @click="login">登录</el-dropdown-item>
+                        <el-dropdown-item v-if="LOGIN==='NOT'&&statusStore.loginStatus" @click="logout">退出登录</el-dropdown-item>
                         <el-dropdown-item @click="bankManageClickHandler">岸段管理</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
@@ -112,6 +112,7 @@ import router from '../../router/index'
 import { useStatusStore } from '../../store/statusStore'
 import { onBeforeRouteUpdate } from 'vue-router'
 
+const LOGIN = import.meta.env.VITE_LOGIN
 const statusStore = useStatusStore()
 
 const titleWidthInPixel = ref(300)

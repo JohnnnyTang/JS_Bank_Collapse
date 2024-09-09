@@ -53,14 +53,35 @@ export default class BankResourceHelper {
      * @param {"Hydrodynamic" | "DEM" | "Boundary" | "Config"} dataType 
      * @param {*} bankEnName 
      */
-    static getBankResourceList(dataType, bankEnName) {
+    static getBankCalculateResourceList(dataType, bankEnName) {
         const params = {
             dataType: dataType,
             bank: bankEnName
         }
-        //  todo 区分不同类别
         return axiosIns.get(`/bank/calculate/dataType`, { params: params })
     }
+
+    /**
+     * 
+     * @param {"DEM" | ""} dataType 
+     * @param {string} bankEnName 
+     */
+    static getBankVisualResourceList(dataType, bankEnName) {
+        const params = {
+            dataType: dataType,
+            bank: bankEnName
+        }
+        return axiosIns.get(`/bank/visual/dataType`, { params: params })
+    }
+
+
+
+
+
+
+
+
+
     /**
      * 
      * @param {"Hydrodynamic" | "DEM" | "Boundary" | "Config"} dataType 

@@ -39,5 +39,11 @@ div.bank-twin-container {
 
     background: linear-gradient(70deg, rgba(0, 56, 128, 1) 0%, rgb(44, 151, 252) 100%);
 
+    :deep(.el-form) {
+        // background-color: red;
+        margin: 0vh 2vw;
+
+    }
+
 }
 </style>

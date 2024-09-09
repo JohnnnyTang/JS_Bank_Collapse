@@ -1,6 +1,6 @@
 <template>
     <div class="bank-resouce-create-container" v-loading="loading">
-        <div class="main-title">岸段资源管理
+        <div class="main-title">岸段管理
         </div>
         <div class="desc-box-container">
             <div class="title-container">岸段基本信息</div>
@@ -14,11 +14,6 @@
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
                             " placeholder="请输入" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
-                        <!-- <el-input v-model="bank.bankEnName" style="
-                                width: 50%;
-                                height: 100%;
-                                font-size: calc(0.6vw + 0.6vh);
-                            " placeholder="请输入" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" /> -->
                     </div>
                     <div class="bankName-val" v-else>
                         {{ bank.name }}
@@ -79,7 +74,8 @@
                             :key="resourceTypeIndex">
                             <div class="resource-title">
                                 {{ item.key }}
-                                <div class="resource-upload-btn" v-show="key==='模型资源管理'"  @click="resourceUploadClickHandler(resourceTypeIndex)">上传
+                                <div class="resource-upload-btn" v-show="key === '模型资源管理'"
+                                    @click="resourceUploadClickHandler(resourceTypeIndex)">上传
                                 </div>
                             </div>
                             <div class="resource-content">
@@ -114,7 +110,9 @@
         </div>
     </div>
 
-    <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
+    <uploadDialog ref="uploadDialogRef" :type="uploadDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
+        :bank-en-name="uploadDialogBaseInfo.bankEnName"></uploadDialog>
+    <!-- <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
         <template #header="{ titleId, titleClass }">
             <div class="form-header">
                 {{ dialogFormTitle }}
@@ -141,17 +139,18 @@
                 </el-button>
             </div>
         </template>
-    </el-dialog>
+    </el-dialog> -->
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, toRaw, watch } from 'vue'
+import { ref, onMounted, reactive, toRaw, watch, computed } from 'vue'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue'
 import axios from 'axios';
-import { defaultTableColumns } from './bankResource'
+import { defaultTableColumns, typeDict, resourceTypeDict } from './bankResource'
+import uploadDialog from './uploadDialog.vue'
 
 //////////////////////////// global
 const route = useRoute();
@@ -259,6 +258,8 @@ const typeIndexWatcher = watch(nowTypeIndex, (newVal, oldVal) => {
         refItem.style.transform = transfromDict[newVal];
     })
 })
+const nowSubTypeIndex = ref(0)
+
 const typeIndexChange = (add) => {
     if (add) {
         if (nowTypeIndex.value === - 1 + Object.keys(resourceInfo.value).length) return
@@ -273,52 +274,18 @@ const typeIndexChange = (add) => {
 const resourceInfo = ref({})
 
 ///////////// bank resource upload
-const dialogFormVisible = ref(false)
-const dialogFormTitle = ref('资源上传')
-const dialogInfo = ref([
-    {
-        label: '岸段',
-        enName: 'segment',
-        value: ''
-    },
-    {
-        label: '年份',
-        enName: 'year',
-        value: '2023'
-    },
-    {
-        label: '工况集',
-        enName: 'set',
-        value: 'standard'
-    },
-    // {
-    //     label: '文件类型',
-    //     enName: 'category',
-    //     value: 'DEM'    (DEM|Hydrodynamic|Boundary|Config)
-    // }
-    {
-        label: '备注',
-        enName: 'description',
-        value: ''
-    },
-    // {
-    //     label: '边界',
-    //     enName: '',
-    //     value: ''
-    // },
-    // {
-    //     label: '其他',
-    //     enName: 'temp',
-    //     value: ''
-    // },
-
-])
-
+const uploadDialogRef = ref(null)
+const uploadDialogBaseInfo = computed(() => {
+    return {
+        type: typeDict[nowTypeIndex.value],
+        subType: resourceTypeDict[typeDict[nowTypeIndex.value]][nowSubTypeIndex.value],
+        bankEnName: bank.bankEnName,
+    }
+})
 
 const resourceUploadClickHandler = (resourceTypeIndex) => {
-    const type = ['地形', '水动力', '边界', '配置']
-    dialogFormTitle.value = `${type[resourceTypeIndex]}资源上传`
-    dialogFormVisible.value = true
+    nowSubTypeIndex.value = resourceTypeIndex
+    uploadDialogRef.value.dialogFormVisible = true
 }
 
 
@@ -340,12 +307,12 @@ onMounted(async () => {
     const _thisBankEnName = route.params.id
     await initOneBank(_thisBankEnName)
     console.log(bank.name)
-    dialogInfo.value[0].value = bank.name
 })
 
-
-
-
+// {
+//     "name": "201210",
+//     "bank": "Mzs"
+// }
 
 ////////////////// helper ///////////////////
 const initOneBank = async (bankEnName) => {
@@ -355,17 +322,17 @@ const initOneBank = async (bankEnName) => {
     console.log(_thisBankBasicInfo)
 
     // bank resource init
-    const _ogDEM = (await BankResourceHelper.getBankResourceList('DEM', _thisBankEnName)).data
-    const _ogHydro = (await BankResourceHelper.getBankResourceList('Hydrodynamic', _thisBankEnName)).data
-    const _ogBound = (await BankResourceHelper.getBankResourceList('Boundary', _thisBankEnName)).data
-    const _ogConfig = (await BankResourceHelper.getBankResourceList('Config', _thisBankEnName)).data
+    const _ogDEM = (await BankResourceHelper.getBankCalculateResourceList('DEM', _thisBankEnName)).data
+    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', _thisBankEnName)).data
+    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', _thisBankEnName)).data
+    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', _thisBankEnName)).data
     const _thisBankResourceInfo = [
         {
             key: '岸段地形资源',
             resourceList: BankResourceHelper.DEMResourcetoList(_ogDEM)
         },
         {
-            key: '水动力模型资源',
+            key: '水动力预算工况',
             resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
         },
         {
@@ -379,17 +346,12 @@ const initOneBank = async (bankEnName) => {
     ]
 
     // visual resource init
-    ///////// fake data
+    const demTileList = (await BankResourceHelper.getBankVisualResourceList('DEM', bankEnName)).data
+    demTileList.map(item => item.fileType = '地形切片')
     const _thisVisualResourceInfo = [
         {
             key: '栅格可视化资源',
-            resourceList: [
-                {
-                    name: '示例栅格资源',
-                    fileType: '地形切片',
-                    uploadTime: '2024-09-01',
-                }
-            ]
+            resourceList: demTileList
         },
         {
             key: '矢量可视化资源',
@@ -397,7 +359,6 @@ const initOneBank = async (bankEnName) => {
                 {
                     name: '示例矢量资源',
                     fileType: 'geojson',
-                    uploadTime: '2024-09-01',
                 }
             ]
         },
@@ -414,30 +375,58 @@ const initOneBank = async (bankEnName) => {
     ]
 
     // device resource init
-    const monitorInfo = (await axios.get('/api/data/monitorInfo')).data
-    const { _GNSS, _Incline, _Stress, _Menometer, _Vedio } = parseMonitorInfo(monitorInfo)
-    const _thisDeviceResourceInfo = [
-        {
-            key: 'GNSS设备',
-            resourceList: _GNSS
-        },
-        {
-            key: '孔隙水压力计设备',
-            resourceList: _Menometer
-        },
-        {
-            key: '应力桩设备',
-            resourceList: _Stress
-        },
-        {
-            key: '测斜仪设备',
-            resourceList: _Incline
-        },
-        {
-            key: '监控摄像设备',
-            resourceList: _Vedio
-        },
-    ]
+    let _thisDeviceResourceInfo = []
+    if (bankEnName === 'Mzs') {
+        const monitorInfo = (await axios.get('/api/data/monitorInfo')).data
+        const { _GNSS, _Incline, _Stress, _Menometer, _Vedio } = parseMonitorInfo(monitorInfo)
+        _thisDeviceResourceInfo = [
+            {
+                key: 'GNSS设备',
+                resourceList: _GNSS
+            },
+            {
+                key: '孔隙水压力计设备',
+                resourceList: _Menometer
+            },
+            {
+                key: '应力桩设备',
+                resourceList: _Stress
+            },
+            {
+                key: '测斜仪设备',
+                resourceList: _Incline
+            },
+            {
+                key: '监控摄像设备',
+                resourceList: _Vedio
+            },
+        ]
+    }
+    else {
+        _thisDeviceResourceInfo = [
+            {
+                key: 'GNSS设备',
+                resourceList: []
+            },
+            {
+                key: '孔隙水压力计设备',
+                resourceList: []
+            },
+            {
+                key: '应力桩设备',
+                resourceList: []
+            },
+            {
+                key: '测斜仪设备',
+                resourceList: []
+            },
+            {
+                key: '监控摄像设备',
+                resourceList: []
+            },
+        ]
+    }
+
 
 
     //////////////////
@@ -887,15 +876,5 @@ div.bank-resouce-create-container {
         }
 
     }
-}
-
-div.form-header {
-    position: relative;
-    height: 4vh;
-    margin-top: -1vh;
-    text-align: center;
-    font-size: calc(0.9vw + 0.8vh);
-    color: #0539a8;
-    font-weight: 800;
 }
 </style>

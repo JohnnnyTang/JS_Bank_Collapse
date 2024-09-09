@@ -188,6 +188,23 @@ const useHydrodynamicStore = defineStore('hydrodynamicStore', () => {
     }
 })
 
+
+const useMathModelStore = defineStore('mathModelStore', () => {
+    const calculatingCases = ref({})
+    const addCalculatingCase = (caseName, caseData) => {
+        calculatingCases.value[caseName] = caseData
+    }
+    return {
+        calculatingCases, addCalculatingCase
+    }
+},
+    {
+        persist: {
+            storage: localStorage,
+        }
+    }
+)
+
 export {
-    useSoilAnalysisStore, useHydrodynamicStore
+    useSoilAnalysisStore, useHydrodynamicStore, useMathModelStore
 }
