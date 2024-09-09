@@ -45,8 +45,10 @@ public class QuartzSchedulerManager {
     public void startJob() throws SchedulerException {
         log.info("start job here");
 //        startTestJob(scheduler);
-        startTestRunningJob(scheduler);
+//        startTestRunningJob(scheduler);
 //        startGnssWarningJob(scheduler);
+        startGetWaterConditionJob(scheduler);
+        startModelServerHandShakeJob(scheduler);
         scheduler.start();
     }
 
@@ -64,8 +66,15 @@ public class QuartzSchedulerManager {
         scheduler.start();
     }
 
+    // 执行实时水情定时获取任务
+    public void startGetWaterConditionJob(Scheduler scheduler) throws SchedulerException {
+        log.info("start WaterConditionJob here");
+        WaterConditionJob(scheduler);
+        scheduler.start();
+    }
+
     // 执行模型计算服务定时握手
-    public void startModelServerHandShakeJob() throws SchedulerException {
+    public void startModelServerHandShakeJob(Scheduler scheduler) throws SchedulerException {
         log.info("start ModelServerHandShakeJob here");
         modelServerHandShakeJob(scheduler);
         scheduler.start();
@@ -164,6 +173,19 @@ public class QuartzSchedulerManager {
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/30 * * * ?");
         // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("gnssWarningTrigger", "tesGroup")
+                .withSchedule(cronScheduleBuilder).build();
+        scheduler.scheduleJob(jobDetail, cronTrigger);
+    }
+
+    private void WaterConditionJob(Scheduler scheduler) throws SchedulerException {
+        // 通过JobBuilder构建JobDetail实例，JobDetail规定其job只能是实现Job接口的实例
+        JobDetail jobDetail = JobBuilder.newJob(WaterConditonJob.class)
+                .withIdentity("waterCondition", "waterConditionGroup")
+                .build();
+        // 基于表达式构建触发器
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/30 * * * ?");
+        // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("waterConditionTrigger", "waterConditionGroup")
                 .withSchedule(cronScheduleBuilder).build();
         scheduler.scheduleJob(jobDetail, cronTrigger);
     }

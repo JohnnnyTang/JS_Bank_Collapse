@@ -12,4 +12,4 @@ if __name__ == '__main__':
     zoom = sys.argv[3]
     tilesize = sys.argv[4]
 
-    gdal2tiles.generate_tiles(tif_path, tiles_path, zoom=zoom, tilesize=tilesize, epsg="3857")
+    gdal2tiles.generate_tiles(tif_path, tiles_path, zoom=zoom, tilesize=tilesize)
