@@ -128,7 +128,7 @@
                     <div class="video-content-container">
                         <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                             <div class="video-content">
-                                <iframe :src="item.videoUrl + token" width="100%" height="100%" :id="item.name"
+                                <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name" :key="item.key"
                                     allowfullscreen>
                                 </iframe>
                             </div>
@@ -213,12 +213,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onBeforeUnmount, onBeforeMount } from 'vue'
+import { ref, onMounted, watch, onBeforeUnmount, onBeforeMount, computed, reactive } from 'vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 // import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
 import axios from 'axios'
 import * as echarts from 'echarts'
 import BackEndRequest from '../../api/backend'
+import dayjs from 'dayjs'
 import {
     genGnssOptionOfDevice,
     genStressOptionOfDevice,
@@ -241,7 +242,7 @@ const props = defineProps({
 })
 
 const token = ref(
-    'at.dkwitzt466laf01r0l03ttua9io5n2n4-6bgy348g6r-0hhpe6p-cewsscnul',
+    'empty token',
 )
 
 const chartDom = ref()
@@ -403,6 +404,10 @@ const sectionClassColorMap = ref({
 
 const deviceTypeList = ref(['位移测量站', '应力桩', '孔隙水压力计', '测斜仪'])
 
+const getIframeUrl = (item) => {
+    return item.videoUrl + token.value
+}
+/// 添加Key属性，强制渲染
 const videoList = ref([
     {
         name: '民主沙海事码头监控',
@@ -418,6 +423,7 @@ const videoList = ref([
             { name: '海事码头', status: 'normal' },
         ],
         warn: false,
+        key: 0,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
@@ -433,6 +439,7 @@ const videoList = ref([
             { name: '小港池', status: 'normal' },
         ],
         warn: false,
+        key: 1,
     },
     {
         name: '民主沙上游围堤监控',
@@ -448,8 +455,48 @@ const videoList = ref([
             { name: 'JZ-01', status: 'normal' },
         ],
         warn: false,
+        key: 2,
     },
 ])
+const userInteractInfo = reactive({
+    lastInteractTime: dayjs(),
+    refreshIframe: 1
+})
+window.addEventListener('mousemove', (e) => {
+    // 用户交互，更新lastInteractTime
+    userInteractInfo.lastInteractTime = dayjs()
+    userInteractInfo.refreshIframe = 1
+})
+const refreshInterval = setInterval(() => {
+    // 检查上次交互和此次交互的分钟数
+    let nowTime = dayjs()
+    let diffTime = nowTime.diff(userInteractInfo.lastInteractTime, 'seconds')
+    console.log(diffTime + 'seconds ' + '用户无操作')
+    if (diffTime > 60 * 5) {
+        // close page if no user interaction for 3 minutes
+        userInteractInfo.refreshIframe = 0
+    }
+}, 1000 * 30 * 1)
+
+const refreshIframe = (val) => {
+    console.log('refresh iframe ! ', val)
+    if (val) {  // show iframe
+        token.value = validToken
+        videoList.value.forEach((item) => {
+            item.key += 1
+        })
+    } else { // hide iframe
+        token.value = ''
+        videoList.value.forEach((item) => {
+            item.key += 1
+        })
+    }
+}
+
+watch(() => userInteractInfo.refreshIframe, (val) => {
+    refreshIframe(val)
+})
+
 
 const zoomFuncList = [
     { label: '放大', func: '' },
@@ -780,7 +827,7 @@ function distanceOpenTime(showTime) {
 
     return days
 }
-
+let validToken = null
 onBeforeMount(async () => {
     // const daysFromToken = distanceOpenTime('2024-06-25')
     // let leftDays = daysFromToken % 7
@@ -789,15 +836,21 @@ onBeforeMount(async () => {
         let newToken = (await BackEndRequest.getVideoToken()).data
         if (newToken && newToken.data && newToken.data.accessToken) {
             token.value = newToken.data.accessToken
+            validToken = newToken.data.accessToken
         }
         else {
             console.log("request token failed..")
         }
-        console.log('request for token', token.value)
+        console.log('BeforeMount request for token', token.value)
+        // console.log('request for token')
     }
 })
 
 onMounted(async () => {
+    setTimeout(() => {
+        console.log('init with new token!!')
+        refreshIframe(1)
+    }, 1000);
     // await updateNewestTime()
     // let myDate = new Date()
     // deviceStatusDataList.value[4].time =
@@ -847,10 +900,14 @@ onMounted(async () => {
         updateTimeLoading.value = false
     }, 1000 * 60)
     // console.log('initialData', initialData)
+
+
+
 })
 
 onBeforeUnmount(async () => {
     await moveBack2Origin()
+    refreshInterval && clearInterval(refreshInterval)
 })
 </script>
 
