@@ -120,6 +120,12 @@ export default class BackEndRequest {
                     `/data/inclinometerData/hour/5/device/${code}`,
                 )
             }
+            // case '5': {
+            //     // return backendInstance.get(`/data/fiberData/day/1/device/${code}`)
+            //     return backendInstance.get(
+            //         `/data/fiberData/hour/5/device/${code}`,
+            //     )
+            // }
         }
     }
 
@@ -175,6 +181,7 @@ export default class BackEndRequest {
             backendInstance.get('/data/stressData/newest'),
             backendInstance.get('/data/manometerData/newest'),
             backendInstance.get('/data/inclinometerData/newest'),
+            // backendInstance.get('/data/fiberData/newest'),
         ])
     }
 

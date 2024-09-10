@@ -1,0 +1,74 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: bank
+      authentication-database: admin
+      uri: mongodb://localhost:27017/bank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+    default:
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: 123456
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1275441282@qq.com
+    password: ezuxlysqewrgfhhi
+    from: 1275441282@qq.com
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        debug: true #启动debug调试
+        smtp:
+          ssl:
+            enable: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory #SSL连接配置
+
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+tile:
+  mzsTilePath: E:\Data\rasterTIle\
+  worldTilePath: D:\WebGIS\Projects\BankCollapse\data\bank_collapse\baseMap
+  nodeServicePath: E:\Data\node\index.js
+  riverTilePath: E:\Data\riverRasterTile\
+  riverImagePath: D:/2024-work/shore_collapse/tiles/worldImage/tiles/
+
+video:
+  yangzhong: E:\Data\video\125_1711267167.mp4
+
+multiIndex:
+  condaEnv: BMS
+  dataPath: E:\Data\modelData
+  wholeDataPath: E:\Data\dataWhole
+  resPath: E:\Data\modelRes\
+
+sms:
+  accessTokenLoc: D:\2024-work\AccessKey.json
+  signName: 江苏长江崩岸监测预警系统
+  verifyTemplateCode: SMS_465975002
+
+flowData:
+  texturePath: D:/2024-work/shore_collapse/data/flowData/flowFieldResourceArchive/
+
+modelServer:
+  url: http://172.21.212.216:8000
+  storageLimit: 50
+  caseLimit: 50
