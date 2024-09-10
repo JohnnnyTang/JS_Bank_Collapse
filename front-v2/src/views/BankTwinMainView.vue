@@ -7,8 +7,11 @@
         </div> -->
         <div class="visual-tab-container">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
-                    @change="viewChangeClick"></e-tab>
+                <!-- <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
+                    @change="viewChangeClick"></e-tab> -->
+                <el-radio-group v-model="viewRadio" @change="viewChangeClick">
+                    <el-radio-button v-for="item in items" :label=item.label :value=item.value />
+                </el-radio-group>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
@@ -485,6 +488,7 @@ const deviceShowControl = (index, only = false) => {
             : map.setLayoutProperty(layerNameList[index], 'visibility', 'none')
     })
 }
+const viewRadio = ref('2d')
 const viewChangeClick = (value) => {
     // console.log('view Change!', value)
     let map = useMapStore().getMap()
@@ -714,6 +718,20 @@ const clearDom = (dom) => {
 </script>
 
 <style lang="scss" scoped>
+@keyframes gradientScroll {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 div.twin-main-container {
     position: absolute;
     width: 100vw;
@@ -835,6 +853,7 @@ div.twin-main-container {
         }
     }
 
+
     div.visual-tab-container {
         position: absolute;
         top: 10vh;
@@ -848,7 +867,85 @@ div.twin-main-container {
         font-size: calc(0.6vw + 0.4vh);
         background-color: rgb(0, 56, 141);
         box-shadow: 4px 8px 8px -4px rgba(0, 11, 34, 0.9);
+
         // background-color: antiquewhite;
+        :deep(.dv-border-box-12) {
+
+            .border-box-content {
+                // background-color: red;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                .el-radio-group {
+                    width: 9vw;
+                    height: 4.5vh;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+
+                    .el-radio-button {
+                        display: block;
+                        height: 4vh;
+                        width: 4vw;
+                        margin: 0vh 0.2vw;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 2;
+                        transition: .5s ease-in-out;
+
+                        &.is-active {
+                            .el-radio-button__inner {
+                                color: white;
+                                &::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: -0.15vh;
+                                    left: -0.15vw;
+                                    bottom: -0.15vh;
+                                    right: -0.15vw;
+                                    background-image: linear-gradient(45deg, rgb(235, 88, 104), #0400ff, rgb(90, 244, 255));
+                                    background-size: 200% 200%;
+                                    animation: gradientScroll 3s ease-in-out infinite;
+                                    z-index: -1;
+                                    border-radius: inherit;
+                                    /* 如果需要圆角 */
+                                }
+                            }
+                        }
+
+                        .el-radio-button__original-radio {
+                            display: none;
+                        }
+
+                        .el-radio-button__inner {
+                            position: relative;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 4vh;
+                            width: 3.6vw;
+                            background-color: rgb(5, 33, 98);
+                            font-size: calc(0.5vw + 0.4vh);
+                            border: none;
+                            border-radius: 10px;
+                            color: rgb(184, 184, 184);
+                            &:hover {
+                                font-weight: 800;
+                                font-size: calc(0.5vw + 0.5vh);
+                                color: white;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
     }
 
     div.marquee-container {
