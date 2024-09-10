@@ -70,10 +70,10 @@ const routes = [
         path: '/main',
         component: () => import("../views/BankMainView.vue")
     },
-    {
-        path: '/test',
-        component: () => import("../components/dataVisual/test.vue")
-    },
+    // {
+    //     path: '/test',
+    //     component: () => import("../components/dataVisual/test.vue")
+    // },
     {
         path: '/modelStore',
         redirect: '/modelStore/main',

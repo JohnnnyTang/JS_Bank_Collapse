@@ -6,7 +6,7 @@
         </div>
         <el-scrollbar>
             <el-menu class="el-menu-vertical-demo" :default-active="defaultActive" @select="handleSelect">
-                <el-sub-menu index="4">
+                <el-sub-menu index="4" v-if="MANAGEMENT === 'YES'">
                     <template #title>
                         <el-icon>
                             <FolderOpened />
@@ -17,20 +17,10 @@
                         <template #title>岸段列表</template>
                         <el-menu-item v-for="bankItem in bankList" :index="'preview/' + bankItem.bank">{{ bankItem.name
                         }}</el-menu-item>
-                        <!-- <el-menu-item index="preview/mzs">民主沙右缘</el-menu-item> -->
                     </el-sub-menu>
                     <!-- <el-menu-item index="create"
                         style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item> -->
                 </el-sub-menu>
-                <!-- <el-sub-menu index="basic">
-                    <template #title>
-                        <el-icon>
-                            <InfoFilled />
-                        </el-icon>
-                        <span>基础信息</span>
-                    </template>
-                    <el-menu-item index="basic/mzs">民主沙右缘</el-menu-item>
-                </el-sub-menu> -->
                 <el-sub-menu index="2">
                     <template #title>
                         <el-icon>
@@ -102,6 +92,7 @@ import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper'
 
 
+const MANAGEMENT = import.meta.env.VITE_BANK_MANAGEMENT
 const updateBankList = async () => {
     console.log('updateBankList')
     let _bankList = (await BankResourceHelper.getBankNamesList()).data

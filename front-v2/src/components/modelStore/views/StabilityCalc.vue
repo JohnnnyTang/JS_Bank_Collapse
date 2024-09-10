@@ -429,8 +429,6 @@ const createNewCaseClickHandler = (nodeData, nodeInfo) => {
 ////////////// 数模计算
 const mathModelStore = useMathModelStore()
 const modelStartLoading = ref(false)
-const dataNeedStorage = {
-}
 
 const uploadRef = ref(null)
 const filesNeedUpload = ['属性文件', '网格文件', '控制文件', '径流边界', '潮位边界']
@@ -448,10 +446,10 @@ const handleUpload = (file) => {
     console.log('user upload file -- ', file)
 }
 const runMathModel = () => {
-    console.log('mathModelParams')
-    console.log(mathModelParams)
-    console.log('file lists')
-    console.log(fileLists.value)
+    // console.log('mathModelParams')
+    // console.log(mathModelParams)
+    // console.log('file lists')
+    // console.log(fileLists.value)
 
     modelStartLoading.value = true
     const formData = new FormData()
@@ -538,11 +536,14 @@ const runMathModel = () => {
 
     }).catch(err => {
         ElNotification.error({
-            message: '模型计算失败--工况 ' + name,
+            message: '数学模型计算失败--工况 ' + name,
             offset: 130
         })
         delete calcCaseInfo.value[name]
         console.error('数模计算失败', err)
+
+        modelStartLoading.value = false
+        // mathModelCalcBlockShow.value = false
     })
 }
 //////////////////// 新建工况 + 数模计算 ////////////////////END
