@@ -413,8 +413,8 @@ const videoList = ref([
         name: '民主沙海事码头监控',
         position: '32.0316674, 120.5402574',
         deviceId: 'FB5033035',
-        videoUrl: `https://open.ys7.com/ezopen`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
         order: 0,
         presetPt: [
             { name: '上游岸段', status: 'normal' },
@@ -429,8 +429,8 @@ const videoList = ref([
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
         deviceId: 'FB5033037',
-        videoUrl: `https://open.ys7.com/ezopen`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
         order: 1,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
@@ -445,8 +445,8 @@ const videoList = ref([
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
         deviceId: 'FB5033036',
-        videoUrl: `https://open.ys7.com/ezopen`,
-        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
         order: 2,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
