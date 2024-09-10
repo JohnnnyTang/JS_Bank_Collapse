@@ -13,7 +13,29 @@ import java.util.List;
  * @Description:
  */
 public class DataNodeUtil {
-    public static JSONArray transferToFolderList(List<DataNodeV2> dataNodeList) {
+    public static JSONArray transferToJsonArray(List<DataNodeV2> dataNodeList) {
+        JSONArray dataList = new JSONArray();
+        for (DataNodeV2 dataNode : dataNodeList) {
+            JSONObject dataNodeObj = new JSONObject();
+            dataNodeObj.put("name",dataNode.getBasicInfo().getString("name"));
+            dataNodeObj.put("bank",dataNode.getBank());
+            dataList.add(dataNodeObj);
+        }
+        return dataList;
+    }
+
+    public static JSONArray transferToFolderList_visualDEM(List<DataNodeV2> dataNodeList) {
+        JSONArray dataList = new JSONArray();
+        for (DataNodeV2 dataNode : dataNodeList) {
+            JSONObject dataNodeObj = new JSONObject();
+            dataNodeObj.put("name",dataNode.getName());
+            dataNodeObj.put("bank",dataNode.getBank());
+            dataList.add(dataNodeObj);
+        }
+        return dataList;
+    }
+
+    public static JSONArray transferToFolderList_calculateDEM(List<DataNodeV2> dataNodeList) {
 
         Comparator<DataNodeV2> DatanodeComparator = new Comparator<DataNodeV2>() {
             @Override
@@ -37,6 +59,9 @@ public class DataNodeUtil {
             }
         };
         JSONArray dataList = new JSONArray();
+        if (dataNodeList.isEmpty()) {
+            return dataList;
+        }
         // 首先做dataNode的排序
         dataNodeList.sort(DatanodeComparator);
         // 排序完成后新建dataList，向其中以此插入dataNode数据
@@ -45,6 +70,7 @@ public class DataNodeUtil {
         JSONObject currentYearListObj = new JSONObject();
         JSONArray currentYearList = new JSONArray();
         String firstYear = dataNodeList.get(0).getBasicInfo().getString("year");
+        String firstMonth = dataNodeList.get(0).getBasicInfo().getString("month");
         String firstSet = dataNodeList.get(0).getBasicInfo().getString("set");
         String firstName = dataNodeList.get(0).getName();
         String firstTemp = dataNodeList.get(0).getBasicInfo().getString("temp");
@@ -56,6 +82,7 @@ public class DataNodeUtil {
         firstNodeObj.put("temp",firstTemp);
         firstNodeObj.put("fileType",firstFileType);
         firstNodeObj.put("path",firstPath);
+        firstNodeObj.put("month",firstMonth);
         currentSetList.add(firstNodeObj);
         currentSetListObj.put("list",currentSetList);
         currentSetListObj.put("name",firstSet);
@@ -67,6 +94,7 @@ public class DataNodeUtil {
         for (int i = 1; i < dataNodeList.size(); i++) {
             DataNodeV2 dataNode = dataNodeList.get(i);
             String year = dataNode.getBasicInfo().getString("year");
+            String month = dataNode.getBasicInfo().getString("month");
             String set = dataNode.getBasicInfo().getString("set");
             String name = dataNode.getName();
             String temp = dataNode.getBasicInfo().getString("temp");
@@ -77,6 +105,7 @@ public class DataNodeUtil {
             dataNodeObj.put("temp", temp);
             dataNodeObj.put("fileType", fileType);
             dataNodeObj.put("path",path);
+            dataNodeObj.put("month",month);
             if (year.equals(currentYearListObj.get("year"))) {
                 // 若year与之前相同，则判断set
                 if (set.equals(currentSetListObj.get("name"))) {

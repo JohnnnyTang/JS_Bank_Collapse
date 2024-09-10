@@ -70,16 +70,20 @@
             </div>
         </div>
         <div class="header-user-container">
-            <el-dropdown trigger="click">
+            <el-dropdown trigger="click" v-if="LOGIN === 'YES'">
                 <div class="user-avatar-icon"></div>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item v-if="!statusStore.loginStatus" @click="login">登录</el-dropdown-item>
-                        <el-dropdown-item v-else="statusStore.loginStatus" @click="logout">退出登录</el-dropdown-item>
-                        <el-dropdown-item @click="bankManageClickHandler">岸段管理</el-dropdown-item>
+                        <el-dropdown-item v-if="LOGIN === 'YES' && !statusStore.loginStatus"
+                            @click="login">登录</el-dropdown-item>
+                        <el-dropdown-item v-if="LOGIN === 'YES' && statusStore.loginStatus"
+                            @click="logout">退出登录</el-dropdown-item>
+                        <el-dropdown-item v-if="MANAGEMENT === 'YES'" @click="bankManageClickHandler">岸段管理</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
+
+            <div class="user-avatar-icon" v-else></div>
         </div>
     </div>
     <div class="title-header">
@@ -112,6 +116,8 @@ import router from '../../router/index'
 import { useStatusStore } from '../../store/statusStore'
 import { onBeforeRouteUpdate } from 'vue-router'
 
+const LOGIN = import.meta.env.VITE_LOGIN
+const MANAGEMENT = import.meta.env.VITE_BANK_MANAGEMENT
 const statusStore = useStatusStore()
 
 const titleWidthInPixel = ref(300)
@@ -180,7 +186,7 @@ const routerPathIndexMap = {
     '/modelStore': 4,
     '/knowledgeStore': 4,
     '/bankTwin': 1,
-    '/bankManage': 1,
+    '/bankManage': 2,
     '/': 2,
 }
 
@@ -304,7 +310,7 @@ onMounted(() => {
     watch(
         () => router.currentRoute.value.path,
         (newPath, oldPath) => {
-            // console.log(newPath, oldPath)
+            console.log(newPath, oldPath)
             // console.log(newPath.split('/'), oldPath)
             let parentPath = newPath
             let splitPath = newPath.split('/')

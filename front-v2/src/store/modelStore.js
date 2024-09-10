@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { MarkerType } from '@vue-flow/core'
 
 
@@ -134,11 +134,9 @@ const useHydrodynamicStore = defineStore('hydrodynamicStore', () => {
         let totalInfo = { ...nowInfo, ...info }
         markerInfos.set(markerDom, totalInfo)
     }
-
     const getMarkerInfo = (markerDom) => {
         return markerInfos.get(markerDom)
     }
-
     const removeMarkerInfo = (markerDom) => {
         let markerInfo = markerInfos.get(markerDom)
         if (markerInfo) {
@@ -147,12 +145,66 @@ const useHydrodynamicStore = defineStore('hydrodynamicStore', () => {
         markerInfos.delete(markerDom)
     }
 
+
+
+    const flowFieldCurrentTimeStep = ref(0)
+    const getMarkLineOption = () => {
+        return {
+            symbolSize: 5,
+            itemStyle: {
+                normal: {
+                    color: 'rgb(94, 208, 251)',
+                    borderColor: 'black',
+                    borderWidth: 0.5,
+                },
+            },
+            lineStyle: {
+                color: 'red',
+                opacity: 0.8,
+                width: 3,
+            },
+            data: [
+                {
+                    name: 'timeStep',
+                    xAxis: flowFieldCurrentTimeStep.value,
+                    label: {
+                        formatter: `${parseFloat(flowFieldCurrentTimeStep.value)}小时`,
+                        backgroundColor: 'rgb(208, 236, 255)',
+                        color: 'red',
+                        fontSize: '15px',
+                        position: 'end',
+                        offset: [0, 10],
+                    },
+                },
+            ],
+        }
+    }
+
+
     return {
-        focusingMarkerDom,showingOption,
-        markerInfos, addMarkerInfo, appendMarkerInfo, getMarkerInfo, calculatingMarkerDom, removeMarkerInfo
+        focusingMarkerDom, showingOption,
+        markerInfos, addMarkerInfo, appendMarkerInfo, getMarkerInfo, calculatingMarkerDom, removeMarkerInfo,
+        flowFieldCurrentTimeStep, getMarkLineOption
     }
 })
 
+
+const useMathModelStore = defineStore('mathModelStore', () => {
+    const calculatingCases = ref({})
+    const addCalculatingCase = (caseName, caseData) => {
+        calculatingCases.value[caseName] = caseData
+    }
+    return {
+        calculatingCases, addCalculatingCase
+    }
+},
+    {
+        persist: {
+            storage: localStorage,
+        }
+    }
+)
+
 export {
-    useSoilAnalysisStore, useHydrodynamicStore
+    useSoilAnalysisStore, useHydrodynamicStore, useMathModelStore
 }

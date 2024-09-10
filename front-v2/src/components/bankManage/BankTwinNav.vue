@@ -5,43 +5,43 @@
             <div class="back-text">返回</div>
         </div>
         <el-scrollbar>
-            <el-menu
-                class="el-menu-vertical-demo"
-                :default-active="defaultActive"
-                @select="handleSelect"
-            >
-                <el-sub-menu index="basic">
+            <el-menu class="el-menu-vertical-demo" :default-active="defaultActive" @select="handleSelect">
+                <el-sub-menu index="4" v-if="MANAGEMENT === 'YES'">
                     <template #title>
-                        <el-icon><InfoFilled /></el-icon>
-                        <span>基础信息</span>
+                        <el-icon>
+                            <FolderOpened />
+                        </el-icon>
+                        <span>岸段管理</span>
                     </template>
-                    <el-menu-item index="basic/mzs">民主沙右缘</el-menu-item>
+                    <el-sub-menu index="4-1">
+                        <template #title>岸段列表</template>
+                        <el-menu-item v-for="bankItem in bankList" :index="'preview/' + bankItem.bank">{{ bankItem.name
+                        }}</el-menu-item>
+                    </el-sub-menu>
+                    <!-- <el-menu-item index="create"
+                        style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item> -->
                 </el-sub-menu>
                 <el-sub-menu index="2">
                     <template #title>
-                        <el-icon><View /></el-icon>
+                        <el-icon>
+                            <View />
+                        </el-icon>
                         <span>岸坡监测</span>
                     </template>
                     <el-sub-menu index="2-1">
                         <template #title>民主沙右缘</template>
-                        <el-menu-item index="monitor/video"
-                            >视频监测</el-menu-item
-                        >
+                        <el-menu-item index="monitor/video">视频监测</el-menu-item>
                         <el-menu-item index="monitor/gnss">GNSS</el-menu-item>
-                        <el-menu-item index="monitor/inclinometer"
-                            >测斜仪</el-menu-item
-                        >
-                        <el-menu-item index="monitor/manometer"
-                            >孔隙水压力计</el-menu-item
-                        >
-                        <el-menu-item index="monitor/stress"
-                            >应力桩</el-menu-item
-                        >
+                        <el-menu-item index="monitor/inclinometer">测斜仪</el-menu-item>
+                        <el-menu-item index="monitor/manometer">孔隙水压力计</el-menu-item>
+                        <el-menu-item index="monitor/stress">应力桩</el-menu-item>
                     </el-sub-menu>
                 </el-sub-menu>
                 <el-sub-menu index="3">
                     <template #title>
-                        <el-icon><WarningFilled /></el-icon>
+                        <el-icon>
+                            <WarningFilled />
+                        </el-icon>
                         <span>风险预警</span>
                     </template>
                     <el-sub-menu index="3-1">
@@ -71,6 +71,7 @@
                     <el-menu-item index="report/week">周报</el-menu-item>
                     <el-menu-item index="4-3">月报</el-menu-item>
                 </el-sub-menu> -->
+
             </el-menu>
         </el-scrollbar>
         <div class="placement-container down"></div>
@@ -80,18 +81,34 @@
 <script setup>
 import {
     Document,
+    FolderOpened,
     InfoFilled,
     WarningFilled,
     View,
 } from '@element-plus/icons-vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import router from '../../router'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import BankResourceHelper from '../modelStore/views/bankResourceHelper'
+
+
+const MANAGEMENT = import.meta.env.VITE_BANK_MANAGEMENT
+const updateBankList = async () => {
+    console.log('updateBankList')
+    let _bankList = (await BankResourceHelper.getBankNamesList()).data
+    bankList.value = _bankList
+}
+defineExpose({
+    updateBankList
+})
+
+
 
 const returnPage = () => {
     // router.push('/bankTwin')
     router.push('/modelStore/main')
 }
+const bankList = ref([])
 
 const route = useRoute()
 
@@ -106,11 +123,11 @@ const defaultActive = ref('')
 // }
 
 const handleSelect = (index, indexPath) => {
-    // console.log('select', index, indexPath)
+    console.log('select', index, indexPath)
     router.push('/bankManage/' + index)
 }
 
-const updateSelection = (curRoute) =>{
+const updateSelection = (curRoute) => {
     let pathSplit = curRoute.fullPath.split('/')
     let selectIndex =
         pathSplit[pathSplit.length - 2] + '/' + pathSplit[pathSplit.length - 1]
@@ -123,14 +140,21 @@ onBeforeRouteUpdate((to, from) => {
     updateSelection(to)
 })
 
-onMounted(() => {
+onMounted(async () => {
     // console.log(route.params)
     updateSelection(route)
+    let _bankList = (await BankResourceHelper.getBankNamesList()).data
+    _bankList.forEach(bank => {
+        bankList.value.push(bank)
+    })
+    // console.log(bankList.value)
+
 })
 </script>
 
 <style lang="scss" scoped>
 $openMenuColor: rgba(28, 59, 163, 0.6);
+
 div.vertical-menu-container {
     position: relative;
     left: 0vw;
@@ -181,6 +205,7 @@ div.vertical-menu-container {
                     background-size: 70%;
                 }
             }
+
             div.back-icon {
                 height: 5vh;
                 width: 3vw;
@@ -212,6 +237,7 @@ div.vertical-menu-container {
         }
     }
 }
+
 :deep(.el-menu) {
     border-bottom-right-radius: 12px;
     border-bottom-left-radius: 12px;
@@ -234,12 +260,14 @@ div.vertical-menu-container {
     &.is-opened {
         background-color: $openMenuColor;
         border-right: 2px solid #38d7ff;
+
         .el-sub-menu__title,
         li {
             color: #ffff;
             background-color: $openMenuColor;
             border-right: 2px solid #38d7ff;
         }
+
         &.is-active,
         li.is-active {
             background-color: rgb(18, 98, 247);

@@ -42,13 +42,19 @@ tile:
   worldTilePath: E:/Data/bankProjectData/baseMap
   nodeServicePath: E:/Data/bankProjectData/node/index.js
   riverTilePath: E:/Data/bankProjectData/riverRasterTile/
-  riverImagePath: E:/Project/bankProjectData/imageTiles/tiles/
+  riverImagePath: E:/Data/bankProjectData/imageTiles/tiles/
+
+staticData:
+  tifTilePath: E:/Data/bankProjectData/staticData/tifTile
+  vectorDataPath: E:/Data/bankProjectData/staticData/vectorData
+  waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
 
 flowData:
   texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/
 
 modelServer:
-  url: http://172.21.212.216:8000
+  url: http://172.21.212.44:8000
   storageLimit: 50
   caseLimit: 50
 
+loginFunction: "no"

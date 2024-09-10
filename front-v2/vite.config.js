@@ -19,14 +19,14 @@ export default defineConfig({
         proxy: {
             '/api': {
                 // target: 'http://172.21.212.165:8989/api/v1',
-                target: 'http://localhost:8989/api/v1',
+                target: 'http://172.21.212.165:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
-            '/temp': {
-                target: 'http://192.168.1.130:8989/api/v2',
+            '/cry': {
+                target: 'http://172.21.212.165:8989/api/v1',
                 changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/temp/, ''),
+                rewrite: (path) => path.replace(/^\/cry/, ''),
             },
             '/device': {
                 target: 'http://119.45.198.54:9999/api/v1',
@@ -34,21 +34,21 @@ export default defineConfig({
                 rewrite: (path) => path.replace(/^\/device/, ''),
             },
             '/model/': {
-                target: 'http://192.168.1.130:8989/api/v2',
+                target: 'http://172.21.212.165:8989/api/v2',
                 //target: 'http://localhost:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),
             },
-            '/hydrodynamicList': {
-                target: 'http://172.21.212.216:8000/v0/fs/resource/hydrodynamic/list',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/hydrodynamicList/, ''),
-            },
-            '/mutilIndexTemplate': {
-                target: 'http://172.21.212.216:8000/v0/fs/resource/file?name=json/Mzs/2023/standard/RiskLevel/template.json',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/hydrodynamicList/, ''),
-            }
+            // '/hydrodynamicList': {
+            //     target: 'http://172.21.212.216:8000/v0/fs/resource/hydrodynamic/list',
+            //     changeOrigin: true,
+            //     rewrite: (path) => path.replace(/^\/hydrodynamicList/, ''),
+            // },
+            // '/mutilIndexTemplate': {
+            //     target: 'http://172.21.212.216:8000/v0/fs/resource/file?name=json/Mzs/2023/standard/RiskLevel/template.json',
+            //     changeOrigin: true,
+            //     rewrite: (path) => path.replace(/^\/hydrodynamicList/, ''),
+            // }
         },
         // https:{
         //     key: fs.readFileSync('cert/192.168.1.107-key.pem'),

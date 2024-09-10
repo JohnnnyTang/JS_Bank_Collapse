@@ -1,6 +1,6 @@
 <template>
     <div class="timestep-shower">
-        <el-progress type="dashboard" :percentage="percentage">
+        <el-progress type="dashboard" :percentage="percentage" :width="110" :height="110">
             <template #default="{ percentage }">
                 <!-- <span class="percentage-value">{{ hour + '时' }}</span> -->
                 <span class="percentage-value">{{ Math.floor(props.timeStep!) + '时' }}</span>
@@ -23,7 +23,7 @@ const props = defineProps({
 // const percentage = 100;
 
 const percentage = computed(() => {
-    return Math.ceil((props.timeStep! / props.totalCount!) * 100);
+    return Math.ceil((props.timeStep! / props.totalCount!) * 100) > 100 ? 100 : Math.ceil((props.timeStep! / props.totalCount!) * 100);
 })
 
 const timee = computed(() => {
@@ -62,13 +62,13 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
 .timestep-shower {
     /* position: absolute;
     right: 4vw;
     bottom: 28vh; */
     position: relative;
     z-index: 3;
-    scale: 0.9;
 }
 
 .percentage-value {

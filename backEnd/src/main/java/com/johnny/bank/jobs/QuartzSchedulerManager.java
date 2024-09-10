@@ -2,6 +2,7 @@ package com.johnny.bank.jobs;
 
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +23,15 @@ public class QuartzSchedulerManager {
     @Lazy
     private Scheduler scheduler;
 
+//    @Value("${sms.allowSendingMessage}")
+//    String allowSendingMessage;
+
     // 开始执行定时器
     public void startJob() throws SchedulerException {
 //        startTestJob(scheduler);
+//        if (allowSendingMessage.equals("yes")) {
         startGnssWarningJob(scheduler);
+//        }
         scheduler.start();
     }
 

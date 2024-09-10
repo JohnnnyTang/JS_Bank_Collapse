@@ -394,7 +394,7 @@ export default defineComponent({
           }
         } else {
           let regionGeom = getGeomById(param.value.region);
-          context.emit("addCurrentModel", "区域等深线");
+          context.emit("addCurrentModel", "冲淤等深线");
           const data = await calculateRegionContour({
             "bench-id": param.value.benchmarkDem.fileId,
             "ref-id": param.value.referDem.fileId,
@@ -403,7 +403,7 @@ export default defineComponent({
                 ? "NONE"
                 : { type: "FeatureCollection", features: [regionGeom] },
           });
-          let result = await checkStateHandle(data.data, "区域等深线");
+          let result = await checkStateHandle(data.data, "冲淤等深线");
           if (result != null) {
             if (dataList[dataList.length - 1].id !== "") {
               dataList.push({

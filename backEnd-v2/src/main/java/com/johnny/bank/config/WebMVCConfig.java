@@ -1,6 +1,7 @@
 package com.johnny.bank.config;
 
 import com.johnny.bank.model.configuration.JWTInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -25,6 +26,9 @@ import java.util.List;
 @Configuration
 public class WebMVCConfig implements WebMvcConfigurer {
 
+    @Value("${loginFunction}")
+    public String loginFunction;
+
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
             "classpath:/META-INF/resources/",
             "classpath:/static/", "classpath:/public/" };
@@ -43,10 +47,12 @@ public class WebMVCConfig implements WebMvcConfigurer {
     }
 
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new JWTInterceptor())
-                .addPathPatterns("/**")
-                .excludePathPatterns("/api/v1/user/**")
-                .excludePathPatterns("/api/v1/tile/**")
-                .excludePathPatterns("/api/v1/proxy/**");
+        if (loginFunction.equals("yes")) {
+            registry.addInterceptor(new JWTInterceptor())
+                    .addPathPatterns("/**")
+                    .excludePathPatterns("/api/v1/user/**")
+                    .excludePathPatterns("/api/v1/tile/**")
+                    .excludePathPatterns("/api/v1/proxy/**");
+        }
     }
 }

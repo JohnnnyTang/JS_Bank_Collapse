@@ -5,8 +5,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.*;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.utils.DataNodeUtil;
+import org.bouncycastle.math.ec.custom.sec.SecT571R1Curve;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 /**
@@ -22,6 +24,21 @@ public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
         return IBaseNodeRepo.save(dataNode).getId();
     }
 
+    public DataNodeV2 getDataNodeByCategoryName(String category, String name) {
+        return IBaseNodeRepo.getNodeByCategoryAndName(category, name);
+    }
+
+    public DataNodeV2 getDataNodeByCategoryBankName(String category, String bank, String name) {
+        return IBaseNodeRepo.getNodeByCategoryBankAndName(category, bank, name);
+    }
+
+    public void addDataGroupNode(String bank, String name, String category, String path) {
+        DataNodeV2 dataNodeV2 = DataNodeV2.dataNodeBuilder()
+                .bank(bank).name(name).dataOrigin("Local")
+                .category(category).path(path).auth("all")
+                .build();
+        save(dataNodeV2);
+    }
 
     private final List<String> deviceTypeList = new ArrayList<>(
             Arrays.asList("Gnss", "Stress", "Manometer", "Inclinometer", "Inclinometer_O", "Video"));
@@ -49,22 +66,6 @@ public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
         );
     }
 
-    public DataNodeV2 getStaticDataGroupNode(String dataType, String bank) {
-        return ((IDataNodeRepoV2)IBaseNodeRepo).getNodeByCategoryAndBank(
-                dataType + "DataGroup",
-                bank
-        );
-    }
-
-    public JSONArray getStaticDataList(String path) {
-
-        List<DataNodeV2> dataNodeList = IBaseNodeRepo.getNodeChildByPath(path);
-        if (dataNodeList.isEmpty()) {
-            return new JSONArray();
-        }
-        return DataNodeUtil.transferToFolderList(dataNodeList);
-    }
-
     public static String getDataNodeStringValueOfUsage(DataNodeV2 dataNode, String key) {
         return dataNode.getUsage().getString(key);
     }
@@ -73,7 +74,7 @@ public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
         return dataNode.getUsage().getInteger(key);
     }
 
-    public List<DataNodeV2> getModelServerResourceNode(String category, String bank, String year, String name) {
-        return ((IDataNodeRepoV2)IBaseNodeRepo).getNodeByCategoryBankYearAndName(category, bank, year, name);
-    }
+//    public List<DataNodeV2> getModelServerResourceNode(String category, String bank, String year, String name) {
+//        return ((IDataNodeRepoV2)IBaseNodeRepo).getNodeByCategoryBankYearAndName(category, bank, year, name);
+//    }
 }

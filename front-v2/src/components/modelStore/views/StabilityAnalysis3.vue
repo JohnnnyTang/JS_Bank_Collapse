@@ -244,11 +244,11 @@
 </template>
 
 <script setup>
-import MapboxDraw from '@mapbox/mapbox-gl-draw'
+// import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import ModelTitleVue from '../ModelTitle.vue'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
-import { ref, reactive, onMounted, onUnmounted, computed, watch, createApp } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch, createApp, toRaw } from 'vue'
 import { initFineMap } from '../../../utils/mapUtils';
 import { useMapStore } from '../../../store/mapStore';
 import { useHydrodynamicStore } from '../../../store/modelStore'
@@ -265,6 +265,7 @@ import { useRouter } from "vue-router";
 import ModelRunner from '../modelRunner'
 import '../../../utils/WebGL/dat_gui_style.css'
 import mapboxGl from 'mapbox-gl'
+import { getRealTimeFlowAndLevelData } from '../../../api/realtimeWaterCondition';
 
 
 let globleVariable = reactive({
@@ -279,7 +280,7 @@ let globleVariable = reactive({
   lagrangeLayer: 'flowLayer1',
   eulerLayer: 'flowLayer2',
 })
-const selectedBank = ref('')
+
 const mapRef = ref(null)
 const tideLineChartDom = ref(null)
 const mapStore = useMapStore()
@@ -321,14 +322,14 @@ const customParams = ref({
   // minTide: null,
   diffTide: null,
 });
-const tableData = ref([
-  {
-    flow: 98000,
-    // maxTide: 5.2,
-    // minTide: 2.7,
-    diffTide: 2.4,
-  },
-]);
+// const tableData = ref([
+//   {
+//     flow: 98000,
+//     // maxTide: 5.2,
+//     // minTide: 2.7,
+//     diffTide: 2.4,
+//   },
+// ]);
 const statusStyle = computed(() => {
   switch (modelRunnningStatusDesc.value) {
     case '未运行':
@@ -347,20 +348,22 @@ const statusStyle = computed(() => {
 // const selectableTideList = ['大潮', '中潮', '小潮']
 
 ///////////////////// 岸段选择
-const confirmBankHandler = async (bankName) => {
-  console.log('confirmBankHandler', bankName)
-  const bankNameMap = {
-    '民主沙': 'Mzs'
-  }
-  mapFlyToRiver(mapStore.getMap(map), bankName)
+const selectedBank = reactive({
+  name: null,
+  bankEnName: null
+})
+const confirmBankHandler = async (bank) => {
+  selectedBank.name = bank.name
+  selectedBank.bankEnName = bank.bankEnName
 
-  selectedBank.value = bankName
+  mapFlyToRiver(mapStore.getMap(map), bank.name)
 
   ElNotification({
     type: 'success',
     title: '选择岸段',
-    message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
-    offset: 180
+    message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
+    position: 'top-right',
+    offset: 250,
   })
 }
 
@@ -403,14 +406,14 @@ const conditionClickHandler = (type) => {
       title: '水文条件配置成功',
       // message: `流量：${params.value.flow}，大潮潮位：${params.value.maxTide}，小潮潮位：${params.value.minTide}`,
       // message: `流量：${params.value.flow}，潮型：${params.value.tideType}`,
-      offset: 120,
+      offset: 250,
       type: 'success',
     })
   else
     ElNotification({
       title: '水文条件配置失败',
       message: `请检查输入是否合法`,
-      offset: 120,
+      offset: 250,
       type: 'error',
     })
   modelRunnningProgress.value = 0
@@ -418,36 +421,33 @@ const conditionClickHandler = (type) => {
   globleVariable.status = false
 }
 const runModelClickHandler = async () => {
+
+  if (selectedBank.name === null) {
+    ElNotification({
+      title: '提示',
+      message: `请先选择岸段，获取岸段绑定的相关资源`,
+      offset: 250,
+      type: 'info',
+    })
+    return;
+  }
+
   if (!check(params.value)) {
     ElNotification({
       title: '运行失败',
       message: `请检查输入是否合法`,
-      offset: 120,
+      offset: 250,
       type: 'error',
     })
     return
   }
-  // ElMessageBox.confirm(
-  //   '模型正在运行，请稍后...',
-  //   {
-  //     showConfirmButton: false,
-  //     showCancelButton: true,
-  //     // confirmButtonText: '确定',
-  //     cancelButtonText: '取消',
-  //     type: 'warning',
-  //   }
-  // )
-  // ElNotification({
-  //   title: '模型正在运行，请稍后...',
-  //   type: 'info',
-  //   offset: 120,
-  // })
+
   if (runningMsg.value === '模型正在运行，请稍后...') {
     ElNotification({
       type: 'info',
       title: '模型正在运行',
       message: '请勿重复提交',
-      offset: 120,
+      offset: 250,
     })
     return
   }
@@ -501,7 +501,7 @@ const runModelClickHandler = async () => {
         })
     },
     'ERROR': () => {
-
+      // showRunning.value = false
     }
   }
   Confirm[globleVariable.runningStatus]()
@@ -518,148 +518,163 @@ const modelRunnning = async (type) => {
   }
   // console.log('check0 ', type)
   if (type === '0') {
-    modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+    modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": mmap[params.value.tideType],
-      "segment": "Mzs",
+      "segment": selectedBank.bankEnName,
       "set": "standard",
       "year": "2023",
     }
   } else if (type === '1') {
-    modelPostUrl = '/temp/taskNode/start/numeric/hydrodynamic'
+    modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": params.value.diffTide,
-      "segment": "Mzs",
+      "segment": selectedBank.bankEnName,
       "set": "standard",
       "year": "2023",
     }
   }
   // console.log('check1 ', modelPostUrl, modelParams)
-  // try {
+  try {
 
-  const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
-  // ElNotification({
-  //   title: '开始运行水动力模型',
-  //   offset: 120,
-  //   type: 'info',
-  // })
-  // const TASK_ID = '1'
-  console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
-  modelRunnningStatusDesc.value = '运行中'
-  modelRunnningProgress.value = 0
-  globleVariable.taskID = TASK_ID
-  console.log('===Interval')
-  let runningStatusInterval = setInterval(async () => {
-    console.log('runningStatusInterval')
-    let runningStatus = (await axios.get('/temp/taskNode/status/id?taskId=' + TASK_ID)).data
-    // let runningStatus = 'RUNNING'
+    const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+    // ElNotification({
+    //   title: '开始运行水动力模型',
+    //   offset: 250,
+    //   type: 'info',
+    // })
+    // const TASK_ID = '1'
+    console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
+
+    if (TASK_ID === 'WRONG') {
+      throw new Error('缺乏相关资源文件')
+    }
+
     modelRunnningStatusDesc.value = '运行中'
-    let randomFactor = 3.0
-    if (runningStatus === 'RUNNING') {
-      globleVariable.runningStatus = 'RUNNING'
-      if (modelRunnningProgress.value < 88) randomFactor = 1.0
-      if (modelRunnningProgress.value > 88) randomFactor = 0.5
-      if (modelRunnningProgress.value > 95) randomFactor = 0.1
+    modelRunnningProgress.value = 0
+    globleVariable.taskID = TASK_ID
+    let runningStatusInterval = setInterval(async () => {
+      let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
+      console.log('runningResult ', runningStatus)
+      // let runningStatus = 'RUNNING'
+      modelRunnningStatusDesc.value = '运行中'
+      let randomFactor = 3.0
+      if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
+        globleVariable.runningStatus = 'RUNNING'
+        if (modelRunnningProgress.value < 88) randomFactor = 1.0
+        if (modelRunnningProgress.value > 88) randomFactor = 0.5
+        if (modelRunnningProgress.value > 95) randomFactor = 0.1
 
-      let nextProgress = Math.round((modelRunnningProgress.value + Math.random() * randomFactor) * 100) / 100
-      nextProgress = nextProgress > 95 ? 95 : nextProgress
-      modelRunnningProgress.value = nextProgress
-    }
-    else if (runningStatus === 'ERROR') {
-      globleVariable.runningStatus = 'ERROR'
-      runningMsg.value = ''
-      showRunning.value = false
-      const url = `/temp/taskNode/result/id?taskId=${TASK_ID}`
-      axios.get(url).then(response => {
-        let errorLog = response.data['error-log']
-        resolve(errorLog)
-      }).catch(error => {
-        console.warn(error)
-        reject(error)
-      })
-      const errorLog = (await axios.get(url)).data['error-log']
+        let nextProgress = Math.round((modelRunnningProgress.value + Math.random() * randomFactor) * 100) / 100
+        nextProgress = nextProgress > 95 ? 95 : nextProgress
+        modelRunnningProgress.value = nextProgress
+      }
+      else if (runningStatus === 'ERROR') {
+        globleVariable.runningStatus = 'ERROR'
+        runningMsg.value = ''
+        showRunning.value = false
+        const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
+        axios.get(url).then(response => {
+          let errorLog = response.data['error-log']
+          resolve(errorLog)
+        }).catch(error => {
+          console.warn(error)
+          reject(error)
+        })
+        const errorLog = (await axios.get(url)).data['error-log']
 
-      ElNotification({
-        title: '模型运行失败',
-        message: `错误原因:\n` + errorLog,
-        offset: 120,
-        type: 'error',
-      })
-      modelRunnningStatusDesc.value = '运行失败'
-      globleVariable.runningStatus = 'NONE'
-      clearInterval(runningStatusInterval)
+        ElNotification({
+          title: '模型运行失败',
+          message: `错误原因:\n` + errorLog,
+          offset: 250,
+          type: 'error',
+        })
+        modelRunnningStatusDesc.value = '运行失败'
+        globleVariable.runningStatus = 'NONE'
+        clearInterval(runningStatusInterval)
 
-    }
-    else if (runningStatus === 'COMPLETE') {
-      runningMsg.value = ''
-      showRunning.value = false
-      clearInterval(runningStatusInterval)
-      let runningResult = (await axios.get('/temp/taskNode/result/id?taskId=' + TASK_ID)).data
-      console.log('runningResult ', runningResult)
+      }
+      else if (runningStatus === 'COMPLETE') {
+        runningMsg.value = ''
+        showRunning.value = false
+        clearInterval(runningStatusInterval)
+        let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data
+        console.log('runningResult ', runningResult)
 
-      globleVariable.caseID = runningResult['case-id']
+        globleVariable.caseID = runningResult['case-id']
 
-      globleVariable.pngPrefix = `/temp/data/modelServer/down/resource/file/image?name=`
-      globleVariable.binPrefix = `/temp/data/modelServer/down/resource/file/bin?name=`
-      globleVariable.stationBinUrl = runningResult['visualization-station-bin']
-      globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
+        globleVariable.pngPrefix = `/model/data/bankResource/down/modelServer/resource/file/image?name=`
+        globleVariable.binPrefix = `/model/data/bankResource/down/modelServer/resource/file/bin?name=`
+        globleVariable.stationBinUrl = runningResult['visualization-station-bin']
+        globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
 
-      ///temp/data/modelServer/down/resource/file/json?name=hydrodynamic/MZS/2024/test/104000xc/renderResource/flow_field_description.json
-      let visulizationDescUrl = `/temp/data/modelServer/down/resource/file/json?name=${runningResult['visualization-description-json']}`
+        ///model/data/modelServer/down/resource/file/json?name=hydrodynamic/MZS/2024/test/104000xc/renderResource/flow_field_description.json
+        let visulizationDescUrl = `/model/data/bankResource/down/modelServer/resource/file/json?name=${runningResult['visualization-description-json']}`
 
-      globleVariable.visualizationJsonUrl = visulizationDescUrl
-      console.log('globle data info::', globleVariable)
+        globleVariable.visualizationJsonUrl = visulizationDescUrl
+        console.log('globle data info::', globleVariable)
 
-      // const visualizationJson = (await axios.get(visulizationDescUrl)).data
-      // console.log('visualizationJson ', visualizationJson)
-      globleVariable.status = true
-      globleVariable.runningStatus = 'COMPLETE'
-      modelRunnningStatusDesc.value = '运行完毕'
-      modelRunnningProgress.value = 100
+        // const visualizationJson = (await axios.get(visulizationDescUrl)).data
+        // console.log('visualizationJson ', visualizationJson)
+        globleVariable.status = true
+        globleVariable.runningStatus = 'COMPLETE'
+        modelRunnningStatusDesc.value = '运行完毕'
+        modelRunnningProgress.value = 100
 
-      // showFlowClickHandler(1)
-    }
-  }, 500)
-  // } catch (error) {
-  //   console.log('error', error)
-  //   ElNotification({
-  //     title: '模型运行失败',
-  //     message: `错误原因:\n` + error.message,
-  //     offset: 120,
-  //     type: 'error',
-  //   })
-  // }
+        // showFlowClickHandler(1)
+      }
+    }, 500)
+  } catch (error) {
+    ElNotification({
+      title: '模型运行失败',
+      message: `错误原因:\n` + error.message,
+      offset: 250,
+      type: 'error',
+    })
+    modelRunnningStatusDesc.value = '运行失败'
+    globleVariable.runningStatus = 'NONE'
+    showRunning.value = false
+    console.log(modelRunnningStatusDesc)
+  }
 }
 
 //////////////////// 流场控制
+let flowWatcher = null
+
 const flowLayerControl = (type, show) => {
   let map = mapStore.getMap()
   const controlMap = {
     'lagrange': {
       add: () => {
-        console.log('add lagrenge');
+        console.log('add lagrenge')
+        flowWatcher && flowWatcher() // rm watcher
 
-        let backEndJsonUrl2 = "/api/data/flow/configJson/flood";
-        let imageSrcPrefix2 = "/api/data/flow/texture/flood/";
-        // let floodFlow = reactive(
-        //   new FlowFieldLayer("floodFlow", backEndJsonUrl2, imageSrcPrefix2)
-        // );
-        let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix)
-        // let flow = new FlowFieldLayer(globleVariable.lagrangeLayer, backEndJsonUrl2, imageSrcPrefix2)
+        let flow = reactive(new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix))
+        flowWatcher = watch(() => flow.stepProgressRate, (newVal) => {
+          hydrodynamicStore.flowFieldCurrentTimeStep = newVal
+        })
+
+
         mapStore.getMap().addLayer(flow, 'mzsLabel')
       },
       remove: () => {
-        console.log('rm lagrenge');
+        console.log('rm lagrenge')
+        flowWatcher && flowWatcher() // rm watcher
+        hydrodynamicStore.flowFieldCurrentTimeStep = 0
         map.getLayer(globleVariable.lagrangeLayer) && map.removeLayer(globleVariable.lagrangeLayer)
       }
     },
     'euler': {
       add: () => {
-        console.log('add euler');
-        let flow = new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix)
+        console.log('add euler')
+        flowWatcher && flowWatcher() // rm watcher
+        let flow = reactive(new EulerFlowLayer(globleVariable.eulerLayer, globleVariable.stationBinUrl, globleVariable.uvBinUrls, globleVariable.binPrefix))
 
+        flowWatcher = watch(() => flow.stepProgressRate, (newVal) => {
+          hydrodynamicStore.flowFieldCurrentTimeStep = newVal
+        })
         // let flow = new EulerFlowLayer(globleVariable.eulerLayer, 'station.bin', ['uv_0.bin','uv_1.bin','uv_2.bin'],
         // '/bin/')
 
@@ -667,6 +682,8 @@ const flowLayerControl = (type, show) => {
       },
       remove: () => {
         console.log('rm euler');
+        flowWatcher && flowWatcher() // rm watcher
+        hydrodynamicStore.flowFieldCurrentTimeStep = 0
         map.getLayer(globleVariable.eulerLayer) && map.removeLayer(globleVariable.eulerLayer)
       }
     }
@@ -675,12 +692,12 @@ const flowLayerControl = (type, show) => {
 }
 
 const showFlowClickHandler = (id) => {
-  console.log(globleVariable)
+  // console.log(globleVariable)
   if (!globleVariable.status) {
     ElNotification({
       title: '错误',
       message: '模型尚未运行或运行未结束，缺乏可视化依赖数据',
-      offset: 120,
+      offset: 250,
       type: 'error',
     })
     showFlow.value = 0
@@ -711,11 +728,11 @@ const showFlowClickHandler = (id) => {
 
 
 /////////////////// 潮位点绘制
-window.addEventListener('keydown', (event) => {
-  if (event.key === 'v') {
-    console.log(hydrodynamicStore.markerInfos)
-  }
-})
+// window.addEventListener('keydown', (event) => {
+//   if (event.key === 'v') {
+//     console.log(hydrodynamicStore.markerInfos)
+//   }
+// })
 
 // popover vue
 const createDom = () => {
@@ -733,7 +750,7 @@ const drawButtonClickHandler = () => {
       title: '警告',
       message: '水动力模型计算完成后方可提取潮位过程线',
       type: 'warning',
-      offset: 120,
+      offset: 250,
     })
     return
   }
@@ -742,7 +759,7 @@ const drawButtonClickHandler = () => {
       title: '警告',
       message: '请等待当前任务完成，请稍后...',
       type: 'warning',
-      offset: 120,
+      offset: 250,
     })
     return
   }
@@ -751,14 +768,14 @@ const drawButtonClickHandler = () => {
     title: '提示',
     message: '进入绘制状态，点击地图以添加潮位点',
     type: 'info',
-    offset: 120,
+    offset: 250,
   })
   let map = mapStore.getMap()
   let dom = map.getCanvasContainer()
   dom.style.cursor = 'crosshair'
   if (drawingStatus === false) {
     map.once('click', (e) => {
-      console.log(e.lngLat)
+      // console.log(e.lngLat)
       // add marker
 
       const popoverDom = createDom()
@@ -776,7 +793,7 @@ const drawButtonClickHandler = () => {
       hydrodynamicStore.addMarkerInfo(marker, markerDom, e.lngLat.lng, e.lngLat.lat)
 
       markerDom.addEventListener('click', function (e) {
-        console.log('click marker!!', this)
+        // console.log('click marker!!', this)
         const _markerDom = this
         hydrodynamicStore.focusingMarkerDom = _markerDom
       })
@@ -785,7 +802,7 @@ const drawButtonClickHandler = () => {
         type: 'info',
         title: '新添潮位点',
         message: `经度：${e.lngLat.lng.toFixed(4)}，纬度：${e.lngLat.lat.toFixed(4)}`,
-        offset: 120,
+        offset: 250,
       })
 
       // run model
@@ -795,7 +812,7 @@ const drawButtonClickHandler = () => {
     })
     drawingStatus = true
   }
-  else{
+  else {
     return
   }
 
@@ -806,9 +823,9 @@ const drawButtonClickHandler = () => {
 const tidePointVelocityCalc = async (lng, lat) => {
   // pointConfirmShow.value = false
   // console.log('pointFeature::', tidePointFeature.value)
-  console.log('getVelocity caseId::', globleVariable.caseID)
+  // console.log('getVelocity caseId::', globleVariable.caseID)
   // modelRunnningStatusDesc
-  const pointVelocityModelUrl = '/temp/taskNode/start/numeric/getFlowFieldVelocities'
+  const pointVelocityModelUrl = '/model/taskNode/start/numeric/getFlowFieldVelocities'
   const params = {
     "case-id": globleVariable.caseID,
     // "case-id": '6c6496ca7c80adbbff129da890894990',
@@ -823,7 +840,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
   runningMsg.value = '正在提取潮位线...'
   const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
   const hereTaskId = await pointVelocityMR.modelStart()
-  console.log('hereTaskId', hereTaskId)
+  // console.log('hereTaskId', hereTaskId)
 
 
   console.log('===Interval')
@@ -839,7 +856,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
         ElNotification({
           title: '计算失败',
           message: `错误原因:\n` + errorLog,
-          offset: 120,
+          offset: 250,
           type: 'error',
         })
         showRunning.value = false
@@ -851,19 +868,19 @@ const tidePointVelocityCalc = async (lng, lat) => {
         clearInterval(runningInterval)
         ElNotification({
           title: '计算成功',
-          offset: 120,
+          offset: 250,
           type: 'success',
         })
         let runningResult = await pointVelocityMR.getModelResult()
 
-        let testOption = getTideLineDataOption(runningResult)
+        let _tideLineOption = getTideLineDataOption(runningResult)
 
-        hydrodynamicStore.showingOption = testOption
-        // chartIns.setOption(testOption)
+        hydrodynamicStore.showingOption = _tideLineOption
+        // chartIns.setOption(_tideLineOption)
 
         // 在store中补充result
         let newInfo = {
-          option: testOption
+          option: _tideLineOption
         }
         hydrodynamicStore.appendMarkerInfo(hydrodynamicStore.calculatingMarkerDom, newInfo)
 
@@ -883,7 +900,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
 const getTideLineDataOption = (data) => {
   const usData = data.result[0].us
   const vsData = data.result[0].vs
-  const timeData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+  const timeData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
 
   const tideLineOption = {
     grid: {
@@ -942,36 +959,39 @@ const mapFlyToRiver = (mapIns, bankName) => {
       [120.45997922676836, 32.00001616423072],
       [120.60909640208264, 32.084171362618625],
     ],
+    '民主沙右缘': [
+      [120.45997922676836, 32.00001616423072],
+      [120.60909640208264, 32.084171362618625],
+    ],
   }
-
-  mapIns.fitBounds(
-    boundsMap[bankName],
-    {
-      duration: 1500,
-    }
-  );
+  if (boundsMap[bankName]) {
+    mapIns.fitBounds(
+      boundsMap[bankName],
+      {
+        duration: 1500,
+      }
+    );
+  }
 }
 
 
 const updateRealtimeWaterCondition = async () => {
   // async request
-  const response = {
-    flow: 85000,
-    // maxTide: 5.2,
-    // minTide: 3.9,
-    diffTide: 3.9
-  }
+  const response = await getRealTimeFlowAndLevelData()
   // update
-  tableData.value = [
-    response
-  ]
+  // tableData.value = [
+  //   response
+  // ]
   updateTime.value = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
-  customParams.value = response
+  customParams.value = {
+    flow: response.flow,
+    diffTide: response.level
+  }
   ElNotification({
     title: '已更新实时水文条件',
     message: `更新时间：${updateTime.value}`,
-    offset: 120,
+    offset: 250,
     type: 'success',
   })
 }
@@ -983,10 +1003,26 @@ onMounted(async () => {
   mapStore.setMap(map)
   chartIns = echarts.init(tideLineChartDom.value)
 
-  watch(() => hydrodynamicStore.showingOption, (newVal) => {
-    console.log('newVal', newVal)
-    chartIns.setOption(newVal)
+  let tidePointWatcher = null
+  let markLineWatcher = null
+
+  tidePointWatcher = watch(() => hydrodynamicStore.showingOption, (newVal) => {
+
+    markLineWatcher && markLineWatcher() // rm watcher
+
+    let option = JSON.parse(JSON.stringify(toRaw(newVal)))// deep copy
+    console.log('showing option change!::', option)
+    chartIns.setOption(option)
+
+    markLineWatcher = watch(() => hydrodynamicStore.flowFieldCurrentTimeStep, (newVal) => {
+      console.log('newVal::', newVal)
+      let showingOption = JSON.parse(JSON.stringify(toRaw(hydrodynamicStore.showingOption)))// deep copy
+      let markLineOption = hydrodynamicStore.getMarkLineOption()
+      showingOption.series[0].markLine = markLineOption
+      chartIns.setOption(showingOption)
+    })
   })
+
 })
 
 
@@ -1125,54 +1161,6 @@ div.stability-analysis {
       align-items: center;
       z-index: 1;
 
-      .title-icon {
-        z-index: 0;
-        width: 4.5vh;
-        height: 4.5vh;
-        background-size: contain;
-      }
-
-      .el-popper.is-customized {
-        z-index: 3;
-        padding: 6px 12px;
-        background: linear-gradient(90deg, rgb(179, 255, 171), rgb(204, 229, 129));
-      }
-
-      .el-popper.is-customized .el-popper__arrow::before {
-        background: linear-gradient(45deg, #b2e68d, #bce689);
-        right: 0;
-        z-index: 3;
-      }
-
-      .detailIcon {
-        width: 4.5vh;
-        height: 4.5vh;
-        background-size: contain;
-        margin-left: 2.5vw;
-        background-image: url("/icons/searching.png");
-        z-index: 0;
-
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.03);
-          transition: 500ms;
-        }
-      }
-
-      .returnIcon {
-        width: 4.5vh;
-        height: 4.5vh;
-        background-size: contain;
-        margin-left: 2.5vw;
-        background-image: url("/back.png");
-
-        &:hover {
-          cursor: pointer;
-          transform: scale(1.03);
-          transition: 500ms;
-        }
-      }
-
       div.basemap-radio-container {
         z-index: 1;
         width: 20vw;
@@ -1180,81 +1168,32 @@ div.stability-analysis {
         display: flex;
         flex-flow: row nowrap;
         background-color: #fff;
-        box-shadow: 0 0 4px 1px rgba(#0642b1, 0.55), 0 6px 12px 0 rgba(#0642b1, 0.55);
+        box-shadow:
+          0 0 4px 1px rgba(#0642b1, 0.55),
+          0 6px 12px 0 rgba(#0642b1, 0.55);
         padding: 0.6vh;
         border-radius: 0.6vw; // just a high number to create pill effect
         margin-right: auto;
         margin-left: 8px;
 
-        * {
-          z-index: 7;
-        }
-
-        input[type="radio"] {
-          display: none;
-        }
-
-        .tab {
+        :deep(.el-radio-group) {
+          // background-color: red;
+          width: 18.8vw;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 4vh;
-          width: 7vw;
-          font-size: calc(0.8vw + 0.5vh);
-          font-weight: 600;
-          border-radius: 1.6rem; // just a high number to create pill effect
-          cursor: pointer;
-          transition: color 0.15s ease-in;
-        }
+          flex-direction: row;
+          justify-content: space-evenly;
 
-        input[type="radio"] {
-          &:checked {
-            &+label {
-              color: #185ee0;
+          .el-radio-button {
+            width: 6vw;
+
+            .el-radio-button__inner {
+              width: 6vw;
+              font-size: calc(0.6vw + 0.6vh);
+              font-weight: 800;
+              padding: 1vh 0vw;
             }
           }
         }
-
-        input[id="radio-1"] {
-          &:checked {
-            &~.glider {
-              transform: translateX(0);
-            }
-          }
-        }
-
-        input[id="radio-2"] {
-          &:checked {
-            &~.glider {
-              transform: translateX(100%);
-            }
-          }
-        }
-
-        input[id="radio-3"] {
-          &:checked {
-            &~.glider {
-              transform: translateX(200%);
-            }
-          }
-        }
-
-        .glider {
-          position: absolute;
-          display: flex;
-          height: 4vh;
-          width: 7vw;
-          background-color: #bcd8fc;
-          z-index: 5;
-          border-radius: 0.6vw; // just a high number to create pill effect
-          transition: 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
-        }
-
-        // @media (max-width: 700px) {
-        //     .tabs {
-        //         transform: scale(0.6);
-        //     }
-        // }
       }
     }
 

@@ -68,15 +68,17 @@ export default defineComponent({
       if (!map) return;
 
       let boundsMap = {
-        民主沙: [
+        民主沙右缘: [
           [120.45997922676836, 32.00001616423072],
           [120.60909640208264, 32.084171362618625],
         ],
       };
 
-      map.fitBounds(boundsMap[bankName], {
-        duration: 1500,
-      });
+      if (boundsMap[bankName]) {
+        map.fitBounds(boundsMap[bankName], {
+          duration: 1500,
+        });
+      }
     };
 
     const lineDraw = new MapboxDraw({
@@ -304,7 +306,9 @@ export default defineComponent({
             type: "image",
             url: `${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }data/modelServer/down/result/file/image?caseId=${param.id}&name=${param.name}`,
+            }data/bankResource/down/modelServer/result/file/image?caseId=${
+              param.id
+            }&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
@@ -317,7 +321,9 @@ export default defineComponent({
             type: "image",
             url: `${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }/data/modelServer/down/result/file/image?caseId=${param.id}&name=${param.name}`,
+            }/data/bankResource/down/modelServer/result/file/image?caseId=${
+              param.id
+            }&name=${param.name}`,
             coordinates: param.params.extent,
           });
           map.addLayer({
@@ -454,7 +460,7 @@ export default defineComponent({
       inputValue,
       visualType,
       clickHandle,
-      mapFlyToRiver
+      mapFlyToRiver,
     };
   },
 });

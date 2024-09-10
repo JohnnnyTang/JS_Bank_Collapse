@@ -1,17 +1,25 @@
 <template>
     <div class="bank-twin-container">
-        <BankTwinNavVue />
-        <router-view />
+        <BankTwinNavVue ref="navRef" />
+        <router-view @update-bank-basic-info="updateBankBasicInfoHandler" />
     </div>
 </template>
 
 <script setup>
 import BankTwinNavVue from '../components/bankManage/BankTwinNav.vue';
+import { ref } from 'vue';
+
+const navRef = ref(null);
+const updateBankBasicInfoHandler = (val) => {
+    if (!val) return;
+    if (navRef.value) {
+        navRef.value.updateBankList()
+    }
+}
 
 </script>
 
 <style lang="scss" scoped>
-
 div.bank-twin-container {
     position: absolute;
     width: 100vw;
@@ -29,8 +37,13 @@ div.bank-twin-container {
 
     overflow: hidden;
 
-    background: linear-gradient(70deg, rgba(0,56,128,1) 0%, rgb(44, 151, 252) 100%);
+    background: linear-gradient(70deg, rgba(0, 56, 128, 1) 0%, rgb(44, 151, 252) 100%);
+
+    :deep(.el-form) {
+        // background-color: red;
+        margin: 0vh 2vw;
+
+    }
 
 }
-
 </style>
