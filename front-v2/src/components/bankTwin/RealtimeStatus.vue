@@ -1,7 +1,6 @@
 <template>
     <div class="device-info-container" :class="{ 'hide-left': props.domHide }">
         <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
-        <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
             <div class="device-info-content">
                 <div class="monitor-title-container">设备状态</div>
                 <!-- <div class="monitor-info-splitter">
