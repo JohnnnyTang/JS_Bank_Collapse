@@ -4,6 +4,10 @@ import CommonUtils from '../utils/CommonUtils'
 import { ElMessage } from 'element-plus';
 import router from '../router/index'
 
+const bankName = [
+    'Mzs',  //民主沙
+    'Zys',  //自由沙
+]
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
     baseURL: '/api',
@@ -61,36 +65,37 @@ export default class BackEndRequest {
     }
 
     static getChannelData() {
-        return backendInstance.get('/data/channel')
+        return backendInstance.get('/data/channel')     //暂不改
     }
 
     static getbankLineData() {
-        return backendInstance.get('/data/bankLine')
+        return backendInstance.get('/data/bankLine')    //暂不改
     }
 
     static getBankLineSimpleData() {
-        return backendInstance.get('/data/bankLine/simple')
+        return backendInstance.get('/data/bankLine/simple')     //暂不改
     }
 
     static getHistoryInfo() {
-        return backendInstance.get('/data/historyInfo')
+        return backendInstance.get('/data/historyInfo')         //暂不改
     }
 
     static getMonitorInfo() {
-        return backendInstance.get('/data/monitorInfo')
+        return backendInstance.get('/data/monitorInfo')         //可更改
+        // return backendInstance.get('/data/bank/${bankName[0]}/monitorInfo')  
     }
 
     static getSpecMonitorInfo(type) {
         //设备概述信息！！！！
         switch (type) {
             case '1':
-                return backendInstance.get('/data/monitorInfo/type/1')
+                return backendInstance.get('/data/monitorInfo/type/1')      //可更改
             case '2':
-                return backendInstance.get('/data/monitorInfo/type/2')
+                return backendInstance.get('/data/monitorInfo/type/2')      //可更改
             case '3':
-                return backendInstance.get('/data/monitorInfo/type/3')
+                return backendInstance.get('/data/monitorInfo/type/3')      //可更改
             case '4':
-                return backendInstance.get('/data/monitorInfo/type/4')
+                return backendInstance.get('/data/monitorInfo/type/4')      //可更改
         }
     }
 
