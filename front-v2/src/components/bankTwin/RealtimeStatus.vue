@@ -923,7 +923,7 @@ const deviceSelectChange = async (deviceName) => {
                 // 点击的是折点，更新 option 为 newOption
                 echartIns.setOption(fiberNewOption, { notMerge: true });
                 showButton.value = true;
-                console.log(showButton)
+                // console.log(showButton)
             }
         });
     }

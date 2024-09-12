@@ -60,10 +60,16 @@ multiIndex:
   wholeDataPath: E:\Data\dataWhole
   resPath: E:\Data\modelRes\
 
+
 sms:
   accessTokenLoc: D:\2024-work\AccessKey.json
   signName: 江苏长江崩岸监测预警系统
   verifyTemplateCode: SMS_465975002
+
+staticData:
+  tifTilePath: E:/Data/bankProjectData/staticData/tifTile
+  vectorDataPath: E:/Data/bankProjectData/staticData/vectorData
+  waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
 
 flowData:
   texturePath: D:/2024-work/shore_collapse/data/flowData/flowFieldResourceArchive/
@@ -72,3 +78,5 @@ modelServer:
   url: http://172.21.212.216:8000
   storageLimit: 50
   caseLimit: 50
+
+loginFunction: "no"
