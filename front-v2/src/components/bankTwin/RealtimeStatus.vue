@@ -661,13 +661,13 @@ const fiberNewOption = {
     legend: {
         data: ['微应变'],
         top: '3%',
-        right: '30%',
+        right: '20%',
     },
     grid: {
         left: '3%',
         right: '10%',
         bottom: '3%',
-
+        top: '10%',
         containLabel: true
     },
     xAxis: {
@@ -899,6 +899,7 @@ const deviceSelectChange = async (deviceName) => {
     updateTimeLoading.value = true
     showButton.value = false;
     if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
+        console.log(deviceTypeNameMap[selectedDeviceType.value]),
         curDeviceData = (
             await BackEndRequest.getMonitorDataByTypeIdWithTime(
                 deviceTypeNameMap[selectedDeviceType.value],
@@ -908,6 +909,7 @@ const deviceSelectChange = async (deviceName) => {
             )
         ).data
     } else {
+        console.log(deviceTypeNameMap[selectedDeviceType.value]),
         curDeviceData = []
         // 添加 click 事件监听器
         echartIns.on('click', function (params) {

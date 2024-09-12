@@ -81,8 +81,7 @@ export default class BackEndRequest {
     }
 
     static getMonitorInfo() {
-        return backendInstance.get('/data/monitorInfo')         //可更改
-        // return backendInstance.get('/data/bank/${bankName[0]}/monitorInfo')  
+        return backendInstance.get('data/monitorInfo')         //可更改
     }
 
     static getSpecMonitorInfo(type) {

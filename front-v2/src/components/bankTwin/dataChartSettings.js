@@ -1214,8 +1214,8 @@ const genFiberOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         },
         legend: {
             data: ['微应变'],
-            right: '1%',
-            width: '60%',
+            top: '3%',
+            right: '20%',
         },
         grid: {
             left: '2%',
@@ -1257,12 +1257,12 @@ const genFiberOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         dataZoom: [
             {
                 type: 'inside',
-                start: 90,
+                start: 80,
                 end: 100,
             },
             {
                 type: 'slider',
-                start: 90,
+                start: 80,
                 end: 100,
             },
         ],
