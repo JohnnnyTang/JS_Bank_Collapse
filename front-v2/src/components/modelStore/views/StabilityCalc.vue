@@ -618,7 +618,16 @@ const visulizationPrepare = async () => {
         ModelRunningMessage.value = '正在加载可视化资源...'
         globleVariable.runningStatus = 'start'
 
-        const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+        const response = await axios.post(modelPostUrl, modelParams).catch(() => {
+            ModelRunningShow.value = false
+            ModelRunningMessage.value = ''
+            ElNotification({
+                type: 'error',
+                title: '断面形态计算模型启动失败',
+                offset: 130
+            })
+        })
+        const TASK_ID = response.data
         // const TASK_ID = '1'
         console.log('TASK_ID ', TASK_ID) // 66a23664bec8e12b68c9ce86
         globleVariable.taskID = TASK_ID
