@@ -44,30 +44,31 @@
                                 </div>
                             </div>
 
-                            <div class="soil-layer-profile flex-coloum" style="width: 61%;">
-                                <div class="title2">土壤分层详情</div>
+                            <div class="second-row">
+                                <div class="soil-layer-profile flex-coloum">
+                                    <div class="title2">土壤分层详情</div>
 
-                                <div class="content flex-row">
-                                    <div class="keyValue flex-row" v-for="i in 5">
-                                        <div class="key">{{ thicknessName[i - 1] }}</div>
-                                        <!-- <div class="value">{{ keepFloat2(thicknessData[i - 1]) }}</div> -->
-                                        <input type="number" class="value" :key="i" v-model="thicknessData[i - 1]">
+                                    <div class="content flex-row">
+                                        <div class="keyValue flex-row" v-for="i in 5">
+                                            <div class="key">{{ thicknessName[i - 1] }}</div>
+                                            <!-- <div class="value">{{ keepFloat2(thicknessData[i - 1]) }}</div> -->
+                                            <input type="number" class="value" :key="i" v-model="thicknessData[i - 1]">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="temp-block">
+                                    <div class="title2">潮位参数配置</div>
+                                    <div class="content one-center">
+                                        <div class="keyValue flex-row">
+                                            <div class="key">elevation of Flow</div>
+                                            <input type="number" class="value" placeholder="请输入潮位"
+                                                v-model="elevationOfFlow">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-
-                            <div class="temp-block">
-                                <div class="title2" style="margin-top: 1vh;">潮位参数配置</div>
-                                <div class="content one-center">
-                                    <div class="keyValue flex-row" style="margin-top: .2vh;">
-                                        <div class="key">elevation of Flow</div>
-                                        <input type="number" class="value" placeholder="请输入潮位" v-model="elevationOfFlow">
-                                    </div>
-                                </div>
-                            </div>
-
-
 
                             <div class="right-block flex-coloum">
                                 <div class="full-block flex-coloum" style="justify-content: flex-start;">
@@ -150,20 +151,15 @@
 
 <script setup>
 import ModelTitleVue from '../ModelTitle.vue'
-import soilFlowChart from '../soilAnalysis/soilFlowChart.vue';
 import sectionDraw from '../soilAnalysis/sectionDraw.vue'
 import sectionChart from '../soilAnalysis/chart copy'
-import axios from 'axios';
-// import { getData, getTestData } from '../soilAnalysis/chart'
-import { onMounted, ref, reactive, watch, nextTick, computed } from 'vue';
+import { onMounted, ref, reactive, watch } from 'vue';
 import { ElNotification } from 'element-plus';
-import { initPureScratchMap } from '../../../utils/mapUtils';
 import ModelRunner from '../modelRunner'
 import BankResourceHelper from './bankResourceHelper';
 
 const chartdom = ref(null)
 const sectionDrawRef = ref(null)
-const mapRef = ref(null)
 const elevationOfFlow = ref(2.8)
 const ModelRunningShow = ref(false)
 const ModelRunningMessage = ref('请完整配置参数后运行')
@@ -179,7 +175,6 @@ const fileList = ref([])
 const uploadJson = ref({})
 
 
-let resultMap = null
 let chart = null
 
 const thicknessData = ref([1.93, -4.07, -11.57, -26.57, -36.57])
@@ -191,7 +186,6 @@ const beforeUpload = (file, e) => {
     console.log('beforeUpload', file, e)
     const isJSON = file.type === 'application/json';
     if (!isJSON) {
-        console.log('请上传合法的 JSON 参数配置文件!');
         return false;
     }
     return isJSON;
@@ -231,8 +225,6 @@ const handleExceed = (files, fileList) => {
 }
 const handleRequest = (a, b) => {
     console.log('============')
-    console.log(a)
-    console.log(b)
 }
 
 watch(uploadJson, async (newValue, oldValue) => {
@@ -304,11 +296,6 @@ const inputData = (type) => {
             return
         }
         mapInputVisible.value = true
-        // setTimeout(() => {
-        //     console.log(sectionDrawRef.value)
-        //     sectionDrawRef.value.resizeMap()
-        // }, 1);
-        // sectionDrawRef.value.resizeMap()
     }
 
     BSTEMResult.see = 0
@@ -333,35 +320,26 @@ const demSelectHandler = (name) => {
     //     '2004': '200408_dem/w001001.adf'
     // }
     // selectedDem.value = NameList[name]
-    console.log(name)
     selectedDem.value = name
 }
 
 const sectionViewModelRun = async (param) => {
     console.log('section view model run')
-    // let sectionViewParams = {
-    //     'dem-id': selectedDem,
-    //     'section-geometry': sectionGeojson,
-    // }
-    // const paramsCheck = () => {
-    //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
-    //         ElNotification({position: 'top-left',
-    //             type: 'warning',
-    //             message: '请完成断面绘制和地形选择',
-    //             title: '警告',
-    //             offset: 130
-    //         })
-    //         return false
-    //     }
-    //     return true
-    // }
-
 
     ModelRunningShow.value = true
     ModelRunningMessage.value = '正在计算断面形态'
     let sectionViewModelUrl = '/model/taskNode/start/riverbedEvolution/calculateSectionView'
     const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
-    const taskId = await sectionViewMR.modelStart()
+    const taskId = await sectionViewMR.modelStart().catch(() => {
+        ModelRunningShow.value = false
+        ModelRunningMessage.value = ''
+        ElNotification({
+            position: 'top-left',
+            type: 'error',
+            title: '断面形态计算模型启动失败',
+            offset: 130
+        })
+    })
     console.log('task id', taskId, sectionViewMR.taskId)
     let statusInterval = setInterval(async () => {
         const status = await sectionViewMR.getRunningStatus()
@@ -379,10 +357,10 @@ const sectionViewModelRun = async (param) => {
                 const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err) => {
                     ElNotification({
                         position: 'top-left',
+                        offset: 130,
                         type: 'error',
                         title: '错误',
                         message: '断面形态计算完毕，但获取断面信息失败！',
-                        offset: 130
                     })
                     console.log(err)
                 })
@@ -462,20 +440,17 @@ const calSectionViewClickHandler = () => {
 }
 
 const findIndexOfMin = (arr) => {
+    // // 找到最小值的索引
+    // const numbers = [10, 5, 8, 3, 7];
+    // const minIndex = findIndexOfMin(numbers);
     if (arr.length === 0) {
         return -1; // 如果数组为空，返回 -1 表示没有最小值
     }
-
     return arr.reduce((minIndex, currentValue, currentIndex, array) => {
         return currentValue < array[minIndex] ? currentIndex : minIndex;
     }, 0);
 }
 
-// // 示例数组
-// const numbers = [10, 5, 8, 3, 7];
-
-// // 找到最小值的索引
-// const minIndex = findIndexOfMin(numbers);
 
 const BSTEMModelRun = async () => {
     let BSTEMModelParams = {
@@ -488,7 +463,6 @@ const BSTEMModelRun = async () => {
         // "bool-tension": false,
         "bank-layer-thickness": thicknessData.value,
     }
-    console.log(BSTEMModelParams)
     const paramsCheck = () => {
         if (elevationOfFlow.value == null || elevationOfFlow.value == '') {
             ElNotification({
@@ -515,7 +489,16 @@ const BSTEMModelRun = async () => {
 
         let BSTEMModelUrl = '/model/taskNode/start/erosionModel/calculateBSTEM'
         const BSTEMMR = new ModelRunner(BSTEMModelUrl, BSTEMModelParams)
-        const taskId = await BSTEMMR.modelStart()
+        const taskId = await BSTEMMR.modelStart().catch(() => {
+            ModelRunningShow.value = false
+            ModelRunningMessage.value = ''
+            ElNotification({
+                position: 'top-left',
+                type: 'error',
+                title: '土体变形分析模型启动失败',
+                offset: 130
+            })
+        })
         console.log('task id', taskId, BSTEMMR.taskId)
         let statusInterval = setInterval(async () => {
             const status = await BSTEMMR.getRunningStatus()
@@ -575,8 +558,6 @@ const BSTEMModelRun = async () => {
 
 const redrawChartClickHandler = () => {
 
-    // console.log(xzData.value)
-    // console.log(thicknessData.value)
     BSTEMResult.see = 0
     BSTEMResult.ssa = 0
     BSTEMResult.fos = 0
@@ -604,37 +585,12 @@ const drawChartFromMap = () => {
         })
         chart.initBaseChart(false)
     }
-    // chart.initGraphic()
-
-    // watch(() => chart.newDataInfo, (e) => {
-    //     thicknessData.value = e.thicknessData.sort((a, b) => b - a)
-    //     xzData.value = e.pointData.sort((a, b) => a[0] - b[0])
-    // }, {
-    //     deep: true
-    // })
-}
-const resultMapInit = async () => {
-    resultMap = await initPureScratchMap(mapRef.value)
-    resultMap.resize()
-    attachBaseLayer(resultMap)
-    mapFlyToRiver(resultMap)
 }
 
 
 
 onMounted(async () => {
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key == 'q') {
-            console.log(xzData.value)
-        }
-        if (e.key == 'w') {
-            console.log(thicknessData.value)
-        }
-
-    })
-    // /taskNode/result/id?taskId=66ade6c2cb34b50d7075f6a4
-
+    // do nothing
 })
 
 /// helper
@@ -786,7 +742,6 @@ const attachBaseLayer = (map) => {
         },
     })
 }
-
 const dataGenerate = (origin) => {
     console.log('origin', origin)
     const lineData = []
@@ -818,8 +773,6 @@ const dataGenerate = (origin) => {
         ]
     }
 }
-
-
 const parseUploadJson = (jsonData) => {
     try {
         let pointDT = []
@@ -998,7 +951,6 @@ div.main-content {
 
                 :deep(div.el-tabs__nav-scroll) {
                     background-color: rgb(171, 213, 246);
-                    // border-bottom: 3px solid #2a4ac9;
                 }
 
             }
@@ -1121,143 +1073,154 @@ div.main-content {
 
                         }
 
-                        .soil-layer-profile {
+                        .second-row {
+                            width: 82%;
+                            height: 40%;
+                            display: flex;
+                            flex-direction: row;
 
-                            position: relative;
-                            // width: 80%;
-                            height: 30%;
-                            padding: 10px;
-                            margin: 5px;
-                            background-color: rgb(212, 239, 254);
-                            border-radius: 10px;
 
-                            .content {
+                            .soil-layer-profile {
 
-                                justify-content: space-evenly;
-                                align-items: center;
+                                position: relative;
+                                width: 74%;
+                                height: 65%;
+                                overflow: hidden;
+                                padding: 10px;
+                                margin: 5px;
+                                background-color: rgb(212, 239, 254);
+                                border-radius: 10px;
 
-                                .keyValue {
-                                    position: relative;
-                                    justify-content: center;
+                                .content {
+
+                                    justify-content: space-evenly;
                                     align-items: center;
-                                    width: 10vw;
-                                    height: 4vh;
 
-                                    .key {
-                                        height: 2.5vh;
-                                        width: 3vw;
-                                        margin-right: .2vw;
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.4vw + 0.3vh);
-                                        transition: .3s ease-in-out;
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
-                                        border-radius: 5px;
-                                        background-color: rgb(44, 61, 212);
-                                        font-weight: bold;
-                                        color: white;
-                                    }
-
-                                    .value {
+                                    .keyValue {
                                         position: relative;
-                                        height: 2.5vh;
-                                        width: 3vw;
-                                        // flex: 1;
-                                        // border: 1px solid rgb(201, 201, 201);
-                                        border: none !important;
-                                        border-right: 2px solid rgb(2, 143, 199) !important;
-                                        border-bottom: 1px solid rgb(5, 88, 121) !important;
-                                        border-radius: 5px;
-                                        text-align: center;
+                                        justify-content: center;
+                                        align-items: center;
+                                        width: 10vw;
+                                        height: 4vh;
 
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.4vw + 0.5vh);
-                                        transition: .3s ease-in-out;
-
-                                        &:nth-child(even) {
-                                            color: rgb(44, 61, 212);
-                                            background-color: #ffffff;
-                                        }
-
-                                        &:nth-child(odd) {
-                                            color: white;
-                                            background-color: rgba(44, 61, 212, 0.527);
-                                        }
-
-                                        &:hover {
-                                            background-color: rgb(44, 61, 212);
-                                            color: white;
-                                            font-weight: bold;
-                                        }
-
-                                        &.head {
-                                            background-color: #0e14cf;
+                                        .key {
+                                            height: 2.5vh;
+                                            width: 3vw;
+                                            margin-right: .2vw;
+                                            display: grid;
+                                            place-items: center;
                                             font-size: calc(0.4vw + 0.3vh);
+                                            transition: .3s ease-in-out;
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            background-color: rgb(44, 61, 212);
+                                            font-weight: bold;
+                                            color: white;
                                         }
 
+                                        .value {
+                                            position: relative;
+                                            height: 2.5vh;
+                                            width: 3vw;
+                                            // flex: 1;
+                                            // border: 1px solid rgb(201, 201, 201);
+                                            border: none !important;
+                                            border-right: 2px solid rgb(2, 143, 199) !important;
+                                            border-bottom: 1px solid rgb(5, 88, 121) !important;
+                                            border-radius: 5px;
+                                            text-align: center;
+
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.4vw + 0.5vh);
+                                            transition: .3s ease-in-out;
+
+                                            &:nth-child(even) {
+                                                color: rgb(44, 61, 212);
+                                                background-color: #ffffff;
+                                            }
+
+                                            &:nth-child(odd) {
+                                                color: white;
+                                                background-color: rgba(44, 61, 212, 0.527);
+                                            }
+
+                                            &:hover {
+                                                background-color: rgb(44, 61, 212);
+                                                color: white;
+                                                font-weight: bold;
+                                            }
+
+                                            &.head {
+                                                background-color: #0e14cf;
+                                                font-size: calc(0.4vw + 0.3vh);
+                                            }
+
+                                        }
                                     }
+
                                 }
 
                             }
 
-                        }
+                            .temp-block {
 
-                        .temp-block {
-                            position: absolute;
-                            width: 15vw;
-                            height: 9vh;
-                            top: 15.8vh;
-                            right: 15.5vw;
-                            background-color: rgb(212, 239, 254);
-                            border-radius: 10px;
+                                position: relative;
+                                width: 21.5%;
+                                height: 65%;
+                                overflow: hidden;
+                                padding: 10px;
+                                margin: 5px;
+                                background-color: rgb(212, 239, 254);
+                                border-radius: 10px;
 
-                            .title2 {
-                                margin-left: .5vw;
-                            }
+                                .title2 {
+                                    margin-left: .5vw;
+                                }
 
-                            .content {
+                                .content {
 
 
-                                .keyValue {
-                                    position: relative;
-                                    justify-content: center;
-                                    align-items: center;
-                                    width: 12vw;
-                                    height: 4vh;
+                                    .keyValue {
+                                        position: relative;
+                                        justify-content: center;
+                                        align-items: center;
+                                        width: 12vw;
+                                        height: 4vh;
 
-                                    .key {
-                                        height: 2.5vh;
-                                        width: 65%;
-                                        margin-right: .5vw;
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.5vw + 0.3vh);
-                                        transition: .3s ease-in-out;
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
-                                        border-radius: 5px;
-                                        background-color: rgb(44, 61, 212);
-                                        font-weight: bold;
-                                        color: white;
-                                    }
+                                        .key {
+                                            height: 2.5vh;
+                                            width: 65%;
+                                            margin-right: .5vw;
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.5vw + 0.3vh);
+                                            transition: .3s ease-in-out;
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            background-color: rgb(44, 61, 212);
+                                            font-weight: bold;
+                                            color: white;
+                                        }
 
-                                    .value {
-                                        height: 2.5vh;
-                                        // flex: 0.4;
-                                        width: 33%;
+                                        .value {
+                                            height: 2.5vh;
+                                            // flex: 0.4;
+                                            width: 33%;
+                                            text-align: center;
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.4vw + 0.4vh);
+                                            transition: .3s ease-in-out;
+                                            background-color: #ffffff;
+                                            color: rgb(44, 61, 212);
 
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
-                                        border-radius: 5px;
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.4vw + 0.4vh);
-                                        transition: .3s ease-in-out;
-                                        background-color: #ffffff;
-                                        color: rgb(44, 61, 212);
-
+                                        }
                                     }
                                 }
                             }

@@ -205,7 +205,7 @@ const infoPannelTitle = ref('')
 const search = ref('')
 const realtimeZoom = ref(0)
 var latestLGID = ''
-const waterTableData = [
+const waterTableData = ref([
     {
         station: '大通站',
         flow: 'N/A',
@@ -236,7 +236,7 @@ const waterTableData = [
         flow: 'N/A',
         level: 'N/A',
     },
-]
+])
 const infoTableData = ref([])
 const infoTableHeader = ref([])
 let nowSource
@@ -828,7 +828,7 @@ onMounted(async () => {
     initSortedLayer(map)
     // temp(map)
     // console.log('side bar tree ok')
-
+    console.log(waterTableData.value)
     waterTableData.value = await getRealTimeStationData()
     console.log(waterTableData.value)
 
