@@ -712,7 +712,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/icons/市界.png', '市界')
+        await loadImage(map, '/legend/shijie.png', '市界')
         !map.getLayer('市级行政区') &&
             map.addLayer({
                 id: '市级行政区',
@@ -1347,7 +1347,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/hydroStationPoint/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/legend/水文站.png', '水文站')
+        await loadImage(map, '/legend/shuiwenzhan.png', '水文站')
         !map.getLayer('水文站点') &&
             map.addLayer({
                 id: '水文站点',
@@ -1452,7 +1452,7 @@ const layerAddFunctionMap = {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/embankmentLine/{x}/{y}/{z}'],
             })
-        await loadImage(map, '/legend/堤防.png', '堤防')
+        await loadImage(map, '/legend/difang.png', '堤防')
 
         !map.getLayer('其他堤防') &&
             map.addLayer({
@@ -1518,9 +1518,9 @@ const layerAddFunctionMap = {
                 ],
             })
         await loadImage(map, '/legend/test.png', 'test')
-        await loadImage(map, '/legend/已建通道1.png', '已建')
-        await loadImage(map, '/legend/在建通道1.png', '在建')
-        await loadImage(map, '/legend/规划通道1.png', '规划')
+        await loadImage(map, '/legend/yijiantongdao1.png', '已建')
+        await loadImage(map, '/legend/zaijiantongdao1.png', '在建')
+        await loadImage(map, '/legend/guihuatongdao1.png', '规划')
         !map.getLayer('过江通道-隧道/通道') &&
             map.addLayer({
                 id: '过江通道-隧道/通道',
@@ -1794,7 +1794,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverBridge/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/legend/已建通道2.png', '已建')
+        await loadImage(map, '/legend/yijiantongdao2.png', '已建')
         // await loadImage(map, '/legend/在建通道1.png', '在建')
         // await loadImage(map, '/legend/规划通道1.png', '规划')
         !map.getLayer('已建通道') &&
@@ -1837,7 +1837,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/riverBridge/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/legend/在建通道1.png', '在建')
+        await loadImage(map, '/legend/zaijiantongdao1.png', '在建')
         !map.getLayer('在建通道') &&
             map.addLayer({
                 id: '在建通道',
@@ -2190,7 +2190,7 @@ const layerAddFunctionMap = {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/reservoirArea/{x}/{y}/{z}'],
             })
-        await loadImage(map, '/legend/水库.png', '水库')
+        await loadImage(map, '/legend/shuiku.png', '水库')
         !map.getLayer('水库大坝') &&
             map.addLayer({
                 id: '水库大坝',
@@ -2262,7 +2262,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
                 ],
             })
-        loadImage(map, '/legend/水闸.png', '水闸')
+        loadImage(map, '/legend/shuizha.png', '水闸')
         !map.getLayer('水闸工程-重点') &&
             map.addLayer({
                 id: '水闸工程-重点',
@@ -2351,7 +2351,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/center/sluiceArea/{x}/{y}/{z}',
                 ],
             })
-        loadImage(map, '/legend/水闸.png', '水闸')
+        loadImage(map, '/legend/shuizha.png', '水闸')
 
         map.addLayer({
             id: '大中型水闸',
@@ -2524,7 +2524,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/legend/泵站.png', '泵站')
+        await loadImage(map, '/legend/bengzhan.png', '泵站')
         !map.getLayer('泵站工程') &&
             map.addLayer({
                 id: '泵站工程',
@@ -2602,7 +2602,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/legend/泵站.png', '泵站')
+        await loadImage(map, '/legend/bengzhan.png', '泵站')
         !map.getLayer('大中型泵站') &&
             map.addLayer({
                 id: '大中型泵站',
@@ -2674,7 +2674,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/center/pumpArea/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/legend/泵站.png', '泵站')
+        await loadImage(map, '/legend/bengzhan.png', '泵站')
         !map.getLayer('其他泵站') &&
             map.addLayer({
                 id: '其他泵站',
@@ -2739,7 +2739,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/combineProjectPoint/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, '/legend/枢纽.png', '枢纽')
+        await loadImage(map, '/legend/shuniu.png', '枢纽')
         !map.getLayer('枢纽工程') &&
             map.addLayer({
                 id: '枢纽工程',
@@ -2797,7 +2797,7 @@ const layerAddFunctionMap = {
             type: 'vector',
             tiles: [tileServer + '/tile/vector/riverBankLine/{x}/{y}/{z}'],
         })
-        await loadImage(map, '/legend/堤防.png', '堤防')
+        await loadImage(map, '/legend/difang.png', '堤防')
         map.addLayer({
             id: '长江干堤',
             type: 'line',
@@ -2841,7 +2841,7 @@ const layerAddFunctionMap = {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/riverBankLine/{x}/{y}/{z}'],
             })
-        await loadImage(map, '/legend/堤防-影像.png', '堤防2')
+        await loadImage(map, '/legend/difang-yingxiang.png', '堤防2')
         !map.getLayer('长江干堤-影像') &&
             map.addLayer({
                 id: '长江干堤-影像',
@@ -2886,9 +2886,9 @@ const layerAddFunctionMap = {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/riverCityBoundary/{x}/{y}/{z}'],
             })
-        await loadImage(map, '/icons/市界.png', '市界')
-        await loadImage(map, '/legend/省界.png', '省界')
-        await loadImage(map, '/legend/海岸线.png', '海岸线')
+        await loadImage(map, '/legend/shijie.png', '市界')
+        await loadImage(map, '/legend/shengjie.png', '省界')
+        await loadImage(map, '/legend/haianxian.png', '海岸线')
         !map.getLayer('重点行政区边界') &&
             map.addLayer({
                 id: '重点行政区边界',
@@ -3842,72 +3842,72 @@ const layerRemoveFunction = (map, layerID) => {
 }
 
 const initSortedLayer = async (map) => {
-    await layerAddFunction(map, '大型湖泊')// 全程展示
-    await layerAddFunction(map, '区域性骨干河道')// 全程展示
-    await layerAddFunction(map, '流域性河道')// 全程展
-    await layerAddFunction(map, '洲滩')// 全程展示
-    await layerAddFunction(map, '其他河道')// 缩放展示  level2 
-    await layerAddFunction(map, '市级行政区')// 全程展示
-    await layerAddFunction(map, '沿江码头')// 全程展示
-    await layerAddFunction(map, '水库大坝')// 全程展示
-    await layerInitFunction(map, '大中型水闸-面')
-    await layerInitFunction(map, '其他水闸-面')
+    layerAddFunction(map, '大型湖泊')// 全程展示
+    layerAddFunction(map, '区域性骨干河道')// 全程展示
+    layerAddFunction(map, '流域性河道')// 全程展
+    layerAddFunction(map, '洲滩')// 全程展示
+    layerAddFunction(map, '其他河道')// 缩放展示  level2 
+    layerAddFunction(map, '市级行政区')// 全程展示
+    layerAddFunction(map, '沿江码头')// 全程展示
+    layerAddFunction(map, '水库大坝')// 全程展示
+    layerInitFunction(map, '大中型水闸-面')
+    layerInitFunction(map, '其他水闸-面')
 
     // 线
-    await layerAddFunction(map, '长江干堤')// 全程
-    await layerAddFunction(map, '河道分段')// max
-    await layerAddFunction(map, '一级预警岸段')// 缩放
-    await layerAddFunction(map, '二级预警岸段')// 缩放
-    await layerAddFunction(map, '三级预警岸段')// 缩放
+    layerAddFunction(map, '长江干堤')// 全程
+    layerAddFunction(map, '河道分段')// max
+    layerAddFunction(map, '一级预警岸段')// 缩放
+    layerAddFunction(map, '二级预警岸段')// 缩放
+    layerAddFunction(map, '三级预警岸段')// 缩放
 
-    await layerInitFunction(map, '已建通道')// 缩放
-    await layerInitFunction(map, '在建通道')// 缩放
-    await layerInitFunction(map, '过江通道辅助线')// 缩放
-    await layerInitFunction(map, '规划通道')// 缩放
-    await layerAddFunction(map, '重点行政区边界')// 全程
+    layerInitFunction(map, '已建通道')// 缩放
+    layerInitFunction(map, '在建通道')// 缩放
+    layerInitFunction(map, '过江通道辅助线')// 缩放
+    layerInitFunction(map, '规划通道')// 缩放
+    layerAddFunction(map, '重点行政区边界')// 全程
 
     // 点
-    await layerAddFunction(map, '里程桩')
-    await layerInitFunction(map, '水文站点')// 分类
-    await layerInitFunction(map, '大中型水闸')// 全程展示
-    await layerInitFunction(map, '其他水闸')// 缩放展示  level2 
-    await layerInitFunction(map, '大中型泵站')
-    await layerInitFunction(map, '其他泵站')
-    await layerAddFunction(map, '河道分段点')
-    await layerAddFunction(map, '行政点')
+    layerAddFunction(map, '里程桩')
+    layerInitFunction(map, '水文站点')// 分类
+    layerInitFunction(map, '大中型水闸')// 全程展示
+    layerInitFunction(map, '其他水闸')// 缩放展示  level2 
+    layerInitFunction(map, '大中型泵站')
+    layerInitFunction(map, '其他泵站')
+    layerAddFunction(map, '河道分段点')
+    layerAddFunction(map, '行政点')
 
     // 注记
-    await layerAddFunction(map, '里程桩-注记')
-    await layerAddFunction(map, '大型湖泊-注记')
-    await layerAddFunction(map, '区域性骨干河道-注记')
-    await layerAddFunction(map, '流域性河道-注记')
-    await layerAddFunction(map, '其他河道-注记')
-    await layerInitFunction(map, '沿江码头-注记')
-    await layerAddFunction(map, '水库大坝-注记')
-    await layerAddFunction(map, '洲滩-注记')
-    await layerAddFunction(map, '行政点-注记')
+    layerAddFunction(map, '里程桩-注记')
+    layerAddFunction(map, '大型湖泊-注记')
+    layerAddFunction(map, '区域性骨干河道-注记')
+    layerAddFunction(map, '流域性河道-注记')
+    layerAddFunction(map, '其他河道-注记')
+    layerInitFunction(map, '沿江码头-注记')
+    layerAddFunction(map, '水库大坝-注记')
+    layerAddFunction(map, '洲滩-注记')
+    layerAddFunction(map, '行政点-注记')
 
 
-    await layerAddFunction(map, '汊道')
-    await layerAddFunction(map, '一级岸段-注记')
-    await layerAddFunction(map, '二级岸段-注记')
-    await layerAddFunction(map, '三级岸段-注记')
-    await layerAddFunction(map, '一级岸段-点注记')
-    await layerAddFunction(map, '二级岸段-点注记')
-    await layerAddFunction(map, '三级岸段-点注记')
-    await layerInitFunction(map, '已建通道-注记')
-    await layerInitFunction(map, '在建通道-注记')
-    await layerInitFunction(map, '规划通道-注记')
-    await layerInitFunction(map, '水文站点-注记')
-    await layerInitFunction(map, '大中型水闸-注记')
-    await layerInitFunction(map, '其他水闸-注记')
-    await layerInitFunction(map, '大中型泵站-注记')
-    await layerInitFunction(map, '其他泵站-注记')
+    layerAddFunction(map, '汊道')
+    layerAddFunction(map, '一级岸段-注记')
+    layerAddFunction(map, '二级岸段-注记')
+    layerAddFunction(map, '三级岸段-注记')
+    layerAddFunction(map, '一级岸段-点注记')
+    layerAddFunction(map, '二级岸段-点注记')
+    layerAddFunction(map, '三级岸段-点注记')
+    layerInitFunction(map, '已建通道-注记')
+    layerInitFunction(map, '在建通道-注记')
+    layerInitFunction(map, '规划通道-注记')
+    layerInitFunction(map, '水文站点-注记')
+    layerInitFunction(map, '大中型水闸-注记')
+    layerInitFunction(map, '其他水闸-注记')
+    layerInitFunction(map, '大中型泵站-注记')
+    layerInitFunction(map, '其他泵站-注记')
 
-    await layerAddFunction(map, '河道分段-注记')
-    await layerAddFunction(map, '河道分段点-注记')
+    layerAddFunction(map, '河道分段-注记')
+    layerAddFunction(map, '河道分段点-注记')
 
-    await layerAddFunction(map, '一级预警岸段-注记')
+    layerAddFunction(map, '一级预警岸段-注记')
 }
 
 const temp = async (map) => {
