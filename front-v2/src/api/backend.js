@@ -81,7 +81,7 @@ export default class BackEndRequest {
     }
 
     static getMonitorInfo() {
-        return backendInstance.get('data/monitorInfo')         //可更改
+        return backendInstance.get('data/monitorInfo')          //可更改
     }
 
     static getSpecMonitorInfo(type) {
@@ -128,6 +128,7 @@ export default class BackEndRequest {
                     `/data/inclinometerData/hour/5/device/${code}`,
                 )
             }
+            //分布式光纤
             // case '5': {
             //     // return backendInstance.get(`/data/fiberData/day/1/device/${code}`)
             //     return backendInstance.get(
