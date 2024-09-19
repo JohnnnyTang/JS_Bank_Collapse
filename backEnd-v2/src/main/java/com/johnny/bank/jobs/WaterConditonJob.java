@@ -29,10 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,26 +50,62 @@ public class WaterConditonJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         JobDataMap dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String waterConditionPath = dataMap.getString("waterConditionPath");
-        String tideUrl = dataMap.getString("tideUrl");
-        String flowUrl = dataMap.getString("flowUrl");
+        String waterConditionUrl = dataMap.getString("waterConditionUrl");
+        String tideUrl = waterConditionUrl + "/jssqApi/v1/tide";
+        String flowUrl = waterConditionUrl + "/jssqApi/v1/river";
+        final Map<String, List<String>> stationMap = new HashMap<>(Map.of(
+                "datong", List.of("大通站", "001"),
+                "nanjing", List.of("南京站", "002"),
+                "zhenjiang", List.of("镇江站", "003"),
+                "sanjiangying", List.of("三江营站", "004"),
+                "jiangyin", List.of("江阴站", "005"),
+                "xuliujing", List.of("徐六泾站", "006")
+        ));
         String category = "BankNode";
         BankResourceService bankResourceService = BeanUtil.getBean(BankResourceService.class);
         List<DataNodeV2> bankList = bankResourceService.getBankList(category);
         for (DataNodeV2 bankNode : bankList) {
-            // TODO: 通过接口获取各个站点的实时水文数据
-
             String bank = bankNode.getBank();
             String path = waterConditionPath + File.separator + bank + File.separator + "water.json";
             String content = FileUtil.getFileContent(path);
             JSONArray waterConditionJson = JSONArray.parseArray(content);
             for (int index=0; index<waterConditionJson.size(); index++) {
                 JSONObject stationJson = (JSONObject) waterConditionJson.get(index);
-//                if (stationJson.getString("station").equals("大通站")) {
-//                    stationJson.put("flow","121");
-//                    waterConditionJson.set(index, stationJson);
-//                }
+                String stationName = stationJson.getString("stationName");
+                String stationId = stationMap.get(stationName).get(1);
+                stationJson.put("flow",getFlow(flowUrl, stationId));
+                stationJson.put("tide-level",getTide(tideUrl, stationId));
+                waterConditionJson.set(index, stationJson);
             }
             FileUtil.modifiyFileContent(path, waterConditionJson.toString());
         }
+    }
+
+    private static Double getFlow(String flowUrl, String stationId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime endTime = LocalDateTime.now();
+        String endTimeStr = endTime.format(formatter);
+        LocalDateTime startTime = LocalDateTime.now().minusHours(1);
+        String startTimeStr = startTime.format(formatter);
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("STCDS",stationId);
+        requestBody.put("STARTTIME",startTimeStr);
+        requestBody.put("ENDTIME",endTimeStr);
+//        JSONObject response = JSONObject.parseObject(InternetUtil.doPost(flowUrl, requestBody));
+        return 57500.0;
+    }
+
+    private static Double getTide(String tideUrl, String stationId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime endTime = LocalDateTime.now();
+        String endTimeStr = endTime.format(formatter);
+        LocalDateTime startTime = LocalDateTime.now().minusHours(1);
+        String startTimeStr = startTime.format(formatter);
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("STCDS",stationId);
+        requestBody.put("STARTTIME",startTimeStr);
+        requestBody.put("ENDTIME",endTimeStr);
+//        JSONObject response = JSONObject.parseObject(InternetUtil.doPost(tideUrl, requestBody));
+        return 3.3;
     }
 }
