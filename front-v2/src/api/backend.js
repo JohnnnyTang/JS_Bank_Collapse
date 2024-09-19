@@ -4,14 +4,23 @@ import CommonUtils from '../utils/CommonUtils'
 import { ElMessage } from 'element-plus';
 import router from '../router/index'
 
-const bankName = [
-    'Mzs',  //民主沙
-    'Zys',  //自由沙
-]
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
     baseURL: '/api',
 })
+
+
+///////////////////////////////////////////////////////
+const bankName = [
+    'Mzs',  //民主沙
+    'Zys',  //自由沙
+]
+const newBackendInstance = axios.create({
+    baseURL: '/model/'
+})
+///////////////////////////////////////////////////////
+
+
 const login = import.meta.env.VITE_LOGIN
 if (login === 'YSE') {
     backendInstance.interceptors.request.use(
@@ -81,22 +90,37 @@ export default class BackEndRequest {
     }
 
     static getMonitorInfo() {
-        return backendInstance.get('data/monitorInfo')          //可更改
+        return newBackendInstance.get(`/data/bank/Mzs/monitorInfo`)          //可更改
     }
 
     static getSpecMonitorInfo(type) {
         //设备概述信息！！！！
         switch (type) {
             case '1':
-                return backendInstance.get('/data/monitorInfo/type/1')      //可更改
+                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/1')      //可更改
             case '2':
-                return backendInstance.get('/data/monitorInfo/type/2')      //可更改
+                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/2')      //可更改
             case '3':
-                return backendInstance.get('/data/monitorInfo/type/3')      //可更改
+                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/3')      //可更改
             case '4':
-                return backendInstance.get('/data/monitorInfo/type/4')      //可更改
+                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/4')      //可更改
         }
     }
+
+    
+///////////////////////////////////////////////////////
+    static test() {
+        let url = '/api/v2/data/bank/Mzs/monitorData'
+        const params = {
+            bank: 'Mzs',
+            timeUnit: 'hour',
+            deviceCode: '123',
+            dur: 3
+        }
+        backendInstance.get(url,params)
+    }
+///////////////////////////////////////////////////////
+
 
     static getMonitorDetailByType_Code(code, type) {
         //data
@@ -142,7 +166,7 @@ export default class BackEndRequest {
         //desc
         switch (type) {
             case '1': {
-                return new Promise((sresolve) => {
+                return new Promise((resolve) => {
                     resolve({ data: { pointNum: 0 } })
                 })
                 // return backendInstance.get(`/data/gnssInfo/id/${code}`)
