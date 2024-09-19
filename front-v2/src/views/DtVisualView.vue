@@ -812,7 +812,10 @@ const prepareMap = async () => {
     //         await initSortedLayer(mapInstance)
     //     }
     // })
-
+    window.addEventListener('keydown', (e) => {
+        const styleJson = mapInstance.getStyle();
+        console.log(styleJson)
+    })
     return mapInstance
 }
 
@@ -822,15 +825,16 @@ onMounted(async () => {
 
     //////////add legend
     legendList.value = legendListt
-    console.log(legendListt)
+    // console.log(legendListt)
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
     initSortedLayer(map)
     // temp(map)
     // console.log('side bar tree ok')
-    console.log(waterTableData.value)
     waterTableData.value = await getRealTimeStationData()
-    console.log(waterTableData.value)
+    
+    const styleJson = map.getStyle();
+    // console.log(styleJson)
 
 
     ///////////DEBUG
