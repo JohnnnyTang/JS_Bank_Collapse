@@ -1,118 +1,7 @@
 <template>
     <div class="main">
-        <!-- <div ref="mapRef" id="map"></div> -->
+        <div ref="mapRef" id="map"></div>
 
-        <div class="math-model-calculation flex-coloum" style="align-items: center" v-show="true">
-            <div class="main-title">
-                数学模型计算
-                <div class="minimize-btn" @click="mathModelCalcBlockShow = false"></div>
-            </div>
-            <div class="file-upload-container one-center">
-                <div class="card border" style="margin-top: 0; height: 25.7vh">
-                    <div class="title">
-                        <span style="font-size: medium; margin-left: 1vw">➤</span>
-                        文件上传
-                    </div>
-                    <div class="content flex-coloum" style="
-                                height: 20vh;
-                                justify-content: space-evenly;
-                                align-items: center;
-                            ">
-                        <el-upload v-model:file-list="fileLists[index]" action="#" :show-file-list="false" :limit="1"
-                            ref="uploadRef" :http-request="handleUpload" v-for="(item, index) in filesNeedUpload
-                            " style="height: 4vh">
-                            <el-button type="primary" plain>
-                                {{ item }}
-                                <span>({{ exampleFileLists[index] }})</span>
-                            </el-button>
-                        </el-upload>
-                    </div>
-                </div>
-            </div>
-            <div class="model-container one-center">
-                <div class="card border">
-                    <div class="title">
-                        <span style="font-size: medium; margin-left: 1vw">➤</span>
-                        模型计算
-                    </div>
-                    <div class="content flex-coloum" style="
-                                justify-content: flex-start;
-                                align-items: center;
-                            ">
-                        <div class="setting-container">
-                            <div class="judge-container flex-coloum" style="
-                                        justify-content: center;
-                                        align-items: center;
-                                    ">
-                                <div class="judge-desc">
-                                    是否作为参考动力条件加入崩岸风险研判 ?
-                                </div>
-
-                                <el-radio-group v-model="mathModelParams.addToRiskJudgeFlag
-                                    ">
-                                    <el-radio value="1" size="large">
-                                        是
-                                    </el-radio>
-                                    <el-radio value="2" size="large">
-                                        否
-                                    </el-radio>
-                                </el-radio-group>
-
-                                <div class="after-judge one-center" v-show="mathModelParams.addToRiskJudgeFlag ==
-                                    1
-                                    ">
-                                    <div class="flex-coloum">
-                                        <div style="margin-bottom: 1vh">
-                                            <span>流量：</span>
-                                            <el-input v-model="mathModelParams.flow
-                                                " style="
-                                                        width: 8vw;
-                                                        height: 3.5vh;
-                                                    " placeholder="请输入流量" />
-                                        </div>
-                                        <div>
-                                            <span>潮型：</span>
-                                            <el-select v-model="mathModelParams.tideType
-                                                " placeholder="请选择潮型" style="
-                                                        width: 8vw;
-                                                        height: 3.5vh;
-                                                        
-                                                    " @change="">
-                                                <el-option v-for="(
-                                                            item, index
-                                                        ) in tideTypeList" :key="index" :label="item"
-                                                    :value="tideValue[index]">
-                                                    <div style="
-                                                                text-align: center;
-                                                            ">
-                                                        {{ item }}
-                                                    </div>
-                                                </el-option>
-                                            </el-select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="after-judge one-center" v-show="mathModelParams.addToRiskJudgeFlag ==
-                                    2
-                                    ">
-                                    <div class="flex-row">
-                                        <span style="line-height: 3.5vh">自定义名称：</span>
-                                        <el-input v-model="mathModelParams.customName
-                                            " style="
-                                                    width: 6vw;
-                                                    height: 3.5vh;
-                                                " placeholder="请输入名称" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="running-container">
-                            <el-button type="primary" plain @click="runMathModel">确认并运行</el-button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -125,93 +14,31 @@ const mapRef = ref(null)
 
 
 
-//////////////////// math model calculation ////////////////////START
-const uploadRef = ref(null)
-const filesNeedUpload = ['属性文件', '网格文件', '控制文件', '径流边界', '潮位边界']
-const exampleFileLists = ['fort.13', 'fort.14', 'fort.15', 'fort.19', 'fort.20']
-const fileLists = ref([[], [], [], [], []])
-const mathModelParams = reactive({
-    addToRiskJudgeFlag: null,
-    flow: null,
-    tideType: null,
-    customName: null,
-})
-const tideTypeList = ['小潮', '中潮', '大潮']
-const tideValue = ['xc', 'zc', 'dc']
-const handleUpload = (file) => {
-    console.log('user upload file -- ', file)
-}
-const runMathModel = () => {
-    console.log('mathModelParams')
-    console.log(mathModelParams)
-    console.log('file lists')
-    console.log(fileLists.value)
-
-    const formData = new FormData()
-    for (let i = 0; i < fileLists.value.length; i++) {
-        const fileList = fileLists.value[i]
-        const key = exampleFileLists[i]
-        if (fileList.length > 0) {
-            const file = fileList[0].raw
-            formData.append(key, file)
-        } else {
-            alert('文件未完全上传！')
-            return
-        }
-    }
-    const name = mathModelParams.addToRiskJudgeFlag == 1 ? '' + mathModelParams.flow + mathModelParams.tideType : mathModelParams.customName
-    const mathModelInfo = {
-        "segment": "Mzs",
-        "year": "2023",
-        "set": "standard",
-        "name": name,
-        "temp": mathModelParams.addToRiskJudgeFlag == 1,
-        "boundary": "geojson/Mzs/2023/standard/boundary/boundary.geojson"
-    }
-    formData.append("info", JSON.stringify(mathModelInfo))
-
-    axios.post('/model/taskNode/start/numeric/hydrodynamic/real', formData).then(res => {
-        ElMessage.success({
-            message: '模型开始计算',
-            offset: 130
-        })
-    }).catch(err => {
-        ElMessage.success({
-            message: '模型计算失败',
-            offset: 130
-        })
-        console.error('数模计算失败', err)
-    })
-}
-//////////////////// math model calculation ////////////////////END
-
-
-
-
-
 onMounted(async () => {
 
-    // const map = new mapboxgl.Map({
-    //     container: mapRef.value, // container ID
-    //     accessToken:
-    //         'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-    //     style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-    //     center: [120.312, 31.917], // starting position [lng, lat]
-    //     zoom: 8,
-    //     maxZoom: 22,
-    //     projection: 'mercator',
-    //     antialias: true,
-    //     transformRequest: (url) => {
-    //         if (url.startsWith(import.meta.env.VITE_APP_TEMP_ADDRESS)) {
-    //             return {
-    //                 url: url,
-    //                 headers: { token: localStorage.getItem("token") },
-    //             };
-    //         }
-    //     },
+    const map = new mapboxgl.Map({
+        container: mapRef.value, // container ID
+        accessToken:
+            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
+        style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+        center: [120.312, 31.917], // starting position [lng, lat]
+        zoom: 8,
+        maxZoom: 22,
+        projection: 'mercator',
+        antialias: true,
+        transformRequest: (url) => {
+            if (url.startsWith(import.meta.env.VITE_APP_TEMP_ADDRESS)) {
+                return {
+                    url: url,
+                    headers: { token: localStorage.getItem("token") },
+                };
+            }
+        },
 
-    // }).on('load', async () => {
-    //     console.log('PureScratchMap init!')
+    }).on('load', async () => {
+        map.showTileBoundaries = true;
+        console.log('PureScratchMap init!')
+    })
 
     //     let tileInfo = {
     //         "name": "199901",

@@ -1,5 +1,5 @@
 server:
-  port: 8989
+  port: 18989
 
 spring:
   data:
@@ -48,6 +48,10 @@ staticData:
   tifTilePath: E:/Data/bankProjectData/staticData/tifTile
   vectorDataPath: E:/Data/bankProjectData/staticData/vectorData
   waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
+
+waterCondition:
+  tideUrl: http://10.32.22.202:8001/jssqApi/v1/tide
+  flowUrl: http://10.32.22.202:8001/jssqApi/v1/river
 
 flowData:
   texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/

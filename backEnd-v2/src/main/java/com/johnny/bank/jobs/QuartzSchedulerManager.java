@@ -32,6 +32,15 @@ public class QuartzSchedulerManager {
     @Value("${modelServer.caseLimit}")
     String CASE_LIMIT;
 
+    @Value("${staticData.waterConditionPath}")
+    String WATER_CONDITION_PATH;
+
+    @Value("${waterCondition.flowUrl}")
+    String FLOW_URL;
+
+    @Value("${waterCondition.tideUrl}")
+    String TIDE_URL;
+
     @Autowired
     @Lazy
     private Scheduler scheduler;
@@ -182,8 +191,12 @@ public class QuartzSchedulerManager {
         JobDetail jobDetail = JobBuilder.newJob(WaterConditonJob.class)
                 .withIdentity("waterCondition", "waterConditionGroup")
                 .build();
+        jobDetail.getJobDataMap().put("waterConditionPath", WATER_CONDITION_PATH);
+        jobDetail.getJobDataMap().put("flowUrl", FLOW_URL);
+        jobDetail.getJobDataMap().put("tideUrl", TIDE_URL);
         // 基于表达式构建触发器
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/30 * * * ?");
+//        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("* * * * * ?");
         // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("waterConditionTrigger", "waterConditionGroup")
                 .withSchedule(cronScheduleBuilder).build();

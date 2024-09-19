@@ -205,7 +205,7 @@ const infoPannelTitle = ref('')
 const search = ref('')
 const realtimeZoom = ref(0)
 var latestLGID = ''
-const waterTableData = [
+const waterTableData = ref([
     {
         station: '大通站',
         flow: 'N/A',
@@ -236,7 +236,7 @@ const waterTableData = [
         flow: 'N/A',
         level: 'N/A',
     },
-]
+])
 const infoTableData = ref([])
 const infoTableHeader = ref([])
 let nowSource
@@ -812,7 +812,10 @@ const prepareMap = async () => {
     //         await initSortedLayer(mapInstance)
     //     }
     // })
-
+    window.addEventListener('keydown', (e) => {
+        const styleJson = mapInstance.getStyle();
+        console.log(styleJson)
+    })
     return mapInstance
 }
 
@@ -822,15 +825,16 @@ onMounted(async () => {
 
     //////////add legend
     legendList.value = legendListt
-    console.log(legendListt)
+    // console.log(legendListt)
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
     initSortedLayer(map)
     // temp(map)
     // console.log('side bar tree ok')
-
     waterTableData.value = await getRealTimeStationData()
-    console.log(waterTableData.value)
+    
+    const styleJson = map.getStyle();
+    // console.log(styleJson)
 
 
     ///////////DEBUG

@@ -16,10 +16,11 @@ export default class ModelRunner {
                 resolve(this.taskId)
             }).catch(error => {
                 ElNotification({
-                    title: '模型运行失败',
+                    title: '模型启动失败',
                     message: '错误原因：\n' + error.message,
                     type: 'error',
-                    duration: 0
+                    position: 'top-left',
+                    offset: 130,
                 })
                 console.warn(error)
                 reject(error)
@@ -73,8 +74,6 @@ export default class ModelRunner {
     async getModelResultFile(fileName, fileType = 'json') {
         return new Promise((resolve, reject) => {
             const MAP = {
-                // 'bin': `/model/data/modelServer/down/resource/file/bin?name=&name=${fileName}`,
-                // /model/data/modelServer/down/result/file/json?caseId=dcfa6865c911e10c44d86ef45788b5c2&name=section.json
                 'image': `/model/data/bankResource/down/modelServer/result/file/image?caseId=${this.caseId}&name=${fileName}`,
 
                 'json': `/model/data/bankResource/down/modelServer/result/file/json?caseId=${this.caseId}&name=${fileName}`
