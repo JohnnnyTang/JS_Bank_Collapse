@@ -3842,72 +3842,72 @@ const layerRemoveFunction = (map, layerID) => {
 }
 
 const initSortedLayer = async (map) => {
-    layerAddFunction(map, '大型湖泊')// 全程展示
-    layerAddFunction(map, '区域性骨干河道')// 全程展示
-    layerAddFunction(map, '流域性河道')// 全程展
-    layerAddFunction(map, '洲滩')// 全程展示
-    layerAddFunction(map, '其他河道')// 缩放展示  level2 
-    layerAddFunction(map, '市级行政区')// 全程展示
-    layerAddFunction(map, '沿江码头')// 全程展示
-    layerAddFunction(map, '水库大坝')// 全程展示
-    layerInitFunction(map, '大中型水闸-面')
-    layerInitFunction(map, '其他水闸-面')
+    await layerAddFunction(map, '大型湖泊')// 全程展示
+    await layerAddFunction(map, '区域性骨干河道')// 全程展示
+    await layerAddFunction(map, '流域性河道')// 全程展
+    await layerAddFunction(map, '洲滩')// 全程展示
+    await layerAddFunction(map, '其他河道')// 缩放展示  level2 
+    await layerAddFunction(map, '市级行政区')// 全程展示
+    await layerAddFunction(map, '沿江码头')// 全程展示
+    await layerAddFunction(map, '水库大坝')// 全程展示
+    await layerInitFunction(map, '大中型水闸-面')
+    await layerInitFunction(map, '其他水闸-面')
 
     // 线
-    layerAddFunction(map, '长江干堤')// 全程
-    layerAddFunction(map, '河道分段')// max
-    layerAddFunction(map, '一级预警岸段')// 缩放
-    layerAddFunction(map, '二级预警岸段')// 缩放
-    layerAddFunction(map, '三级预警岸段')// 缩放
+    await layerAddFunction(map, '长江干堤')// 全程
+    await layerAddFunction(map, '河道分段')// max
+    await layerAddFunction(map, '一级预警岸段')// 缩放
+    await layerAddFunction(map, '二级预警岸段')// 缩放
+    await layerAddFunction(map, '三级预警岸段')// 缩放
 
-    layerInitFunction(map, '已建通道')// 缩放
-    layerInitFunction(map, '在建通道')// 缩放
-    layerInitFunction(map, '过江通道辅助线')// 缩放
-    layerInitFunction(map, '规划通道')// 缩放
-    layerAddFunction(map, '重点行政区边界')// 全程
+    await layerInitFunction(map, '已建通道')// 缩放
+    await layerInitFunction(map, '在建通道')// 缩放
+    await layerInitFunction(map, '过江通道辅助线')// 缩放
+    await layerInitFunction(map, '规划通道')// 缩放
+    await layerAddFunction(map, '重点行政区边界')// 全程
 
     // 点
-    layerAddFunction(map, '里程桩')
-    layerInitFunction(map, '水文站点')// 分类
-    layerInitFunction(map, '大中型水闸')// 全程展示
-    layerInitFunction(map, '其他水闸')// 缩放展示  level2 
-    layerInitFunction(map, '大中型泵站')
-    layerInitFunction(map, '其他泵站')
-    layerAddFunction(map, '河道分段点')
-    layerAddFunction(map, '行政点')
+    await layerAddFunction(map, '里程桩')
+    await layerInitFunction(map, '水文站点')// 分类
+    await layerInitFunction(map, '大中型水闸')// 全程展示
+    await layerInitFunction(map, '其他水闸')// 缩放展示  level2 
+    await layerInitFunction(map, '大中型泵站')
+    await layerInitFunction(map, '其他泵站')
+    await layerAddFunction(map, '河道分段点')
+    await layerAddFunction(map, '行政点')
 
     // 注记
-    layerAddFunction(map, '里程桩-注记')
-    layerAddFunction(map, '大型湖泊-注记')
-    layerAddFunction(map, '区域性骨干河道-注记')
-    layerAddFunction(map, '流域性河道-注记')
-    layerAddFunction(map, '其他河道-注记')
-    layerInitFunction(map, '沿江码头-注记')
-    layerAddFunction(map, '水库大坝-注记')
-    layerAddFunction(map, '洲滩-注记')
-    layerAddFunction(map, '行政点-注记')
+    await layerAddFunction(map, '里程桩-注记')
+    await layerAddFunction(map, '大型湖泊-注记')
+    await layerAddFunction(map, '区域性骨干河道-注记')
+    await layerAddFunction(map, '流域性河道-注记')
+    await layerAddFunction(map, '其他河道-注记')
+    await layerInitFunction(map, '沿江码头-注记')
+    await layerAddFunction(map, '水库大坝-注记')
+    await layerAddFunction(map, '洲滩-注记')
+    await layerAddFunction(map, '行政点-注记')
 
 
-    layerAddFunction(map, '汊道')
-    layerAddFunction(map, '一级岸段-注记')
-    layerAddFunction(map, '二级岸段-注记')
-    layerAddFunction(map, '三级岸段-注记')
-    layerAddFunction(map, '一级岸段-点注记')
-    layerAddFunction(map, '二级岸段-点注记')
-    layerAddFunction(map, '三级岸段-点注记')
-    layerInitFunction(map, '已建通道-注记')
-    layerInitFunction(map, '在建通道-注记')
-    layerInitFunction(map, '规划通道-注记')
-    layerInitFunction(map, '水文站点-注记')
-    layerInitFunction(map, '大中型水闸-注记')
-    layerInitFunction(map, '其他水闸-注记')
-    layerInitFunction(map, '大中型泵站-注记')
-    layerInitFunction(map, '其他泵站-注记')
+    await layerAddFunction(map, '汊道')
+    await layerAddFunction(map, '一级岸段-注记')
+    await layerAddFunction(map, '二级岸段-注记')
+    await layerAddFunction(map, '三级岸段-注记')
+    await layerAddFunction(map, '一级岸段-点注记')
+    await layerAddFunction(map, '二级岸段-点注记')
+    await layerAddFunction(map, '三级岸段-点注记')
+    await layerInitFunction(map, '已建通道-注记')
+    await layerInitFunction(map, '在建通道-注记')
+    await layerInitFunction(map, '规划通道-注记')
+    await layerInitFunction(map, '水文站点-注记')
+    await layerInitFunction(map, '大中型水闸-注记')
+    await layerInitFunction(map, '其他水闸-注记')
+    await layerInitFunction(map, '大中型泵站-注记')
+    await layerInitFunction(map, '其他泵站-注记')
 
-    layerAddFunction(map, '河道分段-注记')
-    layerAddFunction(map, '河道分段点-注记')
+    await layerAddFunction(map, '河道分段-注记')
+    await layerAddFunction(map, '河道分段点-注记')
 
-    layerAddFunction(map, '一级预警岸段-注记')
+    await layerAddFunction(map, '一级预警岸段-注记')
 }
 
 const temp = async (map) => {

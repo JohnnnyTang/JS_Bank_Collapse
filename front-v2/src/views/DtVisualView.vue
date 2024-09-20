@@ -832,24 +832,6 @@ onMounted(async () => {
     // temp(map)
     // console.log('side bar tree ok')
     waterTableData.value = await getRealTimeStationData()
-    
-    const styleJson = map.getStyle();
-    // console.log(styleJson)
-
-
-    ///////////DEBUG
-    // map.on('click', ['water_polygon'], (e) => {
-    //     console.log(e.features[0])
-    // })
-    // window.addEventListener('keydown', (e) => {
-    //     if (e.key === '1') {
-    //         showDetail.value = true
-    //     } else if (e.key === '2') {
-    //         showDetail.value = false
-    //     } else if (e.key === '3') {
-    //         console.log(nowSource, sourceNameMap[nowSource])
-    //     }
-    // })
 
 })
 
