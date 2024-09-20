@@ -89,21 +89,23 @@ export default class BackEndRequest {
         return backendInstance.get('/data/historyInfo')         //暂不改
     }
 
-    static getMonitorInfo() {
-        return newBackendInstance.get(`/data/bank/Mzs/monitorInfo`)          //可更改
+    static getMonitorInfo(bank) {
+        // return newBackendInstance.get('/data/bank/Mzs/monitorInfo')          //可更改
+        return backendInstance.get(`/data/bank/${bank}/monitorInfo`)                         //可更改
+        
     }
 
-    static getSpecMonitorInfo(type) {
+    static getSpecMonitorInfo(type,bank) {
         //设备概述信息！！！！
         switch (type) {
             case '1':
-                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/1')      //可更改
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/1`)      //可更改
             case '2':
-                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/2')      //可更改
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/2`)      //可更改
             case '3':
-                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/3')      //可更改
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/3`)      //可更改
             case '4':
-                return newBackendInstance.get('/data/bank/Mzs/monitorInfo/type/4')      //可更改
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/4`)      //可更改
         }
     }
 
@@ -117,7 +119,7 @@ export default class BackEndRequest {
             deviceCode: '123',
             dur: 3
         }
-        backendInstance.get(url,params)
+       return backendInstance.get(url,params)
     }
 ///////////////////////////////////////////////////////
 
