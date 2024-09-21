@@ -51,15 +51,14 @@ public class WaterConditonJob implements Job {
         JobDataMap dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String waterConditionPath = dataMap.getString("waterConditionPath");
         String waterConditionUrl = dataMap.getString("waterConditionUrl");
-        String tideUrl = waterConditionUrl + "/jssqApi/v1/tide";
-        String flowUrl = waterConditionUrl + "/jssqApi/v1/river";
+        String apiUrl = waterConditionUrl + "/newApi/SL324/ST_FORECAST_F";
         final Map<String, List<String>> stationMap = new HashMap<>(Map.of(
-                "datong", List.of("大通站", "001"),
-                "nanjing", List.of("南京站", "002"),
-                "zhenjiang", List.of("镇江站", "003"),
-                "sanjiangying", List.of("三江营站", "004"),
-                "jiangyin", List.of("江阴站", "005"),
-                "xuliujing", List.of("徐六泾站", "006")
+                "datong", List.of("大通站", "60115000"),
+                "nanjing", List.of("南京站", "60116200"),
+                "zhenjiang", List.of("镇江站", "60116601"),
+                "sanjiangying", List.of("三江营站", "60197172"),
+                "jiangyin", List.of("江阴站", "60117000"),
+                "xuliujing", List.of("徐六泾站", "60117400")
         ));
         String category = "BankNode";
         BankResourceService bankResourceService = BeanUtil.getBean(BankResourceService.class);
@@ -73,39 +72,37 @@ public class WaterConditonJob implements Job {
                 JSONObject stationJson = (JSONObject) waterConditionJson.get(index);
                 String stationName = stationJson.getString("stationName");
                 String stationId = stationMap.get(stationName).get(1);
-                stationJson.put("flow",getFlow(flowUrl, stationId));
-                stationJson.put("tide-level",getTide(tideUrl, stationId));
-                waterConditionJson.set(index, stationJson);
+                List<Double> dataList = getFlowAndTide(apiUrl, stationId);
+                if (!dataList.isEmpty()) {
+                    stationJson.put("flow",dataList.get(0));
+                    stationJson.put("tide-level",dataList.get(1));
+                    waterConditionJson.set(index, stationJson);
+                }
             }
             FileUtil.modifiyFileContent(path, waterConditionJson.toString());
         }
     }
 
-    private static Double getFlow(String flowUrl, String stationId) {
+    private static List<Double> getFlowAndTide(String apiUrl, String stationId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime endTime = LocalDateTime.now();
         String endTimeStr = endTime.format(formatter);
-        LocalDateTime startTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime startTime = LocalDateTime.now().minusHours(12);
         String startTimeStr = startTime.format(formatter);
         JSONObject requestBody = new JSONObject();
-        requestBody.put("STCDS",stationId);
+        requestBody.put("STCDS",List.of(stationId));
         requestBody.put("STARTTIME",startTimeStr);
         requestBody.put("ENDTIME",endTimeStr);
-//        JSONObject response = JSONObject.parseObject(InternetUtil.doPost(flowUrl, requestBody));
-        return 57500.0;
-    }
-
-    private static Double getTide(String tideUrl, String stationId) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime endTime = LocalDateTime.now();
-        String endTimeStr = endTime.format(formatter);
-        LocalDateTime startTime = LocalDateTime.now().minusHours(1);
-        String startTimeStr = startTime.format(formatter);
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("STCDS",stationId);
-        requestBody.put("STARTTIME",startTimeStr);
-        requestBody.put("ENDTIME",endTimeStr);
-//        JSONObject response = JSONObject.parseObject(InternetUtil.doPost(tideUrl, requestBody));
-        return 3.3;
+        requestBody.put("pageNo",1);
+        requestBody.put("pageSize",1000);
+        JSONObject responseObj = JSONObject.parseObject(InternetUtil.doPost_waterCondition(apiUrl, requestBody));
+        JSONArray stationArray = JSONArray.parseArray(responseObj.getString("data"));
+        if (!stationArray.isEmpty()) {
+            String flow = stationArray.getJSONObject(0).getString("Q");
+            String tide = stationArray.getJSONObject(0).getString("Z");
+            return List.of(Double.parseDouble(flow),Double.parseDouble(tide));
+        } else {
+            return List.of();
+        }
     }
 }
