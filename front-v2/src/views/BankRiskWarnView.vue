@@ -494,15 +494,7 @@
 </template>
 
 <script setup>
-import {
-    onMounted,
-    ref,
-    reactive,
-    watch,
-    onUnmounted,
-    defineAsyncComponent,
-    computed,
-    toRaw,
+import { onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw,
 } from 'vue'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'

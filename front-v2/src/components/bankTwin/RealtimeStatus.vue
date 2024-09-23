@@ -148,13 +148,6 @@
                                 " @click="focusOn(index)">
                                 {{ item.name }}
                             </div>
-                            <!-- <div
-                                class="video-focus"
-                                v-if="item.order != 0"
-                                @click="focusOn(index)"
-                            >
-                                放大
-                            </div> -->
                             <div class="small-pic" v-if="item.order == 0" :id="index"></div>
                         </div>
                     </div>

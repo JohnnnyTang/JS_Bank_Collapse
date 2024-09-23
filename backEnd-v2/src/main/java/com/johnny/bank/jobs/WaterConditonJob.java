@@ -29,10 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,26 +50,59 @@ public class WaterConditonJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         JobDataMap dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String waterConditionPath = dataMap.getString("waterConditionPath");
-        String tideUrl = dataMap.getString("tideUrl");
-        String flowUrl = dataMap.getString("flowUrl");
+        String waterConditionUrl = dataMap.getString("waterConditionUrl");
+        String apiUrl = waterConditionUrl + "/newApi/SL324/ST_FORECAST_F";
+        final Map<String, List<String>> stationMap = new HashMap<>(Map.of(
+                "datong", List.of("大通站", "60115000"),
+                "nanjing", List.of("南京站", "60116200"),
+                "zhenjiang", List.of("镇江站", "60116601"),
+                "sanjiangying", List.of("三江营站", "60197172"),
+                "jiangyin", List.of("江阴站", "60117000"),
+                "xuliujing", List.of("徐六泾站", "60117400")
+        ));
         String category = "BankNode";
         BankResourceService bankResourceService = BeanUtil.getBean(BankResourceService.class);
         List<DataNodeV2> bankList = bankResourceService.getBankList(category);
         for (DataNodeV2 bankNode : bankList) {
-            // TODO: 通过接口获取各个站点的实时水文数据
-
             String bank = bankNode.getBank();
             String path = waterConditionPath + File.separator + bank + File.separator + "water.json";
             String content = FileUtil.getFileContent(path);
             JSONArray waterConditionJson = JSONArray.parseArray(content);
             for (int index=0; index<waterConditionJson.size(); index++) {
                 JSONObject stationJson = (JSONObject) waterConditionJson.get(index);
-//                if (stationJson.getString("station").equals("大通站")) {
-//                    stationJson.put("flow","121");
-//                    waterConditionJson.set(index, stationJson);
-//                }
+                String stationName = stationJson.getString("stationName");
+                String stationId = stationMap.get(stationName).get(1);
+                List<Double> dataList = getFlowAndTide(apiUrl, stationId);
+                if (!dataList.isEmpty()) {
+                    stationJson.put("flow",dataList.get(0));
+                    stationJson.put("tide-level",dataList.get(1));
+                    waterConditionJson.set(index, stationJson);
+                }
             }
             FileUtil.modifiyFileContent(path, waterConditionJson.toString());
+        }
+    }
+
+    private static List<Double> getFlowAndTide(String apiUrl, String stationId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime endTime = LocalDateTime.now();
+        String endTimeStr = endTime.format(formatter);
+        LocalDateTime startTime = LocalDateTime.now().minusHours(12);
+        String startTimeStr = startTime.format(formatter);
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("STCDS",List.of(stationId));
+        requestBody.put("STARTTIME",startTimeStr);
+        requestBody.put("ENDTIME",endTimeStr);
+        requestBody.put("pageNo",1);
+        requestBody.put("pageSize",1000);
+        JSONObject responseObj = JSONObject.parseObject(InternetUtil.doPost_waterCondition(apiUrl, requestBody));
+        JSONArray stationArray = JSONArray.parseArray(responseObj.getString("data"));
+        if (!stationArray.isEmpty()) {
+            String flow = stationArray.getJSONObject(0).getString("Q");
+            String tide = stationArray.getJSONObject(0).getString("Z");
+            return List.of(Double.parseDouble(flow),Double.parseDouble(tide));
+        } else {
+            return List.of();
         }
     }
 }

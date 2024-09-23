@@ -35,11 +35,8 @@ public class QuartzSchedulerManager {
     @Value("${staticData.waterConditionPath}")
     String WATER_CONDITION_PATH;
 
-    @Value("${waterCondition.flowUrl}")
-    String FLOW_URL;
-
-    @Value("${waterCondition.tideUrl}")
-    String TIDE_URL;
+    @Value("${waterCondition.url}")
+    String WATER_CONDITION_URL;
 
     @Autowired
     @Lazy
@@ -192,8 +189,7 @@ public class QuartzSchedulerManager {
                 .withIdentity("waterCondition", "waterConditionGroup")
                 .build();
         jobDetail.getJobDataMap().put("waterConditionPath", WATER_CONDITION_PATH);
-        jobDetail.getJobDataMap().put("flowUrl", FLOW_URL);
-        jobDetail.getJobDataMap().put("tideUrl", TIDE_URL);
+        jobDetail.getJobDataMap().put("waterConditionUrl", WATER_CONDITION_URL);
         // 基于表达式构建触发器
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/30 * * * ?");
 //        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("* * * * * ?");
