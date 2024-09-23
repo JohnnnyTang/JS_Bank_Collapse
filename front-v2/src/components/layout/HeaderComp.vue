@@ -33,12 +33,8 @@
                             <el-dropdown-item @click="navToKnowledgePage">崩岸知识库</el-dropdown-item>
                         </el-dropdown-menu>
                         <el-dropdown-menu v-if="index == 1 || index == 3">
-                            <el-dropdown-item @click="navToWarnOrRiskPage(index)">
-                                <span style="float: left" class="left">民主沙右缘</span>
-                                <span style="float: right" class="right level-one">一级预警岸段</span>
-                            </el-dropdown-item>
-                            <el-dropdown-item @click="navToWarnOrRiskPage(index)">
-                                <span style="float: left" class="left">自由沙右缘</span>
+                            <el-dropdown-item v-for="(item, idx) in bankList" @click="clickBankItem(item, index)">
+                                <span style="float: left" class="left">{{ item.name }}</span>
                                 <span style="float: right" class="right level-one">一级预警岸段</span>
                             </el-dropdown-item>
                             <el-dropdown-item disabled>
@@ -82,7 +78,8 @@
                             @click="login">登录</el-dropdown-item>
                         <el-dropdown-item v-if="LOGIN === 'YES' && statusStore.loginStatus"
                             @click="logout">退出登录</el-dropdown-item>
-                        <el-dropdown-item v-if="MANAGEMENT === 'YES'" @click="bankManageClickHandler">岸段管理</el-dropdown-item>
+                        <el-dropdown-item v-if="MANAGEMENT === 'YES'"
+                            @click="bankManageClickHandler">岸段管理</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -112,17 +109,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch, onUnmounted } from 'vue'
+import { ref, onMounted, nextTick, watch, onUnmounted, onBeforeMount } from 'vue'
 import TitleContainerVue from '../header/TitleContainer.vue'
 import DecorateLineVue from '../header/DecorateLine.vue'
 import TitleBracket from '../header/TitleBracket.vue'
 import router from '../../router/index'
 import { useStatusStore } from '../../store/statusStore'
+import { useBankNameStore } from '../../store/bankNameStore'
 import { onBeforeRouteUpdate } from 'vue-router'
+import axios from 'axios'
 
 const LOGIN = import.meta.env.VITE_LOGIN
 const MANAGEMENT = import.meta.env.VITE_BANK_MANAGEMENT
 const statusStore = useStatusStore()
+const bankNameStore = useBankNameStore()
 
 const titleWidthInPixel = ref(300)
 const headerDom = ref(null)
@@ -193,6 +193,16 @@ const routerPathIndexMap = {
     '/bankManage': 2,
     '/': 2,
 }
+
+//通过点击获取岸端名
+const bankList = ref([])
+const clickBankItem = (bankItem, index) => {
+    bankNameStore.globalBankName = bankItem.bank
+    navToWarnOrRiskPage(index)
+}
+window.addEventListener('keydown', e => {
+    console.log(bankNameStore.globalBankName)
+})
 
 let previousActive = 2
 
@@ -294,10 +304,16 @@ const logout = () => {
 const bankManageClickHandler = () => {
     router.push('/bankManage')
 }
+onBeforeMount(async () => {
+    const res = await axios.get('/model/data/bankResource/bank')
+    console.log(res.data)
+    bankList.value = res.data
+})
 
 onMounted(() => {
     // console.log(headerDom.value);
     // titleWidthInPixel.value = titleDom;
+
     onResize(headerDom.value.clientWidth, headerDom.value.clientHeight)
     resizeObserver.observe(headerDom.value)
     console.log(navItemRefs.value)

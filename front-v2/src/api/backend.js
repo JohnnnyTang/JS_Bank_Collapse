@@ -3,6 +3,7 @@ import axios from 'axios'
 import CommonUtils from '../utils/CommonUtils'
 import { ElMessage } from 'element-plus';
 import router from '../router/index'
+import { useBankNameStore } from '../store/bankNameStore';
 
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
@@ -11,10 +12,9 @@ const backendInstance = axios.create({
 
 
 ///////////////////////////////////////////////////////
-const bankName = [
-    'Mzs',  //民主沙
-    'Zys',  //自由沙
-]
+
+// const bankNameStore = useBankNameStore()
+
 const newBackendInstance = axios.create({
     baseURL: '/model/'      //v2版本api前缀
 })
@@ -56,8 +56,8 @@ if (login === 'YSE') {
 export default class BackEndRequest {
     static getDataNodeTree() {
         // return instance.get(Vue.prototype.reqURL + "/user/hello")
-        return backendInstance.get('/dataNode/tree')
-        // return newBackendInstance.get('dataNode/tree')      //  暂不改, status 500 internal server error
+        // return backendInstance.get('/dataNode/tree')
+        return newBackendInstance.get('dataNode/tree')      //  v2版本, status 500 internal server error
     }
 
     static getDataNodeData(dataNode) {
@@ -91,31 +91,11 @@ export default class BackEndRequest {
     }
 
     static getMonitorInfo() {
-        return newBackendInstance.get('/data/bank/Mzs/monitorInfo')          //可更改
-        // return backendInstance.get(`/data/bank/${bank}/monitorInfo`)                         //可更改
+        let bank = useBankNameStore().globalBankName
+        return newBackendInstance.get(`/data/bank/${bank}/monitorInfo`)     //v2版本
+        // return backendInstance.get('/data/monitorInfo')  //v1版本
         
     }
-
-    static getSpecMonitorInfo(type) {
-        //设备概述信息！！！！
-        switch (type) {
-            case '1':
-                // return backendInstance.get(`/data/monitorInfo/type/1`)      //可更改
-                // return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/1`)      //可更改
-                return newBackendInstance.get(`/data/bank/Mzs/monitorInfo/type/1`)      //可更改
-            case '2':
-                return backendInstance.get(`/data/monitorInfo/type/2`)      //可更改
-                // return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/2`)      //可更改
-            case '3':
-                return backendInstance.get(`/data/monitorInfo/type/3`)      //可更改
-                // return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/3`)      //可更改
-            case '4':
-                return backendInstance.get(`/data/monitorInfo/type/4`)      //可更改
-                // return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/4`)      //可更改
-        }
-    }
-
-    
 ///////////////////////////////////////////////////////
     static test() {
         let url = '/api/v2/data/bank/Mzs/monitorData'
@@ -128,9 +108,48 @@ export default class BackEndRequest {
        return backendInstance.get(url,params)
     }
 ///////////////////////////////////////////////////////
+static getSpecMonitorInfo(type) {
+    //设备概述信息！！！！  v2版本
+    let bank = useBankNameStore().globalBankName
+    switch (type) {
+        case '1':
+            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/1`)      
+        case '2':
+            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/2`)      
+        case '3':
+            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/3`)      
+        case '4':
+            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/4`)      
+    }
+}
+    // static getSpecMonitorInfo(type) {
+    //     //设备概述信息！！！！  v1版本
+    //     let bank = useBankNameStore().globalBankName
+    //     switch (type) {
+    //         case '1':
+    //             return backendInstance.get(`/data/monitorInfo/type/1`)                   
+    //         case '2':
+    //             return backendInstance.get(`/data/monitorInfo/type/2`)                   
+    //         case '3':
+    //             return backendInstance.get(`/data/monitorInfo/type/3`)                   
+    //         case '4':
+    //             return backendInstance.get(`/data/monitorInfo/type/4`)                   
+    //     }
+    // }
 
+    //v2版本
+    static getMonitorDataByCode(deviceCode) {
+        let bank = useBankNameStore().globalBankName
+        return newBackendInstance.get(`/data/bank/${bank}/monitorData/hour/5/device/${deviceCode}/`)
+    }
 
-    static getMonitorDetailByType_Code(code, type, bank) {
+    static getMonitorInfoByCode(id) {
+        let bank = useBankNameStore().globalBankName
+        return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/id/${id}`)
+    }
+///////////////////////////////////////////////////////
+    //v1版本    
+    static getMonitorDetailByType_Code(code, type) {
         //data
         switch (type) {
             case '1': {
@@ -160,13 +179,6 @@ export default class BackEndRequest {
                     `/data/inclinometerData/hour/5/device/${code}`,
                 )
             }
-            //分布式光纤
-            // case '5': {
-            //     // return backendInstance.get(`/data/fiberData/day/1/device/${code}`)
-            //     return backendInstance.get(
-            //         `/data/fiberData/hour/5/device/${code}`,
-            //     )
-            // }
         }
     }
 
