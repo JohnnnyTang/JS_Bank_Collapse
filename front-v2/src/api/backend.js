@@ -16,7 +16,7 @@ const bankName = [
     'Zys',  //自由沙
 ]
 const newBackendInstance = axios.create({
-    baseURL: '/model/'
+    baseURL: '/model/'      //v2版本api前缀
 })
 ///////////////////////////////////////////////////////
 
@@ -57,6 +57,7 @@ export default class BackEndRequest {
     static getDataNodeTree() {
         // return instance.get(Vue.prototype.reqURL + "/user/hello")
         return backendInstance.get('/dataNode/tree')
+        // return newBackendInstance.get('dataNode/tree')      //  暂不改, status 500 internal server error
     }
 
     static getDataNodeData(dataNode) {
@@ -99,9 +100,9 @@ export default class BackEndRequest {
         //设备概述信息！！！！
         switch (type) {
             case '1':
-                return backendInstance.get(`/data/monitorInfo/type/1`)      //可更改
+                // return backendInstance.get(`/data/monitorInfo/type/1`)      //可更改
                 // return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/1`)      //可更改
-                // return newBackendInstance.get(`/data/bank/Mzs/monitorInfo/type/1`)      //可更改
+                return newBackendInstance.get(`/data/bank/Mzs/monitorInfo/type/1`)      //可更改
             case '2':
                 return backendInstance.get(`/data/monitorInfo/type/2`)      //可更改
                 // return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/2`)      //可更改
@@ -129,7 +130,7 @@ export default class BackEndRequest {
 ///////////////////////////////////////////////////////
 
 
-    static getMonitorDetailByType_Code(code, type) {
+    static getMonitorDetailByType_Code(code, type, bank) {
         //data
         switch (type) {
             case '1': {

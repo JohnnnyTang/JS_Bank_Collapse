@@ -37,6 +37,10 @@
                                 <span style="float: left" class="left">民主沙右缘</span>
                                 <span style="float: right" class="right level-one">一级预警岸段</span>
                             </el-dropdown-item>
+                            <el-dropdown-item @click="navToWarnOrRiskPage(index)">
+                                <span style="float: left" class="left">自由沙右缘</span>
+                                <span style="float: right" class="right level-one">一级预警岸段</span>
+                            </el-dropdown-item>
                             <el-dropdown-item disabled>
                                 <span style="text-align: center" class="">...</span>
                             </el-dropdown-item>
