@@ -255,7 +255,7 @@ static getSpecMonitorInfo(type) {
         let bank = useBankNameStore().globalBankName
         return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/6`)
     }
-
+    //
     static getMonitorWarningInfomation() {
         return new Promise((resolve) => {
             resolve({
