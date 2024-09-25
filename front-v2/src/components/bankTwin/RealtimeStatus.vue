@@ -619,7 +619,7 @@ const toggleChartOptionFromData = (deviceData) => {
         deviceTypeErrorMap[selectedDeviceType.value],
         selectedDataMode.value,
     )
-    console.log(deviceOptionMap)
+    // console.log(deviceOptionMap)
     // console.log('option', gnssOption)
     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
     // if (selectedDeviceType.value == '位移测量站') {
@@ -899,13 +899,14 @@ const deviceSelectChange = async (deviceName) => {
     updateTimeLoading.value = true
     showButton.value = false;
     if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
-        console.log(deviceTypeNameMap[selectedDeviceType.value]),
+        // console.log(deviceTypeNameMap[selectedDeviceType.value]),
         curDeviceData = (
             await BackEndRequest.getMonitorDataByTypeIdWithTime(
-                deviceTypeNameMap[selectedDeviceType.value],
-                deviceIdMap[deviceName],
+                // deviceTypeNameMap[selectedDeviceType.value],
+                // deviceIdMap[deviceName],
                 deviceTypeTimeMap[selectedDeviceType.value].timeUnit,
                 deviceTypeTimeMap[selectedDeviceType.value].timeCount,
+                deviceIdMap[deviceName],
             )
         ).data
     } else {
@@ -1050,7 +1051,7 @@ async function updateNewestData() {
     if (curDeviceData == null) return
     let deviceNewestData = (
         await BackEndRequest.getDeviceNewestData(
-            deviceTypeNameMap[selectedDeviceType.value],
+            // deviceTypeNameMap[selectedDeviceType.value],
             deviceIdMap[selectedDevice.value],
         )
     ).data
@@ -1174,10 +1175,11 @@ onMounted(async () => {
     echartIns = echarts.init(chartDom.value)
     curDeviceData = (
         await BackEndRequest.getMonitorDataByTypeIdWithTime(
-            'gnss',
-            deviceIdMap['CL-01'],
+            // 'gnss',
+            // deviceIdMap['CL-01'],
             deviceTypeTimeMap['位移测量站'].timeUnit,
             deviceTypeTimeMap['位移测量站'].timeCount,
+            deviceIdMap['CL-01'],
         )
     ).data
     let newestData = curDeviceData.slice(-1)[0]
@@ -1198,6 +1200,8 @@ onMounted(async () => {
             chartDataLoading.value = true
             updateTimeLoading.value = true
             await updateNewestData()
+            // console.log(deviceTypeNameMap[selectedDeviceType.value])
+            // console.log(deviceIdMap[selectedDevice.value])
             chartDataLoading.value = false
             updateTimeLoading.value = false
         }

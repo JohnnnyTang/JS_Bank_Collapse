@@ -981,6 +981,8 @@ class MonitorDataAssistant {
     async getMonitoringdata() {
         //general infomation
         this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
+        // this.monitoringData = (await BackEndRequest.getMonitorDataByCode(this.info["deviceCode"])).data
+        console.log(this.monitoringData)
         //meta infomation -- pointnum
         return this.monitoringData
     }
