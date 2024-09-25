@@ -2,33 +2,45 @@
     <div class="bank-resouce-create-container">
         <div class="main-title">新建岸段 </div>
         <div class="content">
-
             <div class="desc-box-container">
                 <div class="title-container">岸段基本信息
                     <div class="upload-btn" @click="createNewBankClickHandler">新建</div>
                 </div>
-                <div class="detail-content-container">
+                <el-scrollbar height="77vh">
 
-                    <div class="bank-name">
-                        <div class="bankName-key">岸段名称</div>
-                        <div class="bankName-val">
-                            <el-input v-model="bank.name" style="
+                    <div class="detail-content-container">
+
+                        <div class="bank-name">
+                            <div class="bankName-key">岸段名称</div>
+                            <div class="bankName-val">
+                                <el-input v-model="bank.name" class="necessary" style="
                                 width: 50%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
                             " placeholder="请输入岸段名称" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
-                            <el-input v-model="bank.bankEnName" style="
+                                <el-input v-model="bank.bankEnName" class="necessary" style="
                                 width: 50%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
                             " placeholder="请输入名称编码" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type">
-                        <div class="detail-key">{{ item.key }}</div>
-                        <div class="detail-val">
-                            <el-input v-model="item.val" style="
+                        <!-- <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type"> -->
+                        <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type">
+
+                            <div class="detail-key">{{ item.key }}</div>
+
+                            <div class="detail-val">
+                                <el-select v-if="item.key === '预警级别'" v-model="item.val" placeholder="请选择预警级别"
+                                    style="width: 100%;height: 100%; font-size: calc(0.6vw + 0.6vh);">
+                                    <el-option v-for="(item, index) in warnLevelList" :key="index" :value="item">
+                                        <span style="width: 100%;text-align: center;">{{ item }}</span>
+                                    </el-option>
+                                </el-select>
+                                <el-date-picker v-else-if="item.key === '监测起始时间'" v-model="item.val" type="date"
+                                    placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
+                                <el-input v-else v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
@@ -36,11 +48,14 @@
                                 ? 'textarea'
                                 : 'text'
                                 " :autosize="{ minRows: 4, maxRows: 6 }" />
+                            </div>
+
                         </div>
+
+                        <div style="margin-top: 20vh;"></div>
                     </div>
+                </el-scrollbar>
 
-
-                </div>
             </div>
         </div>
 
@@ -98,17 +113,52 @@
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
-import { defaultBankBasicInfo, defaultBankResouceList } from './bankResource'
+import { defaultBankBasic_Style_Info } from './bankResource'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
+// import { zhCn } from 'element-plus/es/locale';
+
+
+///////////////////////////// element language setting
+// const chinese = zhCn
 
 
 //////////////////////////// bank basic info
+
+const warnLevelList = ["I 级预警岸段", "Ⅱ 级预警岸段", "Ⅲ 级预警岸段"]
+
 const bank = reactive({
     name: '',
     bankEnName: ''
 })
-const bankBasicInfo = ref(defaultBankBasicInfo)
+const bankBasicInfo = ref(defaultBankBasic_Style_Info)
+
+////////////////// DEBUG ////////////////
+window.addEventListener('keydown', e => {
+    if (e.key === 'e') {
+        const parseLonLat = (inputStr) => {
+            const coordinates = inputStr.slice(1, -1).split(',');
+            const longitude = parseFloat(coordinates[0]);
+            const latitude = parseFloat(coordinates[1]);
+            return [longitude, latitude]
+        }
+        let nowBasicInfo = bankBasicInfo.value
+        let ReqBody = {
+            "bank": bank.bankEnName,
+            "name": bank.name,
+            "riskLevel": nowBasicInfo[0].val,
+            "center": parseLonLat(nowBasicInfo[1].val),
+            "monitorLength": nowBasicInfo[2].val,
+            "monitorStartTime": nowBasicInfo[3].val.toISOString(),
+            "introduction": nowBasicInfo[4].val,
+            "management": {
+                "department": nowBasicInfo[5].val,
+                "contact": nowBasicInfo[6].val,
+            }
+        }
+        console.log(ReqBody)
+    }
+})
 
 const createNewBankClickHandler = async () => {
     const haveNULL = Object.values(bank).some(item => item === '' || item === null || item === undefined)
@@ -144,10 +194,12 @@ const createNewBankClickHandler = async () => {
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
             "center": parseLonLat(nowBasicInfo[1].val),
-            "introduction": nowBasicInfo[2].val,
+            "monitorLength": nowBasicInfo[2].val,
+            "monitorStartTime": nowBasicInfo[3].val.toISOString(),
+            "introduction": nowBasicInfo[4].val,
             "management": {
-                "department": nowBasicInfo[3].val,
-                "contact": nowBasicInfo[4].val,
+                "department": nowBasicInfo[5].val,
+                "contact": nowBasicInfo[6].val,
             }
         }
         const createMsg = (await BankResourceHelper.createNewBank(bank.bankEnName, ReqBody)).data
@@ -155,11 +207,7 @@ const createNewBankClickHandler = async () => {
             'title': createMsg,
             'offset': 120
         })
-        ElMessage({
-            type: 'success',
-            offset: 120,
-            message: '创建成功',
-        })
+
     }).catch(() => {
         console.log('取消创建岸段');
     })
@@ -174,82 +222,82 @@ const createNewBankClickHandler = async () => {
 
 
 /////////////////////////// bank resource info
-const resourceInfo = defaultBankResouceList
-const tableColumnInfo = [
-    {
-        prop: "name",
-        label: "名称",
-        "min-width": "25%",
-        asTag: false
-    },
-    {
-        prop: "sets",
-        label: "工况集",
-        "min-width": "25%",
-        asTag: false
-    },
-    {
-        prop: "year",
-        label: "年份",
-        "min-width": "25%",
-        asTag: false
-    },
-    {
-        prop: "fileType",
-        label: "文件类型",
-        "min-width": "25%",
-        asTag: true
-    },
-]
+// const resourceInfo = defaultBankResouceList
+// const tableColumnInfo = [
+//     {
+//         prop: "name",
+//         label: "名称",
+//         "min-width": "25%",
+//         asTag: false
+//     },
+//     {
+//         prop: "sets",
+//         label: "工况集",
+//         "min-width": "25%",
+//         asTag: false
+//     },
+//     {
+//         prop: "year",
+//         label: "年份",
+//         "min-width": "25%",
+//         asTag: false
+//     },
+//     {
+//         prop: "fileType",
+//         label: "文件类型",
+//         "min-width": "25%",
+//         asTag: true
+//     },
+// ]
 
-///////////// bank resource upload
-const dialogFormVisible = ref(false)
-const dialogFormTitle = ref('资源上传')
-const dialogInfo = ref([
-    {
-        label: '岸段',
-        enName: 'segment',
-        value: bank.name
-    },
-    {
-        label: '年份',
-        enName: 'year',
-        value: '2023'
-    },
-    {
-        label: '工况集',
-        enName: 'set',
-        value: 'standard'
-    },
-    // {
-    //     label: '文件类型',
-    //     enName: 'category',
-    //     value: 'DEM'    (DEM|Hydrodynamic|Boundary|Config)
-    // }
-    {
-        label: '备注',
-        enName: 'description',
-        value: ''
-    },
-    {
-        label: '边界',
-        enName: '',
-        value: ''
-    },
-    // {
-    //     label: '其他',
-    //     enName: 'temp',
-    //     value: ''
-    // },
+// ///////////// bank resource upload
+// const dialogFormVisible = ref(false)
+// const dialogFormTitle = ref('资源上传')
+// const dialogInfo = ref([
+//     {
+//         label: '岸段',
+//         enName: 'segment',
+//         value: bank.name
+//     },
+//     {
+//         label: '年份',
+//         enName: 'year',
+//         value: '2023'
+//     },
+//     {
+//         label: '工况集',
+//         enName: 'set',
+//         value: 'standard'
+//     },
+//     // {
+//     //     label: '文件类型',
+//     //     enName: 'category',
+//     //     value: 'DEM'    (DEM|Hydrodynamic|Boundary|Config)
+//     // }
+//     {
+//         label: '备注',
+//         enName: 'description',
+//         value: ''
+//     },
+//     {
+//         label: '边界',
+//         enName: '',
+//         value: ''
+//     },
+//     // {
+//     //     label: '其他',
+//     //     enName: 'temp',
+//     //     value: ''
+//     // },
 
-])
+// ])
 
 
-const resourceUploadClickHandler = (resourceTypeIndex) => {
-    const type = ['地形', '水动力', '边界', '配置']
-    dialogFormTitle.value = `${type[resourceTypeIndex]}资源上传`
-    dialogFormVisible.value = true
-}
+// const resourceUploadClickHandler = (resourceTypeIndex) => {
+//     const type = ['地形', '水动力', '边界', '配置']
+//     dialogFormTitle.value = `${type[resourceTypeIndex]}资源上传`
+//     dialogFormVisible.value = true
+// }
 
 
 
@@ -280,7 +328,7 @@ div.bank-resouce-create-container {
 
     border-radius: 12px;
     // margin-bottom: 1vh;
-    overflow: hidden;
+    // overflow: hidden;
 
     background-color: rgb(233, 247, 255);
 
@@ -338,7 +386,7 @@ div.bank-resouce-create-container {
 
             // box-shadow: 10px 12px 20px -10px rgba(0, 0, 0, 0.8);
 
-            overflow: hidden;
+            // overflow: hidden;
 
             div.title-container {
                 width: 42vw;
@@ -382,13 +430,14 @@ div.bank-resouce-create-container {
                 width: 38vw;
                 margin-left: 2.5vw;
                 // padding-right: 0.5vw;
-                height: calc(83vh - 4px);
+                height: fit-content;
 
                 display: flex;
                 flex-flow: row wrap;
                 justify-content: space-between;
                 align-content: flex-start;
                 row-gap: 3vh;
+
 
                 div.bank-name {
                     width: 38vw;
@@ -560,7 +609,7 @@ div.bank-resouce-create-container {
 
         border-right: 2px solid #7aa8ff;
 
-        overflow: hidden;
+        // overflow: hidden;
 
         div.title-container {
             position: relative;
@@ -648,5 +697,40 @@ div.form-header {
     background-color: #b1e0ff;
     width: 108%;
     margin-left: -4%;
+}
+
+:deep(.el-input) {
+    &.necessary {
+        ::before {
+            content: "*";
+            color: red;
+            position: absolute;
+            top: .3vh;
+            right: .5vw;
+            font-size: 24px;
+            z-index: 5;
+        }
+    }
+
+    &.el-date-editor--date {
+        width: 100%;
+        height: 100%;
+        font-size: calc(0.6vh + 0.6vw);
+        // background-color: red;
+    }
+}
+
+
+:deep(.el-select) {
+
+
+    .el-select__placeholder.is-transparent {
+        font-size: calc(0.6vh + 0.6vw);
+    }
+
+    .el-select__wrapper {
+        height: inherit;
+        line-height: inherit;
+    }
 }
 </style>

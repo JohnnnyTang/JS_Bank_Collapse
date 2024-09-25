@@ -374,7 +374,7 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('/legend/水文站.png')`,
+            'background-image': `url('/legend/shuiwenzhan.png')`,
             'transform': 'translateX(28%)',
         },
         text: '水文站点'
@@ -383,7 +383,7 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('/legend/水闸.png')`,
+            'background-image': `url('/legend/shuizha.png')`,
             'transform': 'translateX(10%) scale(0.75)',
         },
         text: '水闸工程'
@@ -392,7 +392,7 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('/legend/泵站.png')`,
+            'background-image': `url('/legend/bengzhan.png')`,
             'transform': 'translateX(35%) scale(1.3)',
         },
         text: '泵站工程'
@@ -401,7 +401,7 @@ const legendListt = [
         style: {
             'height': '60%',
             'width': '50%',
-            'background-image': `url('/legend/堤防.png')`,
+            'background-image': `url('/legend/difang.png')`,
             'transform': 'translateX(10%)',
         },
         text: '长江干堤'
@@ -435,7 +435,7 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('/legend/已建通道2.png')`,
+            'background-image': `url('/legend/yijiantongdao2.png')`,
             'transform': 'scaleY(0.5) translateX(5%)'
         },
         text: '已建过江通道'
@@ -445,7 +445,7 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('/legend/在建通道1.png')`,
+            'background-image': `url('/legend/zaijiantongdao1.png')`,
             'transform': 'scaleY(0.5) translateX(5%)'
         },
         text: '在建过江通道'
@@ -455,7 +455,7 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('/legend/规划通道.png')`,
+            'background-image': `url('/legend/guihuatongdao.png')`,
             'transform': ' translateX(5%)'
         },
         text: '规划过江通道'

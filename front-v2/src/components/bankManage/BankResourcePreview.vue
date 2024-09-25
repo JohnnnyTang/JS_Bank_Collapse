@@ -1,67 +1,71 @@
 <template>
     <div class="bank-resouce-create-container" v-loading="loading">
-        <div class="main-title">岸段管理
-        </div>
+        <div class="main-title">岸段管理</div>
         <div class="desc-box-container">
             <div class="title-container">岸段基本信息</div>
-            <div class="detail-content-container">
+            <div class="change-button-container">
+                <div class="change-button" v-if="!changeStatus" @click="startModify">
+                    修改
+                </div>
+                <div class="change-button modify" v-if="changeStatus" @click="commitModify">
+                    提交
+                </div>
+                <div class="cancel-button" v-if="changeStatus" @click="cancelModify">
+                    取消
+                </div>
+            </div>
+            <el-scrollbar height="77vh">
+                <div class="detail-content-container">
 
-                <div class="bank-name">
-                    <div class="bankName-key">岸段名称</div>
-                    <div class="bankName-val" v-if="changeStatus">
-                        <el-input v-model="bank.name" style="
+                    <div class="bank-name">
+                        <div class="bankName-key">岸段名称</div>
+                        <div class="bankName-val" v-if="changeStatus">
+                            <el-input v-model="bank.name" style="
                                 width: 100%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
                             " placeholder="请输入" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
+                        </div>
+                        <div class="bankName-val" v-else>
+                            {{ bank.name }}
+                        </div>
                     </div>
-                    <div class="bankName-val" v-else>
-                        {{ bank.name }}
-                    </div>
-                </div>
 
 
-                <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type">
-                    <div class="detail-key">{{ item.key }}</div>
-                    <div class="detail-val" v-if="changeStatus">
-                        <el-input v-model="item.val" style="
+                    <div class="detail-box-item" v-for="(item, index) in bankBasicInfo" :key="index" :class="item.type">
+                        <div class="detail-key">{{ item.key }}</div>
+                        <div class="detail-val" v-if="changeStatus">
+                            <el-select v-if="item.key === '预警级别'" v-model="item.val" placeholder="请选择预警级别"
+                                style="width: 100%;height: 100%; font-size: calc(0.6vw + 0.6vh);">
+                                <el-option v-for="(item, index) in warnLevelList" :key="index" :value="item">
+                                    <span style="width: 100%;text-align: center;">{{ item }}</span>
+                                </el-option>
+                            </el-select>
+                            <el-date-picker v-else-if="item.key === '监测起始时间'" v-model="item.val" type="date"
+                                placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
+                            <el-input v-else v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
-                            " placeholder="Please input" :type="item.type.includes('long-text')
+                            " :placeholder="item.key === '中心坐标' ? '请输入坐标: [经度,维度]' : '请输入' + item.key" :type="item.type.includes('long-text')
                                 ? 'textarea'
                                 : 'text'
                                 " :autosize="{ minRows: 4, maxRows: 6 }" />
-                    </div>
-                    <div class="detail-val" v-else-if="item.type.includes('two-row')">
-                        <div class="detail-val-row">
-                            {{ item.val.split(item.splitter)[0] }}
                         </div>
-                        <div class="detail-val-row">
-                            {{ item.val.split(item.splitter)[1] }}
-                        </div>
-                    </div>
-                    <div class="detail-val" v-else>{{ item.val }}</div>
+                        <!-- <div class="detail-val" v-else>{{ item.val }}</div> -->
+                        <div class="detail-val" v-else>{{
+                            item.key === '监测起始时间' ? item.val.slice(0, 10) : item.val
+                        }}</div>
 
-
-                    <div class="change-button-container">
-                        <div class="change-button" v-if="!changeStatus" @click="startModify">
-                            修改
-                        </div>
-                        <div class="change-button modify" v-if="changeStatus" @click="commitModify">
-                            提交
-                        </div>
-                        <div class="cancel-button" v-if="changeStatus" @click="cancelModify">
-                            取消
-                        </div>
                     </div>
+
                 </div>
-
-            </div>
+            </el-scrollbar>
         </div>
 
         <div class="resource-box-container">
-            <div class="one-type-resource-container" v-for="key in   Object.keys(resourceInfo)  " :ref=handleRef>
+            <div class="one-type-resource-container" v-for="(key, resourceCatogoryIndex) in   Object.keys(resourceInfo)  "
+                :ref=handleRef>
                 <div class="title-container">
                     <span @click="typeIndexChange(0)" class="page left" :class="{ ban: nowTypeIndex === 0 }">上一页</span>
                     <span>{{ key }}</span>
@@ -74,7 +78,7 @@
                             :key="resourceTypeIndex">
                             <div class="resource-title">
                                 {{ item.key }}
-                                <div class="resource-upload-btn" v-show="key === '模型资源管理'"
+                                <div class="resource-upload-btn" v-show="item.upload"
                                     @click="resourceUploadClickHandler(resourceTypeIndex)">上传
                                 </div>
                             </div>
@@ -91,14 +95,20 @@
                                             </div>
                                         </template>
                                     </el-table-column>
-                                    <!-- <el-table-column fixed="right" label="Operations" min-width="20%" align="center">
+
+                                    <el-table-column fixed="right" label="操作" min-width="20%" align="center"
+                                        v-if="item.delete || item.update">
                                         <template #default="scope">
-                                            <el-button link type="primary" size="small"
-                                                @click.prevent="deleteRow(scope.$index, resourceTypeIndex)">
+                                            <el-button link type="danger" size="small" v-if="item.delete"
+                                                @click.prevent="deleteRow(scope.$index, resourceTypeIndex, scope.row)">
                                                 删除
                                             </el-button>
+                                            <el-button link type="warning" size="small" v-if="item.update"
+                                                @click.prevent="updateRow(scope.$index, resourceTypeIndex, scope.row)">
+                                                更新
+                                            </el-button>
                                         </template>
-                                    </el-table-column> -->
+                                    </el-table-column>
                                 </el-table>
                             </div>
                         </div>
@@ -110,36 +120,11 @@
         </div>
     </div>
 
-    <uploadDialog ref="uploadDialogRef" :type="uploadDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
-        :bank-en-name="uploadDialogBaseInfo.bankEnName"></uploadDialog>
-    <!-- <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
-        <template #header="{ titleId, titleClass }">
-            <div class="form-header">
-                {{ dialogFormTitle }}
-            </div>
-        </template>
-        <el-form :model="dialogInfo">
-            <el-form-item v-for="(  item, index  ) in   dialogInfo  " :key="index" :label="item.label">
-                <el-input v-model="item.value" autocomplete="off" />
-            </el-form-item>
-        </el-form>
-        <el-upload style="height: fit-content;" drag action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-            :multiple="false" :show-file-list="true">
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">
-                <em>拖拽文件至此处</em>或<em>点击</em>进行上传
-            </div>
-        </el-upload>
+    <UploadDialog ref="uploadDialogRef" :type="uploadDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
+        :bank-en-name="uploadDialogBaseInfo.bankEnName"></UploadDialog>
 
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">
-                    确认
-                </el-button>
-            </div>
-        </template>
-    </el-dialog> -->
+    <UpdateDialog ref="updateDialogRef" :type="updateDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
+        :bank-en-name="updateDialogBaseInfo.bankEnName" :resource-item-info="updateDialogBaseInfo.itemInfo"></UpdateDialog>
 </template>
 
 <script setup>
@@ -148,17 +133,23 @@ import { useRoute, onBeforeRouteUpdate } from 'vue-router';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue'
+import { useResourceStore } from '../../store/resourceStore'
 import axios from 'axios';
-import { defaultTableColumns, typeDict, resourceTypeDict } from './bankResource'
-import uploadDialog from './uploadDialog.vue'
+import { defaultTableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
+import UploadDialog from './UploadDialog.vue'
+import UpdateDialog from './UpdateDialog.vue'
 
 //////////////////////////// global
+const warnLevelList = ["I 级预警岸段", "Ⅱ 级预警岸段", "Ⅲ 级预警岸段"]
+
 const route = useRoute();
 onBeforeRouteUpdate(async (to, from) => {
     const toBankEnName = to.params.id
     initOneBank(toBankEnName)
 })
 const emit = defineEmits(['update-bank-basic-info'])
+
+const resourceStore = useResourceStore()
 
 
 
@@ -210,22 +201,34 @@ const commitModify = () => {
             return [longitude, latitude]
         }
         let nowBasicInfo = bankBasicInfo.value
+        // let ReqBody = {
+        //     "bank": bank.bankEnName,
+        //     "name": bank.name,
+        //     "riskLevel": nowBasicInfo[0].val,
+        //     "center": parseLonLat(nowBasicInfo[1].val),
+        //     "introduction": nowBasicInfo[2].val,
+        //     "management": {
+        //         "department": nowBasicInfo[3].val,
+        //         "contact": nowBasicInfo[4].val,
+        //     }
+        // }
         let ReqBody = {
             "bank": bank.bankEnName,
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
             "center": parseLonLat(nowBasicInfo[1].val),
-            "introduction": nowBasicInfo[2].val,
+            "monitorLength": nowBasicInfo[2].val,
+            "monitorStartTime": nowBasicInfo[3].val.toISOString(),
+            "introduction": nowBasicInfo[4].val,
             "management": {
-                "department": nowBasicInfo[3].val,
-                "contact": nowBasicInfo[4].val,
+                "department": nowBasicInfo[5].val,
+                "contact": nowBasicInfo[6].val,
             }
         }
-
-        const createMsg = (await BankResourceHelper.updateBankBasicInfo(bank.bankEnName, ReqBody)).data
+        const updateMsg = (await BankResourceHelper.updateBankBasicInfo(bank.bankEnName, ReqBody)).data
         emit('update-bank-basic-info', true)
         ElNotification.success({
-            'title': createMsg,
+            'title': updateMsg,
             'offset': 120
         })
         changeStatus.value = false
@@ -271,7 +274,9 @@ const typeIndexChange = (add) => {
 }
 
 
+// const resourceInfo = resourceStore.resourcesObject
 const resourceInfo = ref({})
+
 
 ///////////// bank resource upload
 const uploadDialogRef = ref(null)
@@ -285,20 +290,89 @@ const uploadDialogBaseInfo = computed(() => {
 
 const resourceUploadClickHandler = (resourceTypeIndex) => {
     nowSubTypeIndex.value = resourceTypeIndex
+    console.log(uploadDialogBaseInfo.value)
     uploadDialogRef.value.dialogFormVisible = true
 }
 
+
+///////////// bank resource update
+const updateDialogRef = ref(null)
+const operatingResourceItem = ref({
+    "aspect": '',
+    "deviceId": '',
+    "deviceName": '',
+    "type": '',
+    "longitude": '',
+    "latitude": '',
+    "elevation": '',
+})
+const updateDialogBaseInfo = computed(() => {
+    return {
+        type: typeDict[nowTypeIndex.value],
+        subType: resourceTypeDict[typeDict[nowTypeIndex.value]][nowSubTypeIndex.value],
+        bankEnName: bank.bankEnName,
+        itemInfo: operatingResourceItem,
+    }
+})
+const resourceItemUpdateClickHandler = () => {
+    updateDialogRef.value.dialogFormVisible = true
+}
 
 
 ///////////// bank resource table operation
 const tableColumnInfo = defaultTableColumns
 
 
-const deleteRow = (rowIndex, resourceTypeIndex) => {
-    console.log(rowIndex, resourceTypeIndex)
-    // console.log('resourceType',resourceInfo.value[resourceTypeIndex])
-    let resourceList = resourceInfo.value[resourceTypeIndex].resourceList
-    resourceList.splice(rowIndex, 1)
+const deleteRow = (rowIndex, resourceTypeIndex, info) => {
+
+    // console.log('now catogory index', nowTypeIndex.value)
+    // console.log('now resource index', resourceTypeIndex)
+    // console.log('now item index', rowIndex)
+    operatingResourceItem.value = info
+
+    console.log('operatingItem', info)
+
+    ElMessageBox.confirm(
+        '确认删除该条资源？',
+        '警告',
+        {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(() => {
+        console.log('确认删除');
+        // frontend delete
+        let resourceList = resourceInfo.value[categoryNameDict[nowTypeIndex.value]][resourceTypeIndex].resourceList
+        resourceList.splice(rowIndex, 1)
+
+        // backend delete 。。。
+        if (bank.bankEnName === 'Zys') {
+            BankResourceHelper.deleteBankDevice(info.code).then(res => {
+                console.log(res)
+            }).catch(e => {
+                console.warn(e)
+            })
+        }
+
+        ElMessage.success({
+            'offset': 100,
+            'message': '删除成功！'
+        })
+
+    }).catch(_ => {
+        console.log('取消删除', _);
+    })
+}
+const updateRow = (rowIndex, resourceTypeIndex, info) => {
+    // console.log('now catogory index', nowTypeIndex.value)
+    // console.log('now resource index', resourceTypeIndex)
+    // console.log('now item index', rowIndex)
+    nowSubTypeIndex.value = resourceTypeIndex
+    operatingResourceItem.value = info
+
+    // updateDialog show
+    resourceItemUpdateClickHandler()
 }
 
 
@@ -306,41 +380,62 @@ const loading = ref(false)
 onMounted(async () => {
     const _thisBankEnName = route.params.id
     await initOneBank(_thisBankEnName)
-    console.log(bank.name)
+
+    ///// debug 
+    window.addEventListener('keydown', (e) => {
+        console.log('resourceStore.resourceInfo', resourceStore.resourceInfo)
+    })
+    // for refresh
+    watch(() => resourceStore.resourceInfo, (newVal, oldVal) => {
+        console.log(newVal, oldVal)
+        console.log('should update')
+    })
+
 })
 
-// {
-//     "name": "201210",
-//     "bank": "Mzs"
-// }
 
 ////////////////// helper ///////////////////
 const initOneBank = async (bankEnName) => {
     loading.value = true
     const _thisBankEnName = bankEnName
     const _thisBankBasicInfo = (await BankResourceHelper.getOneBankBasicInfo(_thisBankEnName)).data
-    console.log(_thisBankBasicInfo)
 
-    // bank resource init
+    // // bank resource init
     const _ogDEM = (await BankResourceHelper.getBankCalculateResourceList('DEM', _thisBankEnName)).data
     const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', _thisBankEnName)).data
     const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', _thisBankEnName)).data
     const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', _thisBankEnName)).data
+    // const _ogDEM = []
+    // const _ogHydro = []
+    // const _ogBound = []
+    // const _ogConfig = []
     const _thisBankResourceInfo = [
         {
             key: '岸段地形资源',
+            upload: true,
+            update: false,
+            delete: true,
             resourceList: BankResourceHelper.DEMResourcetoList(_ogDEM)
         },
         {
             key: '水动力预算工况',
+            upload: true,
+            update: false,
+            delete: true,
             resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
         },
         {
-            key: '岸段边界资源',
+            key: '岸段边界矢量',
+            upload: true,
+            update: false,
+            delete: true,
             resourceList: BankResourceHelper.BoundaryResourcetoList(_ogBound)
         },
         {
-            key: '岸段配置资源',
+            key: '模型配置文件',
+            upload: true,
+            update: false,
+            delete: true,
             resourceList: BankResourceHelper.ConfigResourcetoList(_ogConfig)
         },
     ]
@@ -348,154 +443,99 @@ const initOneBank = async (bankEnName) => {
     // visual resource init
     const demTileList = (await BankResourceHelper.getBankVisualResourceList('DEM', bankEnName)).data
     demTileList.map(item => item.fileType = '地形切片')
+    const vectorTileList = (await BankResourceHelper.getBankVisualResourceList("vector", bankEnName)).data
+    vectorTileList.map(item => {
+        item.fileType = '矢量切片'
+        item.name = item.tileName
+    })
+
     const _thisVisualResourceInfo = [
         {
             key: '栅格可视化资源',
+            upload: false,
+            update: false,
+            delete: false,
             resourceList: demTileList
         },
         {
             key: '矢量可视化资源',
-            resourceList: [
-                {
-                    name: '示例矢量资源',
-                    fileType: 'geojson',
-                }
-            ]
-        },
-        {
-            key: '其他',
-            resourceList: [
-                {
-                    name: '示例资源',
-                    fileType: 'config.json',
-                    uploadTime: '2024-09-01',
-                }
-            ]
+            upload: true,
+            update: false,
+            delete: true,
+            resourceList: vectorTileList
         },
     ]
 
     // device resource init
     let _thisDeviceResourceInfo = []
-    if (bankEnName === 'Mzs') {
-        const monitorInfo = (await axios.get('/api/data/monitorInfo')).data
-        const { _GNSS, _Incline, _Stress, _Menometer, _Vedio } = parseMonitorInfo(monitorInfo)
-        _thisDeviceResourceInfo = [
-            {
-                key: 'GNSS设备',
-                resourceList: _GNSS
-            },
-            {
-                key: '孔隙水压力计设备',
-                resourceList: _Menometer
-            },
-            {
-                key: '应力桩设备',
-                resourceList: _Stress
-            },
-            {
-                key: '测斜仪设备',
-                resourceList: _Incline
-            },
-            {
-                key: '监控摄像设备',
-                resourceList: _Vedio
-            },
-        ]
-    }
-    else {
-        _thisDeviceResourceInfo = [
-            {
-                key: 'GNSS设备',
-                resourceList: []
-            },
-            {
-                key: '孔隙水压力计设备',
-                resourceList: []
-            },
-            {
-                key: '应力桩设备',
-                resourceList: []
-            },
-            {
-                key: '测斜仪设备',
-                resourceList: []
-            },
-            {
-                key: '监控摄像设备',
-                resourceList: []
-            },
-        ]
-    }
 
+    const _GNSS = (await BankResourceHelper.getBankDeviceResourceList("GNSS", bankEnName)).data
+    const _Incline = (await BankResourceHelper.getBankDeviceResourceList("INCLINE", bankEnName)).data
+    const _Stress = (await BankResourceHelper.getBankDeviceResourceList("STRESS", bankEnName)).data
+    const _Menometer = (await BankResourceHelper.getBankDeviceResourceList("MENOMETER", bankEnName)).data
+    const _Vedio = (await BankResourceHelper.getBankDeviceResourceList("VEDIO", bankEnName)).data
 
-
+    // const _GNSS = []
+    // const _Incline = []
+    // const _Stress = []
+    // const _Menometer = []
+    // const _Vedio = []
+    _thisDeviceResourceInfo = [
+        {
+            key: 'GNSS设备',
+            upload: true,
+            update: true,
+            delete: true,
+            resourceList: _GNSS
+        },
+        {
+            key: '孔隙水压力计设备',
+            upload: true,
+            update: true,
+            delete: true,
+            resourceList: _Menometer
+        },
+        {
+            key: '应力桩设备',
+            upload: true,
+            update: true,
+            delete: true,
+            resourceList: _Stress
+        },
+        {
+            key: '测斜仪设备',
+            upload: true,
+            update: true,
+            delete: true,
+            resourceList: _Incline
+        },
+        {
+            key: '监控摄像设备',
+            upload: true,
+            update: true,
+            delete: true,
+            resourceList: _Vedio
+        },
+    ]
     //////////////////
     bank.name = _thisBankBasicInfo.name
     bank.bankEnName = _thisBankEnName
-    bankBasicInfo.value = parseBasicInfo(_thisBankBasicInfo)
+    bankBasicInfo.value = getBankBasic_Style_Info(_thisBankBasicInfo)
     resourceInfo.value = {
         '模型资源管理': _thisBankResourceInfo,
         '可视化资源管理': _thisVisualResourceInfo,
-        '设备资源管理': _thisDeviceResourceInfo
+        '设备资源管理': _thisDeviceResourceInfo,
+        // '模型资源管理': [],
+        // '可视化资源管理': [],
+        // '设备资源管理': []
+    }
+    /// store init value
+    resourceStore.resourceInfo = {
+        '模型资源管理': _thisBankResourceInfo,
+        '可视化资源管理': _thisVisualResourceInfo,
+        '设备资源管理': _thisDeviceResourceInfo,
     }
     loading.value = false
-}
-
-const parseBasicInfo = (basicInfo) => {
-    return [
-        { key: '预警级别', val: basicInfo["riskLevel"], type: ['half', 'left'] },
-        {
-            key: '中心坐标',
-            val: basicInfo["center"],
-            type: ['half', 'right'],
-            splitter: ' ',
-        },
-        {
-            key: '情况介绍',
-            val: basicInfo["introduction"],
-            type: ['single', 'long-text'],
-        },
-        {
-            key: '管理单位',
-            val: basicInfo["management"]["department"],
-            type: ['half', 'left'],
-        },
-        {
-            key: '管理单位联系方式',
-            val: basicInfo["management"]["contact"],
-            type: ['half', 'right'],
-        },
-    ]
-}
-
-const parseMonitorInfo = (monitorInfo) => {
-    const _GNSS = []
-    const _Incline = []
-    const _Stress = []
-    const _Menometer = []
-    const _Vedio = []
-    monitorInfo.forEach(item => {
-        switch (item.type) {
-            case '1':
-                _GNSS.push(item)
-                break;
-            case '2':
-                _Stress.push(item)
-                break;
-            case '3':
-                _Menometer.push(item)
-                break;
-            case '4':
-                _Incline.push(item)
-                break;
-            case '6':
-                _Vedio.push(item)
-                break;
-            default:
-                break;
-        }
-    })
-    return { _GNSS, _Incline, _Stress, _Menometer, _Vedio }
 }
 
 
@@ -582,11 +622,85 @@ div.bank-resouce-create-container {
             color: #001d7a;
         }
 
+        div.change-button-container {
+            position: absolute;
+            width: 8vw;
+            height: 4vh;
+            top: 1.8vh;
+            right: 2.5vw;
+
+            // background-color: #0040a0;
+
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+
+            text-align: center;
+            font-weight: bold;
+            font-size: calc(0.8vw + 0.4vh);
+
+            div.change-button {
+                width: 8vw;
+                height: 4vh;
+                line-height: 4vh;
+                border-radius: 6px;
+
+                background-color: #b4ddff;
+                transition: all 0.2s ease-in-out;
+
+                box-shadow:
+                    rgba(0, 132, 255, 0.8) 1px 1px,
+                    rgba(0, 119, 255, 0.7) 2px 2px,
+                    rgba(0, 119, 255, 0.6) 3px 3px;
+
+                &.modify {
+                    width: 3.2vw;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                    transform: translate3d(2px, 2px, 2px);
+                    color: #0539a8;
+                    box-shadow:
+                        rgba(0, 132, 255, 0.8) 1px 1px,
+                        rgba(0, 119, 255, 0.7) 2px 2px,
+                        rgba(0, 119, 255, 0.6) 3px 3px,
+                        rgba(0, 119, 255, 0.4) 4px 4px;
+                }
+            }
+
+            div.cancel-button {
+                width: 3.2vw;
+                height: 4vh;
+                line-height: 4vh;
+                transition: all 0.6s ease-in-out;
+
+                border-radius: 6px;
+                color: #f0f8ff;
+                background-color: #2358eb;
+                box-shadow:
+                    rgba(29, 142, 248, 0.8) 1px 1px,
+                    rgba(26, 133, 255, 0.7) 2px 2px,
+                    rgba(25, 132, 255, 0.6) 3px 3px;
+
+                &:hover {
+                    cursor: pointer;
+                    color: #85f7ff;
+                    transform: translate3d(2px, 2px, 2px);
+                    box-shadow:
+                        rgba(29, 142, 248, 0.8) 1px 1px,
+                        rgba(26, 133, 255, 0.7) 2px 2px,
+                        rgba(25, 132, 255, 0.6) 3px 3px,
+                        rgba(35, 138, 255, 0.4) 4px 4px;
+                }
+            }
+        }
+
         div.detail-content-container {
             width: 38vw;
             margin-left: 2.5vw;
             // padding-right: 0.5vw;
-            height: calc(83vh - 4px);
+            height: fit-content;
 
             display: flex;
             flex-flow: row wrap;
@@ -668,79 +782,7 @@ div.bank-resouce-create-container {
                 }
             }
 
-            div.change-button-container {
-                position: absolute;
-                width: 8vw;
-                height: 4vh;
-                top: 2vh;
-                right: 2.5vw;
 
-                // background-color: #0040a0;
-
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: space-between;
-
-                text-align: center;
-                font-weight: bold;
-                font-size: calc(0.8vw + 0.4vh);
-
-                div.change-button {
-                    width: 8vw;
-                    height: 4vh;
-                    line-height: 4vh;
-                    border-radius: 6px;
-
-                    background-color: #b4ddff;
-                    transition: all 0.2s ease-in-out;
-
-                    box-shadow:
-                        rgba(0, 132, 255, 0.8) 1px 1px,
-                        rgba(0, 119, 255, 0.7) 2px 2px,
-                        rgba(0, 119, 255, 0.6) 3px 3px;
-
-                    &.modify {
-                        width: 3.2vw;
-                    }
-
-                    &:hover {
-                        cursor: pointer;
-                        transform: translate3d(2px, 2px, 2px);
-                        color: #0539a8;
-                        box-shadow:
-                            rgba(0, 132, 255, 0.8) 1px 1px,
-                            rgba(0, 119, 255, 0.7) 2px 2px,
-                            rgba(0, 119, 255, 0.6) 3px 3px,
-                            rgba(0, 119, 255, 0.4) 4px 4px;
-                    }
-                }
-
-                div.cancel-button {
-                    width: 3.2vw;
-                    height: 4vh;
-                    line-height: 4vh;
-                    transition: all 0.6s ease-in-out;
-
-                    border-radius: 6px;
-                    color: #f0f8ff;
-                    background-color: #2358eb;
-                    box-shadow:
-                        rgba(29, 142, 248, 0.8) 1px 1px,
-                        rgba(26, 133, 255, 0.7) 2px 2px,
-                        rgba(25, 132, 255, 0.6) 3px 3px;
-
-                    &:hover {
-                        cursor: pointer;
-                        color: #85f7ff;
-                        transform: translate3d(2px, 2px, 2px);
-                        box-shadow:
-                            rgba(29, 142, 248, 0.8) 1px 1px,
-                            rgba(26, 133, 255, 0.7) 2px 2px,
-                            rgba(25, 132, 255, 0.6) 3px 3px,
-                            rgba(35, 138, 255, 0.4) 4px 4px;
-                    }
-                }
-            }
 
             // background-color: antiquewhite;
         }
@@ -828,7 +870,7 @@ div.bank-resouce-create-container {
                     position: relative;
                     width: 41vw;
                     margin-left: 0.5vw;
-                    height: 30vh;
+                    height: fit-content;
 
                     div.resource-title {
                         position: relative;
@@ -865,16 +907,49 @@ div.bank-resouce-create-container {
                     div.resource-content {
                         position: relative;
                         width: 41vw;
-                        height: 25vh;
-                        // background-color: aquamarine;
-
+                        // height: 25vh;
+                        height: fit-content;
                         letter-spacing: 0.1rem;
-
                     }
                 }
             }
         }
 
+    }
+}
+
+:deep(.el-input) {
+    &.necessary {
+        ::before {
+            content: "*";
+            color: red;
+            position: absolute;
+            top: .3vh;
+            right: .5vw;
+            font-size: 24px;
+            z-index: 5;
+        }
+    }
+
+    &.el-date-editor--date {
+        width: 100%;
+        height: 100%;
+        font-size: calc(0.6vh + 0.6vw);
+        // background-color: red;
+    }
+}
+
+
+:deep(.el-select) {
+
+
+    .el-select__placeholder.is-transparent {
+        font-size: calc(0.6vh + 0.6vw);
+    }
+
+    .el-select__wrapper {
+        height: inherit;
+        line-height: inherit;
     }
 }
 </style>
