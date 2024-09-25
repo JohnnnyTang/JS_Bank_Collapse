@@ -1,15 +1,50 @@
 import axios from "axios";
+import { ElMessage } from "element-plus";
 
 const axiosIns = axios.create({
     baseURL: "/model/data/bankResource",
-    headers: {
-        "token": localStorage.getItem("token")
-    }
 })
+axiosIns.interceptors.response.use((response) => {
+    if (response.data.code === 500) {
+        ElMessage.error({
+            offset: 120,
+            message: ' 500-服务器内部错误'
+        })
+        return null;
+    }
+    return response;
+})
+
+
+const axiosIns4Device = axios.create({
+    baseURL: "/model/data",
+})
+axiosIns4Device.interceptors.response.use((response) => {
+    if (response.data.code === 500) {
+        ElMessage.error({
+            offset: 120,
+            message: ' 500-服务器内部错误'
+        })
+        return null;
+    }
+    return response;
+})
+
+/**
+ * @typedef {Object} DeviceInfo
+ * @property {string} bank - 岸段名称。
+ * @property {string} aspect - 方位角。
+ * @property {string} deviceId - 设备ID。
+ * @property {string} deviceName - 设备名字。
+ * @property {string} type - 类型标识。
+ * @property {number} longitude - 经度。
+ * @property {number} latitude - 纬度。
+ * @property {number} elevation - 海拔高度。
+ */
 
 export default class BankResourceHelper {
 
-    /////////////// bank
+    ////////////////////////////////////BANK BASIC INFO
     static getBankNamesList() {
         return axiosIns.get("/bank")
     }
@@ -47,7 +82,8 @@ export default class BankResourceHelper {
     }
 
 
-    /////////////// bank resource
+    /////////////////////////////////BANK RESOURCE
+    //////////////// MODEL RESOURCE ////////////////
     /**
      * 
      * @param {"Hydrodynamic" | "DEM" | "Boundary" | "Config"} dataType 
@@ -60,24 +96,116 @@ export default class BankResourceHelper {
         }
         return axiosIns.get(`/bank/calculate/dataType`, { params: params })
     }
-
     /**
      * 
-     * @param {"DEM" | ""} dataType 
-     * @param {string} bankEnName 
+     * @param {FormData} formData 
      */
-    static getBankVisualResourceList(dataType, bankEnName) {
-        const params = {
-            dataType: dataType,
-            bank: bankEnName
-        }
-        return axiosIns.get(`/bank/visual/dataType`, { params: params })
+    static uploadBankCalculateResourceFile(formData) {
+
+        return axiosIns.post(`/up/modelServer/resource/file`, formData)
+
+    }
+
+    static updateBankCalculateResourceFile(dataType, bankEnName, fileInput, fileInfo) {
+
+    }
+
+    static deleteBankCalculateResourceFile(dataType, bankEnName, fileName) {
+
     }
 
 
 
 
 
+    ////////////// VISUAL RESOURCE ////////////////
+    /**
+     * 
+     * @param {"DEM" | "vector"} dataType 
+     * @param {string} bankEnName 
+     */
+    static getBankVisualResourceList(dataType, bankEnName) {
+        if (dataType === "DEM") {
+            const params = {
+                dataType: dataType,
+                bank: bankEnName
+            }
+            return axiosIns.get(`/bank/visual/dataType`, { params: params })
+        }
+        else if (dataType === "vector") {
+            const params = {
+                bank: bankEnName
+            }
+            return axiosIns.get(`/bank/visual/vector`, { params: params })
+        }
+    }
+
+    static uploadBankVisualResourceFile(formData, bankEnName) {
+        // /api/v2/data/bankResource/up/local/resource/{bank}/file
+        return axiosIns.post(`/up/local/resource/${bankEnName}/file`, formData)
+
+    }
+
+    static updateBankVisualResourceFile(dataType, bankEnName, fileInput, fileInfo) {
+
+    }
+
+    static deleteBankVisualResourceFile(vectorName, bankEnName) {
+        // /api/v2/data/bankResource/delete/local/resource/{bank}/file/{name}
+        return axiosIns.delete(`/delete/local/resource/${bankEnName}/file/${vectorName}`)
+    }
+
+
+
+    ////////////// DEVICE RESOURCE ////////////////
+    static DeviceTypeMap = {
+        "GNSS": "1",
+        "STRESS": "2",
+        "MENOMETER": "3",
+        "INCLINE": "4",
+        "VEDIO": "6"
+    }
+    /**
+     * 
+     * @param {"GNSS" | "STRESS" | "MENOMETER" | "INCLINE" | "VEDIO"} deviceType 
+     * @param {*} bankEnName 
+     */
+    static getBankDeviceResourceList(deviceType, bankEnName) {
+        // return axiosIns4Device.get(`/bank/${bankEnName}/monitorInfo/type/${this.DeviceTypeMap[deviceType]}`)
+        const params = {
+            bank: bankEnName,
+            typeCode: this.DeviceTypeMap[deviceType]
+        }
+        return axiosIns.get(`/bank/device/type`, { params })
+    }
+
+    /**
+     * @param {DeviceInfo} deviceInfo 
+     * @returns 
+     */
+    static uploadBankDevice(deviceInfo, bankEnName) {
+
+        return axiosIns.post(`/up/local/resource/${bankEnName}/device`, deviceInfo)
+
+    }
+    /**
+     * 
+     * @param {string} deviceCode -  设备编码  "code": "MZS120.52557975_32.03825056_1", 
+     * @returns 
+     */
+    static deleteBankDevice(deviceCode) {
+
+        return axiosIns.delete(`/delete/local/resource/device/${deviceCode}`)
+    }
+
+    /**
+      * @param {DeviceInfo} deviceInfo 
+      * @returns 
+      */
+    static updateBankDevice(deviceInfo, bankEnName, deviceCode) {
+        // /update/local/resource/{bank}/device/{code}
+        return axiosIns.put(`/update/local/resource/${bankEnName}/device/${deviceCode}`, deviceInfo)
+    }
 
 
 
@@ -117,7 +245,118 @@ export default class BankResourceHelper {
 
 
 
-    /////////////// data process
+
+
+
+
+
+
+
+
+    ////////////////////////////////////////////// Resoure refresh
+    /**
+     * 
+     * @param {*} proxy  --- the proxy of ref : resourceInfo 
+     * @param {*} bankEnName 
+     * @param {*} category 
+     * @param {*} type 
+     */
+    static refreshBankVisualResource(proxy, bankEnName, category, type) {
+
+        const _proxyCategoryDICI = {
+            'model': '模型资源管理',
+            'visual': '可视化资源管理',
+            'device': '设备资源管理'
+        } 
+
+
+        const _listDataDict = {
+            'model': {
+                'DEM': async () => {
+                    const _ogDEM = (await BankResourceHelper.getBankCalculateResourceList('DEM', _thisBankEnName)).data
+                    let result = this.DEMResourcetoList(_ogDEM)
+                    proxy[_proxyCategoryDICI['model']][0]['resourceList'] = result
+                },
+                'Hydrodynamic': async () => {
+                    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', _thisBankEnName)).data
+                    let result = this.HydrodynamicResourcetoList(_ogHydro)
+                    proxy[_proxyCategoryDICI['model']][1]['resourceList'] = result
+
+                },
+                'Boundary': async () => {
+                    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', _thisBankEnName)).data
+                    let result = this.BoundaryResourcetoList(_ogBound)
+                    proxy[_proxyCategoryDICI['model']][2]['resourceList'] = result
+
+                },
+                'Config': async () => {
+                    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', _thisBankEnName)).data
+                    let result = this.ConfigResourcetoList(_ogConfig)
+                    proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
+
+                }
+            },
+            'visual': {
+                'DEM': async () => {
+                    const demTileList = (await BankResourceHelper.getBankVisualResourceList('DEM', bankEnName)).data
+                    demTileList.map(item => item.fileType = '地形切片')
+                    let result = demTileList
+                    proxy[_proxyCategoryDICI['visual']][0]['resourceList'] = result
+
+                },
+                'Vector': async () => {
+                    const vectorTileList = (await BankResourceHelper.getBankVisualResourceList("vector", bankEnName)).data
+                    vectorTileList.map(item => {
+                        item.fileType = '矢量切片'
+                        item.name = item.tileName
+                    })
+                    let result = vectorTileList
+                    proxy[_proxyCategoryDICI['visual']][1]['resourceList'] = result
+                }
+            },
+            'device': {
+                'GNSS': async () => {
+                    const _GNSS = (await BankResourceHelper.getBankDeviceResourceList("GNSS", bankEnName)).data
+                    let result = _GNSS
+                    proxy[_proxyCategoryDICI['device']][0]['resourceList'] = result
+
+                },
+                'MENOMETER': async () => {
+                    const _Menometer = (await BankResourceHelper.getBankDeviceResourceList("MENOMETER", bankEnName)).data
+                    let result = _Menometer
+                    proxy[_proxyCategoryDICI['device']][1]['resourceList'] = result
+
+                },
+                'STRESS': async () => {
+                    const _Stress = (await BankResourceHelper.getBankDeviceResourceList("STRESS", bankEnName)).data
+                    let result = _Stress
+                    proxy[_proxyCategoryDICI['device']][2]['resourceList'] = result
+
+                },
+                'INCLINE': async () => {
+                    const _Incline = (await BankResourceHelper.getBankDeviceResourceList("INCLINE", bankEnName)).data
+                    let result = _Incline
+                    proxy[_proxyCategoryDICI['device']][3]['resourceList'] = result
+
+                },
+                'VEDIO': async () => {
+                    const _Vedio = (await BankResourceHelper.getBankDeviceResourceList("VEDIO", bankEnName)).data
+                    let result = _Incline
+                    proxy[_proxyCategoryDICI['device']][4]['resourceList'] = result
+                },
+            }
+        }
+
+        _listDataDict[category][type]()
+
+    }
+
+
+
+
+
+
+    ///////////////////////////////////////////// DATA PROCESS
     static toList(originalData) {
         const _list = []
         for (let i = 0; i < originalData.length; i++) {
@@ -152,7 +391,6 @@ export default class BankResourceHelper {
         return _list
     }
 
-
     static DEMResourcetoList(originalData) {
         return this.toList(originalData)
     }
@@ -168,8 +406,6 @@ export default class BankResourceHelper {
     static ConfigResourcetoList(originalData) {
         return this.toList(originalData)
     }
-
-
 
     static HydroResourceToTree(originalData, bankEnName) {
         const result = [
@@ -213,5 +449,7 @@ export default class BankResourceHelper {
         result[0].children = years
         return result
     }
+
+
 
 }

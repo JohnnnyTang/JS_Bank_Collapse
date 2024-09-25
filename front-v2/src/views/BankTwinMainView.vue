@@ -77,6 +77,7 @@
                             }"></div>
                             <span style="
                                     text-align: center;
+                                    font-size: calc(0.5vw + 0.4vh);
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
@@ -96,6 +97,7 @@
                             }"></div>
                             <span style="
                                     text-align: center;
+                                    font-size: calc(0.5vw + 0.4vh);
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
@@ -121,6 +123,7 @@
                         <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
                         <span style="
                                 text-align: center;
+                                font-size: calc(0.5vw + 0.4vh);
                                 width: 100%;
                                 display: block;
                                 line-height: 2.5vh;
@@ -537,7 +540,7 @@ const viewChangeClick = (value) => {
             setTimeout(() => {
                 threeDLoading.value = false
                 createCompIns()
-            }, 5000)
+            }, 10000)
             // map.addLayer(maskLayer)
         }
     }
@@ -1118,7 +1121,7 @@ div.twin-main-container {
                 div.item-title {
                     height: 3vh;
                     line-height: 3vh;
-
+                    font-size: calc(0.5vw + 0.4vh);
                     &:hover {
                         cursor: pointer;
                     }
@@ -1153,7 +1156,6 @@ div.twin-main-container {
 
                     .device-check-container {
                         margin-top: 0.3vh;
-
                         // font-size: 40px;
                         .input[type='checkbox'] {
                             display: none;

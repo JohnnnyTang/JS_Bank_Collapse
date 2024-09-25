@@ -83,7 +83,18 @@
                 </template>
             </el-dropdown>
 
-            <div class="user-avatar-icon" v-else></div>
+
+            <el-dropdown trigger="click" v-if="LOGIN === 'NOT' && MANAGEMENT === 'YES'">
+                <div class="user-avatar-icon"></div>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item @click="bankManageClickHandler">岸段管理</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+
+            <div class="user-avatar-icon"  v-if="LOGIN === 'NOT' && MANAGEMENT === 'NOT'"></div>
+
         </div>
     </div>
     <div class="title-header">

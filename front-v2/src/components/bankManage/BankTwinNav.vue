@@ -18,8 +18,8 @@
                         <el-menu-item v-for="bankItem in bankList" :index="'preview/' + bankItem.bank">{{ bankItem.name
                         }}</el-menu-item>
                     </el-sub-menu>
-                    <!-- <el-menu-item index="create"
-                        style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item> -->
+                    <el-menu-item index="create"
+                        style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item>
                 </el-sub-menu>
                 <el-sub-menu index="2">
                     <template #title>
@@ -114,13 +114,6 @@ const route = useRoute()
 
 const defaultActive = ref('')
 
-// const handleOpen = (key, keyPath) => {
-//     console.log(key, keyPath)
-// }
-
-// const handleClose = (key, keyPath) => {
-//     console.log(key, keyPath)
-// }
 
 const handleSelect = (index, indexPath) => {
     console.log('select', index, indexPath)
@@ -129,25 +122,25 @@ const handleSelect = (index, indexPath) => {
 
 const updateSelection = (curRoute) => {
     let pathSplit = curRoute.fullPath.split('/')
-    let selectIndex =
-        pathSplit[pathSplit.length - 2] + '/' + pathSplit[pathSplit.length - 1]
-    // console.log(selectIndex)
+    let selectIndex = pathSplit[pathSplit.length - 2] + '/' + pathSplit[pathSplit.length - 1]
+
     defaultActive.value = selectIndex
 }
 
 onBeforeRouteUpdate((to, from) => {
-    // console.log(to, from)
+
     updateSelection(to)
 })
 
 onMounted(async () => {
-    // console.log(route.params)
+
     updateSelection(route)
+
     let _bankList = (await BankResourceHelper.getBankNamesList()).data
     _bankList.forEach(bank => {
         bankList.value.push(bank)
     })
-    // console.log(bankList.value)
+
 
 })
 </script>
@@ -283,4 +276,6 @@ div.vertical-menu-container {
 
     // overflow: hidden;
 }
+
+
 </style>
