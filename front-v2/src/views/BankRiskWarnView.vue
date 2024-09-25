@@ -202,7 +202,7 @@
         </div>
 
         <div class="warn-status-container" v-if="showRiskStatus">
-            <div class="warn-status-title">民主沙右缘风险评估结果</div>
+            <div class="warn-status-title">风险评估结果</div>
             <!-- <div class="warn-status-content" :class="riskDataAll[riskDataIndex-1].value">
                 {{ riskDataAll[riskDataIndex-1].label }}
             </div> -->

@@ -18,7 +18,7 @@ let gnssOption = {
         scale: true,
         min: 0,
         max: function (value) {
-            return parseInt((value.max * 1.5)/10+1) * 10;
+            return parseInt((value.max * 1.5) / 10 + 1) * 10;
         },
         name: '土体表面位移(mm)',
         nameLocation: 'end',
@@ -161,11 +161,11 @@ let gnssRealTimeSetting = {
     yAxis: {
         scale: true,
         min: function (value) {
-            let i = parseInt((value.min / 1.1)/2-1) * 2
-            return (i<0)?0:i
+            let i = parseInt((value.min / 1.1) / 2 - 1) * 2
+            return (i < 0) ? 0 : i
         },
         max: function (value) {
-            return parseInt((value.max * 1.1)/2+1) * 2
+            return parseInt((value.max * 1.1) / 2 + 1) * 2
         },
         name: '土体表面累积位移(mm)',
         nameLocation: 'end',
@@ -195,7 +195,7 @@ let gnssLongTimeSetting = {
         scale: true,
         min: 0,
         max: function (value) {
-            return parseInt((value.max * 1.5)/10+1) * 10;
+            return parseInt((value.max * 1.5) / 10 + 1) * 10;
         },
         name: '土体表面累积位移(mm)',
         nameLocation: 'end',
@@ -292,7 +292,7 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         symbol: 'none',
         data: gnssDataInterval[3],
     }
-    if(dataMode === "实时"){
+    if (dataMode === "实时") {
         gnssOption.yAxis = gnssRealTimeSetting.yAxis
         gnssOption.dataZoom = gnssRealTimeSetting.dataZoom
         // console.log("shishi sdada")
@@ -338,7 +338,7 @@ let stressOption = {
         scale: true,
         min: 0,
         max: function (value) {
-            return parseInt((value.max * 1.2)/100+1) * 100;
+            return parseInt((value.max * 1.2) / 100 + 1) * 100;
         },
         name: '土体内部应变值(με)',
         nameLocation: 'end',
@@ -366,7 +366,7 @@ let stressRealTimeSetting = {
         scale: true,
         min: 0,
         max: function (value) {
-            return parseInt((value.max * 1.1)/50+1) * 50;
+            return parseInt((value.max * 1.1) / 50 + 1) * 50;
         },
         name: '土体表面累积位移(mm)',
         nameLocation: 'end',
@@ -396,7 +396,7 @@ let stressLongTimeSetting = {
         scale: true,
         min: 0,
         max: function (value) {
-            return parseInt((value.max * 1.2)/100+1) * 100;
+            return parseInt((value.max * 1.2) / 100 + 1) * 100;
         },
         name: '土体内部应变值(με)',
         nameLocation: 'end',
@@ -554,7 +554,7 @@ const genStressOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         symbol: 'none',
         data: dataInterval[7],
     }
-    if(dataMode === "实时"){
+    if (dataMode === "实时") {
         stressOption.yAxis = stressRealTimeSetting.yAxis
         stressOption.dataZoom = stressRealTimeSetting.dataZoom
         // console.log("shishi sdada")
@@ -595,12 +595,12 @@ let incinometerOption = {
     yAxis: {
         scale: true,
         min: function (value) {
-            if(value.min > 0) return -10
-            return parseInt((value.min * 1.5)/4-1) * 4;
+            if (value.min > 0) return -10
+            return parseInt((value.min * 1.5) / 4 - 1) * 4;
         },
         max: function (value) {
-            if(value.max < 2) return 10
-            return parseInt((value.max * 1.5)/4+1) * 4;
+            if (value.max < 2) return 10
+            return parseInt((value.max * 1.5) / 4 + 1) * 4;
         },
         name: '土体体内部位移(με)',
         nameLocation: 'end',
@@ -627,12 +627,12 @@ let incinometerRealTimeSetting = {
     yAxis: {
         scale: true,
         min: function (value) {
-            if(value.min > 0) return -4
-            return parseInt((value.min * 1.2)/2-1) * 2;
+            if (value.min > 0) return -4
+            return parseInt((value.min * 1.2) / 2 - 1) * 2;
         },
         max: function (value) {
-            if(value.max < 2) return 4
-            return parseInt((value.max * 1.2)/2+1) * 2;
+            if (value.max < 2) return 4
+            return parseInt((value.max * 1.2) / 2 + 1) * 2;
         },
         name: '土体体内部位移(με)',
         nameLocation: 'end',
@@ -661,12 +661,12 @@ let incinometerLongTimeSetting = {
     yAxis: {
         scale: true,
         min: function (value) {
-            if(value.min > 0) return -10
-            return parseInt((value.min * 1.5)/4-1) * 4;
+            if (value.min > 0) return -10
+            return parseInt((value.min * 1.5) / 4 - 1) * 4;
         },
         max: function (value) {
-            if(value.max < 2) return 10
-            return parseInt((value.max * 1.5)/4+1) * 4;
+            if (value.max < 2) return 10
+            return parseInt((value.max * 1.5) / 4 + 1) * 4;
         },
         name: '土体体内部位移(με)',
         nameLocation: 'end',
@@ -789,8 +789,8 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         symbol: 'none',
         data: dataInterval[5],
     }
-    
-    if(dataMode === "实时"){
+
+    if (dataMode === "实时") {
         incinometerOption.yAxis = incinometerRealTimeSetting.yAxis
         incinometerOption.dataZoom = incinometerRealTimeSetting.dataZoom
         // console.log("shishi sdada")
@@ -830,12 +830,12 @@ let manometerOption = {
     yAxis: {
         scale: true,
         min: function (value) {
-            if(value.min > 0) return -2
-            return parseInt((value.min * 1.5)/2-1) * 2;
+            if (value.min > 0) return -2
+            return parseInt((value.min * 1.5) / 2 - 1) * 2;
         },
         max: function (value) {
-            if(value.max < 2) return 2
-            return parseInt((value.max * 1.5)/2+1) * 2;
+            if (value.max < 2) return 2
+            return parseInt((value.max * 1.5) / 2 + 1) * 2;
         },
         name: '潜水位土体孔隙水压力(m)',
         nameLocation: 'end',
@@ -862,11 +862,11 @@ let manometerRealTimeSetting = {
     yAxis: {
         scale: true,
         min: function (value) {
-            if(value.min > 0) return 0
-            return Math.floor(value.min)-0.5;
+            if (value.min > 0) return 0
+            return Math.floor(value.min) - 0.5;
         },
         max: function (value) {
-            return Math.floor(value.max + 1)+0.5;
+            return Math.floor(value.max + 1) + 0.5;
         },
         name: '土体体内部位移(με)',
         nameLocation: 'end',
@@ -895,12 +895,12 @@ let manometerLongTimeSetting = {
     yAxis: {
         scale: true,
         min: function (value) {
-            if(value.min > 0) return -10
-            return parseInt((value.min * 1.5)/4-1) * 4;
+            if (value.min > 0) return -10
+            return parseInt((value.min * 1.5) / 4 - 1) * 4;
         },
         max: function (value) {
-            if(value.max < 2) return 10
-            return parseInt((value.max * 1.5)/4+1) * 4;
+            if (value.max < 2) return 10
+            return parseInt((value.max * 1.5) / 4 + 1) * 4;
         },
         name: '土体体内部位移(με)',
         nameLocation: 'end',
@@ -930,7 +930,9 @@ const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     let dataInterval = [[], [], []]
     let noArea = false
     deviceDataList.map(function (item) {
-        manometerOption.xAxis.data.push(item['measureTime'].replace(' ', '\n'))
+        manometerOption.xAxis.data.push(
+            item['measureTime'].replace(' ', '\n')
+        )
         dataInterval[0].push(+item['height'].toFixed(2))
         dataInterval[1].push(+(item['height'] + halfError).toFixed(2))
         if (Math.abs(item['height']) > halfError) {
@@ -988,8 +990,8 @@ const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
         symbol: 'none',
         data: dataInterval[2],
     }
-    
-    if(dataMode === "实时"){
+
+    if (dataMode === "实时") {
         manometerOption.yAxis = manometerRealTimeSetting.yAxis
         manometerOption.dataZoom = manometerRealTimeSetting.dataZoom
     }
@@ -999,6 +1001,365 @@ const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     }
     return manometerOption
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+let fiberOption = {
+    tooltip: {
+        trigger: 'axis',
+    },
+    grid: {
+        left: '2%',
+        right: '4%',
+        bottom: '10%',
+        top: '10%',
+        containLabel: true,
+    },
+    legend: {
+        right: '1%',
+        width: '60%',
+        data: [
+            { name: '微应变' },
+            { name: '微应变误差上限' },
+            { name: '微应变误差下限' },
+        ],
+    },
+    xAxis: {
+        // data: data.map(function (item) {
+        //   return item[0];
+        // })
+    },
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            if (value.min > 0) return -2
+            return parseInt((value.min * 1.5) / 2 - 1) * 2;
+        },
+        max: function (value) {
+            if (value.max < 2) return 2
+            return parseInt((value.max * 1.5) / 2 + 1) * 2;
+        },
+        name: '微应变',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+        },
+        {
+            type: 'slider',
+        },
+    ],
+    backgroundColor: 'rgba(255,255,255,1)',
+    series: [{}, {}, {}],
+}
+
+let fiberRealTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            if (value.min > 0) return 0
+            return Math.floor(value.min) - 0.5;
+        },
+        max: function (value) {
+            return Math.floor(value.max + 1) + 0.5;
+        },
+        name: '微应变',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 99,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 99,
+            end: 100,
+        },
+    ],
+}
+
+let fiberLongTimeSetting = {
+    yAxis: {
+        scale: true,
+        min: function (value) {
+            if (value.min > 0) return -10
+            return parseInt((value.min * 1.5) / 4 - 1) * 4;
+        },
+        max: function (value) {
+            if (value.max < 2) return 10
+            return parseInt((value.max * 1.5) / 4 + 1) * 4;
+        },
+        name: '微应变',
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 0,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 0,
+            end: 100,
+        },
+    ],
+}
+
+const genFiberOptionOfDevice0 = (deviceDataList, halfError, dataMode) => {
+    fiberOption.xAxis.data = []
+    let dataInterval = [[], [], []]
+    let noArea = false
+    deviceDataList.map(function (item) {
+        fiberOption.xAxis.data.push(item['measureTime'].replace(' ', '\n'))
+        dataInterval[0].push(+item['height'].toFixed(2))
+        dataInterval[1].push(+(item['height'] + halfError).toFixed(2))
+        if (Math.abs(item['height']) > halfError) {
+            noArea = true
+        }
+        dataInterval[2].push(+(item['height'] - halfError).toFixed(2))
+    })
+    // console.log('12313', dataInterval[4])
+    fiberOption.series[0] = {
+        name: '微应变',
+        type: 'line',
+        data: dataInterval[0],
+        lineStyle: {
+            opacity: 1,
+            width: 2,
+            color: '#45BF55',
+        },
+        itemStyle: {
+            color: '#45BF55',
+            opacity: 0.4,
+        },
+    }
+    fiberOption.series[1] = {
+        name: '微应变误差下限',
+        type: 'line',
+        // stack: 'error',
+        lineStyle: {
+            color: '#38D0F2',
+            opacity: 0.4,
+        },
+        // areaStyle: {
+        //     color: '#A7C5C5',
+        //     opacity: 0.2
+        // },
+        itemStyle: {
+            color: '#38D0F2',
+            borderColor: '#38D0F2',
+            opacity: 0.4,
+        },
+        symbol: 'none',
+        data: dataInterval[1],
+    }
+    fiberOption.series[2] = {
+        name: '微应变误差上限',
+        type: 'line',
+        // stack: 'error',
+        // areaStyle: {
+        //     color: '#A7C5C5',
+        //     opacity: 0.2
+        // },
+        lineStyle: {
+            color: '#38D0F2',
+            opacity: 0.4,
+        },
+        symbol: 'none',
+        data: dataInterval[2],
+    }
+
+    if (dataMode === "实时") {
+        fiberOption.yAxis = fiberRealTimeSetting.yAxis
+        fiberOption.dataZoom = fiberRealTimeSetting.dataZoom
+    }
+    else {
+        fiberOption.yAxis = fiberLongTimeSetting.yAxis
+        fiberOption.dataZoom = fiberLongTimeSetting.dataZoom
+    }
+    return fiberOption
+}
+
+const genFiberOptionOfDevice = (deviceDataList, halfError, dataMode) => {
+    var option = {
+        title: {
+            text: '距离为1050m处',
+            left:'2%'
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: ['微应变'],
+            top: '3%',
+            right: '20%',
+        },
+        grid: {
+            left: '2%',
+            right: '8%',
+            bottom: '10%',
+            top: '15%',
+            containLabel: true,
+        },
+        xAxis: {
+            name: '时间',
+            type: 'category',
+            boundaryGap: false,
+            data: ['2024-08-14', '2024-08-15', '2024-08-16', '2024-08-17', '2024-08-18',
+                   '2024-08-19', '2024-08-20', '2024-08-21', '2024-08-22', '2024-08-23', 
+                   '2024-08-24', '2024-08-25', '2024-08-26', '2024-08-27', '2024-08-28', 
+                   '2024-08-29', '2024-08-30', '2024-08-31', '2024-09-01', '2024-09-02', 
+                   '2024-09-03', '2024-09-04', '2024-09-05', '2024-09-06'],
+            axisLabel: {
+                // 使用formatter函数来自定义标签的显示格式
+                formatter: function(value) {
+                    // 将标签值按照指定的位置进行换行
+                    return value + '\n14:00:00';
+                }
+            }
+        },
+        yAxis: {
+            name: '微应变',
+            type: 'value',
+            scale: true,
+            nameLocation: 'end',
+            nameTextStyle: {
+                fontSize: 13,
+                align: 'left',
+                verticalAlign: 'top',
+                fontWeight: 'bold',
+            },
+        },
+        backgroundColor: 'rgba(255,255,255,1)',
+        dataZoom: [
+            {
+                type: 'inside',
+                start: 80,
+                end: 100,
+            },
+            {
+                type: 'slider',
+                start: 80,
+                end: 100,
+            },
+        ],
+        visualMap: [
+            {
+                show: false,
+                top: '4%',
+                right: '2%',
+                itemHeight: '20',
+                itemWidth: '28',
+                seriesIndex: 2,
+                pieces: [
+                    {
+                        gt: 0,
+                        lte: 35,
+                        color: '#45BF55',
+                    },
+                    {
+                        gt: 35,
+                        lte: 50,
+                        color: '#FF8E00',
+                    },
+                    {
+                        gt: 50,
+                        color: '#FD0100',
+                    },
+                ],
+                outOfRange: {
+                    color: '#999',
+                },
+                formatter: '{value}~{value2}',
+                orient: 'horizontal',
+                align: 'left',
+                // textGap: 20,
+                itemGap: 20,
+                textStyle: {
+                    fontFamily: 'Times',
+                    fontWeight: 'bold',
+                },
+            },
+            {
+                show: false,
+                seriesIndex: 1,
+                pieces: [
+                    {
+                        gt: 35,
+                        lte: 50,
+                        color: '#FF8E00',
+                    },
+                    {
+                        gt: 50,
+                        color: '#FD0100',
+                    },
+                ],
+                outOfRange: {
+                    color: 'rgb(163,163,163)',
+                },
+            },
+        ],
+        series: [
+            {
+                name: '微应变',
+                // 添加 lineStyle 并设置 clickable 为 true
+                lineStyle: {
+                    normal: {
+                        width: 2,
+                    }
+                },
+                clickable: true, // 设置折点可点击
+                data: [0.46,0.26,0.94,0.94,2.2,2.66,2.46,1.8,1.6,1.86,1.66,1.34,
+                       1.14,1.8,2.54,3.14,2.74,2.14,1.74,0.4,0.26,-0.46,0.46,0.66,-0.46],
+                type: 'line',
+                markLine: {
+                    silent: true,
+                    lineStyle: {
+                        color: '#333',
+                        width: 2,
+                        opacity: 0.75,
+                    },
+                }
+            }
+        ]
+    };
+
+    // option.xAxis.data = []
+    // deviceDataList.map(function (item) {
+    //     option.xAxis.data.push(
+    //         item['measureTime'] ? item['measureTime'].replace(' ', '\n') : null,
+    //     )
+    // })
+
+    return option
+}
+
+
+
+
 
 const dataModeOptionMap = {
     位移测量站: {
@@ -1017,6 +1378,10 @@ const dataModeOptionMap = {
         实时: stressRealTimeSetting,
         长期: stressLongTimeSetting,
     },
+    分布式光纤: {
+        实时: fiberRealTimeSetting,
+        长期: fiberLongTimeSetting,
+    },
 }
 
 const toggleOptionDataMode = (option, deviceType, dataMode) => {
@@ -1030,5 +1395,6 @@ export {
     genStressOptionOfDevice,
     genIncinometerOptionOfDevice,
     genManometerOptionOfDevice,
+    genFiberOptionOfDevice,
     toggleOptionDataMode
 }

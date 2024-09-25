@@ -1,5 +1,5 @@
 server:
-  port: 18989
+  port: 8989
 
 spring:
   data:
@@ -50,14 +50,13 @@ staticData:
   waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
 
 waterCondition:
-  tideUrl: http://10.32.22.202:8001/jssqApi/v1/tide
-  flowUrl: http://10.32.22.202:8001/jssqApi/v1/river
+  url: http://10.32.22.202:8001
 
 flowData:
   texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/
 
 modelServer:
-  url: http://172.21.212.44:8000
+  url: http://172.21.212.166:8000
   storageLimit: 50
   caseLimit: 50
 

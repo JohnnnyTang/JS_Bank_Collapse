@@ -206,6 +206,11 @@
             <artifactId>spring-test</artifactId>
             <version>6.1.1</version>
         </dependency>
+<!--        -->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
     <repositories>
         <repository>

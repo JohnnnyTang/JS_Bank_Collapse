@@ -328,6 +328,52 @@ public class InternetUtil {
         }
     }
 
+    public static String doPost_waterCondition(String url, JSONObject body) {
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+            connection.setRequestProperty("X-Data-AppKey", "MFkwEwYHKoZIzj0CAQYIKoEcz1UBgi0DQgAE2O9HiNkUihPwMyyyMkyVhuNfZOmJAfs04P13G1Z59T7aesRmUybJQOmGC7YKuBP8w6M1Hyo2nkDEPMagm0+Rbg==");
+            connection.setRequestProperty("X-Data-Secret", "MIGTAgEAMBMGByqGSM49AgEGCCqBHM9VAYItBHkwdwIBAQQg9lVDY6TIXeo6jX08+fiRmFGhugEKIt4CrSB2ShCQG0ugCgYIKoEcz1UBgi2hRANCAATY70eI2RSKE/AzLLIyTJWG419k6YkB+zTg/XcbVnn1Ptp6xGZTJslA6YYLtgq4E/zDozUfKjaeQMQ8xqCbT5Fu");
+            // 设置超时时间为10s
+            connection.setConnectTimeout(60000);
+            connection.setReadTimeout(60000);
+
+            // Send post request
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                wr.write(body.toString().getBytes(StandardCharsets.UTF_8));
+                wr.flush();
+            }
+
+            int responseCode = connection.getResponseCode();
+            StringBuilder response = new StringBuilder();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                }
+            } else {
+                log.error("POST request failed with response code " + responseCode);
+            }
+
+            connection.disconnect();
+            return response.toString();
+
+        } catch (Exception e) {
+            if (e instanceof java.net.SocketTimeoutException) {
+                return "Connection timed out: " + e.getMessage();
+            } else {
+                return "Error during POST request: " + e.getMessage();
+            }
+        }
+    }
+
     public static byte[] doPost_Byte(String url, JSONObject body) {
         try {
             URL obj = new URL(url);
