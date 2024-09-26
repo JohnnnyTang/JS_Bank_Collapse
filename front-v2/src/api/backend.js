@@ -87,8 +87,8 @@ export default class BackEndRequest {
 
     static getMonitorInfo() {
         let bank = useBankNameStore().globalBankName
-        return newBackendInstance.get(`/data/bank/${bank}/monitorInfo`)     //v2版本
         // return backendInstance.get('/data/monitorInfo')  //v1版本
+        return newBackendInstance.get(`/data/bank/${bank}/monitorInfo`)     //v2版本
     }
 
 ///////////////////////////////////////////////////////
