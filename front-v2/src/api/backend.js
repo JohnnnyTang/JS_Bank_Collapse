@@ -124,7 +124,7 @@ static getSpecMonitorInfo(type) {
 }
 
 ///////////////////////////////////////////////////////
-    //v1版本    ChartData.js调用
+    //v1版本    ChartData.js调用————解决
     // static getMonitorDetailByType_Code(code, type) {
     //     //data
     //     switch (type) {
