@@ -263,7 +263,7 @@ const deviceStatusDataList = ref([
     { name: '应力桩', count: 7, time: '2024', freq: '1分钟' },
     { name: '孔隙水压力计', count: 9, time: '2024', freq: '1小时' },
     { name: '测斜仪', count: 9, time: '2024', freq: '1小时' },
-    { name: '分布式光纤', count: 1, time: '2024', freq: '1小时' },
+    // { name: '分布式光纤', count: 1, time: '2024', freq: '1小时' },
     // { name: '视频监控', count: 3, time: '2024', freq: '实时' },
 ])
 
@@ -317,9 +317,9 @@ const deviceListMap = {
         'YL-06',
         'YL-07'
     ],
-    分布式光纤: [
-        'GX-01'
-    ],
+    // 分布式光纤: [
+    //     'GX-01'
+    // ],
 }
 
 const deviceTypeNameMap = {
@@ -327,7 +327,7 @@ const deviceTypeNameMap = {
     测斜仪: 'inclinometer',
     孔隙水压力计: 'manometer',
     应力桩: 'stress',
-    分布式光纤: 'fiber',
+    // 分布式光纤: 'fiber',
 }
 
 const deviceTypeErrorMap = {
@@ -335,7 +335,7 @@ const deviceTypeErrorMap = {
     测斜仪: 3,
     孔隙水压力计: 0.2,
     应力桩: 40,
-    分布式光纤: 1,
+    // 分布式光纤: 1,
 }
 
 const deviceIdMap = {
@@ -374,7 +374,6 @@ const deviceIdMap = {
     'CX-07': 'MZS120.51738292_32.04054923_4',
     'CX-08': 'MZS120.51749021_32.04053105_4',
     'CX-09': 'MZS120.51957026_32.04008655_4',
-    // 'GX-01': 'MZS120_32',
 }
 
 const deviceTypeTimeMap = {
@@ -406,13 +405,13 @@ const deviceTypeTimeMap = {
         realTimeUnit: 'hour',
         freq: '1分钟',
     },
-    分布式光纤: {
-        timeUnit: 'hour',
-        timeCount: 3,
-        realTimeCount: 6,
-        realTimeUnit: 'hour',
-        freq: '1小时',
-    },
+    // 分布式光纤: {
+    //     timeUnit: 'hour',
+    //     timeCount: 3,
+    //     realTimeCount: 6,
+    //     realTimeUnit: 'hour',
+    //     freq: '1小时',
+    // },
 }
 
 const selectedDeviceType = ref('位移测量站')
@@ -431,7 +430,8 @@ const sectionClassColorMap = ref({
     统计: 'all',
 })
 
-const deviceTypeList = ref(['位移测量站', '应力桩', '孔隙水压力计', '测斜仪', '分布式光纤'])
+const deviceTypeList = ref(['位移测量站', '应力桩', '孔隙水压力计', '测斜仪'])
+// const deviceTypeList = ref(['位移测量站', '应力桩', '孔隙水压力计', '测斜仪', '分布式光纤'])
 
 const getIframeUrl = (item) => {
     return item.videoUrl + token.value
@@ -579,14 +579,14 @@ let deviceOptionMap = {
     测斜仪: {},
     孔隙水压力计: {},
     应力桩: {},
-    分布式光纤: {},
+    // 分布式光纤: {},
 }
 let deviceGenOptionMap = {
     位移测量站: genGnssOptionOfDevice,
     测斜仪: genIncinometerOptionOfDevice,
     孔隙水压力计: genManometerOptionOfDevice,
     应力桩: genStressOptionOfDevice,
-    分布式光纤: genFiberOptionOfDevice,
+    // 分布式光纤: genFiberOptionOfDevice,
 }
 
 const changeDeviceType = (deviceName) => {
@@ -1325,7 +1325,7 @@ div.device-info-container {
 
                 div.device-status-row {
                     height: 100%;
-                    width: 20%;
+                    width: 24%;
                     border-radius: 2px;
 
                     // background-color: #2622fd;
