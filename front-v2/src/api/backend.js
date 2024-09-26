@@ -9,11 +9,11 @@ import { useBankInfoStore } from '../store/bankInfoStore';
 //v1前缀
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
+    baseURL: '/api',        
 })
 //v2前缀
 const newBackendInstance = axios.create({
-    baseURL: '/model/'      //v2版本api前缀
+    baseURL: '/model/'      
 })
 
 // const bankNameStore = useBankNameStore()
@@ -51,7 +51,7 @@ if (login === 'YES') {
 export default class BackEndRequest {
     static getDataNodeTree() {
         // return instance.get(Vue.prototype.reqURL + "/user/hello")
-        return backendInstance.get('/dataNode/tree')
+        return backendInstance.get('/dataNode/tree')           //  v1版本
         // return newBackendInstance.get('dataNode/tree')      //  v2版本, status 500 internal server error
     }
 
@@ -63,9 +63,9 @@ export default class BackEndRequest {
         console.log(url)
 
         if (apiInfo[apiInfo.length - 1] != 'Item') {
-            return backendInstance.get(url)
+            return backendInstance.get(url)      //  v1版本
         } else {
-            return backendInstance.get(url + '/id/' + dataNode.linkCode)
+            return backendInstance.get(url + '/id/' + dataNode.linkCode)         //  v1版本
         }
     }
 
@@ -88,23 +88,13 @@ export default class BackEndRequest {
     static getMonitorInfo() {
         let bank = useBankNameStore().globalBankName
         // return backendInstance.get('/data/monitorInfo')  //v1版本
-        return newBackendInstance.get(`/data/bank/${bank}/monitorInfo`)     //v2版本
+        return newBackendInstance.get(`/data/bank/${bank}/monitorInfo`)     //v2版本————解决
     }
 
-///////////////////////////////////////////////////////
-    static test() {
-        let url = '/api/v2/data/bank/Mzs/monitorData'
-        const params = {
-            bank: 'Mzs',
-            timeUnit: 'hour',
-            deviceCode: '123',
-            dur: 3
-        }
-       return backendInstance.get(url,params)
-    }
+
 ///////////////////////////////////////////////////////
 
-//设备概述信息！！！！  v1版本
+//设备概述信息！！！！  v1版本————未使用
 // static getSpecMonitorInfo(type) {
 //     switch (type) {
 //         case '1':
@@ -134,7 +124,7 @@ static getSpecMonitorInfo(type) {
 }
 
 ///////////////////////////////////////////////////////
-    //v1版本    与ChartData.js耦合
+    //v1版本    ChartData.js调用
     static getMonitorDetailByType_Code(code, type) {
         //data
         switch (type) {
@@ -167,42 +157,41 @@ static getSpecMonitorInfo(type) {
             }
         }
     }
-
-    static getMonitorInfoByType_Code(code, type) {
-        //desc
-        switch (type) {
-            case '1': {
-                return new Promise((resolve) => {
-                    resolve({ data: { pointNum: 0 } })
-                })
-                // return backendInstance.get(`/data/gnssInfo/id/${code}`)
-            }
-            case '2': {
-                return backendInstance.get(`/data/inclinometerInfo/id/${code}`)
-            }
-            case '3': {
-                return backendInstance.get(`/data/manometerInfo/id/${code}`)
-            }
-            case '4': {
-                return backendInstance.get(`/data/stressInfo/id/${code}`)
-            }
-        }
-    }
-
-    // //v2版本 
+    //v2版本 
     static getMonitorDataByCode(deviceCode) {
         let bank = useBankNameStore().globalBankName
         return newBackendInstance.get(`/data/bank/${bank}/monitorData/hour/5/device/${deviceCode}/`)
     }
 
+    //v1版本————未使用    
+    // static getMonitorInfoByType_Code(code, type) {
+    //     //desc
+    //     switch (type) {
+    //         case '1': {
+    //             return new Promise((resolve) => {
+    //                 resolve({ data: { pointNum: 0 } })
+    //             })
+    //             // return backendInstance.get(`/data/gnssInfo/id/${code}`)
+    //         }
+    //         case '2': {
+    //             return backendInstance.get(`/data/inclinometerInfo/id/${code}`)
+    //         }
+    //         case '3': {
+    //             return backendInstance.get(`/data/manometerInfo/id/${code}`)
+    //         }
+    //         case '4': {
+    //             return backendInstance.get(`/data/stressInfo/id/${code}`)
+    //         }
+    //     }
+    // }
+    //v2版本 
     static getMonitorInfoByCode(id) {
         let bank = useBankNameStore().globalBankName
         return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/id/${id}`)
     }
 
 ///////////////////////////////////////////////////////
-
-    //v1版本    与RealtimeStatus.vue耦合
+    //v1版本    RealtimeStatus.vue调用————解决
     // static getMonitorDataByTypeIdWithTime(typeStr, id, timeUnit, timeCount) {
     //     return backendInstance.get(
     //         `/data/${typeStr}Data/${timeUnit}/${timeCount}/device/${id}`,
@@ -216,7 +205,7 @@ static getSpecMonitorInfo(type) {
         )
     }
 
-    //v1版本    与RealtimeStatus.vue耦合————解决
+    //v1版本    RealtimeStatus.vue调用————未使用
     // static getAllTypeMonitorNewestData() {
     //     return axios.all([
     //         backendInstance.get('/data/gnssData/newest'),
@@ -236,7 +225,7 @@ static getSpecMonitorInfo(type) {
         ])
     }
 
-    //v1版本    与RealtimeStatus.vue耦合————解决
+    //v1版本    RealtimeStatus.vue调用————解决
     // static getDeviceNewestData(deviceType, deviceId) {
     //     return backendInstance.get(`/data/${deviceType}Data/newest/device/${deviceId}`)
     // }
@@ -246,7 +235,7 @@ static getSpecMonitorInfo(type) {
         return newBackendInstance.get(`/data/bank/${bank}/monitorData/newest/device/${deviceCode}`)
     }
 
-    //v1版本    与BankVideo.vue耦合————解决
+    //v1版本    BankVideo.vue调用————解决
     // static getVideoDeviceInfo() {
     //     return backendInstance.get('/data/monitorInfo/type/6')
     // }

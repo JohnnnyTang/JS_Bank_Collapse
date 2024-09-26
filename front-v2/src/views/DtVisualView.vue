@@ -814,7 +814,7 @@ const prepareMap = async () => {
     // })
     window.addEventListener('keydown', (e) => {
         const styleJson = mapInstance.getStyle();
-        console.log(styleJson)
+        // console.log(styleJson)
     })
     return mapInstance
 }
