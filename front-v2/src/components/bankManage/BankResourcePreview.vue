@@ -387,8 +387,8 @@ onMounted(async () => {
     })
     // for refresh
     watch(() => resourceStore.resourceInfo, (newVal, oldVal) => {
-        console.log(newVal, oldVal)
-        console.log('should update')
+        // do refresh
+        resourceInfo.value = toRaw(newVal)
     })
 
 })

@@ -1,7 +1,22 @@
+const nodataGraphic = {
+    type: 'text',
+    left: 'center', // 居中
+    top: 'center', // 居中
+    style: {
+        text: '暂无数据',
+        textAlign: 'center',
+        fill: '#222222',
+        fontSize: 22
+    },
+    invisible: false
+}
+
+
 let gnssOption = {
     tooltip: {
         trigger: 'axis',
     },
+    graphic: nodataGraphic,
     grid: {
         left: '2%',
         right: '4%',
@@ -223,6 +238,10 @@ let gnssLongTimeSetting = {
 const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     gnssOption.xAxis.data = []
     let gnssDataInterval = [[], [], [], []]
+
+    deviceDataList.length ? gnssOption.graphic.invisible = true : gnssOption.graphic.invisible = false
+
+
     deviceDataList.map(function (item) {
         gnssOption.xAxis.data.push(
             item['measureTime'] ? item['measureTime'].replace(' ', '\n') : null,
@@ -310,6 +329,7 @@ let stressOption = {
     tooltip: {
         trigger: 'axis',
     },
+    graphic: nodataGraphic,
     grid: {
         left: '2%',
         right: '4%',
@@ -424,6 +444,9 @@ let stressLongTimeSetting = {
 const genStressOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     stressOption.xAxis.data = []
     let dataInterval = [[], [], [], [], [], [], [], []]
+
+    deviceDataList.length ? stressOption.graphic.invisible = true : stressOption.graphic.invisible = false
+
     deviceDataList.map(function (item) {
         stressOption.xAxis.data.push(
             item['measureTime'] ? item['measureTime'].replace(' ', '\n') : null,
@@ -570,6 +593,7 @@ let incinometerOption = {
     tooltip: {
         trigger: 'axis',
     },
+    graphic: nodataGraphic,
     grid: {
         left: '2%',
         right: '4%',
@@ -695,6 +719,9 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     incinometerOption.xAxis.data = []
     let dataInterval = [[], [], [], [], [], []]
     let noArea = false
+    
+    deviceDataList.length ? incinometerOption.graphic.invisible = true : incinometerOption.graphic.invisible = false
+
     deviceDataList.map(function (item) {
         incinometerOption.xAxis.data.push(
             item['measureTime'].replace(' ', '\n'),
@@ -806,6 +833,7 @@ let manometerOption = {
     tooltip: {
         trigger: 'axis',
     },
+    graphic: nodataGraphic,
     grid: {
         left: '2%',
         right: '4%',
@@ -929,6 +957,10 @@ const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     manometerOption.xAxis.data = []
     let dataInterval = [[], [], []]
     let noArea = false
+    
+    deviceDataList.length ? manometerOption.graphic.invisible = true : manometerOption.graphic.invisible = false
+
+
     deviceDataList.map(function (item) {
         manometerOption.xAxis.data.push(
             item['measureTime'].replace(' ', '\n')
@@ -1207,7 +1239,7 @@ const genFiberOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     var option = {
         title: {
             text: '距离为1050m处',
-            left:'2%'
+            left: '2%'
         },
         tooltip: {
             trigger: 'axis'
@@ -1229,13 +1261,13 @@ const genFiberOptionOfDevice = (deviceDataList, halfError, dataMode) => {
             type: 'category',
             boundaryGap: false,
             data: ['2024-08-14', '2024-08-15', '2024-08-16', '2024-08-17', '2024-08-18',
-                   '2024-08-19', '2024-08-20', '2024-08-21', '2024-08-22', '2024-08-23', 
-                   '2024-08-24', '2024-08-25', '2024-08-26', '2024-08-27', '2024-08-28', 
-                   '2024-08-29', '2024-08-30', '2024-08-31', '2024-09-01', '2024-09-02', 
-                   '2024-09-03', '2024-09-04', '2024-09-05', '2024-09-06'],
+                '2024-08-19', '2024-08-20', '2024-08-21', '2024-08-22', '2024-08-23',
+                '2024-08-24', '2024-08-25', '2024-08-26', '2024-08-27', '2024-08-28',
+                '2024-08-29', '2024-08-30', '2024-08-31', '2024-09-01', '2024-09-02',
+                '2024-09-03', '2024-09-04', '2024-09-05', '2024-09-06'],
             axisLabel: {
                 // 使用formatter函数来自定义标签的显示格式
-                formatter: function(value) {
+                formatter: function (value) {
                     // 将标签值按照指定的位置进行换行
                     return value + '\n14:00:00';
                 }
@@ -1332,8 +1364,8 @@ const genFiberOptionOfDevice = (deviceDataList, halfError, dataMode) => {
                     }
                 },
                 clickable: true, // 设置折点可点击
-                data: [0.46,0.26,0.94,0.94,2.2,2.66,2.46,1.8,1.6,1.86,1.66,1.34,
-                       1.14,1.8,2.54,3.14,2.74,2.14,1.74,0.4,0.26,-0.46,0.46,0.66,-0.46],
+                data: [0.46, 0.26, 0.94, 0.94, 2.2, 2.66, 2.46, 1.8, 1.6, 1.86, 1.66, 1.34,
+                    1.14, 1.8, 2.54, 3.14, 2.74, 2.14, 1.74, 0.4, 0.26, -0.46, 0.46, 0.66, -0.46],
                 type: 'line',
                 markLine: {
                     silent: true,

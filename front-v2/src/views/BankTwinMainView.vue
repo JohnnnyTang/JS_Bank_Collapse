@@ -5,7 +5,7 @@
             <div class="nav-manage-text">监测详情</div>
             <div class="nav-arrow-icon"></div>
         </div> -->
-        <div class="visual-tab-container">
+        <div class="visual-tab-container" v-if="showViewButton">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
                 <!-- <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
                     @change="viewChangeClick"></e-tab> -->
@@ -15,7 +15,7 @@
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
-        <RealtimeStatusVue :domHide="domHideMap.status" :device-type="currentDeviceType" />
+        <RealtimeStatusVue :domHide="domHideMap.status" :device-type="currentDeviceType" :show-vedio="showVedio" />
         <!-- <RealtimeVideoVue :active="!warnActive" :domHide="domHideMap.video" /> -->
         <!-- <SectionRisk />
         <DeviceWarn /> -->
@@ -180,24 +180,16 @@
 </template>
 
 <script setup>
-// import router from '../router'
+
 import {
-    onMounted,
-    ref,
-    onUnmounted,
-    watch,
-    computed,
-    nextTick,
-    createApp,
+    onMounted, ref, onUnmounted, watch, computed, nextTick, createApp
 } from 'vue'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
-// import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
-import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
-import axios from 'axios'
 import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
 import {
     mapInit,
@@ -205,38 +197,29 @@ import {
     removeDeviceClickEvent,
     deviceOnClick,
 } from '../components/bankManage/mapInit'
-// test bank3d popUP
-// import threedVue from '../components/bankTwin/threedPopup.vue'
 import threeDdevice from '../components/bankTwin/threeDdevice.vue'
 
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
+import { useBankNameStore } from '../store/bankNameStore'
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
-import { initPureScratchMap } from '../utils/mapUtils'
-// import { init } from 'echarts'
+import { initPureScratchMap, refreshMap } from '../utils/mapUtils'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const route = useRoute()
 const containerDom = ref(null)
 const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const unityCanvaDom = ref()
 const mapDom = ref()
 const warnActive = ref(true)
+
+const showVedio = ref(false)
+const showViewButton = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
 const currentDeviceType = ref('位移测量站')
-////////DEBUG
-// window.addEventListener('keydown', (e) => {
-//     if (e.key === '1') {
-//         // currentDeviceType.value = '位移测量站'
-//         warnActive.value = true
-//     } else if (e.key === '2') {
-//         // currentDeviceType.value = '应力桩'
-//         warnActive.value = false
-//     }
-
-// })
 
 const detailLoading = ref(false)
 const warnLoading = ref(true)
@@ -244,13 +227,9 @@ const warnLoading = ref(true)
 const threeDLoading = ref(false)
 const deviceShowing = ref([true, true, true, true, true, true])
 
-// mapboxgl.accessToken =
-//     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 let map = null
 const warnInfoStore = useWarnInfoStore()
-// const token = ref(
-//     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
-// )
+
 const statusText = ref('正常')
 
 const domHideMap = ref({
@@ -317,7 +296,7 @@ const legendList = [
         text2: '监测',
         device: '测斜仪',
     },
-////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // {
     //     icon: '/icons/测斜仪.png',
     //     text1: '土体',
@@ -325,7 +304,7 @@ const legendList = [
     //     text2: '监测',
     //     device: '分布式光纤',
     // },
-////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     {
         icon: '/icons/视频监控.png',
         text1: '  ',
@@ -379,11 +358,11 @@ const deviceNameMap = {
         'MZS120.548925_32.029361_2': 'YL-06',
         'MZS120.552209_32.028149_2': 'YL-07',
     },
-////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     分布式光纤: {
         'MZS120_32_5': 'GX-01',
     },
-////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 const gnssIdSectionMap = {
@@ -625,6 +604,7 @@ const updateWarnInfoDesc = async (warnInfo) => {
     }
 }
 
+
 watch(
     () => warnInfoStore.warnInfo,
     (newV, oldV) => {
@@ -646,22 +626,36 @@ watch(
     },
 )
 
+// 岸段切换
+onBeforeRouteUpdate((to, from) => {
+
+    useBankNameStore().globalBankName = to.params.id
+    if (useBankNameStore().globalBankName === 'Mzs') {
+        showVedio.value = true
+        showViewButton.value = true
+    } else {
+        showVedio.value = false
+        showViewButton.value = false
+    }
+    // refreshMap(useMapStore().getMap())
+    mapInit(useMapStore().getMap(), true)
+
+})
+
 onMounted(async () => {
     // setTimeout(() => {
     //     warnActive.value = true
     // }, 3000)
-    // map = new mapboxgl.Map({
-    //     container: 'map', // container ID
-    //     accessToken:
-    //         'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-    //     style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-    //     center: [120.542, 32.036], // starting position [lng, lat]
-    //     zoom: 8, // starting zoom
-    //     bounds: [
-    //         [114.36611654985586, 30.55501729652339],
-    //         [124.5709218840081, 35.31358005439914],
-    //     ],
-    // })
+    // console.log(route.params.id)
+    useBankNameStore().globalBankName = route.params.id
+    if (useBankNameStore().globalBankName === 'Mzs') {
+        showVedio.value = true
+        showViewButton.value = true
+    } else {
+        showVedio.value = false
+        showViewButton.value = false
+    }
+
     //////////return loaded Map
     map = await initPureScratchMap(mapDom.value)
     // map = await initBaseMap(mapDom.value)
@@ -673,27 +667,7 @@ onMounted(async () => {
 
     useMapStore().setMap(map)
     await mapInit(map, true)
-    map.addSource('zjgLine', {
-        type: 'vector',
-        tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
-    })
 
-    map.addLayer({
-        id: 'zjgBridge',
-        type: 'line',
-        source: 'zjgLine',
-        'source-layer': 'default',
-        layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-        },
-        paint: {
-            'line-opacity': 0.6,
-            // 'line-pattern': 'test',
-            'line-color': 'rgb(183, 189, 183)',
-            'line-width': 2.0,
-        },
-    })
 
     // const videoAccessKey = (await axios.post(
     //     'https://open.ys7.com/api/lapp/token/get?appKey=d228a2fab09d4c879b4449c356bbd90d&appSecret=0c46042ef59aed43c4eddbb80d637369',
@@ -917,6 +891,7 @@ div.twin-main-container {
                         &.is-active {
                             .el-radio-button__inner {
                                 color: white;
+
                                 &::after {
                                     content: '';
                                     position: absolute;
@@ -950,6 +925,7 @@ div.twin-main-container {
                             border: none;
                             border-radius: 10px;
                             color: rgb(184, 184, 184);
+
                             &:hover {
                                 font-weight: 800;
                                 font-size: calc(0.5vw + 0.5vh);
@@ -1136,6 +1112,7 @@ div.twin-main-container {
                     height: 3vh;
                     line-height: 3vh;
                     font-size: calc(0.5vw + 0.4vh);
+
                     &:hover {
                         cursor: pointer;
                     }
@@ -1170,6 +1147,7 @@ div.twin-main-container {
 
                     .device-check-container {
                         margin-top: 0.3vh;
+
                         // font-size: 40px;
                         .input[type='checkbox'] {
                             display: none;

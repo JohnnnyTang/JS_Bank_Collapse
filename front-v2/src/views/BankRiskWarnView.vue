@@ -115,14 +115,14 @@
     </div> -->
         <div class="basic-info-container">
             <div class="basic-info-content">
-                <div class="title-container">民主沙右缘示范段</div>
+                <div class="title-container">{{ bankBCInfo.name }}示范段</div>
                 <div class="key-val-container">
                     <div class="key-text">预警级别：</div>
-                    <div class="val-text">Ⅰ级</div>
+                    <div class="val-text">{{ bankBCInfo.riskLevel }}</div>
                 </div>
                 <div class="key-val-container right">
                     <div class="key-text">岸段长度：</div>
-                    <div class="val-text">全长7公里</div>
+                    <div class="val-text">全长{{ bankBCInfo.monitorLength }}</div>
                 </div>
             </div>
         </div>
@@ -177,7 +177,7 @@
             </div>
         </div>
 
-        <div class="terrain-control-block">
+        <div class="terrain-control-block" v-if="showTerrain3DControl">
             <label class="switch">
                 <input type="checkbox" :checked="showTerrain" @click="TerrainControlHandler()" />
                 <span class="slider"></span>
@@ -214,7 +214,7 @@
                     <span class="warn-detail-span"> </span>
                     {{ totalResult.desc }}区域 :
                     <span class="warn-detail-span">{{
-                        riskAreas
+                        riskAreas.length === 0 ? '暂无' : riskAreas
                     }}</span>
                 </div>
             </div>
@@ -494,8 +494,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw,
+import {
+    onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw,
 } from 'vue'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -504,7 +506,7 @@ import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
-import { initPureScratchMap } from '../utils/mapUtils'
+import { addBankLayer, initPureScratchMap, refreshMap } from '../utils/mapUtils'
 // import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask'
 import FlowFieldLayer from '../utils/WebGL/notSimpleLayer'
 import TerrainLayer from '../utils/WebGL/terrainLayer'
@@ -512,7 +514,7 @@ import TerrainLayer from '../utils/WebGL/terrainLayer'
 import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer'
 import { useMapStore } from '../store/mapStore'
 import * as echarts from 'echarts'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElNotification, dayjs } from 'element-plus'
 import axios from 'axios'
 import { filterFields } from 'element-plus/es/components/form/src/utils'
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
@@ -538,6 +540,8 @@ import { runRiskLevelForAll, riskWarnResultParse } from '../components/bankRiskW
 // import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
 import ClientStorageHelper from '../utils/ClientStorageHelper';
 import { getRealTimeFlowAndLevelData } from '../api/realtimeWaterCondition';
+import { useBankNameStore } from '../store/bankNameStore'
+import BackEndRequest from '../api/backend'
 
 const curActiveIndex = ref(-1)
 
@@ -575,6 +579,8 @@ const geologyAndProjectVue = defineAsyncComponent(
     () => import('../components/bankRiskWarn/GeologyAndProject.vue'),
 )
 
+const route = useRoute()
+
 // const activeStatus = ref([true, false, false])
 // 地图与基本信息展示
 const loading_message = ref('自定义断面信息计算中...')
@@ -597,52 +603,6 @@ const infoTreeData = ref(InfoTree)
 
 
 const nowWaterConditionType = ref('洪季')
-let DryflowLayer
-let FloodflowLayer
-let dryflow = {
-    layer: null,
-    layerId: null,
-    currentResourcePointer: 0,
-    watcher: null,
-}
-let floodflow = {
-    layer: null,
-    layerId: null,
-    currentResourcePointer: 0,
-    watcher: null,
-}
-const waterTableData = [
-    {
-        station: '大通站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '南京站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '镇江站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '三江营站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '江阴站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '徐六泾站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-]
 
 const conditionChangeHandler = (lable) => {
     nowWaterConditionType.value = lable
@@ -660,13 +620,13 @@ const conditionChangeHandler = (lable) => {
         }
     }
 
-    if (map.getLayer('dryFlow')) {
-        map.removeLayer('dryFlow')
-        if (dryWatcher) {
-            dryWatcher()
-            dryWatcher = null
-        }
-    }
+    // if (map.getLayer('dryFlow')) {
+    //     map.removeLayer('dryFlow')
+    //     if (dryWatcher) {
+    //         dryWatcher()
+    //         dryWatcher = null
+    //     }
+    // }
 }
 
 const mapFlyToRiver = (mapIns) => {
@@ -702,23 +662,27 @@ const mapJumpToRiver = (mapIns) => {
 
 /////////////// 初始岸段资源获取
 const demResources = ref([])
-const getDemResource = async () => {
-    const _bankEnName = 'Mzs'
+const getDemResource = async (bankEnName) => {
+    const _bankEnName = bankEnName
     const _demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', _bankEnName)).data
-    console.log('getDemResource', _demData)
     return BankResourceHelper.DEMResourcetoList(_demData)
     // return [{ name: '1' }, { name: '2' }]
 }
-
+const bankBCInfo = ref({
+    name: '',
+    riskLevel: '',
+    monitorLength: '',
+})
 
 // totalResult
 const styleMap = {
     '低风险': 'low',
     '中风险': 'middle',
-    '高风险': 'high'
+    '高风险': 'high',
+    '暂无': 'none',
 }
 const totalResult = reactive({
-    desc: '高风险'
+    desc: '暂无'
 })
 ////////////// 重置水文条件，12个断面执行多指标模型
 const conditionConfigureData = reactive({
@@ -743,10 +707,27 @@ const conditionConfigureData = reactive({
 })
 const realtimeConditionHandler = async () => {
 
-    const realTimeCond = await getRealTimeFlowAndLevelData()
+    try {
+        const realTimeCond = await getRealTimeFlowAndLevelData()
 
-    conditionConfigureData.flow = realTimeCond.flow
-    conditionConfigureData.tideDif = realTimeCond.level
+        conditionConfigureData.flow = realTimeCond.flow
+        conditionConfigureData.tideDif = realTimeCond.level
+        ElNotification.success({
+            'offset': 80,
+            'position': 'top-right',
+            'message': `获取实时水文条件,${dayjs().format('YYYY-MM-DD hh:mm')}`
+        })
+
+    } catch (e) {
+        ElNotification.error({
+            'offset': 120,
+            'position': 'top-left',
+            'message': `获取实时水文条件失败`
+        })
+    }
+
+
+
 }
 
 
@@ -851,6 +832,7 @@ const conditionConfigureDataResetHandler = async () => {
         let map = useMapStore().getMap()
         if (bankWarnLayer && map) {
             bankWarnLayer.update(warnLayerData)
+            map.setLayoutProperty('岸段预警', 'visibility', 'visible')
             map.triggerRepaint()
         }
 
@@ -1057,12 +1039,12 @@ const ProfileLoadingProcess = async (
     changeProfileListForShow() //展示高风险
     CalProfileListForShow(profileData.value)
     // CalProfileList(profileData.value)
-    if (mapInstance.getLayer('mzsBankLineLowRisk') !== undefined) {
-        mapInstance.removeLayer('mzsBankLineLowRisk')
-        addBankLineRiskLayer(mapInstance, profileList)
-    } else {
-        addBankLineRiskLayer(mapInstance, profileList)
-    }
+    // if (mapInstance.getLayer('mzsBankLineLowRisk') !== undefined) {
+    //     mapInstance.removeLayer('mzsBankLineLowRisk')
+    //     addBankLineRiskLayer(mapInstance, profileList)
+    // } else {
+    //     addBankLineRiskLayer(mapInstance, profileList)
+    // }
     showRiskStatus.value = true
     preSceneBeforeValue.value = sceneBeforeValue.value
     preSceneNowValue.value = sceneNowValue.value
@@ -1212,7 +1194,7 @@ const onAddProfileOption = () => { }
 const onAddProfile = () => { }
 
 let floodWatcher = null
-let dryWatcher = null
+// let dryWatcher = null
 const flowControlHandler = async () => {
     showFlow.value = !showFlow.value
     let map = useMapStore().getMap()
@@ -1232,13 +1214,6 @@ const flowControlHandler = async () => {
             )
             map.addLayer(floodFlow, 'chaoWeiPointLable')
 
-            // floodWatcher = watch(
-            //     () => floodFlow.currentResourcePointer,
-            //     (v) => {
-            //         timeStep.value = floodFlow.currentResourcePointer
-            //         // timeStepFloat.value = floodFlow.currentResourcePointer + floodFlow.progressRate
-            //     },
-            // )
             floodWatcher = watch(
                 () => floodFlow._progressRate,
                 (v) => {
@@ -1252,31 +1227,32 @@ const flowControlHandler = async () => {
             )
 
             console.log('add 洪季')
-        } else if (nowWaterConditionType.value == '枯季') {
-            let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
-            let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
-            let dryFlow = reactive(
-                new FlowFieldLayer('dryFlow', backEndJsonUrl1, imageSrcPrefix1),
-            )
-            map.addLayer(dryFlow, 'chaoWeiPointLable')
-
-            // dryWatcher = watch(
-            //     () => dryFlow.currentResourcePointer,
-            //     (v) => {
-            //         timeStep.value = dryFlow.currentResourcePointer
-            //     },
-            // )
-            dryWatcher = watch(
-                () => dryFlow._progressRate,
-                (v) => {
-                    let val = parseFloat(
-                        (dryFlow.timeCount / dryFlow.timePerFrame).toFixed(1),
-                    )
-                    timeStep.value = val
-                },
-            )
-            console.log('add 枯季')
         }
+        // else if (nowWaterConditionType.value == '枯季') {
+        //     let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
+        //     let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
+        //     let dryFlow = reactive(
+        //         new FlowFieldLayer('dryFlow', backEndJsonUrl1, imageSrcPrefix1),
+        //     )
+        //     map.addLayer(dryFlow, 'chaoWeiPointLable')
+
+        //     // dryWatcher = watch(
+        //     //     () => dryFlow.currentResourcePointer,
+        //     //     (v) => {
+        //     //         timeStep.value = dryFlow.currentResourcePointer
+        //     //     },
+        //     // )
+        //     dryWatcher = watch(
+        //         () => dryFlow._progressRate,
+        //         (v) => {
+        //             let val = parseFloat(
+        //                 (dryFlow.timeCount / dryFlow.timePerFrame).toFixed(1),
+        //             )
+        //             timeStep.value = val
+        //         },
+        //     )
+        //     console.log('add 枯季')
+        // }
     } else {
         if (nowWaterConditionType.value == '洪季') {
             if (map.getLayer('floodFlow')) {
@@ -1284,13 +1260,14 @@ const flowControlHandler = async () => {
                 floodWatcher()
                 floodWatcher = null
             }
-        } else if (nowWaterConditionType.value == '枯季') {
-            if (map.getLayer('dryFlow')) {
-                map.removeLayer('dryFlow')
-                dryWatcher()
-                dryWatcher = null
-            }
         }
+        // else if (nowWaterConditionType.value == '枯季') {
+        //     if (map.getLayer('dryFlow')) {
+        //         map.removeLayer('dryFlow')
+        //         dryWatcher()
+        //         dryWatcher = null
+        //     }
+        // }
     }
 
     // if (showFlow.value) {
@@ -1376,7 +1353,7 @@ let sceneCompareBefore
 let sceneCompareNow
 
 // 窗口显示变量
-const showRiskStatus = ref(false)
+const showRiskStatus = ref(true)
 const showProfileInfo = ref(false)
 const showYearlyProfileShape = ref(false)
 const showYearlyProfileShapeFunc = () => {
@@ -1418,6 +1395,7 @@ const showFlowSpeedFunc = async () => {
     await flowControlHandler()
 }
 const showRasterControl = ref(false)
+const showTerrain3DControl = ref(false)
 const showRasterControlFunc = () => {
     RasterControlHandler()
     showRasterControl.value = !showRasterControl.value
@@ -1427,6 +1405,7 @@ const showRasterControlFunc = () => {
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
 const showWaterPower = ref(false)
 const showWaterPowerFunc = async () => {
+    if (!(useBankNameStore().globalBankName === 'Mzs')) return
     if (showRiverBed.value === true) {
         showRiverBedFunc()
     } else if (showGeologyAndProject.value === true) {
@@ -1441,6 +1420,7 @@ const showWaterPowerFunc = async () => {
 
 const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
+    if (!(useBankNameStore().globalBankName === 'Mzs')) return
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
     } else if (showGeologyAndProject.value === true) {
@@ -1466,6 +1446,7 @@ const showRiverBedFunc = () => {
 
 const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
+    if (!(useBankNameStore().globalBankName === 'Mzs')) return
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
     } else if (showRiverBed.value === true) {
@@ -1802,466 +1783,686 @@ const addBankLineRiskLayer = (map, profileList) => {
     )
 }
 
-onMounted(async () => {
-    demResources.value = await getDemResource()
 
-    await initPureScratchMap(mapContainer.value).then(async (map) => {
-        mapInstance = map
-        // map.on('draw.create', function (e) {
-        //     sectionConfirmShow.value = true
-        //     let lineFeature = e.features[0]
-        //     sectionLineLabel.value =
-        //         lineFeature.geometry.coordinates[0][0].toFixed(6) +
-        //         ',' +
-        //         lineFeature.geometry.coordinates[0][1].toFixed(6)
-        //     sectionLineLabelSec.value =
-        //         lineFeature.geometry.coordinates[1][0].toFixed(6) +
-        //         ',' +
-        //         lineFeature.geometry.coordinates[1][1].toFixed(6)
-        //     let startWebMerCoord = convertToMercator(
-        //         lineFeature.geometry.coordinates[0],
-        //     )
-        //     let endWebMerCoord = convertToMercator(
-        //         lineFeature.geometry.coordinates[1],
-        //     )
-        //     StartPtX = startWebMerCoord[0]
-        //     StartPtY = startWebMerCoord[1]
-        //     EndPtX = endWebMerCoord[0]
-        //     EndPtY = endWebMerCoord[1]
-        //     return
-        // })
 
-        // map.addControl(new mapboxgl.NavigationControl(), 'top-left')
-        // mapJumpToRiver(map)
-        mapFlyToRiver(map)
-        // console.log('map loaded!!!')
-        map.addSource('mzsPlaceLabelSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
-        })
-        map.addSource('mzsPlaceLineSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
-        })
-        map.addSource('mzsBankAreaSSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/mzsBankAreaOne/{x}/{y}/{z}'],
-        })
-        map.addSource('mzsBankLineSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
-        })
-        map.addSource('dockAreaSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
-        })
-        map.addSource('dockAreaLabelSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}'],
-        })
-        map.addSource('fixProjectAreaSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}'],
-        })
-        map.addSource('fixProjectLineSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
-        })
-        map.addSource('fixProjectAreaLabelSource', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}',
-            ],
-        })
-        map.addSource('riverPlaceLabel', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
-        })
-        map.addSource('riverBeachSource', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
-        })
-        map.addSource('zjgLine', {
-            type: 'vector',
-            tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
-        })
-        map.addLayer({
-            id: 'riverBeachArea',
-            type: 'fill',
-            source: 'riverBeachSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgba(210,244,247, 1)',
-            },
-        })
-        map.addLayer({
-            id: 'zjgBridge',
-            type: 'line',
-            source: 'zjgLine',
-            'source-layer': 'default',
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 0.6,
-                // 'line-pattern': 'test',
-                'line-color': 'rgb(183, 189, 183)',
-                'line-width': 2.0,
-            },
-        })
 
-        addRasterLayer(map, 23032209, 'mapRaster')
 
-        map.setLayoutProperty('mapRaster', 'visibility', 'none')
-        // map.addLayer({
-        //     id: 'riverBeachArea',
-        //     type: 'fill',
-        //     source: 'riverBeachSource',
-        //     'source-layer': 'default',
-        //     paint: {
-        //         'fill-color': 'rgba(210,244,247, 1)',
-        //     },
-        // })
 
-        map.addLayer(new TerrainLayer(14))
-        map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
 
-        map.addLayer({
-            id: 'mzsLine',
-            type: 'line',
-            source: 'mzsPlaceLineSource',
-            'source-layer': 'default',
-            // filter:['==', '$type', 'LineString'],
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                'line-color': 'rgba(26, 87, 138, 0.6)',
-                'line-width': 2,
-            },
-        })
-        map.addLayer({
-            id: 'fjsFixLine',
-            type: 'line',
-            source: 'fixProjectLineSource',
-            'source-layer': 'default',
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                'line-color': 'rgba(216, 217, 228, 0.5)',
-                'line-width': 4,
-            },
-        })
-        map.addLayer({
-            id: 'fixProjectFillLayer',
-            type: 'fill',
-            source: 'fixProjectAreaSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgba(220,224,237, 0.8)',
-                'fill-outline-color': 'rgba(220,224,237, 0.8)',
-            },
-        })
-        map.addLayer({
-            id: 'fixProjectAreaLabel',
-            type: 'symbol',
-            source: 'fixProjectAreaLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'layer'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'right',
-                'text-size': 12,
-            },
-            paint: {
-                'text-color': 'rgba(31, 44, 126, 0.6)',
-            },
-        })
-        map.addLayer({
-            id: 'mzsLabel',
-            type: 'symbol',
-            source: 'mzsPlaceLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-            },
-            paint: {
-                'text-color': 'rgba(31, 14, 126, 0.75)',
-            },
-        })
-        map.addLayer({
-            id: 'dockArea',
-            type: 'fill',
-            source: 'dockAreaSource',
-            'source-layer': 'default',
-            paint: {
-                'fill-color': 'rgb(172,214,239)',
-            },
-        })
-        map.addLayer({
-            id: 'dockAreaLabel',
-            type: 'symbol',
-            source: 'dockAreaLabelSource',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'project_name'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'bottom',
-                'text-size': 12,
-            },
-            paint: {
-                'text-color': 'rgba(31, 44, 126, 0.6)',
-            },
-        })
-        map.addLayer({
-            id: 'riverPlaceLabel',
-            type: 'symbol',
-            source: 'riverPlaceLabel',
-            'source-layer': 'default',
-            layout: {
-                'text-field': ['get', 'label'],
-                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                // 'text-offset': [0, 1.25],
-                'text-anchor': 'left',
-                'text-size': 18,
-            },
-            paint: {
-                'text-color': 'rgba(31, 44, 226, 1)',
-            },
-        })
-        // map.addLayer({
-        //     id: 'mzsSectionArea1',
-        //     type: 'fill',
-        //     source: 'mzsBankAreaSSource',
-        //     'source-layer': 'default',
-        //     paint: {
-        //         'fill-color': [
-        //             'match',
-        //             ['get', 'stability'],
-        //             '较稳定',
-        //             '#18b915',
-        //             '稳定',
-        //             '#06bef1',
-        //             '不稳定',
-        //             '#df8105',
-        //             '较不稳定',
-        //             '#ee3603',
-        //             '#18b915',
-        //         ],
-        //     },
-        // })
-        // const jsonUrl = '/bankWarn/bankWarn.json'
-        // map.addLayer({
-        //     id: 'mzsBankLine',
-        //     type: 'line',
-        //     source: 'mzsBankLineSource',
-        //     'source-layer': 'default',
-        //     filter: ['all'],
-        //     layout: {
-        //         'line-cap': 'round',
-        //         'line-join': 'round',
-        //     },
-        //     paint: {
-        //         'line-opacity': 1,
-        //         'line-color': 'rgba(31, 14, 223, 0.5)',
-        //         'line-width': 4,
-        //     },
-        // })
 
-        map.addSource('mzsSectionLabel', {
-            type: 'vector',
-            tiles: [
-                tileServer + '/tile/vector/geomCenter/mzsBankLine/{x}/{y}/{z}',
-            ],
-        })
 
-        const chaoWeiPoint = {
-            type: 'FeatureCollection',
-            features: [
-                {
-                    type: 'Feature',
-                    properties: {
-                        label: '潮位点',
+
+
+onBeforeRouteUpdate(async (to, from) => {
+    useBankNameStore().globalBankName = to.params.id
+    let bank = to.params.id
+
+    const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
+    bankBCInfo.value = bcInfo
+
+    demResources.value = await getDemResource(bank)
+
+
+    let map = useMapStore().getMap()
+    mapFlyToRiver(map)
+    refreshMap(map)
+    addBankLayer(map, bank).then(async (_) => {
+        if (bank === 'Mzs') {
+            addRasterLayer(map, 23032209, 'mapRaster')
+            map.setLayoutProperty('mapRaster', 'visibility', 'none')
+            map.addLayer(new TerrainLayer(14))
+            map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+            const chaoWeiPoint = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {
+                            label: '潮位点',
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [120.522864, 32.035502],
+                        },
                     },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [120.522864, 32.035502],
+                ],
+            }
+            map.addSource('chaoWeiPoint', {
+                type: 'geojson',
+                data: chaoWeiPoint,
+            })
+            map.addLayer({
+                id: 'chaoWeiPoint',
+                type: 'circle',
+                source: 'chaoWeiPoint',
+                paint: {
+                    'circle-radius': 7,
+                    'circle-color': 'rgb(255, 0,0)',
+                },
+            })
+            map.addLayer(
+                {
+                    id: 'chaoWeiPointLable',
+                    type: 'symbol',
+                    source: 'chaoWeiPoint',
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        'text-anchor': 'top',
+                        'text-offset': [0.0, 0.5],
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(255,255,255)',
                     },
                 },
-            ],
+                'chaoWeiPoint',
+            )
+            map.getLayer('岸段预警') && map.removeLayer('岸段预警')
+            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+            map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+
+            getProfileTime()
+            showRiskStatus.value = true
+            showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
+            showRiskResult.value = false
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = true
+            await ProfileLoadingProcess(
+                sceneBefore,
+                sceneNow,
+                sceneCompareBefore,
+                sceneCompareNow,
+            )
+            totalResult.desc = '高风险'
+            riskAreas.value = getRiskAreas('high')
+            showWaterPowerFunc()
+        } else {
+
+            // remove flow layer
+            map.getLayer('floodFlow') && map.removeLayer('floodFlow')
+            // add invisible bank Warn layer
+            map.getLayer('岸段预警') && map.removeLayer('岸段预警')
+            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+            map.addLayer(bankWarnLayer)
+            map.setLayoutProperty('岸段预警', 'visibility', 'none')
+
+            // do nothing temp
+            showRiskStatus.value = true
+            showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
+            showRiskResult.value = false
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = false
+
+            // risk level
+            totalResult.desc = '暂无'
+            riskAreas.value = []
         }
-        map.addSource('chaoWeiPoint', {
-            type: 'geojson',
-            data: chaoWeiPoint,
-        })
-        map.addLayer({
-            id: 'chaoWeiPoint',
-            type: 'circle',
-            source: 'chaoWeiPoint',
-            paint: {
-                'circle-radius': 7,
-                'circle-color': 'rgb(255, 0,0)',
-            },
-        })
-        map.addLayer(
-            {
-                id: 'chaoWeiPointLable',
-                type: 'symbol',
-                source: 'chaoWeiPoint',
+    })
+
+
+})
+
+
+onMounted(async () => {
+    useBankNameStore().globalBankName = route.params.id
+    let bk = route.params.id
+
+    if (bk === 'Mzs') {
+
+        const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
+        bankBCInfo.value = bcInfo
+
+
+        demResources.value = await getDemResource(bk)
+
+        initPureScratchMap(mapContainer.value).then(async (map) => {
+            mapInstance = map
+
+            mapFlyToRiver(map)
+
+            /*
+            map.addSource('mzsPlaceLabelSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
+            })
+            map.addSource('mzsPlaceLineSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
+            })
+            map.addSource('mzsBankAreaSSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsBankAreaOne/{x}/{y}/{z}'],
+            })
+            map.addSource('mzsBankLineSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
+            })
+            map.addSource('dockAreaSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
+            })
+            map.addSource('dockAreaLabelSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}'],
+            })
+            map.addSource('fixProjectAreaSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}'],
+            })
+            map.addSource('fixProjectLineSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
+            })
+            map.addSource('fixProjectAreaLabelSource', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}',
+                ],
+            })
+            map.addSource('riverPlaceLabel', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+            })
+            map.addSource('riverBeachSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+            })
+            map.addSource('zjgLine', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
+            })
+            map.addLayer({
+                id: 'riverBeachArea',
+                type: 'fill',
+                source: 'riverBeachSource',
+                'source-layer': 'default',
+                paint: {
+                    'fill-color': 'rgba(210,244,247, 1)',
+                },
+            })
+            map.addLayer({
+                id: 'zjgBridge',
+                type: 'line',
+                source: 'zjgLine',
+                'source-layer': 'default',
                 layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                        'Arial Unicode MS Bold',
-                    ],
-                    'text-anchor': 'top',
-                    'text-offset': [0.0, 0.5],
-                    'text-size': 18,
-                    'text-allow-overlap': true,
+                    'line-cap': 'round',
+                    'line-join': 'round',
                 },
                 paint: {
-                    'text-color': 'rgb(255,255,255)',
+                    'line-opacity': 0.6,
+                    // 'line-pattern': 'test',
+                    'line-color': 'rgb(183, 189, 183)',
+                    'line-width': 2.0,
                 },
-            },
-            'chaoWeiPoint',
-        )
-        bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
-        map.addLayer(bankWarnLayer, 'chaoWeiPoint')
-
-        map.addLayer(
-            {
-                id: 'mzsBankLineChoosen',
+            })
+        
+            addRasterLayer(map, 23032209, 'mapRaster')
+        
+            map.setLayoutProperty('mapRaster', 'visibility', 'none')
+        
+            map.addLayer(new TerrainLayer(14))
+            map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+        
+            map.addLayer({
+                id: 'mzsLine',
                 type: 'line',
-                source: 'mzsBankLineSource',
+                source: 'mzsPlaceLineSource',
                 'source-layer': 'default',
-                filter: profileList.value[1].filter,
+                // filter:['==', '$type', 'LineString'],
                 layout: {
                     'line-cap': 'round',
                     'line-join': 'round',
                 },
                 paint: {
                     'line-opacity': 1,
-                    'line-color': 'rgb(134, 245, 230)',
-                    'line-width': 10,
+                    'line-color': 'rgba(26, 87, 138, 0.6)',
+                    'line-width': 2,
                 },
-            },
-            'chaoWeiPoint',
-        )
-
-        map.addLayer(
-            {
-                id: 'mzsSectionLabelLayer-important',
-                type: 'symbol',
-                source: 'mzsSectionLabel',
+            })
+            map.addLayer({
+                id: 'fjsFixLine',
+                type: 'line',
+                source: 'fixProjectLineSource',
                 'source-layer': 'default',
-                maxzoom: 12,
-                minzoom: 8,
-                filter: ['==', 'label', 'MZ08海事码头'],
                 layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                        'Arial Unicode MS Bold',
-                    ],
-                    'text-offset': [-1.0, 1.15],
-                    'text-anchor': 'top',
-                    'text-size': 18,
-                    'text-allow-overlap': true,
+                    'line-cap': 'round',
+                    'line-join': 'round',
                 },
                 paint: {
-                    'text-color': 'rgb(100, 2, 125)',
-                    // 'text-color': 'rgb(255, 0,0)',
+                    'line-opacity': 1,
+                    'line-color': 'rgba(216, 217, 228, 0.5)',
+                    'line-width': 4,
                 },
-            },
-            'chaoWeiPoint',
-        )
-
-        map.addLayer(
-            {
-                id: 'mzsSectionLabelLayer',
-                type: 'symbol',
-                source: 'mzsSectionLabel',
+            })
+            map.addLayer({
+                id: 'fixProjectFillLayer',
+                type: 'fill',
+                source: 'fixProjectAreaSource',
                 'source-layer': 'default',
-                maxzoom: 22,
-                minzoom: 12,
+                paint: {
+                    'fill-color': 'rgba(220,224,237, 0.8)',
+                    'fill-outline-color': 'rgba(220,224,237, 0.8)',
+                },
+            })
+            map.addLayer({
+                id: 'fixProjectAreaLabel',
+                type: 'symbol',
+                source: 'fixProjectAreaLabelSource',
+                'source-layer': 'default',
                 layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                        'Arial Unicode MS Bold',
-                    ],
-                    // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
-                    'text-offset': [-1.0, 1.15],
-                    'text-anchor': 'top',
-                    'text-size': 18,
-                    'text-allow-overlap': true,
+                    'text-field': ['get', 'layer'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'right',
+                    'text-size': 12,
                 },
                 paint: {
-                    'text-color': 'rgb(0, 22, 145)',
+                    'text-color': 'rgba(31, 44, 126, 0.6)',
                 },
-            },
-            'chaoWeiPoint',
-        )
+            })
+            map.addLayer({
+                id: 'mzsLabel',
+                type: 'symbol',
+                source: 'mzsPlaceLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                },
+                paint: {
+                    'text-color': 'rgba(31, 14, 126, 0.75)',
+                },
+            })
+            map.addLayer({
+                id: 'dockArea',
+                type: 'fill',
+                source: 'dockAreaSource',
+                'source-layer': 'default',
+                paint: {
+                    'fill-color': 'rgb(172,214,239)',
+                },
+            })
+            map.addLayer({
+                id: 'dockAreaLabel',
+                type: 'symbol',
+                source: 'dockAreaLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'project_name'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'bottom',
+                    'text-size': 12,
+                },
+                paint: {
+                    'text-color': 'rgba(31, 44, 126, 0.6)',
+                },
+            })
+            map.addLayer({
+                id: 'riverPlaceLabel',
+                type: 'symbol',
+                source: 'riverPlaceLabel',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                    'text-size': 18,
+                },
+                paint: {
+                    'text-color': 'rgba(31, 44, 226, 1)',
+                },
+            })
+            // map.addLayer({
+            //     id: 'mzsSectionArea1',
+            //     type: 'fill',
+            //     source: 'mzsBankAreaSSource',
+            //     'source-layer': 'default',
+            //     paint: {
+            //         'fill-color': [
+            //             'match',
+            //             ['get', 'stability'],
+            //             '较稳定',
+            //             '#18b915',
+            //             '稳定',
+            //             '#06bef1',
+            //             '不稳定',
+            //             '#df8105',
+            //             '较不稳定',
+            //             '#ee3603',
+            //             '#18b915',
+            //         ],
+            //     },
+            // })
+            // const jsonUrl = '/bankWarn/bankWarn.json'
+            // map.addLayer({
+            //     id: 'mzsBankLine',
+            //     type: 'line',
+            //     source: 'mzsBankLineSource',
+            //     'source-layer': 'default',
+            //     filter: ['all'],
+            //     layout: {
+            //         'line-cap': 'round',
+            //         'line-join': 'round',
+            //     },
+            //     paint: {
+            //         'line-opacity': 1,
+            //         'line-color': 'rgba(31, 14, 223, 0.5)',
+            //         'line-width': 4,
+            //     },
+            // })
+        
+            map.addSource('mzsSectionLabel', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/geomCenter/mzsBankLine/{x}/{y}/{z}',
+                ],
+            })
+        
+            const chaoWeiPoint = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {
+                            label: '潮位点',
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [120.522864, 32.035502],
+                        },
+                    },
+                ],
+            }
+            map.addSource('chaoWeiPoint', {
+                type: 'geojson',
+                data: chaoWeiPoint,
+            })
+            map.addLayer({
+                id: 'chaoWeiPoint',
+                type: 'circle',
+                source: 'chaoWeiPoint',
+                paint: {
+                    'circle-radius': 7,
+                    'circle-color': 'rgb(255, 0,0)',
+                },
+            })
+            map.addLayer(
+                {
+                    id: 'chaoWeiPointLable',
+                    type: 'symbol',
+                    source: 'chaoWeiPoint',
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        'text-anchor': 'top',
+                        'text-offset': [0.0, 0.5],
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(255,255,255)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
+            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+            map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+        
+            map.addLayer(
+                {
+                    id: 'mzsBankLineChoosen',
+                    type: 'line',
+                    source: 'mzsBankLineSource',
+                    'source-layer': 'default',
+                    filter: profileList.value[1].filter,
+                    layout: {
+                        'line-cap': 'round',
+                        'line-join': 'round',
+                    },
+                    paint: {
+                        'line-opacity': 1,
+                        'line-color': 'rgb(134, 245, 230)',
+                        'line-width': 10,
+                    },
+                },
+                'chaoWeiPoint',
+            )
+        
+            map.addLayer(
+                {
+                    id: 'mzsSectionLabelLayer-important',
+                    type: 'symbol',
+                    source: 'mzsSectionLabel',
+                    'source-layer': 'default',
+                    maxzoom: 12,
+                    minzoom: 8,
+                    filter: ['==', 'label', 'MZ08海事码头'],
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        'text-offset': [-1.0, 1.15],
+                        'text-anchor': 'top',
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(100, 2, 125)',
+                        // 'text-color': 'rgb(255, 0,0)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
+        
+            map.addLayer(
+                {
+                    id: 'mzsSectionLabelLayer',
+                    type: 'symbol',
+                    source: 'mzsSectionLabel',
+                    'source-layer': 'default',
+                    maxzoom: 22,
+                    minzoom: 12,
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+                        'text-offset': [-1.0, 1.15],
+                        'text-anchor': 'top',
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(0, 22, 145)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
+        
+            // !map.getSource('mzsBankLabel') &&
+            //     map.addSource('mzsBankLabel', {
+            //         type: 'vector',
+            //         tiles: [tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}'],
+            //     })
+            // !map.getLayer('民主沙岸段注记') &&
+            //     map.addLayer({
+            //         id: '民主沙岸段注记',
+            //         type: 'symbol',
+            //         source: 'mzsBankLabel',
+            //         'source-layer': 'default',
+            //         layout: {
+            //             'text-field': ['get', 'label'],
+            //             'text-font': [
+            //                 'Open Sans Semibold',
+            //                 'Arial Unicode MS Bold',
+            //             ],
+            //             'text-anchor': 'center',
+            //             'text-size': 20
+            //         },
+            //         paint: {
+            //             'text-color': 'rgb(28,13,106)',
+            //         },
+            //     })
+        
+            // map.addControl(draw)
+        
+            */
 
-        // !map.getSource('mzsBankLabel') &&
-        //     map.addSource('mzsBankLabel', {
-        //         type: 'vector',
-        //         tiles: [tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}'],
-        //     })
-        // !map.getLayer('民主沙岸段注记') &&
-        //     map.addLayer({
-        //         id: '民主沙岸段注记',
-        //         type: 'symbol',
-        //         source: 'mzsBankLabel',
-        //         'source-layer': 'default',
-        //         layout: {
-        //             'text-field': ['get', 'label'],
-        //             'text-font': [
-        //                 'Open Sans Semibold',
-        //                 'Arial Unicode MS Bold',
-        //             ],
-        //             'text-anchor': 'center',
-        //             'text-size': 20
-        //         },
-        //         paint: {
-        //             'text-color': 'rgb(28,13,106)',
-        //         },
-        //     })
+            refreshMap(map)
+            await addBankLayer(map, bk)
 
-        // map.addControl(draw)
+            //////////////////// special layer
+            addRasterLayer(map, 23032209, 'mapRaster')
+            map.setLayoutProperty('mapRaster', 'visibility', 'none')
+            map.addLayer(new TerrainLayer(14))
+            map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+            const chaoWeiPoint = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {
+                            label: '潮位点',
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [120.522864, 32.035502],
+                        },
+                    },
+                ],
+            }
+            map.addSource('chaoWeiPoint', {
+                type: 'geojson',
+                data: chaoWeiPoint,
+            })
+            map.addLayer({
+                id: 'chaoWeiPoint',
+                type: 'circle',
+                source: 'chaoWeiPoint',
+                paint: {
+                    'circle-radius': 7,
+                    'circle-color': 'rgb(255, 0,0)',
+                },
+            })
+            map.addLayer(
+                {
+                    id: 'chaoWeiPointLable',
+                    type: 'symbol',
+                    source: 'chaoWeiPoint',
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        'text-anchor': 'top',
+                        'text-offset': [0.0, 0.5],
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(255,255,255)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
+            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+            map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+            //////////////////// special layer
 
-        useMapStore().setMap(map)
-    })
+            useMapStore().setMap(map)
 
-    getProfileTime()
-    showRiskStatus.value = false
-    showProfileInfo.value = false
-    showProfileShape.value = false
-    showProfileSlope.value = false
-    showProfileErosion.value = false
-    showRiskResult.value = false
-    showFlowSpeed.value = false
-    await ProfileLoadingProcess(
-        sceneBefore,
-        sceneNow,
-        sceneCompareBefore,
-        sceneCompareNow,
-    )
+            getProfileTime()
+            showRiskStatus.value = true
+            showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
+            showRiskResult.value = false
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = false
+            await ProfileLoadingProcess(
+                sceneBefore,
+                sceneNow,
+                sceneCompareBefore,
+                sceneCompareNow,
+            )
+            totalResult.desc = '高风险'
+            riskAreas.value = getRiskAreas('high')
+            showWaterPowerFunc()
 
-    riskAreas.value = getRiskAreas('high')
+        })
+    } else {
 
-    showWaterPowerFunc()
+        const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
+        bankBCInfo.value = bcInfo
+
+        demResources.value = await getDemResource(bk)
+        initPureScratchMap(mapContainer.value).then(async (map) => {
+            mapFlyToRiver(map)
+            refreshMap(map)
+
+            await addBankLayer(map, bk)
+            useMapStore().setMap(map)
+
+            // add invisible bank warn layer
+            map.getLayer('岸段预警') && map.removeLayer('岸段预警')
+            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+            map.addLayer(bankWarnLayer)
+            map.setLayoutProperty('岸段预警', 'visibility', 'none')
+
+            // do nothing temp
+            showRiskStatus.value = true
+            showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
+            showRiskResult.value = false
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = false
+
+            // risk level
+            totalResult.desc = '暂无'
+            riskAreas.value = []
+        })
+
+
+    }
+
+
+
+
 })
 
 onUnmounted(() => {
@@ -3149,6 +3350,10 @@ div.risk-warn-container {
                 background-color: rgb(211, 121, 60);
             }
 
+            &.none {
+                background-color: rgb(116, 116, 116);
+            }
+
             &.high {
                 background-color: rgb(254, 15, 31);
             }
@@ -3177,6 +3382,7 @@ div.risk-warn-container {
         &.high {
             border: #ec250a solid 3px;
         }
+
 
         div.warn-detail-profile {
             position: absolute;
@@ -3268,6 +3474,10 @@ div.risk-warn-container {
             width: 1.4vw;
             height: 2vh;
             z-index: 11;
+
+            &.none{
+                left: 10.3vw;
+            }
 
             &.low {
                 left: 10.3vw;

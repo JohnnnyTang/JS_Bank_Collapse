@@ -94,7 +94,7 @@
                 </template>
             </el-dropdown>
 
-            <div class="user-avatar-icon"  v-if="LOGIN === 'NOT' && MANAGEMENT === 'NOT'"></div>
+            <div class="user-avatar-icon" v-if="LOGIN === 'NOT' && MANAGEMENT === 'NOT'"></div>
 
         </div>
     </div>
@@ -209,11 +209,8 @@ const routerPathIndexMap = {
 const bankList = ref([])
 const clickBankItem = (bankItem, index) => {
     bankNameStore.globalBankName = bankItem.bank
-    navToWarnOrRiskPage(index)
+    navToWarnOrRiskPage(index, bankItem.bank)
 }
-window.addEventListener('keydown', e => {
-    console.log(bankNameStore.globalBankName)
-})
 
 let previousActive = 2
 
@@ -275,13 +272,13 @@ const navToKnowledgePage = () => {
     focusOnNavItem(4)
 }
 
-const navToWarnOrRiskPage = (index) => {
+const navToWarnOrRiskPage = (index, bankEnName) => {
     if (index == 1) {
         eleDropDownDomRef.value[0].handleClose()
-        router.push('/bankTwin')
+        router.push('/bankTwin/' + bankEnName)
     } else if (index == 3) {
         eleDropDownDomRef.value[1].handleClose()
-        router.push('/bankWarn')
+        router.push('/bankWarn/' + bankEnName)
     }
     focusOnNavItem(index)
 }

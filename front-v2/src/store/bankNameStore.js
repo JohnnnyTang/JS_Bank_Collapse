@@ -4,7 +4,7 @@ import { ref } from 'vue'
 export const useBankNameStore = defineStore(
     'bankNameStore',
     () => {
-        const globalBankName = ref()
+        const globalBankName = ref('Mzs') // default bank name
         return {
             globalBankName
         }

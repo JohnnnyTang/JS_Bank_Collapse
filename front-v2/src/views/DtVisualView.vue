@@ -138,16 +138,19 @@
 
 
         <div class="hydro-pannel">
-            <div class="title"> 实时水文信息
-                <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%;" class="iconn">
+            <div class="title"> 
+                <span style="padding-left: .5vw;">实时水文信息</span>
+                <span class="title-time">{{ dayjs().format(`YYYY年MM月DD日`) }}</span>
+                <el-icon @click="showHydroPannel = !showHydroPannel" class="iconn">
                     <More />
                 </el-icon>
             </div>
 
-            <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
-                <el-table-column prop="station" label="站点" />
-                <el-table-column prop="flow" label="流量" />
-                <el-table-column prop="level" label="水位" />
+            <el-table :data="waterTableData" border style="width: 100%" v-show="showHydroPannel">
+                <el-table-column prop="station" label="站点" :min-width="'20%'" :align="'center'" />
+                <el-table-column prop="flow" label="流量(m³/s)" :min-width="'30%'" :align="'center'" />
+                <el-table-column prop="level" label="水位(m)" :min-width="'25%'" :align="'center'" />
+                <el-table-column prop="time" label="更新时间" :min-width="'30%'" :align="'center'" />
             </el-table>
         </div>
 
@@ -184,6 +187,7 @@ import { sourceFieldMap, legendMap, legendStyleMap, sourceColumnMap, sourceZoomM
 import { initSortedLayer, initTextLayer, temp } from '../components/dataVisual/layerUtil'
 import { getSideBarTree, showLayers, hideLayers, DICT } from '../components/dataVisual/js/useful'
 import { getRealTimeStationData } from '../api/realtimeWaterCondition';
+import dayjs from 'dayjs'
 
 // data
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
@@ -205,38 +209,7 @@ const infoPannelTitle = ref('')
 const search = ref('')
 const realtimeZoom = ref(0)
 var latestLGID = ''
-const waterTableData = ref([
-    {
-        station: '大通站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '南京站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '镇江站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '三江营站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '江阴站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-    {
-        station: '徐六泾站',
-        flow: 'N/A',
-        level: 'N/A',
-    },
-])
+const waterTableData = ref([])
 const infoTableData = ref([])
 const infoTableHeader = ref([])
 let nowSource
@@ -1694,12 +1667,13 @@ const customSort4 = (a, b) => {
         z-index: 2;
         right: 5vw;
         top: 0vh;
-        width: 15vw;
+        width: 18vw;
         padding: calc(0.1vw + 0.1vh);
         background-color: aliceblue;
         user-select: none;
         border: solid calc(0.1vh + 0.1vw) rgb(82, 163, 235);
         border-radius: calc(0.1vh + 0.3vw);
+        transition: ease-in-out .3s;
 
         .title {
             border-bottom: rgb(41, 40, 40) 1px solid;
@@ -1708,7 +1682,16 @@ const customSort4 = (a, b) => {
             line-height: 3vh;
             width: 100%;
 
+            .title-time {
+                padding-left: 3vw;
+                font-size: calc(0.55vw + 0.4vh);
+                line-height: 3vh;
+            }
+
             .iconn {
+                position: absolute;
+                right: 1vw;
+                top:1vh;
                 :hover {
                     cursor: pointer;
                 }
@@ -1759,11 +1742,11 @@ const customSort4 = (a, b) => {
     color: #173eaa;
     background: rgba(238, 244, 255, 0.6);
     font-size: calc(0.6vw + 0.3vh);
-    height: 2vh;
 
     div.cell {
-        height: 2vh;
-        line-height: 2vh;
+        height: 100%;
+        line-height: 100%;
+        width: 100%;
     }
 }
 
@@ -1775,7 +1758,8 @@ const customSort4 = (a, b) => {
         height: fit-content;
         line-height: 2vh;
         width: fit-content;
-        font-size: calc(0.6vw + 0.2vh);
+        font-size: calc(0.5vw + 0.3vh);
+        text-align: center;
     }
 }
 
@@ -1822,5 +1806,9 @@ const customSort4 = (a, b) => {
 
 :deep(.el-table tbody tr.highLight-row:hover > td) {
     cursor: pointer;
+}
+
+.small-column {
+    background-color: red;
 }
 </style>
