@@ -175,6 +175,7 @@ const handleFileUpload = (file) => {
         })
         // 补充
         fileInfo['segment'] = props.bankEnName
+        if(fileInfo['fields'] === "") delete fileInfo['fields']
 
         ////// build form data
         formData = new FormData()

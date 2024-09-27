@@ -138,7 +138,8 @@ onMounted(async () => {
     // console.log(_bankList)
 
     const map = await initMap(mapRef.value)
-    addBankLayer(map, 'Zys')
+    const tileServer = 'http://172.21.212.166:8989/api/v1'
+    // addBankLayer(map, 'Zys')
     // const tServer = 'http://172.21.212.166:8989/api/v2'
 
     // const bank = 'Zys'
@@ -270,17 +271,17 @@ onMounted(async () => {
     //         },
     //     })
 
-    // map.addSource('mapRaster2020', {
-    //     type: 'raster',
-    //     tiles: [
-    //         tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
-    //     ],
-    // })
-    // map.addLayer({
-    //     id: 'ras',
-    //     type: 'raster',
-    //     source: 'mapRaster2020',
-    // })
+    map.addSource('mapRaster2020', {
+        type: 'raster',
+        tiles: [
+            tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
+        ],
+    })
+    map.addLayer({
+        id: 'ras',
+        type: 'raster',
+        source: 'mapRaster2020',
+    })
 
     // map.addSource('demTile', {
     //     type: 'raster',
