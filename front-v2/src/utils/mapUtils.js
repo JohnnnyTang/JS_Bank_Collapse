@@ -27,7 +27,6 @@ const addBankLayer = async (map, bankEnName) => {
     const tServer = import.meta.env.VITE_MAP_TILE_SERVER2
 
     const bank = bankEnName
-    console.log('!!!!!!!!!!!!',)
     const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
     console.log(bankVectorLayers)
     const layers = {
@@ -106,6 +105,7 @@ const addBankLayer = async (map, bankEnName) => {
             type: 'vector',
             tiles: [flayer.tileUrl]
         })
+        console.log(flayer.fields[0])
         map.addLayer({
             id: flayer.name,
             type: 'symbol',
@@ -128,6 +128,10 @@ const addBankLayer = async (map, bankEnName) => {
                 'text-halo-color': "rgba(255, 255, 255, 1.0)",
                 'text-halo-width': 2.0,
             }
+        })
+
+        map.on('click',flayer.name,(e)=>{
+            console.log(e.features)
         })
     })
 

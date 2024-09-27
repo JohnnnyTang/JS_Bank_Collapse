@@ -78,7 +78,7 @@ const updateInfo = async () => {
         info.monitorStartTime = res.data.monitorStartTime
 
         BackEndRequest.getMonitorInfo().then(res => {
-            console.log('device NUm is ', res.length)
+            // console.log('device NUm is ', res.length)
             info.deviceNum = res.length
         })
     })
