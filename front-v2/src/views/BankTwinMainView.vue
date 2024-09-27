@@ -141,7 +141,7 @@
         </div>
 
         <div class="warn-status-container" v-loading="warnLoading">
-            <div class="warn-status-title">民主沙右缘状态</div>
+            <div class="warn-status-title">{{ info["name"] }}状态</div>
             <div class="warn-status-content" :class="statusText == '正常' ? 'normal' : 'warn'">
                 {{ statusText }}
             </div>
@@ -182,12 +182,13 @@
 <script setup>
 
 import {
-    onMounted, ref, onUnmounted, watch, computed, nextTick, createApp
+    onMounted, ref, reactive, onUnmounted, watch, computed, nextTick, createApp
 } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
+import { useBankNameStore } from '../store/bankNameStore';
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
 import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
@@ -200,7 +201,7 @@ import {
 import threeDdevice from '../components/bankTwin/threeDdevice.vue'
 
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
-import { useBankNameStore } from '../store/bankNameStore'
+import BackEndRequest from '../api/backend';
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
@@ -237,7 +238,16 @@ const domHideMap = ref({
     status: false,
     warn: true,
 })
-
+///////////////////////////////////////////////////////////
+const bankNameStore = useBankNameStore()
+const info = reactive({
+    "name": '',
+    "riskLevel": '',
+    "monitorLength": '',
+    "monitorStartTime": '2024-04-20',
+    "deviceNum": 0
+})
+///////////////////////////////////////////////////////////
 // custome layer
 /**
  * @type {customLayers.UnityLayer}
@@ -382,6 +392,26 @@ const gnssIdSectionMap = {
     'MZS120.51967889_32.04004108_4': 'MZ03顺堤尾',
     'MZS120.541648_32.030524_2': 'MZ08海事码头',
 }
+
+//////////////////////////////////////////////////////////////////////
+const updateInfo = async () => {
+    BackEndRequest.getBankBasicInfo().then(res => {
+        info.name = res.data.name
+        info.riskLevel = res.data.riskLevel
+        info.monitorLength = res.data.monitorLength
+        info.monitorStartTime = res.data.monitorStartTime
+
+        BackEndRequest.getMonitorInfo().then(res => {
+            // console.log('device NUm is ', res.length)
+            info.deviceNum = res.length
+        })
+    })
+}
+
+watch(() => bankNameStore.globalBankName, (newV, oldV) => {
+    updateInfo()
+})
+//////////////////////////////////////////////////////////////////////
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -647,6 +677,7 @@ onMounted(async () => {
     //     warnActive.value = true
     // }, 3000)
     // console.log(route.params.id)
+    updateInfo()
     useBankNameStore().globalBankName = route.params.id
     if (useBankNameStore().globalBankName === 'Mzs') {
         showVedio.value = true

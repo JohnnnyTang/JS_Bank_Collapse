@@ -136,7 +136,7 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import { useResourceStore } from '../../store/resourceStore'
 import axios from 'axios';
 import { defaultTableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
-import UploadDialog from './UploadDialog.vue'
+import UploadDialog from './uploadDialog.vue'
 import UpdateDialog from './UpdateDialog.vue'
 
 //////////////////////////// global
