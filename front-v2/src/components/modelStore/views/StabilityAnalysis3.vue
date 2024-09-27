@@ -989,11 +989,12 @@ const updateRealtimeWaterCondition = async () => {
     diffTide: response.level
   }
   ElNotification({
-    title: '已更新实时水文条件',
-    message: `更新时间：${updateTime.value}`,
-    offset: 250,
+    message: `获取实时水文条件，更新时间：${updateTime.value}`,
+    'offset': 130,
+    'position': 'top-right',
     type: 'success',
   })
+
 }
 
 

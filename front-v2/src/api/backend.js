@@ -49,6 +49,12 @@ if (login === 'YES') {
 }
 
 export default class BackEndRequest {
+
+    static getBankBasicInfo() {
+        let bank = useBankNameStore().globalBankName
+        return newBackendInstance.get('/data/bankResource/bank/' + bank)
+    }
+
     static getDataNodeTree() {
         // return instance.get(Vue.prototype.reqURL + "/user/hello")
         return backendInstance.get('/dataNode/tree')           //  v1版本
@@ -87,41 +93,69 @@ export default class BackEndRequest {
 
     static getMonitorInfo() {
         let bank = useBankNameStore().globalBankName
-        // return backendInstance.get('/data/monitorInfo')  //v1版本
-        return newBackendInstance.get(`/data/bank/${bank}/monitorInfo`)     //v2版本————解决
+        // return newBackendInstance.get(`/data/bank/${bank}/monitorInfo`)     //v2版本
+        // // return backendInstance.get('/data/monitorInfo')  //v1版本
+        // /data/bankResource/bank/device/type?bank=Mzs&typeCode=1
+        return new Promise((resolve) => {
+            Promise.all([
+                newBackendInstance.get(`/data/bankResource/bank/device/type?bank=${bank}&typeCode=1`),
+                newBackendInstance.get(`/data/bankResource/bank/device/type?bank=${bank}&typeCode=2`),
+                newBackendInstance.get(`/data/bankResource/bank/device/type?bank=${bank}&typeCode=3`),
+                newBackendInstance.get(`/data/bankResource/bank/device/type?bank=${bank}&typeCode=4`),
+                newBackendInstance.get(`/data/bankResource/bank/device/type?bank=${bank}&typeCode=6`),
+            ]).then(res => {
+                const monitorInfo = []
+                res.forEach(item => {
+                    monitorInfo.push(...item.data)
+                })
+                resolve(monitorInfo)
+            })
+        })
+
+
     }
 
-
-///////////////////////////////////////////////////////
-
-//设备概述信息！！！！  v1版本————未使用
-// static getSpecMonitorInfo(type) {
-//     switch (type) {
-//         case '1':
-//             return backendInstance.get(`/data/monitorInfo/type/1`)  
-//         case '2':
-//             return backendInstance.get(`/data/monitorInfo/type/2`) 
-//         case '3':
-//             return backendInstance.get(`/data/monitorInfo/type/3`)  
-//         case '4':
-//             return backendInstance.get(`/data/monitorInfo/type/4`)  
-//     }
-// }
-
-//设备概述信息！！！！  v2版本
-static getSpecMonitorInfo(type) {
-    let bank = useBankNameStore().globalBankName
-    switch (type) {
-        case '1':
-            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/1`)      
-        case '2':
-            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/2`)      
-        case '3':
-            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/3`)      
-        case '4':
-            return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/4`)      
+    ///////////////////////////////////////////////////////
+    static test() {
+        let url = '/api/v2/data/bank/Mzs/monitorData'
+        const params = {
+            bank: 'Mzs',
+            timeUnit: 'hour',
+            deviceCode: '123',
+            dur: 3
+        }
+        return backendInstance.get(url, params)
     }
-}
+    ///////////////////////////////////////////////////////
+
+    //设备概述信息！！！！  v1版本
+    // static getSpecMonitorInfo(type) {
+    //     switch (type) {
+    //         case '1':
+    //             return backendInstance.get(`/data/monitorInfo/type/1`)  
+    //         case '2':
+    //             return backendInstance.get(`/data/monitorInfo/type/2`) 
+    //         case '3':
+    //             return backendInstance.get(`/data/monitorInfo/type/3`)  
+    //         case '4':
+    //             return backendInstance.get(`/data/monitorInfo/type/4`)  
+    //     }
+    // }
+
+    //设备概述信息！！！！  v2版本
+    static getSpecMonitorInfo(type) {
+        let bank = useBankNameStore().globalBankName
+        switch (type) {
+            case '1':
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/1`)
+            case '2':
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/2`)
+            case '3':
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/3`)
+            case '4':
+                return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/type/4`)
+        }
+    }
 
 ///////////////////////////////////////////////////////
     //v1版本    ChartData.js调用————解决

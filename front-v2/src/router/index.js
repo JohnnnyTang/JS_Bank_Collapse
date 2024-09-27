@@ -124,7 +124,7 @@ const routes = [
         ]
     },
     {
-        path: '/bankTwin',
+        path: '/bankTwin/:id',
         component: () => import('../views/BankTwinMainView.vue')
     },
     {
@@ -155,7 +155,7 @@ const routes = [
         ]
     },
     {
-        path: '/bankWarn',
+        path: '/bankWarn/:id',
         component: () => import('../views/BankRiskWarnView.vue')
     },
     {

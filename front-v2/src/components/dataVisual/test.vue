@@ -22,20 +22,11 @@ import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 //         "if_importa"
 //     ]
 // }
+const addBankLayer = async (map, bankEnName) => {
+    const tServer = 'http://172.21.212.166:8989/api/v2'
 
-
-onMounted(async () => {
-
-    // let _bankList = (await BankResourceHelper.getBankNamesList()).data
-    // console.log(_bankList)
-
-    const map = await initMap(mapRef.value)
-    const tileServer = 'http://172.21.212.166:8989/api/v2'
-
-    const bank = 'Zys'
+    const bank = bankEnName
     const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
-
-    console.log(bankVectorLayers)
 
     const layers = {
         'point': [],
@@ -44,7 +35,7 @@ onMounted(async () => {
         'symbol': []
     }
     const _tile = (name) => {
-        return tileServer + `/tile/vector/${bank}/${name}/{x}/{y}/{z}`
+        return tServer + `/tile/vector/${bank}/${name}/{x}/{y}/{z}`
     }
 
     bankVectorLayers.forEach(blayer => {
@@ -56,7 +47,6 @@ onMounted(async () => {
             name, fields, tileUrl
         })
     })
-    console.log(layers)
 
     layers.polygon.forEach((flayer, index) => {
         map.addSource(flayer.name + 'source', {
@@ -138,6 +128,125 @@ onMounted(async () => {
             }
         })
     })
+
+}
+
+
+onMounted(async () => {
+
+    // let _bankList = (await BankResourceHelper.getBankNamesList()).data
+    // console.log(_bankList)
+
+    const map = await initMap(mapRef.value)
+    addBankLayer(map, 'Zys')
+    // const tServer = 'http://172.21.212.166:8989/api/v2'
+
+    // const bank = 'Zys'
+    // const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
+
+    // console.log(bankVectorLayers)
+
+    // const layers = {
+    //     'point': [],
+    //     'line': [],
+    //     'polygon': [],
+    //     'symbol': []
+    // }
+    // const _tile = (name) => {
+    //     return tServer + `/tile/vector/${bank}/${name}/{x}/{y}/{z}`
+    // }
+
+    // bankVectorLayers.forEach(blayer => {
+    //     const name = blayer.tileName
+    //     const tileUrl = _tile(name)
+    //     const type = blayer.type
+    //     const fields = blayer.fields
+    //     layers[type].push({
+    //         name, fields, tileUrl
+    //     })
+    // })
+    // console.log(layers)
+
+    // layers.polygon.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'fill',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'fill-color': `rgb(155,155,${(135 + index * 10) % 255})`,
+    //             'fill-opacity': 0.8
+    //         }
+    //     })
+    // })
+
+    // layers.line.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'line',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'line-color': `rgb(255,30,${(30 + index * 10) % 255})`,
+    //             'line-opacity': 0.8
+    //         }
+    //     })
+    // })
+
+    // layers.point.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'circle',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'circle-color': `rgb(222,100,${(200 + index * 10) % 255})`,
+    //             'circle-radius': 5.0,
+    //         }
+    //     })
+    // })
+
+    // layers.symbol.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'symbol',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         layout: {
+    //             'text-field': ['get', flayer.fields[0]],
+    //             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //             'text-size': 17,
+    //         },
+    //         paint: {
+    //             'text-color': 'rgb(51, 51, 51)',
+    //             'text-opacity': [
+    //                 'match',
+    //                 ["get", "name"],
+    //                 'assist',
+    //                 0.0,
+    //                 1.0
+    //             ],
+    //             'text-halo-color': "rgba(255, 255, 255, 1.0)",
+    //             'text-halo-width': 2.0,
+    //         }
+    //     })
+    // })
 
 
     // map.addSource('mzsBankLine', {

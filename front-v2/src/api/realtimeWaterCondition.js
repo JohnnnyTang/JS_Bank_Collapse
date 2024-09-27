@@ -1,6 +1,7 @@
 // This file is used to get real-time water condition data from the API.
 import axios from "axios";
 import { ElMessage } from "element-plus";
+import dayjs from 'dayjs';
 
 
 export const getRealTimeStationData = async () => {
@@ -13,6 +14,7 @@ export const getRealTimeStationData = async () => {
             station: item.station,
             flow: item['flow'],
             level: item['tide-level'],
+            time: dayjs().format('HH:mm:ss')
         }
     })
 

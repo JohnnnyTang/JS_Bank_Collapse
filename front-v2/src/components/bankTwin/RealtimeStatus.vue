@@ -88,9 +88,9 @@
                                 </div> -->
                             <div class="section-selectior-item">
                                 <el-select v-model="selectedDevice" placeholder="选择具体设备"
-                                    style="width: 4.5vw; height: 2.4vh" @change="deviceSelectChange">
-                                    <el-option v-for="(item, index) in deviceList" :key="index" :label="item"
-                                        :value="item">
+                                    style="width: 4.5vw; height: 2.4vh;  font-size: 0.1vw + 0.1vh;"
+                                    @change="deviceSelectChange">
+                                    <el-option v-for="(item, index) in deviceList" :key="index" :label="item" :value="item">
                                         <span class="section-name-text">{{
                                             item
                                         }}</span>
@@ -123,10 +123,11 @@
                                 </div> -->
                         </div>
                         <div>
-                            <div class="goBack" >
+                            <div class="goBack">
                                 <el-button @click="goBack" v-if="showButton">返回原表</el-button>
                             </div>
-                            <div class="device-chart-dom" ref="chartDom" v-loading="chartDataLoading" @dblclick="navToMoreData"></div> 
+                            <div class="device-chart-dom" ref="chartDom" v-loading="chartDataLoading"
+                                @dblclick="navToMoreData"></div>
                         </div>
                         <!-- <div style="z-index: 9999;position: absolute;top:10px;right: 200px;background-color: red">
                             <el-button @click="goBack">返回原始图表</el-button>
@@ -137,76 +138,79 @@
 
                         </div> -->
                     </div>
-                    <div class="video-content-container">
-                        <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
-                            <div class="video-content">
-                                <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name" :key="item.key"
-                                    allowfullscreen>
-                                </iframe>
-                            </div>
-                            <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
-                                " @click="focusOn(index)">
-                                {{ item.name }}
-                            </div>
-                            <div class="small-pic" v-if="item.order == 0" :id="index"></div>
-                        </div>
-                    </div>
-                    <div class="video-control-opener" :class="{ open: videoControlOpen }">
-                        <div class="left tri"></div>
-                        <div class="control-open-text" @click="videoControlOpen = !videoControlOpen">
-                            {{
-                                videoControlOpen
-                                ? '◀监控云台控制◀'
-                                : '▶监控云台控制▶'
-                            }}
-                        </div>
-                        <div class="right tri"></div>
-                    </div>
-                    <div class="video-controller-container" v-if="videoControlOpen">
-                        <div class="crc-directions">
-                            <div class="crc-directions-up" @click="basicVideoFunction(0)">
-                                <ArrowUpBold style="
-                                        width: 3vh;
-                                        height: 3vh;
-                                        display: block;
-                                    " />
-                            </div>
-                            <div class="crc-directions-left" @click="basicVideoFunction(2)">
-                                <ArrowLeftBold style="
-                                        width: 3vh;
-                                        height: 3vh;
-                                        display: block;
-                                    " />
-                            </div>
-                            <div class="crc-directions-right" @click="basicVideoFunction(3)">
-                                <ArrowRightBold style="
-                                        width: 3vh;
-                                        height: 3vh;
-                                        display: block;
-                                    " />
-                            </div>
-                            <div class="crc-directions-down" @click="basicVideoFunction(1)">
-                                <ArrowDownBold style="
-                                        width: 3vh;
-                                        height: 3vh;
-                                        display: block;
-                                    " />
-                            </div>
-                        </div>
-                        <div class="function-button-group">
-                            <div class="preset button-title">预设点</div>
-                            <div class="preset button-column">
-                                <div class="preset button-item" v-for="(item, i) in videoList[
-                                    curBigVideoIndex
-                                ].presetPt" :key="i" @click="move2PresetPoint(i + 1)" :class="item.status">
+
+                    <div v-if="props.showVedio">
+                        <div class="video-content-container">
+                            <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
+                                <div class="video-content">
+                                    <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
+                                        :key="item.key" allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
+                                    " @click="focusOn(index)">
                                     {{ item.name }}
                                 </div>
+                                <div class="small-pic" v-if="item.order == 0" :id="index"></div>
                             </div>
-                            <div class="zoom button-title">视角缩放</div>
-                            <div class="zoom button-column">
-                                <div class="zoom button-item" v-for="(func, index) in zoomFuncList" :key="index"
-                                    @click="basicVideoFunction(index + 4)">
-                                    {{ func.label }}
+                        </div>
+                        <div class="video-control-opener" :class="{ open: videoControlOpen }">
+                            <div class="left tri"></div>
+                            <div class="control-open-text" @click="videoControlOpen = !videoControlOpen">
+                                {{
+                                    videoControlOpen
+                                    ? '◀监控云台控制◀'
+                                    : '▶监控云台控制▶'
+                                }}
+                            </div>
+                            <div class="right tri"></div>
+                        </div>
+                        <div class="video-controller-container" v-if="videoControlOpen">
+                            <div class="crc-directions">
+                                <div class="crc-directions-up" @click="basicVideoFunction(0)">
+                                    <ArrowUpBold style="
+                                        width: 3vh;
+                                        height: 3vh;
+                                        display: block;
+                                    " />
+                                </div>
+                                <div class="crc-directions-left" @click="basicVideoFunction(2)">
+                                    <ArrowLeftBold style="
+                                        width: 3vh;
+                                        height: 3vh;
+                                        display: block;
+                                    " />
+                                </div>
+                                <div class="crc-directions-right" @click="basicVideoFunction(3)">
+                                    <ArrowRightBold style="
+                                        width: 3vh;
+                                        height: 3vh;
+                                        display: block;
+                                    " />
+                                </div>
+                                <div class="crc-directions-down" @click="basicVideoFunction(1)">
+                                    <ArrowDownBold style="
+                                        width: 3vh;
+                                        height: 3vh;
+                                        display: block;
+                                    " />
+                                </div>
+                            </div>
+                            <div class="function-button-group">
+                                <div class="preset button-title">预设点</div>
+                                <div class="preset button-column">
+                                    <div class="preset button-item" v-for="(item, i) in videoList[
+                                        curBigVideoIndex
+                                    ].presetPt" :key="i" @click="move2PresetPoint(i + 1)" :class="item.status">
+                                        {{ item.name }}
+                                    </div>
+                                </div>
+                                <div class="zoom button-title">视角缩放</div>
+                                <div class="zoom button-column">
+                                    <div class="zoom button-item" v-for="(func, index) in zoomFuncList" :key="index"
+                                        @click="basicVideoFunction(index + 4)">
+                                        {{ func.label }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -219,6 +223,7 @@
 
 <script setup>
 import { ref, onMounted, watch, onBeforeUnmount, onBeforeMount, computed, reactive } from 'vue'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 // import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
 import axios from 'axios'
@@ -235,7 +240,10 @@ import {
 } from './dataChartSettings'
 import router from '../../router'
 import { useWarnInfoStore } from '../../store/mapStore'
+import DeviceHelper from './deviceHelper'
+import { useBankNameStore } from '../../store/bankNameStore'
 
+const route = useRoute()
 const props = defineProps({
     domHide: {
         type: Boolean,
@@ -245,6 +253,10 @@ const props = defineProps({
         type: String,
         default: '位移测量站',
     },
+    showVedio: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const token = ref(
@@ -267,60 +279,23 @@ const deviceStatusDataList = ref([
     // { name: '视频监控', count: 3, time: '2024', freq: '实时' },
 ])
 
-const warnDeviceCount = ref([0, 0, 0, 0, 0,'-'])
+const warnDeviceCount = ref([0, 0, 0, 0, 0, '-'])
 
 const domHide = ref(true)
 
 const deviceUpdateTime = ref('2024-06-15 14:00:00')
 
-const deviceListMap = {
-    位移测量站: [
-        'CL-01',
-        'CL-02',
-        'CL-03',
-        'CL-04',
-        'CL-05',
-        'CL-06',
-        'CL-07',
-        'CL-08',
-        'CL-09',
-        'CL-10',
-    ],
-    测斜仪: [
-        'CX-01',
-        'CX-02',
-        'CX-03',
-        'CX-04',
-        'CX-05',
-        'CX-06',
-        'CX-07',
-        'CX-08',
-        'CX-09',
-    ],
-    孔隙水压力计: [
-        'KX-01',
-        'KX-02',
-        'KX-03',
-        'KX-04',
-        'KX-05',
-        'KX-06',
-        'KX-07',
-        'KX-08',
-        'KX-09',
-    ],
-    应力桩: [
-        'YL-01',
-        'YL-02',
-        'YL-03',
-        'YL-04',
-        'YL-05',
-        'YL-06',
-        'YL-07'
-    ],
-    // 分布式光纤: [
-    //     'GX-01'
-    // ],
+const shitMap = {
+    位移测量站: "GNSS",
+    应力桩: "STRESS",
+    孔隙水压力计: "MENOMETER",
+    测斜仪: "INCLINE",
+    视频监控: "VIDEO",
+    分布式光纤: "fiber",
 }
+
+const monitorInfo = ref({})
+
 
 const deviceTypeNameMap = {
     位移测量站: 'gnss',
@@ -338,43 +313,44 @@ const deviceTypeErrorMap = {
     // 分布式光纤: 1,
 }
 
-const deviceIdMap = {
-    'CL-01': 'MZS120.51749289_32.04059243_1',
-    'CL-02': 'MZS120.51977143_32.04001152_1',
-    'CL-03': 'MZS120.52557975_32.03825056_1',
-    'CL-04': 'MZS120.52660704_32.03676583_1',
-    'CL-05': 'MZS120.53334877_32.03227055_1',
-    'CL-06': 'MZS120.54599538_32.02837993_1',
-    'CL-07': 'MZS120.55327892_32.02707923_1',
-    'CL-08': 'MZS120.55649757_32.02592404_1',
-    'CL-09': 'MZS120.56334257_32.02298144_1',
-    'CL-10': 'MZS120.56944728_32.02070961_1',
-    'KX-01': 'MZS120.51726088_32.04054582_3',
-    'KX-02': 'MZS120.51738292_32.04054923_3',
-    'KX-03': 'MZS120.51749021_32.04053105_3',
-    'KX-04': 'MZS120.51957026_32.04008655_3',
-    'KX-05': 'MZS120.51967889_32.04004108_3',
-    'KX-06': 'MZS120.51986665_32.03998992_3',
-    'KX-07': 'MZS120.52557975_32.03825056_3',
-    'KX-08': 'MZS120.52565217_32.03813574_3',
-    'KX-09': 'MZS120.52566826_32.03799363_3',
-    'YL-01': 'MZS120.513203_32.042733_2',
-    'YL-02': 'MZS120.515433_32.04231_2',
-    'YL-03': 'MZS120.521221_32.040331_2',
-    'YL-04': 'MZS120.529078_32.034385_2',
-    'YL-05': 'MZS120.541648_32.030524_2',
-    'YL-06': 'MZS120.548925_32.029361_2',
-    'YL-07': 'MZS120.552209_32.028149_2',
-    'CX-01': 'MZS120.51967889_32.04004108_4',
-    'CX-02': 'MZS120.51986665_32.03998992_4',
-    'CX-03': 'MZS120.52557975_32.03825056_4',
-    'CX-04': 'MZS120.52565217_32.03813574_4',
-    'CX-05': 'MZS120.52566826_32.03799363_4',
-    'CX-06': 'MZS120.51726088_32.04054582_4',
-    'CX-07': 'MZS120.51738292_32.04054923_4',
-    'CX-08': 'MZS120.51749021_32.04053105_4',
-    'CX-09': 'MZS120.51957026_32.04008655_4',
-}
+// const deviceIdMap = {
+//     'CL-01': 'MZS120.51749289_32.04059243_1',
+//     'CL-02': 'MZS120.51977143_32.04001152_1',
+//     'CL-03': 'MZS120.52557975_32.03825056_1',
+//     'CL-04': 'MZS120.52660704_32.03676583_1',
+//     'CL-05': 'MZS120.53334877_32.03227055_1',
+//     'CL-06': 'MZS120.54599538_32.02837993_1',
+//     'CL-07': 'MZS120.55327892_32.02707923_1',
+//     'CL-08': 'MZS120.55649757_32.02592404_1',
+//     'CL-09': 'MZS120.56334257_32.02298144_1',
+//     'CL-10': 'MZS120.56944728_32.02070961_1',
+//     'KX-01': 'MZS120.51726088_32.04054582_3',
+//     'KX-02': 'MZS120.51738292_32.04054923_3',
+//     'KX-03': 'MZS120.51749021_32.04053105_3',
+//     'KX-04': 'MZS120.51957026_32.04008655_3',
+//     'KX-05': 'MZS120.51967889_32.04004108_3',
+//     'KX-06': 'MZS120.51986665_32.03998992_3',
+//     'KX-07': 'MZS120.52557975_32.03825056_3',
+//     'KX-08': 'MZS120.52565217_32.03813574_3',
+//     'KX-09': 'MZS120.52566826_32.03799363_3',
+//     'YL-01': 'MZS120.513203_32.042733_2',
+//     'YL-02': 'MZS120.515433_32.04231_2',
+//     'YL-03': 'MZS120.521221_32.040331_2',
+//     'YL-04': 'MZS120.529078_32.034385_2',
+//     'YL-05': 'MZS120.541648_32.030524_2',
+//     'YL-06': 'MZS120.548925_32.029361_2',
+//     'YL-07': 'MZS120.552209_32.028149_2',
+//     'CX-01': 'MZS120.51967889_32.04004108_4',
+//     'CX-02': 'MZS120.51986665_32.03998992_4',
+//     'CX-03': 'MZS120.52557975_32.03825056_4',
+//     'CX-04': 'MZS120.52565217_32.03813574_4',
+//     'CX-05': 'MZS120.52566826_32.03799363_4',
+//     'CX-06': 'MZS120.51726088_32.04054582_4',
+//     'CX-07': 'MZS120.51738292_32.04054923_4',
+//     'CX-08': 'MZS120.51749021_32.04053105_4',
+//     'CX-09': 'MZS120.51957026_32.04008655_4',
+//     // 'GX-01': 'MZS120_32',
+// }
 
 const deviceTypeTimeMap = {
     位移测量站: {
@@ -416,9 +392,8 @@ const deviceTypeTimeMap = {
 
 const selectedDeviceType = ref('位移测量站')
 
-const deviceList = ref(deviceListMap['位移测量站'])
-// console.log(deviceList)
-const selectedDevice = ref('CL-01')
+const deviceList = ref([])
+const selectedDevice = ref('')
 
 const selectedDataMode = ref('实时')
 
@@ -442,8 +417,8 @@ const videoList = ref([
         name: '民主沙海事码头监控',
         position: '32.0316674, 120.5402574',
         deviceId: 'FB5033035',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
         order: 0,
         presetPt: [
             { name: '上游岸段', status: 'normal' },
@@ -458,8 +433,8 @@ const videoList = ref([
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
         deviceId: 'FB5033037',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
         order: 1,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
@@ -474,8 +449,8 @@ const videoList = ref([
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
         deviceId: 'FB5033036',
-        // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        videoUrl: `https://open.ys7.com/ezopen`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
         order: 2,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
@@ -595,13 +570,14 @@ const changeDeviceType = (deviceName) => {
 }
 
 const deviceTypeSelectChange = async (deviceType) => {
-    // console.log(deviceType)
-    deviceList.value = deviceListMap[deviceType]
-    selectedDevice.value = deviceListMap[deviceType][0]
+    console.log(deviceType)
+    let tp = shitMap[deviceType]
+    deviceList.value = monitorInfo.value[tp] ? monitorInfo.value[tp]['DeviceList'] : []
+    selectedDevice.value = deviceList.value[0]
     echartIns.clear()
     chartDataLoading.value = true
     updateTimeLoading.value = true
-    await deviceSelectChange(deviceListMap[deviceType][0])
+    await deviceSelectChange(selectedDevice.value)
     updateTimeLoading.value = false
     chartDataLoading.value = false
 }
@@ -741,29 +717,29 @@ const fiberNewOption = {
     },
     yAxis: {
         name: '微应变',
-            type: 'value',
-            scale: true,
-            nameLocation: 'end',
-            nameTextStyle: {
-                fontSize: 13,
-                align: 'left',
-                verticalAlign: 'top',
-                fontWeight: 'bold',
-            },
+        type: 'value',
+        scale: true,
+        nameLocation: 'end',
+        nameTextStyle: {
+            fontSize: 13,
+            align: 'left',
+            verticalAlign: 'top',
+            fontWeight: 'bold',
+        },
     },
     backgroundColor: 'rgba(255,255,255,1)',
     dataZoom: [
-            {
-                type: 'inside',
-                start: 0,
-                end: 100,
-            },
-            {
-                type: 'slider',
-                start: 0,
-                end: 100,
-            },
-        ],
+        {
+            type: 'inside',
+            start: 0,
+            end: 100,
+        },
+        {
+            type: 'slider',
+            start: 0,
+            end: 100,
+        },
+    ],
     visualMap: [
         {
             show: false,
@@ -821,11 +797,11 @@ const fiberNewOption = {
         },
     ],
     axisLabel: {
-            formatter: function(value) {
-                // 根据需要更改格式化函数
-                return value; // 移除换行
-            }
-        },
+        formatter: function (value) {
+            // 根据需要更改格式化函数
+            return value; // 移除换行
+        }
+    },
     series: [
         {
             name: '微应变',
@@ -855,11 +831,11 @@ const fiberNewOption = {
                 2.26, 2.54, 3.2, 3.54, 3.2, 2.46, 2.2, 2.2, 2.4, 2.54, 3.06, 3.14, 3.4, 3.6, 3.4, 2.8, 2.26, 2.26, 2.14, 2.26, 2.6, 2.66, 2.66, 1.8, 1.66, 2.66, 2.46, 2.14, 2.46, 3.54, 3.2, 3.06, 2.8, 2.4, 2.06, 2.54, 3.6, 3.94, 4.54,
                 3.14, 2.26, 3.6, 3.6, 3.54, 4.26, 4.34, 3.26, 4.06, 3.86, 3.2, 3.26, 3.2, 3.26, 3.74, 4, 4.26, 4.14, 4.2, 3.6, 3.94, 4.66, 3.94, 3.2, 3.66, 4.06, 3.54, 2.06, 2.8, 2.66, 3.34, 3.4, 3.6, 3.4, 3.66, 3.14, 3.26, 3.2, 3.34,
                 3.2, 3.46, 3.66, 3.14, 1.8, 2.4, 1.86, 2.2, 1.86, 1.8, 1.26, 1, 0.94, 0.34, -0.2, 0.14, 0.14, 0.2, 0.74, 0.26, 1.46, 2.14, 1.54, 0.54, -0.86, -0.54, -0.4, 0.26, 1.54, 0.74, 0.4, 1.14, 0.74, 1.8, 1.6, 0.74, 0.74, 1.14,
-                1.34, 0.94, 0.4, -0.46, -0.94,0.54, 0.4, 0.66, 0.6, 1.4, 0.8, 1.34, 1.86, 0.8, 2.34, 2.54, 2.26, 2.2, 2.2, 3.94, 3, 2.94, 3.14, 2.66,0.14, -0.34, -0.54, -0.86, -1.86,4.94, 4.34, 4.26, 3.8, 4.26, 4.74, 4, 3.74, 3.66,
-                -1.26, -0.8, 0.26, 0.74, 0.06, 0.26, 0, -0.14, 0.2,5.2, 3.6, 4.4, 4, 3.06, 4.06, 4.2, 4, 4.66, 5,2.86, 3, 3.74, 4.06, 4.6, 5.4,-0.46, -1, -0.94, -2.2, -1.66, -1.2,
+                1.34, 0.94, 0.4, -0.46, -0.94, 0.54, 0.4, 0.66, 0.6, 1.4, 0.8, 1.34, 1.86, 0.8, 2.34, 2.54, 2.26, 2.2, 2.2, 3.94, 3, 2.94, 3.14, 2.66, 0.14, -0.34, -0.54, -0.86, -1.86, 4.94, 4.34, 4.26, 3.8, 4.26, 4.74, 4, 3.74, 3.66,
+                -1.26, -0.8, 0.26, 0.74, 0.06, 0.26, 0, -0.14, 0.2, 5.2, 3.6, 4.4, 4, 3.06, 4.06, 4.2, 4, 4.66, 5, 2.86, 3, 3.74, 4.06, 4.6, 5.4, -0.46, -1, -0.94, -2.2, -1.66, -1.2,
                 1.34, 2.46, 2.14, 1.4, 0.46, 0.26, -0.26, 0.34, 0.54, 0.46, 2.54, 1.8, 2.86, 2.54, 0.8, -0.4, -0.26, -0.34, -0.26, 0.06, 1.06, 2, 1.6, 0.8, 0.06, -0.2, 0.2, 1.6, 0.4, 0.8, 1.2, 1.46, 0.86, 0, 0.2, 0.46, -0.2, -1, -1.6,
                 0.34, 0.54, 0.74, 0.06, 0.06, -1.2, -1.66, -1.46, -0.8, -0.6, -0.86, -0.66, -0.34, -0.14, -0.8, -1.54, -2.14, -1.74, -1.14, -0.74, 2, 2, 1.46, 1.86, 1.6, 1.2, 1, 1.34, 1, 2, 2.34, 2.2, 1.94, 1.94, 0.4, -0.66, -0.86,
-                -0.2, -0.66, 0.2, -0.66, -0.46,-1.66, 0.6, 0.74, 1.46, 0.54,1.66, 1.86, 2.4, 2.46, 1.94, 1.66, 2.74, 1.54,2.94, 4, 3.74, 3.66, 3.94, 4.4, 4,4.06, 5, 4.14, 3.8, 3.86, 2.46,5.26, 5.54, 6.46, 6, 5.46, 4.8,
+                -0.2, -0.66, 0.2, -0.66, -0.46, -1.66, 0.6, 0.74, 1.46, 0.54, 1.66, 1.86, 2.4, 2.46, 1.94, 1.66, 2.74, 1.54, 2.94, 4, 3.74, 3.66, 3.94, 4.4, 4, 4.06, 5, 4.14, 3.8, 3.86, 2.46, 5.26, 5.54, 6.46, 6, 5.46, 4.8,
                 -0.34, 0.74, 2, 2.06, 2.66, 1.6, 0.8, 0.6, -0.54, -1.14, -1.46, -1.34, 0, 0.14, -0.06, -0.8, -1.26, -2, -0.94, -0.2, 0.4, -0.94, 0.54, 0.6, 2.26, 3.2, 3.26, 2.14, 2.46, 2.74, 4.06, 3.46, 3.8, 4.2, 4.26, 3.86, 4.14,
                 4.34, 4.8, 4.66, 4.4, 4.26, 4.54, 3.8, 3.14, 2.86, 3.66, 3.2, 4.06, 3.8, 3.4, 2.66, 3.46, 3.14, 3.54, 2.66, 2.54, 3.54, 3.46, 3.34, 3.66, 3.86, 3.8, 4.26, 4.54, 4.8, 3.6, 3.14, 3.34, 3.06, 3.8, 3.34, 3.14, 2.86, 2.34,
                 5.2, 5, 4.86, 4.14, 3.94, 3.46, 3, 3.86, 3.8, 3.26, 3.14, 3.74, 3.86, 3.6, 4.4, 4.86, 5.34, 4.94, 4.26, 4.26, 4.06, 4, 3.66, 3, 2.86, 2.8, 3.46, 3.74, 4.6, 3.14, 3.54, 3.86, 3.6, 3.4, 2.86, 2.94, 3.94, 4.54, 4.94, 4.74,
@@ -868,20 +844,20 @@ const fiberNewOption = {
                 2.4, 3.06, 3.94, 5.06, 4.74, 4.4, 3.86, 3, 4.06, 4, 3.94, 4.14, 5, 5.26, 6.34, 5.66, 4.66, 4.46, 4.2, 4.46, 4.46, 4.66, 5.46, 4.66, 4.66, 5.46, 5.54, 4.94, 4.34, 4.06, 5.46, 5.94, 6.46, 6.06, 5.8, 6, 5.34, 5, 4.4, 4.94,
                 4.34, 4.34, 4.86, 6.14, 5.26, 4.54, 4.26, 4.14, 4.26, 5.2, 4.6, 4.6, 3.86, 3.6, 3.54, 4.54, 5.26, 4.8, 5, 5.06, 5.14, 4.66, 4.6, 3.46, 2.74, 2.66, 3.6, 5.4, 6, 4.06, 4.74, 4.94, 4.94, 4.8, 4.94, 5.06, 4.8, 4.66, 4.8,
                 3.74, 3.46, 3.46, 3.54, 3.2, 3.4, 3.4, 3.34, 3.34, 3.26, 3.34, 3.2, 3.34, 3.14, 3, 3.26, 3.54, 2.74, 1.54, 3.06, 3.6, 3.86, 4.74, 3.46, 2.6, 2.54, 2.54, 3.74, 5.06, 3.66, 2.74, 2.74, 3.14, 1.66, 2.54, 3.66, 3.34,
-                3.06, 4.66, 5, 5.66, 5.4, 5, 4.54, 4.74,0.2, 0.8, 0.46, 0.86, 0.54, -0.34, 0.2, 0.26,-2.54, -2.4, -4.2, -2.66, -2.14, -2, -2.4,1.8, 1.6, 0.74, 0.74, 1.14, 1.34,-0.2, 0.2, 1.6, 0.4, 0.8,
+                3.06, 4.66, 5, 5.66, 5.4, 5, 4.54, 4.74, 0.2, 0.8, 0.46, 0.86, 0.54, -0.34, 0.2, 0.26, -2.54, -2.4, -4.2, -2.66, -2.14, -2, -2.4, 1.8, 1.6, 0.74, 0.74, 1.14, 1.34, -0.2, 0.2, 1.6, 0.4, 0.8,
                 4.94, 4.74, 3.86, 4.06, 4, 4.54, 2.8, 3.34, 3.06, 3.66, 3.94, 3.74, 3.8, 3.14, 3.4, 3, 2.34, 0.4, 0.74, 0.14, 0.2, 0.26, 0.34, 0.4, 0.74, 0.66, 0.94, 0.54, 0.4, -0.46, -1.46, -1.06, -0.94, -0.86, -1.26, -0.94, 0.14,
                 -0.66, -0.94, -0.2, -0.66, -1.34, -0.6, 1.2, 1.86, 1.6, 1.34, 0.94, 0.46, -0.26, 0.26, -0.06, 0.54, 0.6, 0.66, 0.46, 0.14, -0.26, -1.2, -1.54, -1.4, -1.54, -2, -1.4, -1.14, -1.26, -1.26, -0.8, -0.66, -0.6, -0.26,
                 1, 1.54, 2, 1.4, -0.74, -1.2, -1.6, -1.26, -1.54, -0.86, -0.54, 0.06, 0.2, -0.2, -0.34, 0.26, -0.54, -0.66, -0.86, 0.14, -0.06, 0.86, 1.2, 0.26, 0.54, -0.6, -0.94, -1.74, -1.2, -0.86, -1.54, -1.8, -1.6, -1.6,
                 -1.26, -0.4, -0.26, 0.14, 0.06, 0.14, -0.06, -0.66, -1.14, -1.94, -2.34, -2.66, -3, -2, -2.14, -2, -2.14, -2.34, -2.4, -2.54, -2.6, -2.6, -2.4, -2.06, -1.26, -0.66, -1.26, -1.74, -2.8, -4.2, -4.4, -3.34,
                 -2.46, -3.94, -2.34, -3.34, -2.6, -4.14, -4.54, -4.14, -5.14, -4.14, -4.06, -3.66, -2.46, -2.74, -3.26, -3.34, -2.94, -3.4, -4.86, -4.86, -4.14, -3.8, -3.8, -2.6, -2, -1.86, -2.06, -3.4, -4.14, -2.66,
                 -1.6, -1.54, -2.14, -3.06, -4.74, -5.26, -4.6, -3.86, -2.94, -3.94, -3.8, -3.26, -3, -3.14, -3.46, -3.66, -4.26, -3.34, -3.54, -3.94, -3.94, -3.86, -4.8, -4.94, -4.74, -4.8, -4.06, -4.14, -4.54, -2.94,
-                -3.4, -3.2, -2.94, -2.54, -3, -2, -1.34,-5.4, -5.66, -4.94, -3.4, -2.34, -3.2, -4.6,-2.34, -3.14, -3.2, -3.66, -4.2, -4.54, -3.94, -2.54, -1.66, 2.06, 2.8, 2.66, 3.34, 3.4, 3.6,0.74, 0.4, 1.14, 0.74, 
+                -3.4, -3.2, -2.94, -2.54, -3, -2, -1.34, -5.4, -5.66, -4.94, -3.4, -2.34, -3.2, -4.6, -2.34, -3.14, -3.2, -3.66, -4.2, -4.54, -3.94, -2.54, -1.66, 2.06, 2.8, 2.66, 3.34, 3.4, 3.6, 0.74, 0.4, 1.14, 0.74,
                 -1.06, -2, -2.46, -2.86, -2.8, -2.6, -1.94, -1.54, -1.66, -2.34, -3.54, -2.86, -4.14, -4, -4.8, -5.66, -5.26, -4, -2.8, -2.54, -2.06, -2.06, -2.34, -3.8, -5.6, -4.26, -3.34, -2.4, -2.26, -2.86, -4.26,
                 -5.4, -4.34, -3.6, -3.6, -3.8, -4.06, -6.14, -5.34, -4.94, -5.14, -3.86, -2.2, -1.06, -1.26, -0.6, -2.34, -2.26, -1.74, -2.2, -2, -2.74, -3.34, -3.26, -1.54, -1.6, -1.74, -1.2, 0.06, 0.74, 0.86, 0.46, 0.14, 0.54, 0.6,
                 -0.66, -0.46, -0.86, -0.46, 0.14, -0.26, -0.06, -0.2, -1.8, -1.74, -1.26, -1.66, -1.94, -2.06, -1.86, -2.14, -0.26, -1.14, -0.46, -0.46, -0.06, -0.6, -0.6, -0.66, -0.94, -0.86, -0.4, 0.06, -0.14, -0.94, -2.4, -1.34,
                 2.46, 2.26, 1.6, 0.86, 0.86, 2.14, 1.74, 1.26, 0.26, 0.4, 0.46, 0.66, 0.74, 0.74, 0.66, 0.66, 0.74, 0.74, 0.86, 1.8, 0.46, 0.66, 0.74, 0.8, 0.4, -0.06, -0.4, -0.14, 0.34, 0.46, 0.86, 0.74, 0.6, 2.06, 2.06, 2.2, 1.66, 1.94,
                 2.94, 1.46, 1.34, 1.34, 1.14, 0.86, 0.94, 1.26, 1.54, 2.54, 2.66, 1.06, 0.8, 0.54, 0.4, 0.66, 0.6, 1.4, 0.8, 1.34, 1.86, 3.26, 3.46, 3.2, 2.94, 2.74, 2.86, 3, 2.66, 2, 2.46, 1.74, 2.26, 2.8, 3.4, 3.8, 3.74, 3.6, 3.46, 3.34,
-                2.74, 2.74, 3.2, 2.86, 3.34, 3.94, 4.06, 4.34, 4.86,1.8, 1.66, 2.66, 2.46, 2.14,2.06, 2.14, 2.8, 3.86, 3.4,0.4, 0.46, 0.54, 0.66, 0.86, 0.6, 0.54, 0.14, -0.54,-1.06, -0.14, 1.14, 1.66,
+                2.74, 2.74, 3.2, 2.86, 3.34, 3.94, 4.06, 4.34, 4.86, 1.8, 1.66, 2.66, 2.46, 2.14, 2.06, 2.14, 2.8, 3.86, 3.4, 0.4, 0.46, 0.54, 0.66, 0.86, 0.6, 0.54, 0.14, -0.54, -1.06, -0.14, 1.14, 1.66,
                 6.86, 6.6, 5.26, 3.74, 3.14, 3.34, 4.94, 4.74, 3.14, 2.26, 2.46, 2.34, 2.54, 2.26, 2.2, 2.2, 2.26, 2.54, 3.2, 3.54, 3.2, 2.46, 2.2, 2.2, 2.4, 2.54, 3.06, 3.14, 3.4, 3.6, 3.4, 2.8, 2.26, 2.26, 2.14, 2.26, 2.6, 2.66, 2.66,
                 2.46, 3.54, 3.2, 3.06, 2.8, 2.4, 2.06, 2.54, 3.6, 3.94, 4.54, 3.94, 3.14, 2.26, 3.6, 3.6, 3.54, 4.26, 4.34, 3.26, 4.06, 3.86, 3.2, 3.26, 3.2, 3.26, 3.74, 4, 4.26, 4.14, 4.2, 3.6, 3.94, 4.66, 3.94, 3.2, 3.66, 4.06, 3.54,
                 3.4, 3.66, 3.14, 3.26, 3.2, 3.34, 3, 2.94, 3.14, 2.66, 3.2, 3.46, 3.66, 3.14, 1.8, 2.4, 1.86, 2.2, 1.86, 1.8, 1.26, 1, 0.94, 0.34, -0.2, 0.14, 0.14, 0.2, 0.74, 0.26, 1.46, 2.14, 1.54, 0.54, -0.86, -0.54, -0.4, 0.26, 1.54,
@@ -894,24 +870,38 @@ const fiberNewOption = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const deviceSelectChange = async (deviceName) => {
-    // console.log('device change', deviceName)
+    console.log('device change', deviceName)
     chartDataLoading.value = true
     updateTimeLoading.value = true
     showButton.value = false;
     if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
         // console.log(deviceTypeNameMap[selectedDeviceType.value]),
-        curDeviceData = (
-            await BackEndRequest.getMonitorDataByTypeIdWithTime(
-                // deviceTypeNameMap[selectedDeviceType.value],
-                // deviceIdMap[deviceName],
-                deviceTypeTimeMap[selectedDeviceType.value].timeUnit,
-                deviceTypeTimeMap[selectedDeviceType.value].timeCount,
-                deviceIdMap[deviceName],
-            )
-        ).data
+        let tp = shitMap[selectedDeviceType.value]
+        let _deviceCode = monitorInfo.value[tp]["NAME_CODE_Map"][deviceName]
+        // curDeviceData = (
+        //     await BackEndRequest.getMonitorDataByTypeIdWithTime(
+        //         // deviceTypeNameMap[selectedDeviceType.value],
+        //         // deviceIdMap[deviceName],
+        //         deviceTypeTimeMap[selectedDeviceType.value].timeUnit,
+        //         deviceTypeTimeMap[selectedDeviceType.value].timeCount,
+        //         _deviceCode
+        //     )
+        // ).data
+        try {
+            curDeviceData = (
+                await BackEndRequest.getMonitorDataByTypeIdWithTime(
+                    // 'gnss',
+                    deviceTypeTimeMap[selectedDeviceType.value].timeUnit,
+                    deviceTypeTimeMap[selectedDeviceType.value].timeCount,
+                    _deviceCode
+                )
+            ).data
+        } catch (e) {
+            curDeviceData = []
+        }
     } else {
         console.log(deviceTypeNameMap[selectedDeviceType.value]),
-        curDeviceData = []
+            curDeviceData = []
         // 添加 click 事件监听器
         echartIns.on('click', function (params) {
             // 检查点击的是否是系列中的折点
@@ -923,10 +913,10 @@ const deviceSelectChange = async (deviceName) => {
             }
         });
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (curDeviceData.length > 0) {
         let newestData = curDeviceData.slice(-1)[0]
-        deviceUpdateTime.value = newestData.measureTime
+        deviceUpdateTime.value = newestData.measureTime ? newestData.measureTime : "暂无"
     }
     chartDataLoading.value = false
     updateTimeLoading.value = false
@@ -950,7 +940,7 @@ const dataModeChange = (dataMode) => {
         // updateTimeLoading.value = true
         // if (curDeviceData.length > 0) {
         //     let newestData = curDeviceData.slice(-1)[0]
-        //     deviceUpdateTime.value = newestData.measureTime
+        //     deviceUpdateTime.value = newestData.measureTime ? newestData.measureTime: "暂无"
         // }
         // chartDataLoading.value = false
         // updateTimeLoading.value = false
@@ -1049,12 +1039,25 @@ async function updateNewestTime() {
 
 async function updateNewestData() {
     if (curDeviceData == null) return
-    let deviceNewestData = (
-        await BackEndRequest.getDeviceNewestData(
-            // deviceTypeNameMap[selectedDeviceType.value],
-            deviceIdMap[selectedDevice.value],
-        )
-    ).data
+    let tp = shitMap[selectedDeviceType.value]
+    let _deviceCode = monitorInfo.value[tp]["NAME_CODE_Map"][selectedDevice.value]
+    // let deviceNewestData = (
+    //     await BackEndRequest.getDeviceNewestData(
+    //         // deviceTypeNameMap[selectedDeviceType.value],
+    //         _deviceCode,
+    //     )
+    // ).data
+    let deviceNewestData
+    try {
+        deviceNewestData = (
+            await BackEndRequest.getDeviceNewestData(
+                _deviceCode,
+            )
+        ).data
+    } catch (e) {
+        deviceNewestData = []
+    }
+
     if (
         curDeviceData.length == 0 ||
         deviceNewestData.measureTime !=
@@ -1127,6 +1130,78 @@ function distanceOpenTime(showTime) {
 
     return days
 }
+
+
+
+onBeforeRouteUpdate(async (to, from) => {
+    useBankNameStore().globalBankName = to.params.id
+
+    deviceStatusLoading.value = true
+
+    const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(useBankNameStore().globalBankName))
+    monitorInfo.value = importantInfo
+
+    deviceList.value = monitorInfo.value[shitMap[selectedDeviceType.value]] ? monitorInfo.value[shitMap[selectedDeviceType.value]]['DeviceList'] : []
+
+    deviceStatusDataList.value[0].count = monitorInfo.value["GNSS"]['DeviceList'].length
+    deviceStatusDataList.value[1].count = monitorInfo.value["STRESS"]['DeviceList'].length
+    deviceStatusDataList.value[2].count = monitorInfo.value["MENOMETER"]['DeviceList'].length
+    deviceStatusDataList.value[3].count = monitorInfo.value["INCLINE"]['DeviceList'].length
+
+    selectedDevice.value = deviceList.value[0]
+
+    deviceStatusLoading.value = false
+    updateTimeLoading.value = true
+
+    let tp = shitMap[selectedDeviceType.value]
+    let _deviceCode = monitorInfo.value[tp]["NAME_CODE_Map"][deviceList.value[0]]
+
+    try {
+        curDeviceData = (
+            await BackEndRequest.getMonitorDataByTypeIdWithTime(
+                // 'gnss',
+                deviceTypeTimeMap['位移测量站'].timeUnit,
+                deviceTypeTimeMap['位移测量站'].timeCount,
+                // deviceIdMap['CL-01'],
+                _deviceCode
+            )
+        ).data
+    } catch (e) {
+        console.log('catch request error! ', _deviceCode)
+        curDeviceData = []
+    }
+
+
+    let newestData = curDeviceData.slice(-1)[0] ? curDeviceData.slice(-1)[0] : {}
+    deviceUpdateTime.value = newestData.measureTime ? newestData.measureTime : "暂无"
+    updateTimeLoading.value = false
+    deviceOptionMap['位移测量站'] = genGnssOptionOfDevice(
+        curDeviceData,
+        deviceTypeErrorMap['位移测量站'],
+        selectedDataMode.value,
+    )
+    // console.log(deviceOptionMap)
+    // console.log('option', deviceOptionMap['位移测量站'])
+    echartIns.setOption(deviceOptionMap['位移测量站'])
+    chartDataLoading.value = false
+
+    setInterval(async () => {
+        if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
+            chartDataLoading.value = true
+            updateTimeLoading.value = true
+            await updateNewestData()
+            // console.log(deviceTypeNameMap[selectedDeviceType.value])
+            // console.log(deviceIdMap[selectedDevice.value])
+            chartDataLoading.value = false
+            updateTimeLoading.value = false
+        }
+    }, 1000 * 60)
+    // console.log('initialData', initialData)
+
+})
+
+
+
 let validToken = null
 onBeforeMount(async () => {
     // const daysFromToken = distanceOpenTime('2024-06-25')
@@ -1147,6 +1222,23 @@ onBeforeMount(async () => {
 })
 
 onMounted(async () => {
+    useBankNameStore().globalBankName = route.params.id
+
+    // DeviceHelper.getProcessedMonitorInfo(useBankNameStore().globalBankName).then(res => {
+    //     console.log('processed monitor info', res)
+    // })
+    const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(useBankNameStore().globalBankName))
+    monitorInfo.value = importantInfo
+
+    deviceList.value = monitorInfo.value[shitMap[selectedDeviceType.value]] ? monitorInfo.value[shitMap[selectedDeviceType.value]]['DeviceList'] : []
+
+    deviceStatusDataList.value[0].count = monitorInfo.value["GNSS"]['DeviceList'].length
+    deviceStatusDataList.value[1].count = monitorInfo.value["STRESS"]['DeviceList'].length
+    deviceStatusDataList.value[2].count = monitorInfo.value["MENOMETER"]['DeviceList'].length
+    deviceStatusDataList.value[3].count = monitorInfo.value["INCLINE"]['DeviceList'].length
+
+    selectedDevice.value = deviceList.value[0]
+
     setTimeout(() => {
         console.log('init with new token!!')
         refreshIframe(1)
@@ -1173,17 +1265,22 @@ onMounted(async () => {
     updateTimeLoading.value = true
     // console.log('213', newestDataStatus)
     echartIns = echarts.init(chartDom.value)
-    curDeviceData = (
-        await BackEndRequest.getMonitorDataByTypeIdWithTime(
-            // 'gnss',
-            // deviceIdMap['CL-01'],
-            deviceTypeTimeMap['位移测量站'].timeUnit,
-            deviceTypeTimeMap['位移测量站'].timeCount,
-            deviceIdMap['CL-01'],
-        )
-    ).data
-    let newestData = curDeviceData.slice(-1)[0]
-    deviceUpdateTime.value = newestData.measureTime
+    let tp = shitMap[selectedDeviceType.value]
+    let _deviceCode = monitorInfo.value[tp]["NAME_CODE_Map"][deviceList.value[0]]
+    try {
+        curDeviceData = (
+            await BackEndRequest.getMonitorDataByTypeIdWithTime(
+                // 'gnss',
+                deviceTypeTimeMap['位移测量站'].timeUnit,
+                deviceTypeTimeMap['位移测量站'].timeCount,
+                _deviceCode
+            )
+        ).data
+    } catch (e) {
+        curDeviceData = []
+    }
+    let newestData = curDeviceData.slice(-1)[0] ? curDeviceData.slice(-1)[0] : {}
+    deviceUpdateTime.value = newestData.measureTime ? newestData.measureTime : "暂无"
     updateTimeLoading.value = false
     deviceOptionMap['位移测量站'] = genGnssOptionOfDevice(
         curDeviceData,
@@ -1196,7 +1293,7 @@ onMounted(async () => {
     chartDataLoading.value = false
 
     setInterval(async () => {
-        if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber'){
+        if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
             chartDataLoading.value = true
             updateTimeLoading.value = true
             await updateNewestData()
@@ -1436,7 +1533,8 @@ div.device-info-container {
 
                     // background-color: #2a5fdb;
                 }
-                div.goBack{
+
+                div.goBack {
                     z-index: 9999;
                     position: absolute;
                     top: 43px;
@@ -1491,7 +1589,7 @@ div.device-info-container {
                             border-radius: 3px;
                             font-family: 'Microsoft YaHei';
                             font-weight: bold;
-                            font-size: calc(0.45vw + 0.42vh);
+                            font-size: calc(0.4vw + 0.3vh);
                             background-color: #e6f7ff;
                         }
 

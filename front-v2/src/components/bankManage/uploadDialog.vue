@@ -145,6 +145,8 @@ const handleFileUpload = (file) => {
 
         ///// file info 
         const fileInfo = parseInfoFromArray(dialogInfo.value[props.type][props.subType])
+        if (!fileInfo) return
+        
         console.log('fileInfo!!', fileInfo)
 
         ///// build form data
@@ -210,7 +212,9 @@ defineExpose({
     dialogFormVisible
 })
 
-
+window.addEventListener('keydown', e => {
+    console.log(resourceStore.resourceInfo)
+})
 
 
 //////////////// helper ///////////////////
@@ -223,6 +227,17 @@ defineExpose({
  * @returns {Object} - 解析后的对象
  */
 const parseInfoFromArray = (arr) => {
+
+    let boundaryPath
+    if (props.subType === 'Hydrodynamic') {
+        try {
+            boundaryPath = resourceStore.resourceInfo['模型资源管理'][2]["resourceList"][0]["path"]
+        } catch (e) {
+            ElMessage.error('请先上传岸段边界矢量文件!')
+            return false
+        }
+    }
+    console.log(boundaryPath)
     const obj = {}
     arr.forEach(item => {
         if (!item.enName.includes('file')) obj[item.enName] = item.value
@@ -232,7 +247,7 @@ const parseInfoFromArray = (arr) => {
     obj['fileType'] = fileTypeDict[props.type][props.subType]
     obj['category'] = props.subType
     obj['temp'] = false
-    obj['boundary'] = `geojson/${props.bankEnName}/${obj['year']}/${obj['set']}/boundary/boundary.geojson`
+    obj['boundary'] = boundaryPath
     return obj
 }
 
