@@ -102,7 +102,6 @@
                 </div>
             </div>
         </div> -->
-
         <!-- <div class="test" style="
       position: absolute;
       top: 2vh;
@@ -126,9 +125,10 @@
                 </div>
             </div>
         </div>
-        <div class="risk-item-title">崩岸风险因素分析</div>
-
-        <div class="risk-item-container">
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <div v-if="showFactorRisk" class="risk-factor-container">
+            <div class="risk-item-title">崩岸风险因素分析</div>
+            <div class="risk-item-container">
             <div class="risk-item" :class="{ active: showWaterPower }">
                 <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
                     <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
@@ -155,8 +155,9 @@
                     <div class="risk-item-text">外部因素</div>
                 </div>
             </div> -->
+            </div>
         </div>
-
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
         <div class="raster-control-block" v-if="showRasterControl">
             <label class="switch">
                 <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
@@ -497,7 +498,7 @@
 import {
     onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw,
 } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate, } from 'vue-router'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -513,6 +514,7 @@ import TerrainLayer from '../utils/WebGL/terrainLayer'
 // import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
 import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer'
 import { useMapStore } from '../store/mapStore'
+import { useResourceStore } from '../store/resourceStore.js'
 import * as echarts from 'echarts'
 import { ElMessage, ElNotification, dayjs } from 'element-plus'
 import axios from 'axios'
@@ -543,6 +545,10 @@ import { getRealTimeFlowAndLevelData } from '../api/realtimeWaterCondition';
 import { useBankNameStore } from '../store/bankNameStore'
 import BackEndRequest from '../api/backend'
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+const bankName = useBankNameStore().globalBankName
+console.log(bankName)
+////////////////////////////////////////////////////////////////////////////////////////////////
 const curActiveIndex = ref(-1)
 
 const riskResultBarVue = defineAsyncComponent(
@@ -595,6 +601,7 @@ const timeStepFloat = ref(0)
 // const timeStepFloat = computed(()=>{
 //     return timeStep.value
 // })
+const showFactorRisk = ref(false)
 const showFlow = ref(false)
 const showRaster = ref(false)
 const showBankLine = ref(true)
@@ -1797,6 +1804,18 @@ onBeforeRouteUpdate(async (to, from) => {
     useBankNameStore().globalBankName = to.params.id
     let bank = to.params.id
 
+    window.addEventListener('keydown', (e) => {
+        console.log(useBankNameStore().globalBankName)
+    })
+   
+    if (useBankNameStore().globalBankName === 'Mzs') {
+        showFactorRisk.value = true
+        console.log(showFactorRisk)
+    } else {
+        showFactorRisk.value = false
+        console.log(showFactorRisk)
+    }
+
     const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
     bankBCInfo.value = bcInfo
 
@@ -1918,10 +1937,30 @@ onBeforeRouteUpdate(async (to, from) => {
 })
 
 
+
 onMounted(async () => {
     useBankNameStore().globalBankName = route.params.id
     let bk = route.params.id
 
+    window.addEventListener('keydown', (e) => {
+        console.log(useBankNameStore().globalBankName)
+    })
+   
+    if (useBankNameStore().globalBankName === 'Mzs') {
+        showFactorRisk.value = true
+        console.log(showFactorRisk)
+    } else {
+        showFactorRisk.value = false
+        console.log(showFactorRisk)
+    }
+
+    window.addEventListener('keydown', (e) => {
+        console.log(useBankNameStore().globalBankName)
+    })
+    window.addEventListener('keydown', (e) => {
+        console.log('resourceStore.resourceInfo', useResourceStore().resourceInfo)
+    })
+    
     if (bk === 'Mzs') {
 
         const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
@@ -2630,7 +2669,8 @@ div.risk-warn-container {
         top: 0.5vh;
         // width: 31.2vw;
         width: 26vw;
-        height: 15vh;
+        height: 7vh;
+
         background-color: rgba(146, 190, 228, 0.5);
         backdrop-filter: blur(5px);
         border: #0a59ec 2px solid;
@@ -2693,8 +2733,21 @@ div.risk-warn-container {
         }
     }
 
-    div.risk-item-title {
+    div.risk-factor-container {
         position: absolute;
+        z-index: 5;
+        left: 0.3vw;
+        top: 7.5vh;
+        // width: 31.2vw;
+        width: 26vw;
+        height: 7vh;
+
+        background-color: rgba(146, 190, 228, 0.5);
+        backdrop-filter: blur(5px);
+        border: #0a59ec 2px solid;
+        border-radius: 6px;
+
+        div.risk-item-title {
         top: 8vh;
         height: 2.6vh;
         line-height: 2.6vh;
@@ -2710,7 +2763,6 @@ div.risk-warn-container {
     }
 
     div.risk-item-container {
-        position: absolute;
         top: 11.2vh;
         left: 0.4vw;
         height: 4.5vh;
@@ -2770,6 +2822,8 @@ div.risk-warn-container {
                 }
             }
         }
+    }
+    
 
         div.risk-main-index {
             width: 6.8vw;
