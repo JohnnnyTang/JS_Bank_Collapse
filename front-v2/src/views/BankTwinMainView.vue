@@ -240,6 +240,8 @@ const domHideMap = ref({
 })
 ///////////////////////////////////////////////////////////
 const bankNameStore = useBankNameStore()
+console.log(bankNameStore)
+
 const info = reactive({
     "name": '',
     "riskLevel": '',

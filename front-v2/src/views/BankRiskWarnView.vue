@@ -126,9 +126,9 @@
                 </div>
             </div>
         </div>
-        <div class="risk-item-title">崩岸风险因素分析</div>
-
-        <div class="risk-item-container">
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <div class="risk-item-title" v-if="bankName === 'Mzs'">崩岸风险因素分析</div>
+        <div class="risk-item-container" v-if="bankName === 'Mzs'">
             <div class="risk-item" :class="{ active: showWaterPower }">
                 <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
                     <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
@@ -156,7 +156,7 @@
                 </div>
             </div> -->
         </div>
-
+<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
         <div class="raster-control-block" v-if="showRasterControl">
             <label class="switch">
                 <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
@@ -543,6 +543,10 @@ import { getRealTimeFlowAndLevelData } from '../api/realtimeWaterCondition';
 import { useBankNameStore } from '../store/bankNameStore'
 import BackEndRequest from '../api/backend'
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+const bankName = useBankNameStore().globalBankName
+console.log(bankName)
+////////////////////////////////////////////////////////////////////////////////////////////////
 const curActiveIndex = ref(-1)
 
 const riskResultBarVue = defineAsyncComponent(
@@ -1922,6 +1926,10 @@ onMounted(async () => {
     useBankNameStore().globalBankName = route.params.id
     let bk = route.params.id
 
+    window.addEventListener('keydown', (e) => {
+        console.log('resourceStore.resourceInfo', resourceStore.resourceInfo)
+    })
+    
     if (bk === 'Mzs') {
 
         const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
