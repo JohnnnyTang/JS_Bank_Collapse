@@ -136,7 +136,8 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import { useResourceStore } from '../../store/resourceStore'
 import axios from 'axios';
 import { defaultTableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
-import UploadDialog from './uploadDialog.vue'
+// import UploadDialog from './UploadDialog.vue'
+import UploadDialog from './UploadDialog.vue'
 import UpdateDialog from './UpdateDialog.vue'
 
 //////////////////////////// global
@@ -418,11 +419,11 @@ const initOneBank = async (bankEnName) => {
             resourceList: BankResourceHelper.DEMResourcetoList(_ogDEM)
         },
         {
-            key: '水动力预算工况',
+            key: '模型参数文件',
             upload: true,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
+            resourceList: BankResourceHelper.ConfigResourcetoList(_ogConfig)
         },
         {
             key: '岸段边界矢量',
@@ -432,11 +433,11 @@ const initOneBank = async (bankEnName) => {
             resourceList: BankResourceHelper.BoundaryResourcetoList(_ogBound)
         },
         {
-            key: '模型配置文件',
+            key: '水动力预算工况',
             upload: true,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.ConfigResourcetoList(_ogConfig)
+            resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
         },
     ]
 

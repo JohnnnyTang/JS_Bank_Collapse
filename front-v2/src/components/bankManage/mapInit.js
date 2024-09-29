@@ -15,6 +15,7 @@ import axios from 'axios'
 import { useSceneStore } from '../../store/mapStore'
 import { ElMessageBox, ElMessage, dayjs } from 'element-plus'
 import { useBankNameStore } from '../../store/bankNameStore'
+import router from '../../router'
 // import ElementPlus from "element-plus";
 
 const propertyRef = ref({})
@@ -1034,7 +1035,7 @@ const removeWarningDeviceStyle2 = (map, deviceCode) => {
 }
 
 const createPopUp = (deviceProperty, zoom) => {
-    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
+    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom }).use(router)
 
     const container = document.createElement('div')
     container.id = 'monitorDetailV2-div'

@@ -90,6 +90,7 @@ import { onMounted, ref, watch } from 'vue'
 import router from '../../router'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper'
+import { useBankInfoStore } from '../../store/bankInfoStore'
 
 
 const MANAGEMENT = import.meta.env.VITE_BANK_MANAGEMENT
@@ -97,6 +98,7 @@ const updateBankList = async () => {
     console.log('updateBankList')
     let _bankList = (await BankResourceHelper.getBankNamesList()).data
     bankList.value = _bankList
+    useBankInfoStore().bankList = _bankList
 }
 defineExpose({
     updateBankList

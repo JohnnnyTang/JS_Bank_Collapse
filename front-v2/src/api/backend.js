@@ -194,7 +194,7 @@ export default class BackEndRequest {
     //v2版本 
     static getMonitorDetailByType_Code(deviceCode) {
         let bank = useBankNameStore().globalBankName
-        return newBackendInstance.get(`/data/bank/${bank}/monitorData/hour/5/device/${deviceCode}`)
+        return newBackendInstance.get(`/data/bank/${bank}/monitorData/hour/35/device/${deviceCode}`)
     }
 
     //v1版本————未使用    

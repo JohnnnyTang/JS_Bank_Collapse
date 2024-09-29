@@ -14,12 +14,12 @@
                 </div>
                 <div class="device-button-container" v-show="buttonShow">
                     <div class="device-status-button" @click="clickbuttonHandler">
-                         查看图表 </div>
+                        查看图表 </div>
                 </div>
             </div>
             <div class="detail-info-container">
                 <div class="detail-info-flex">
-                    <div class="device-id">{{ deviceIdMap[deviceInfo.code] }}</div>
+                    <div class="device-id">{{ deviceInfo.code }}</div>
                     <div class="device-type-container detail-double-container">
                         <div class="device-type-title detail-title-item">设备编号</div>
                         <div class="device-type-content detail-content-item">
@@ -28,7 +28,7 @@
                     <div class="device-user-container detail-double-container">
                         <div class="device-user-title detail-title-item">监测岸段</div>
                         <div class="device-user-content detail-content-item">
-                            {{ deviceIdPlaceMap[deviceInfo.code] }}</div>
+                            {{ getBankName(deviceInfo.stationCode) }}</div>
                     </div>
                     <div class="device-loc-container detail-single-container">
                         <div class="device-loc-title detail-title-item">安装位置</div>
@@ -57,91 +57,25 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, onBeforeMount } from 'vue';
+import { onMounted, ref, computed, onBeforeMount, watch } from 'vue';
 import pureChart from '../monitorDevice/pureChart.vue';
+import { useBankInfoStore } from '../../../store/bankInfoStore';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const props = defineProps({
     deviceInfo: Object,
     zoom: Object
 })
 
-const deviceIdMap = {
-    'MZS120.51749289_32.04059243_1': 'CL-01',
-    'MZS120.51977143_32.04001152_1': 'CL-02',
-    'MZS120.52557975_32.03825056_1': 'CL-03',
-    'MZS120.52660704_32.03676583_1': 'CL-04',
-    'MZS120.53334877_32.03227055_1': 'CL-05',
-    'MZS120.54599538_32.02837993_1': 'CL-06',
-    'MZS120.55327892_32.02707923_1': 'CL-07',
-    'MZS120.55649757_32.02592404_1': 'CL-08',
-    'MZS120.56334257_32.02298144_1': 'CL-09',
-    'MZS120.56944728_32.02070961_1': 'CL-10',
-    'MZS120.51726088_32.04054582_3': 'KX-01',
-    'MZS120.51738292_32.04054923_3': 'KX-02',
-    'MZS120.51749021_32.04053105_3': 'KX-03',
-    'MZS120.51957026_32.04008655_3': 'KX-04',
-    'MZS120.51967889_32.04004108_3': 'KX-05',
-    'MZS120.51986665_32.03998992_3': 'KX-06',
-    'MZS120.52557975_32.03825056_3': 'KX-07',
-    'MZS120.52565217_32.03813574_3': 'KX-08',
-    'MZS120.52566826_32.03799363_3': 'KX-09',
-    'MZS120.56944728_32.02070961_1': 'KX-10',
-    'MZS120.513203_32.042733_2': 'YL-01',
-    'MZS120.515433_32.04231_2': 'YL-02',
-    'MZS120.521221_32.040331_2': 'YL-03',
-    'MZS120.529078_32.034385_2': 'YL-04',
-    'MZS120.541648_32.030524_2': 'YL-05',
-    'MZS120.548925_32.029361_2': 'YL-06',
-    'MZS120.552209_32.028149_2': 'YL-07',
-    'MZS120.51967889_32.04004108_4': 'CX-01',
-    'MZS120.51986665_32.03998992_4': 'CX-02',
-    'MZS120.52557975_32.03825056_4': 'CX-03',
-    'MZS120.52565217_32.03813574_4': 'CX-04',
-    'MZS120.52566826_32.03799363_4': 'CX-05',
-    'MZS120.51726088_32.04054582_4': 'CX-06',
-    'MZS120.51738292_32.04054923_4': 'CX-07',
-    'MZS120.51749021_32.04053105_4': 'CX-08',
-    'MZS120.51957026_32.04008655_4': 'CX-09',
+
+const getBankName = () => {
+    const bankEnName = route.params.id
+    console.log('getBankName:', useBankInfoStore().bankList, bankEnName)
+    let bankItem = useBankInfoStore().bankList.find(item => item.bank === bankEnName)
+    return bankItem.name
 }
 
-const deviceIdPlaceMap = {
-    '': '暂无',
-    'MZS120.51749289_32.04059243_1': '南顺堤',
-    'MZS120.51977143_32.04001152_1': '南顺堤尾部',
-    'MZS120.52557975_32.03825056_1': '江滩办事处',
-    'MZS120.52660704_32.03676583_1': '小港池',
-    'MZS120.53334877_32.03227055_1': '张靖皋桥位上游',
-    'MZS120.54599538_32.02837993_1': '海事码头',
-    'MZS120.55327892_32.02707923_1': '海事码头下游',
-    'MZS120.55649757_32.02592404_1': '雷达站',
-    'MZS120.56334257_32.02298144_1': '民主沙尾部主路',
-    'MZS120.56944728_32.02070961_1': '民主沙尾部',
-    'MZS120.51726088_32.04054582_3': '南顺堤',
-    'MZS120.51738292_32.04054923_3': '南顺堤',
-    'MZS120.51749021_32.04053105_3': '南顺堤',
-    'MZS120.51957026_32.04008655_3': '南顺堤尾部',
-    'MZS120.51967889_32.04004108_3': '南顺堤尾部',
-    'MZS120.51986665_32.03998992_3': '南顺堤尾部',
-    'MZS120.52557975_32.03825056_3': '江滩办事处',
-    'MZS120.52565217_32.03813574_3': '江滩办事处',
-    'MZS120.52566826_32.03799363_3': '江滩办事处',
-    'MZS120.513203_32.042733_2': '南顺堤',
-    'MZS120.515433_32.04231_2': '南顺堤尾部',
-    'MZS120.521221_32.040331_2': '江滩办事处',
-    'MZS120.529078_32.034385_2': '张靖皋桥位上游',
-    'MZS120.541648_32.030524_2': '海事码头',
-    'MZS120.548925_32.029361_2': '海事码头下游',
-    'MZS120.552209_32.028149_2': '雷达站',
-    'MZS120.51967889_32.04004108_4': '南顺堤',
-    'MZS120.51986665_32.03998992_4': '南顺堤',
-    'MZS120.52557975_32.03825056_4': '南顺堤',
-    'MZS120.52565217_32.03813574_4': '南顺堤尾部',
-    'MZS120.52566826_32.03799363_4': '南顺堤尾部',
-    'MZS120.51726088_32.04054582_4': '南顺堤尾部',
-    'MZS120.51738292_32.04054923_4': '江滩办事处',
-    'MZS120.51749021_32.04053105_4': '江滩办事处',
-    'MZS120.51957026_32.04008655_4': '江滩办事处',
-}
 
 
 const showChart = ref(false)
@@ -173,10 +107,10 @@ const clickbuttonHandler = () => {
 }
 
 onBeforeMount(() => {
-    console.log('monitorDetailV2 onBeforeMount!!!');
+    // console.log('monitorDetailV2 onBeforeMount!!!');
 })
 onMounted(async () => {
-    console.log('monitorDetailV2 onMounted!!!');
+    // console.log('monitorDetailV2 onMounted!!!');
     deviceInfo.value["status"] = '正常运行';
     deviceInfo.value["updating"] = false;
 
@@ -345,10 +279,10 @@ div.info-content-container {
                 text-align: center;
 
                 // line-height: 3vh;
-                font-family: "Trebuchet MS", Helvetica, sans-serif;
-                font-size: calc(1.0vh + 1vw);
+                font-family: "Microsoft YaHei", sans-serif;
+                font-size: calc(0.6vh + 0.75vw);
                 font-weight: 600;
-                color: rgb(0, 19, 70);
+                color: rgb(0, 0, 0);
                 transform: translateX(-5%);
                 // padding-bottom: 0.3vh;
             }
@@ -401,6 +335,7 @@ div.info-content-container {
                 &.device-elevation-content {
                     text-align: right;
                 }
+
                 &.device-user-content {
                     width: 6vw;
                 }

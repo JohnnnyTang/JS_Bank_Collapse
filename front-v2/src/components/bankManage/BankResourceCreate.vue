@@ -116,12 +116,9 @@ import { ref, onMounted, reactive } from 'vue'
 import { defaultBankBasic_Style_Info } from './bankResource'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
-// import { zhCn } from 'element-plus/es/locale';
 
 
-///////////////////////////// element language setting
-// const chinese = zhCn
-
+const emit = defineEmits(['refresh-bank-list'])
 
 //////////////////////////// bank basic info
 
@@ -134,31 +131,31 @@ const bank = reactive({
 const bankBasicInfo = ref(defaultBankBasic_Style_Info)
 
 ////////////////// DEBUG ////////////////
-window.addEventListener('keydown', e => {
-    if (e.key === 'e') {
-        const parseLonLat = (inputStr) => {
-            const coordinates = inputStr.slice(1, -1).split(',');
-            const longitude = parseFloat(coordinates[0]);
-            const latitude = parseFloat(coordinates[1]);
-            return [longitude, latitude]
-        }
-        let nowBasicInfo = bankBasicInfo.value
-        let ReqBody = {
-            "bank": bank.bankEnName,
-            "name": bank.name,
-            "riskLevel": nowBasicInfo[0].val,
-            "center": parseLonLat(nowBasicInfo[1].val),
-            "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val.toISOString(),
-            "introduction": nowBasicInfo[4].val,
-            "management": {
-                "department": nowBasicInfo[5].val,
-                "contact": nowBasicInfo[6].val,
-            }
-        }
-        console.log(ReqBody)
-    }
-})
+// window.addEventListener('keydown', e => {
+//     if (e.key === 'e') {
+//         const parseLonLat = (inputStr) => {
+//             const coordinates = inputStr.slice(1, -1).split(',');
+//             const longitude = parseFloat(coordinates[0]);
+//             const latitude = parseFloat(coordinates[1]);
+//             return [longitude, latitude]
+//         }
+//         let nowBasicInfo = bankBasicInfo.value
+//         let ReqBody = {
+//             "bank": bank.bankEnName,
+//             "name": bank.name,
+//             "riskLevel": nowBasicInfo[0].val,
+//             "center": parseLonLat(nowBasicInfo[1].val),
+//             "monitorLength": nowBasicInfo[2].val,
+//             "monitorStartTime": nowBasicInfo[3].val.toISOString(),
+//             "introduction": nowBasicInfo[4].val,
+//             "management": {
+//                 "department": nowBasicInfo[5].val,
+//                 "contact": nowBasicInfo[6].val,
+//             }
+//         }
+//         console.log(ReqBody)
+//     }
+// })
 
 const createNewBankClickHandler = async () => {
     const haveNULL = Object.values(bank).some(item => item === '' || item === null || item === undefined)
@@ -207,6 +204,7 @@ const createNewBankClickHandler = async () => {
             'title': createMsg,
             'offset': 120
         })
+        emit('refresh-bank-list', true)
 
     }).catch(() => {
         console.log('取消创建岸段');
@@ -726,11 +724,21 @@ div.form-header {
 
     .el-select__placeholder.is-transparent {
         font-size: calc(0.6vh + 0.6vw);
+        font-weight: 500;
     }
 
     .el-select__wrapper {
         height: inherit;
         line-height: inherit;
     }
+
+    .el-select__selected-item {
+        font-size: calc(0.6vh + 0.6vw);
+        font-weight: 500;
+    }
 }
+
+// :deep(.el-select__selected-item .el-select__placeholder){
+//     font-size: calc(0.6vh + 0.6vw);
+// }
 </style>

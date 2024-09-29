@@ -145,17 +145,21 @@ const handleFileUpload = (file) => {
 
         ///// file info 
         const fileInfo = parseInfoFromArray(dialogInfo.value[props.type][props.subType])
-        if (!fileInfo) return
-        
+        if (!fileInfo) {
+            upLoading.value = false
+            return
+        }
+
+        const fileName = extractFileName(file.file.name)
+        fileInfo['name'] = fileName
         console.log('fileInfo!!', fileInfo)
 
         ///// build form data
         formData = new FormData()
         formData.append('file', file.file)
         formData.append('info', JSON.stringify(fileInfo))
-        console.log('formData!!', formData)
 
-        ///// http request
+        /// http request
         BankResourceHelper.uploadBankCalculateResourceFile(formData).then(res => {
             normalSuccessCallback(res)
         }).catch(err => {
@@ -175,7 +179,7 @@ const handleFileUpload = (file) => {
         })
         // 补充
         fileInfo['segment'] = props.bankEnName
-        if(fileInfo['fields'] === "") delete fileInfo['fields']
+        if (fileInfo['fields'] === "") delete fileInfo['fields']
 
         ////// build form data
         formData = new FormData()
@@ -229,6 +233,7 @@ window.addEventListener('keydown', e => {
  */
 const parseInfoFromArray = (arr) => {
 
+    // 水动力工况需要提供边界文件
     let boundaryPath
     if (props.subType === 'Hydrodynamic') {
         try {
@@ -238,7 +243,6 @@ const parseInfoFromArray = (arr) => {
             return false
         }
     }
-    console.log(boundaryPath)
     const obj = {}
     arr.forEach(item => {
         if (!item.enName.includes('file')) obj[item.enName] = item.value
@@ -251,6 +255,17 @@ const parseInfoFromArray = (arr) => {
     obj['boundary'] = boundaryPath
     return obj
 }
+/**
+ * 从 "aaa.bbb"的文件名中提取 "aaa"
+ * @param {string} res 
+ */
+const extractFileName = (res) => {
+    const arr = res.split('.')
+    return arr[0]
+}
+
+
+
 
 const normalSuccessCallback = (res) => {
     ElMessage.success({ message: '上传成功！', offset: 100 })
@@ -283,5 +298,17 @@ div.form-header {
     color: #0539a8;
     letter-spacing: .3rem;
     font-weight: 800;
+}
+
+:deep(.el-form-item) {
+    label {
+        font-size: calc(0.6vw + 0.5vh);
+        font-weight: 600;
+    }
+}
+
+:deep(.el-form-item__label) {
+    font-size: calc(0.6vw + 0.5vh);
+    font-weight: 600;
 }
 </style>

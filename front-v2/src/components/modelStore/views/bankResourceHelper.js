@@ -268,7 +268,7 @@ export default class BankResourceHelper {
             'model': '模型资源管理',
             'visual': '可视化资源管理',
             'device': '设备资源管理'
-        } 
+        }
 
 
         const _listDataDict = {
@@ -278,9 +278,9 @@ export default class BankResourceHelper {
                     let result = this.DEMResourcetoList(_ogDEM)
                     proxy[_proxyCategoryDICI['model']][0]['resourceList'] = result
                 },
-                'Hydrodynamic': async () => {
-                    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
-                    let result = this.HydrodynamicResourcetoList(_ogHydro)
+                'Config': async () => {
+                    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
+                    let result = this.ConfigResourcetoList(_ogConfig)
                     proxy[_proxyCategoryDICI['model']][1]['resourceList'] = result
 
                 },
@@ -290,12 +290,13 @@ export default class BankResourceHelper {
                     proxy[_proxyCategoryDICI['model']][2]['resourceList'] = result
 
                 },
-                'Config': async () => {
-                    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
-                    let result = this.ConfigResourcetoList(_ogConfig)
+                'Hydrodynamic': async () => {
+                    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
+                    let result = this.HydrodynamicResourcetoList(_ogHydro)
                     proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
 
-                }
+                },
+
             },
             'visual': {
                 'DEM': async () => {
