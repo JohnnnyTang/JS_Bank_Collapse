@@ -216,6 +216,11 @@ public class BankResourceController {
         return ResponseEntity.ok(bankResourceService.deleteVector(bank, name));
     }
 
+    @DeleteMapping("/delete/calculate/resource/{bank}/file/{dataType}/{name}")
+    public ResponseEntity<String> deleteCalculateResource(@PathVariable String bank, @PathVariable String dataType, @PathVariable String name) {
+        return ResponseEntity.ok(modelServerService.deleteCalculateResourceData(bank, dataType, name));
+    }
+
     // 资源更新
     @PutMapping("/update/local/resource/bank/{bank}")
     public ResponseEntity<String> updateBankInfo(@PathVariable String bank, @RequestBody JSONObject info) {

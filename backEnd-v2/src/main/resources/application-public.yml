@@ -49,12 +49,12 @@ tile:
   nodeServicePath: E:\bankAppData\baseMapService\index.js
   riverTilePath: E:\bankAppData\riverRasterTile\
   riverImagePath: E:\bankAppData\imageTiles\tiles\
-  tifTilePath: E:\bankAppData\tifTile
 
 staticData:
   tifTilePath: E:\bankAppData\staticData\tifTile
   vectorDataPath: E:\bankAppData\staticData\vectorData
   waterConditionPath: E:\bankAppData\staticData\waterCondition
+  draftDataPath: E:\\Data\\bankProjectData\\staticData\\draftData
 
 waterCondition:
   url: http://10.32.22.202:8001

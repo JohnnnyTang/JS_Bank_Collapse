@@ -45,6 +45,9 @@ public class BankResourceService {
     @Value("${staticData.tifTilePath}")
     String tifTilePath;
 
+    @Value("${staticData.draftDataPath}")
+    String draftDataPath;
+
     @Value("${staticData.waterConditionPath}")
     String waterConditionPath;
 
@@ -210,8 +213,10 @@ public class BankResourceService {
             deleteVector(vectorDataNode.getBank(), vectorDataNode.getName());
         }
         // 删除本地瓦片资源
-        File deleteFolder = new File(tifTilePath + "/tile/" + bank);
-        FileUtil.deleteFolder(deleteFolder);
+        File deleteTileFolder = new File(tifTilePath + "/tile/" + bank);
+        File deleteDraftFolder = new File(draftDataPath + "/tif/" + bank);
+        FileUtil.deleteFolder(deleteTileFolder);
+        FileUtil.deleteFolder(deleteDraftFolder);
         // 删除岸段所有数据节点
         List<DataNodeV2> deleteDataNodes = dataNodeRepoV2.getNodeChildByPath(bankPath);
         deleteDataNodes.add(bankDataNode);
