@@ -400,7 +400,8 @@ const mapInit = async (map, vis) => {
     })
     */
     refreshMap(map)
-    addBankLayer(map, useBankNameStore().globalBankName)
+    let bankEnName = useBankNameStore().globalBankName
+    addBankLayer(map, bankEnName)
     if (vis) {
         const pulsingCVSMap = {
             GNSS: 'point',

@@ -24,6 +24,7 @@ const initMap = async (ref) => {
     })
 }
 const addBankLayer = async (map, bankEnName) => {
+    console.log('bankenname',bankEnName)
     const tServer = import.meta.env.VITE_MAP_TILE_SERVER2
 
     const bank = bankEnName
@@ -41,6 +42,7 @@ const addBankLayer = async (map, bankEnName) => {
     bankVectorLayers.forEach(blayer => {
         const name = blayer.tileName
         const tileUrl = _tile(name)
+        console.log(tileUrl)
         const type = blayer.type
         const fields = blayer.fields
         layers[type].push({

@@ -1,6 +1,6 @@
 <template>
     <div class="device-info-container" :class="{ 'hide-left': props.domHide }">
-        <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
+        <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']" :key="componentKey">
             <div class="device-info-content">
                 <div class="monitor-title-container">设备状态</div>
                 <!-- <div class="monitor-info-splitter">
@@ -139,7 +139,7 @@
                         </div> -->
                     </div>
 
-                    <div v-if="props.showVedio">
+                    <div v-show="props.showVedio">
                         <div class="video-content-container">
                             <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                                 <div class="video-content">
@@ -282,7 +282,6 @@ const deviceStatusDataList = ref([
 const warnDeviceCount = ref([0, 0, 0, 0, 0, '-'])
 
 const domHide = ref(true)
-
 const deviceUpdateTime = ref('2024-06-15 14:00:00')
 
 const shitMap = {
@@ -895,7 +894,7 @@ const deviceSelectChange = async (deviceName) => {
             curDeviceData = []
         }
     } else {
-            curDeviceData = []
+        curDeviceData = []
         // 添加 click 事件监听器
         echartIns.on('click', function (params) {
             // 检查点击的是否是系列中的折点
@@ -929,7 +928,7 @@ const goBack = () => {
 const dataModeChange = (dataMode) => {
     if (curDeviceData != null) {
         showButton.value = false
-   
+
         // chartDataLoading.value = true
         // updateTimeLoading.value = true
         // if (curDeviceData.length > 0) {
@@ -1125,14 +1124,18 @@ function distanceOpenTime(showTime) {
     return days
 }
 
-
+const componentKey = ref(0)
+const reRender = () => {
+    // componentKey.value += 1
+}
 
 onBeforeRouteUpdate(async (to, from) => {
-    useBankNameStore().globalBankName = to.params.id
 
+    useBankNameStore().globalBankName = to.params.id
     deviceStatusLoading.value = true
 
-    const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(useBankNameStore().globalBankName))
+
+    const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(to.params.id))
     monitorInfo.value = importantInfo
 
     deviceList.value = monitorInfo.value[shitMap[selectedDeviceType.value]] ? monitorInfo.value[shitMap[selectedDeviceType.value]]['DeviceList'] : []
@@ -1190,6 +1193,7 @@ onBeforeRouteUpdate(async (to, from) => {
             updateTimeLoading.value = false
         }
     }, 1000 * 60)
+    // reRender()
     // console.log('initialData', initialData)
 
 })
@@ -1215,6 +1219,13 @@ onBeforeMount(async () => {
 })
 
 onMounted(async () => {
+
+    window.addEventListener('keydown', e => {
+        if (e.key === '1') {
+            console.log(props.showVedio)
+        }
+    })
+
     useBankNameStore().globalBankName = route.params.id
 
     // DeviceHelper.getProcessedMonitorInfo(useBankNameStore().globalBankName).then(res => {
@@ -1334,11 +1345,10 @@ div.device-info-container {
         width: 25.4vw;
         margin-left: 0.3vw;
         margin-right: 0.3vw;
-        // height: 72.5vh;
-        height: fit-content;
-        padding-bottom: 0.5vh;
-        margin-top: 0vh;
-        margin-bottom: 0.5vh;
+        height: 72.5vh;
+        // height: fit-content;
+        // margin-top: 0vh;
+        // margin-bottom: 0.5vh;
 
         div.monitor-title-container {
             height: 4vh;
