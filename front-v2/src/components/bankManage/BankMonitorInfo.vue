@@ -1,7 +1,8 @@
 <template>
     <div class="bank-monitor-container">
-        <BankVideo v-if="curPage=='video'"/>
-        <BankDevice v-else :initDevice="initDevice"/>
+        <!-- <BankVideo v-if="curPage=='video'"/>
+        <BankDevice v-else :initDevice="initDevice"/> -->
+        <BankDevice :initDevice="initDevice"/>
     </div>
 </template>
 

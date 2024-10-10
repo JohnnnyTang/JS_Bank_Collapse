@@ -427,6 +427,7 @@ export const resourceUploadTitle = {
 export const fileTypeDict = {
     'model': {
         'DEM': 'tiff',
+        // 'DEM': 'txt',
         'Config': 'json',
         'Boundary': 'geojson',
         'Hydrodynamic': 'hydrodynamic',

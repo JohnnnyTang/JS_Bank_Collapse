@@ -1,7 +1,7 @@
 <template>
     <div class="bank-twin-container">
         <BankTwinNavVue ref="navRef" />
-        <router-view @update-bank-basic-info="updateBankBasicInfoHandler" @refresh-bank-list="updateBankBasicInfoHandler" />
+        <router-view  @refresh-bank-list="updateBankBasicInfoHandler"/>
     </div>
 </template>
 

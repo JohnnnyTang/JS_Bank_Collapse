@@ -40,10 +40,6 @@ const props = defineProps({
     legendList: Array,
 })
 
-watch(props, (newV, oldV) => {
-    console.log(newV, oldV)
-})
-
 
 const close = () => {
     emit('close', 2)

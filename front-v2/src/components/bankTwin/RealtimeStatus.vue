@@ -570,7 +570,6 @@ const changeDeviceType = (deviceName) => {
 }
 
 const deviceTypeSelectChange = async (deviceType) => {
-    console.log(deviceType)
     let tp = shitMap[deviceType]
     deviceList.value = monitorInfo.value[tp] ? monitorInfo.value[tp]['DeviceList'] : []
     selectedDevice.value = deviceList.value[0]
@@ -587,7 +586,6 @@ let realTimeData = null
 let curUpdateInterval = null
 
 const toggleChartOptionFromData = (deviceData) => {
-    // console.log('select data mode', selectedDataMode.value)
     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[
         selectedDeviceType.value
     ](
@@ -595,8 +593,6 @@ const toggleChartOptionFromData = (deviceData) => {
         deviceTypeErrorMap[selectedDeviceType.value],
         selectedDataMode.value,
     )
-    // console.log(deviceOptionMap)
-    // console.log('option', gnssOption)
     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
     // if (selectedDeviceType.value == '位移测量站') {
     //     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[selectedDeviceType.value](
@@ -870,7 +866,6 @@ const fiberNewOption = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const deviceSelectChange = async (deviceName) => {
-    console.log('device change', deviceName)
     chartDataLoading.value = true
     updateTimeLoading.value = true
     showButton.value = false;
@@ -900,7 +895,6 @@ const deviceSelectChange = async (deviceName) => {
             curDeviceData = []
         }
     } else {
-        console.log(deviceTypeNameMap[selectedDeviceType.value]),
             curDeviceData = []
         // 添加 click 事件监听器
         echartIns.on('click', function (params) {
@@ -935,7 +929,7 @@ const goBack = () => {
 const dataModeChange = (dataMode) => {
     if (curDeviceData != null) {
         showButton.value = false
-        console.log('in change.. no data request')
+   
         // chartDataLoading.value = true
         // updateTimeLoading.value = true
         // if (curDeviceData.length > 0) {
@@ -1216,8 +1210,7 @@ onBeforeMount(async () => {
         else {
             console.log("request token failed..")
         }
-        console.log('BeforeMount request for token', token.value)
-        // console.log('request for token')
+        // console.log('BeforeMount request for token', token.value)
     }
 })
 

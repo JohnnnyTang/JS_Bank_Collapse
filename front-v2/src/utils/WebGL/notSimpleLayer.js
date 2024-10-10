@@ -233,7 +233,6 @@ export default class FlowFieldLayer {
         }
         //parser as a JsonFileParser and a data storage
         //just for short writing
-        console.log(this.parser);
         // maxSegmentNum === segmentNum === segmentPrepare
         this.parser.trajectoryNum = this.controller.lineNum;
         this.parser.segmentPrepare = this.parser.maxSegmentNum;

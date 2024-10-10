@@ -451,7 +451,6 @@ const mapInit = async (map, vis) => {
         )
         const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
-        console.log('res geojson', gnss)
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',

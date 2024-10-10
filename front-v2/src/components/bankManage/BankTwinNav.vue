@@ -30,7 +30,7 @@
                     </template>
                     <el-sub-menu index="2-1">
                         <template #title>民主沙右缘</template>
-                        <el-menu-item index="monitor/video">视频监测</el-menu-item>
+                        <!-- <el-menu-item index="monitor/video">视频监测</el-menu-item> -->
                         <el-menu-item index="monitor/gnss">GNSS</el-menu-item>
                         <el-menu-item index="monitor/inclinometer">测斜仪</el-menu-item>
                         <el-menu-item index="monitor/manometer">孔隙水压力计</el-menu-item>

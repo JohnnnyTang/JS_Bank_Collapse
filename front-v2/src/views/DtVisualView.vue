@@ -138,9 +138,9 @@
 
 
         <div class="hydro-pannel">
-            <div class="title"> 
+            <div class="title">
                 <span style="padding-left: .5vw;">实时水文信息</span>
-                <span class="title-time">{{ dayjs().format(`YYYY年MM月DD日`) }}</span>
+                <span class="title-time">{{ waterConditionTime }}</span>
                 <el-icon @click="showHydroPannel = !showHydroPannel" class="iconn">
                     <More />
                 </el-icon>
@@ -791,6 +791,11 @@ const prepareMap = async () => {
     })
     return mapInstance
 }
+const waterConditionTime = ref(dayjs().format(`YYYY年MM月DD日`))
+const updateWaterInfo = async () => {
+    waterTableData.value = await getRealTimeStationData()
+    waterConditionTime.value = dayjs().format(`YYYY年MM月DD日`)
+}
 
 onMounted(async () => {
     //////////init map
@@ -801,9 +806,10 @@ onMounted(async () => {
     dataSource.value = await getSideBarTree()
     sideBarLoading.value = false
     initSortedLayer(map)
-    // temp(map)
-    // console.log('side bar tree ok')
-    waterTableData.value = await getRealTimeStationData()
+
+
+    updateWaterInfo()
+    setInterval(updateWaterInfo, 1000)
 
 })
 
@@ -1691,7 +1697,8 @@ const customSort4 = (a, b) => {
             .iconn {
                 position: absolute;
                 right: 1vw;
-                top:1vh;
+                top: 1vh;
+
                 :hover {
                     cursor: pointer;
                 }
@@ -1757,7 +1764,6 @@ const customSort4 = (a, b) => {
     div.cell {
         height: fit-content;
         line-height: 2vh;
-        width: fit-content;
         font-size: calc(0.5vw + 0.3vh);
         text-align: center;
     }

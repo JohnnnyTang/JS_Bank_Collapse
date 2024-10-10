@@ -111,7 +111,7 @@ export default class BankResourceHelper {
     }
 
     static deleteBankCalculateResourceFile(dataType, bankEnName, fileName) {
-
+        ///bankResource/delete/local/resource/{bank}/file/{name}
     }
 
 
@@ -125,7 +125,6 @@ export default class BankResourceHelper {
      * @param {string} bankEnName 
      */
     static getBankVisualResourceList(dataType, bankEnName) {
-        console.log('1111')
         if (dataType === "DEM") {
             const params = {
                 dataType: dataType,

@@ -148,7 +148,7 @@ onBeforeRouteUpdate(async (to, from) => {
     const toBankEnName = to.params.id
     initOneBank(toBankEnName)
 })
-const emit = defineEmits(['update-bank-basic-info'])
+const emit = defineEmits(['refresh-bank-list'])
 
 const resourceStore = useResourceStore()
 
@@ -227,7 +227,7 @@ const commitModify = () => {
             }
         }
         const updateMsg = (await BankResourceHelper.updateBankBasicInfo(bank.bankEnName, ReqBody)).data
-        emit('update-bank-basic-info', true)
+        emit('refresh-bank-list', true)
         ElNotification.success({
             'title': updateMsg,
             'offset': 120
@@ -348,12 +348,32 @@ const deleteRow = (rowIndex, resourceTypeIndex, info) => {
         resourceList.splice(rowIndex, 1)
 
         // backend delete 。。。
-        if (bank.bankEnName === 'Zys') {
-            BankResourceHelper.deleteBankDevice(info.code).then(res => {
-                console.log(res)
-            }).catch(e => {
-                console.warn(e)
-            })
+        if (bank.bankEnName != 'Mzs') {
+
+            switch (typeDict[nowTypeIndex.value]) {
+
+                case 'model':
+
+                    break;
+
+                case 'visual':
+                    BankResourceHelper.deleteBankVisualResourceFile(info.tileName, bank.bankEnName).then(res => {
+                        console.log(res)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
+                    break;
+
+                case 'device':
+                    BankResourceHelper.deleteBankDevice(info.code).then(res => {
+                        console.log(res)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
+                    break;
+
+            }
+
         }
 
         ElMessage.success({
@@ -382,10 +402,6 @@ onMounted(async () => {
     const _thisBankEnName = route.params.id
     await initOneBank(_thisBankEnName)
 
-    ///// debug 
-    window.addEventListener('keydown', (e) => {
-        console.log('resourceStore.resourceInfo', resourceStore.resourceInfo)
-    })
     // for refresh
     watch(() => resourceStore.resourceInfo, (newVal, oldVal) => {
         // do refresh

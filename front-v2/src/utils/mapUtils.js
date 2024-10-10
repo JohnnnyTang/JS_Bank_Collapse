@@ -28,7 +28,6 @@ const addBankLayer = async (map, bankEnName) => {
 
     const bank = bankEnName
     const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
-    console.log(bankVectorLayers)
     const layers = {
         'point': [],
         'line': [],
@@ -105,7 +104,6 @@ const addBankLayer = async (map, bankEnName) => {
             type: 'vector',
             tiles: [flayer.tileUrl]
         })
-        console.log(flayer.fields[0])
         map.addLayer({
             id: flayer.name,
             type: 'symbol',
