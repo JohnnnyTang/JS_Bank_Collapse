@@ -6,8 +6,7 @@ import dayjs from 'dayjs';
 
 export const getRealTimeStationData = async () => {
     // let stationData = []
-    const stationData = (await axios.get('/model/data/bankResource/down/local/resource/Mzs/waterCondition')).data
-    console.log(stationData)
+    const stationData = (await axios.get('/model/data/bankResource/down/local/resource/waterCondition')).data
 
     let resultData = stationData.map(item => {
         return {
@@ -23,13 +22,14 @@ export const getRealTimeStationData = async () => {
 
 export const getRealTimeFlowAndLevelData = async () => {
 
-    const totalStationData = (await axios.get('/model/data/bankResource/down/local/resource/Mzs/waterCondition')).data
+    const totalStationData = (await axios.get('/model/data/bankResource/down/local/resource/waterCondition')).data
+    const totalTidalRange = (await axios.get('/model/data/bankResource/down/local/resource/tidalRange')).data
     let flow, level
     for (let i = 0; i < totalStationData.length; i++) {
         if (totalStationData[i].station == '大通站')
             flow = totalStationData[i]['flow']
         else if (totalStationData[i].station == '徐六泾站')
-            level = totalStationData[i]['tide-level']
+            level = totalTidalRange[i]['tidalRange']
     }
 
     let flowAndLevelData = {

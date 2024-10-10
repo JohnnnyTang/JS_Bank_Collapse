@@ -1,6 +1,6 @@
 <template>
     <div class="device-info-container" :class="{ 'hide-left': props.domHide }">
-        <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
+        <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']" :key="componentKey">
             <div class="device-info-content">
                 <div class="monitor-title-container">设备状态</div>
                 <!-- <div class="monitor-info-splitter">
@@ -139,7 +139,7 @@
                         </div> -->
                     </div>
 
-                    <div v-if="props.showVedio">
+                    <div v-show="props.showVedio">
                         <div class="video-content-container">
                             <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                                 <div class="video-content">
@@ -282,7 +282,6 @@ const deviceStatusDataList = ref([
 const warnDeviceCount = ref([0, 0, 0, 0, 0, '-'])
 
 const domHide = ref(true)
-
 const deviceUpdateTime = ref('2024-06-15 14:00:00')
 
 const shitMap = {
@@ -570,7 +569,6 @@ const changeDeviceType = (deviceName) => {
 }
 
 const deviceTypeSelectChange = async (deviceType) => {
-    console.log(deviceType)
     let tp = shitMap[deviceType]
     deviceList.value = monitorInfo.value[tp] ? monitorInfo.value[tp]['DeviceList'] : []
     selectedDevice.value = deviceList.value[0]
@@ -587,7 +585,6 @@ let realTimeData = null
 let curUpdateInterval = null
 
 const toggleChartOptionFromData = (deviceData) => {
-    // console.log('select data mode', selectedDataMode.value)
     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[
         selectedDeviceType.value
     ](
@@ -595,8 +592,6 @@ const toggleChartOptionFromData = (deviceData) => {
         deviceTypeErrorMap[selectedDeviceType.value],
         selectedDataMode.value,
     )
-    // console.log(deviceOptionMap)
-    // console.log('option', gnssOption)
     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
     // if (selectedDeviceType.value == '位移测量站') {
     //     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[selectedDeviceType.value](
@@ -870,7 +865,6 @@ const fiberNewOption = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const deviceSelectChange = async (deviceName) => {
-    console.log('device change', deviceName)
     chartDataLoading.value = true
     updateTimeLoading.value = true
     showButton.value = false;
@@ -900,8 +894,7 @@ const deviceSelectChange = async (deviceName) => {
             curDeviceData = []
         }
     } else {
-        console.log(deviceTypeNameMap[selectedDeviceType.value]),
-            curDeviceData = []
+        curDeviceData = []
         // 添加 click 事件监听器
         echartIns.on('click', function (params) {
             // 检查点击的是否是系列中的折点
@@ -935,7 +928,7 @@ const goBack = () => {
 const dataModeChange = (dataMode) => {
     if (curDeviceData != null) {
         showButton.value = false
-        console.log('in change.. no data request')
+
         // chartDataLoading.value = true
         // updateTimeLoading.value = true
         // if (curDeviceData.length > 0) {
@@ -1131,14 +1124,18 @@ function distanceOpenTime(showTime) {
     return days
 }
 
-
+const componentKey = ref(0)
+const reRender = () => {
+    // componentKey.value += 1
+}
 
 onBeforeRouteUpdate(async (to, from) => {
-    useBankNameStore().globalBankName = to.params.id
 
+    useBankNameStore().globalBankName = to.params.id
     deviceStatusLoading.value = true
 
-    const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(useBankNameStore().globalBankName))
+
+    const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(to.params.id))
     monitorInfo.value = importantInfo
 
     deviceList.value = monitorInfo.value[shitMap[selectedDeviceType.value]] ? monitorInfo.value[shitMap[selectedDeviceType.value]]['DeviceList'] : []
@@ -1196,6 +1193,7 @@ onBeforeRouteUpdate(async (to, from) => {
             updateTimeLoading.value = false
         }
     }, 1000 * 60)
+    // reRender()
     // console.log('initialData', initialData)
 
 })
@@ -1216,12 +1214,18 @@ onBeforeMount(async () => {
         else {
             console.log("request token failed..")
         }
-        console.log('BeforeMount request for token', token.value)
-        // console.log('request for token')
+        // console.log('BeforeMount request for token', token.value)
     }
 })
 
 onMounted(async () => {
+
+    window.addEventListener('keydown', e => {
+        if (e.key === '1') {
+            console.log(props.showVedio)
+        }
+    })
+
     useBankNameStore().globalBankName = route.params.id
 
     // DeviceHelper.getProcessedMonitorInfo(useBankNameStore().globalBankName).then(res => {
@@ -1333,8 +1337,8 @@ div.device-info-container {
     left: 1vw;
     top: 18.5vh;
     width: 26vw;
-    height: 72.5vh;
-
+    // height: 72.5vh;
+    height: fit-content;
     transition: all ease-in-out 0.2s;
 
     div.device-info-content {
@@ -1342,8 +1346,9 @@ div.device-info-container {
         margin-left: 0.3vw;
         margin-right: 0.3vw;
         height: 72.5vh;
-        margin-top: 0vh;
-        margin-bottom: 0.5vh;
+        // height: fit-content;
+        // margin-top: 0vh;
+        // margin-bottom: 0.5vh;
 
         div.monitor-title-container {
             height: 4vh;
@@ -1376,7 +1381,7 @@ div.device-info-container {
             width: 98%;
             // margin-top: 0.2vh;
             margin-left: 1%;
-            height: 24.2vh;
+            height: fit-content;
 
             div.small-title-container {
                 position: relative;

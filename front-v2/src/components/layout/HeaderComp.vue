@@ -129,6 +129,7 @@ import { useStatusStore } from '../../store/statusStore'
 import { useBankNameStore } from '../../store/bankNameStore'
 import { onBeforeRouteUpdate } from 'vue-router'
 import axios from 'axios'
+import { useBankInfoStore } from '../../store/bankInfoStore'
 
 const LOGIN = import.meta.env.VITE_LOGIN
 const MANAGEMENT = import.meta.env.VITE_BANK_MANAGEMENT
@@ -312,9 +313,16 @@ const logout = () => {
 const bankManageClickHandler = () => {
     router.push('/bankManage')
 }
+
+
+watch(() => useBankInfoStore().bankList, (newVal) => {
+    console.log('bankList changed')
+    bankList.value = newVal
+})
+
 onBeforeMount(async () => {
     const res = await axios.get('/model/data/bankResource/bank')
-    console.log(res.data)
+    useBankInfoStore().bankList = res.data
     bankList.value = res.data
 })
 

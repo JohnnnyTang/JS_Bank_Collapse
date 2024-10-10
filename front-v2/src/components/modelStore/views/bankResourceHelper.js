@@ -109,9 +109,15 @@ export default class BankResourceHelper {
     static updateBankCalculateResourceFile(dataType, bankEnName, fileInput, fileInfo) {
 
     }
-
+    /**
+     * 
+     * @param {"Hydrodynamic" | "DEM" | "Boundary" | "Config"} dataType 
+     * @param {string} bankEnName 
+     * @param {string} bankEnName 
+     */
     static deleteBankCalculateResourceFile(dataType, bankEnName, fileName) {
-
+        ///  data/bankResource/delete/calculate/resource/Mzsl/file/DEM/202104
+        return axiosIns.delete(`/delete/calculate/resource/${bankEnName}/file/${dataType}/${fileName}`)
     }
 
 
@@ -125,7 +131,6 @@ export default class BankResourceHelper {
      * @param {string} bankEnName 
      */
     static getBankVisualResourceList(dataType, bankEnName) {
-        console.log('1111')
         if (dataType === "DEM") {
             const params = {
                 dataType: dataType,
@@ -268,7 +273,7 @@ export default class BankResourceHelper {
             'model': '模型资源管理',
             'visual': '可视化资源管理',
             'device': '设备资源管理'
-        } 
+        }
 
 
         const _listDataDict = {
@@ -278,9 +283,9 @@ export default class BankResourceHelper {
                     let result = this.DEMResourcetoList(_ogDEM)
                     proxy[_proxyCategoryDICI['model']][0]['resourceList'] = result
                 },
-                'Hydrodynamic': async () => {
-                    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
-                    let result = this.HydrodynamicResourcetoList(_ogHydro)
+                'Config': async () => {
+                    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
+                    let result = this.ConfigResourcetoList(_ogConfig)
                     proxy[_proxyCategoryDICI['model']][1]['resourceList'] = result
 
                 },
@@ -290,12 +295,13 @@ export default class BankResourceHelper {
                     proxy[_proxyCategoryDICI['model']][2]['resourceList'] = result
 
                 },
-                'Config': async () => {
-                    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
-                    let result = this.ConfigResourcetoList(_ogConfig)
+                'Hydrodynamic': async () => {
+                    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
+                    let result = this.HydrodynamicResourcetoList(_ogHydro)
                     proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
 
-                }
+                },
+
             },
             'visual': {
                 'DEM': async () => {

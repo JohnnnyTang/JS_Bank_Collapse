@@ -10,7 +10,6 @@ export default class BankWarnLayer {
         this.type = 'custom'
         this.showLayer = false
         this.prepared = false
-        console.log('contruictasd12312', this.jsonData)
     }
     async onAdd(map, gl) {
         this.gl = gl
@@ -108,7 +107,6 @@ export default class BankWarnLayer {
 
         // vertexAttribute
         this.aPos = gl.getAttribLocation(this.program, 'a_position');
-        console.log(this.aPos);
         // buffer
         this.buffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);

@@ -390,6 +390,7 @@ const confirmBankHandler = async (bank) => {
     })
 }
 const updateTreeFromBack = async (bankEnName) => {
+    console.log(bankEnName)
     const hydroData = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
     const _treeData = await getTreeDataFromJson(hydroData, bankEnName)
     updateTreeData(_treeData)

@@ -1,7 +1,7 @@
 <template>
     <div class="bank-twin-container">
         <BankTwinNavVue ref="navRef" />
-        <router-view @update-bank-basic-info="updateBankBasicInfoHandler" />
+        <router-view  @refresh-bank-list="updateBankBasicInfoHandler"/>
     </div>
 </template>
 
@@ -16,6 +16,12 @@ const updateBankBasicInfoHandler = (val) => {
         navRef.value.updateBankList()
     }
 }
+// const refreshBanklistHandler = (val) => {
+//     if (!val) return
+//     if (navRef.value) {
+//         navRef.value.updateBankList()
+//     }
+// }
 
 </script>
 

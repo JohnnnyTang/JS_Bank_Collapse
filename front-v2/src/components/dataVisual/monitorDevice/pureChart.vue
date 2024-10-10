@@ -62,6 +62,10 @@ const showChart = (index) => {
 // })
 
 
+setTimeout(() => {
+    console.log(selectedFeature.value)
+}, 1000);
+
 
 
 onMounted(async () => {

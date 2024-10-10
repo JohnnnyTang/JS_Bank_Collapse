@@ -38,7 +38,11 @@ const bankList = ref([])
 const emit = defineEmits(['confirmBank'])
 
 const selectedBankChangeHandler = (value) => {
-    emit('confirmBank', value)
+    console.log(value)
+    emit('confirmBank', {
+        name: value.name,
+        bankEnName: value.bank,
+    })
 }
 
 const returnMain = () => {

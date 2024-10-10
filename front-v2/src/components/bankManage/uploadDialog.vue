@@ -7,6 +7,10 @@
             </div>
         </template>
         <el-form :model="dialogInfo[props.type][props.subType]" label-position="top">
+            <!-- <el-radio-group v-model="DEMFileType" v-if="props.type === 'model' && props.subType === 'DEM'">
+                <el-radio value="tif">tif</el-radio>
+                <el-radio value="txt">txt</el-radio>
+            </el-radio-group> -->
             <el-form-item v-for="(  item, index  ) in  dialogInfo[props.type][props.subType]  " :key="index"
                 :label="item.label">
 
@@ -68,6 +72,9 @@ const dialogRef = ref(null)
 
 const resourceStore = useResourceStore()
 
+///////////////// special //////////////////
+// const DEMFileType = ref('txt')
+
 
 
 ///////////////// dialog info ////////////////
@@ -83,14 +90,22 @@ const dialogInfo = ref(resourceUploadNeeded)
 const uploadRef = ref(null)
 const fileList = ref([])
 const upLoading = ref(false)
-let loadingInstance = null
-watch(upLoading, (val) => {
-    if (val) {
-        loadingInstance = ElLoading.service({ target: '.dialog-class', text: '正在上传中...', lock: true, background: 'rgba(255, 255, 255, 0.715)', parent: dialogRef.value })
-    } else {
-        loadingInstance.close()
-    }
-})
+const uploadingStart = () => {
+    upLoading.value = true
+    ElMessage.info({
+        message: '文件正在上传中,请稍后...',
+        offset: 100
+    })
+    dialogFormVisible.value = false
+}
+// let loadingInstance = null
+// watch(upLoading, (val) => {
+//     if (val) {
+//         loadingInstance = ElLoading.service({ target: '.dialog-class', text: '正在上传中...', lock: true, background: 'rgba(255, 255, 255, 0.715)', parent: dialogRef.value })
+//     } else {
+//         loadingInstance.close()
+//     }
+// })
 
 const handlePreview = (file) => {
     console.log('preview! ', file)
@@ -109,8 +124,7 @@ const handleFileUpload = (file) => {
 
     if (props.type === 'device') {
         // 前端解析json后构建请求体
-        upLoading.value = true
-
+        uploadingStart()
         const fileReader = new FileReader()
         fileReader.onload = (e) => {
             try {
@@ -122,7 +136,9 @@ const handleFileUpload = (file) => {
                 ////// http request
                 if (requestInfoFromJsonFile) {
                     BankResourceHelper.uploadBankDevice(requestInfoFromJsonFile, props.bankEnName).then(res => {
-                        normalSuccessCallback(res)
+                        setTimeout(() => {
+                            normalSuccessCallback(res)
+                        }, 3000);
                     }).catch(err => {
                         normalFailCallback(err)
                     })
@@ -142,20 +158,27 @@ const handleFileUpload = (file) => {
     else if (props.type === 'model') {
         // 上传文件至后端
         upLoading.value = true
-
+        uploadingStart()
         ///// file info 
         const fileInfo = parseInfoFromArray(dialogInfo.value[props.type][props.subType])
-        if (!fileInfo) return
-        
-        console.log('fileInfo!!', fileInfo)
+        if (!fileInfo) {
+            upLoading.value = false
+            return
+        }
+
+        // next process of fileInfo
+        const [fileName, fileType] = extractFileNameAndType(file.file.name)
+        fileInfo['name'] = fileName
+        fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
+
 
         ///// build form data
         formData = new FormData()
         formData.append('file', file.file)
         formData.append('info', JSON.stringify(fileInfo))
-        console.log('formData!!', formData)
 
-        ///// http request
+
+        /// http request
         BankResourceHelper.uploadBankCalculateResourceFile(formData).then(res => {
             normalSuccessCallback(res)
         }).catch(err => {
@@ -166,7 +189,7 @@ const handleFileUpload = (file) => {
     else if (props.type === 'visual') {
 
         upLoading.value = true
-
+        uploadingStart()
         ////// file info
         const fileInfo = {}
         const needed = dialogInfo.value[props.type][props.subType]
@@ -175,7 +198,7 @@ const handleFileUpload = (file) => {
         })
         // 补充
         fileInfo['segment'] = props.bankEnName
-        if(fileInfo['fields'] === "") delete fileInfo['fields']
+        if (fileInfo['fields'] === "") delete fileInfo['fields']
 
         ////// build form data
         formData = new FormData()
@@ -196,7 +219,7 @@ const cancleUploadHandler = () => {
     dialogFormVisible.value = false
 }
 const confirmUploadHandler = (e) => {
-    console.log('confirmUploadHandler!!', e)
+
     // console.log(' uploadRef.value!',  uploadRef.value[0])
     // uploadRef.value && uploadRef.value.map((item) => item.submit())
 
@@ -213,10 +236,6 @@ defineExpose({
     dialogFormVisible
 })
 
-window.addEventListener('keydown', e => {
-    console.log(resourceStore.resourceInfo)
-})
-
 
 //////////////// helper ///////////////////
 /**
@@ -229,6 +248,7 @@ window.addEventListener('keydown', e => {
  */
 const parseInfoFromArray = (arr) => {
 
+    // 水动力工况需要提供边界文件
     let boundaryPath
     if (props.subType === 'Hydrodynamic') {
         try {
@@ -238,7 +258,6 @@ const parseInfoFromArray = (arr) => {
             return false
         }
     }
-    console.log(boundaryPath)
     const obj = {}
     arr.forEach(item => {
         if (!item.enName.includes('file')) obj[item.enName] = item.value
@@ -251,6 +270,16 @@ const parseInfoFromArray = (arr) => {
     obj['boundary'] = boundaryPath
     return obj
 }
+/**
+ * 从 "aaa.bbb"的文件名中提取 "aaa"
+ * @param {string} res 
+ */
+const extractFileNameAndType = (res) => {
+    const arr = res.split('.')
+    return [arr[0], arr[1]]
+}
+
+
 
 const normalSuccessCallback = (res) => {
     ElMessage.success({ message: '上传成功！', offset: 100 })
@@ -270,9 +299,6 @@ const normalFailCallback = (err) => {
 </script>
 
 <style lang="scss" scoped>
-:deep(.el-form) {
-    background-color: red;
-}
 
 div.form-header {
     position: relative;
@@ -284,4 +310,17 @@ div.form-header {
     letter-spacing: .3rem;
     font-weight: 800;
 }
+
+:deep(.el-form-item) {
+    label {
+        font-size: calc(0.6vw + 0.5vh);
+        font-weight: 600;
+    }
+}
+
+:deep(.el-form-item__label) {
+    font-size: calc(0.6vw + 0.5vh);
+    font-weight: 600;
+}
+
 </style>

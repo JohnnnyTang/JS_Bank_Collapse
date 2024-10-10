@@ -136,7 +136,8 @@ import { UploadFilled } from '@element-plus/icons-vue'
 import { useResourceStore } from '../../store/resourceStore'
 import axios from 'axios';
 import { defaultTableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
-import UploadDialog from './uploadDialog.vue'
+// import UploadDialog from './UploadDialog.vue'
+import UploadDialog from './UploadDialog.vue'
 import UpdateDialog from './UpdateDialog.vue'
 
 //////////////////////////// global
@@ -147,7 +148,7 @@ onBeforeRouteUpdate(async (to, from) => {
     const toBankEnName = to.params.id
     initOneBank(toBankEnName)
 })
-const emit = defineEmits(['update-bank-basic-info'])
+const emit = defineEmits(['refresh-bank-list'])
 
 const resourceStore = useResourceStore()
 
@@ -226,7 +227,7 @@ const commitModify = () => {
             }
         }
         const updateMsg = (await BankResourceHelper.updateBankBasicInfo(bank.bankEnName, ReqBody)).data
-        emit('update-bank-basic-info', true)
+        emit('refresh-bank-list', true)
         ElNotification.success({
             'title': updateMsg,
             'offset': 120
@@ -347,12 +348,37 @@ const deleteRow = (rowIndex, resourceTypeIndex, info) => {
         resourceList.splice(rowIndex, 1)
 
         // backend delete 。。。
-        if (bank.bankEnName === 'Zys') {
-            BankResourceHelper.deleteBankDevice(info.code).then(res => {
-                console.log(res)
-            }).catch(e => {
-                console.warn(e)
-            })
+        if (bank.bankEnName != 'Mzs') {
+
+            switch (typeDict[nowTypeIndex.value]) {
+                case 'model':
+                    let subType = resourceTypeDict[typeDict[nowTypeIndex.value]][nowSubTypeIndex.value]
+                    console.log('subType', subType)
+                    BankResourceHelper.deleteBankCalculateResourceFile(subType, bank.bankEnName, info.name).then(res => {
+                        console.log(res)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
+                    break;
+
+                case 'visual':
+                    BankResourceHelper.deleteBankVisualResourceFile(info.tileName, bank.bankEnName).then(res => {
+                        console.log(res)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
+                    break;
+
+                case 'device':
+                    BankResourceHelper.deleteBankDevice(info.code).then(res => {
+                        console.log(res)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
+                    break;
+
+            }
+
         }
 
         ElMessage.success({
@@ -381,10 +407,6 @@ onMounted(async () => {
     const _thisBankEnName = route.params.id
     await initOneBank(_thisBankEnName)
 
-    ///// debug 
-    window.addEventListener('keydown', (e) => {
-        console.log('resourceStore.resourceInfo', resourceStore.resourceInfo)
-    })
     // for refresh
     watch(() => resourceStore.resourceInfo, (newVal, oldVal) => {
         // do refresh
@@ -418,11 +440,11 @@ const initOneBank = async (bankEnName) => {
             resourceList: BankResourceHelper.DEMResourcetoList(_ogDEM)
         },
         {
-            key: '水动力预算工况',
+            key: '模型参数文件',
             upload: true,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
+            resourceList: BankResourceHelper.ConfigResourcetoList(_ogConfig)
         },
         {
             key: '岸段边界矢量',
@@ -432,11 +454,11 @@ const initOneBank = async (bankEnName) => {
             resourceList: BankResourceHelper.BoundaryResourcetoList(_ogBound)
         },
         {
-            key: '模型配置文件',
+            key: '水动力预算工况',
             upload: true,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.ConfigResourcetoList(_ogConfig)
+            resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
         },
     ]
 

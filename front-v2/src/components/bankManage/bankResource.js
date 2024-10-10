@@ -158,7 +158,8 @@ export const typeDict = ['model', 'visual', 'device']
 export const categoryNameDict = ['模型资源管理', '可视化资源管理', '设备资源管理']
 
 export const resourceTypeDict = {
-    'model': ['DEM', 'Hydrodynamic', 'Boundary', 'Config'],
+    // 'model': ['DEM', 'Hydrodynamic', 'Boundary', 'Config'],
+    'model': ['DEM', 'Config', 'Boundary', 'Hydrodynamic'],
     'visual': ['DEM', 'Vector'],
     'device': ['GNSS', 'MENOMETER', "STRESS", "INCLINE", "VEDIO"]
 }
@@ -167,12 +168,12 @@ export const resourceTypeDict = {
 export const resourceUploadNeeded = {
     'model': {
         'DEM': [
-            {
-                label: '文件名',
-                enName: 'name',
-                value: '',
-                type: 'input',
-            },
+            // {
+            //     label: '文件名',
+            //     enName: 'name',
+            //     value: '',
+            //     type: 'input',
+            // },
             {
                 label: '年份',
                 enName: 'year',
@@ -204,13 +205,13 @@ export const resourceUploadNeeded = {
                 type: 'file',
             }
         ],
-        'Hydrodynamic': [
-            {
-                label: '文件名',
-                enName: 'name',
-                value: '',
-                type: 'input',
-            },
+        'Config': [
+            // {
+            //     label: '文件名',
+            //     enName: 'name',
+            //     value: '',
+            //     type: 'input',
+            // },
             {
                 label: '年份',
                 enName: 'year',
@@ -236,19 +237,19 @@ export const resourceUploadNeeded = {
                 type: 'input',
             },
             {
-                label: '水动力工况文件',
+                label: '模型配置文件',
                 enName: 'file',
                 value: null,
                 type: 'file',
             }
         ],
         'Boundary': [
-            {
-                label: '文件名',
-                enName: 'name',
-                value: '',
-                type: 'input',
-            },
+            // {
+            //     label: '文件名',
+            //     enName: 'name',
+            //     value: '',
+            //     type: 'input',
+            // },
             {
                 label: '年份',
                 enName: 'year',
@@ -280,13 +281,13 @@ export const resourceUploadNeeded = {
                 type: 'file',
             }
         ],
-        'Config': [
-            {
-                label: '文件名',
-                enName: 'name',
-                value: '',
-                type: 'input',
-            },
+        'Hydrodynamic': [
+            // {
+            //     label: '文件名',
+            //     enName: 'name',
+            //     value: '',
+            //     type: 'input',
+            // },
             {
                 label: '年份',
                 enName: 'year',
@@ -312,12 +313,13 @@ export const resourceUploadNeeded = {
                 type: 'input',
             },
             {
-                label: '模型配置文件',
+                label: '水动力工况文件',
                 enName: 'file',
                 value: null,
                 type: 'file',
             }
-        ]
+        ],
+
     },
     'visual': {
         'DEM': [
@@ -405,9 +407,9 @@ export const resourceUploadNeeded = {
 export const resourceUploadTitle = {
     'model': {
         'DEM': '地形数据',
-        'Hydrodynamic': '预算工况数据',
+        'Config': '配置数据',
         'Boundary': '岸段边界数据',
-        'Config': '配置数据'
+        'Hydrodynamic': '预算工况数据',
     },
     'visual': {
         'DEM': '栅格数据',
@@ -415,7 +417,7 @@ export const resourceUploadTitle = {
     },
     'device': {
         'GNSS': 'GNSS设备',
-        'MENOMETER': '孔隙水压力计设备',
+        'MENOMETER': '水压力计设备',
         'STRESS': '应力桩设备',
         'INCLINE': '测斜仪设备',
         'VEDIO': '监控设备'
@@ -425,9 +427,10 @@ export const resourceUploadTitle = {
 export const fileTypeDict = {
     'model': {
         'DEM': 'tiff',
-        'Hydrodynamic': 'hydrodynamic',
+        // 'DEM': 'txt',
+        'Config': 'json',
         'Boundary': 'geojson',
-        'Config': 'json'
+        'Hydrodynamic': 'hydrodynamic',
     }
 }
 

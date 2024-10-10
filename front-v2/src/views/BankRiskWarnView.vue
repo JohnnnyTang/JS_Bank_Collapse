@@ -125,30 +125,30 @@
                 </div>
             </div>
         </div>
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
         <div v-if="showFactorRisk" class="risk-factor-container">
             <div class="risk-item-title">崩岸风险因素分析</div>
             <div class="risk-item-container">
-            <div class="risk-item" :class="{ active: showWaterPower }">
-                <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
-                    <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
-                    <div class="risk-item-text">水流动力</div>
+                <div class="risk-item" :class="{ active: showWaterPower }">
+                    <div class="risk-main-index waterpower" @click="showWaterPowerFunc">
+                        <dv-border-box-12 v-if="showWaterPower"></dv-border-box-12>
+                        <div class="risk-item-text">水流动力</div>
+                    </div>
                 </div>
-            </div>
-            <div class="risk-item" :class="{ active: showRiverBed }">
-                <div class="risk-main-index riverbed" @click="showRiverBedFunc">
-                    <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
-                    <div class="risk-item-text">河床演变</div>
+                <div class="risk-item" :class="{ active: showRiverBed }">
+                    <div class="risk-main-index riverbed" @click="showRiverBedFunc">
+                        <dv-border-box-12 :color="['rgb(73, 164, 101)', '#9cf3e0']" v-if="showRiverBed"></dv-border-box-12>
+                        <div class="risk-item-text">河床演变</div>
+                    </div>
                 </div>
-            </div>
-            <div class="risk-item" :class="{ active: showGeologyAndProject }">
-                <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
-                    <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
-                        v-if="showGeologyAndProject"></dv-border-box-12>
-                    <div class="risk-item-text">地质与工程治理</div>
+                <div class="risk-item" :class="{ active: showGeologyAndProject }">
+                    <div class="risk-main-index bankGeology" @click="showGeologyAndProjectFunc">
+                        <dv-border-box-12 :color="['rgb(153, 143, 199)', 'rgb(231, 161, 240)']"
+                            v-if="showGeologyAndProject"></dv-border-box-12>
+                        <div class="risk-item-text">地质与工程治理</div>
+                    </div>
                 </div>
-            </div>
-            <!-- <div class="risk-item" :class="{ active: showGeologyAndProject }">
+                <!-- <div class="risk-item" :class="{ active: showGeologyAndProject }">
                 <div class="risk-main-index outproject" @click="showGeologyAndProjectFunc">
                     <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']"
                         v-if="showGeologyAndProject"></dv-border-box-12>
@@ -157,7 +157,7 @@
             </div> -->
             </div>
         </div>
-<!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
         <div class="raster-control-block" v-if="showRasterControl">
             <label class="switch">
                 <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
@@ -1804,16 +1804,29 @@ onBeforeRouteUpdate(async (to, from) => {
     useBankNameStore().globalBankName = to.params.id
     let bank = to.params.id
 
-    window.addEventListener('keydown', (e) => {
-        console.log(useBankNameStore().globalBankName)
-    })
-   
     if (useBankNameStore().globalBankName === 'Mzs') {
         showFactorRisk.value = true
-        console.log(showFactorRisk)
+        conditionConfigureData.refDEM = {
+            "sets": "standard",
+            "year": "2012",
+            "name": "201210",
+            "fileType": "tiff",
+            "path": "tiff/Mzs/2012/standard/201210/201210.tif",
+            "month": "10"
+        }
+        conditionConfigureData.benchDEM = {
+            "sets": "standard",
+            "year": "2023",
+            "name": "202304",
+            "fileType": "tiff",
+            "path": "tiff/Mzs/2023/standard/202304/202304.tif",
+            "month": "04"
+        }
+
     } else {
         showFactorRisk.value = false
-        console.log(showFactorRisk)
+        conditionConfigureData.refDEM = null
+        conditionConfigureData.benchDEM = null
     }
 
     const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
@@ -1942,25 +1955,31 @@ onMounted(async () => {
     useBankNameStore().globalBankName = route.params.id
     let bk = route.params.id
 
-    window.addEventListener('keydown', (e) => {
-        console.log(useBankNameStore().globalBankName)
-    })
-   
     if (useBankNameStore().globalBankName === 'Mzs') {
         showFactorRisk.value = true
-        console.log(showFactorRisk)
+        conditionConfigureData.refDEM = {
+            "sets": "standard",
+            "year": "2012",
+            "name": "201210",
+            "fileType": "tiff",
+            "path": "tiff/Mzs/2012/standard/201210/201210.tif",
+            "month": "10"
+        }
+        conditionConfigureData.benchDEM = {
+            "sets": "standard",
+            "year": "2023",
+            "name": "202304",
+            "fileType": "tiff",
+            "path": "tiff/Mzs/2023/standard/202304/202304.tif",
+            "month": "04"
+        }
+
     } else {
         showFactorRisk.value = false
-        console.log(showFactorRisk)
+        conditionConfigureData.refDEM = null
+        conditionConfigureData.benchDEM = null
     }
 
-    window.addEventListener('keydown', (e) => {
-        console.log(useBankNameStore().globalBankName)
-    })
-    window.addEventListener('keydown', (e) => {
-        console.log('resourceStore.resourceInfo', useResourceStore().resourceInfo)
-    })
-    
     if (bk === 'Mzs') {
 
         const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
@@ -2748,82 +2767,82 @@ div.risk-warn-container {
         border-radius: 6px;
 
         div.risk-item-title {
-        top: 8vh;
-        height: 2.6vh;
-        line-height: 2.6vh;
-        left: 0.4vw;
-        z-index: 8;
-        width: 26vw;
-        font-weight: bold;
-        font-size: calc(0.6vw + 0.8vh);
-        text-shadow: #eef3ff 1px 1px;
-        // box-shadow: 0px 2px rgb(0, 26, 255);
-        color: #0011ff;
-        text-align: center;
-    }
+            top: 8vh;
+            height: 2.6vh;
+            line-height: 2.6vh;
+            left: 0.4vw;
+            z-index: 8;
+            width: 26vw;
+            font-weight: bold;
+            font-size: calc(0.6vw + 0.8vh);
+            text-shadow: #eef3ff 1px 1px;
+            // box-shadow: 0px 2px rgb(0, 26, 255);
+            color: #0011ff;
+            text-align: center;
+        }
 
-    div.risk-item-container {
-        top: 11.2vh;
-        left: 0.4vw;
-        height: 4.5vh;
-        width: 26vw;
-        // background-color: rgba(197, 211, 228, 0.6);
-        // border: rgba(0, 119, 255, 0.6) 2px solid;
-        border-radius: 6px;
-        z-index: 20;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        // background-color: red;
-        backdrop-filter: blur(8px);
-
-        div.risk-item {
-            flex: 1 1 0;
-            position: relative;
+        div.risk-item-container {
+            top: 11.2vh;
+            left: 0.4vw;
+            height: 4.5vh;
+            width: 26vw;
+            // background-color: rgba(197, 211, 228, 0.6);
+            // border: rgba(0, 119, 255, 0.6) 2px solid;
+            border-radius: 6px;
+            z-index: 20;
             display: flex;
-            margin-bottom: 0.5vh;
-            margin-left: 0.5vw;
-            margin-right: 0.5vw;
+            flex-direction: row;
+            justify-content: space-evenly;
+            // background-color: red;
+            backdrop-filter: blur(8px);
 
-            @keyframes colorSlide {
-                0% {
-                    background-position: 0% 50%;
+            div.risk-item {
+                flex: 1 1 0;
+                position: relative;
+                display: flex;
+                margin-bottom: 0.5vh;
+                margin-left: 0.5vw;
+                margin-right: 0.5vw;
+
+                @keyframes colorSlide {
+                    0% {
+                        background-position: 0% 50%;
+                    }
+
+                    // 50% {
+                    //     background-position: 200% 50%;
+                    // }
+                    100% {
+                        background-position: 300% 50%;
+                    }
                 }
 
-                // 50% {
-                //     background-position: 200% 50%;
-                // }
-                100% {
-                    background-position: 300% 50%;
-                }
-            }
+                &.active {
+                    div.risk-main-index {
+                        &.waterpower {
+                            animation: colorSlide ease-in-out 2s;
+                            animation-fill-mode: forwards;
+                        }
 
-            &.active {
-                div.risk-main-index {
-                    &.waterpower {
-                        animation: colorSlide ease-in-out 2s;
-                        animation-fill-mode: forwards;
-                    }
+                        &.riverbed {
+                            animation: colorSlide ease-in-out 2s;
+                            animation-fill-mode: forwards;
+                        }
 
-                    &.riverbed {
-                        animation: colorSlide ease-in-out 2s;
-                        animation-fill-mode: forwards;
-                    }
+                        &.bankGeology {
+                            animation: colorSlide ease-in-out 2s;
+                            animation-fill-mode: forwards;
+                        }
 
-                    &.bankGeology {
-                        animation: colorSlide ease-in-out 2s;
-                        animation-fill-mode: forwards;
-                    }
-
-                    &.outproject {
-                        animation: colorSlide ease-in-out 2s;
-                        animation-fill-mode: forwards;
+                        &.outproject {
+                            animation: colorSlide ease-in-out 2s;
+                            animation-fill-mode: forwards;
+                        }
                     }
                 }
             }
         }
-    }
-    
+
 
         div.risk-main-index {
             width: 6.8vw;
@@ -3529,7 +3548,7 @@ div.risk-warn-container {
             height: 2vh;
             z-index: 11;
 
-            &.none{
+            &.none {
                 left: 10.3vw;
             }
 

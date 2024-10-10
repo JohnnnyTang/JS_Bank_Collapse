@@ -15,6 +15,7 @@ import axios from 'axios'
 import { useSceneStore } from '../../store/mapStore'
 import { ElMessageBox, ElMessage, dayjs } from 'element-plus'
 import { useBankNameStore } from '../../store/bankNameStore'
+import router from '../../router'
 // import ElementPlus from "element-plus";
 
 const propertyRef = ref({})
@@ -399,7 +400,8 @@ const mapInit = async (map, vis) => {
     })
     */
     refreshMap(map)
-    addBankLayer(map, useBankNameStore().globalBankName)
+    let bankEnName = useBankNameStore().globalBankName
+    addBankLayer(map, bankEnName)
     if (vis) {
         const pulsingCVSMap = {
             GNSS: 'point',
@@ -450,7 +452,6 @@ const mapInit = async (map, vis) => {
         )
         const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
-        console.log('res geojson', gnss)
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',
@@ -1034,7 +1035,7 @@ const removeWarningDeviceStyle2 = (map, deviceCode) => {
 }
 
 const createPopUp = (deviceProperty, zoom) => {
-    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
+    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom }).use(router)
 
     const container = document.createElement('div')
     container.id = 'monitorDetailV2-div'

@@ -661,8 +661,9 @@ watch(
 // 岸段切换
 onBeforeRouteUpdate((to, from) => {
 
+ 
     useBankNameStore().globalBankName = to.params.id
-    if (useBankNameStore().globalBankName === 'Mzs') {
+    if (to.params.id === 'Mzs') {
         showVedio.value = true
         showViewButton.value = true
     } else {
@@ -671,6 +672,7 @@ onBeforeRouteUpdate((to, from) => {
     }
     // refreshMap(useMapStore().getMap())
     mapInit(useMapStore().getMap(), true)
+
 
 })
 
