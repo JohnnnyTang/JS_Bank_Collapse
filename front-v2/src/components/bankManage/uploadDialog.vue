@@ -1,25 +1,35 @@
 <template>
-    <el-dialog v-model="dialogFormVisible" width="18vw" :show-close="false" v-if="props.type === 'model'" ref="dialogRef"
-        custom-class="dialog-class">
+    <el-dialog v-model="dialogFormVisible" width="18vw" :show-close="false" ref="dialogRef" custom-class="dialog-class"
+        :destroy-on-close="true">
         <template #header="{ titleId, titleClass }">
             <div class="form-header">
                 {{ dialogFormTitle }}
             </div>
         </template>
-        <el-form :model="dialogInfo[props.type]">
-            <el-form-item v-for="(  item, index  ) in  dialogInfo[props.type]  " :key="index" :label="item.label">
-                <el-input v-model="item.value" autocomplete="off" />
+        <el-form :model="dialogInfo[props.type][props.subType]" label-position="top">
+            <el-form-item v-for="(  item, index  ) in  dialogInfo[props.type][props.subType]  " :key="index"
+                :label="item.label">
+
+                <el-input v-if="item.type === 'input'" v-model="item.value" autocomplete="off" />
+
+                <el-radio-group v-model="item.value" v-else-if="item.type === 'radios'">
+                    <el-radio v-for="(_, radioIndex) in item.radioLabelArray" :value='item.radioValueArray[radioIndex]'> {{
+                        item.radioLabelArray[radioIndex] }} </el-radio>
+                </el-radio-group>
+
+                <el-upload v-else-if="item.type === 'file'" style="height: fit-content;" drag action="#" :multiple="false"
+                    :show-file-list="true" ref="uploadRef" :auto-upload="false" :file-list="fileList"
+                    :on-preview="handlePreview" :on-remove="handleRemove" :on-change="handleFileChange"
+                    :http-request="handleFileUpload">
+                    <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                    <div class="el-upload__text">
+                        <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+                    </div>
+                </el-upload>
+
             </el-form-item>
         </el-form>
-        <el-upload style="height: fit-content;" drag action="#" :multiple="false" :show-file-list="true" ref="uploadRef"
-            :auto-upload="false" :file-list="fileList" :on-preview="handlePreview" :on-remove="handleRemove"
-            :http-request="handleFileUpload">
-            <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-            <div class="el-upload__text">
-                <em>拖拽文件至此处</em>或<em>点击</em>进行上传
-            </div>
-            <!-- <div slot="tip" class="el-upload__tip">只能上传jpg/jpeg/png文件，且不超过500kb</div> -->
-        </el-upload>
+
 
         <template #footer>
             <div class="dialog-footer">
@@ -36,6 +46,9 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { ElLoading, ElMessage } from 'element-plus'
 import axios from 'axios'
+import { resourceUploadNeeded, resourceUploadTitle, fileTypeDict } from './bankResource'
+import BankResourceHelper from '../modelStore/views/bankResourceHelper';
+import { useResourceStore } from '../../store/resourceStore';
 
 const props = defineProps({
     type: {
@@ -49,69 +62,22 @@ const props = defineProps({
     bankEnName: {
         type: String,
         default: 'Mzs'
-    },
+    }
 })
 const dialogRef = ref(null)
+
+const resourceStore = useResourceStore()
+
+
 
 ///////////////// dialog info ////////////////
 const dialogFormVisible = ref(false)
 const dialogFormTitle = computed(() => {
-    const titleMap = {
-        'model': {
-            'DEM': '地形数据',
-            'Hydrodynamic': '预算工况数据',
-            'Boundary': '岸段边界数据',
-            'Config': '配置数据'
-        }
-    }
-    return titleMap[props.type][props.subType] + '上传'
+    return resourceUploadTitle[props.type][props.subType] + '上传'
 })
-const segment = computed(() => {
-    return props.bankEnName
-})
-const fileType = computed(() => {
-    const fileTypeMap = {
-        'model': {
-            'DEM': 'tiff',
-            'Hydrodynamic': 'Hydrodynamic',
-            'Boundary': 'shapefile',
-            'Config': 'json'
-        }
-    }
-    return fileTypeMap[props.type][props.subType]
-})
-const category = computed(() => {
-    return props.subType
-})
-const dialogInfo = ref({
-    'model': [
-        {
-            label: '文件名',
-            enName: 'name',
-            value: ''
-        },
-        {
-            label: '年份',
-            enName: 'year',
-            value: '2023'
-        },
-        {
-            label: '月份',
-            enName: 'month',
-            value: '04'
-        },
-        {
-            label: '工况集',
-            enName: 'set',
-            value: 'standard'
-        },
-        {
-            label: '备注',
-            enName: 'description',
-            value: ''
-        },
-    ]
-})
+
+const dialogInfo = ref(resourceUploadNeeded)
+
 
 //////////////// upload /////////////////////
 const uploadRef = ref(null)
@@ -134,36 +100,108 @@ const handleRemove = (file, fileList) => {
     console.log('Cancel the transfer! ', file.name)
 }
 let formData = null
+let requestInfoFromJsonFile = null
+const handleFileChange = (file) => {
+    console.log('file change!')
+}
 const handleFileUpload = (file) => {
+    console.log('handleFileUpload!!', file, fileList.value)
 
-    // file info 
-    const fileInfo = parseInfoFromArray(dialogInfo.value[props.type])
-    console.log('fileInfo!!', fileInfo)
-    // build form data
-    formData = new FormData()
-    formData.append('file', file.file)
-    formData.append('info', JSON.stringify(fileInfo))
-    console.log('formData!!', formData)
+    if (props.type === 'device') {
+        // 前端解析json后构建请求体
+        upLoading.value = true
+
+        const fileReader = new FileReader()
+        fileReader.onload = (e) => {
+            try {
+                ////// request body
+                let fileContent = JSON.parse(e.target.result)
+                console.log(fileContent)
+                requestInfoFromJsonFile = Object.assign({}, fileContent)
+
+                ////// http request
+                if (requestInfoFromJsonFile) {
+                    BankResourceHelper.uploadBankDevice(requestInfoFromJsonFile, props.bankEnName).then(res => {
+                        normalSuccessCallback(res)
+                    }).catch(err => {
+                        normalFailCallback(err)
+                    })
+                }
+
+            } catch (err) {
+                console.log(err)
+                normalFailCallback(err)
+                ElMessage.error({
+                    message: '请上传正确的设备配置文件！',
+                    offset: 100
+                })
+            }
+        }
+        fileReader.readAsText(file.file)
+    }
+    else if (props.type === 'model') {
+        // 上传文件至后端
+        upLoading.value = true
+
+        ///// file info 
+        const fileInfo = parseInfoFromArray(dialogInfo.value[props.type][props.subType])
+        if (!fileInfo) return
+        
+        console.log('fileInfo!!', fileInfo)
+
+        ///// build form data
+        formData = new FormData()
+        formData.append('file', file.file)
+        formData.append('info', JSON.stringify(fileInfo))
+        console.log('formData!!', formData)
+
+        ///// http request
+        BankResourceHelper.uploadBankCalculateResourceFile(formData).then(res => {
+            normalSuccessCallback(res)
+        }).catch(err => {
+            normalFailCallback(err)
+        })
+
+    }
+    else if (props.type === 'visual') {
+
+        upLoading.value = true
+
+        ////// file info
+        const fileInfo = {}
+        const needed = dialogInfo.value[props.type][props.subType]
+        needed.forEach(item => {
+            if (!item.enName.includes('file')) fileInfo[item.enName] = item.value
+        })
+        // 补充
+        fileInfo['segment'] = props.bankEnName
+        if(fileInfo['fields'] === "") delete fileInfo['fields']
+
+        ////// build form data
+        formData = new FormData()
+        formData.append('file', file.file)
+        formData.append('info', JSON.stringify(fileInfo))
+
+        ////// http request
+        BankResourceHelper.uploadBankVisualResourceFile(formData, props.bankEnName).then(res => {
+            normalSuccessCallback(res)
+        }).catch(err => {
+            normalFailCallback(err)
+        })
+
+    }
+
 }
 const cancleUploadHandler = () => {
     dialogFormVisible.value = false
 }
-const confirmUploadHandler = (res) => {
-    console.log('confirmUploadHandler!!', formData)
-    if (formData && formData.has('file') && formData.has('info')) {
-        // post info to server
-        upLoading.value = true
-        axios.post('/model/data/bankResource/up/modelServer/resource/file', formData).then(res => {
-            console.log('上传成功！', res)
-            dialogFormVisible.value = false
-            upLoading.value = false
-        }).catch(err => {
-            console.error('上传失败！', err)
-        })
-    }
-    else {
-        ElMessage.error('请选择文件后上传')
-    }
+const confirmUploadHandler = (e) => {
+    console.log('confirmUploadHandler!!', e)
+    // console.log(' uploadRef.value!',  uploadRef.value[0])
+    // uploadRef.value && uploadRef.value.map((item) => item.submit())
+
+    uploadRef.value && uploadRef.value[0].submit()
+
 }
 
 
@@ -175,7 +213,9 @@ defineExpose({
     dialogFormVisible
 })
 
-
+window.addEventListener('keydown', e => {
+    console.log(resourceStore.resourceInfo)
+})
 
 
 //////////////// helper ///////////////////
@@ -188,16 +228,45 @@ defineExpose({
  * @returns {Object} - 解析后的对象
  */
 const parseInfoFromArray = (arr) => {
+
+    let boundaryPath
+    if (props.subType === 'Hydrodynamic') {
+        try {
+            boundaryPath = resourceStore.resourceInfo['模型资源管理'][2]["resourceList"][0]["path"]
+        } catch (e) {
+            ElMessage.error('请先上传岸段边界矢量文件!')
+            return false
+        }
+    }
+    console.log(boundaryPath)
     const obj = {}
     arr.forEach(item => {
-        obj[item.enName] = item.value
+        if (!item.enName.includes('file')) obj[item.enName] = item.value
     })
     // 补充
-    obj['segment'] = segment.value
-    obj['fileType'] = fileType.value
-    obj['category'] = category.value
+    obj['segment'] = props.bankEnName
+    obj['fileType'] = fileTypeDict[props.type][props.subType]
+    obj['category'] = props.subType
+    obj['temp'] = false
+    obj['boundary'] = boundaryPath
     return obj
 }
+
+const normalSuccessCallback = (res) => {
+    ElMessage.success({ message: '上传成功！', offset: 100 })
+    console.log('SUCCESS::', res.data)
+    dialogFormVisible.value = false
+    BankResourceHelper.refreshBankVisualResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
+    upLoading.value = false
+}
+const normalFailCallback = (err) => {
+    console.error('上传失败！', err)
+    ElMessage.error({ message: '上传失败！', offset: 100 })
+    BankResourceHelper.refreshBankVisualResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
+    upLoading.value = false
+}
+
+
 </script>
 
 <style lang="scss" scoped>

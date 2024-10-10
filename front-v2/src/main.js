@@ -5,6 +5,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router/index'
 import ElementPlus, { ElMessage } from 'element-plus'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 import DataVVue3 from '@kjgl77/datav-vue3'
@@ -56,12 +57,14 @@ import { useStatusStore } from './store/statusStore'
 
 
 
-    const app = createApp(App)
-        .use(DraggablePlugin)
-        .use(router)
-        .use(DataVVue3)
-        .use(ElementPlus)
-        .use(pinia)
+const app = createApp(App)
+    .use(DraggablePlugin)
+    .use(router)
+    .use(DataVVue3)
+    .use(ElementPlus,{
+        locale: zhCn,
+    })
+    .use(pinia)
 
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
         app.component(key, component)

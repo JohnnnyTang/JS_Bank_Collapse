@@ -2,7 +2,7 @@
     <div class="basic-info-container">
         <e-border-box-3 text="基本信息" background-color="#0446a8">
             <div class="basic-info-content">
-                <div class="title-container">民主沙右缘示范段</div>
+                <div class="title-container">{{ info["name"] }}示范段</div>
                 <!-- <div class="splitter-container">
                     <dv-decoration5
                         :dur="4"
@@ -12,19 +12,19 @@
                 </div> -->
                 <div class="key-val-container">
                     <div class="key-text">预警级别：</div>
-                    <div class="val-text">Ⅰ级</div>
+                    <div class="val-text">{{ info["riskLevel"] }}</div>
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">监测长度：</div>
-                    <div class="val-text">全长7公里</div>
+                    <div class="val-text">全长{{ info["monitorLength"] }}</div>
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">布设监测设备：</div>
-                    <div class="val-text">32台</div>
+                    <div class="val-text"> {{ info["deviceNum"] }} 台</div>
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">持续监测时间：</div>
-                    <div class="val-text">{{ distanceOpenTime('2024-04-20') }}</div>
+                    <div class="val-text">{{ distanceOpenTime(info['monitorStartTime']) }}</div>
                 </div>
             </div>
         </e-border-box-3>
@@ -33,27 +33,64 @@
 
 <script setup>
 import { EBorderBox3 } from 'e-datav-vue3'
+import axios from 'axios';
+import BackEndRequest from '../../api/backend';
+import { onMounted, reactive, watch } from 'vue';
+import { useBankNameStore } from '../../store/bankNameStore';
+
+const bankNameStore = useBankNameStore()
+const info = reactive({
+    "name": '',
+    "riskLevel": '',
+    "monitorLength": '',
+    "monitorStartTime": '2024-04-20',
+    "deviceNum": 0
+})
+
+
 
 function distanceOpenTime(showTime) {
-//   let timer = showTime
+    //   let timer = showTime
 
-  const currentTime = new Date()
-  const targetTime = new Date(showTime)
+    const currentTime = new Date()
+    const targetTime = new Date(showTime)
 
-  // 计算时间差（以毫秒为单位）
-  const timeDiff = currentTime.getTime() - targetTime.getTime()
+    // 计算时间差（以毫秒为单位）
+    const timeDiff = currentTime.getTime() - targetTime.getTime()
 
-  // 将时间差转换为小时、分钟和秒数
-  const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
-//   const hours = Math.floor(timeDiff / (1000 * 60 * 60) % 24)
-//   const minutes = Math.floor((timeDiff / (1000 * 60)) % 60)
-//   const seconds = Math.floor((timeDiff / 1000) % 60)
+    // 将时间差转换为小时、分钟和秒数
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+    //   const hours = Math.floor(timeDiff / (1000 * 60 * 60) % 24)
+    //   const minutes = Math.floor((timeDiff / (1000 * 60)) % 60)
+    //   const seconds = Math.floor((timeDiff / 1000) % 60)
 
-//   let ret = `${days} 天 ${hours} 小时 ${minutes} 分`
-  let ret = `${days} 天`
+    //   let ret = `${days} 天 ${hours} 小时 ${minutes} 分`
+    let ret = `${days} 天`
 
-  return ret
+    return ret
 }
+
+const updateInfo = async () => {
+    BackEndRequest.getBankBasicInfo().then(res => {
+        info.name = res.data.name
+        info.riskLevel = res.data.riskLevel
+        info.monitorLength = res.data.monitorLength
+        info.monitorStartTime = res.data.monitorStartTime
+
+        BackEndRequest.getMonitorInfo().then(res => {
+            // console.log('device NUm is ', res.length)
+            info.deviceNum = res.length
+        })
+    })
+}
+
+watch(() => bankNameStore.globalBankName, (newV, oldV) => {
+    updateInfo()
+})
+
+onMounted(() => {
+    updateInfo()
+})
 
 
 
@@ -150,10 +187,11 @@ div.basic-info-container {
 
             &:nth-child(2n) {
                 text-align: left;
-                
+
                 // padding-left: 6%;
                 // border-right: 2px solid rgb(0, 32, 175);
             }
+
             &:nth-child(2n + 1) {
                 text-align: right;
                 justify-content: flex-end;
@@ -161,6 +199,7 @@ div.basic-info-container {
                 // border-left: 2px solid rgb(0, 32, 175);
             }
         }
+
         // background-color: aliceblue;
     }
 }

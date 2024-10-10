@@ -8,80 +8,301 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import mapboxgl from 'mapbox-gl'
+import { initMap } from '../../utils/mapUtils';
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { ElMessage } from 'element-plus';
 const mapRef = ref(null)
+import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 
+
+// const a = {
+//     "tileName": "waterLine",
+//     "tableName": "zys_water_line",
+//     "type": "line",
+//     "fields": [
+//         "if_importa"
+//     ]
+// }
+const addBankLayer = async (map, bankEnName) => {
+    const tServer = 'http://172.21.212.166:8989/api/v2'
+
+    const bank = bankEnName
+    const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
+
+    const layers = {
+        'point': [],
+        'line': [],
+        'polygon': [],
+        'symbol': []
+    }
+    const _tile = (name) => {
+        return tServer + `/tile/vector/${bank}/${name}/{x}/{y}/{z}`
+    }
+
+    bankVectorLayers.forEach(blayer => {
+        const name = blayer.tileName
+        const tileUrl = _tile(name)
+        const type = blayer.type
+        const fields = blayer.fields
+        layers[type].push({
+            name, fields, tileUrl
+        })
+    })
+
+    layers.polygon.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'fill',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            paint: {
+                'fill-color': `rgb(155,155,${(135 + index * 10) % 255})`,
+                'fill-opacity': 0.8
+            }
+        })
+    })
+
+    layers.line.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'line',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            paint: {
+                'line-color': `rgb(255,30,${(30 + index * 10) % 255})`,
+                'line-opacity': 0.8
+            }
+        })
+    })
+
+    layers.point.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'circle',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            paint: {
+                'circle-color': `rgb(222,100,${(200 + index * 10) % 255})`,
+                'circle-radius': 5.0,
+            }
+        })
+    })
+
+    layers.symbol.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'symbol',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            layout: {
+                'text-field': ['get', flayer.fields[0]],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-size': 17,
+            },
+            paint: {
+                'text-color': 'rgb(51, 51, 51)',
+                'text-opacity': [
+                    'match',
+                    ["get", "name"],
+                    'assist',
+                    0.0,
+                    1.0
+                ],
+                'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                'text-halo-width': 2.0,
+            }
+        })
+    })
+
+}
 
 
 onMounted(async () => {
 
-    const map = new mapboxgl.Map({
-        container: mapRef.value, // container ID
-        accessToken:
-            'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-        style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-        center: [120.312, 31.917], // starting position [lng, lat]
-        zoom: 8,
-        maxZoom: 22,
-        projection: 'mercator',
-        antialias: true,
-        transformRequest: (url) => {
-            if (url.startsWith(import.meta.env.VITE_APP_TEMP_ADDRESS)) {
-                return {
-                    url: url,
-                    headers: { token: localStorage.getItem("token") },
-                };
-            }
-        },
+    // let _bankList = (await BankResourceHelper.getBankNamesList()).data
+    // console.log(_bankList)
 
-    }).on('load', async () => {
-        map.showTileBoundaries = true;
-        console.log('PureScratchMap init!')
-    })
+    const map = await initMap(mapRef.value)
+    const tileServer = 'http://172.21.212.166:8989/api/v1'
+    // addBankLayer(map, 'Zys')
+    // const tServer = 'http://172.21.212.166:8989/api/v2'
 
-    //     let tileInfo = {
-    //         "name": "199901",
-    //         "bank": "Mzs"
-    //     }
-    //     const tileServer = import.meta.env.VITE_APP_TEMP_ADDRESS
+    // const bank = 'Zys'
+    // const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
 
-    //     map.addSource('mapRaster2020', {
-    //         type: 'raster',
-    //         tiles: [
-    //             tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
-    //         ],
-    //         // tileSize: 1024,
-    //         // minzoom: 10,
-    //         // maxzoom: 20,
-    //         // bounds: [120.509, 32.023, 120.555, 32.0402],
+    // console.log(bankVectorLayers)
+
+    // const layers = {
+    //     'point': [],
+    //     'line': [],
+    //     'polygon': [],
+    //     'symbol': []
+    // }
+    // const _tile = (name) => {
+    //     return tServer + `/tile/vector/${bank}/${name}/{x}/{y}/{z}`
+    // }
+
+    // bankVectorLayers.forEach(blayer => {
+    //     const name = blayer.tileName
+    //     const tileUrl = _tile(name)
+    //     const type = blayer.type
+    //     const fields = blayer.fields
+    //     layers[type].push({
+    //         name, fields, tileUrl
     //     })
-    //     // map.addLayer({
-    //     //     id: 'ras',
-    //     //     type: 'raster',
-    //     //     source: 'mapRaster2020',
-    //     // })
+    // })
+    // console.log(layers)
 
-    //     map.addSource('demTile', {
-    //         type: 'raster',
-    //         tiles: [tileServer + '/tile/raster/dem/Mzs/199901/{x}/{y}/{z}'],
-    //         tileSize: 1024,
-    //         minzoom: 10,
-    //         maxzoom: 20,
-    //         bounds: [120.509, 32.023, 120.555, 32.0402],
+    // layers.polygon.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
     //     })
     //     map.addLayer({
-    //         id: 'ras',
-    //         type: 'raster',
-    //         source: 'demTile',
+    //         id: flayer.name,
+    //         type: 'fill',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
     //         paint: {
-    //             'raster-opacity': 1.0,
+    //             'fill-color': `rgb(155,155,${(135 + index * 10) % 255})`,
+    //             'fill-opacity': 0.8
     //         }
     //     })
+    // })
 
+    // layers.line.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'line',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'line-color': `rgb(255,30,${(30 + index * 10) % 255})`,
+    //             'line-opacity': 0.8
+    //         }
+    //     })
+    // })
+
+    // layers.point.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'circle',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'circle-color': `rgb(222,100,${(200 + index * 10) % 255})`,
+    //             'circle-radius': 5.0,
+    //         }
+    //     })
+    // })
+
+    // layers.symbol.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'symbol',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         layout: {
+    //             'text-field': ['get', flayer.fields[0]],
+    //             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //             'text-size': 17,
+    //         },
+    //         paint: {
+    //             'text-color': 'rgb(51, 51, 51)',
+    //             'text-opacity': [
+    //                 'match',
+    //                 ["get", "name"],
+    //                 'assist',
+    //                 0.0,
+    //                 1.0
+    //             ],
+    //             'text-halo-color': "rgba(255, 255, 255, 1.0)",
+    //             'text-halo-width': 2.0,
+    //         }
+    //     })
+    // })
+
+
+    // map.addSource('mzsBankLine', {
+    //     type: 'vector',
+    //     tiles: ['http://172.21.212.166:8989/api/v2' + '/tile/vector/Zys/zysLine/{x}/{y}/{z}']
+    //     // tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
+    // })
+
+    // !map.getLayer('预警岸段') &&
+    //     map.addLayer({
+    //         id: '预警岸段',
+    //         type: 'line',
+    //         source: 'mzsBankLine',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'line-join': 'round',
+    //         },
+    //         paint: {
+    //             'line-color': '#ff3d2b',
+    //             'line-width': 5,
+    //         },
+    //     })
+
+    map.addSource('mapRaster2020', {
+        type: 'raster',
+        tiles: [
+            tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
+        ],
+    })
+    map.addLayer({
+        id: 'ras',
+        type: 'raster',
+        source: 'mapRaster2020',
+    })
+
+    // map.addSource('demTile', {
+    //     type: 'raster',
+    //     tiles: [tileServer + '/tile/raster/dem/Mzs/199901/{x}/{y}/{z}'],
+    //     tileSize: 1024,
+    //     minzoom: 10,
+    //     maxzoom: 20,
+    //     bounds: [120.509, 32.023, 120.555, 32.0402],
+    // })
+    // map.addLayer({
+    //     id: 'ras',
+    //     type: 'raster',
+    //     source: 'demTile',
+    //     paint: {
+    //         'raster-opacity': 1.0,
+    //     }
     // })
 
 })
+
+
 </script>
 
 <style lang="scss" scoped>
