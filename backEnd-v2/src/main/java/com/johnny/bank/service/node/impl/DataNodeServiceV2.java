@@ -2,10 +2,15 @@ package com.johnny.bank.service.node.impl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.johnny.bank.model.common.DefaultDatasource;
+import com.johnny.bank.model.common.PublicDatasource;
 import com.johnny.bank.model.node.*;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.utils.DataNodeUtil;
 import org.bouncycastle.math.ec.custom.sec.SecT571R1Curve;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.xml.crypto.Data;
@@ -18,6 +23,10 @@ import java.util.*;
  */
 @Service("DataNodeServiceV2")
 public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
+
+    @Autowired
+    @Qualifier("publicDatasource")
+    private PublicDatasource publicDatasource;
 
     @Override
     public String save(DataNodeV2 dataNode) {
@@ -37,6 +46,61 @@ public class DataNodeServiceV2 extends NodeService<DataNodeV2> {
                 .bank(bank).name(name).dataOrigin("Local")
                 .category(category).path(path).auth("all")
                 .build();
+        switch (category) {
+            case ("RealtimeDeviceGroup") -> {
+                dataNodeV2.setApiPrefix(publicDatasource.getUrl());
+                JSONObject usage = new JSONObject();
+                usage.put("password",publicDatasource.getPassword());
+                usage.put("userName",publicDatasource.getUsername());
+                usage.put("tableName", "machine");
+                dataNodeV2.setUsage(usage);
+            }
+            case ("GnssGroup") -> {
+                dataNodeV2.setApiPrefix(publicDatasource.getUrl());
+                JSONObject usage = new JSONObject();
+                usage.put("password",publicDatasource.getPassword());
+                usage.put("userName",publicDatasource.getUsername());
+                usage.put("tableName", "machine"); usage.put("typeField","type"); usage.put("typeValue",1);
+                usage.put("dataTable","gnss_record"); usage.put("avgNum", "60");
+                dataNodeV2.setUsage(usage);
+            }
+            case ("StressGroup") -> {
+                dataNodeV2.setApiPrefix(publicDatasource.getUrl());
+                JSONObject usage = new JSONObject();
+                usage.put("password",publicDatasource.getPassword());
+                usage.put("userName",publicDatasource.getUsername());
+                usage.put("tableName", "machine"); usage.put("typeField","type"); usage.put("typeValue",2);
+                usage.put("dataTable","stresspile_record"); usage.put("avgNum", "300");
+                dataNodeV2.setUsage(usage);
+            }
+            case ("ManometerGroup") -> {
+                dataNodeV2.setApiPrefix(publicDatasource.getUrl());
+                JSONObject usage = new JSONObject();
+                usage.put("password",publicDatasource.getPassword());
+                usage.put("userName",publicDatasource.getUsername());
+                usage.put("tableName", "machine"); usage.put("typeField","type"); usage.put("typeValue",3);
+                usage.put("dataTable","manometer_record"); usage.put("avgNum", "300");
+                dataNodeV2.setUsage(usage);
+            }
+            case ("InclinometerGroup") -> {
+                dataNodeV2.setApiPrefix(publicDatasource.getUrl());
+                JSONObject usage = new JSONObject();
+                usage.put("password",publicDatasource.getPassword());
+                usage.put("userName",publicDatasource.getUsername());
+                usage.put("tableName", "machine"); usage.put("typeField","type"); usage.put("typeValue",4);
+                usage.put("dataTable","stresspile_record"); usage.put("avgNum", "2");
+                dataNodeV2.setUsage(usage);
+            }
+            case ("VideoGroup") -> {
+                dataNodeV2.setApiPrefix(publicDatasource.getUrl());
+                JSONObject usage = new JSONObject();
+                usage.put("password",publicDatasource.getPassword());
+                usage.put("userName",publicDatasource.getUsername());
+                usage.put("tableName", "machine"); usage.put("typeField","type");
+                usage.put("typeValue",6);
+                dataNodeV2.setUsage(usage);
+            }
+        }
         save(dataNodeV2);
     }
 
