@@ -109,9 +109,15 @@ export default class BankResourceHelper {
     static updateBankCalculateResourceFile(dataType, bankEnName, fileInput, fileInfo) {
 
     }
-
+    /**
+     * 
+     * @param {"Hydrodynamic" | "DEM" | "Boundary" | "Config"} dataType 
+     * @param {string} bankEnName 
+     * @param {string} bankEnName 
+     */
     static deleteBankCalculateResourceFile(dataType, bankEnName, fileName) {
-        ///bankResource/delete/local/resource/{bank}/file/{name}
+        ///  data/bankResource/delete/calculate/resource/Mzsl/file/DEM/202104
+        return axiosIns.delete(`/delete/calculate/resource/${bankEnName}/file/${dataType}/${fileName}`)
     }
 
 

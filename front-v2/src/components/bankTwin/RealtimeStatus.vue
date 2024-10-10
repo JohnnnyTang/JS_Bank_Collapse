@@ -1326,15 +1326,17 @@ div.device-info-container {
     left: 1vw;
     top: 18.5vh;
     width: 26vw;
-    height: 72.5vh;
-
+    // height: 72.5vh;
+    height: fit-content;
     transition: all ease-in-out 0.2s;
 
     div.device-info-content {
         width: 25.4vw;
         margin-left: 0.3vw;
         margin-right: 0.3vw;
-        height: 72.5vh;
+        // height: 72.5vh;
+        height: fit-content;
+        padding-bottom: 0.5vh;
         margin-top: 0vh;
         margin-bottom: 0.5vh;
 
@@ -1369,7 +1371,7 @@ div.device-info-container {
             width: 98%;
             // margin-top: 0.2vh;
             margin-left: 1%;
-            height: 24.2vh;
+            height: fit-content;
 
             div.small-title-container {
                 position: relative;

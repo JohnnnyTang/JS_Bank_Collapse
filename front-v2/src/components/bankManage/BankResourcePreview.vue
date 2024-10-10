@@ -351,9 +351,14 @@ const deleteRow = (rowIndex, resourceTypeIndex, info) => {
         if (bank.bankEnName != 'Mzs') {
 
             switch (typeDict[nowTypeIndex.value]) {
-
                 case 'model':
-
+                    let subType = resourceTypeDict[typeDict[nowTypeIndex.value]][nowSubTypeIndex.value]
+                    console.log('subType', subType)
+                    BankResourceHelper.deleteBankCalculateResourceFile(subType, bank.bankEnName, info.name).then(res => {
+                        console.log(res)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
                     break;
 
                 case 'visual':
