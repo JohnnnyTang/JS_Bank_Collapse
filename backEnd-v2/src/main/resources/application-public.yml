@@ -51,6 +51,14 @@ tile:
   riverImagePath: E:\bankAppData\imageTiles\tiles\
   tifTilePath: E:\bankAppData\tifTile
 
+staticData:
+  tifTilePath: E:\bankAppData\staticData\tifTile
+  vectorDataPath: E:\bankAppData\staticData\vectorData
+  waterConditionPath: E:\bankAppData\staticData\waterCondition
+
+waterCondition:
+  url: http://10.32.22.202:8001
+
 video:
   yangzhong: E:\bankAppData\video\125_1711267167.mp4
 
@@ -72,3 +80,5 @@ modelServer:
   url: http://127.0.0.1:8000
   storageLimit: 50
   caseLimit: 50
+
+loginFunction: "no"

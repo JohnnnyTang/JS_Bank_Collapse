@@ -7,16 +7,17 @@ import com.johnny.bank.repository.nodeRepo.base.IBaseNodeRepo;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import com.johnny.bank.service.resource.dataSource.IModelServerService;
-import com.johnny.bank.utils.BeanUtil;
-import com.johnny.bank.utils.InternetUtil;
-import com.johnny.bank.utils.TifUtil;
+import com.johnny.bank.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -112,6 +113,7 @@ public class ModelServerService implements IModelServerService {
             case "tiff" -> uploadCalculateResourceTiffData(file, info);
             case "adf" -> uploadCalculateResourceAdfData(file, info);
             case "json" -> uploadCalculateResourceJsonData(file, info);
+            case "txt" -> uploadCalculateResourceTxtData(file, info);
 //            case "geoj"
             default -> "无法上传此数据类型";
         };
@@ -167,8 +169,25 @@ public class ModelServerService implements IModelServerService {
         byte[] fileContent = file.getBytes();
         MultipartFile upLoadFile = new MockMultipartFile("file", fileName, contentType, fileContent);
         // TODO: 解析Tiff成为栅格瓦片
-        TifUtil.tif2tile(file, info, info.getString("segment"));
+        TifUtil.tif2tile(file, info.getString("segment"));
         return uploadModelServerData(upLoadFile, info, categoryName, resourceName);
+    }
+
+    public String uploadCalculateResourceTxtData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
+        if (!info.containsKey("category")) {
+            return "请输入数据类别";
+        }
+        String categoryName = info.getString("category");
+        if (!categoryName.equals("DEM") && !categoryName.equals("Hydrodynamic") && !categoryName.equals("Boundary") && !categoryName.equals("Config")) {
+            return "无法上传此数据类别";
+        }
+        String tifPath = TifUtil.txt2tif(file, info, info.getString("segment"));
+        File tifFile = new File(tifPath);
+        FileInputStream input = new FileInputStream(tifFile);
+        MultipartFile tifMultipartFile =new MockMultipartFile("file", tifFile.getName(), "text/plain", IOUtils.toByteArray(input));
+        List<MultipartFile> tifFiles = List.of(tifMultipartFile);
+        String resourceName = "tiff";
+        return uploadModelServerData(ZipUtil.zipFilesAndGetAsMultipartFile(tifFiles,info.getString("name")), info, categoryName, resourceName);
     }
 
     public String uploadCalculateResourceAdfData(MultipartFile file, JSONObject info) {
@@ -211,6 +230,7 @@ public class ModelServerService implements IModelServerService {
         dataNodeBasicInfo.put("month",info.getString("month"));
         dataNodeBasicInfo.put("set",info.getString("set"));
         dataNodeBasicInfo.put("type","calculate");
+        dataNodeBasicInfo.put("segment",bank);
         if (info.containsKey("description")) {
             dataNodeBasicInfo.put("description",info.getString("description"));
         }
@@ -220,7 +240,6 @@ public class ModelServerService implements IModelServerService {
         if (info.containsKey("boundary")) {
             dataNodeBasicInfo.put("boundary",info.getString("boundary"));
         }
-        dataNodeBasicInfo.put("segment",info.getString("segment"));
         DataNodeV2 dataNode = DataNodeV2.dataNodeBuilder()
                 .bank(info.getString("segment")).basicInfo(null)
                 .name(info.getString("name")).dataOrigin("ModelServer")

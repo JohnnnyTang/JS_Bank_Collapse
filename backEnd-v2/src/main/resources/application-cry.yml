@@ -17,6 +17,11 @@ spring:
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: 123456
+    public:
+      url: jdbc:postgresql://119.45.198.54:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: nhri_admin123456
   servlet:
     multipart:
       max-file-size: 1GB
@@ -47,6 +52,7 @@ tile:
 staticData:
   tifTilePath: E:/Data/bankProjectData/staticData/tifTile
   vectorDataPath: E:/Data/bankProjectData/staticData/vectorData
+  draftDataPath: E:\\Data\\bankProjectData\\staticData\\draftData
   waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
 
 waterCondition:

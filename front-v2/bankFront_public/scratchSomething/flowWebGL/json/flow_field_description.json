@@ -1,0 +1,95 @@
+{
+    "area_masks": [
+        "/scratchSomething/flowWebGL/images/mask_100.png",
+        "/scratchSomething/flowWebGL/images/mask_101.png",
+        "/scratchSomething/flowWebGL/images/mask_102.png",
+        "/scratchSomething/flowWebGL/images/mask_103.png",
+        "/scratchSomething/flowWebGL/images/mask_104.png",
+        "/scratchSomething/flowWebGL/images/mask_105.png",
+        "/scratchSomething/flowWebGL/images/mask_106.png",
+        "/scratchSomething/flowWebGL/images/mask_107.png",
+        "/scratchSomething/flowWebGL/images/mask_108.png",
+        "/scratchSomething/flowWebGL/images/mask_109.png",
+        "/scratchSomething/flowWebGL/images/mask_110.png",
+        "/scratchSomething/flowWebGL/images/mask_111.png",
+        "/scratchSomething/flowWebGL/images/mask_112.png",
+        "/scratchSomething/flowWebGL/images/mask_113.png",
+        "/scratchSomething/flowWebGL/images/mask_114.png",
+        "/scratchSomething/flowWebGL/images/mask_115.png",
+        "/scratchSomething/flowWebGL/images/mask_116.png",
+        "/scratchSomething/flowWebGL/images/mask_117.png",
+        "/scratchSomething/flowWebGL/images/mask_118.png",
+        "/scratchSomething/flowWebGL/images/mask_119.png",
+        "/scratchSomething/flowWebGL/images/mask_120.png",
+        "/scratchSomething/flowWebGL/images/mask_121.png",
+        "/scratchSomething/flowWebGL/images/mask_122.png",
+        "/scratchSomething/flowWebGL/images/mask_123.png",
+        "/scratchSomething/flowWebGL/images/mask_124.png",
+        "/scratchSomething/flowWebGL/images/mask_125.png"
+    ],
+    "constraints": {
+        "max_drop_rate": 0.1,
+        "max_drop_rate_bump": 0.2,
+        "max_segment_num": 64,
+        "max_streamline_num": 65535,
+        "max_texture_size": 4096
+    },
+    "extent": [
+        0.8334555829659476,
+        0.4068767558906962,
+        0.8361227715252713,
+        0.40583148000181013
+    ],
+    "flow_boundary": {
+        "u_max": 2.203,
+        "u_min": -2.855,
+        "v_max": 2.312,
+        "v_min": -2.098
+    },
+    "flow_fields": [
+        "/scratchSomething/flowWebGL/images/uv_100.png",
+        "/scratchSomething/flowWebGL/images/uv_101.png",
+        "/scratchSomething/flowWebGL/images/uv_102.png",
+        "/scratchSomething/flowWebGL/images/uv_103.png",
+        "/scratchSomething/flowWebGL/images/uv_104.png",
+        "/scratchSomething/flowWebGL/images/uv_105.png",
+        "/scratchSomething/flowWebGL/images/uv_106.png",
+        "/scratchSomething/flowWebGL/images/uv_107.png",
+        "/scratchSomething/flowWebGL/images/uv_108.png",
+        "/scratchSomething/flowWebGL/images/uv_109.png",
+        "/scratchSomething/flowWebGL/images/uv_110.png",
+        "/scratchSomething/flowWebGL/images/uv_111.png",
+        "/scratchSomething/flowWebGL/images/uv_112.png",
+        "/scratchSomething/flowWebGL/images/uv_113.png",
+        "/scratchSomething/flowWebGL/images/uv_114.png",
+        "/scratchSomething/flowWebGL/images/uv_115.png",
+        "/scratchSomething/flowWebGL/images/uv_116.png",
+        "/scratchSomething/flowWebGL/images/uv_117.png",
+        "/scratchSomething/flowWebGL/images/uv_118.png",
+        "/scratchSomething/flowWebGL/images/uv_119.png",
+        "/scratchSomething/flowWebGL/images/uv_120.png",
+        "/scratchSomething/flowWebGL/images/uv_121.png",
+        "/scratchSomething/flowWebGL/images/uv_122.png",
+        "/scratchSomething/flowWebGL/images/uv_123.png",
+        "/scratchSomething/flowWebGL/images/uv_124.png",
+        "/scratchSomething/flowWebGL/images/uv_125.png"
+    ],
+    "projection": {
+        "2D": "/scratchSomething/flowWebGL/images/projection_mapbox.png",
+        "3D": ""
+    },
+    "texture_size": {
+        "area_mask": [
+            1024,
+            405
+        ],
+        "flow_field": [
+            1024,
+            405
+        ],
+        "projection": [
+            1024,
+            2048
+        ]
+    }
+}

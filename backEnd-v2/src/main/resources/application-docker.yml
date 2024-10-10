@@ -55,6 +55,9 @@ staticData:
 flowData:
   texturePath: /usr/local/resource/data/flowData/flowFieldResourceArchive/
 
+waterCondition:
+  url: http://10.32.22.202:8001
+
 modelServer:
   url: http://host.docker.internal:8000
   storageLimit: 50

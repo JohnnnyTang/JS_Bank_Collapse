@@ -2,17 +2,17 @@ package com.johnny.bank.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @projectName: backEnd
@@ -32,6 +32,36 @@ public class ZipUtil {
      * @return list //解压出的文件的路径合集
      */
     private static String zipPath = "f:/shpfile/";//zip根路径
+
+    public static MultipartFile zipFilesAndGetAsMultipartFile(List<MultipartFile> files, String zipFileName) throws IOException {
+        // 创建一个ByteArrayOutputStream来存储zip文件内容
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    // 创建ZipEntry
+                    String fileName = file.getOriginalFilename();
+                    ZipEntry zipEntry = new ZipEntry(fileName);
+                    zos.putNextEntry(zipEntry);
+
+                    // 读取文件内容并写入ZipOutputStream
+                    byte[] bytes = file.getBytes();
+                    zos.write(bytes, 0, bytes.length);
+                    zos.closeEntry();
+                }
+            }
+            // 完成ZIP文件的创建
+            zos.finish();
+        }
+
+        // 将ByteArrayOutputStream的内容转换为byte数组
+        byte[] zippedFileBytes = baos.toByteArray();
+
+        // 创建一个MockMultipartFile
+
+        return new MockMultipartFile(zipFileName + ".zip", zipFileName + ".zip", "application/zip", zippedFileBytes);
+    }
 
     /**
      * zip解压

@@ -51,7 +51,8 @@ public class WaterConditonJob implements Job {
         JobDataMap dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String waterConditionPath = dataMap.getString("waterConditionPath");
         String waterConditionUrl = dataMap.getString("waterConditionUrl");
-        String apiUrl = waterConditionUrl + "/newApi/SL324/ST_FORECAST_F";
+        String flowApiUrl = waterConditionUrl + "/newApi/SL324/ST_FORECAST_F";
+        String tideApiUrl = waterConditionUrl + "/newApi/SL324/ST_TDFR_F";
         final Map<String, List<String>> stationMap = new HashMap<>(Map.of(
                 "datong", List.of("大通站", "60115000"),
                 "nanjing", List.of("南京站", "60116200"),
@@ -60,34 +61,33 @@ public class WaterConditonJob implements Job {
                 "jiangyin", List.of("江阴站", "60117000"),
                 "xuliujing", List.of("徐六泾站", "60117400")
         ));
-        String category = "BankNode";
-        BankResourceService bankResourceService = BeanUtil.getBean(BankResourceService.class);
-        List<DataNodeV2> bankList = bankResourceService.getBankList(category);
-        for (DataNodeV2 bankNode : bankList) {
-            String bank = bankNode.getBank();
-            String path = waterConditionPath + File.separator + bank + File.separator + "water.json";
-            String content = FileUtil.getFileContent(path);
-            JSONArray waterConditionJson = JSONArray.parseArray(content);
-            for (int index=0; index<waterConditionJson.size(); index++) {
-                JSONObject stationJson = (JSONObject) waterConditionJson.get(index);
-                String stationName = stationJson.getString("stationName");
-                String stationId = stationMap.get(stationName).get(1);
-                List<Double> dataList = getFlowAndTide(apiUrl, stationId);
-                if (!dataList.isEmpty()) {
-                    stationJson.put("flow",dataList.get(0));
-                    stationJson.put("tide-level",dataList.get(1));
-                    waterConditionJson.set(index, stationJson);
-                }
-            }
-            FileUtil.modifiyFileContent(path, waterConditionJson.toString());
+        String path = waterConditionPath + File.separator + "water.json";
+        String content = FileUtil.getFileContent(path);
+        JSONArray waterConditionJson = JSONArray.parseArray(content);
+        for (int index=0; index<waterConditionJson.size(); index++) {
+            JSONObject stationJson = (JSONObject) waterConditionJson.get(index);
+            String stationName = stationJson.getString("stationName");
+            String stationId = stationMap.get(stationName).get(1);
+            Double flow = getFlow(flowApiUrl, stationId);
+            Double tide = getTide(tideApiUrl, stationId);
+//               List<Double> dataList = List.of(flow, tide);
+            stationJson.put("flow", flow);
+            stationJson.put("tide-level", tide);
+            waterConditionJson.set(index, stationJson);
+//               if (!dataList.isEmpty()) {
+//                   stationJson.put("flow",dataList.get(0));
+//                   stationJson.put("tide-level",dataList.get(1));
+//                   waterConditionJson.set(index, stationJson);
+//               }
         }
+        FileUtil.modifiyFileContent(path, waterConditionJson.toString());
     }
 
-    private static List<Double> getFlowAndTide(String apiUrl, String stationId) {
+    private static Double getFlow(String apiUrl, String stationId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime endTime = LocalDateTime.now();
         String endTimeStr = endTime.format(formatter);
-        LocalDateTime startTime = LocalDateTime.now().minusHours(12);
+        LocalDateTime startTime = LocalDateTime.now().minusHours(24);       //间隔24小时
         String startTimeStr = startTime.format(formatter);
         JSONObject requestBody = new JSONObject();
         requestBody.put("STCDS",List.of(stationId));
@@ -98,11 +98,54 @@ public class WaterConditonJob implements Job {
         JSONObject responseObj = JSONObject.parseObject(InternetUtil.doPost_waterCondition(apiUrl, requestBody));
         JSONArray stationArray = JSONArray.parseArray(responseObj.getString("data"));
         if (!stationArray.isEmpty()) {
-            String flow = stationArray.getJSONObject(0).getString("Q");
-            String tide = stationArray.getJSONObject(0).getString("Z");
-            return List.of(Double.parseDouble(flow),Double.parseDouble(tide));
+            String flow = stationArray.getJSONObject(stationArray.size() - 1).getString("Q");     // 获取最新数据(起始时间5天后)
+            return Double.parseDouble(flow);
         } else {
-            return List.of();
+            return null;
         }
     }
+
+    private static Double getTide(String apiUrl, String stationId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime endTime = LocalDateTime.now();
+        String endTimeStr = endTime.format(formatter);
+        LocalDateTime startTime = LocalDateTime.now().minusHours(72);       //间隔3天
+        String startTimeStr = startTime.format(formatter);
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("STCDS",List.of(stationId));
+        requestBody.put("STARTTIME",startTimeStr);
+        requestBody.put("ENDTIME",endTimeStr);
+        requestBody.put("pageNo",1);
+        requestBody.put("pageSize",1000);
+        JSONObject responseObj = JSONObject.parseObject(InternetUtil.doPost_waterCondition(apiUrl, requestBody));
+        JSONArray stationArray = JSONArray.parseArray(responseObj.getString("data"));
+        if (!stationArray.isEmpty()) {
+            // 获取最新数据
+            JSONObject latestData = getLatestData(stationArray);
+            String tide = latestData.getString("TDZ");
+            return Double.parseDouble(tide);
+        } else {
+            return null;
+        }
+    }
+
+    private static JSONObject getLatestData(JSONArray stationArray) {
+        JSONObject latestElement = null;
+        String latestYMDH = null;
+
+        for (int i = 0; i < stationArray.size(); i++) {
+            JSONObject currentElement = stationArray.getJSONObject(i);
+            String currentYMDH = currentElement.getString("YMDH");
+
+            if (latestYMDH == null || currentYMDH.compareTo(latestYMDH) > 0) {
+                latestYMDH = currentYMDH;
+                latestElement = currentElement;
+            }
+        }
+
+        return latestElement;
+    }
 }
+
+
+

@@ -3,6 +3,7 @@ package com.johnny.bank.controller.resource.dataSource;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNodeV2;
+import com.johnny.bank.model.resource.dataResource.MonitorInfo;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.service.resource.dataSource.impl.BankResourceService;
 import com.johnny.bank.service.resource.dataSource.impl.ModelServerService;
@@ -63,10 +64,26 @@ public class BankResourceController {
 
     @GetMapping("/bank/visual/dataType")
     public ResponseEntity<JSONArray> getBankStaticDataNode(@RequestParam String dataType, @RequestParam String bank) {
-        DataNodeV2 dataGroupNode = bankResourceService.getVisualDataGroupNode(dataType, bank);
+        DataNodeV2 dataGroupNode = bankResourceService.getTileVisualDataGroupNode(dataType, bank);
         String path = dataGroupNode.getPath()+dataGroupNode.getName() + ",";
         List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
         return ResponseEntity.ok(DataNodeUtil.transferToFolderList_visualDEM(dataList));
+    }
+
+    @GetMapping("/bank/visual/vector")
+    public ResponseEntity<JSONArray> getBankStaticDataNode(@RequestParam String bank) {
+        DataNodeV2 dataGroupNode = bankResourceService.getVectorVisualDataGroupNode(bank);
+        String path = dataGroupNode.getPath()+"VectorDataGroupOf"+bank+",";
+        List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
+        return ResponseEntity.ok(DataNodeUtil.transferToFolderList_basicInfo(dataList));
+    }
+
+    @GetMapping("/bank/device/type")
+    public ResponseEntity<JSONArray> getResourceDeviceData(@RequestParam String bank, @RequestParam String typeCode) {
+        DataNodeV2 dataGroupNode = bankResourceService.getDeviceDataGroupNode(bank, typeCode);
+        String path = dataGroupNode.getPath()+dataGroupNode.getName()+",";
+        List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
+        return ResponseEntity.ok(DataNodeUtil.transferToFolderList_basicInfo(dataList));
     }
 
     // 资源获取
@@ -148,9 +165,14 @@ public class BankResourceController {
 
     // 资源获取
     // local
-    @GetMapping("/down/local/resource/{bank}/waterCondition")
-    public ResponseEntity<JSONArray> getResourceWaterCondition(@PathVariable String bank) {
-        return ResponseEntity.ok(bankResourceService.getWaterCondition(bank));
+    @GetMapping("/down/local/resource/waterCondition")
+    public ResponseEntity<JSONArray> getResourceWaterCondition() {
+        return ResponseEntity.ok(bankResourceService.getWaterCondition());
+    }
+
+    @GetMapping("/down/local/resource/tidalRange")
+    public ResponseEntity<JSONArray> getResourcetidalRange() {
+        return ResponseEntity.ok(bankResourceService.getTidalRange());
     }
 
     // 资源上载
@@ -167,9 +189,15 @@ public class BankResourceController {
         return ResponseEntity.ok(bankResourceService.addNewBank(bank, info));
     }
 
-    @PostMapping("/up/local/resource/file")
-    public ResponseEntity<String> uploadResourceVisualizationData(@RequestParam("file") MultipartFile file, @RequestParam("info") String info) throws IOException, InterruptedException {
-        return ResponseEntity.ok(bankResourceService.uploadVisualizationResourceData(file, JSONObject.parse(info)));
+    @PostMapping("/up/local/resource/{bank}/file")
+    public ResponseEntity<String> uploadResourceVisualizationData(
+            @PathVariable String bank, @RequestParam("file") MultipartFile file, @RequestParam("info") String info) throws IOException, InterruptedException {
+        return ResponseEntity.ok(bankResourceService.uploadVisualizationResourceData(file, bank, JSONObject.parse(info)));
+    }
+
+    @PostMapping("/up/local/resource/{bank}/device")
+    public ResponseEntity<String> uploadResourceDeviceData(@PathVariable String bank, @RequestBody JSONObject data) {
+        return ResponseEntity.ok(bankResourceService.uploadDeviceResourceData(bank, data));
     }
 
     // 资源删除
@@ -178,10 +206,35 @@ public class BankResourceController {
         return ResponseEntity.ok(bankResourceService.deleteBank(bank));
     }
 
+    @DeleteMapping("/delete/local/resource/device/{code}")
+    public ResponseEntity<String> deleteDevice(@PathVariable String code) {
+        return ResponseEntity.ok(bankResourceService.deleteDevice(code));
+    }
+
+    @DeleteMapping("/delete/local/resource/{bank}/file/{name}")
+    public ResponseEntity<String> deleteVector(@PathVariable String bank, @PathVariable String name) {
+        return ResponseEntity.ok(bankResourceService.deleteVector(bank, name));
+    }
+
     // 资源更新
     @PutMapping("/update/local/resource/bank/{bank}")
     public ResponseEntity<String> updateBankInfo(@PathVariable String bank, @RequestBody JSONObject info) {
         return ResponseEntity.ok(bankResourceService.updateBankInfo(bank, info));
     }
 
+    @PutMapping("/update/local/resource/{bank}/device/{code}")
+    public ResponseEntity<String> updateResourceDeviceData(@PathVariable String bank, @PathVariable String code, @RequestBody JSONObject data) {
+        return ResponseEntity.ok(bankResourceService.updateDeviceResourceData(bank, code, data));
+    }
+
+    @PutMapping("/update/local/resource/{bank}/file/{name}")
+    public ResponseEntity<String> updateResourceVectorDataInfo(@PathVariable String bank, @PathVariable String name, @RequestBody JSONObject data) {
+        return ResponseEntity.ok(bankResourceService.updateVisualizationResourceDataInfo(bank, name, data));
+    }
+
+    @PostMapping("/update/local/resource/{bank}/file/{name}")
+    public ResponseEntity<String> updateResourceVectorData(
+            @RequestParam("file") MultipartFile file, @PathVariable String bank, @PathVariable String name, @RequestParam("data") String data) throws IOException, InterruptedException {
+        return ResponseEntity.ok(bankResourceService.updateVisualizationResourceData(file, bank, name, JSONObject.parseObject(data)));
+    }
 }

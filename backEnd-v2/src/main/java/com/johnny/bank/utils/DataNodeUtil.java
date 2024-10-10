@@ -35,6 +35,14 @@ public class DataNodeUtil {
         return dataList;
     }
 
+    public static JSONArray transferToFolderList_basicInfo(List<DataNodeV2> dataNodeList) {
+        JSONArray dataList = new JSONArray();
+        for (DataNodeV2 dataNode : dataNodeList) {
+            dataList.add(dataNode.getBasicInfo());
+        }
+        return dataList;
+    }
+
     public static JSONArray transferToFolderList_calculateDEM(List<DataNodeV2> dataNodeList) {
 
         Comparator<DataNodeV2> DatanodeComparator = new Comparator<DataNodeV2>() {
