@@ -54,7 +54,8 @@
                         </div>
                         <!-- <div class="detail-val" v-else>{{ item.val }}</div> -->
                         <div class="detail-val" v-else>{{
-                            item.key === '监测起始时间' ? item.val.slice(0, 10) : item.val
+                            // item.key === '监测起始时间' ? item.val.slice(0, 10) : item.val
+                            item.key === '监测起始时间' && item.val ? item.val.slice(0, 10) : item.val
                         }}</div>
 
                     </div>
@@ -543,6 +544,7 @@ const initOneBank = async (bankEnName) => {
     bank.name = _thisBankBasicInfo.name
     bank.bankEnName = _thisBankEnName
     bankBasicInfo.value = getBankBasic_Style_Info(_thisBankBasicInfo)
+    console.log(bankBasicInfo.value)
     resourceInfo.value = {
         '模型资源管理': _thisBankResourceInfo,
         '可视化资源管理': _thisVisualResourceInfo,

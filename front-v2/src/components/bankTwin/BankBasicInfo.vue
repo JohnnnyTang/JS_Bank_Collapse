@@ -24,7 +24,7 @@
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">持续监测时间：</div>
-                    <div class="val-text">{{ distanceOpenTime(info['monitorStartTime']) }}</div>
+                    <div class="val-text">{{ watchingTime }}</div>
                 </div>
             </div>
         </e-border-box-3>
@@ -35,7 +35,7 @@
 import { EBorderBox3 } from 'e-datav-vue3'
 import axios from 'axios';
 import BackEndRequest from '../../api/backend';
-import { onMounted, reactive, watch } from 'vue';
+import { computed, onMounted, reactive, watch } from 'vue';
 import { useBankNameStore } from '../../store/bankNameStore';
 
 const bankNameStore = useBankNameStore()
@@ -47,6 +47,9 @@ const info = reactive({
     "deviceNum": 0
 })
 
+const watchingTime = computed(() => {
+    return distanceOpenTime(info.monitorStartTime)
+})
 
 
 function distanceOpenTime(showTime) {

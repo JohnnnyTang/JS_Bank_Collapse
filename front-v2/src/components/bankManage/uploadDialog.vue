@@ -169,7 +169,8 @@ const handleFileUpload = (file) => {
         // next process of fileInfo
         const [fileName, fileType] = extractFileNameAndType(file.file.name)
         fileInfo['name'] = fileName
-        fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
+        if (props.subType === 'DEM')
+            fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
 
 
         ///// build form data
@@ -299,7 +300,6 @@ const normalFailCallback = (err) => {
 </script>
 
 <style lang="scss" scoped>
-
 div.form-header {
     position: relative;
     height: 4vh;
@@ -322,5 +322,4 @@ div.form-header {
     font-size: calc(0.6vw + 0.5vh);
     font-weight: 600;
 }
-
 </style>
