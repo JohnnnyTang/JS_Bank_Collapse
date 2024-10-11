@@ -12,7 +12,7 @@
                 <el-radio value="txt">txt</el-radio>
             </el-radio-group> -->
             <el-form-item v-for="(  item, index  ) in  dialogInfo[props.type][props.subType]  " :key="index"
-                :label="item.label">
+                :label="item.label" :required="item.required">
 
                 <el-input v-if="item.type === 'input'" v-model="item.value" autocomplete="off" />
 
