@@ -12,7 +12,7 @@
                 <el-radio value="txt">txt</el-radio>
             </el-radio-group> -->
             <el-form-item v-for="(  item, index  ) in  dialogInfo[props.type][props.subType]  " :key="index"
-                :label="item.label">
+                :label="item.label" :required="item.required">
 
                 <el-input v-if="item.type === 'input'" v-model="item.value" autocomplete="off" />
 
@@ -300,7 +300,6 @@ const normalFailCallback = (err) => {
 </script>
 
 <style lang="scss" scoped>
-
 div.form-header {
     position: relative;
     height: 4vh;
@@ -323,5 +322,4 @@ div.form-header {
     font-size: calc(0.6vw + 0.5vh);
     font-weight: 600;
 }
-
 </style>

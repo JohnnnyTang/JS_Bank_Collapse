@@ -678,7 +678,7 @@ const getDemResource = async (bankEnName) => {
 const bankBCInfo = ref({
     name: '',
     riskLevel: '',
-    monitorLength: '',
+    monitorLength: '7km',
 })
 
 // totalResult
@@ -2467,7 +2467,7 @@ onMounted(async () => {
             showFlowSpeed.value = false
             showBedFlowChart.value = false
             showWaterProcessChart.value = false
-            showTerrain3DControl.value = false
+            showTerrain3DControl.value = true
             await ProfileLoadingProcess(
                 sceneBefore,
                 sceneNow,

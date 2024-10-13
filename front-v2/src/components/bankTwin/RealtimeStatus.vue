@@ -1034,19 +1034,16 @@ async function updateNewestData() {
     if (curDeviceData == null) return
     let tp = shitMap[selectedDeviceType.value]
     let _deviceCode = monitorInfo.value[tp]["NAME_CODE_Map"][selectedDevice.value]
-    // let deviceNewestData = (
-    //     await BackEndRequest.getDeviceNewestData(
-    //         // deviceTypeNameMap[selectedDeviceType.value],
-    //         _deviceCode,
-    //     )
-    // ).data
     let deviceNewestData
     try {
-        deviceNewestData = (
-            await BackEndRequest.getDeviceNewestData(
-                _deviceCode,
-            )
-        ).data
+        if (_deviceCode)
+            deviceNewestData = (
+                await BackEndRequest.getDeviceNewestData(
+                    _deviceCode,
+                )
+            ).data
+        else
+            deviceNewestData = []
     } catch (e) {
         deviceNewestData = []
     }
@@ -1152,17 +1149,20 @@ onBeforeRouteUpdate(async (to, from) => {
 
     let tp = shitMap[selectedDeviceType.value]
     let _deviceCode = monitorInfo.value[tp]["NAME_CODE_Map"][deviceList.value[0]]
-
     try {
-        curDeviceData = (
-            await BackEndRequest.getMonitorDataByTypeIdWithTime(
-                // 'gnss',
-                deviceTypeTimeMap['位移测量站'].timeUnit,
-                deviceTypeTimeMap['位移测量站'].timeCount,
-                // deviceIdMap['CL-01'],
-                _deviceCode
-            )
-        ).data
+        if (_deviceCode) {
+            curDeviceData = (
+                await BackEndRequest.getMonitorDataByTypeIdWithTime(
+                    // 'gnss',
+                    deviceTypeTimeMap['位移测量站'].timeUnit,
+                    deviceTypeTimeMap['位移测量站'].timeCount,
+                    // deviceIdMap['CL-01'],
+                    _deviceCode
+                )
+            ).data
+        } else {
+            curDeviceData = []
+        }
     } catch (e) {
         console.log('catch request error! ', _deviceCode)
         curDeviceData = []
@@ -1182,17 +1182,31 @@ onBeforeRouteUpdate(async (to, from) => {
     echartIns.setOption(deviceOptionMap['位移测量站'])
     chartDataLoading.value = false
 
-    setInterval(async () => {
+    // setInterval(async () => {
+    //     if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
+    //         chartDataLoading.value = true
+    //         updateTimeLoading.value = true
+    //         await updateNewestData()
+    //         // console.log(deviceTypeNameMap[selectedDeviceType.value])
+    //         // console.log(deviceIdMap[selectedDevice.value])
+    //         chartDataLoading.value = false
+    //         updateTimeLoading.value = false
+    //     }
+    // }, 1000 * 60)
+
+    setTimeout(async () => {
         if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
             chartDataLoading.value = true
             updateTimeLoading.value = true
+            console.log(useBankNameStore().globalBankName)
             await updateNewestData()
             // console.log(deviceTypeNameMap[selectedDeviceType.value])
             // console.log(deviceIdMap[selectedDevice.value])
             chartDataLoading.value = false
             updateTimeLoading.value = false
         }
-    }, 1000 * 60)
+    }, 10)
+
     // reRender()
     // console.log('initialData', initialData)
 
@@ -1219,12 +1233,6 @@ onBeforeMount(async () => {
 })
 
 onMounted(async () => {
-
-    window.addEventListener('keydown', e => {
-        if (e.key === '1') {
-            console.log(props.showVedio)
-        }
-    })
 
     useBankNameStore().globalBankName = route.params.id
 
@@ -1272,14 +1280,19 @@ onMounted(async () => {
     let tp = shitMap[selectedDeviceType.value]
     let _deviceCode = monitorInfo.value[tp]["NAME_CODE_Map"][deviceList.value[0]]
     try {
-        curDeviceData = (
-            await BackEndRequest.getMonitorDataByTypeIdWithTime(
-                // 'gnss',
-                deviceTypeTimeMap['位移测量站'].timeUnit,
-                deviceTypeTimeMap['位移测量站'].timeCount,
-                _deviceCode
-            )
-        ).data
+        if (_deviceCode) {
+            curDeviceData = (
+                await BackEndRequest.getMonitorDataByTypeIdWithTime(
+                    // 'gnss',
+                    deviceTypeTimeMap['位移测量站'].timeUnit,
+                    deviceTypeTimeMap['位移测量站'].timeCount,
+                    // deviceIdMap['CL-01'],
+                    _deviceCode
+                )
+            ).data
+        } else {
+            curDeviceData = []
+        }
     } catch (e) {
         curDeviceData = []
     }
@@ -1296,19 +1309,31 @@ onMounted(async () => {
     echartIns.setOption(deviceOptionMap['位移测量站'])
     chartDataLoading.value = false
 
-    setInterval(async () => {
+    // setInterval(async () => {
+    //     if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
+    //         chartDataLoading.value = true
+    //         updateTimeLoading.value = true
+    //         await updateNewestData()
+    //         // console.log(deviceTypeNameMap[selectedDeviceType.value])
+    //         // console.log(deviceIdMap[selectedDevice.value])
+    //         chartDataLoading.value = false
+    //         updateTimeLoading.value = false
+    //     }
+    // }, 1000 * 60)
+    // console.log('initialData', initialData)
+
+    setTimeout(async () => {
         if (deviceTypeNameMap[selectedDeviceType.value] != 'fiber') {
             chartDataLoading.value = true
             updateTimeLoading.value = true
+            console.log(useBankNameStore().globalBankName)
             await updateNewestData()
             // console.log(deviceTypeNameMap[selectedDeviceType.value])
             // console.log(deviceIdMap[selectedDevice.value])
             chartDataLoading.value = false
             updateTimeLoading.value = false
         }
-    }, 1000 * 60)
-    // console.log('initialData', initialData)
-
+    }, 10)
 
 
 })

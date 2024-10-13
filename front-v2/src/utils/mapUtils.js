@@ -42,7 +42,6 @@ const addBankLayer = async (map, bankEnName) => {
     bankVectorLayers.forEach(blayer => {
         const name = blayer.tileName
         const tileUrl = _tile(name)
-        console.log(tileUrl)
         const type = blayer.type
         const fields = blayer.fields
         layers[type].push({

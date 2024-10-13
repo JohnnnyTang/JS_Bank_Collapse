@@ -18,7 +18,7 @@ document.body.appendChild(unityCanvas)
 
 class UnityLayer {
 
-    constructor(originPosition, visibleZoom) {
+    constructor(originPosition, visibleZoom, loadedCallback) {
 
         this.type = 'custom'
         this.id = 'UnityLayer'
@@ -26,6 +26,8 @@ class UnityLayer {
         this.unityProjName = 'output'
         this.visibleZoom = visibleZoom
         this.originPosition = originPosition
+
+        this.loadedCallback = loadedCallback
 
         this.map = undefined
         this.zoom = undefined
@@ -140,6 +142,9 @@ class UnityLayer {
             this.keep(this.zoom >= this.visibleZoom)
 
             stopWebCam()
+
+            this.loadedCallback()
+
 
             const offset = 0.0
             // const devices = [

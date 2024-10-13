@@ -179,30 +179,35 @@ export const resourceUploadNeeded = {
                 enName: 'year',
                 value: '2023',
                 type: 'input',
+                required: true
             },
             {
                 label: '月份',
                 enName: 'month',
                 value: '04',
                 type: 'input',
+                required: true
             },
             {
                 label: '工况集',
                 enName: 'set',
                 value: 'standard',
                 type: 'input',
+                required: true
             },
             {
                 label: '备注',
                 enName: 'description',
                 value: '',
                 type: 'input',
+                required: false
             },
             {
                 label: '地形文件',
                 enName: 'file',
                 value: null,
                 type: 'file',
+                required: true
             }
         ],
         'Config': [
@@ -217,18 +222,21 @@ export const resourceUploadNeeded = {
                 enName: 'year',
                 value: '2023',
                 type: 'input',
+                required: true
             },
             {
                 label: '月份',
                 enName: 'month',
                 value: '04',
                 type: 'input',
+                required: true
             },
             {
                 label: '工况集',
                 enName: 'set',
                 value: 'standard',
                 type: 'input',
+                required: true
             },
             {
                 label: '备注',
@@ -241,6 +249,7 @@ export const resourceUploadNeeded = {
                 enName: 'file',
                 value: null,
                 type: 'file',
+                required: true
             }
         ],
         'Boundary': [
@@ -255,30 +264,35 @@ export const resourceUploadNeeded = {
                 enName: 'year',
                 value: '2023',
                 type: 'input',
+                required: true
             },
             {
                 label: '月份',
                 enName: 'month',
                 value: '04',
                 type: 'input',
+                required: true
             },
             {
                 label: '工况集',
                 enName: 'set',
                 value: 'standard',
                 type: 'input',
+                required: true
             },
             {
                 label: '备注',
                 enName: 'description',
                 value: '',
                 type: 'input',
+                required: false
             },
             {
                 label: '边界矢量文件',
                 enName: 'file',
                 value: null,
                 type: 'file',
+                required: true
             }
         ],
         'Hydrodynamic': [
@@ -293,30 +307,35 @@ export const resourceUploadNeeded = {
                 enName: 'year',
                 value: '2023',
                 type: 'input',
+                required: true
             },
             {
                 label: '月份',
                 enName: 'month',
                 value: '04',
                 type: 'input',
+                required: true
             },
             {
                 label: '工况集',
                 enName: 'set',
                 value: 'standard',
                 type: 'input',
+                required: true
             },
             {
                 label: '备注',
                 enName: 'description',
                 value: '',
                 type: 'input',
+                required: false
             },
             {
                 label: '水动力工况文件',
                 enName: 'file',
                 value: null,
                 type: 'file',
+                required: true
             }
         ],
 
@@ -331,6 +350,7 @@ export const resourceUploadNeeded = {
                 enName: 'name',
                 value: '',
                 type: 'input',
+                required: true
             },
             {
                 label: '几何类型',
@@ -338,6 +358,7 @@ export const resourceUploadNeeded = {
                 value: '',
                 type: 'radios',
                 radioLabelArray: ['点', '线', '面', '注记'],
+                required: true,
                 radioValueArray: ['point', 'line', 'polygon', 'symbol']
             },
             {
@@ -345,6 +366,7 @@ export const resourceUploadNeeded = {
                 value: '',
                 enName: 'fields',
                 type: 'input',
+                required: false
             },
             // {
             //     label: '配置文件(Json)',
@@ -357,6 +379,7 @@ export const resourceUploadNeeded = {
                 enName: 'file',
                 value: '',
                 type: 'file',
+                required: true
             }
         ]
     },
@@ -367,6 +390,7 @@ export const resourceUploadNeeded = {
                 enName: 'file',
                 value: '',
                 type: 'file',
+                required: true
             },
         ],
         'MENOMETER': [
@@ -375,6 +399,7 @@ export const resourceUploadNeeded = {
                 enName: 'file',
                 value: '',
                 type: 'file',
+                required: true
             },
         ],
         'STRESS': [
@@ -383,6 +408,7 @@ export const resourceUploadNeeded = {
                 enName: 'file',
                 value: '',
                 type: 'file',
+                required: true
             },
         ],
         'INCLINE': [
@@ -391,6 +417,7 @@ export const resourceUploadNeeded = {
                 enName: 'file',
                 value: '',
                 type: 'file',
+                required: true
             },
         ],
         'VEDIO': [
@@ -399,6 +426,7 @@ export const resourceUploadNeeded = {
                 enName: 'file',
                 value: '',
                 type: 'file',
+                required: true
             },
         ],
     }

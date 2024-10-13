@@ -2,6 +2,11 @@
     <div class="bank-resouce-create-container" v-loading="loading">
         <div class="main-title">岸段管理</div>
         <div class="desc-box-container">
+            <div class="change-button-container delete" v-show="bank.bankEnName != 'Mzs' && bank.bankEnName != ''">
+                <div class="change-button delete" v-if="!changeStatus" @click="deleteBank">
+                    删除
+                </div>
+            </div>
             <div class="title-container">岸段基本信息</div>
             <div class="change-button-container">
                 <div class="change-button" v-if="!changeStatus" @click="startModify">
@@ -43,6 +48,20 @@
                             </el-select>
                             <el-date-picker v-else-if="item.key === '监测起始时间'" v-model="item.val" type="date"
                                 placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
+                            <div v-else-if="item.key === '中心坐标'" class="full">
+                                <el-input v-model="lnglat.lng" style="
+                                        width: 50%;
+                                        height: 100%;
+                                        font-size: calc(0.6vw + 0.6vh);
+                                    " placeholder="请输入经度" type="number" :step="0.0000001"
+                                    :autosize="{ minRows: 4, maxRows: 6 }" />
+                                <el-input v-model="lnglat.lat" style="
+                                            width: 50%;
+                                            height: 100%;
+                                            font-size: calc(0.6vw + 0.6vh);
+                                        " placeholder="请输入纬度" type="number" :step="0.0000001"
+                                    :autosize="{ minRows: 4, maxRows: 6 }" />
+                            </div>
                             <el-input v-else v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
@@ -53,6 +72,7 @@
                                 " :autosize="{ minRows: 4, maxRows: 6 }" />
                         </div>
                         <!-- <div class="detail-val" v-else>{{ item.val }}</div> -->
+
                         <div class="detail-val" v-else>{{
                             // item.key === '监测起始时间' ? item.val.slice(0, 10) : item.val
                             item.key === '监测起始时间' && item.val ? item.val.slice(0, 10) : item.val
@@ -130,7 +150,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, toRaw, watch, computed } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router';
+import { useRoute, onBeforeRouteUpdate, useRouter } from 'vue-router';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue'
@@ -145,8 +165,10 @@ import UpdateDialog from './UpdateDialog.vue'
 const warnLevelList = ["I 级预警岸段", "Ⅱ 级预警岸段", "Ⅲ 级预警岸段"]
 
 const route = useRoute();
+const router = useRouter();
 onBeforeRouteUpdate(async (to, from) => {
     const toBankEnName = to.params.id
+    changeStatus.value = false
     initOneBank(toBankEnName)
 })
 const emit = defineEmits(['refresh-bank-list'])
@@ -162,7 +184,10 @@ const bank = reactive({
     name: '',
     bankEnName: ''
 })
-
+const lnglat = reactive({
+    lng: '',
+    lat: ''
+})
 const bankBasicInfo = ref()
 const changeStatus = ref(false)
 let originalBankBasicInfo = null
@@ -171,22 +196,67 @@ let originalBank = {
     bankEnName: ''
 }
 const startModify = () => {
-    console.log('进入修改状态')
+    // console.log('进入修改状态')
+    let center = typeof bankBasicInfo.value[1].val === 'string' ? JSON.parse(bankBasicInfo.value[1].val) : bankBasicInfo.value[1].val
+    lnglat.lng = center[0]
+    lnglat.lat = center[1]
+    console.log('lnglat', lnglat)
+
     changeStatus.value = true
     originalBankBasicInfo = bankBasicInfo.value.map(item => ({ ...item })) // deep copy
     originalBank.name = bank.name
     originalBank.bankEnName = bank.bankEnName
 }
 const cancelModify = () => {
-    console.log('退出修改状态')
+    // console.log('退出修改状态')
     changeStatus.value = false
     bankBasicInfo.value = originalBankBasicInfo // 手动退出，恢复原值
     bank.name = originalBank.name
     bank.bankEnName = originalBank.bankEnName
 }
+const deleteBank = () => {
+    ElMessageBox.confirm(
+        '确认删除该岸段？',
+        '警告',
+        {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(async () => {
+
+        BankResourceHelper.deleteBank(bank.bankEnName).then(res => {
+            const deleteMsg = res.data
+            ElMessage.success({
+                'offset': 100,
+                'message': deleteMsg
+            })
+            //删除岸段后回退到mzs，mzs不可删除
+            emit('refresh-bank-list', true)
+            router.push('/bankManage/preview/Mzs')
+        }).catch(_ => {
+            console.log(_)
+            ElMessage.error({
+                'offset': 100,
+                'message': '删除失败'
+            })
+        })
+
+    }).catch(_ => {
+        ElMessage.info({
+            'offset': 100,
+            'message': '取消删除'
+        })
+    })
+
+
+
+
+}
+
 
 const commitModify = () => {
-    console.log('提交修改')
+    // console.log('提交修改')
     ElMessageBox.confirm(
         '确认修改岸段信息？',
         '提示',
@@ -196,31 +266,16 @@ const commitModify = () => {
             type: 'info',
         }
     ).then(async () => {
-        const parseLonLat = (inputStr) => {
-            const coordinates = inputStr.slice(1, -1).split(',');
-            const longitude = parseFloat(coordinates[0]);
-            const latitude = parseFloat(coordinates[1]);
-            return [longitude, latitude]
-        }
+
         let nowBasicInfo = bankBasicInfo.value
-        // let ReqBody = {
-        //     "bank": bank.bankEnName,
-        //     "name": bank.name,
-        //     "riskLevel": nowBasicInfo[0].val,
-        //     "center": parseLonLat(nowBasicInfo[1].val),
-        //     "introduction": nowBasicInfo[2].val,
-        //     "management": {
-        //         "department": nowBasicInfo[3].val,
-        //         "contact": nowBasicInfo[4].val,
-        //     }
-        // }
+        let center = [parseFloat(lnglat.lng), parseFloat(lnglat.lat)]
         let ReqBody = {
             "bank": bank.bankEnName,
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
-            "center": parseLonLat(nowBasicInfo[1].val),
+            "center": center,
             "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val.toISOString(),
+            "monitorStartTime": nowBasicInfo[3].val,
             "introduction": nowBasicInfo[4].val,
             "management": {
                 "department": nowBasicInfo[5].val,
@@ -233,9 +288,14 @@ const commitModify = () => {
             'title': updateMsg,
             'offset': 120
         })
+
+        const _thisBankBasicInfo = (await BankResourceHelper.getOneBankBasicInfo(bank.bankEnName)).data
+        console.log('true!!')
+        bank.name = _thisBankBasicInfo.name
+        bankBasicInfo.value = getBankBasic_Style_Info(_thisBankBasicInfo)
         changeStatus.value = false
     }).catch(_ => {
-        console.log('取消修改');
+        console.log('取消修改', _);
         bankBasicInfo.value = originalBankBasicInfo // 恢复原值
         bank.name = originalBank.name
         bank.bankEnName = originalBank.bankEnName
@@ -544,6 +604,7 @@ const initOneBank = async (bankEnName) => {
     bank.name = _thisBankBasicInfo.name
     bank.bankEnName = _thisBankEnName
     bankBasicInfo.value = getBankBasic_Style_Info(_thisBankBasicInfo)
+    console.log(bankBasicInfo.value)
     resourceInfo.value = {
         '模型资源管理': _thisBankResourceInfo,
         '可视化资源管理': _thisVisualResourceInfo,
@@ -662,6 +723,11 @@ div.bank-resouce-create-container {
             font-weight: bold;
             font-size: calc(0.8vw + 0.4vh);
 
+            &.delete {
+                right: auto;
+                left: 2.5vw;
+            }
+
             div.change-button {
                 width: 8vw;
                 height: 4vh;
@@ -689,6 +755,25 @@ div.bank-resouce-create-container {
                         rgba(0, 119, 255, 0.7) 2px 2px,
                         rgba(0, 119, 255, 0.6) 3px 3px,
                         rgba(0, 119, 255, 0.4) 4px 4px;
+                }
+
+                &.delete {
+                    background-color: #ffc9b4;
+                    box-shadow:
+                        rgba(255, 165, 81, 0.8) 1px 1px,
+                        rgba(255, 165, 81, 0.7) 2px 2px,
+                        rgba(255, 165, 81, 0.6) 3px 3px;
+
+                    &:hover {
+                        cursor: pointer;
+                        transform: translate3d(2px, 2px, 2px);
+                        color: #722f02;
+                        box-shadow:
+                            rgba(255, 165, 81, 0.8) 1px 1px,
+                            rgba(255, 165, 81, 0.7) 2px 2px,
+                            rgba(255, 165, 81, 0.6) 3px 3px,
+                            rgba(255, 165, 81, 0.4) 4px 4px;
+                    }
                 }
             }
 
@@ -962,6 +1047,11 @@ div.bank-resouce-create-container {
     }
 }
 
+div.full {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
 
 :deep(.el-select) {
 
@@ -974,5 +1064,18 @@ div.bank-resouce-create-container {
         height: inherit;
         line-height: inherit;
     }
+}
+
+:deep(.el-input__inner[type=number]) {
+
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    -moz-appearance: textfield;
 }
 </style>
