@@ -810,7 +810,7 @@ onMounted(async () => {
 
 
     updateWaterInfo()
-    c = setInterval(updateWaterInfo, 1000)
+    c = setInterval(updateWaterInfo, 1000 * 60 * 1)
 
 })
 
