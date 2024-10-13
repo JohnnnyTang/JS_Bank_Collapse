@@ -12,10 +12,25 @@ spring:
       maxLifeTime: 120000
       idle-timeout: 0
     default:
+      database: bank_new
       url: jdbc:postgresql://localhost:5432/bank_new?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: nhri_admin123456
+    public:
+      database: bank
+      url: jdbc:postgresql://119.45.198.54:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: nhri_admin123456
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+  mybatis:
+    mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+    configuration:
+      call-setters-on-nulls: true
   mail:
     host: smtp.qq.com
     port: 465
@@ -32,16 +47,16 @@ spring:
             enable: true
           socketFactory:
             class: javax.net.ssl.SSLSocketFactory #SSL连接配置
-
-mybatis:
-  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
-  configuration:
-    call-setters-on-nulls: true
-
 springfox:
   documentation:
     swagger-ui:
       enabled: true
+
+multiIndex:
+  condaEnv: Env1
+  dataPath: E:\bankAppData\modelData
+  wholeDataPath: E:\bankAppData\dataWhole
+  resPath: E:/bankAppData/modelRes/
 
 tile:
   mzsTilePath: E:\bankAppData\rasterTile\
@@ -54,19 +69,13 @@ staticData:
   tifTilePath: E:\bankAppData\staticData\tifTile
   vectorDataPath: E:\bankAppData\staticData\vectorData
   waterConditionPath: E:\bankAppData\staticData\waterCondition
-  draftDataPath: E:\\Data\\bankProjectData\\staticData\\draftData
+  draftDataPath: E:\bankAppData\staticData\draftData
 
 waterCondition:
   url: http://10.32.22.202:8001
 
 video:
   yangzhong: E:\bankAppData\video\125_1711267167.mp4
-
-multiIndex:
-  condaEnv: Env1
-  dataPath: E:\bankAppData\modelData
-  wholeDataPath: E:\bankAppData\dataWhole
-  resPath: E:/bankAppData/modelRes/
 
 sms:
   accessTokenLoc: E:\bankAppData\AccessKey.json

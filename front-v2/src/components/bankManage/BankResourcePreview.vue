@@ -54,7 +54,8 @@
                         </div>
                         <!-- <div class="detail-val" v-else>{{ item.val }}</div> -->
                         <div class="detail-val" v-else>{{
-                            item.key === '监测起始时间' ? item.val.slice(0, 10) : item.val
+                            // item.key === '监测起始时间' ? item.val.slice(0, 10) : item.val
+                            item.key === '监测起始时间' && item.val ? item.val.slice(0, 10) : item.val
                         }}</div>
 
                     </div>

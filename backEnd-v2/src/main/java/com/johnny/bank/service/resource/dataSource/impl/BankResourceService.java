@@ -228,11 +228,13 @@ public class BankResourceService {
     }
     public String updateBankInfo(String bank, JSONObject info) {
         JSONObject dataNodeBasicInfo = new JSONObject();
+        dataNodeBasicInfo.put("name",info.getString("name"));
         dataNodeBasicInfo.put("riskLevel",info.getString("riskLevel"));
         dataNodeBasicInfo.put("introduction",info.getString("introduction"));
         dataNodeBasicInfo.put("management",info.getJSONObject("management"));
         dataNodeBasicInfo.put("center",info.getString("center"));
-        dataNodeBasicInfo.put("name",info.getString("name"));
+        dataNodeBasicInfo.put("monitorLength",info.getString("monitorLength"));
+        dataNodeBasicInfo.put("monitorStartTime",info.getString("monitorStartTime"));
         DataNodeV2 dataNode = DataNodeV2.dataNodeBuilder()
                 .bank(bank).name(bank+"BankNode").dataOrigin("Local")
                 .category("BankNode").path(",DataNodeHead,").basicInfo(dataNodeBasicInfo)

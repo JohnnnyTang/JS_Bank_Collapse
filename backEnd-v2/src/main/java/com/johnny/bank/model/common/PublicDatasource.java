@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "spring.datasource.public")
 @Component
 public class PublicDatasource {
+    private String database;
     private String url;
     private String username;
     private String password;

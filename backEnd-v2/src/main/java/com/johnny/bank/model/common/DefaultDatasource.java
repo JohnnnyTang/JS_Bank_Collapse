@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "spring.datasource.default")
 @Component
 public class DefaultDatasource {
+    private String database;
     private String url;
     private String username;
     private String password;

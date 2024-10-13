@@ -169,7 +169,8 @@ const handleFileUpload = (file) => {
         // next process of fileInfo
         const [fileName, fileType] = extractFileNameAndType(file.file.name)
         fileInfo['name'] = fileName
-        fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
+        if (props.subType === 'DEM')
+            fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
 
 
         ///// build form data
