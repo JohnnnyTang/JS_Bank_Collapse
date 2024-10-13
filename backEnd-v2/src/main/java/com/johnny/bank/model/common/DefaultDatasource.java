@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DefaultDatasource {
     private String database;
+    private String ip;
+    private String port;
     private String url;
     private String username;
     private String password;

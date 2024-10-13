@@ -155,7 +155,7 @@ public class VectorUtil {
         params.put("filePath", shpPath);
         params.put("finalTableName", tableName);
         params.put("dbname", defaultDatasource.getDatabase());params.put("user",defaultDatasource.getUsername());
-        params.put("password", defaultDatasource.getPassword());params.put("host","127.0.0.1");params.put("port", "5432");
+        params.put("password", defaultDatasource.getPassword());params.put("host",defaultDatasource.getIp());params.put("port", defaultDatasource.getPort());
         paramNode.setParams(params);
         paramNodeService.save(paramNode);
         taskNode.setParamNode(paramNode);
