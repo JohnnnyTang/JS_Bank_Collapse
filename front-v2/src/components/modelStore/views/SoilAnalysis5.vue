@@ -44,30 +44,31 @@
                                 </div>
                             </div>
 
-                            <div class="soil-layer-profile flex-coloum" style="width: 61%;">
-                                <div class="title2">土壤分层详情</div>
+                            <div class="second-row">
+                                <div class="soil-layer-profile flex-coloum">
+                                    <div class="title2">土壤分层详情</div>
 
-                                <div class="content flex-row">
-                                    <div class="keyValue flex-row" v-for="i in 5">
-                                        <div class="key">{{ thicknessName[i - 1] }}</div>
-                                        <!-- <div class="value">{{ keepFloat2(thicknessData[i - 1]) }}</div> -->
-                                        <input type="number" class="value" :key="i" v-model="thicknessData[i - 1]">
+                                    <div class="content flex-row">
+                                        <div class="keyValue flex-row" v-for="i in 5">
+                                            <div class="key">{{ thicknessName[i - 1] }}</div>
+                                            <!-- <div class="value">{{ keepFloat2(thicknessData[i - 1]) }}</div> -->
+                                            <input type="number" class="value" :key="i" v-model="thicknessData[i - 1]">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="temp-block">
+                                    <div class="title2">潮位参数配置</div>
+                                    <div class="content one-center">
+                                        <div class="keyValue flex-row">
+                                            <div class="key">elevation of Flow</div>
+                                            <input type="number" class="value" placeholder="请输入潮位"
+                                                v-model="elevationOfFlow">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-
-                            <div class="temp-block">
-                                <div class="title2" style="margin-top: 1vh;">潮位参数配置</div>
-                                <div class="content one-center">
-                                    <div class="keyValue flex-row" style="margin-top: .2vh;">
-                                        <div class="key">elevation of Flow</div>
-                                        <input type="number" class="value" placeholder="请输入潮位" v-model="elevationOfFlow">
-                                    </div>
-                                </div>
-                            </div>
-
-
 
                             <div class="right-block flex-coloum">
                                 <div class="full-block flex-coloum" style="justify-content: flex-start;">
@@ -150,20 +151,16 @@
 
 <script setup>
 import ModelTitleVue from '../ModelTitle.vue'
-import soilFlowChart from '../soilAnalysis/soilFlowChart.vue';
 import sectionDraw from '../soilAnalysis/sectionDraw.vue'
 import sectionChart from '../soilAnalysis/chart copy'
-import axios from 'axios';
-// import { getData, getTestData } from '../soilAnalysis/chart'
-import { onMounted, ref, reactive, watch, nextTick, computed } from 'vue';
+import { onMounted, ref, reactive, watch } from 'vue';
 import { ElNotification } from 'element-plus';
-import { initPureScratchMap } from '../../../utils/mapUtils';
 import ModelRunner from '../modelRunner'
+import BankResourceHelper from './bankResourceHelper';
 
 const chartdom = ref(null)
 const sectionDrawRef = ref(null)
-const mapRef = ref(null)
-const elevationOfFlow = ref(null)
+const elevationOfFlow = ref(2.8)
 const ModelRunningShow = ref(false)
 const ModelRunningMessage = ref('请完整配置参数后运行')
 const showSkeleton = ref(true)
@@ -178,19 +175,17 @@ const fileList = ref([])
 const uploadJson = ref({})
 
 
-let resultMap = null
 let chart = null
 
 const thicknessData = ref([1.93, -4.07, -11.57, -26.57, -36.57])
 const thicknessName = ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5']
 const xzData = ref(new Array(23).fill(['0', '0']))
 
-
+////////////////// json 模型参数信息上传
 const beforeUpload = (file, e) => {
     console.log('beforeUpload', file, e)
     const isJSON = file.type === 'application/json';
     if (!isJSON) {
-        console.log('请上传合法的 JSON 参数配置文件!');
         return false;
     }
     return isJSON;
@@ -202,12 +197,14 @@ const handleChange = (file, fileList) => {
             let fileContent = JSON.parse(event.target.result);
             uploadJson.value = fileContent
             ElNotification({
+                position: 'top-left',
                 type: 'success',
                 title: '参数配置文件上传成功！',
                 offset: 130
             })
         } catch (error) {
             ElNotification({
+                position: 'top-left',
                 type: 'error',
                 message: '请上传正确的 JSON 文件！',
                 title: '错误',
@@ -219,6 +216,7 @@ const handleChange = (file, fileList) => {
 }
 const handleExceed = (files, fileList) => {
     ElNotification({
+        position: 'top-left',
         type: 'error',
         message: '文件超出限制，请上传正确的 JSON 文件！',
         title: '错误',
@@ -227,8 +225,6 @@ const handleExceed = (files, fileList) => {
 }
 const handleRequest = (a, b) => {
     console.log('============')
-    console.log(a)
-    console.log(b)
 }
 
 watch(uploadJson, async (newValue, oldValue) => {
@@ -256,26 +252,27 @@ watch(uploadJson, async (newValue, oldValue) => {
 
 })
 
-// first into the page, select bank and get related data
-const selectedBank = ref(null)
+///////////////// 初始，岸段选择
 const demResources = ref([])
-const confirmBankHandler = async (bankName) => {
-    console.log('confirmBankHandler', bankName)
-    const bankNameMap = {
-        '民主沙': 'Mzs'
-    }
-    // const dem = (await axios.get(`/temp/dataNode/bank/dataType?dataType=DEM&bank=${bankNameMap[bankName]}`)).data
-    const dem = t
-    const _demResource = getDemResource(dem)
-    console.log('demdata', _demResource)
-    demResources.value = _demResource
-    selectedBank.value = bankName
+const selectedBank = reactive({
+    name: null,
+    bankEnName: null
+})
+const confirmBankHandler = async (bank) => {
+
+    selectedBank.name = bank.name
+    selectedBank.bankEnName = bank.bankEnName
+
+    let demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', selectedBank.bankEnName)).data
+    let demList = BankResourceHelper.DEMResourcetoList(demData)
+    demResources.value = demList
 
     ElNotification({
         type: 'success',
         title: '选择岸段',
-        message: `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
-        offset: 180
+        message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
+        position: 'top-left',
+        offset: 180,
     })
 }
 
@@ -288,8 +285,9 @@ const inputData = (type) => {
     }
     else if (type == 'map') {
         console.log('map input')
-        if(selectedBank.value == null){
+        if (selectedBank.name == null) {
             ElNotification({
+                position: 'top-left',
                 type: 'info',
                 message: '请先选择岸段',
                 title: '警告',
@@ -297,13 +295,7 @@ const inputData = (type) => {
             })
             return
         }
-
         mapInputVisible.value = true
-        // setTimeout(() => {
-        //     console.log(sectionDrawRef.value)
-        //     sectionDrawRef.value.resizeMap()
-        // }, 1);
-        // sectionDrawRef.value.resizeMap()
     }
 
     BSTEMResult.see = 0
@@ -328,41 +320,34 @@ const demSelectHandler = (name) => {
     //     '2004': '200408_dem/w001001.adf'
     // }
     // selectedDem.value = NameList[name]
-    console.log(name)
     selectedDem.value = name
 }
 
 const sectionViewModelRun = async (param) => {
     console.log('section view model run')
-    // let sectionViewParams = {
-    //     'dem-id': selectedDem,
-    //     'section-geometry': sectionGeojson,
-    // }
-    // const paramsCheck = () => {
-    //     if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
-    //         ElNotification({
-    //             type: 'warning',
-    //             message: '请完成断面绘制和地形选择',
-    //             title: '警告',
-    //             offset: 130
-    //         })
-    //         return false
-    //     }
-    //     return true
-    // }
-
 
     ModelRunningShow.value = true
     ModelRunningMessage.value = '正在计算断面形态'
-    let sectionViewModelUrl = '/temp/taskNode/start/riverbedEvolution/calculateSectionView'
+    let sectionViewModelUrl = '/model/taskNode/start/riverbedEvolution/calculateSectionView'
     const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
-    const taskId = await sectionViewMR.modelStart()
+    const taskId = await sectionViewMR.modelStart().catch(() => {
+        ModelRunningShow.value = false
+        ModelRunningMessage.value = ''
+        ElNotification({
+            position: 'top-left',
+            type: 'error',
+            title: '断面形态计算模型启动失败',
+            offset: 130
+        })
+    })
     console.log('task id', taskId, sectionViewMR.taskId)
     let statusInterval = setInterval(async () => {
         const status = await sectionViewMR.getRunningStatus()
         console.log('status', status)
         switch (status) {
             case 'RUNNING':
+            case 'LOCK':
+            case 'UNLOCK':
                 break
             case 'COMPLETE':
                 clearInterval(statusInterval)
@@ -371,10 +356,11 @@ const sectionViewModelRun = async (param) => {
                 let sectionFileName = result['raw-json']
                 const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err) => {
                     ElNotification({
+                        position: 'top-left',
+                        offset: 130,
                         type: 'error',
                         title: '错误',
                         message: '断面形态计算完毕，但获取断面信息失败！',
-                        offset: 130
                     })
                     console.log(err)
                 })
@@ -385,6 +371,7 @@ const sectionViewModelRun = async (param) => {
                 ModelRunningShow.value = false
                 ModelRunningMessage.value = ''
                 ElNotification({
+                    position: 'top-left',
                     type: 'success',
                     message: '计算断面形态成功',
                     title: '成功',
@@ -404,6 +391,7 @@ const sectionViewModelRun = async (param) => {
                 ModelRunningShow.value = false
                 ModelRunningMessage.value = ''
                 ElNotification({
+                    position: 'top-left',
                     type: 'error',
                     message: '计算断面形态失败,\n' + errorLog,
                     title: '错误',
@@ -428,10 +416,12 @@ const calSectionViewClickHandler = () => {
     let sectionViewParams = {
         'dem-id': selectedDem.value,
         'section-geometry': sectionGeojson.value,
+        // 'section-geometry':{ "type": "Feature", "properties": { "id": 7, "label": "MZ08海事码头" }, "geometry": { "type": "LineString", "coordinates": [ [ 120.541607142803116, 32.03073986301149 ], [ 120.529324527677801, 31.999868738955477 ] ] } }
     }
     const paramsCheck = () => {
         if (sectionViewParams['dem-id'] == null || sectionViewParams['section-geometry'] == null) {
             ElNotification({
+                position: 'top-left',
                 type: 'warning',
                 message: '请完成断面绘制和地形选择',
                 title: '警告',
@@ -449,6 +439,17 @@ const calSectionViewClickHandler = () => {
     }
 }
 
+const findIndexOfMin = (arr) => {
+    // // 找到最小值的索引
+    // const numbers = [10, 5, 8, 3, 7];
+    // const minIndex = findIndexOfMin(numbers);
+    if (arr.length === 0) {
+        return -1; // 如果数组为空，返回 -1 表示没有最小值
+    }
+    return arr.reduce((minIndex, currentValue, currentIndex, array) => {
+        return currentValue < array[minIndex] ? currentIndex : minIndex;
+    }, 0);
+}
 
 
 const BSTEMModelRun = async () => {
@@ -457,14 +458,15 @@ const BSTEMModelRun = async () => {
         "section-geometry": sectionGeojson.value,
         "x-values": xzData.value.map(item => Math.round(item[0] * 1000) / 1000),
         "z-values": xzData.value.map(item => Math.round(item[1] * 1000) / 1000),
-        "index-toe": "",
-        "bool-tension": false,
+        "index-toe": findIndexOfMin(xzData.value.map(item => Math.round(item[1] * 1000) / 1000)),
+        "flow-elevation": elevationOfFlow.value,
+        // "bool-tension": false,
         "bank-layer-thickness": thicknessData.value,
     }
-    console.log(BSTEMModelParams)
     const paramsCheck = () => {
         if (elevationOfFlow.value == null || elevationOfFlow.value == '') {
             ElNotification({
+                position: 'top-left',
                 type: 'warning',
                 message: '请完整配置参数后运行',
                 title: '警告',
@@ -478,15 +480,25 @@ const BSTEMModelRun = async () => {
         ModelRunningShow.value = true
         ModelRunningMessage.value = '正在执行土地变形分析模型'
         ElNotification({
+            position: 'top-left',
             type: 'info',
             message: '执行土地变形分析模型',
             title: '提示',
             offset: 130
         })
 
-        let BSTEMModelUrl = '/temp/taskNode/start/erosionModel/calculateBSTEM'
+        let BSTEMModelUrl = '/model/taskNode/start/erosionModel/calculateBSTEM'
         const BSTEMMR = new ModelRunner(BSTEMModelUrl, BSTEMModelParams)
-        const taskId = await BSTEMMR.modelStart()
+        const taskId = await BSTEMMR.modelStart().catch(() => {
+            ModelRunningShow.value = false
+            ModelRunningMessage.value = ''
+            ElNotification({
+                position: 'top-left',
+                type: 'error',
+                title: '土体变形分析模型启动失败',
+                offset: 130
+            })
+        })
         console.log('task id', taskId, BSTEMMR.taskId)
         let statusInterval = setInterval(async () => {
             const status = await BSTEMMR.getRunningStatus()
@@ -502,9 +514,9 @@ const BSTEMModelRun = async () => {
                     let see = Number.parseFloat(result['see'])
                     let ssa = Number.parseFloat(result['ssa'])
 
-                    fos = fos + Math.random() * 0.3
-                    see = see + Math.random() * 5.0
-                    ssa = ssa + Math.random() * 8.0
+                    // fos = fos + Math.random() * 0.3
+                    // see = see + Math.random() * 5.0
+                    // ssa = ssa + Math.random() * 8.0
 
                     BSTEMResult.fos = fos
                     BSTEMResult.see = see
@@ -513,6 +525,7 @@ const BSTEMModelRun = async () => {
                     ModelRunningShow.value = false
                     ModelRunningMessage.value = ''
                     ElNotification({
+                        position: 'top-left',
                         type: 'success',
                         message: '土地变形分析模型执行成功',
                         title: '成功',
@@ -527,6 +540,7 @@ const BSTEMModelRun = async () => {
                     ModelRunningShow.value = false
                     ModelRunningMessage.value = ''
                     ElNotification({
+                        position: 'top-left',
                         type: 'error',
                         message: '土地变形分析模型执行失败,\n' + errorLog,
                         title: '错误',
@@ -544,8 +558,6 @@ const BSTEMModelRun = async () => {
 
 const redrawChartClickHandler = () => {
 
-    // console.log(xzData.value)
-    // console.log(thicknessData.value)
     BSTEMResult.see = 0
     BSTEMResult.ssa = 0
     BSTEMResult.fos = 0
@@ -573,37 +585,12 @@ const drawChartFromMap = () => {
         })
         chart.initBaseChart(false)
     }
-    // chart.initGraphic()
-
-    // watch(() => chart.newDataInfo, (e) => {
-    //     thicknessData.value = e.thicknessData.sort((a, b) => b - a)
-    //     xzData.value = e.pointData.sort((a, b) => a[0] - b[0])
-    // }, {
-    //     deep: true
-    // })
-}
-const resultMapInit = async () => {
-    resultMap = await initPureScratchMap(mapRef.value)
-    resultMap.resize()
-    attachBaseLayer(resultMap)
-    mapFlyToRiver(resultMap)
 }
 
 
 
 onMounted(async () => {
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key == 'q') {
-            console.log(xzData.value)
-        }
-        if (e.key == 'w') {
-            console.log(thicknessData.value)
-        }
-
-    })
-    // /taskNode/result/id?taskId=66ade6c2cb34b50d7075f6a4
-
+    // do nothing
 })
 
 /// helper
@@ -755,21 +742,24 @@ const attachBaseLayer = (map) => {
         },
     })
 }
-
 const dataGenerate = (origin) => {
     console.log('origin', origin)
     const lineData = []
     const lineDataStep = origin['step']
     const pointData = []
-    const pointDataStep = origin['step_er_verified']
+    // const pointDataStep = origin['step_er_verified']
+    const pointDataStep = origin['step_er']
     for (let i = 0; i < origin['points'].length; i++) {
         let point = origin['points'][i]
         lineData.push([lineDataStep * i, point[2]])
     }
-    let scatterStart = lineDataStep * origin['deepest_index'] - (origin['points_er_verified'].length - 1) * pointDataStep
+    // let scatterStart = lineDataStep * origin['deepest_index'] - (origin['points_er_verified'].length - 1) * pointDataStep
+    let scatterStart = lineDataStep * origin['deepest_index'] - (origin['points_er'].length - 1) * pointDataStep
 
-    for (let i = 0; i < origin['points_er_verified'].length; i++) {
-        let point = origin['points_er_verified'][i]
+    // for (let i = 0; i < origin['points_er_verified'].length; i++) {
+    for (let i = 0; i < origin['points_er'].length; i++) {
+        // let point = origin['points_er_verified'][i]
+        let point = origin['points_er'][i]
         // pointData.push([scatterStart + i * pointDataStep, point[2]])
         pointData.push([i * pointDataStep, point[2]])
 
@@ -783,8 +773,6 @@ const dataGenerate = (origin) => {
         ]
     }
 }
-
-
 const parseUploadJson = (jsonData) => {
     try {
         let pointDT = []
@@ -796,6 +784,7 @@ const parseUploadJson = (jsonData) => {
         let flowElevation = jsonData['flow-elevation']
 
         ElNotification({
+            position: 'top-left',
             type: 'success',
             message: '参数配置文件解析完毕',
             title: '成功',
@@ -809,6 +798,7 @@ const parseUploadJson = (jsonData) => {
     }
     catch (e) {
         ElNotification({
+            position: 'top-left',
             type: 'error',
             message: '解析失败，请上传正确的 JSON 文件！',
             title: '错误',
@@ -817,112 +807,6 @@ const parseUploadJson = (jsonData) => {
     }
 }
 
-const getDemResource = (ogSource) => {
-    const _demRes = []
-    for (let i = 0; i < ogSource.length; i++) {
-        const year = ogSource[i]['year']
-        const sets = ogSource[i]['sets']
-        for (let j = 0; j < sets.length; j++) {
-
-            const set = sets[j]
-            for (let k = 0; k < set['list'].length; k++) {
-                const item = set['list'][k]
-                // const name = item['name']
-                const demResourceNode = {
-                    year: year,
-                    name: item['name'],
-                    fileType: item['fileType'],
-                    path: item['path']
-                }
-                _demRes.push(demResourceNode)
-            }
-
-        }
-    }
-    return _demRes
-}
-const t = [
-    {
-        "year": "1999",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "199901",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/1999/standard/199901/199901.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2012",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "201210",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2012/standard/201210/201210.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2016",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "201610",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2016/standard/201610/201610.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2019",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "201904",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2019/standard/201904/201904.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    },
-    {
-        "year": "2023",
-        "sets": [
-            {
-                "list": [
-                    {
-                        "name": "202304",
-                        "temp": "",
-                        "fileType": "tiff",
-                        "path": "tiff/Mzs/2023/standard/202304/202304.tif"
-                    }
-                ],
-                "name": "standard"
-            }
-        ]
-    }
-]
 </script>
 
 <style lang="scss" scoped>
@@ -1067,7 +951,6 @@ div.main-content {
 
                 :deep(div.el-tabs__nav-scroll) {
                     background-color: rgb(171, 213, 246);
-                    // border-bottom: 3px solid #2a4ac9;
                 }
 
             }
@@ -1190,143 +1073,154 @@ div.main-content {
 
                         }
 
-                        .soil-layer-profile {
+                        .second-row {
+                            width: 82%;
+                            height: 40%;
+                            display: flex;
+                            flex-direction: row;
 
-                            position: relative;
-                            // width: 80%;
-                            height: 30%;
-                            padding: 10px;
-                            margin: 5px;
-                            background-color: rgb(212, 239, 254);
-                            border-radius: 10px;
 
-                            .content {
+                            .soil-layer-profile {
 
-                                justify-content: space-evenly;
-                                align-items: center;
+                                position: relative;
+                                width: 74%;
+                                height: 65%;
+                                overflow: hidden;
+                                padding: 10px;
+                                margin: 5px;
+                                background-color: rgb(212, 239, 254);
+                                border-radius: 10px;
 
-                                .keyValue {
-                                    position: relative;
-                                    justify-content: center;
+                                .content {
+
+                                    justify-content: space-evenly;
                                     align-items: center;
-                                    width: 10vw;
-                                    height: 4vh;
 
-                                    .key {
-                                        height: 2.5vh;
-                                        width: 3vw;
-                                        margin-right: .2vw;
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.4vw + 0.3vh);
-                                        transition: .3s ease-in-out;
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
-                                        border-radius: 5px;
-                                        background-color: rgb(44, 61, 212);
-                                        font-weight: bold;
-                                        color: white;
-                                    }
-
-                                    .value {
+                                    .keyValue {
                                         position: relative;
-                                        height: 2.5vh;
-                                        width: 3vw;
-                                        // flex: 1;
-                                        // border: 1px solid rgb(201, 201, 201);
-                                        border: none !important;
-                                        border-right: 2px solid rgb(2, 143, 199) !important;
-                                        border-bottom: 1px solid rgb(5, 88, 121) !important;
-                                        border-radius: 5px;
-                                        text-align: center;
+                                        justify-content: center;
+                                        align-items: center;
+                                        width: 10vw;
+                                        height: 4vh;
 
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.4vw + 0.5vh);
-                                        transition: .3s ease-in-out;
-
-                                        &:nth-child(even) {
-                                            color: rgb(44, 61, 212);
-                                            background-color: #ffffff;
-                                        }
-
-                                        &:nth-child(odd) {
-                                            color: white;
-                                            background-color: rgba(44, 61, 212, 0.527);
-                                        }
-
-                                        &:hover {
-                                            background-color: rgb(44, 61, 212);
-                                            color: white;
-                                            font-weight: bold;
-                                        }
-
-                                        &.head {
-                                            background-color: #0e14cf;
+                                        .key {
+                                            height: 2.5vh;
+                                            width: 3vw;
+                                            margin-right: .2vw;
+                                            display: grid;
+                                            place-items: center;
                                             font-size: calc(0.4vw + 0.3vh);
+                                            transition: .3s ease-in-out;
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            background-color: rgb(44, 61, 212);
+                                            font-weight: bold;
+                                            color: white;
                                         }
 
+                                        .value {
+                                            position: relative;
+                                            height: 2.5vh;
+                                            width: 3vw;
+                                            // flex: 1;
+                                            // border: 1px solid rgb(201, 201, 201);
+                                            border: none !important;
+                                            border-right: 2px solid rgb(2, 143, 199) !important;
+                                            border-bottom: 1px solid rgb(5, 88, 121) !important;
+                                            border-radius: 5px;
+                                            text-align: center;
+
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.4vw + 0.5vh);
+                                            transition: .3s ease-in-out;
+
+                                            &:nth-child(even) {
+                                                color: rgb(44, 61, 212);
+                                                background-color: #ffffff;
+                                            }
+
+                                            &:nth-child(odd) {
+                                                color: white;
+                                                background-color: rgba(44, 61, 212, 0.527);
+                                            }
+
+                                            &:hover {
+                                                background-color: rgb(44, 61, 212);
+                                                color: white;
+                                                font-weight: bold;
+                                            }
+
+                                            &.head {
+                                                background-color: #0e14cf;
+                                                font-size: calc(0.4vw + 0.3vh);
+                                            }
+
+                                        }
                                     }
+
                                 }
 
                             }
 
-                        }
+                            .temp-block {
 
-                        .temp-block {
-                            position: absolute;
-                            width: 15vw;
-                            height: 9vh;
-                            top: 15.8vh;
-                            right: 15.5vw;
-                            background-color: rgb(212, 239, 254);
-                            border-radius: 10px;
+                                position: relative;
+                                width: 21.5%;
+                                height: 65%;
+                                overflow: hidden;
+                                padding: 10px;
+                                margin: 5px;
+                                background-color: rgb(212, 239, 254);
+                                border-radius: 10px;
 
-                            .title2 {
-                                margin-left: .5vw;
-                            }
+                                .title2 {
+                                    margin-left: .5vw;
+                                }
 
-                            .content {
+                                .content {
 
 
-                                .keyValue {
-                                    position: relative;
-                                    justify-content: center;
-                                    align-items: center;
-                                    width: 12vw;
-                                    height: 4vh;
+                                    .keyValue {
+                                        position: relative;
+                                        justify-content: center;
+                                        align-items: center;
+                                        width: 12vw;
+                                        height: 4vh;
 
-                                    .key {
-                                        height: 2.5vh;
-                                        width: 65%;
-                                        margin-right: .5vw;
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.5vw + 0.3vh);
-                                        transition: .3s ease-in-out;
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
-                                        border-radius: 5px;
-                                        background-color: rgb(44, 61, 212);
-                                        font-weight: bold;
-                                        color: white;
-                                    }
+                                        .key {
+                                            height: 2.5vh;
+                                            width: 65%;
+                                            margin-right: .5vw;
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.5vw + 0.3vh);
+                                            transition: .3s ease-in-out;
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            background-color: rgb(44, 61, 212);
+                                            font-weight: bold;
+                                            color: white;
+                                        }
 
-                                    .value {
-                                        height: 2.5vh;
-                                        // flex: 0.4;
-                                        width: 33%;
+                                        .value {
+                                            height: 2.5vh;
+                                            // flex: 0.4;
+                                            width: 33%;
+                                            text-align: center;
+                                            border-right: 2px solid rgb(2, 143, 199);
+                                            border-bottom: 1px solid rgb(5, 88, 121);
+                                            border-radius: 5px;
+                                            display: grid;
+                                            place-items: center;
+                                            font-size: calc(0.4vw + 0.4vh);
+                                            transition: .3s ease-in-out;
+                                            background-color: #ffffff;
+                                            color: rgb(44, 61, 212);
 
-                                        border-right: 2px solid rgb(2, 143, 199);
-                                        border-bottom: 1px solid rgb(5, 88, 121);
-                                        border-radius: 5px;
-                                        display: grid;
-                                        place-items: center;
-                                        font-size: calc(0.4vw + 0.4vh);
-                                        transition: .3s ease-in-out;
-                                        background-color: #ffffff;
-                                        color: rgb(44, 61, 212);
-
+                                        }
                                     }
                                 }
                             }
@@ -1562,194 +1456,6 @@ div.main-content {
                     }
 
                 }
-
-                // div.warn-status-Desc {
-                //     position: absolute;
-                //     right: 26vw;
-                //     top: 1vh;
-                //     height: 4vh;
-                //     line-height: 4vh;
-                //     width: 25vw;
-                //     text-align: center;
-                //     font-size: calc(0.8vw + 0.3vh);
-                //     font-weight: bold;
-                //     color: #e3f9ff;
-                //     box-shadow: 0px 2px rgb(0, 225, 255);
-                //     border-radius: 6px;
-                //     background-color: #0011ffd5;
-                // }
-
-                // div.warn-status-container {
-                //     position: absolute;
-                //     right: 32vw;
-                //     top: 6vh;
-                //     width: 14vw;
-                //     height: 10vh;
-
-                //     background-color: #0511bbd5;
-                //     backdrop-filter: blur(8px);
-                //     z-index: 3;
-                //     border-radius: 6px;
-                //     text-align: center;
-                //     overflow: hidden;
-
-                //     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
-
-
-                //     div.warn-status-title {
-                //         height: 4vh;
-                //         line-height: 4vh;
-                //         width: 14vw;
-                //         font-size: calc(0.8vw + 0.3vh);
-                //         font-weight: bold;
-                //         color: #e3f9ff;
-                //         box-shadow: 0px 2px rgb(0, 225, 255);
-                //     }
-
-                //     div.warn-status-content {
-                //         height: 6vh;
-                //         line-height: 6vh;
-                //         width: 14vw;
-                //         font-size: calc(1.1vw + 0.8vh);
-                //         font-weight: bold;
-                //         // background-color: #2688f8;
-                //         color: #ebf8ff;
-                //         text-align: cen;
-                //         letter-spacing: 1rem;
-                //         text-indent: 1rem;
-
-                //         &.low {
-                //             background-color: rgb(17, 17, 255);
-
-                //         }
-
-                //         &.middle {
-                //             background-color: rgb(220, 126, 37);
-                //         }
-
-                //         &.high {
-                //             background-color: rgb(255, 9, 9);
-
-                //         }
-                //     }
-                // }
-
-                // div.fos-result-container {
-                //     position: absolute;
-                //     right: 1vw;
-                //     bottom: 5vh;
-                //     width: 6vw;
-                //     height: 21vh;
-                //     background-color: rgb(81, 95, 114);
-                //     color: white;
-                //     border-radius: 5px;
-
-                //     box-shadow: 4px 6px 6px -4px rgb(0, 47, 117);
-                //     display: flex;
-                //     flex-direction: column;
-                //     justify-content: center;
-                //     align-items: center;
-
-                //     .title {
-                //         position: relative;
-                //         font-size: calc(0.6vw + 0.6vh);
-                //         font-weight: bold;
-                //         line-height: 4vh;
-                //         margin-bottom: 0.5vh;
-                //     }
-
-                //     .pallete-container {
-                //         position: relative;
-                //         height: 15vh;
-                //         width: 2vw;
-                //         // border: 1px solid #000;
-
-                //         .pallete {
-                //             position: absolute;
-                //             top: 0;
-                //             left: 0;
-                //             width: 100%;
-                //             height: 15vh;
-
-                //             .color-section {
-                //                 width: 100%;
-
-                //                 &.green {
-                //                     height: 3vh;
-                //                     background-color: green;
-                //                     border-top-right-radius: 5px;
-                //                     border-top-left-radius: 5px;
-                //                 }
-
-                //                 &.orange {
-                //                     height: 2vh;
-                //                     background-color: orange;
-                //                 }
-
-                //                 &.red {
-                //                     height: 10vh;
-                //                     background-color: red;
-                //                     border-bottom-left-radius: 5px;
-                //                     border-bottom-right-radius: 5px;
-                //                 }
-                //             }
-                //         }
-
-                //         .pallete-text-container {
-                //             position: absolute;
-                //             top: 0;
-                //             left: 2.2vw;
-                //             width: 100%;
-                //             height: 15vh;
-
-                //             .pallete-text {
-                //                 width: 100%;
-
-                //                 &.val15 {
-                //                     margin-top: -1vh;
-                //                 }
-
-                //                 &.val13 {
-                //                     margin-top: 1vh;
-                //                 }
-
-                //                 &.val10 {
-                //                     margin-top: 0vh;
-                //                 }
-
-                //                 &.val00 {
-                //                     margin-top: 7vh;
-                //                 }
-
-                //             }
-                //         }
-
-                //         .pointer {
-                //             position: absolute;
-                //             transition: .3s ease-in-out;
-                //             left: -1.2vw;
-                //             bottom: -10px;
-                //             width: 0;
-                //             height: 0;
-                //             border-top: 10px solid transparent;
-                //             border-bottom: 10px solid transparent;
-                //             border-left: 20px solid rgb(255, 178, 178);
-                //             /* 向右指的三角形 */
-                //         }
-
-
-
-
-                //     }
-
-
-
-
-
-
-
-                // }
-
 
             }
         }

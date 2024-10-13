@@ -140,9 +140,8 @@ export default class FlowFieldLayer {
         };
     }
     async FillTextureByImage(gl, Tex, format, filter, width, height, imgSrc, type) {
-        // /temp/data/modelServer/file?caseId=35580981ae885d6d4d92bd22d453816d&name=visualization/mask_0.png
         let imgSrc_backEnd = this.resourcePrefix + imgSrc;
-        console.log(imgSrc_backEnd);
+        // console.log(imgSrc_backEnd);
         //reparsing 
         if (type === 'Float') {
             axios.get(imgSrc_backEnd, { responseType: 'blob' })
@@ -234,7 +233,6 @@ export default class FlowFieldLayer {
         }
         //parser as a JsonFileParser and a data storage
         //just for short writing
-        console.log(this.parser);
         // maxSegmentNum === segmentNum === segmentPrepare
         this.parser.trajectoryNum = this.controller.lineNum;
         this.parser.segmentPrepare = this.parser.maxSegmentNum;

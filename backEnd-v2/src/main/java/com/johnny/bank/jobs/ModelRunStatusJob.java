@@ -52,7 +52,7 @@ public class ModelRunStatusJob implements Job {
             } catch (SchedulerException e) {
                 log.info(e.toString());
             }
-        } else if ( status.equals("ERROR") || status.equals("NONE")) {
+        } else if ( status.equals("ERROR") || status.equals("NONE") || status.equals("NOT FOUND")) {
             log.info("model task " + taskNode.getCaseId() + "has failed!");
             try {
                 // 停止查询任务状态

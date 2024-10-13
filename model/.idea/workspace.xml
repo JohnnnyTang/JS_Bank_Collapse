@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e22f3306-8529-4f17-8b18-47268d613faa" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../backEnd-v2/src/main/resources/application-docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../backEnd-v2/src/main/resources/application-docker.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-v2/.env" beforeDir="false" afterPath="$PROJECT_DIR$/../front-v2/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front-v2/bankFront/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/../front-v2/bankFront/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2lbr5TEXJaZGQGXBWaAaX9WB9FN" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "dev-cry",
+    "last_opened_file_path": "D:/1study/Work/2023_12_22_Storm/StormPerdiction/data/DataProcess"
+  }
+}]]></component>
+  <component name="RunManager" selected="Python.vector2pg">
+    <configuration name="tif2tile" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="model" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Env1" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tile" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tile/tif2tile.py" />
+      <option name="PARAMETERS" value="&quot;E:\Data\bankProjectData\tifTile\temp\199901\199901.tif&quot; &quot;E:\Data\bankProjectData\tifTile\temp\Mzs\DEM\199901&quot; &quot;1-14&quot; &quot;256&quot;" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="vector2pg" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="model" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/vector" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vector/vector2pg.py" />
+      <option name="PARAMETERS" value="&quot;$PROJECT_DIR$/../../spatialData/民主沙/mzsArea/mzs_bank_area_one.shp&quot; test_table &quot;stability,stability_&quot; &quot;test&quot; &quot;postgres&quot; &quot;123456&quot; &quot;127.0.0.1&quot; &quot;5432&quot;" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.vector2pg" />
+      <item itemvalue="Python.tif2tile" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.vector2pg" />
+        <item itemvalue="Python.tif2tile" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e22f3306-8529-4f17-8b18-47268d613faa" name="Changes" comment="" />
+      <created>1725459437510</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1725459437510</updated>
+    </task>
+    <servers />
+  </component>
+</project>

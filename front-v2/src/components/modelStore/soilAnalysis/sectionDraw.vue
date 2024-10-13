@@ -7,7 +7,7 @@
             <template #footer>
                 <div class="dialog-footer">
                     <el-button @click="cancelSectionRese">取消</el-button>
-                    <el-button type="primary" @click="cancelSectionRese">
+                    <el-button type="primary" @click="confirmSectionRese">
                         确认
                     </el-button>
                 </div>
@@ -26,10 +26,10 @@
                 {{ '终点：' + sectionLineLabelSec }}
             </div>
         </div>
-        <div class="section-selectior-item">
+        <div class="section-selectior-item" v-show="demListShow">
             <el-select v-model="selectedDem" placeholder="选择地形" style="width: 10vw; height: 3.5vh"
                 @change="selectedDemChange">
-                <el-option v-for="(item,index) in props.demResources" :key="index" :label="item.name + '地形'
+                <el-option v-for="(item, index) in props.demResources" :key="index" :label="item.name + '地形'
                     " :value="item.path">
                     <!-- <span>{{ item.year }}</span> -->
                     <div style="text-align: center;">{{ item.name + '地形' }}</div>
@@ -54,6 +54,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { onMounted, ref, onUnmounted } from 'vue'
 import { initPureScratchMap } from '../../../utils/mapUtils'
 import { useMapStore } from '@/store/mapStore'
+import { ElMessage } from 'element-plus'
 
 const mapStore = useMapStore()
 const containerDom = ref()
@@ -61,10 +62,22 @@ const sectionConfirmShow = ref(false)
 const sectionLineLabel = ref('')
 const sectionLineLabelSec = ref('')
 const selectedDem = ref('')
-const calcEnable = ref(false)
-const paramFill = [false, false]
 const sectionConfirmClose = () => { }
 const cancelSectionRese = () => {
+    draw.trash()
+    sectionConfirmShow.value = false
+}
+const confirmSectionRese = () => {
+    if (lineJudge(line)) {
+        ElMessage.success({
+            message: '有效断面',
+            offset: 180
+        })
+        emit('sectionDraw', line)
+    } else {
+
+        draw.trash()
+    }
     sectionConfirmShow.value = false
 }
 
@@ -72,20 +85,13 @@ const cancelSectionRese = () => {
 const props = defineProps({
     demResources: {
         type: Array,
-        default: () => [{ year: 1998 },
-        { year: 2004 }]
+        default: []
+    },
+    demListShow: {
+        type: Boolean,
+        default: true
     }
 })
-
-
-const sectionRasterList = ref([
-    // { year: 2020, time: 'before', layerName: '' },
-    // { year: 2021, time: 'before', layerName: '' },
-    // { year: 2022, time: 'before', layerName: '' },
-    // { year: 2023, time: 'before', layerName: '' },
-    { year: 1998 },
-    { year: 2004 }
-])
 
 
 // const multiIndexStore = useMultiIndexStore()
@@ -178,7 +184,6 @@ const draw = new MapboxDraw({
 
 const resizeMap = () => {
     setTimeout(() => {
-        console.log('resize')
         if (map) {
             console.log('map resize')
             map.resize()
@@ -216,8 +221,20 @@ onMounted(async () => {
     mapFlyToRiver(map)
     attachBaseLayer(map)
     // map.showTileBoundaries = true;
-    map.on('draw.create', function (e) {
-        console.log(e.features[0])
+
+
+    function drawCreatCallback(e) {
+
+        if (e.features.length > 0 && e.features[0].geometry.type === 'LineString') {
+            var coordinates = e.features[0].geometry.coordinates;
+            if (coordinates.length > 2) {
+                // 只保留前两个点
+                e.features[0].geometry.coordinates = coordinates.slice(0, 2);
+                // 更新绘制的线条
+                draw.add(e.features[0]);
+            }
+        }
+
         sectionConfirmShow.value = true
         let lineFeature = e.features[0]
         sectionLineLabel.value =
@@ -235,15 +252,28 @@ onMounted(async () => {
             lineFeature.geometry.coordinates[1],
         )
         line = lineFeature
-        emit('sectionDraw', line)
-        paramFill[1] = true
-        if (paramFill.includes(false)) {
-            return
+        // emit('sectionDraw', line)
+    }
+    map.on('draw.create', drawCreatCallback)
+    // 禁用添加第三个点的功能
+    map.on('draw.modechange', function (mode) {
+        if (mode.active === 'draw_line_string') {
+            map.on('click', function (e) {
+                var features = draw.getAll();
+                var lineStrings = features.features.filter(function (feature) {
+                    return feature.geometry.type === 'LineString';
+                });
+                if (lineStrings.length > 0 && lineStrings[0].geometry.coordinates.length >= 2) {
+                    map.off('click'); // 移除点击事件监听器，防止添加第三个点
+                }
+            });
         } else {
-            // multiIndexStore.updateSectionStatus(1)
-            calcEnable.value = true
+            map.off('click'); // 重新添加点击事件监听器
+
         }
-    })
+    });
+
+
     map.resize()
 
 })
@@ -257,20 +287,43 @@ defineExpose({
     getSection
 })
 
-
 const attachBaseLayer = (map) => {
-    map.addSource('mzsOverWaterSource', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
-        ],
+
+    map.addSource('mzsDemBoundArea', {
+        type: 'geojson',
+        data: {
+            "type": "FeatureCollection",
+            "name": "demBound",
+            "features": [
+                { "type": "Feature", "properties": { "id": 0 }, "geometry": { "type": "MultiPolygon", "coordinates": [[[[120.461319752169942, 32.082961734598221], [120.589359165748846, 32.082811477933781], [120.589359165748846, 31.987198228623438], [120.461319752169942, 31.987198228623438], [120.461319752169942, 32.082961734598221]]]] } }
+            ]
+        }
     })
-    map.addSource('mzsUnderWaterSource', {
-        type: 'vector',
-        tiles: [
-            tileServer + '/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
-        ],
+    map.addSource('mzsDemBoundLine', {
+        type: 'geojson',
+        data: {
+            "type": "FeatureCollection",
+            "name": "demBoundLine",
+            "features": [
+                { "type": "Feature", "properties": { "id": 0 }, "geometry": { "type": "MultiLineString", "coordinates": [[[120.461319752169942, 32.082961734598221], [120.589359165748846, 32.082811477933781], [120.589359165748846, 31.987198228623438], [120.461319752169942, 31.987198228623438], [120.461319752169942, 32.082961734598221]]] } }
+            ]
+        }
     })
+
+
+
+    // map.addSource('mzsOverWaterSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsOverWaterBound/{x}/{y}/{z}',
+    //     ],
+    // })
+    // map.addSource('mzsUnderWaterSource', {
+    //     type: 'vector',
+    //     tiles: [
+    //         tileServer + '/tile/vector/mzsUnderWaterBound/{x}/{y}/{z}',
+    //     ],
+    // })
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [
@@ -282,46 +335,6 @@ const attachBaseLayer = (map) => {
         tiles: [
             tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}',
         ],
-    })
-    map.addSource('mapRaster2020', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.509, 32.023, 120.555, 32.0402],
-    })
-    map.addSource('mapRaster2021', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2021/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.5116, 32.02316, 120.555, 32.0402],
-    })
-    map.addSource('mapRaster2022', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2022/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.51, 32.02, 120.552, 32.04046],
-    })
-    map.addSource('mapRaster2023', {
-        type: 'raster',
-        tiles: [
-            tileServer + '/tile/raster/mzs/2023/Before/{x}/{y}/{z}',
-        ],
-        tileSize: 1024,
-        minzoom: 10,
-        maxzoom: 20,
-        bounds: [120.50548, 32.0224, 120.55304, 32.0415],
     })
     map.addSource('riverBeachSource', {
         type: 'vector',
@@ -367,28 +380,49 @@ const attachBaseLayer = (map) => {
             'text-color': 'rgba(31, 14, 126, 0.75)',
         },
     })
+    // map.addLayer({
+    //     id: 'mzsOverWaterBound',
+    //     type: 'fill',
+    //     source: 'mzsOverWaterSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': '#a2800f',
+    //         'fill-opacity': 0.5,
+    //         'fill-outline-color': 'rgba(162, 128, 15, 0.)'
+    //     },
+    // })
+    // map.addLayer({
+    //     id: 'mzsUnderWaterBound',
+    //     type: 'fill',
+    //     source: 'mzsUnderWaterSource',
+    //     'source-layer': 'default',
+    //     paint: {
+    //         'fill-color': '#101B94',
+    //         'fill-opacity': 0.5,
+    //         'fill-outline-color': 'rgba(16, 27, 148, 0.)'
+    //     },
+    // })
     map.addLayer({
-        id: 'mzsOverWaterBound',
+        id: 'mzsDemBoundLayerArea',
         type: 'fill',
-        source: 'mzsOverWaterSource',
-        'source-layer': 'default',
+        source: 'mzsDemBoundArea',
         paint: {
-            'fill-color': '#a2800f',
-            'fill-opacity': 0.5,
-            'fill-outline-color': 'rgba(162, 128, 15, 0.)'
+            'fill-color': 'rgb(16, 27, 148)',
+            'fill-opacity': 0.1,
         },
     })
     map.addLayer({
-        id: 'mzsUnderWaterBound',
-        type: 'fill',
-        source: 'mzsUnderWaterSource',
-        'source-layer': 'default',
+        id: 'mzsDemBoundLayerLine',
+        type: 'line',
+        source: 'mzsDemBoundLine',
         paint: {
-            'fill-color': '#101B94',
-            'fill-opacity': 0.5,
-            'fill-outline-color': 'rgba(16, 27, 148, 0.)'
+            'line-color': 'rgba(16, 27, 148, 1.0)',
+            'line-dasharray': [2, 2],
+            'line-width': 1,
+
         },
     })
+
     map.addControl(draw)
 }
 const mapFlyToRiver = (mapIns) => {
@@ -431,6 +465,66 @@ const convertToMercator = (lonLat) => {
     return xy
 }
 
+function vectorAngle(A, B, C, D) {
+    const M = {
+        x: B[0] - A[0],
+        y: B[1] - A[1]
+    };
+    const N = {
+        x: D[0] - C[0],
+        y: D[1] - C[1]
+    };
+    const dotProduct = M.x * N.x + M.y * N.y;
+
+    const magnitudeM = Math.sqrt(M.x * M.x + M.y * M.y);
+    const magnitudeN = Math.sqrt(N.x * N.x + N.y * N.y);
+
+    const cosTheta = dotProduct / (magnitudeM * magnitudeN);
+    const theta = Math.acos(cosTheta);
+    const angleInDegrees = theta * (180 / Math.PI);
+    return angleInDegrees
+}
+const lineJudge = (lineFeature) => {
+    let resultFlag = true
+    const validSectionExample = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+            "coordinates": [
+                [120.51995208023294, 32.036127085249746],
+                [120.51398616801038, 32.01372735087271]
+            ],
+            "type": "LineString"
+        }
+    }
+    const demBBox = [120.461319752169942, 31.987198228623438, 120.589359165748846, 32.082961734598221]
+
+    let A = validSectionExample.geometry.coordinates[0]
+    let B = validSectionExample.geometry.coordinates[1]
+    let C = lineFeature.geometry.coordinates[0]
+    let D = lineFeature.geometry.coordinates[1]
+    // console.log(C, D)
+
+    /// 断面方向judge
+    let threshold = 50
+    if (vectorAngle(A, B, C, D) > threshold) {
+        resultFlag = false
+        ElMessage.error({
+            message: '请绘制自民主沙右缘往南的有效断面',
+            offset: 180
+        })
+    }
+    /// 地形范围judge
+    else if (Math.min(C[0], D[0]) <= demBBox[0] || Math.max(C[0], D[0]) >= demBBox[2] || Math.min(C[1], D[1]) <= demBBox[1] || Math.max(C[1], D[1]) >= demBBox[3]) {
+        resultFlag = false
+        ElMessage.error({
+            message: '请绘制在地形范围的有效断面',
+            offset: 180
+        })
+    }
+
+    return resultFlag
+}
 </script>
 
 <style lang="scss" scoped>

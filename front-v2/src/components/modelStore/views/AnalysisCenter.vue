@@ -116,6 +116,7 @@ import LayerManage from "../analysis-center/analysis/LayerManage.vue";
 import RightVisual from "../analysis-center/analysis/RightVisual.vue";
 import { useRouter } from "vue-router";
 import utils from "@/utils/CommonUtils";
+import BankResourceHelper from "./bankResourceHelper";
 
 export default defineComponent({
   components: { ModelTitleVue, TopTool, RightVisual, DataManage, LayerManage },
@@ -152,14 +153,20 @@ const jump2Model = (value) => {
   routeMap[value] && router.push(routeMap[value]);
 };
 
-const confirmBankHandler = async (bankName) => {
+const confirmBankHandler = async (bank) => {
   const bankNameMap = {
     民主沙: "Mzs",
+    民主沙右缘: "Mzs",
   };
-  rightMap.value.mapFlyToRiver(bankName);
-  const result = await getDataList("DEM", bankNameMap[bankName]);
-  const baseData = result.data;
-  const formedData = baseData.map((yearData) => {
+  console.log(bank);
+  rightMap.value.mapFlyToRiver(bank.name);
+
+  const demData = (await BankResourceHelper.getBankCalculateResourceList("DEM", bank.bankEnName))
+    .data;
+
+  //const result = await getDataList("DEM", bank.bankEnName);
+  console.log(demData);
+  const formedData = demData.map((yearData) => {
     // TODO: 优化数据组织
     return {
       id: yearData.year,
@@ -178,50 +185,6 @@ const confirmBankHandler = async (bankName) => {
       }),
     };
   });
-  // dataList.value = [
-  //   {
-  //     id: "935809d3-f8de-45df-a2ee-b3cfebfbbf6b",
-  //     label: "2006年长江南京以下DEM",
-  //     flag: true,
-  //     children: [
-  //       {
-  //         id: "294222ef-2dd2-446f-a484-b14659eeeaa7",
-  //         label: "w001001.adf",
-  //         flag: false,
-  //         children: [],
-  //         visualType: "rasterTile",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "30c14195-bfe7-47e4-ac06-70991392409c",
-  //     label: "2004年长江南京以下DEM",
-  //     flag: true,
-  //     children: [
-  //       {
-  //         id: "200408_dem/w001001.adf",
-  //         label: "w001001.adf",
-  //         flag: false,
-  //         children: [],
-  //         visualType: "rasterTile",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "25edd8fa-92c9-49ce-b77b-8d65667b9dd4",
-  //     label: "1998年长江南京以下DEM",
-  //     flag: true,
-  //     children: [
-  //       {
-  //         id: "199801_dem/w001001.adf",
-  //         label: "w001001.adf",
-  //         flag: false,
-  //         children: [],
-  //         visualType: "rasterTile",
-  //       },
-  //     ],
-  //   },
-  // ];
 
   //TODO: 获取数据放在datamanage?
   // 添加已有的分析结果集
@@ -230,12 +193,12 @@ const confirmBankHandler = async (bankName) => {
     formedData.push(allData[allData.length - 1]);
   }
   dataList.value = formedData;
-  selectedBank.value = bankName;
+  selectedBank.value = bank.name;
 
   notice(
     "success",
     "选择岸段",
-    `已选择岸段——${bankName},模型计算将默认采用${bankName}相关资源`,
+    `已选择岸段——${bank.name},模型计算将默认采用${bank.name}相关资源`,
     180
   );
 };
@@ -329,6 +292,7 @@ const updateCurrentModel = (name, status) => {
     }, 1000);
   } else if (status == -1) {
     delete modelProgressList.value[name];
+    if (currentIndex.value > 0) currentIndex.value--;
   } else if (status == 1) {
     if (modelProgressList.value[name] < 90) {
       modelProgressList.value[name] += Math.floor(Math.random() * (10 - 5 + 1)) + 5;
@@ -468,7 +432,7 @@ div.model-content-container {
 
       div.basemap-radio-container {
         z-index: 1;
-        // width: 19vw;
+        width: 18.8vw;
         height: 4vh;
         display: flex;
         flex-flow: row nowrap;
@@ -476,78 +440,27 @@ div.model-content-container {
         box-shadow: 0 0 4px 1px rgba(#0642b1, 0.55), 0 6px 12px 0 rgba(#0642b1, 0.55);
         padding: 0.6vh;
         border-radius: 0.6vw; // just a high number to create pill effect
-        margin-right: auto;
+        // margin-right: auto;
         margin-left: 8px;
 
-        * {
-          z-index: 7;
-        }
-
-        input[type="radio"] {
-          display: none;
-        }
-
-        .tab {
+        .el-radio-group {
+          // background-color: red;
+          width: 18.8vw;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 4vh;
-          width: 7vw;
-          font-size: calc(0.8vw + 0.5vh);
-          font-weight: 600;
-          border-radius: 1.6rem; // just a high number to create pill effect
-          cursor: pointer;
-          transition: color 0.15s ease-in;
-        }
+          flex-direction: row;
+          justify-content: space-evenly;
 
-        input[type="radio"] {
-          &:checked {
-            & + label {
-              color: #185ee0;
+          .el-radio-button {
+            width: 6vw;
+
+            .el-radio-button__inner {
+              width: 6vw;
+              font-size: calc(0.6vw + 0.6vh);
+              font-weight: 800;
+              padding: 1vh 0vw;
             }
           }
         }
-
-        input[id="radio-1"] {
-          &:checked {
-            & ~ .glider {
-              transform: translateX(0);
-            }
-          }
-        }
-
-        input[id="radio-2"] {
-          &:checked {
-            & ~ .glider {
-              transform: translateX(100%);
-            }
-          }
-        }
-
-        input[id="radio-3"] {
-          &:checked {
-            & ~ .glider {
-              transform: translateX(200%);
-            }
-          }
-        }
-
-        .glider {
-          position: absolute;
-          display: flex;
-          height: 4vh;
-          width: 7vw;
-          background-color: #bcd8fc;
-          z-index: 5;
-          border-radius: 0.6vw; // just a high number to create pill effect
-          transition: 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
-        }
-
-        // @media (max-width: 700px) {
-        //     .tabs {
-        //         transform: scale(0.6);
-        //     }
-        // }
       }
     }
 

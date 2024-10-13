@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 /**
  * @Author: Johnny Tang
  * @Date: 2024/3/28
@@ -35,6 +37,12 @@ public class RasterTileService implements IRasterTileService {
     public byte[] getMzsFloodRasterInByte(String name, int z, int x, int y) throws Exception {
         String filePath = name + '/' + z + '/' + x + '/' + y + ".png";
         return RasterTileRepo.getMzsFloodRasterFile(filePath);
+    }
+
+    public byte[] getDEMRasterInByte(String path, int z, int x, int y) throws Exception {
+        y = (int) (Math.pow(2,z) - 1 - y);
+        String filePath = path + '/' + z + '/' + x + '/' + y + ".png";
+        return RasterTileRepo.getDEMRasterFile(filePath);
     }
 
     public byte[] getBaseImageInByte(int z, int x, int y) throws Exception {

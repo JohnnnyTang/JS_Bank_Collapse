@@ -32,16 +32,29 @@ public class QuartzSchedulerManager {
     @Value("${modelServer.caseLimit}")
     String CASE_LIMIT;
 
+    @Value("${staticData.waterConditionPath}")
+    String WATER_CONDITION_PATH;
+
+    @Value("${waterCondition.url}")
+    String WATER_CONDITION_URL;
+
     @Autowired
     @Lazy
     private Scheduler scheduler;
+
+    public boolean isJobExist(String name, String group) throws SchedulerException {
+        JobKey jobKey = new JobKey(name, group);
+        return scheduler.checkExists(jobKey);
+    }
 
     // 开始执行定时器
     public void startJob() throws SchedulerException {
         log.info("start job here");
 //        startTestJob(scheduler);
-        startTestRunningJob(scheduler);
+//        startTestRunningJob(scheduler);
 //        startGnssWarningJob(scheduler);
+        startGetWaterConditionJob(scheduler);
+        startModelServerHandShakeJob(scheduler);
         scheduler.start();
     }
 
@@ -52,8 +65,22 @@ public class QuartzSchedulerManager {
         scheduler.start();
     }
 
+    // 执行modelCase删除准备过程
+    public void startModelCaseDeletePreparingJob() throws SchedulerException {
+        log.info("start ModelCaseDeletePreparingJob here");
+        modelCaseDeletePreparingJob(scheduler);
+        scheduler.start();
+    }
+
+    // 执行实时水情定时获取任务
+    public void startGetWaterConditionJob(Scheduler scheduler) throws SchedulerException {
+        log.info("start WaterConditionJob here");
+        WaterConditionJob(scheduler);
+        scheduler.start();
+    }
+
     // 执行模型计算服务定时握手
-    public void startModelServerHandShakeJob() throws SchedulerException {
+    public void startModelServerHandShakeJob(Scheduler scheduler) throws SchedulerException {
         log.info("start ModelServerHandShakeJob here");
         modelServerHandShakeJob(scheduler);
         scheduler.start();
@@ -156,6 +183,22 @@ public class QuartzSchedulerManager {
         scheduler.scheduleJob(jobDetail, cronTrigger);
     }
 
+    private void WaterConditionJob(Scheduler scheduler) throws SchedulerException {
+        // 通过JobBuilder构建JobDetail实例，JobDetail规定其job只能是实现Job接口的实例
+        JobDetail jobDetail = JobBuilder.newJob(WaterConditonJob.class)
+                .withIdentity("waterCondition", "waterConditionGroup")
+                .build();
+        jobDetail.getJobDataMap().put("waterConditionPath", WATER_CONDITION_PATH);
+        jobDetail.getJobDataMap().put("waterConditionUrl", WATER_CONDITION_URL);
+        // 基于表达式构建触发器
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/30 * * * ?");
+//        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("* * * * * ?");
+        // CronTrigger表达式触发器 继承于Trigger。TriggerBuilder 用于构建触发器实例
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("waterConditionTrigger", "waterConditionGroup")
+                .withSchedule(cronScheduleBuilder).build();
+        scheduler.scheduleJob(jobDetail, cronTrigger);
+    }
+
     private void modelServerHandShakeJob(Scheduler scheduler) throws SchedulerException {
         JobDetail jobDetail = JobBuilder.newJob(modelServerShakingHandJob.class)
                 .withIdentity("modelServerHandShake", "modelServerGroup")
@@ -177,7 +220,17 @@ public class QuartzSchedulerManager {
                 .build();
         jobDetail.getJobDataMap().put("taskNode", taskNode);
         jobDetail.getJobDataMap().put("modelServerUrl", MODEL_SERVER_URL);
+        int interval = Integer.parseInt(taskNode.getModelNode().getUsage().getJSONObject("api").getJSONObject("status").getString("interval"));
         SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity(taskNode.getId()+"_trigger","modelTaskTriggerGroup")
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(interval).repeatForever()).build();
+        scheduler.scheduleJob(jobDetail, simpleTrigger);
+    }
+
+    private void modelCaseDeletePreparingJob(Scheduler scheduler) throws SchedulerException {
+        JobDetail jobDetail = JobBuilder.newJob(ModelCaseDeletePreparingJob.class)
+                .withIdentity("modelCaseDeletePreparingJob", "modelDeleteGroup")
+                .build();
+        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger().withIdentity("modelCaseDeletePreparing_trigger","modelDeleteTriggerGroup")
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1).repeatForever()).build();
         scheduler.scheduleJob(jobDetail, simpleTrigger);
     }

@@ -3,6 +3,7 @@ package com.johnny.bank.service.resource.dataSource;
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -13,6 +14,9 @@ import java.io.InputStream;
  * @Description: 模型服务容器业务层
  */
 public interface IModelServerService {
+
+    String getResultByCaseId(String caseId);
+
     String getJsonDataByCaseIdAndFileName(String caseId, String name);
 
     String getResourceJsonDataByCaseIdAndFileName(String name);
@@ -21,6 +25,6 @@ public interface IModelServerService {
 
     byte[] getResourceByteDataByCaseIdAndFileName(String name);
 
-    String uploadCalculateResourceData(MultipartFile file, JSONObject info);
+    String uploadCalculateResourceData(MultipartFile file, JSONObject info) throws IOException, InterruptedException;
 
 }

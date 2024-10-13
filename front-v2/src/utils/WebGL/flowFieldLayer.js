@@ -28,33 +28,33 @@ class JsonFileParser {
     async Parsing() {
         await axios.get(this.url)
             .then((response) => {
-            console.log("parsing!!!  ", this.url);
-            for (let item of response.data['flow_fields']) {
-                this.flowFieldResourceArr.push(item);
-            }
-            for (let item of response.data['area_masks']) {
-                this.seedingResourceArr.push(item);
-            }
-            this.projection2DResource = response.data['projection'][0];
-            // this.projection3DResource = response.data['projection']['3D'];
-            this.flowFieldTexSize = response.data['texture_size']['flow_field'];
-            this.seedingTexSize = response.data['texture_size']['area_mask'];
-            this.projectionTexSize = response.data['texture_size']['projection'];
-            this.flowBoundary[0] = response.data['flow_boundary']['u_min'];
-            this.flowBoundary[1] = response.data['flow_boundary']['v_min'];
-            this.flowBoundary[2] = response.data['flow_boundary']['u_max'];
-            this.flowBoundary[3] = response.data['flow_boundary']['v_max'];
-            this.extent[0] = response.data['extent'][0];
-            this.extent[1] = response.data['extent'][1];
-            this.extent[2] = response.data['extent'][2];
-            this.extent[3] = response.data['extent'][3];
-            this.maxDropRate = response.data['constraints']['max_drop_rate'];
-            this.maxDropRateBump = response.data['constraints']['max_drop_rate_bump'];
-            this.maxSegmentNum = response.data['constraints']['max_segment_num'];
-            // trajectoryNum === streamline_num
-            this.maxTrajectoryNum = response.data['constraints']['max_streamline_num'];
-            this.maxTextureSize = response.data['constraints']['max_texture_size'];
-        });
+                //console.log("parsing!!!  ", this.url);
+                for (let item of response.data['flow_fields']) {
+                    this.flowFieldResourceArr.push(item);
+                }
+                for (let item of response.data['area_masks']) {
+                    this.seedingResourceArr.push(item);
+                }
+                this.projection2DResource = response.data['projection'][0];
+                // this.projection3DResource = response.data['projection']['3D'];
+                this.flowFieldTexSize = response.data['texture_size']['flow_field'];
+                this.seedingTexSize = response.data['texture_size']['area_mask'];
+                this.projectionTexSize = response.data['texture_size']['projection'];
+                this.flowBoundary[0] = response.data['flow_boundary']['u_min'];
+                this.flowBoundary[1] = response.data['flow_boundary']['v_min'];
+                this.flowBoundary[2] = response.data['flow_boundary']['u_max'];
+                this.flowBoundary[3] = response.data['flow_boundary']['v_max'];
+                this.extent[0] = response.data['extent'][0];
+                this.extent[1] = response.data['extent'][1];
+                this.extent[2] = response.data['extent'][2];
+                this.extent[3] = response.data['extent'][3];
+                this.maxDropRate = response.data['constraints']['max_drop_rate'];
+                this.maxDropRateBump = response.data['constraints']['max_drop_rate_bump'];
+                this.maxSegmentNum = response.data['constraints']['max_segment_num'];
+                // trajectoryNum === streamline_num
+                this.maxTrajectoryNum = response.data['constraints']['max_streamline_num'];
+                this.maxTextureSize = response.data['constraints']['max_texture_size'];
+            });
     }
 }
 export default class FlowFieldLayer {
@@ -71,7 +71,7 @@ export default class FlowFieldLayer {
     exaggeration = 4.0;
     uboMapBufferData = new Float32Array(12);
     phaseCount = 0.0;
-    timePerFrame = 160.0;
+    timePerFrame = 120.0;
     timeLast = 10.0;
     currentResourcePointer = 0;
     _timeCount = 0.0;
@@ -111,6 +111,9 @@ export default class FlowFieldLayer {
     //     this.renderingMode = '2d';
     //     this.ffManager = ffManager;
     // }
+
+    stepProgressRate = 0.0
+
     constructor(layerID, jsonUrl, resourcePrefix) {
         this.id = layerID;
         this.type = 'custom';
@@ -135,9 +138,10 @@ export default class FlowFieldLayer {
             this.now_SeedTextureArr[1] = this.seedingTextureArr[nextPhase % this.textureArraySize];
         let temp = value * this.phaseCount;
         this.uboMapBufferData[0] = temp - Math.floor(temp);
+        this.stepProgressRate = this.currentResourcePointer + Math.round(this.uboMapBufferData[0] * 10) / 10;
         if (currentPhase != lastPhase) {
             this.currentResourcePointer = (this.currentResourcePointer + 1) % this.phaseCount;
-            // console.log('now time step :: ', this.currentResourcePointer)
+            // //console.log('now time step :: ', this.currentResourcePointer)
             //checkout new texture
             let index = nextPhase % this.textureArraySize;
             let gl = this.GL;
@@ -159,16 +163,16 @@ export default class FlowFieldLayer {
     async init2ShadersFromSrc(gl, vertURL, fragURL, XF_Varings) {
         const vertSrc = await axios.get(vertURL)
             .then((response) => {
-            return response.data;
-        }).catch((error) => {
-            console.log('ERROR::VERTEX_SHADER FILE NOT FOUND', error);
-        });
+                return response.data;
+            }).catch((error) => {
+                //console.log('ERROR::VERTEX_SHADER FILE NOT FOUND', error);
+            });
         const fragSrc = await axios.get(fragURL)
             .then((response) => {
-            return response.data;
-        }).catch((error) => {
-            console.log('ERROR::FRAGMENT_SHADER FILE NOT FOUND', error);
-        });
+                return response.data;
+            }).catch((error) => {
+                //console.log('ERROR::FRAGMENT_SHADER FILE NOT FOUND', error);
+            });
         const Vshader = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(Vshader, vertSrc);
         gl.compileShader(Vshader);
@@ -185,7 +189,7 @@ export default class FlowFieldLayer {
         gl.linkProgram(program);
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
             //check 
-            console.log(gl.getProgramInfoLog(program));
+            //console.log(gl.getProgramInfoLog(program));
             return;
         }
         //这里的program需不需要记录？？不用shader对象的话，好不好记录？
@@ -196,64 +200,63 @@ export default class FlowFieldLayer {
         };
     }
     async FillTextureByImage(gl, Tex, format, filter, width, height, imgSrc, type) {
-        // /temp/data/modelServer/file?caseId=35580981ae885d6d4d92bd22d453816d&name=visualization/mask_0.png
         let imgSrc_backEnd = this.resourcePrefix + imgSrc;
-        // console.log(imgSrc_backEnd)
+        // //console.log(imgSrc_backEnd)
         //reparsing 
         if (type === 'Float') {
             axios.get(imgSrc_backEnd, { responseType: 'blob' })
                 .then((response) => {
-                createImageBitmap(response.data, {
-                    imageOrientation: 'flipY',
-                    premultiplyAlpha: 'none', colorSpaceConversion: 'default'
+                    createImageBitmap(response.data, {
+                        imageOrientation: 'flipY',
+                        premultiplyAlpha: 'none', colorSpaceConversion: 'default'
+                    })
+                        .then((bitmap) => {
+                            const pixelData = new Uint8Array(bitmap.width * bitmap.height * 4);
+                            const ofsCanvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+                            const ofsGL = ofsCanvas.getContext('webgl2');
+                            const FB = ofsGL.createFramebuffer();
+                            ofsGL.bindFramebuffer(ofsGL.FRAMEBUFFER, FB);
+                            const ofsTex = ofsGL.createTexture();
+                            ofsGL.bindTexture(ofsGL.TEXTURE_2D, ofsTex);
+                            ofsGL.texImage2D(ofsGL.TEXTURE_2D, 0, ofsGL.RGBA8, bitmap.width, bitmap.height, 0, ofsGL.RGBA, ofsGL.UNSIGNED_BYTE, bitmap);
+                            ofsGL.texParameteri(ofsGL.TEXTURE_2D, ofsGL.TEXTURE_MAG_FILTER, ofsGL.LINEAR);
+                            ofsGL.texParameteri(ofsGL.TEXTURE_2D, ofsGL.TEXTURE_MIN_FILTER, ofsGL.LINEAR);
+                            ofsGL.framebufferTexture2D(ofsGL.FRAMEBUFFER, ofsGL.COLOR_ATTACHMENT0, ofsGL.TEXTURE_2D, ofsTex, 0);
+                            ofsGL.readPixels(0, 0, bitmap.width, bitmap.height, ofsGL.RGBA, ofsGL.UNSIGNED_BYTE, pixelData);
+                            ofsGL.bindTexture(ofsGL.TEXTURE_2D, null);
+                            ofsGL.bindFramebuffer(ofsGL.FRAMEBUFFER, null);
+                            ofsGL.deleteTexture(ofsTex);
+                            ofsGL.deleteFramebuffer(FB);
+                            ofsGL.finish();
+                            //get pixelData.buffer
+                            gl.bindTexture(gl.TEXTURE_2D, Tex);
+                            gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, gl.RG, gl.FLOAT, new Float32Array(pixelData.buffer));
+                            gl.bindTexture(gl.TEXTURE_2D, null);
+                            gl.finish();
+                        })
+                        .catch((e) => {
+                            console.warn(e);
+                            console.warn('ERROR::FillTextureByImage CREATEIMAGEBITMAP ERROR' + imgSrc);
+                        });
                 })
-                    .then((bitmap) => {
-                    const pixelData = new Uint8Array(bitmap.width * bitmap.height * 4);
-                    const ofsCanvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-                    const ofsGL = ofsCanvas.getContext('webgl2');
-                    const FB = ofsGL.createFramebuffer();
-                    ofsGL.bindFramebuffer(ofsGL.FRAMEBUFFER, FB);
-                    const ofsTex = ofsGL.createTexture();
-                    ofsGL.bindTexture(ofsGL.TEXTURE_2D, ofsTex);
-                    ofsGL.texImage2D(ofsGL.TEXTURE_2D, 0, ofsGL.RGBA8, bitmap.width, bitmap.height, 0, ofsGL.RGBA, ofsGL.UNSIGNED_BYTE, bitmap);
-                    ofsGL.texParameteri(ofsGL.TEXTURE_2D, ofsGL.TEXTURE_MAG_FILTER, ofsGL.LINEAR);
-                    ofsGL.texParameteri(ofsGL.TEXTURE_2D, ofsGL.TEXTURE_MIN_FILTER, ofsGL.LINEAR);
-                    ofsGL.framebufferTexture2D(ofsGL.FRAMEBUFFER, ofsGL.COLOR_ATTACHMENT0, ofsGL.TEXTURE_2D, ofsTex, 0);
-                    ofsGL.readPixels(0, 0, bitmap.width, bitmap.height, ofsGL.RGBA, ofsGL.UNSIGNED_BYTE, pixelData);
-                    ofsGL.bindTexture(ofsGL.TEXTURE_2D, null);
-                    ofsGL.bindFramebuffer(ofsGL.FRAMEBUFFER, null);
-                    ofsGL.deleteTexture(ofsTex);
-                    ofsGL.deleteFramebuffer(FB);
-                    ofsGL.finish();
-                    //get pixelData.buffer
-                    gl.bindTexture(gl.TEXTURE_2D, Tex);
-                    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, gl.RG, gl.FLOAT, new Float32Array(pixelData.buffer));
-                    gl.bindTexture(gl.TEXTURE_2D, null);
-                    gl.finish();
-                })
-                    .catch((e) => {
-                    console.warn(e);
-                    console.warn('ERROR::FillTextureByImage CREATEIMAGEBITMAP ERROR' + imgSrc);
-                });
-            })
                 .catch((e) => {
-                console.warn('ERROR::FillTextureByImage GET IMG ERROR' + imgSrc);
-            });
+                    console.warn('ERROR::FillTextureByImage GET IMG ERROR' + imgSrc);
+                });
         }
         else {
             await axios.get(imgSrc_backEnd, { responseType: 'blob' })
                 .then((response) => {
-                createImageBitmap(response.data, { imageOrientation: "flipY", premultiplyAlpha: "none", colorSpaceConversion: "default" })
-                    .then((bitmap) => {
-                    // console.log("SUCCESS::GET BLOB RESPONSE & CREATE BITMAP FOR UNSIGNED_BYTE TYPE");
-                    gl.bindTexture(gl.TEXTURE_2D, Tex);
-                    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, format, gl.UNSIGNED_BYTE, bitmap);
-                    //no generateMipmap 
-                    gl.bindTexture(gl.TEXTURE_2D, null);
-                    gl.finish();
-                    // console.log('FINISH::unsigned_byte reparsing');
+                    createImageBitmap(response.data, { imageOrientation: "flipY", premultiplyAlpha: "none", colorSpaceConversion: "default" })
+                        .then((bitmap) => {
+                            // //console.log("SUCCESS::GET BLOB RESPONSE & CREATE BITMAP FOR UNSIGNED_BYTE TYPE");
+                            gl.bindTexture(gl.TEXTURE_2D, Tex);
+                            gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, width, height, format, gl.UNSIGNED_BYTE, bitmap);
+                            //no generateMipmap 
+                            gl.bindTexture(gl.TEXTURE_2D, null);
+                            gl.finish();
+                            // //console.log('FINISH::unsigned_byte reparsing');
+                        });
                 });
-            });
         }
     }
     async UpdateTextureByImage(gl, Tex, format, filter, width, height, imgSrc, type) {
@@ -282,7 +285,7 @@ export default class FlowFieldLayer {
     }
     async prepare(gl) {
         await this.parser.Parsing();
-        console.log(this.parser);
+        //console.log(this.parser);
         //get gl extensions 
         const extensions = gl.getSupportedExtensions();
         for (let ext of extensions) {
@@ -506,13 +509,13 @@ export default class FlowFieldLayer {
         gl.disable(gl.RASTERIZER_DISCARD);
         gl.bindVertexArray(null);
         gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
-        // console.log('simulation is done for one block');
+        // //console.log('simulation is done for one block');
         //-----update TrajectoryPool by the XFBO
         gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, this.now_XFBO); //store the block simulated data
         // texSubImage2D  can  read from  unpack_BUFFER  no need to be parameter
         gl.bindTexture(gl.TEXTURE_2D, this.trajectoryPool);
         //just the begin block
-        // console.log('this.maxBlockSize::'+this.parser.maxBlockSize);
+        // //console.log('this.maxBlockSize::'+this.parser.maxBlockSize);
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
         gl.texSubImage2D(gl.TEXTURE_2D, 0, this.textureOffsetArray[this.beginBlock].offsetX, this.textureOffsetArray[this.beginBlock].offsetY, this.parser.maxBlockSize, this.parser.maxBlockSize, gl.RGB, gl.FLOAT, 0); // particle data from buffer to texture
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -523,7 +526,7 @@ export default class FlowFieldLayer {
             this.parser.segmentPrepare--;
             return;
         }
-        // // console.log('all block is updated , start rendering');
+        // // //console.log('all block is updated , start rendering');
         //## render
         gl.bindVertexArray(this.now_rVAO);
         gl.activeTexture(gl.TEXTURE0);
@@ -567,7 +570,7 @@ export default class FlowFieldLayer {
     }
     async onAdd(map, gl) {
         this.GL = gl;
-        // console.log('Custom flow field layer is being added...');
+        // //console.log('Custom flow field layer is being added...');
         this.initGUI();
         this.map = map;
         await this.prepare(gl);
@@ -577,7 +580,7 @@ export default class FlowFieldLayer {
     }
     render(gl, matrix) {
         if (!this.isReady) {
-            // console.log('manager not ready');
+            // //console.log('manager not ready');
             this.map?.triggerRepaint();
             return;
         }

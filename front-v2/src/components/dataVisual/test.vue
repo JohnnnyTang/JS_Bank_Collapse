@@ -1,127 +1,327 @@
 <template>
     <div class="main">
-        <!-- <sectionDraw></sectionDraw> -->
-        <div class="table">
-            <div class="row">
-                <div class="cell" v-for="(item, index) in testData" :key="index">{{ item[0].toFixed(2) }}</div>
-            </div>
-            <div class="row">
-                <div class="cell" v-for="(item, index) in testData" :key="index">{{ item[1].toFixed(2) }}</div>
-            </div>
-        </div>
+        <div ref="mapRef" id="map"></div>
+
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import sectionDraw from '../modelStore/soilAnalysis/sectionDraw.vue';
-import * as echarts from 'echarts';
-import axios from 'axios';
+import { ref, onMounted, reactive } from 'vue'
+import mapboxgl from 'mapbox-gl'
+import { initMap } from '../../utils/mapUtils';
+import 'mapbox-gl/dist/mapbox-gl.css'
+const mapRef = ref(null)
+import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 
-const chartdom = ref(null)
 
-const testData = [
-    [
-        4.558842192636803e-11,
-        -1.2148850368295108
-    ],
-    [
-        38.10376216666087,
-        -1.2429049979040028
-    ],
-    [
-        76.20752433327615,
-        -1.2259330622439175
-    ],
-    [
-        114.31128649989144,
-        -1.259806958700206
-    ],
-    [
-        152.41504866650672,
-        -1.2611951002238697
-    ],
-    [
-        190.51881083312202,
-        -1.3152647034596443
-    ],
-    [
-        228.6225729997373,
-        -1.4663700476224946
-    ],
-    [
-        266.72633516635256,
-        -1.6060859011160848
-    ],
-    [
-        304.83009733296785,
-        -3.032057199133465
-    ],
-    [
-        342.93385949958315,
-        -3.3242398937408764
-    ],
-    [
-        381.03762166619845,
-        -3.4983403331779157
-    ],
-    [
-        419.1413838328137,
-        -4.124987050220527
-    ],
-    [
-        457.245145999429,
-        -4.851273410394535
-    ],
-    [
-        495.3489081660443,
-        -6.5910771797927366
-    ],
-    [
-        533.4526703326595,
-        -8.942828967567108
-    ],
-    [
-        571.5564324992748,
-        -12.24843115675129
-    ],
-    [
-        609.6601946658901,
-        -16.29660691373699
-    ],
-    [
-        647.7639568325054,
-        -20.083224500410033
-    ],
-    [
-        685.8677189991207,
-        -23.861599173246326
-    ],
-    [
-        723.971481165736,
-        -27.125650170028873
-    ],
-    [
-        762.0752433323513,
-        -28.320095015823984
-    ],
-    [
-        800.1790054989665,
-        -29.132909224573726
-    ],
-    [
-        838.2827676655818,
-        -29.25361011534611
-    ]
-]
+// const a = {
+//     "tileName": "waterLine",
+//     "tableName": "zys_water_line",
+//     "type": "line",
+//     "fields": [
+//         "if_importa"
+//     ]
+// }
+const addBankLayer = async (map, bankEnName) => {
+    const tServer = 'http://172.21.212.166:8989/api/v2'
+
+    const bank = bankEnName
+    const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
+
+    const layers = {
+        'point': [],
+        'line': [],
+        'polygon': [],
+        'symbol': []
+    }
+    const _tile = (name) => {
+        return tServer + `/tile/vector/${bank}/${name}/{x}/{y}/{z}`
+    }
+
+    bankVectorLayers.forEach(blayer => {
+        const name = blayer.tileName
+        const tileUrl = _tile(name)
+        const type = blayer.type
+        const fields = blayer.fields
+        layers[type].push({
+            name, fields, tileUrl
+        })
+    })
+
+    layers.polygon.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'fill',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            paint: {
+                'fill-color': `rgb(155,155,${(135 + index * 10) % 255})`,
+                'fill-opacity': 0.8
+            }
+        })
+    })
+
+    layers.line.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'line',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            paint: {
+                'line-color': `rgb(255,30,${(30 + index * 10) % 255})`,
+                'line-opacity': 0.8
+            }
+        })
+    })
+
+    layers.point.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'circle',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            paint: {
+                'circle-color': `rgb(222,100,${(200 + index * 10) % 255})`,
+                'circle-radius': 5.0,
+            }
+        })
+    })
+
+    layers.symbol.forEach((flayer, index) => {
+        map.addSource(flayer.name + 'source', {
+            type: 'vector',
+            tiles: [flayer.tileUrl]
+        })
+        map.addLayer({
+            id: flayer.name,
+            type: 'symbol',
+            'source-layer': 'default',
+            source: flayer.name + 'source',
+            layout: {
+                'text-field': ['get', flayer.fields[0]],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-size': 17,
+            },
+            paint: {
+                'text-color': 'rgb(51, 51, 51)',
+                'text-opacity': [
+                    'match',
+                    ["get", "name"],
+                    'assist',
+                    0.0,
+                    1.0
+                ],
+                'text-halo-color': "rgba(255, 255, 255, 1.0)",
+                'text-halo-width': 2.0,
+            }
+        })
+    })
+
+}
+
+
 onMounted(async () => {
 
-    const data =( await axios.get('/hydrodynamicList')).data
-    console.log(data)
+    // let _bankList = (await BankResourceHelper.getBankNamesList()).data
+    // console.log(_bankList)
+
+    const map = await initMap(mapRef.value)
+    const tileServer = 'http://172.21.212.166:8989/api/v1'
+    // addBankLayer(map, 'Zys')
+    // const tServer = 'http://172.21.212.166:8989/api/v2'
+
+    // const bank = 'Zys'
+    // const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
+
+    // console.log(bankVectorLayers)
+
+    // const layers = {
+    //     'point': [],
+    //     'line': [],
+    //     'polygon': [],
+    //     'symbol': []
+    // }
+    // const _tile = (name) => {
+    //     return tServer + `/tile/vector/${bank}/${name}/{x}/{y}/{z}`
+    // }
+
+    // bankVectorLayers.forEach(blayer => {
+    //     const name = blayer.tileName
+    //     const tileUrl = _tile(name)
+    //     const type = blayer.type
+    //     const fields = blayer.fields
+    //     layers[type].push({
+    //         name, fields, tileUrl
+    //     })
+    // })
+    // console.log(layers)
+
+    // layers.polygon.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'fill',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'fill-color': `rgb(155,155,${(135 + index * 10) % 255})`,
+    //             'fill-opacity': 0.8
+    //         }
+    //     })
+    // })
+
+    // layers.line.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'line',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'line-color': `rgb(255,30,${(30 + index * 10) % 255})`,
+    //             'line-opacity': 0.8
+    //         }
+    //     })
+    // })
+
+    // layers.point.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'circle',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         paint: {
+    //             'circle-color': `rgb(222,100,${(200 + index * 10) % 255})`,
+    //             'circle-radius': 5.0,
+    //         }
+    //     })
+    // })
+
+    // layers.symbol.forEach((flayer, index) => {
+    //     map.addSource(flayer.name + 'source', {
+    //         type: 'vector',
+    //         tiles: [flayer.tileUrl]
+    //     })
+    //     map.addLayer({
+    //         id: flayer.name,
+    //         type: 'symbol',
+    //         'source-layer': 'default',
+    //         source: flayer.name + 'source',
+    //         layout: {
+    //             'text-field': ['get', flayer.fields[0]],
+    //             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    //             'text-size': 17,
+    //         },
+    //         paint: {
+    //             'text-color': 'rgb(51, 51, 51)',
+    //             'text-opacity': [
+    //                 'match',
+    //                 ["get", "name"],
+    //                 'assist',
+    //                 0.0,
+    //                 1.0
+    //             ],
+    //             'text-halo-color': "rgba(255, 255, 255, 1.0)",
+    //             'text-halo-width': 2.0,
+    //         }
+    //     })
+    // })
+
+
+    // map.addSource('mzsBankLine', {
+    //     type: 'vector',
+    //     tiles: ['http://172.21.212.166:8989/api/v2' + '/tile/vector/Zys/zysLine/{x}/{y}/{z}']
+    //     // tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
+    // })
+
+    // !map.getLayer('预警岸段') &&
+    //     map.addLayer({
+    //         id: '预警岸段',
+    //         type: 'line',
+    //         source: 'mzsBankLine',
+    //         'source-layer': 'default',
+    //         layout: {
+    //             'line-join': 'round',
+    //         },
+    //         paint: {
+    //             'line-color': '#ff3d2b',
+    //             'line-width': 5,
+    //         },
+    //     })
+
+    map.addSource('mapRaster2020', {
+        type: 'raster',
+        tiles: [
+            tileServer + '/tile/raster/mzs/2020/Before/{x}/{y}/{z}',
+        ],
+    })
+    map.addLayer({
+        id: 'ras',
+        type: 'raster',
+        source: 'mapRaster2020',
+    })
+
+    // map.addSource('demTile', {
+    //     type: 'raster',
+    //     tiles: [tileServer + '/tile/raster/dem/Mzs/199901/{x}/{y}/{z}'],
+    //     tileSize: 1024,
+    //     minzoom: 10,
+    //     maxzoom: 20,
+    //     bounds: [120.509, 32.023, 120.555, 32.0402],
+    // })
+    // map.addLayer({
+    //     id: 'ras',
+    //     type: 'raster',
+    //     source: 'demTile',
+    //     paint: {
+    //         'raster-opacity': 1.0,
+    //     }
+    // })
+
 })
+
+
 </script>
 
 <style lang="scss" scoped>
+div.flex-coloum {
+    display: flex;
+    flex-direction: column;
+}
+
+div.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+div.one-center {
+    position: relative;
+    display: grid;
+    place-items: center;
+}
+
 .main {
     position: absolute;
     width: 100vw;
@@ -130,37 +330,121 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
 
-    .table {
-        position: relative;
-        width: 50vw;
-        height: 20vh;
-        display: flex;
-        flex-direction: column;
-        background-color: rgb(186, 221, 252);
-
-        .row {
-            position: relative;
-            width: 100%;
-            flex: 1;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cell {
-            height: 2vh;
-            flex: 1;
-            border: 1px solid black;
-            display: grid;
-            place-items: center;
-            font-size: calc(0.3vw + 0.3vh);
-            background-color: antiquewhite;
-        }
-
-
+    #map {
+        width: 100%;
+        height: 100%;
     }
 
+    div.math-model-calculation {
+        position: absolute;
+        z-index: 1;
+        top: 8vh;
+        left: 20.3vw;
+        width: 15vw;
+        // height: 76vh;
+        background-color: rgb(248, 248, 248);
+        // backdrop-filter: blur(20px);
+        border-radius: calc(0vw + 0.5vh);
+        box-shadow:
+            rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+            rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+            rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 
+        div.main-title {
+            position: relative;
+            width: 13vw;
+            height: 5vh;
+            font-size: calc(0.8vw + 0.7vh);
+            font-weight: 800;
+            font-family: 'Microsoft YaHei';
+            text-align: center;
+            line-height: 5vh;
+            color: #054bb3;
+            // border-bottom: #055279 solid 2px;
+
+            div.minimize-btn {
+                position: absolute;
+                right: 0.1vw;
+                top: 1.5vh;
+                width: 2vh;
+                height: 2vh;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-image: url('/minimize.png');
+                z-index: 1;
+                cursor: pointer;
+            }
+        }
+
+        div.file-upload-container {
+            position: relative;
+            width: 14.8vw;
+            height: 26vh;
+
+            :deep(.el-button, .el-button--primary, .is-plain) {
+                width: 8vw;
+                height: 3.7vh;
+                font-size: calc(0.5vw + 0.6vh);
+                font-family: 'Microsoft YaHei';
+                margin: 0;
+            }
+        }
+
+        div.model-container {
+            position: relative;
+            width: 14.8vw;
+            // height: 44.8vh;
+            margin-bottom: 0.5vh;
+
+            .card {
+                margin-bottom: 0.7vh;
+
+                .content {
+                    .running-container {
+                        margin-top: 0.5vh;
+                        border: #0d6eff54 solid 1px;
+                        border-radius: 5px;
+                    }
+
+                    .setting-container {
+                        margin-top: 1vh;
+                        border: #0d6eff54 solid 1px;
+                        border-radius: 5px;
+
+                        .judge-container {
+                            position: relative;
+                            width: 14vw;
+
+                            .judge-desc {
+                                position: relative;
+                                margin-top: 1vh;
+                                margin-bottom: 1vh;
+                                width: 12.5vw;
+                                font-size: calc(0.6vw + 0.4vh);
+                                font-weight: 600;
+                            }
+
+                            .after-judge {
+                                position: relative;
+                                margin-top: 1vh;
+                                margin-bottom: 1vh;
+                                width: 12.5vw;
+                                font-size: calc(0.6vw + 0.4vh);
+                                font-weight: 600;
+                            }
+
+                            .confirm-container {
+                                position: relative;
+                                margin-top: 1vh;
+                                margin-bottom: 1vh;
+                                width: 12.5vw;
+                                font-size: calc(0.6vw + 0.4vh);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

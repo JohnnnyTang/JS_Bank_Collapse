@@ -9,32 +9,10 @@ const ModelInstance = axios.create({
   timeout: 200000,
 })
 
-// ModelInstance.interceptors.request.use((config) => {
-//   //const token = getToken();
-//   const token = "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiYWRtaW4iLCJuYW1lIjoi566h55CG5ZGYIiwiaWQiOm51bGwsImV4cCI6MTcyMTc0MDg3OCwiZW1haWwiOiJuaHJpX2FkbWluQDE2My5jb20ifQ.tEMP3dapCQpsbq_iXEa9MDlNhGffGBBRTPcNihNgkShlSbei4Pd5guamSHrGkLrYp7W3kQ-nQEu-jqu8BsFu7Q"
-//   const flag = config.headers["debounce"];
-//   (config.headers.Authorization = `Bearer ${token}`),
-//     (config.cancelToken = new axios.CancelToken((e) => {
-//       const cancelRequest = () => {
-//         let url = (config.baseURL) + config.url;
-//         e(url);
-//       };
-
-//       if (flag === "true") {
-//         requestList.has(config.url + JSON.stringify(config.data))
-//           ? cancelRequest()
-//           : requestList.add(config.url + JSON.stringify(config.data));
-//       }
-//     }));
-//   return config;
-// });
-
 ModelInstance.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token');
-    // const token = sessionStorage.getItem('token');
     if (token) {
-      // config.headers['Authorization'] = `Bearer ${token}`;
       config.headers.token = `${token}`;
     }
     return config;
@@ -334,11 +312,12 @@ export default class ModelRequest {
   }
 
   static async getResultData(type, caseid, name) {
-    return await get(`/data/modelServer/down/result/file/${type}?caseId=${caseid}&name=${name}`, true)
+    return await get(`/data/bankResource/down/modelServer/result/file/${type}?caseId=${caseid}&name=${name}`, true)
   }
 
   static async getDataList(datatype, bank) {
-    return await get(`/dataNode/bank/dataType?dataType=${datatype}&bank=${bank}`, true)
+    // return await get(`/dataNode/bank/dataType?dataType=${datatype}&bank=${bank}`, true)
+    return await get(`/data/bankResource/bank/dataType?dataType=${datatype}&bank=${bank}`, true)
   }
 
   /**

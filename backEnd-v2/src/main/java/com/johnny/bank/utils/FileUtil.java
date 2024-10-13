@@ -4,13 +4,13 @@ import com.johnny.bank.model.resource.dataResource.GnssData;
 import com.johnny.bank.model.resource.dataResource.InclinometerData;
 import com.johnny.bank.model.resource.dataResource.ManometerData;
 import com.johnny.bank.model.resource.dataResource.StressPileData;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
@@ -23,7 +23,50 @@ import java.util.List;
  * @date: 2024/1/29 9:31
  * @version: 1.0
  */
+@Slf4j
 public class FileUtil {
+
+    // 删除指定路径文件夹以及其中文件
+    public static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteFolder(file); // 递归删除子文件夹
+                } else {
+                    if (!file.delete()) {
+                        log.info("Failed to delete file: " + file.getAbsolutePath());
+                    }
+                }
+            }
+        }
+        if (!folder.delete()) {
+            log.info("Failed to delete folder: " + folder.getAbsolutePath());
+        }
+    }
+
+    // 获取指定路径文件内容
+    public static String getFileContent(String filePathStr) {
+        Path filePath = Paths.get(filePathStr);
+        if (filePathStr.isEmpty() || Files.notExists(filePath)) {
+            return "NOT EXIST";
+        }
+        try {
+            List<String> lines = Files.readAllLines(filePath);
+            return String.join(System.lineSeparator(), lines);
+        } catch (IOException e) {
+            return "ERROR";
+        }
+    }
+
+    // 修改指定路径文件内容
+    public static void modifiyFileContent(String filePathStr, String content) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
+            writer.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 将文件保存到指定路径

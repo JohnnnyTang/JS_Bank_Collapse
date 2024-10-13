@@ -4,6 +4,7 @@ import com.johnny.bank.model.configuration.TilePath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -18,6 +19,9 @@ import java.io.FileInputStream;
 @Slf4j
 public class IRasterTileRepo {
 
+    @Value("${staticData.tifTilePath}")
+    private String tifTilePathValue;
+
     private final TilePath tilePathConfig;
 
     @Autowired
@@ -30,7 +34,7 @@ public class IRasterTileRepo {
         if(!file.exists()) {
             fullPath = tilePathConfig.getMzsTilePath() + "blank.png";
         }
-//        System.out.println(mzsRasterPath);
+//        System.out.println(fullPath);
         try (FileInputStream in = new FileInputStream(fullPath)){
             return IOUtils.toByteArray(in);
         } catch (Exception e) {
@@ -64,6 +68,11 @@ public class IRasterTileRepo {
 
     public byte[] getMzsFloodRasterFile(String tilePath) throws Exception {
         String fullPath = tilePathConfig.getMzsTilePath() + "floodTile/" + tilePath;
+        return  getRasterDataAsByteArray(fullPath);
+    }
+
+    public byte[] getDEMRasterFile(String tilePath) throws Exception {
+        String fullPath = tifTilePathValue + tilePath;
         return  getRasterDataAsByteArray(fullPath);
     }
 

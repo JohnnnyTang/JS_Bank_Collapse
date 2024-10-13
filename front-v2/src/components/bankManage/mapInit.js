@@ -1,6 +1,6 @@
 import BackEndRequest from '../../api/backend'
 import { DataPioneer } from '../dataVisual/Scene'
-import { pulsing, loadImage } from '../../utils/mapUtils'
+import { pulsing, loadImage, refreshMap, addBankLayer } from '../../utils/mapUtils'
 import mapboxgl from 'mapbox-gl'
 // import MultiChart from '../dataVisual/monitorDevice/MultiChart.vue'
 import monitorDetailV2 from '../dataVisual/featureDetails/monitorDetailV2.vue'
@@ -14,6 +14,8 @@ import { ref, createApp, h } from 'vue'
 import axios from 'axios'
 import { useSceneStore } from '../../store/mapStore'
 import { ElMessageBox, ElMessage, dayjs } from 'element-plus'
+import { useBankNameStore } from '../../store/bankNameStore'
+import router from '../../router'
 // import ElementPlus from "element-plus";
 
 const propertyRef = ref({})
@@ -41,8 +43,8 @@ const filterWarnData = (warnDataList) => {
 }
 
 const mapInit = async (map, vis) => {
+    /*
     const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
-
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
@@ -107,7 +109,12 @@ const mapInit = async (map, vis) => {
         type: 'vector',
         tiles: [tileServer + '/tile/vector/mzsBankAreaS/{x}/{y}/{z}'],
     })
+    map.addSource('zjgLine', {
+        type: 'vector',
+        tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
+    })
 
+    
     map.addLayer({
         id: 'riverBeachArea',
         type: 'fill',
@@ -133,7 +140,22 @@ const mapInit = async (map, vis) => {
             'line-width': 2,
         },
     })
-
+    map.addLayer({
+        id: 'zjgBridge',
+        type: 'line',
+        source: 'zjgLine',
+        'source-layer': 'default',
+        layout: {
+            'line-cap': 'round',
+            'line-join': 'round',
+        },
+        paint: {
+            'line-opacity': 0.6,
+            // 'line-pattern': 'test',
+            'line-color': 'rgb(183, 189, 183)',
+            'line-width': 2.0,
+        },
+    })
     map.addLayer({
         id: 'fjsFixLine',
         type: 'line',
@@ -376,7 +398,10 @@ const mapInit = async (map, vis) => {
             'text-color': 'rgba(31, 44, 126, 0.6)',
         },
     })
-
+    */
+    refreshMap(map)
+    let bankEnName = useBankNameStore().globalBankName
+    addBankLayer(map, bankEnName)
     if (vis) {
         const pulsingCVSMap = {
             GNSS: 'point',
@@ -390,9 +415,10 @@ const mapInit = async (map, vis) => {
             孔隙水压力计: 'manometer-dot-pulsing',
             应力桩: 'stress-dot-pulsing',
         }
-        map.addImage(pulsingMap['GNSS'], pulsing[pulsingCVSMap['GNSS']], {
-            pixelRatio: 1,
-        })
+        if (!map.hasImage(pulsingMap['GNSS']))
+            map.addImage(pulsingMap['GNSS'], pulsing[pulsingCVSMap['GNSS']], {
+                pixelRatio: 1,
+            })
         // map.addImage(
         //     pulsingMap['测斜仪'],
         //     pulsing[pulsingCVSMap['测斜仪']],
@@ -416,7 +442,7 @@ const mapInit = async (map, vis) => {
         // )
 
         //////////////monitor device////////////
-        let monitorInfo = (await BackEndRequest.getMonitorInfo()).data
+        let monitorInfo = (await BackEndRequest.getMonitorInfo())
         let monitorDevice = DataPioneer.generateDeviceGeoJson(
             monitorInfo,
             (element) => {
@@ -426,7 +452,6 @@ const mapInit = async (map, vis) => {
         )
         const { gnss, incline, stress, manometer, camera, gnssJZ } =
             DataPioneer.getDifMonitorData(monitorDevice)
-        console.log('res geojson', gnss)
         // // cluster
         // map.addSource('monitor-source', {
         //     type: 'geojson',
@@ -1010,7 +1035,7 @@ const removeWarningDeviceStyle2 = (map, deviceCode) => {
 }
 
 const createPopUp = (deviceProperty, zoom) => {
-    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom })
+    const ap = createApp(monitorDetailV2, { deviceInfo: deviceProperty, zoom }).use(router)
 
     const container = document.createElement('div')
     container.id = 'monitorDetailV2-div'

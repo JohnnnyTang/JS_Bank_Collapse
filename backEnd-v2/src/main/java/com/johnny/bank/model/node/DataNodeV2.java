@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Document(collection = "dataNodeV2")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataNodeV2 extends BaseNode {
     String apiPrefix;
     JSONObject usage;
@@ -31,7 +31,7 @@ public class DataNodeV2 extends BaseNode {
             String id, String name, String auth, String category, String path, String apiPrefix,
             JSONObject usage, JSONObject basicInfo, String bank, String dataOrigin
     ) {
-        super(id, name, auth, category, path);
+                 super(id, name, auth, category, path);
         this.apiPrefix = apiPrefix;
         this.usage = usage;
         this.bank = bank;

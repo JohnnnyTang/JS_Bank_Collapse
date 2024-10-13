@@ -419,7 +419,6 @@ const generateOptions_GNSS = (processedData) => {
         names: ['各维度位移', '三维位移', '相对位移'],
     }
 }
-
 const generateOptions_Incline_new = (processedData) => {
 
     let option1 = {
@@ -613,8 +612,6 @@ const generateOptions_Incline_new = (processedData) => {
         names: ["偏移曲线", "相对偏移曲线"],
     }
 }
-
-
 const generateOptions_Manometer_new = (processedData) => {
     let option1 = {
         title: {
@@ -983,7 +980,9 @@ class MonitorDataAssistant {
 
     async getMonitoringdata() {
         //general infomation
-        this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"], this.info["type"])).data
+        // this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"])).data
+        this.monitoringData = (await BackEndRequest.getMonitorDetailByType_Code(this.info["code"])).data
+        console.log(this.monitoringData)
         //meta infomation -- pointnum
         return this.monitoringData
     }

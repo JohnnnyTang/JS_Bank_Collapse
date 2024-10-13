@@ -3,34 +3,19 @@
         <div class="desc-box-container">
             <div class="title-container">民主沙右缘-基础信息</div>
             <div class="detail-content-container">
-                <div
-                    class="detail-box-item"
-                    v-for="(item, index) in mzsInfo"
-                    :key="index"
-                    :class="item.type"
-                >
+                <div class="detail-box-item" v-for="(item, index) in mzsInfo" :key="index" :class="item.type">
                     <div class="detail-key">{{ item.key }}</div>
                     <div class="detail-val" v-if="changeStatus">
-                        <el-input
-                            v-model="item.val"
-                            style="
+                        <el-input v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
-                            "
-                            placeholder="Please input"
-                            :type="
-                                item.type.includes('long-text')
+                            " placeholder="Please input" :type="item.type.includes('long-text')
                                     ? 'textarea'
                                     : 'text'
-                            "
-                            :autosize="{ minRows: 4, maxRows: 6 }"
-                        />
+                                " :autosize="{ minRows: 4, maxRows: 6 }" />
                     </div>
-                    <div
-                        class="detail-val"
-                        v-else-if="item.type.includes('two-row')"
-                    >
+                    <div class="detail-val" v-else-if="item.type.includes('two-row')">
                         <div class="detail-val-row">
                             {{ item.val.split(item.splitter)[0] }}
                         </div>
@@ -41,18 +26,10 @@
                     <div class="detail-val" v-else>{{ item.val }}</div>
                 </div>
                 <div class="change-button-container">
-                    <div
-                        class="change-button"
-                        @click="modifyData"
-                        :class="{ modify: changeStatus }"
-                    >
+                    <div class="change-button" @click="modifyData" :class="{ modify: changeStatus }">
                         {{ changeStatus ? '提交' : '修改' }}
                     </div>
-                    <div
-                        class="cancel-button"
-                        v-if="changeStatus"
-                        @click="cancelClick"
-                    >
+                    <div class="cancel-button" v-if="changeStatus" @click="cancelClick">
                         取消
                     </div>
                 </div>
@@ -62,11 +39,7 @@
         <div class="pic-view-container view-box">
             <el-carousel height="44.5vh" arrow="always">
                 <el-carousel-item v-for="item in 4" :key="item">
-                    <el-image
-                        style="width: 100%; height: 100%"
-                        :src="imgUrlList[item - 1]"
-                        fit="cover"
-                    />
+                    <el-image style="width: 100%; height: 100%" :src="imgUrlList[item - 1]" fit="cover" />
                 </el-carousel-item>
             </el-carousel>
         </div>
@@ -77,7 +50,7 @@
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ref, onMounted, onUnmounted } from 'vue'
-import {mapInit} from './mapInit'
+import { mapInit } from './mapInit'
 
 const defaultVal = [
     { key: '预警级别', val: 'Ⅰ级', type: ['half', 'left'] },
@@ -146,8 +119,7 @@ const cancelClick = () => {
 }
 
 const containerDom = ref(null)
-mapboxgl.accessToken =
-    'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
+
 
 let map = null
 
@@ -174,13 +146,14 @@ onMounted(() => {
     map = new mapboxgl.Map({
         container: 'map-container', // container ID
         style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
+        accessToken: 'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
         center: [120.542, 32.036], // starting position [lng, lat]
         zoom: 8, // starting zoom
         bounds: [
             [114.36611654985586, 30.55501729652339],
             [124.5709218840081, 35.31358005439914],
         ],
-    })  
+    })
     map.on('load', () => {
         // console.log('map loaded!!!')
         mapFlyToRiver(map)
@@ -291,6 +264,7 @@ div.basic-page-container {
 
                 &.long-text {
                     height: 24vh;
+
                     div.detail-val {
                         line-height: normal;
                         height: 16vh;
@@ -340,6 +314,7 @@ div.basic-page-container {
                     &.modify {
                         width: 3.2vw;
                     }
+
                     &:hover {
                         cursor: pointer;
                         transform: translate3d(2px, 2px, 2px);
@@ -402,10 +377,7 @@ div.basic-page-container {
             margin-top: 1vh;
         }
 
-        &.pic-view-container {
-        }
+        &.pic-view-container {}
     }
 }
-
-
 </style>

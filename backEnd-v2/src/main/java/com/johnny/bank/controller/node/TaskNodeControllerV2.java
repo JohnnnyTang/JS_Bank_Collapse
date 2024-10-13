@@ -2,11 +2,16 @@ package com.johnny.bank.controller.node;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.controller.node.base.BaseNodeController;
+import com.johnny.bank.jobs.QuartzSchedulerManager;
 import com.johnny.bank.model.node.TaskNode;
 import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import org.quartz.SchedulerException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,9 +31,20 @@ public class TaskNodeControllerV2 extends BaseNodeController<TaskNode> {
     }
 
     @DeleteMapping("delete/all")
-    public ResponseEntity<String> deleteTaskNodeById() throws SchedulerException {
-        ((TaskNodeServiceV2) nodeServiceImpl).deleteAll();
-        return ResponseEntity.ok("all");
+    public ResponseEntity<String> deleteAllTaskNode() throws SchedulerException {
+        String deleteAllStatus = ((TaskNodeServiceV2) nodeServiceImpl).deleteAll();
+        return ResponseEntity.ok(deleteAllStatus);
+    }
+
+    @PostMapping("start/numeric/hydrodynamic/real")
+    public ResponseEntity<String> calRealHydrodynamic(
+            @RequestParam("info") String paramObj, @RequestParam("fort.13") MultipartFile fort13,
+            @RequestParam("fort.14") MultipartFile fort14, @RequestParam("fort.15") MultipartFile fort15,
+            @RequestParam("fort.19") MultipartFile fort19, @RequestParam("fort.20") MultipartFile fort20
+    ) throws Exception {
+        String taskNodeId = ((TaskNodeServiceV2) nodeServiceImpl).calRealHydrodynamic(
+                JSONObject.parseObject(paramObj), fort13, fort14, fort15, fort19, fort20);
+        return ResponseEntity.ok(taskNodeId);
     }
 
     @PostMapping("start/numeric/hydrodynamic")

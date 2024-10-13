@@ -5,14 +5,17 @@
             <div class="nav-manage-text">监测详情</div>
             <div class="nav-arrow-icon"></div>
         </div> -->
-        <div class="visual-tab-container">
+        <div class="visual-tab-container" v-if="showViewButton">
             <DvBorderBox12 backgroundColor="rgb(0, 32, 100)">
-                <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
-                    @change="viewChangeClick"></e-tab>
+                <!-- <e-tab style="z-index: 3; font-size: calc(0.4vw + 0.4vh)" :items="items" :columns="2"
+                    @change="viewChangeClick"></e-tab> -->
+                <el-radio-group v-model="viewRadio" @change="viewChangeClick">
+                    <el-radio-button v-for="item in items" :label=item.label :value=item.value />
+                </el-radio-group>
             </DvBorderBox12>
         </div>
         <BankBasicInfoVue />
-        <RealtimeStatusVue :domHide="domHideMap.status" :device-type="currentDeviceType" />
+        <RealtimeStatusVue :domHide="domHideMap.status" :device-type="currentDeviceType" :show-vedio="showVedio" />
         <!-- <RealtimeVideoVue :active="!warnActive" :domHide="domHideMap.video" /> -->
         <!-- <SectionRisk />
         <DeviceWarn /> -->
@@ -74,6 +77,7 @@
                             }"></div>
                             <span style="
                                     text-align: center;
+                                    font-size: calc(0.5vw + 0.4vh);
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
@@ -93,6 +97,7 @@
                             }"></div>
                             <span style="
                                     text-align: center;
+                                    font-size: calc(0.5vw + 0.4vh);
                                     width: 100%;
                                     display: block;
                                     line-height: 2.5vh;
@@ -118,6 +123,7 @@
                         <div class="icon-block" :style="{ backgroundImage: `url(${item.icon})` }"></div>
                         <span style="
                                 text-align: center;
+                                font-size: calc(0.5vw + 0.4vh);
                                 width: 100%;
                                 display: block;
                                 line-height: 2.5vh;
@@ -135,7 +141,7 @@
         </div>
 
         <div class="warn-status-container" v-loading="warnLoading">
-            <div class="warn-status-title">民主沙右缘状态</div>
+            <div class="warn-status-title">{{ info["name"] }}状态</div>
             <div class="warn-status-content" :class="statusText == '正常' ? 'normal' : 'warn'">
                 {{ statusText }}
             </div>
@@ -174,24 +180,17 @@
 </template>
 
 <script setup>
-// import router from '../router'
+
 import {
-    onMounted,
-    ref,
-    onUnmounted,
-    watch,
-    computed,
-    nextTick,
-    createApp,
+    onMounted, ref, reactive, onUnmounted, watch, computed, nextTick, createApp
 } from 'vue'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { ETab } from 'e-datav-vue3'
 import BankBasicInfoVue from '../components/bankTwin/BankBasicInfo.vue'
+import { useBankNameStore } from '../store/bankNameStore';
 import RealtimeStatusVue from '../components/bankTwin/RealtimeStatus.vue'
-// import WarnHistoryTable from '../components/bankTwin/WarnHistoryTable.vue'
-import RealtimeVideoVue from '../components/bankTwin/RealtimeVideo.vue'
 import BanWarnDetail from '../components/bankTwin/BankWarnDetail.vue'
-import axios from 'axios'
 import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
 import {
     mapInit,
@@ -199,38 +198,29 @@ import {
     removeDeviceClickEvent,
     deviceOnClick,
 } from '../components/bankManage/mapInit'
-// test bank3d popUP
-// import threedVue from '../components/bankTwin/threedPopup.vue'
 import threeDdevice from '../components/bankTwin/threeDdevice.vue'
 
 import { useMapStore, useWarnInfoStore } from '../store/mapStore'
+import BackEndRequest from '../api/backend';
 import * as customLayers from '../utils/WebGL/customLayers'
 import dayjs from 'dayjs'
 import { ElMessage } from 'element-plus'
-import { initPureScratchMap } from '../utils/mapUtils'
-// import { init } from 'echarts'
+import { initPureScratchMap, refreshMap } from '../utils/mapUtils'
 const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const route = useRoute()
 const containerDom = ref(null)
 const animateTime = ref('0s')
 const marqueeBlockDom = ref()
 const unityCanvaDom = ref()
 const mapDom = ref()
 const warnActive = ref(true)
+
+const showVedio = ref(false)
+const showViewButton = ref(false)
 const buttonText = computed(() => {
     return warnActive.value ? '更多' : '▼'
 })
 const currentDeviceType = ref('位移测量站')
-////////DEBUG
-// window.addEventListener('keydown', (e) => {
-//     if (e.key === '1') {
-//         // currentDeviceType.value = '位移测量站'
-//         warnActive.value = true
-//     } else if (e.key === '2') {
-//         // currentDeviceType.value = '应力桩'
-//         warnActive.value = false
-//     }
-
-// })
 
 const detailLoading = ref(false)
 const warnLoading = ref(true)
@@ -238,13 +228,9 @@ const warnLoading = ref(true)
 const threeDLoading = ref(false)
 const deviceShowing = ref([true, true, true, true, true, true])
 
-// mapboxgl.accessToken =
-//     'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg'
 let map = null
 const warnInfoStore = useWarnInfoStore()
-// const token = ref(
-//     'at.9muaq1l4dwsnaqkfbhn98qxe10ud6kgw-54xl36oksd-1bmu6o1-pilufj5d3',
-// )
+
 const statusText = ref('正常')
 
 const domHideMap = ref({
@@ -252,7 +238,18 @@ const domHideMap = ref({
     status: false,
     warn: true,
 })
+///////////////////////////////////////////////////////////
+const bankNameStore = useBankNameStore()
+console.log(bankNameStore)
 
+const info = reactive({
+    "name": '',
+    "riskLevel": '',
+    "monitorLength": '',
+    "monitorStartTime": '2024-04-20',
+    "deviceNum": 0
+})
+///////////////////////////////////////////////////////////
 // custome layer
 /**
  * @type {customLayers.UnityLayer}
@@ -311,6 +308,15 @@ const legendList = [
         text2: '监测',
         device: '测斜仪',
     },
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // {
+    //     icon: '/icons/测斜仪.png',
+    //     text1: '土体',
+    //     strong: '微应变',
+    //     text2: '监测',
+    //     device: '分布式光纤',
+    // },
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     {
         icon: '/icons/视频监控.png',
         text1: '  ',
@@ -364,6 +370,11 @@ const deviceNameMap = {
         'MZS120.548925_32.029361_2': 'YL-06',
         'MZS120.552209_32.028149_2': 'YL-07',
     },
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    分布式光纤: {
+        'MZS120_32_5': 'GX-01',
+    },
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 const gnssIdSectionMap = {
@@ -383,6 +394,26 @@ const gnssIdSectionMap = {
     'MZS120.51967889_32.04004108_4': 'MZ03顺堤尾',
     'MZS120.541648_32.030524_2': 'MZ08海事码头',
 }
+
+//////////////////////////////////////////////////////////////////////
+const updateInfo = async () => {
+    BackEndRequest.getBankBasicInfo().then(res => {
+        info.name = res.data.name
+        info.riskLevel = res.data.riskLevel
+        info.monitorLength = res.data.monitorLength
+        info.monitorStartTime = res.data.monitorStartTime
+
+        BackEndRequest.getMonitorInfo().then(res => {
+            // console.log('device NUm is ', res.length)
+            info.deviceNum = res.length
+        })
+    })
+}
+
+watch(() => bankNameStore.globalBankName, (newV, oldV) => {
+    updateInfo()
+})
+//////////////////////////////////////////////////////////////////////
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return
@@ -485,6 +516,7 @@ const deviceShowControl = (index, only = false) => {
             : map.setLayoutProperty(layerNameList[index], 'visibility', 'none')
     })
 }
+const viewRadio = ref('2d')
 const viewChangeClick = (value) => {
     // console.log('view Change!', value)
     let map = useMapStore().getMap()
@@ -533,7 +565,7 @@ const viewChangeClick = (value) => {
             setTimeout(() => {
                 threeDLoading.value = false
                 createCompIns()
-            }, 5000)
+            }, 10000)
             // map.addLayer(maskLayer)
         }
     }
@@ -604,6 +636,7 @@ const updateWarnInfoDesc = async (warnInfo) => {
     }
 }
 
+
 watch(
     () => warnInfoStore.warnInfo,
     (newV, oldV) => {
@@ -625,24 +658,40 @@ watch(
     },
 )
 
+// 岸段切换
+onBeforeRouteUpdate((to, from) => {
+
+ 
+    useBankNameStore().globalBankName = to.params.id
+    if (to.params.id === 'Mzs') {
+        showVedio.value = true
+        showViewButton.value = true
+    } else {
+        showVedio.value = false
+        showViewButton.value = false
+    }
+    // refreshMap(useMapStore().getMap())
+    mapInit(useMapStore().getMap(), true)
+
+
+})
+
 onMounted(async () => {
     // setTimeout(() => {
     //     warnActive.value = true
     // }, 3000)
-    // map = new mapboxgl.Map({
-    //     container: 'map', // container ID
-    //     accessToken:
-    //         'pk.eyJ1Ijoiam9obm55dCIsImEiOiJja2xxNXplNjYwNnhzMm5uYTJtdHVlbTByIn0.f1GfZbFLWjiEayI6hb_Qvg',
-    //     style: 'mapbox://styles/johnnyt/clto0l02401bv01pt54tacrtg', // style URL
-    //     center: [120.542, 32.036], // starting position [lng, lat]
-    //     zoom: 8, // starting zoom
-    //     bounds: [
-    //         [114.36611654985586, 30.55501729652339],
-    //         [124.5709218840081, 35.31358005439914],
-    //     ],
-    // })
+    // console.log(route.params.id)
+    updateInfo()
+    useBankNameStore().globalBankName = route.params.id
+    if (useBankNameStore().globalBankName === 'Mzs') {
+        showVedio.value = true
+        showViewButton.value = true
+    } else {
+        showVedio.value = false
+        showViewButton.value = false
+    }
+
     //////////return loaded Map
-    // await axios.get('/api/data/monitorInfo')
     map = await initPureScratchMap(mapDom.value)
     // map = await initBaseMap(mapDom.value)
     map.on('render', () => {
@@ -653,27 +702,7 @@ onMounted(async () => {
 
     useMapStore().setMap(map)
     await mapInit(map, true)
-    map.addSource('zjgLine', {
-        type: 'vector',
-        tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
-    })
 
-    map.addLayer({
-        id: 'zjgBridge',
-        type: 'line',
-        source: 'zjgLine',
-        'source-layer': 'default',
-        layout: {
-            'line-cap': 'round',
-            'line-join': 'round',
-        },
-        paint: {
-            'line-opacity': 0.6,
-            // 'line-pattern': 'test',
-            'line-color': 'rgb(183, 189, 183)',
-            'line-width': 2.0,
-        },
-    })
 
     // const videoAccessKey = (await axios.post(
     //     'https://open.ys7.com/api/lapp/token/get?appKey=d228a2fab09d4c879b4449c356bbd90d&appSecret=0c46042ef59aed43c4eddbb80d637369',
@@ -715,6 +744,20 @@ const clearDom = (dom) => {
 </script>
 
 <style lang="scss" scoped>
+@keyframes gradientScroll {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 div.twin-main-container {
     position: absolute;
     width: 100vw;
@@ -836,6 +879,7 @@ div.twin-main-container {
         }
     }
 
+
     div.visual-tab-container {
         position: absolute;
         top: 10vh;
@@ -849,7 +893,87 @@ div.twin-main-container {
         font-size: calc(0.6vw + 0.4vh);
         background-color: rgb(0, 56, 141);
         box-shadow: 4px 8px 8px -4px rgba(0, 11, 34, 0.9);
+
         // background-color: antiquewhite;
+        :deep(.dv-border-box-12) {
+
+            .border-box-content {
+                // background-color: red;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                .el-radio-group {
+                    width: 9vw;
+                    height: 4.5vh;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+
+                    .el-radio-button {
+                        display: block;
+                        height: 4vh;
+                        width: 4vw;
+                        margin: 0vh 0.2vw;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 2;
+                        transition: .5s ease-in-out;
+
+                        &.is-active {
+                            .el-radio-button__inner {
+                                color: white;
+
+                                &::after {
+                                    content: '';
+                                    position: absolute;
+                                    top: -0.15vh;
+                                    left: -0.15vw;
+                                    bottom: -0.15vh;
+                                    right: -0.15vw;
+                                    background-image: linear-gradient(45deg, rgb(235, 88, 104), #0400ff, rgb(90, 244, 255));
+                                    background-size: 200% 200%;
+                                    animation: gradientScroll 3s ease-in-out infinite;
+                                    z-index: -1;
+                                    border-radius: inherit;
+                                    /* 如果需要圆角 */
+                                }
+                            }
+                        }
+
+                        .el-radio-button__original-radio {
+                            display: none;
+                        }
+
+                        .el-radio-button__inner {
+                            position: relative;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 4vh;
+                            width: 3.6vw;
+                            background-color: rgb(5, 33, 98);
+                            font-size: calc(0.5vw + 0.4vh);
+                            border: none;
+                            border-radius: 10px;
+                            color: rgb(184, 184, 184);
+
+                            &:hover {
+                                font-weight: 800;
+                                font-size: calc(0.5vw + 0.5vh);
+                                color: white;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+
     }
 
     div.marquee-container {
@@ -1022,6 +1146,7 @@ div.twin-main-container {
                 div.item-title {
                     height: 3vh;
                     line-height: 3vh;
+                    font-size: calc(0.5vw + 0.4vh);
 
                     &:hover {
                         cursor: pointer;

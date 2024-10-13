@@ -53,7 +53,11 @@ const routes = [
         name: 'home',
         // redirect: '/dataVisual'
         redirect: _ => {
-            return localStorage.getItem('token') ? '/dataVisual' : '/login';
+            const login = import.meta.env.VITE_LOGIN
+            if (login === 'YES')
+                return localStorage.getItem('token') ? '/dataVisual' : '/login';
+            else if (login === 'NOT')
+                return '/dataVisual';
         }
         // component: () => import("../views/BankMainView.vue")
     },
@@ -105,13 +109,13 @@ const routes = [
             },
             {
                 path: 'riskWarning',
-                // component: () => import('../components/modelStore/views/RiskWarning.vue'),
-                component: () => import('../components/modelStore/views/EmptyPage.vue'),
+                component: () => import('../components/modelStore/views/RiskWarning3.vue'),
+                // component: () => import('../components/modelStore/views/EmptyPage.vue'),
             },
-            {
-                path: 'riskWarning2',
-                component: () => import('../components/modelStore/views/RiskWarning2.vue'),
-            },
+            // {
+            //     path: 'riskWarning2',
+            //     component: () => import('../components/modelStore/views/RiskWarning2.vue'),
+            // },
             // {
             //     path: 'numericalModel',
             //     component: () => import('../components/modelStore/views/NumericalModel.vue'),
@@ -120,12 +124,12 @@ const routes = [
         ]
     },
     {
-        path: '/bankTwin',
+        path: '/bankTwin/:id',
         component: () => import('../views/BankTwinMainView.vue')
     },
     {
         path: '/bankManage',
-        redirect: '/bankManage/basic/mzs',
+        redirect: '/bankManage/preview/Mzs',
         component: () => import('../views/BankTwinManageView.vue'),
         children: [
             {
@@ -139,11 +143,19 @@ const routes = [
             {
                 path: 'warn/:id', // 默认子页面
                 component: () => import('../components/bankManage/BankWarnTable.vue')
+            },
+            {
+                path: '/bankManage/preview/:id',
+                component: () => import('../components/bankManage/BankResourcePreview.vue')
+            },
+            {
+                path: '/bankManage/create',
+                component: () => import('../components/bankManage/BankResourceCreate.vue')
             }
         ]
     },
     {
-        path: '/bankWarn',
+        path: '/bankWarn/:id',
         component: () => import('../views/BankRiskWarnView.vue')
     },
     {
@@ -163,23 +175,26 @@ const router = createRouter({
     routes: routes,
 })
 
+const login = import.meta.env.VITE_LOGIN
 router.beforeEach((to, from, next) => {
-    if (to.path === '/login') {
-        next()
-    } else {
-        const isLoggedIn = localStorage.getItem('token');
-        if (isLoggedIn) {
-            axios.get('/api/data/monitorInfo').then(res => {
-                // as token check
-                next()
-            }).catch(err => {
-                console.log(err)
-                next('/login');
-            })
-            // next()
+    if (login === 'YES') {
+        if (to.path === '/login') {
+            next()
         } else {
-            next('/login');
+            const isLoggedIn = localStorage.getItem('token');
+            if (isLoggedIn) {
+                axios.get('/model/data/bank').then(res => {
+                    next()
+                }).catch(err => {
+                    console.log(err)
+                    next('/login');
+                })
+            } else {
+                next('/login');
+            }
         }
+    } else if (login === 'NOT') {
+        next()
     }
 })
 

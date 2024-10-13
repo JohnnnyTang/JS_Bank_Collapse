@@ -33,8 +33,8 @@
                             <el-dropdown-item @click="navToKnowledgePage">崩岸知识库</el-dropdown-item>
                         </el-dropdown-menu>
                         <el-dropdown-menu v-if="index == 1 || index == 3">
-                            <el-dropdown-item @click="navToWarnOrRiskPage(index)">
-                                <span style="float: left" class="left">民主沙右缘</span>
+                            <el-dropdown-item v-for="(item, idx) in bankList" @click="clickBankItem(item, index)">
+                                <span style="float: left" class="left">{{ item.name }}</span>
                                 <span style="float: right" class="right level-one">一级预警岸段</span>
                             </el-dropdown-item>
                             <el-dropdown-item disabled>
@@ -70,16 +70,32 @@
             </div>
         </div>
         <div class="header-user-container">
-            <el-dropdown trigger="click">
+            <el-dropdown trigger="click" v-if="LOGIN === 'YES'">
                 <div class="user-avatar-icon"></div>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item v-if="!statusStore.loginStatus" @click="login">登录</el-dropdown-item>
-                        <el-dropdown-item v-else="statusStore.loginStatus" @click="logout">退出登录</el-dropdown-item>
+                        <el-dropdown-item v-if="LOGIN === 'YES' && !statusStore.loginStatus"
+                            @click="login">登录</el-dropdown-item>
+                        <el-dropdown-item v-if="LOGIN === 'YES' && statusStore.loginStatus"
+                            @click="logout">退出登录</el-dropdown-item>
+                        <el-dropdown-item v-if="MANAGEMENT === 'YES'"
+                            @click="bankManageClickHandler">岸段管理</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+
+
+            <el-dropdown trigger="click" v-if="LOGIN === 'NOT' && MANAGEMENT === 'YES'">
+                <div class="user-avatar-icon"></div>
+                <template #dropdown>
+                    <el-dropdown-menu>
                         <el-dropdown-item @click="bankManageClickHandler">岸段管理</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
+
+            <div class="user-avatar-icon" v-if="LOGIN === 'NOT' && MANAGEMENT === 'NOT'"></div>
+
         </div>
     </div>
     <div class="title-header">
@@ -104,15 +120,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch, onUnmounted } from 'vue'
+import { ref, onMounted, nextTick, watch, onUnmounted, onBeforeMount } from 'vue'
 import TitleContainerVue from '../header/TitleContainer.vue'
 import DecorateLineVue from '../header/DecorateLine.vue'
 import TitleBracket from '../header/TitleBracket.vue'
 import router from '../../router/index'
 import { useStatusStore } from '../../store/statusStore'
+import { useBankNameStore } from '../../store/bankNameStore'
 import { onBeforeRouteUpdate } from 'vue-router'
+import axios from 'axios'
+import { useBankInfoStore } from '../../store/bankInfoStore'
 
+const LOGIN = import.meta.env.VITE_LOGIN
+const MANAGEMENT = import.meta.env.VITE_BANK_MANAGEMENT
 const statusStore = useStatusStore()
+const bankNameStore = useBankNameStore()
 
 const titleWidthInPixel = ref(300)
 const headerDom = ref(null)
@@ -180,8 +202,15 @@ const routerPathIndexMap = {
     '/modelStore': 4,
     '/knowledgeStore': 4,
     '/bankTwin': 1,
-    '/bankManage': 1,
+    '/bankManage': 2,
     '/': 2,
+}
+
+//通过点击获取岸端名
+const bankList = ref([])
+const clickBankItem = (bankItem, index) => {
+    bankNameStore.globalBankName = bankItem.bank
+    navToWarnOrRiskPage(index, bankItem.bank)
 }
 
 let previousActive = 2
@@ -244,13 +273,13 @@ const navToKnowledgePage = () => {
     focusOnNavItem(4)
 }
 
-const navToWarnOrRiskPage = (index) => {
+const navToWarnOrRiskPage = (index, bankEnName) => {
     if (index == 1) {
         eleDropDownDomRef.value[0].handleClose()
-        router.push('/bankTwin')
+        router.push('/bankTwin/' + bankEnName)
     } else if (index == 3) {
         eleDropDownDomRef.value[1].handleClose()
-        router.push('/bankWarn')
+        router.push('/bankWarn/' + bankEnName)
     }
     focusOnNavItem(index)
 }
@@ -285,9 +314,22 @@ const bankManageClickHandler = () => {
     router.push('/bankManage')
 }
 
+
+watch(() => useBankInfoStore().bankList, (newVal) => {
+    console.log('bankList changed')
+    bankList.value = newVal
+})
+
+onBeforeMount(async () => {
+    const res = await axios.get('/model/data/bankResource/bank')
+    useBankInfoStore().bankList = res.data
+    bankList.value = res.data
+})
+
 onMounted(() => {
     // console.log(headerDom.value);
     // titleWidthInPixel.value = titleDom;
+
     onResize(headerDom.value.clientWidth, headerDom.value.clientHeight)
     resizeObserver.observe(headerDom.value)
     console.log(navItemRefs.value)
@@ -304,7 +346,7 @@ onMounted(() => {
     watch(
         () => router.currentRoute.value.path,
         (newPath, oldPath) => {
-            // console.log(newPath, oldPath)
+            console.log(newPath, oldPath)
             // console.log(newPath.split('/'), oldPath)
             let parentPath = newPath
             let splitPath = newPath.split('/')

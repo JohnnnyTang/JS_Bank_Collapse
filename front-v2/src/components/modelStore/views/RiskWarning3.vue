@@ -1,0 +1,1416 @@
+<template>
+    <div class="risk-warning-3">
+        <ModelTitleVue :ModelName="'风险预警模型'" v-on:confirm-bank="confirmBankHandler" />
+        <div class="flex-row main">
+            <div class="left-container one-center">
+                <div class="pannel parameters">
+                    <div class="title">
+                        <span style="margin-left: 1vw"></span>模型基本参数
+                    </div>
+                    <div class="content flex-coloum" style="justify-content: space-evenly">
+                        <div class="parameter-card">
+                            <div class="title flex-row between">
+                                <span><span style="margin-left: 1vw"></span>土壤参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['hs'] && basicParams['hc']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
+                            </div>
+                            <div class="content flex-coloum" style="
+                                    justify-content: space-evenly;
+                                    align-items: center;
+                                ">
+                                <div class="key-value">
+                                    <div class="key">下卧砂土层厚度</div>
+                                    <div class="value flex-row" style="margin-left: 0.5vw">
+                                        <input type="number" name="" :step="0.0001" v-model="basicParams['hs']" /><span
+                                            style="
+                                                width: 1.5vw;
+                                                padding-left: 0.3vw;
+                                            ">m</span>
+                                    </div>
+                                </div>
+                                <div class="key-value">
+                                    <div class="key">上覆粘土层厚度</div>
+                                    <div class="value flex-row" style="margin-left: 0.5vw">
+                                        <input type="number" name="" :step="0.0001" v-model="basicParams['hc']" /><span
+                                            style="
+                                                width: 1.5vw;
+                                                padding-left: 0.3vw;
+                                            ">m</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="title flex-row between">
+                                <span><span style="margin-left: 1vw"></span>地质工程参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['protection-level'] &&
+                                    basicParams['control-level']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
+                            </div>
+
+                            <div class="content flex-coloum" style="
+                                    justify-content: space-evenly;
+                                    align-items: center;
+                                ">
+                                <div class="key-value">
+                                    <div class="key">岸坡护岸程度</div>
+                                    <div class="value">
+                                        <el-select style="width: 6.5vw; height: 3.5vh" @change="" v-model="basicParams['protection-level']
+                                            ">
+                                            <el-option v-for="(
+                                                    item, index
+                                                ) in PROTECTION_VALUE" :key="index" :label="PROTECTION_LEVEL[index]"
+                                                :value="item">
+                                                <div style="text-align: center">
+                                                    {{
+                                                        PROTECTION_LEVEL[index]
+                                                    }}
+                                                </div>
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+                                <div class="key-value">
+                                    <div class="key">突加荷载指标</div>
+                                    <div class="value">
+                                        <el-select style="width: 6.5vw; height: 3.5vh" @change="" v-model="basicParams['control-level']
+                                            ">
+                                            <el-option v-for="(
+                                                    item, index
+                                                ) in CONTROL_VALUE" :key="index" :label="CONTROL_LEVEL[index]"
+                                                :value="item">
+                                                <div style="text-align: center">
+                                                    {{ CONTROL_LEVEL[index] }}
+                                                </div>
+                                            </el-option>
+                                        </el-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="title flex-row between">
+                                <span><span style="margin-left: 1vw"></span>地形参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['bench-id'] &&
+                                    basicParams['ref-id']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
+                            </div>
+                            <div class="content flex-coloum" style="
+                                    justify-content: space-evenly;
+                                    align-items: center;
+                                ">
+                                <div class="key-value">
+                                    <div class="key"> 判别计算地形</div>
+                                    <el-select style="width: 6.5vw; height: 3.5vh" v-model="basicParams['bench-id']"
+                                        value-key="name">
+                                        <el-option v-for="(
+                                                item, index
+                                            ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
+                                        </el-option>
+                                    </el-select>
+                                </div>
+                                <div class="key-value">
+                                    <div class="key">冲淤起算地形</div>
+                                    <el-select style="width: 6.5vw; height: 3.5vh" v-model="basicParams['ref-id']"
+                                        value-key="name">
+                                        <el-option v-for="(
+                                                item, index
+                                            ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
+                                        </el-option>
+                                    </el-select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="title flex-row between">
+                                <span><span style="margin-left: 1vw"></span>水文参数</span>
+                                <el-tag type="success" style="margin-right: 1vw" v-if="basicParams['water-qs'] &&
+                                    basicParams['tidal-level']
+                                    ">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
+                            </div>
+                            <div class="content flex-coloum" style="
+                                    justify-content: space-evenly;
+                                    align-items: center;
+                                ">
+                                <div class="key-value">
+                                    <div class="key">流量</div>
+                                    <div class="value flex-row">
+                                        <input type="number" name="" v-model="basicParams['water-qs']" /><span style="
+                                                width: 1.5vw;
+                                                padding-left: 0.5vw;
+                                            ">m³/s</span>
+                                    </div>
+                                </div>
+                                <div class="key-value">
+                                    <div class="key">潮差</div>
+                                    <div class="value flex-row">
+                                        <input type="number" name="" :step="0.001"
+                                            v-model="basicParams['tidal-level']" /><span style="
+                                                width: 1.5vw;
+                                                padding-left: 0.5vw;
+                                            ">m</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-card">
+                            <div class="title flex-row between">
+                                <span><span style="margin-left: 1vw"></span>断面几何参数</span>
+                                <el-tag type="success" style="margin-right: 1vw"
+                                    v-if="basicParams['section-geometry']">已录入</el-tag>
+                                <el-tag type="primary" style="margin-right: 1vw" v-else>待录入</el-tag>
+                            </div>
+                            <div class="content flex-row" style="
+                                    justify-content: space-evenly;
+                                    align-items: center;
+                                ">
+                                <el-upload class="upload-demo" :file-list="fileList" :before-upload="beforeUpload"
+                                    :on-change="handleChange" :limit="1" :http-request="handleRequest"
+                                    :show-file-list="false">
+                                    <div class="button one-center">
+                                        文件上传
+                                    </div>
+                                </el-upload>
+                                <div class="button one-center" @click="mapInputVisible = true">
+                                    地图绘制
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="middle-container one-center">
+                <div class="pannel weights">
+                    <div class="title">
+                        <span style="margin-left: 1vw"></span>风险阈值和指标权重
+                    </div>
+                    <div class="content flex-coloum" style="background-color: rgb(217, 237, 254)">
+                        <ThresholdForm ref="thresholdFormRef" />
+                        <div class="" style="height: 20vh; width: 100%; flex-grow: 1">
+                            <div id="weight-chart" ref="weightChartRef" style="
+                                    height: 100%;
+                                    width: 100%;
+                                    background-color: rgb(217, 237, 254);
+                                "></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-container one-center">
+                <div class="pannel results">
+                    <div class="title">
+                        <span style="margin-left: 1vw"></span>模型运行
+                    </div>
+                    <div class="content">
+                        <div class="top-block one-center">
+                            <div class="card" style="width: 23vw; height: 23vh">
+                                <div class="title">
+                                    <span style="margin-left: 1vw"></span>模型运行状态
+                                </div>
+                                <div class="content flex-coloum">
+                                    <div class="flex-row" style="
+                                            justify-content: space-between;
+                                            align-items: center;
+                                            height: 4vh;
+                                            width: 90%;
+                                        ">
+                                        <div class="flex-row">
+                                            <div class="status">状态</div>
+                                            <div class="statustext" :class="statusClass[modelStatus]">
+                                                {{ statusText[modelStatus] }}
+                                            </div>
+                                        </div>
+                                        <div class="button one-center" style="width: 5vw; height: 4vh"
+                                            @click="runModelClickHandler">
+                                            运行模型
+                                        </div>
+                                    </div>
+                                    <div style="
+                                            width: 90%;
+                                            height: 4vh;
+                                            margin-top: 4vh;
+                                        ">
+                                        <el-progress :percentage="modelRunnningProgress" :stroke-width="27"
+                                            :format="progressFormat" striped striped-flow :duration="25" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-block one-center">
+                            <div class="card" style="width: 23vw; height: 52vh">
+                                <div class="title">
+                                    <span style="margin-left: 1vw"></span>模型运行结果
+                                </div>
+                                <div class="content flex-coloum">
+                                    <div class="flex-row">
+                                        <div class="keyValue flex-coloum" style="margin-top: 0.2vh">
+                                            <div class="key">风险计算结果</div>
+                                            <div class="value">
+                                                {{
+                                                    riskModelFinalResultNumber
+                                                    ? riskModelFinalResultNumber
+                                                    : '暂无'
+                                                }}
+                                            </div>
+                                        </div>
+                                        <div class="keyValue flex-coloum" style="margin-top: 0.2vh">
+                                            <div class="key">评估断面状态</div>
+                                            <div class="value">
+                                                {{
+                                                    riskModelFinalResultStatus
+                                                    ? riskModelFinalResultStatus
+                                                    : '暂无'
+                                                }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="result-chart" ref="chartRef" style="
+                                            width: 100%;
+                                            flex-grow: 1;
+                                            background-color: aliceblue;
+                                        "></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <el-dialog v-model="mapInputVisible" title="基于地图绘制断面" width="41.5vw">
+        <div class="main-content">
+            <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" :demResources="demResources"
+                :demListShow="false">
+            </sectionDraw>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="mapInputVisible = false">取消</el-button>
+                <el-button type="primary" @click="confirmSectionDraw">
+                    确定
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+
+<script setup>
+import ModelTitleVue from '../ModelTitle.vue'
+import {
+    onMounted,
+    onUnmounted,
+    reactive,
+    ref,
+    toRaw,
+    watch,
+    computed,
+    nextTick,
+} from 'vue'
+import sectionDraw from '../soilAnalysis/sectionDraw.vue'
+import ThresholdForm from '../riskWarn/ThresholdForm.vue'
+import * as echarts from 'echarts'
+import { useMapStore } from '../../../store/mapStore'
+import { ElNotification, ElMessage } from 'element-plus'
+import axios from 'axios'
+import BankResourceHelper from './bankResourceHelper'
+
+
+/////////////// 初始 岸段选择
+const demResources = ref([])
+const selectedBank = reactive({
+    name: null,
+    bankEnName: null
+})
+const confirmBankHandler = async (bank) => {
+    selectedBank.name = bank.name
+    selectedBank.bankEnName = bank.bankEnName
+
+    let demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', selectedBank.bankEnName)).data
+    let demList = BankResourceHelper.DEMResourcetoList(demData)
+
+    demResources.value = demList
+
+    ElNotification({
+        type: 'success',
+        title: '选择岸段',
+        message: `已选择岸段——${selectedBank.name},模型计算将采用该岸段相关资源`,
+        position: 'top-left',
+        offset: 180,
+    })
+}
+
+
+////////////// 断面绘制
+const mapInputVisible = ref(false)
+const sectionDrawRef = ref(null)
+let sectionGeojson = ref(null)
+const sectionDrawHandler = (geojson) => {
+    console.log(' i got geojson !!', geojson)
+    sectionGeojson.value = geojson
+    basicParams['section-geometry'] = geojson
+}
+const confirmSectionDraw = () => {
+    const paramsCheck = () => {
+        if (sectionGeojson.value === null) {
+            ElNotification({
+                type: 'warning',
+                message: '请完成断面绘制后确认',
+                title: '警告',
+                offset: 140,
+            })
+            return false
+        }
+        return true
+    }
+    if (paramsCheck()) {
+        setTimeout(() => {
+            mapInputVisible.value = false
+        }, 0)
+    }
+}
+
+////////////// 基本参数
+const basicParams = reactive({
+    hs: 42,
+    hc: 13.5,
+    'protection-level': 'low',
+    'control-level': 'low',
+    'section-geometry': null,
+    'bench-id': null,
+    'ref-id': null,
+    'current-timepoint': 'yyyy-mm-dd',
+    'comparison-timepoint': 'yyyy-mm-dd',
+    'water-qs': 57500,
+    'tidal-level': 3.1,
+    'risk-thresholds': 'NONE',
+})
+
+//岸坡护岸程度
+const PROTECTION_LEVEL = ['系统防护', '一般防护', '较弱防护', '无防护']
+const PROTECTION_VALUE = ['systemic', 'normal', 'low', 'no']
+//突加荷载指标
+const CONTROL_LEVEL = ['严格控制', '一般控制', '较弱控制', '无控制']
+const CONTROL_VALUE = ['strict', 'normal', 'low', 'no']
+
+////////////// 断面geojson文件上传
+const fileList = ref([])
+const beforeUpload = (file, e) => {
+    fileList.value = []
+}
+const handleChange = (file, fileList) => {
+    // console.log('change')
+    const reader = new FileReader()
+    reader.onload = (event) => {
+        try {
+            const isJSON = file.raw.type === 'application/json'
+            if (!isJSON) {
+                throw new Error('not a geojson feature')
+            }
+            let fileContent = JSON.parse(event.target.result)
+            console.log(fileContent)
+            if (isGeoJSONFeature(fileContent)) {
+                basicParams['section-geometry'] = fileContent
+                ElMessage({
+                    type: 'success',
+                    message: '断面几何形态上传成功！',
+                    offset: 140,
+                })
+            } else throw new Error('not a geojson feature')
+        } catch (error) {
+            ElMessage({
+                type: 'warning',
+                message: '请上传正确的断面几何Geojson-feature文件！',
+                offset: 140,
+            })
+        }
+    }
+    reader.readAsText(file.raw)
+}
+const handleRequest = (a, b) => {
+    console.log('============')
+}
+
+// 阈值 \ 权重
+const thresholdFormRef = ref(null)
+const getThresholdParams = () => {
+    return toRaw(thresholdFormRef.value.thresholdParmas)
+}
+const isParamsReady = () => {
+    for (let key in basicParams) {
+        if (
+            basicParams[key] === null ||
+            basicParams[key] === '' ||
+            basicParams[key] === undefined
+        ) {
+            return false
+        }
+    }
+    return true
+}
+
+///////////// 模型和参数状态
+const parametersInputStatus = computed(() => {
+    for (let key in basicParams) {
+        if (!isParamsReady(basicParams[key])) return false
+    }
+    return true
+})
+const modelStatus = ref(0)
+const statusText = ['参数配置中', '待运行', '运行中...', '运行成功', '运行失败']
+const statusClass = ['', 'ready', 'running', 'success', 'error']
+const modelRunnningProgress = ref(0)
+const progressFormat = (percentage) =>
+    percentage === 100 ? '100%' : `${percentage.toFixed(2)}%`
+watch(parametersInputStatus, (newval) => {
+    if (newval) {
+        modelStatus.value = 1
+    } else {
+        modelStatus.value = 0
+    }
+})
+
+///////////// 多指标模型
+//// 模型结果
+const riskModelFinalResultNumber = ref(null)
+const riskModelFinalResultStatus = ref(null)
+const subIndicatorResult = reactive({
+    Dsed: 0,
+    Zb: 0,
+    Sa: 0,
+    Ln: 0,
+    PQ: 0,
+    Ky: 0,
+    Zd: 0,
+    PL: basicParams['protection-level'],
+    LC: basicParams['control-level'],
+})
+let indicatorResult = []
+
+
+
+const run = async () => {
+    /// parameters prepare
+    const weightandthreshold = getThresholdParams()
+    const _basicParams = toRaw(basicParams)
+    const comparisonTimepoint =
+        _basicParams['ref-id'].year +
+        '-' +
+        _basicParams['ref-id'].month +
+        '-' +
+        '01'
+    const currentTimepoint =
+        _basicParams['bench-id'].year +
+        '-' +
+        _basicParams['bench-id'].month +
+        '-' +
+        '01'
+
+    const requestBody = {
+        segment: selectedBank.bankEnName,
+        set: 'standard',
+        ..._basicParams,
+        'ref-id': _basicParams['ref-id'].path,
+        'bench-id': _basicParams['bench-id'].path,
+        'comparison-timepoint': comparisonTimepoint,
+        'current-timepoint': currentTimepoint,
+        wRE: weightandthreshold['wRE'],
+        wNM: weightandthreshold['wNM'],
+        wGE: weightandthreshold['wGE'],
+        wRL: weightandthreshold['wRL'],
+        'risk-thresholds': {
+            Dsed: weightandthreshold['Dsed'],
+            Zb: weightandthreshold['Zb'],
+            Sa: weightandthreshold['Sa'],
+            Ln: weightandthreshold['Ln'],
+            PQ: weightandthreshold['PQ'],
+            Ky: weightandthreshold['Ky'],
+            Zd: weightandthreshold['Zd'],
+            all: weightandthreshold['all'],
+        },
+    }
+    console.log(requestBody)
+
+    const riskVec4Parse = (vec4) => {
+        let riskLevelIndex
+        for (let i = 0; i < vec4.length; i++)
+            if (vec4[i] === 1) {
+                riskLevelIndex = i
+                break
+            }
+        const dict = ['低风险', '较低风险', '较高风险', '高风险']
+        return dict[riskLevelIndex]
+    }
+
+    const resultParse = async (res) => {
+        // const subIndicatorInfo = res['multi-indicator-ids']
+        let subIndicatorInfo = {}
+        indicatorResult.splice(0)
+        for (let key in res['multi-indicator-ids']) {
+            let indicator = key
+            let indicatorCaseId = res['multi-indicator-ids'][key]
+            const result = (
+                await axios.get(
+                    `/model/data/bankResource/down/modelServer/result/caseId?caseId=${indicatorCaseId}`,
+                )
+            ).data
+            indicatorResult.push(result.result)
+            subIndicatorInfo[indicator] = riskVec4Parse(
+                result.result['risk-level'],
+            )
+            if (indicator !== 'PQ' && indicator !== 'LC' && result.result[indicator])
+                subIndicatorResult[indicator] = result.result[indicator].toFixed(3)
+        }
+        subIndicatorResult.LC = _basicParams['control-level']
+        subIndicatorResult.PL = _basicParams['protection-level']
+        console.log('subIndicatorInfo', subIndicatorInfo)
+        console.log('subIndicatorResult', subIndicatorResult)
+
+        return {
+            riskModelNumber: res['result'],
+            riskLevelDescription: riskVec4Parse(res['risk-level']),
+            ...subIndicatorInfo,
+        }
+    }
+
+    const rrr = async () => {
+        const modelUrl =
+            '/model/taskNode/start/multipleIndicators/calculateRiskLevel'
+        modelRunnningProgress.value = 0
+
+        let TASK_ID
+        try {
+            TASK_ID = (await axios.post(modelUrl, requestBody)).data
+            if (TASK_ID === 'WRONG') throw new Error()
+        } catch (error) {
+            console.log('task ID error')
+            ElMessage({
+                message: '运行失败,模型任务创建失败',
+                type: 'error',
+                offset: 140,
+            })
+            modelStatus.value = 4
+            return;
+        }
+        console.log('TASK_ID', TASK_ID)
+        const interval = setInterval(async () => {
+            const status = (
+                await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)
+            ).data
+            console.log('status :: ', status)
+
+            switch (status) {
+                case 'RUNNING':
+                case 'LOCK':
+                case 'UNLOCK':
+                    let progress = modelRunnningProgress.value + Math.random() * 8
+                    modelRunnningProgress.value = clamp(progress, 0, 98)
+
+                    break
+                case 'COMPLETE':
+                    clearInterval(interval)
+                    modelRunnningProgress.value = 100
+                    const result = await axios.get(
+                        `/model/taskNode/result/id?taskId=${TASK_ID}`,
+                    )
+                    console.log('result', result.data)
+
+                    const modelResult = await resultParse(result.data)
+                    console.log('parsed result', modelResult)
+                    riskModelFinalResultNumber.value =
+                        parseFloat(modelResult.riskModelNumber).toFixed(3)
+                    riskModelFinalResultStatus.value =
+                        modelResult.riskLevelDescription
+
+                    drawChartFromResult(modelResult)
+
+                    modelStatus.value = 3
+                    ElNotification({
+                        type: 'success',
+                        message: '计算成功',
+                        offset: 140,
+                        position: 'top-left',
+                    })
+                    break
+                // case 'UNLOCK':
+                //     clearInterval(interval)
+                //     modelRunnningProgress.value = 0
+                //     ElMessage({
+                //         message: '运行失败 ' + err.data,
+                //         type: 'error',
+                //         offset: 140,
+                //     })
+                //     break
+                case 'ERROR':
+                    clearInterval(interval)
+                    modelRunnningProgress.value = 0
+                    const err = await axios.get(
+                        `/model/taskNode/result/id?taskId=${TASK_ID}`,
+                    )
+                    console.log('err result', err)
+                    modelStatus.value = 4
+                    ElMessage({
+                        message: '运行失败 ' + err.data['error-log'],
+                        type: 'error',
+                        offset: 140,
+                    })
+                    break
+                default:
+                    break
+            }
+        }, 1000)
+    }
+
+    rrr()
+}
+const modelParamsCheck = () => {
+    let flag = true
+    const weightandthreshold = getThresholdParams()
+    const weights = {
+        wRE: weightandthreshold['wRE'],
+        wNM: weightandthreshold['wNM'],
+        wGE: weightandthreshold['wGE'],
+        wRL: weightandthreshold['wRL'],
+    }
+    const weightsNameDict = {
+        "wRE": "河床演变指标",
+        "wNM": "水流动力指标",
+        "wGE": "地质工程指标",
+        "wRL": "一级指标"
+    }
+    for (let key in weights) {
+        let _3weight = weights[key]
+        if (_3weight[0] + _3weight[1] + _3weight[2] !== 1) {
+            ElMessage.error({
+                offset: 140,
+                message: `权重总和不为1，请重置${weightsNameDict[key]}权重`,
+            })
+            flag = false
+            break
+        }
+    }
+    return flag
+}
+
+
+const runModelClickHandler = async () => {
+    console.log('runModelClickHandler')
+    switch (modelStatus.value) {
+        case 0:
+            ElMessage({
+                message: '请先完成参数配置',
+                type: 'warning',
+                offset: 140,
+            })
+            break
+        case 2:
+            ElMessage({
+                message: '模型运行中，请勿重复操作',
+                type: 'warning',
+                offset: 140,
+            })
+            break
+        case 1:
+        case 3:
+        case 4:
+            if (modelParamsCheck()) {
+                riskModelFinalResultNumber.value = null
+                riskModelFinalResultStatus.value = null
+                drawChartBase()
+                ElMessage({
+                    message: '运行模型', offset: 140,
+                })
+                modelStatus.value = 2
+                run()
+            }
+            break
+        default:
+            break
+    }
+}
+
+///////////// 权重图
+const weightChartRef = ref(null)
+let weightChartIns = null
+const drawWeightChart = (thresholdFormData) => {
+    console.log(thresholdFormData)
+    let option = {
+        tooltip: {},
+        title: {
+            text: '风险预警模型指标权重饼图',
+            left: 'center',
+            top: 20,
+            textStyle: {
+                color: '#00367c',
+                fontSize: 22,
+                fontWeight: 'bold',
+            },
+        },
+        series: [
+            {
+                name: '一级指标权重',
+                type: 'pie',
+                selectedMode: 'single',
+                center: ['50%', '90%'],
+                radius: [0, '70%'],
+                startAngle: 180,
+                endAngle: 360,
+                label: {
+                    position: 'inner',
+                    fontSize: 14,
+                },
+                labelLine: {
+                    show: false,
+                },
+                data: [
+                    { value: thresholdFormData['wRL'][0], name: '水流动力' },
+                    { value: thresholdFormData['wRL'][1], name: '河床演变' },
+                    { value: thresholdFormData['wRL'][2], name: '地质工程' },
+                ],
+            },
+            {
+                name: '指标权重',
+                type: 'pie',
+                center: ['50%', '90%'],
+                radius: ['85%', '110%'],
+                startAngle: 180,
+                endAngle: 360,
+                labelLine: {
+                    length: 30,
+                },
+                data: [
+                    {
+                        value: thresholdFormData['wNM'][0],
+                        name: '抗冲流速指标',
+                    },
+                    {
+                        value: thresholdFormData['wNM'][1],
+                        name: '造床流量当量',
+                    },
+                    {
+                        value: thresholdFormData['wNM'][2],
+                        name: '水位变幅指标',
+                    },
+                    {
+                        value: thresholdFormData['wRE'][0],
+                        name: '岸坡坡比指标',
+                    },
+                    {
+                        value: thresholdFormData['wRE'][1],
+                        name: '近岸冲刷指标',
+                    },
+                    {
+                        value: thresholdFormData['wRE'][2],
+                        name: '滩槽高差指标',
+                    },
+                    {
+                        value: thresholdFormData['wGE'][0],
+                        name: '土体组成指标',
+                    },
+                    {
+                        value: thresholdFormData['wGE'][1],
+                        name: '岸坡防护指标',
+                    },
+                    {
+                        value: thresholdFormData['wGE'][2],
+                        name: '荷载控制指标',
+                    },
+                ],
+            },
+        ],
+    }
+    weightChartIns.setOption(option)
+}
+
+/////////////// 雷达图
+const chartRef = ref(null)
+let chartIns = null
+const baseIndicators = ['Zb', 'Sa', 'Ln', 'PQ', 'Ky', 'Zd', 'Dsed', 'PL', 'LC']
+const IndicatorNameMap = {
+    Zb: '滩槽高差指标',
+    Sa: '岸坡坡比指标',
+    Ln: '近岸冲刷指标',
+
+    PQ: '造床流量指标',
+    Ky: '抗冲流速指标',
+    Zd: '水位变幅指标',
+
+    Dsed: '土体组成指标',
+    PL: '岸坡防护指标',
+    LC: '荷载控制指标',
+}
+
+const drawChartBase = () => {
+    chartIns.clear()
+    let basicOption = {
+        title: {
+            text: '风险预警模型结果',
+            left: 'center',
+            top: 15,
+            textStyle: {
+                color: '#00367c',
+                fontSize: 22,
+            },
+        },
+        // legend: {},
+        tooltip: {
+            formatter: function (params) {
+                const riskLevels = {
+                    0.25: '低风险',
+                    0.5: '较低风险',
+                    0.75: '较高风险',
+                    1: '高风险'
+                };
+                let riskText = '';
+                params.value.forEach((value, index) => {
+                    const indicatorName = Object.values(IndicatorNameMap)[index];
+                    const riskLevel = riskLevels[parseFloat(value.toFixed(2))];
+                    const indicatorValue = subIndicatorResult[Object.keys(IndicatorNameMap)[index]]
+                    riskText += `【${indicatorName}(${Object.keys(IndicatorNameMap)[index]})】--- ${riskLevel} --- ${indicatorValue}<br/>`;
+                });
+                // return `${params.seriesName}<br/>${riskText}`;
+                return `${riskText}`;
+            }
+        },
+        radar: {
+            indicator: baseIndicators.map((name) => ({
+                name: IndicatorNameMap[name],
+                max: 1,
+            })),
+            radius: 110,
+            startAngle: 90,
+            center: ['50%', '55%'],
+            splitNumber: 4,
+            // shape: 'circle',
+            axisName: {
+                formatter: '【{value}】',
+                color: '#00478d',
+            },
+            splitArea: {
+                areaStyle: {
+                    shadowColor: 'rgba(110, 190, 255, 0.89)',
+                    shadowBlur: 10,
+                },
+            },
+            axisLine: {
+                lineStyle: {
+                    color: 'rgba(211, 236, 253, 0.8)',
+                },
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(211, 253, 250, 0.8)',
+                },
+            },
+        },
+    }
+    chartIns.setOption(basicOption)
+    window.addEventListener('resize', function () {
+        chartIns.resize()
+    })
+}
+
+const drawChartFromResult = (result) => {
+    let radarValues = []
+    const valuerMap = {
+        低风险: 0.25,
+        较低风险: 0.5,
+        较高风险: 0.75,
+        高风险: 1.0,
+    }
+    //// temp
+    // radarValues = [0.5, 0.5, 0.75, 0.25, 0.5, 0.75, 0.75, 0.5, 0.5]
+    for (let i = 0; i < baseIndicators.length; i++) {
+        const indicator = baseIndicators[i]
+        radarValues[i] = valuerMap[result[indicator]]
+    }
+
+    const centerColorMap = {
+        低风险: '#00ff88',
+        较低风险: '#91ff00',
+        较高风险: '#FFA500',
+        高风险: '#FF0000',
+    }
+    let centerColor = centerColorMap[result.riskLevelDescription]
+
+    let addedOption = {
+        series: [
+            {
+                name: '多指标风险预警结果',
+                type: 'radar',
+                data: [
+                    {
+                        value: radarValues,
+                        areaStyle: {
+                            color: new echarts.graphic.RadialGradient(
+                                0.5,
+                                0.5,
+                                0.5,
+                                [
+                                    {
+                                        color: centerColor + '99',
+                                        offset: 0,
+                                    },
+                                    {
+                                        color: centerColor + 'FF',
+                                        offset: 1,
+                                    },
+                                ],
+                            ),
+                        },
+                    },
+                ],
+            },
+        ],
+    }
+    chartIns.setOption(addedOption)
+}
+
+////////////// life cycle
+onMounted(() => {
+    weightChartIns = echarts.init(weightChartRef.value)
+    chartIns = echarts.init(chartRef.value)
+    nextTick(() => {
+        // console.log(thresholdFormRef.value.thresholdParmas)
+        drawChartBase()
+        watch(thresholdFormRef.value.thresholdParmas, (newval) => {
+            debounce(() => {
+                drawWeightChart(newval)
+            })()
+        })
+    })
+})
+onUnmounted(() => { })
+
+///////////// tools
+let timeoutId = null
+function debounce(fn, delay = 2000) {
+    return function (...args) {
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => {
+            fn.apply(this, args)
+        }, delay)
+    }
+}
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max)
+}
+function isGeoJSONFeature(json) {
+    // 检查是否为对象
+    if (typeof json !== 'object' || json === null) {
+        return false
+    }
+
+    // 检查必要的属性
+    return (
+        json.type === 'Feature' &&
+        typeof json.geometry === 'object' &&
+        json.geometry.type === 'LineString' &&
+        json.geometry.coordinates.length > 1
+    )
+}
+</script>
+
+<style lang="scss" scoped>
+div.flex-coloum {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    &.evenly {
+        justify-content: space-evenly;
+        align-items: center;
+    }
+}
+
+div.flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    &.between {
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+div.one-center {
+    position: relative;
+    display: grid;
+    place-items: center;
+}
+
+div.pannel {
+    position: relative;
+    width: 98%;
+    height: 97%;
+    border-radius: 3px;
+
+    &.parameters {}
+
+    &.weights {}
+
+    &.results {}
+
+    .title {
+        position: relative;
+        width: 100%;
+        height: 5vh;
+        line-height: 5vh;
+        background-color: rgb(15, 75, 116);
+        color: white;
+        font-size: calc(0.8vw + 1vh);
+        font-weight: 700;
+    }
+
+    .content {
+        position: relative;
+        width: 100%;
+        height: calc(100% - 5vh);
+        background-color: rgb(217, 237, 255);
+    }
+}
+
+div.parameter-card {
+    position: relative;
+    box-shadow:
+        rgba(0, 72, 131, 0.2) 5px 5px,
+        rgba(0, 72, 131, 0.1) 10px 10px,
+        rgba(0, 72, 131, 0.05) 15px 15px;
+    display: flex;
+    flex-direction: column;
+    width: 18vw;
+    margin: 1vh 1vw;
+
+    .title {
+        position: relative;
+        width: 100%;
+        height: 3.5vh;
+        line-height: 3.5vh;
+        background-color: rgb(39, 113, 161);
+        color: white;
+        font-size: calc(0.7vw + 0.8vh);
+        font-weight: 700;
+    }
+
+    .content {
+        position: relative;
+        width: 100%;
+        flex-grow: 1;
+        background-color: rgb(211, 232, 250);
+
+        div.key-value {
+            padding-top: 0.5vh;
+            padding-left: 1vw;
+            padding-right: 1vw;
+            padding-bottom: 0.5vh;
+            display: flex;
+            flex-direction: row;
+            height: 4vh;
+            justify-content: center;
+            align-items: center;
+
+            div.key {
+                border: none !important;
+                border-right: 2px solid rgb(2, 143, 199) !important;
+                border-bottom: 1px solid rgb(5, 88, 121) !important;
+                border-radius: 0px;
+                text-align: center;
+                height: 3vh;
+                line-height: 3vh;
+                width: 7vw;
+                background-color: rgb(255, 255, 255);
+
+                padding: 0px 10px;
+                display: grid;
+                place-items: center;
+                font-size: calc(0.6vw + 0.7vh);
+                transition: 0.3s ease-in-out;
+                margin-right: 0.5vw;
+            }
+
+            div.value {
+                div {}
+
+                input {
+                    height: 2.8vh;
+                    width: 4vw;
+
+                    border: none !important;
+                    border-right: 2px solid rgb(2, 143, 199) !important;
+                    border-bottom: 1px solid rgb(5, 88, 121) !important;
+                    border-radius: 5px;
+                    text-align: center;
+                    background-color: rgb(170, 224, 255);
+
+                    display: grid;
+                    place-items: center;
+                    font-size: calc(0.6vw + 0.45vh);
+                    transition: 0.3s ease-in-out;
+
+                    // &:hover {
+                    //     background-color: rgb(44, 61, 212);
+                    //     color: white;
+                    //     font-weight: bold;
+                    // }
+                    &:focus {
+                        background-color: rgb(0, 162, 236);
+                        color: white;
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+
+        div.button {
+            width: 6vw;
+            height: 3.8vh;
+            border-right: 2px solid rgb(2, 143, 199);
+            border-bottom: 3px solid rgb(87, 179, 216);
+            border-left: 2px solid rgb(1, 165, 230);
+            border-radius: 3px;
+            transition: 0.1s ease-in-out;
+            cursor: pointer;
+            font-size: calc(0.6vw + 0.6vh);
+            font-weight: 700;
+
+            color: rgb(23, 87, 112);
+            text-shadow: 0px 0px 5px #b4f1f1;
+            background-color: #b8e9ff;
+
+            margin: 1vh 1vw;
+
+            &:hover {
+                color: rgb(19, 69, 88);
+                background-color: #dff5ff;
+            }
+        }
+    }
+}
+
+.keyValue {
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    width: 10vw;
+    height: 10vh;
+
+    .key {
+        height: 4vh;
+        width: 8vw;
+        display: grid;
+        place-items: center;
+        font-size: calc(0.6vw + 0.7vh);
+        transition: 0.3s ease-in-out;
+        border-right: 2px solid rgb(2, 143, 199);
+        border-bottom: 1px solid rgb(5, 88, 121);
+        border-radius: 5px;
+        background-color: rgb(61, 143, 225);
+        font-weight: bold;
+        color: white;
+    }
+
+    .value {
+        position: relative;
+        height: 4vh;
+        width: 8vw;
+        // flex: 1;
+        // border: 1px solid rgb(201, 201, 201);
+        border: none !important;
+        border-right: 2px solid rgb(2, 143, 199) !important;
+        border-bottom: 1px solid rgb(5, 88, 121) !important;
+        border-radius: 5px;
+        text-align: center;
+        display: grid;
+        place-items: center;
+        font-size: calc(0.6vw + 0.5vh);
+        transition: 0.3s ease-in-out;
+        color: rgb(35, 41, 90);
+        background-color: #ffffff;
+
+        font-weight: 800;
+        font-size: calc(0.6vw + 0.6vh);
+    }
+}
+
+.risk-warning-3 {
+    position: relative;
+    width: 100vw;
+    height: 92vh;
+    background: linear-gradient(90deg, rgb(91, 219, 209), rgb(35, 119, 247));
+    user-select: none;
+
+    .main {
+        position: relative;
+        width: 100vw;
+        height: 87vh;
+
+        .left-container {
+            position: relative;
+            width: 23vw;
+            height: 88vh;
+        }
+
+        .middle-container {
+            position: relative;
+            width: 52vw;
+            height: 88vh;
+        }
+
+        .right-container {
+            position: relative;
+            width: 25vw;
+            height: 88vh;
+
+            .pannel {
+                .content {
+                    div.top-block {
+                        position: relative;
+                        width: 100%;
+                        height: 30%;
+
+                        .status {
+                            font-size: calc(0.6vw + 0.7vh);
+                            font-weight: 700;
+                            padding: 0.6vh 0.5vw;
+                            margin-right: 0.3vw;
+                            font-size: calc(0.6vw + 0.7vh);
+                            border-radius: 5px;
+                            color: rgb(228, 247, 255);
+                            background-color: rgb(41, 113, 157);
+                        }
+
+                        .statustext {
+                            padding: 0.6vh 0.5vw;
+                            font-weight: 400;
+                            font-size: calc(0.6vw + 0.7vh);
+                            border-radius: 5px;
+                            color: rgb(41, 113, 157);
+                            background-color: rgb(234, 246, 253);
+                            border-right: 2px solid rgb(2, 143, 199);
+                            border-bottom: 1px solid rgb(5, 88, 121);
+                            transition: 0.3s ease-in-out;
+
+                            &.ready {
+                                color: rgb(68, 159, 251);
+                                background-color: rgb(236, 245, 254);
+                            }
+
+                            &.running {
+                                color: rgb(230, 162, 71);
+                                background-color: rgb(253, 246, 237);
+                            }
+
+                            &.success {
+                                color: rgb(99, 194, 70);
+                                background-color: rgb(240, 249, 236);
+                            }
+
+                            &.error {
+                                color: rgb(255, 81, 83);
+                                background-color: rgb(254, 240, 240);
+                            }
+                        }
+                    }
+
+                    div.bottom-block {
+                        position: relative;
+                        width: 100%;
+                        height: 70%;
+                    }
+
+                    div.card {
+                        margin: 1vh 0.5vw;
+                        position: relative;
+                        border-radius: 3px;
+                        box-shadow:
+                            rgba(0, 72, 131, 0.2) 5px 5px,
+                            rgba(0, 72, 131, 0.1) 10px 10px,
+                            rgba(0, 72, 131, 0.05) 15px 15px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+
+                        div.title {
+                            position: relative;
+                            font-size: calc(0.6vw + 0.8vh);
+                            width: 100%;
+                            height: 3.8vh;
+                            line-height: 3.8vh;
+                            background-color: rgb(40, 113, 159);
+                            color: white;
+                            font-size: calc(0.7vw + 0.8vh);
+                            font-weight: 700;
+                        }
+
+                        div.content {
+                            position: relative;
+                            width: 100%;
+                            height: calc(100% - 3vh);
+                            background-color: rgb(183, 215, 245);
+
+                            div.button {
+                                border-right: 2px solid rgb(2, 143, 199);
+                                border-bottom: 3px solid rgb(87, 179, 216);
+                                border-left: 2px solid rgb(1, 165, 230);
+                                border-radius: 3px;
+                                transition: 0.1s ease-in-out;
+                                cursor: pointer;
+                                font-size: calc(0.6vw + 0.6vh);
+                                font-weight: 700;
+
+                                color: rgb(23, 87, 112);
+                                text-shadow: 0px 0px 5px #b4f1f1;
+                                background-color: #b8e9ff;
+
+                                margin: 1vh 1vw;
+                                margin-right: 0.5vw;
+
+                                &:hover {
+                                    color: rgb(19, 69, 88);
+                                    background-color: #dff5ff;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+div.main-content {
+    position: relative;
+    width: 40vw;
+    height: 50vh;
+    background-color: red;
+
+    div.map-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: hsl(194, 69%, 91%);
+    }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+</style>

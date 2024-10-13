@@ -22,9 +22,13 @@ export class bankRiskWarn {
     }
 
     static getProfileData = (before, now, profileId) => {
+        // console.log(before, now, profileId)
+        // const url = profileId < 10 ?
+        //     `/api/fileData/json/jsonStr/name/multiWholeRes-JC0${profileId}_beg${before}_end${now}/newest` :
+        //     `/api/fileData/json/jsonStr/name/multiWholeRes-JC${profileId}_beg${before}_end${now}/newest`;
         const url = profileId < 10 ?
-            `/api/fileData/json/jsonStr/name/multiWholeRes-JC0${profileId}_beg${before}_end${now}/newest` :
-            `/api/fileData/json/jsonStr/name/multiWholeRes-JC${profileId}_beg${before}_end${now}/newest`;
+            `/bankRiskWarnStaticJson/fixedSection-JC0${profileId}_beg${before}_end${now}.json` :
+            `/bankRiskWarnStaticJson/fixedSection-JC${profileId}_beg${before}_end${now}.json`;
         return axios.get(url)
     }
 
