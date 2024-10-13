@@ -548,7 +548,6 @@ const viewChangeClick = (value) => {
             deviceOnClick,
         )
         threeDLoading.value = true
-        console.log('pickUp')
         const script = document.createElement('script')
         script.src =
             '/scratchSomething/unity/collapseBank/build/output.loader.js'
@@ -559,13 +558,13 @@ const viewChangeClick = (value) => {
             unityLayer = new customLayers.UnityLayer(
                 [120.556596, 32.042607],
                 0,
-                unityCanvaDom.value,
+                () => {
+                    console.log('!!!!!!! unity loaded !!!!!!!!')
+                    threeDLoading.value = false
+                    createCompIns()
+                }
             )
             map.addLayer(unityLayer)
-            setTimeout(() => {
-                threeDLoading.value = false
-                createCompIns()
-            }, 10000)
             // map.addLayer(maskLayer)
         }
     }
@@ -661,7 +660,7 @@ watch(
 // 岸段切换
 onBeforeRouteUpdate((to, from) => {
 
- 
+
     useBankNameStore().globalBankName = to.params.id
     if (to.params.id === 'Mzs') {
         showVedio.value = true

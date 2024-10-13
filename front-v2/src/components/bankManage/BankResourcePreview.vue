@@ -2,6 +2,11 @@
     <div class="bank-resouce-create-container" v-loading="loading">
         <div class="main-title">岸段管理</div>
         <div class="desc-box-container">
+            <div class="change-button-container delete" v-show="bank.bankEnName != 'Mzs'">
+                <div class="change-button delete" v-if="!changeStatus" @click="deleteBank">
+                    删除
+                </div>
+            </div>
             <div class="title-container">岸段基本信息</div>
             <div class="change-button-container">
                 <div class="change-button" v-if="!changeStatus" @click="startModify">
@@ -130,7 +135,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, toRaw, watch, computed } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router';
+import { useRoute, onBeforeRouteUpdate, useRouter } from 'vue-router';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue'
@@ -145,6 +150,7 @@ import UpdateDialog from './UpdateDialog.vue'
 const warnLevelList = ["I 级预警岸段", "Ⅱ 级预警岸段", "Ⅲ 级预警岸段"]
 
 const route = useRoute();
+const router = useRouter();
 onBeforeRouteUpdate(async (to, from) => {
     const toBankEnName = to.params.id
     initOneBank(toBankEnName)
@@ -171,22 +177,62 @@ let originalBank = {
     bankEnName: ''
 }
 const startModify = () => {
-    console.log('进入修改状态')
+    // console.log('进入修改状态')
     changeStatus.value = true
     originalBankBasicInfo = bankBasicInfo.value.map(item => ({ ...item })) // deep copy
     originalBank.name = bank.name
     originalBank.bankEnName = bank.bankEnName
 }
 const cancelModify = () => {
-    console.log('退出修改状态')
+    // console.log('退出修改状态')
     changeStatus.value = false
     bankBasicInfo.value = originalBankBasicInfo // 手动退出，恢复原值
     bank.name = originalBank.name
     bank.bankEnName = originalBank.bankEnName
 }
+const deleteBank = () => {
+    ElMessageBox.confirm(
+        '确认删除该岸段？',
+        '警告',
+        {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(async () => {
+
+        BankResourceHelper.deleteBank(bank.bankEnName).then(res => {
+            const deleteMsg = res.data
+            ElMessage.success({
+                'offset': 100,
+                'message': deleteMsg
+            })
+            //删除岸段后回退到mzs，mzs不可删除
+            emit('refresh-bank-list', true)
+            router.push('/bankManage/preview/Mzs')
+        }).catch(_ => {
+            console.log(_)
+            ElMessage.error({
+                'offset': 100,
+                'message': '删除失败'
+            })
+        })
+
+    }).catch(_ => {
+        ElMessage.info({
+            'offset': 100,
+            'message': '取消删除'
+        })
+    })
+
+
+
+
+}
+
 
 const commitModify = () => {
-    console.log('提交修改')
+    // console.log('提交修改')
     ElMessageBox.confirm(
         '确认修改岸段信息？',
         '提示',
@@ -220,7 +266,7 @@ const commitModify = () => {
             "riskLevel": nowBasicInfo[0].val,
             "center": parseLonLat(nowBasicInfo[1].val),
             "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val.toISOString(),
+            "monitorStartTime": nowBasicInfo[3].val,
             "introduction": nowBasicInfo[4].val,
             "management": {
                 "department": nowBasicInfo[5].val,
@@ -235,7 +281,7 @@ const commitModify = () => {
         })
         changeStatus.value = false
     }).catch(_ => {
-        console.log('取消修改');
+        console.log('取消修改', _);
         bankBasicInfo.value = originalBankBasicInfo // 恢复原值
         bank.name = originalBank.name
         bank.bankEnName = originalBank.bankEnName
@@ -663,6 +709,11 @@ div.bank-resouce-create-container {
             font-weight: bold;
             font-size: calc(0.8vw + 0.4vh);
 
+            &.delete {
+                right: auto;
+                left: 2.5vw;
+            }
+
             div.change-button {
                 width: 8vw;
                 height: 4vh;
@@ -690,6 +741,25 @@ div.bank-resouce-create-container {
                         rgba(0, 119, 255, 0.7) 2px 2px,
                         rgba(0, 119, 255, 0.6) 3px 3px,
                         rgba(0, 119, 255, 0.4) 4px 4px;
+                }
+
+                &.delete {
+                    background-color: #ffc9b4;
+                    box-shadow:
+                        rgba(255, 165, 81, 0.8) 1px 1px,
+                        rgba(255, 165, 81, 0.7) 2px 2px,
+                        rgba(255, 165, 81, 0.6) 3px 3px;
+
+                    &:hover {
+                        cursor: pointer;
+                        transform: translate3d(2px, 2px, 2px);
+                        color: #722f02;
+                        box-shadow:
+                            rgba(255, 165, 81, 0.8) 1px 1px,
+                            rgba(255, 165, 81, 0.7) 2px 2px,
+                            rgba(255, 165, 81, 0.6) 3px 3px,
+                            rgba(255, 165, 81, 0.4) 4px 4px;
+                    }
                 }
             }
 
