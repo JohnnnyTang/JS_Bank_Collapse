@@ -2,7 +2,7 @@
     <div class="bank-resouce-create-container" v-loading="loading">
         <div class="main-title">岸段管理</div>
         <div class="desc-box-container">
-            <div class="change-button-container delete" v-show="bank.bankEnName != 'Mzs'">
+            <div class="change-button-container delete" v-show="bank.bankEnName != 'Mzs' && bank.bankEnName != ''">
                 <div class="change-button delete" v-if="!changeStatus" @click="deleteBank">
                     删除
                 </div>
@@ -48,6 +48,20 @@
                             </el-select>
                             <el-date-picker v-else-if="item.key === '监测起始时间'" v-model="item.val" type="date"
                                 placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
+                            <div v-else-if="item.key === '中心坐标'" class="full">
+                                <el-input v-model="lnglat.lng" style="
+                                        width: 50%;
+                                        height: 100%;
+                                        font-size: calc(0.6vw + 0.6vh);
+                                    " placeholder="请输入经度" type="number" :step="0.0000001"
+                                    :autosize="{ minRows: 4, maxRows: 6 }" />
+                                <el-input v-model="lnglat.lat" style="
+                                            width: 50%;
+                                            height: 100%;
+                                            font-size: calc(0.6vw + 0.6vh);
+                                        " placeholder="请输入纬度" type="number" :step="0.0000001"
+                                    :autosize="{ minRows: 4, maxRows: 6 }" />
+                            </div>
                             <el-input v-else v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
@@ -58,6 +72,7 @@
                                 " :autosize="{ minRows: 4, maxRows: 6 }" />
                         </div>
                         <!-- <div class="detail-val" v-else>{{ item.val }}</div> -->
+
                         <div class="detail-val" v-else>{{
                             // item.key === '监测起始时间' ? item.val.slice(0, 10) : item.val
                             item.key === '监测起始时间' && item.val ? item.val.slice(0, 10) : item.val
@@ -153,6 +168,7 @@ const route = useRoute();
 const router = useRouter();
 onBeforeRouteUpdate(async (to, from) => {
     const toBankEnName = to.params.id
+    changeStatus.value = false
     initOneBank(toBankEnName)
 })
 const emit = defineEmits(['refresh-bank-list'])
@@ -168,7 +184,10 @@ const bank = reactive({
     name: '',
     bankEnName: ''
 })
-
+const lnglat = reactive({
+    lng: '',
+    lat: ''
+})
 const bankBasicInfo = ref()
 const changeStatus = ref(false)
 let originalBankBasicInfo = null
@@ -178,6 +197,11 @@ let originalBank = {
 }
 const startModify = () => {
     // console.log('进入修改状态')
+    let center = typeof bankBasicInfo.value[1].val === 'string' ? JSON.parse(bankBasicInfo.value[1].val) : bankBasicInfo.value[1].val
+    lnglat.lng = center[0]
+    lnglat.lat = center[1]
+    console.log('lnglat', lnglat)
+
     changeStatus.value = true
     originalBankBasicInfo = bankBasicInfo.value.map(item => ({ ...item })) // deep copy
     originalBank.name = bank.name
@@ -242,29 +266,14 @@ const commitModify = () => {
             type: 'info',
         }
     ).then(async () => {
-        const parseLonLat = (inputStr) => {
-            const coordinates = inputStr.slice(1, -1).split(',');
-            const longitude = parseFloat(coordinates[0]);
-            const latitude = parseFloat(coordinates[1]);
-            return [longitude, latitude]
-        }
+
         let nowBasicInfo = bankBasicInfo.value
-        // let ReqBody = {
-        //     "bank": bank.bankEnName,
-        //     "name": bank.name,
-        //     "riskLevel": nowBasicInfo[0].val,
-        //     "center": parseLonLat(nowBasicInfo[1].val),
-        //     "introduction": nowBasicInfo[2].val,
-        //     "management": {
-        //         "department": nowBasicInfo[3].val,
-        //         "contact": nowBasicInfo[4].val,
-        //     }
-        // }
+        let center = [parseFloat(lnglat.lng), parseFloat(lnglat.lat)]
         let ReqBody = {
             "bank": bank.bankEnName,
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
-            "center": parseLonLat(nowBasicInfo[1].val),
+            "center": center,
             "monitorLength": nowBasicInfo[2].val,
             "monitorStartTime": nowBasicInfo[3].val,
             "introduction": nowBasicInfo[4].val,
@@ -279,6 +288,11 @@ const commitModify = () => {
             'title': updateMsg,
             'offset': 120
         })
+
+        const _thisBankBasicInfo = (await BankResourceHelper.getOneBankBasicInfo(bank.bankEnName)).data
+        console.log('true!!')
+        bank.name = _thisBankBasicInfo.name
+        bankBasicInfo.value = getBankBasic_Style_Info(_thisBankBasicInfo)
         changeStatus.value = false
     }).catch(_ => {
         console.log('取消修改', _);
@@ -1033,6 +1047,11 @@ div.bank-resouce-create-container {
     }
 }
 
+div.full {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
 
 :deep(.el-select) {
 
@@ -1045,5 +1064,18 @@ div.bank-resouce-create-container {
         height: inherit;
         line-height: inherit;
     }
+}
+
+:deep(.el-input__inner[type=number]) {
+
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    -moz-appearance: textfield;
 }
 </style>
