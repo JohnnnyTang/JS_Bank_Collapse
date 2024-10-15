@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.IManometerInfoRepo">
+    <resultMap id="manometerMap" type="com.johnny.bank.model.resource.dataResource.base.DetailMonitorInfo">
+        <result property="code" column="machine_id_nnu"/>
+        <result property="machineId" column="machine_id"/>
+        <result property="stationCode" column="station_id"/>
+        <result property="operateTime" column="in_time"/>
+        <result property="operateUser" column="in_operator"/>
+        <result property="operateFlag" column="data_v"/>
+        <result property="operateDesc" column="notes"/>
+        <result property="pointNum" column="point_num"/>
+        <result property="point1Depth" column="point1_depth"/>
+        <result property="point2Depth" column="point2_depth"/>
+        <result property="point3Depth" column="point3_depth"/>
+        <result property="point4Depth" column="point4_depth"/>
+        <result property="point5Depth" column="point5_depth"/>
+        <result property="point6Depth" column="point6_depth"/>
+    </resultMap>
+    <select id="findAll" resultMap="manometerMap">
+        SELECT * FROM manometer_info;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM manometer_info;
+    </select>
+
+    <select id="findById" resultMap="manometerMap">
+        SELECT * FROM manometer_info WHERE machine_id_nnu = #{id};
+    </select>
+
+    <select id="findByIdList" resultMap="manometerMap">
+        SELECT * FROM manometer_info WHERE machine_id_nnu IN #{ids};
+    </select>
+
+    <select id="findByCode" resultMap="manometerMap">
+        SELECT * FROM manometer_info WHERE machine_id_nnu = #{deviceCode};
+    </select>
+
+    <select id="findByCodeList" resultMap="manometerMap">
+        SELECT * FROM manometer_info WHERE machine_id_nnu IN #{deviceCodeList};
+    </select>
+
+    <select id="findByStationCode" resultMap="manometerMap">
+        SELECT * FROM manometer_info WHERE station_id = #{stationCode};
+    </select>
+
+    <select id="findByStationCodeList" resultMap="manometerMap">
+        SELECT * FROM manometer_info WHERE station_id IN #{stationCodeList};
+    </select>
+
+    <select id="findNewestData" resultMap="manometerMap">
+        SELECT * FROM manometer_info ORDER BY in_time DESC LIMIT 1;
+    </select>
+
+    <select id="findNewestDeviceInStation" resultMap="manometerMap">
+        SELECT * FROM manometer_info WHERE station_id = #{stationCode} ORDER BY begin_time DESC LIMIT 1;
+    </select>
+
+</mapper>

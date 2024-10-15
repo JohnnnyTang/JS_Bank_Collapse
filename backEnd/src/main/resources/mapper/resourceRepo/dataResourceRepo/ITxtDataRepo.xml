@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.dataResourceRepo.ITxtDataRepo">
+    <resultMap id="TxtMap" type="com.johnny.bank.model.resource.dataResource.TxtData">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="path" column="path"/>
+        <result property="createTime" column="createtime"/>
+        <result property="updateTime" column="updatetime"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="TxtMap">
+        SELECT * FROM txtdata;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        SELECT COUNT(*) FROM txtdata;
+    </select>
+
+    <select id="findById" resultMap="TxtMap">
+        SELECT * FROM txtdata WHERE id = #{id};
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM txtdata WHERE id = #{id};
+    </delete>
+
+    <insert id="insertData" parameterType="com.johnny.bank.model.resource.dataResource.TxtData" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO txtdata (name, type, path, createtime, updatetime)
+        VALUES (#{name}, #{type}, #{path}, #{createTime}, #{updateTime});
+    </insert>
+
+    <select id="findByIdList" resultMap="TxtMap">
+        SELECT * FROM txtdata WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id, jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+</mapper>

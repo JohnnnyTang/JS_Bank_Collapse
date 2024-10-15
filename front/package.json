@@ -1,0 +1,41 @@
+{
+  "name": "node-tree",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ssthouse/vue3-tree-chart": "^0.2.6",
+    "axios": "^1.6.5",
+    "clipboard": "^2.0.11",
+    "echarts": "^5.4.3",
+    "element-plus": "^2.5.0",
+    "file-saver": "^2.0.5",
+    "mapbox-gl": "^3.1.0",
+    "prettier": "^3.2.4",
+    "sass": "^1.69.5",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "vue": "^3.3.11",
+    "vue-router": "^4.2.5",
+    "vue3-json-viewer": "^2.2.2",
+
+    "@turf/turf": "^6.5.0",
+    "@vitejs/plugin-basic-ssl": "^1.1.0",
+    "@webgpu/types": "^0.1.40",
+    "dat.gui": "^0.7.9",
+    "earcut": "^2.2.4",
+    "gl-matrix": "^3.4.3",
+    "libtess": "^1.2.2",
+    "three": "^0.160.0"
+    
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.5.2",
+    "vite": "^5.0.8"
+  }
+}

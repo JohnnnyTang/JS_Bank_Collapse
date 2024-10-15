@@ -1,0 +1,53 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: bank
+      authentication-database: admin
+      uri: mongodb://localhost:27017/bank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+    default:
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: 123456
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+multiIndex:
+  condaEnv: bankModel
+  dataPath: H:\data\bank\images\dataFolders\back\data\modelData
+  wholeDataPath: H:\data\bank\images\dataFolders\back\data\dataWhole
+  resPath: H:\data\bank\images\dataFolders\back\data\modelRes
+
+tile:
+  mzsTilePath: H:/data/bank/images/dataFolders/back/data/bank_collapse/rasterTIle/
+  worldTilePath: H:/data/bank/images/dataFolders/back/data/bank_collapse/baseMap
+  nodeServicePath: H:/data/bank/images/dataFolders/back/data/node/index.js
+  riverTilePath: H:/data/bank/images/dataFolders/back/data/bank_collapse/riverRasterTile/
+  riverImagePath: H:/data/bank/images/dataFolders/back/data/bank_collapse/imageTiles/tiles/
+  tifTilePath: D:\data\bank_data\tifTile
+
+flowData:
+  texturePath: H:/data/bank/images/dataFolders/back/data/flowData/flowFieldResourceArchive/
+
+modelServer:
+  url: http://172.21.212.216:8000
+  storageLimit: 30
+  caseLimit: 20

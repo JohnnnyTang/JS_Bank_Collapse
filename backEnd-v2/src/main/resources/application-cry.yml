@@ -1,0 +1,74 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: bank
+      authentication-database: admin
+      uri: mongodb://localhost:27017/bank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+    default:
+      database: bank
+      ip: 119.45.198.54;
+      port: 5432;
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: 123456
+    public:
+      database: bank
+      ip: 119.45.198.54;
+      port: 5432;
+      url: jdbc:postgresql://119.45.198.54:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: nhri_admin123456
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+multiIndex:
+  condaEnv: Env1
+  dataPath: E:\Data\bankProjectData\modelData
+  wholeDataPath: E:\Data\bankProjectData\dataWhole
+  resPath: E:\Data\bankProjectData\modelRes\
+
+tile:
+  mzsTilePath: E:/Data/bankProjectData/mzsTile/
+  worldTilePath: E:/Data/bankProjectData/baseMap
+  nodeServicePath: E:/Data/bankProjectData/node/index.js
+  riverTilePath: E:/Data/bankProjectData/riverRasterTile/
+  riverImagePath: E:/Data/bankProjectData/imageTiles/tiles/
+
+staticData:
+  tifTilePath: E:/Data/bankProjectData/staticData/tifTile
+  vectorDataPath: E:/Data/bankProjectData/staticData/vectorData
+  draftDataPath: E:\\Data\\bankProjectData\\staticData\\draftData
+  waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
+
+waterCondition:
+  url: http://10.32.22.202:8001
+
+flowData:
+  texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/
+
+modelServer:
+  url: http://172.21.212.166:8000
+  storageLimit: 50
+  caseLimit: 50
+
+loginFunction: "no"

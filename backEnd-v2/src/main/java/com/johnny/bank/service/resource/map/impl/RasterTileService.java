@@ -1,0 +1,54 @@
+package com.johnny.bank.service.resource.map.impl;
+
+import com.johnny.bank.repository.resourceRepo.MapRepo.IRasterTileRepo;
+import com.johnny.bank.service.resource.map.IRasterTileService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+
+/**
+ * @Author: Johnny Tang
+ * @Date: 2024/3/28
+ * @Description:
+ */
+@Service("RasterTileService")
+public class RasterTileService implements IRasterTileService {
+
+    private final IRasterTileRepo RasterTileRepo;
+
+    @Autowired
+    public RasterTileService(@Qualifier("RasterTileRepo") IRasterTileRepo RasterTileRepo) {
+        this.RasterTileRepo = RasterTileRepo;
+    }
+
+    @Override
+    public byte[] getMXZRasterInByte(String year, String tide, int z, int x, int y) throws Exception {
+        String filePath = year + tide + '/' + z + '/' + x + '/' + y + ".png";
+        return RasterTileRepo.getMXSRasterFile(filePath);
+    }
+
+    public byte[] getRiverRasterInByte(String name, int z, int x, int y) throws Exception {
+        String filePath = name + "-new/" + z + '/' + x + '/' + y + ".png";
+        return RasterTileRepo.getRiverRasterFile(filePath);
+    }
+
+    public byte[] getMzsFloodRasterInByte(String name, int z, int x, int y) throws Exception {
+        String filePath = name + '/' + z + '/' + x + '/' + y + ".png";
+        return RasterTileRepo.getMzsFloodRasterFile(filePath);
+    }
+
+    public byte[] getDEMRasterInByte(String path, int z, int x, int y) throws Exception {
+        y = (int) (Math.pow(2,z) - 1 - y);
+        String filePath = path + '/' + z + '/' + x + '/' + y + ".png";
+        return RasterTileRepo.getDEMRasterFile(filePath);
+    }
+
+    public byte[] getBaseImageInByte(int z, int x, int y) throws Exception {
+//        System.out.println(y);
+        String filePath = (z) + "/" + x + "_" + (y) + ".png";
+//        System.out.println(filePath);
+        return RasterTileRepo.getBaseImageRasterFile(filePath);
+    }
+}

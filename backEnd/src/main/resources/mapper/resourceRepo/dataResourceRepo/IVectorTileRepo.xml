@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.johnny.bank.repository.resourceRepo.MapRepo.IVectorTileRepo">
+    <resultMap id="simpleBboxMap" type="com.johnny.bank.model.common.SimpleBboxInfo">
+        <result property="bbox" column="bbox" jdbcType="ARRAY" typeHandler="com.johnny.bank.config.ArrayTypeHandler"/>
+        <result property="id" column="id"/>
+    </resultMap>
+    <select id="getVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.TileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
+                <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+                    ${field}
+                </foreach>
+                from ${name}
+            ) as result
+    </select>
+
+    <select id="getVectorCenterPtTile" resultType="java.lang.Object"  parameterType="com.johnny.bank.model.common.TileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+            select st_asmvtgeom(ST_PointOnSurface(geom), ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
+            <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+                ${field}
+            </foreach>
+            from ${name}
+        ) as result
+    </select>
+
+    <select id="getVectorGeomCenterPtTile" resultType="java.lang.Object"  parameterType="com.johnny.bank.model.common.TileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+        select st_asmvtgeom(ST_Centroid(geom), ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from ${name}
+        ) as result
+    </select>
+
+    <select id="getContourVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.ContourTileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, height, year, type
+                from mzs_contour
+                where year = #{year} AND type = #{tide}
+            ) as result
+    </select>
+    <select id="getDepthLineVectorTile" resultType="java.lang.Object" parameterType="com.johnny.bank.model.common.DepthLineTileBox">
+        select st_asmvt(result, #{visualId}) tile
+        from(
+                select st_asmvtgeom(geom, ST_Transform(st_makeenvelope(#{xMin,jdbcType=NUMERIC}, #{yMin,jdbcType=NUMERIC}, #{xMax,jdbcType=NUMERIC},#{yMax,jdbcType=NUMERIC}, 4326), 3857), 4096, 0, true) as geom, year
+                from depth_line
+                where year = #{year}
+            ) as result
+    </select>
+
+    <select id="getLayerBasicInfo" resultType="java.util.Map">
+        select
+            ST_X(centroid_geom) as center_x,ST_Y(centroid_geom) as center_Y, if_important,
+            <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+                ${field}
+            </foreach>
+        from (
+            select ST_Transform(ST_Centroid(geom), 4326) as centroid_geom, if_important,
+                <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+                    ${field}
+                </foreach>
+            from ${tableName}
+            order by if_important DESC
+        ) as res
+    </select>
+
+    <select id="getLayerWholeInfo" resultType="java.util.Map">
+        select ST_X(ST_Centroid(geom)) as center_x, ST_Y(ST_Centroid(geom)) as center_Y, ARRAY[ST_XMin(geom), ST_YMin(geom), ST_XMax(geom), ST_YMax(geom)] as bbox, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from (
+        select ST_Transform(geom, 4326) as geom, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from ${tableName}
+        order by if_important DESC
+        ) as res
+    </select>
+
+    <select id="getLayerBboxInfoById" resultType="java.util.Map">
+        select ST_X(ST_Centroid(geom)) as center_x, ST_Y(ST_Centroid(geom)) as center_Y, ARRAY[ST_XMin(geom), ST_YMin(geom), ST_XMax(geom), ST_YMax(geom)] as bbox, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from (
+        select ST_Transform(geom, 4326) as geom, if_important,
+        <foreach collection="fieldList" item="field" open=" " separator="," close=" ">
+            ${field}
+        </foreach>
+        from ${tableName}
+        where id = #{id}
+        ) as res
+    </select>
+
+    <select id="getRiverLinkedLayerWholeInfo" resultType="java.util.Map">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Transform(ST_Buffer(ST_ShortestLine(p.geom, r.geom), 500), 4326) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.if_important = '1'
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(shortest_line),ST_YMin(shortest_line),ST_XMax(shortest_line),ST_YMax(shortest_line)] AS bbox
+        FROM
+            shortest_lines;
+    </select>
+
+    <select id="getRiverLinkedLayerWholeInfoById" resultType="java.util.Map">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Transform(ST_Buffer(ST_ShortestLine(p.geom, r.geom), 500), 4326) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.id = #{id}
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(shortest_line),ST_YMin(shortest_line),ST_XMax(shortest_line),ST_YMax(shortest_line)] AS bbox
+        FROM
+            shortest_lines;
+    </select>
+
+    <select id="getRiverLinkedLayerWholeInfoByIdWithRad" resultMap="simpleBboxMap">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Transform(ST_Buffer(ST_ShortestLine(p.geom, r.geom), ${bufferRad}), 4326) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.id = #{id}
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(shortest_line),ST_YMin(shortest_line),ST_XMax(shortest_line),ST_YMax(shortest_line)] AS bbox
+        FROM
+            shortest_lines;
+    </select>
+
+    <select id="getRiverLayerWholeInfoByIdWithRad" resultMap="simpleBboxMap">
+        WITH changjiang_geom AS (
+            SELECT geom
+            FROM river_area
+            WHERE name = '长江'
+        ),
+             shortest_lines AS (
+                 SELECT
+                     p.id AS id,
+                     ST_Envelope(p.geom) AS river_geom,
+                     ST_ShortestLine(p.geom, r.geom) AS shortest_line
+                 FROM
+                     ${tableName} p,
+                     changjiang_geom r
+                 where p.id = #{id}
+             ),
+             unions AS (
+                 SELECT
+                     id,
+                     river_geom,
+                     shortest_line,
+                     ST_Transform(ST_Buffer(ST_Union(river_geom, shortest_line), 500), 4326) AS union_geom
+                 FROM
+                     shortest_lines
+             )
+        SELECT
+            id,
+            ARRAY[ST_XMin(union_geom),ST_YMin(union_geom),ST_XMax(union_geom),ST_YMax(union_geom)] AS bbox
+        FROM
+            unions;
+    </select>
+
+    <select id="selectSectionLineInfo" resultType="com.johnny.bank.model.resource.dataResource.SectionLineInfo">
+        select id, ST_X(stend.stp) as st_x, ST_Y(stend.stp) as st_x, ST_X(stend.endp) as end_x, ST_Y(stend.endp) as end_x, name, label
+        from (
+            select ST_StartPoint(geom) as stp, ST_EndPoint(geom) as endp, name, label, id
+            from public.mzs_bank_line
+        ) as stend
+    </select>
+
+    <select id="selectSectionLineInfoById" resultType="com.johnny.bank.model.resource.dataResource.SectionLineInfo" parameterType="integer">
+        select id, ST_X(stend.stp) as st_x, ST_Y(stend.stp) as st_y, ST_X(stend.endp) as end_x, ST_Y(stend.endp) as end_y, name, label
+        from (
+             select ST_StartPoint(geom) as stp, ST_EndPoint(geom) as endp, name, label, id
+             from public.mzs_bank_line
+             where id=#{id}
+        ) as stend
+    </select>
+
+    <select id="selectLongSectionLineInfoById" resultType="com.johnny.bank.model.resource.dataResource.SectionLineInfo" parameterType="integer">
+        select id, ST_X(stend.stp) as st_x, ST_Y(stend.stp) as st_y, ST_X(stend.endp) as end_x, ST_Y(stend.endp) as end_y, name, label
+        from (
+                 select ST_StartPoint(geom) as stp, ST_EndPoint(geom) as endp, name, label, id
+                 from public.mzs_bank_line_long
+                 where id=#{id}
+             ) as stend
+    </select>
+
+
+</mapper>

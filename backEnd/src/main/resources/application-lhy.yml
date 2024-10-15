@@ -1,0 +1,65 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: newBank
+      authentication-database: admin
+      uri: mongodb://localhost:27017/newBank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+    default:
+      #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
+      url: jdbc:postgresql://localhost:5432/shore?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: QWERBOOM123
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1275441282@qq.com
+    password: ezuxlysqewrgfhhi
+    from: 1275441282@qq.com
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        debug: true #启动debug调试
+        smtp:
+          ssl:
+            enable: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory #SSL连接配置
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+multiIndex:
+  condaEnv: Env1
+  dataPath: E:\WATER\BankCollapse\backdata\modelData
+  wholeDataPath: E:\WATER\BankCollapse\backdata\dataWhole
+  resPath: E:\WATER\BankCollapse\backdata\modelRes\
+
+tile:
+  mzsTilePath:  E:/WATER/BankCollapse/backdata/rasterTIle/
+  worldTilePath: E:/WATER/offline_map
+  nodeServicePath: E:/WATER/node/index.js
+  riverTilePath: E:/WATER/BankCollapse/backdata/riverRasterTile/
+  riverImagePath: E:/WATER/BankCollapse/backdata/imageTiles/tiles/
+
+flowData:
+  texturePath: D:/UyNauhL/Assignments/flowFieldResourceArchive/
+sms:
+  accessTokenLoc: E:\WATER\AccessKey.json
+  signName: 江苏长江崩岸监测预警系统
+  #  verifyTemplateCode: SMS_465975002
+  verifyTemplateCode: SMS_468300113

@@ -1,0 +1,74 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: bank
+      authentication-database: admin
+      uri: mongodb://localhost:27017/bank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+    default:
+      database: bank
+      ip: 119.45.198.54;
+      port: 5432;
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: 123456
+    public:
+      database: bank
+      ip: 119.45.198.54;
+      port: 5432;
+      url: jdbc:postgresql://119.45.198.54:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: nhri_admin123456
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+multiIndex:
+  condaEnv: Env1
+  dataPath: C:/Project/Bank/data/modelData
+  wholeDataPath: C:/Project/Bank/data/dataWhole
+  resPath: C:/Project/Bank/data/modelRes/
+
+tile:
+  mzsTilePath: C:/Project/Bank/data/bank_collapse/rasterTile/
+  worldTilePath: C:/Project/Bank/data/bank_collapse/baseMap
+  nodeServicePath: C:/Project/Bank/data/node/index.js
+  riverTilePath: C:/Project/Bank/data/bank_collapse/riverRasterTile/
+  riverImagePath: C:/Project/Bank/data/bank_collapse/imageTiles/tiles/
+
+staticData:
+  tifTilePath: C:\Project\Bank\data\staticData\tifTile
+  vectorDataPath: C:\Project\Bank\data\staticData\vectorData
+  draftDataPath: C:\Project\Bank\data\staticData\draftData
+  waterConditionPath: C:\Project\Bank\data\staticData\waterCondition
+
+waterCondition:
+  url: http://10.32.37.88:8821
+
+flowData:
+  texturePath: C:/Project/Bank/data/flowData/flowFieldResourceArchive/
+
+modelServer:
+  url: http://172.21.212.166:8000
+  storageLimit: 50
+  caseLimit: 50
+
+loginFunction: "no"
