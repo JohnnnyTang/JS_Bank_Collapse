@@ -811,7 +811,7 @@ const conditionConfigureDataResetHandler = async () => {
         refDEM: conditionConfigureData.refDEM,
         benchDEM: conditionConfigureData.benchDEM,
     }, {}, {
-        bankEnName: 'Mzs',
+        bankEnName: useBankNameStore().globalBankName,
         setName: 'standard'
     }).then((result) => {
         console.log('runRiskLevelForAll result:', result)

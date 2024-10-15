@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 
 
 export const getRealTimeStationData = async () => {
-    // let stationData = []
     const stationData = (await axios.get('/model/data/bankResource/down/local/resource/waterCondition')).data
 
     let resultData = stationData.map(item => {
