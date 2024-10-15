@@ -1,0 +1,32 @@
+[
+    {
+        "station": "大通站",
+        "flow": "57500",
+        "tide-level": "3.3"
+    },
+    {
+        "station": "南京站",
+        "flow": "57500",
+        "tide-level": "3.3"
+    },
+    {
+        "station": "镇江站",
+        "flow": "57500",
+        "tide-level": "3.3"
+    },
+    {
+        "station": "三江营站",
+        "flow": "57500",
+        "tide-level": "3.3"
+    },
+    {
+        "station": "江阴站",
+        "flow": "57500",
+        "tide-level": "3.3"
+    },
+    {
+        "station": "徐六泾站",
+        "flow": "57500",
+        "tide-level": "3.3"
+    }
+]

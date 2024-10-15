@@ -45,9 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class WaterConditonJob implements Job {
-
-    @Override
-    public void execute(JobExecutionContext jobExecutionContext) {
+    public void execute2(JobExecutionContext jobExecutionContext) {
         JobDataMap dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String waterConditionPath = dataMap.getString("waterConditionPath");
         String waterConditionUrl = dataMap.getString("waterConditionUrl");
@@ -81,6 +79,142 @@ public class WaterConditonJob implements Job {
 //               }
         }
         FileUtil.modifiyFileContent(path, waterConditionJson.toString());
+    }
+
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) {
+        JobDataMap dataMap = jobExecutionContext.getJobDetail().getJobDataMap();
+        String waterConditionPath = dataMap.getString("waterConditionPath");
+        String waterConditionUrl = dataMap.getString("waterConditionUrl");
+        String apiUrl = waterConditionUrl + "/newApi/SL324/getByStsc";
+        final Map<String, List<String>> stationMap = new HashMap<>(Map.of(
+                "datong", List.of("大通站", "60115000"),
+                "nanjing", List.of("南京站", "60116200"),
+                "zhenjiang", List.of("镇江站", "60116601"),
+                "sanjiangying", List.of("三江营站", "60197172"),
+                "jiangyin", List.of("江阴站", "60117000"),
+                "xuliujing", List.of("徐六泾站", "60117400")
+        ));
+        final Map<String, List<String>> tidalRangeStationMap = new HashMap<>(Map.of(
+                "datong", List.of("大通站", "60115000"),
+                "nanjing", List.of("南京站", "60116200"),
+                "zhenjiang", List.of("镇江站", "60116601"),
+                "sanjiangying", List.of("三江营站", "60197172"),
+                "jiangyin", List.of("江阴站", "60117000"),
+                "xuliujing", List.of("徐六泾站", "60117400"),
+                "tianshenggang", List.of("天生港站", "60117200")
+        ));
+        String path = waterConditionPath + File.separator + "water.json";
+        String content = FileUtil.getFileContent(path);
+        JSONArray waterConditionJson = JSONArray.parseArray(content);
+
+        String tidalRangePath = waterConditionPath + File.separator + "tidalRange.json";
+        String tidalRangeContent = FileUtil.getFileContent(tidalRangePath);
+        JSONArray tidalRangeJson = JSONArray.parseArray(tidalRangeContent);
+
+        //请求接口
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("bsnm","长江");
+        requestBody.put("sttps","");
+        requestBody.put("addvcd","");
+        JSONObject responseObj = JSONObject.parseObject(InternetUtil.doPost_waterCondition(apiUrl, requestBody));
+        JSONArray allData = JSONArray.parseArray(responseObj.getString("data"));
+
+        for (int index=0; index < waterConditionJson.size(); index++) {
+            JSONObject stationJson = (JSONObject) waterConditionJson.get(index);
+            String stationName = stationJson.getString("stationName");
+            String stationId = stationMap.get(stationName).get(1);
+
+            Double flow = null;
+            Double tide = null;
+
+            JSONArray stationArray = getStationArray(allData, stationId);
+
+            if (stationArray == null) {
+                flow = null;
+                tide = null;
+            } else {
+                // 填充字段
+                for (int i = 0; i < stationArray.size(); i++) {
+                    JSONObject obj = stationArray.getJSONObject(i);
+                    String sname = obj.getString("sname");
+
+                    // 获取流量
+                    if ("flow".equals(sname)) {
+                        try {
+                            flow = Double.parseDouble(obj.getString("value"));
+                        } catch (Exception e) {}
+                    }
+
+                    // 获取水位
+                    if ("waterLevel".equals(sname) || "tidallevel".equals(sname)) {
+                        try {
+                            tide = Math.round(Double.parseDouble(obj.getString("value")) * 100.0) / 100.0;
+                        } catch (Exception e) {}
+                    }
+                }
+            }
+
+            stationJson.put("flow", flow);
+            stationJson.put("tide-level", tide);
+            waterConditionJson.set(index, stationJson);
+        }
+
+        // 潮差计算
+        for (int index=0; index < tidalRangeJson.size(); index++) {
+            JSONObject stationJson = (JSONObject) tidalRangeJson.get(index);
+            String stationName = stationJson.getString("stationName");
+            String stationId = tidalRangeStationMap.get(stationName).get(1);
+
+            Double highTide = null;
+            Double lowTide = null;
+            Double tidalRange = null;
+
+            JSONArray stationArray = getStationArray(allData, stationId);
+
+            if (stationArray == null) {
+                tidalRange = null;
+            } else {
+                // 填充字段
+                for (int i = 0; i < stationArray.size(); i++) {
+                    JSONObject obj = stationArray.getJSONObject(i);
+                    String sname = obj.getString("sname");
+
+                    if ("highTide".equals(sname)) {
+                        try {
+                            highTide = Double.parseDouble(obj.getString("value"));
+                        } catch (Exception e) {}
+                    }
+
+                    if ("lowTide".equals(sname)) {
+                        try {
+                            lowTide = Double.parseDouble(obj.getString("value"));
+                        } catch (Exception e) {}
+                    }
+                }
+
+                if (highTide != null && lowTide != null) {
+                    tidalRange = Math.round((highTide - lowTide) * 100.0) / 100.0;
+                }
+            }
+
+            stationJson.put("tidalRange", tidalRange);
+            tidalRangeJson.set(index, stationJson);
+        }
+
+        FileUtil.modifiyFileContent(path, waterConditionJson.toString());
+        FileUtil.modifiyFileContent(tidalRangePath, tidalRangeJson.toString());
+    }
+
+    // 处理二级数组，获取某一站点的数据集合
+    public static JSONArray getStationArray(JSONArray data, String stationId) {
+        for (int i = 0; i < data.size(); i++) {
+            JSONArray stationArray = data.getJSONArray(i);
+            if (stationId.equals(stationArray.getJSONObject(0).getString("stationId"))) {
+                return stationArray;
+            }
+        }
+        return null;
     }
 
     private static Double getFlow(String apiUrl, String stationId) {

@@ -6,12 +6,11 @@ spring:
     mongodb:
       database: bank
       authentication-database: admin
-      uri: mongodb://host.docker.internal:17017/bank
+      uri: mongodb://10.32.37.72:17017/bank
   datasource:
     hikari:
       maxLifeTime: 120000
       idle-timeout: 0
-      #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
     default:
       database: bank
       ip: host.docker.internal
@@ -55,9 +54,6 @@ tile:
   riverTilePath: /usr/local/resource/data/bank_collapse/riverRasterTile/
   riverImagePath: /usr/local/resource/data/bank_collapse/imageTiles/tiles/
 
-video:
-  yangzhong: /usr/local/resource/data/video/125_1711267167.mp4
-
 staticData:
   tifTilePath: /usr/local/resource/data/staticData/tifTile
   vectorDataPath: /usr/local/resource/data/staticData/vectorData
@@ -68,10 +64,10 @@ flowData:
   texturePath: /usr/local/resource/data/flowData/flowFieldResourceArchive/
 
 waterCondition:
-  url: http://10.32.22.202:8001
+  url: http://10.32.37.88:8821
 
 modelServer:
-  url: http://host.docker.internal:8000
+  url: http://10.32.37.72:8000
   storageLimit: 50
   caseLimit: 50
 

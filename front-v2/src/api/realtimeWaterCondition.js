@@ -28,7 +28,10 @@ export const getRealTimeFlowAndLevelData = async () => {
     for (let i = 0; i < totalStationData.length; i++) {
         if (totalStationData[i].station == '大通站')
             flow = totalStationData[i]['flow']
-        else if (totalStationData[i].station == '徐六泾站')
+    }
+
+    for (let i = 0; i < totalTidalRange.length; i++) {
+        if (totalTidalRange[i].station == '天生港站')
             level = totalTidalRange[i]['tidalRange']
     }
 
