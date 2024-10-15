@@ -77,8 +77,13 @@ export default class BankResourceHelper {
         return axiosIns.put(`/update/local/resource/bank/${bankEnName}`, bankInfo)
     }
 
-    static deleteBankBasicInfo(bankEnName) {
-        return axiosIns.delete(`/update/local/resource/bank/${bankEnName}`)
+    static deleteBank(bankEnName) {
+        if (bankEnName === 'Mzs') {
+            return new Promise((resolve, reject) => {
+                reject('Mzs can not be deleted')
+            })
+        }
+        return axiosIns.delete(`/delete/local/resource/bank/${bankEnName}`)
     }
 
 

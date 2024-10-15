@@ -13,12 +13,12 @@
                         <div class="bank-name">
                             <div class="bankName-key">岸段名称</div>
                             <div class="bankName-val">
-                                <el-input v-model="bank.name" class="necessary" style="
+                                <el-input v-model="bank.name" class="necessary no-number" style="
                                 width: 50%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
                             " placeholder="请输入岸段名称" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
-                                <el-input v-model="bank.bankEnName" class="necessary" style="
+                                <el-input v-model="bank.bankEnName" class="necessary no-number" style="
                                 width: 50%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
@@ -32,22 +32,42 @@
                             <div class="detail-key">{{ item.key }}</div>
 
                             <div class="detail-val">
+
                                 <el-select v-if="item.key === '预警级别'" v-model="item.val" placeholder="请选择预警级别"
                                     style="width: 100%;height: 100%; font-size: calc(0.6vw + 0.6vh);">
                                     <el-option v-for="(item, index) in warnLevelList" :key="index" :value="item">
                                         <span style="width: 100%;text-align: center;">{{ item }}</span>
                                     </el-option>
                                 </el-select>
+
                                 <el-date-picker v-else-if="item.key === '监测起始时间'" v-model="item.val" type="date"
                                     placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
+
+
+                                <div v-else-if="item.key === '中心坐标'" class="full">
+                                    <el-input v-model="lnglat.lng" style="
+                                        width: 50%;
+                                        height: 100%;
+                                        font-size: calc(0.6vw + 0.6vh);
+                                    " placeholder="请输入经度" type="number" :step="0.0000001"
+                                        :autosize="{ minRows: 4, maxRows: 6 }" />
+                                    <el-input v-model="lnglat.lat" style="
+                                            width: 50%;
+                                            height: 100%;
+                                            font-size: calc(0.6vw + 0.6vh);
+                                        " placeholder="请输入纬度" type="number" :step="0.0000001"
+                                        :autosize="{ minRows: 4, maxRows: 6 }" />
+                                </div>
+
                                 <el-input v-else v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
                                 font-size: calc(0.6vw + 0.6vh);
-                            " :placeholder="item.key === '中心坐标' ? '请输入坐标: [经度,维度]' : '请输入' + item.key" :type="item.type.includes('long-text')
+                            " :placeholder="'请输入' + item.key" :type="item.type.includes('long-text')
                                 ? 'textarea'
                                 : 'text'
                                 " :autosize="{ minRows: 4, maxRows: 6 }" />
+
                             </div>
 
                         </div>
@@ -116,6 +136,7 @@ import { ref, onMounted, reactive } from 'vue'
 import { defaultBankBasic_Style_Info } from './bankResource'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
+import { number } from 'echarts';
 
 
 const emit = defineEmits(['refresh-bank-list'])
@@ -128,6 +149,11 @@ const bank = reactive({
     name: '',
     bankEnName: ''
 })
+const lnglat = reactive({
+    lng: '',
+    lat: ''
+})
+
 const bankBasicInfo = ref(defaultBankBasic_Style_Info)
 
 ////////////////// DEBUG ////////////////
@@ -179,20 +205,15 @@ const createNewBankClickHandler = async () => {
         }
     ).then(async () => {
         console.log(bankBasicInfo.value)
-        const parseLonLat = (inputStr) => {
-            const coordinates = inputStr.slice(1, -1).split(',');
-            const longitude = parseFloat(coordinates[0]);
-            const latitude = parseFloat(coordinates[1]);
-            return [longitude, latitude]
-        }
         let nowBasicInfo = bankBasicInfo.value
+        let center = [parseFloat(lnglat.lng), parseFloat(lnglat.lat)]
         let ReqBody = {
             "bank": bank.bankEnName,
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
-            "center": parseLonLat(nowBasicInfo[1].val),
+            "center": center,
             "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val.toISOString(),
+            "monitorStartTime": nowBasicInfo[3].val ? nowBasicInfo[3].val.toISOString() : (new Date()).toISOString(),
             "introduction": nowBasicInfo[4].val,
             "management": {
                 "department": nowBasicInfo[5].val,
@@ -206,8 +227,8 @@ const createNewBankClickHandler = async () => {
         })
         emit('refresh-bank-list', true)
 
-    }).catch(() => {
-        console.log('取消创建岸段');
+    }).catch((e) => {
+        console.log('取消创建岸段', e);
     })
 }
 
@@ -738,7 +759,23 @@ div.form-header {
     }
 }
 
-// :deep(.el-select__selected-item .el-select__placeholder){
-//     font-size: calc(0.6vh + 0.6vw);
-// }
+div.full {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+
+:deep(.el-input__inner[type=number]) {
+
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+    }
+
+    -moz-appearance: textfield;
+}
 </style>

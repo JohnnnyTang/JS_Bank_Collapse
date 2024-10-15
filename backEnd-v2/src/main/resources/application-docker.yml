@@ -13,10 +13,21 @@ spring:
       idle-timeout: 0
       #      jdbc-url: jdbc:postgresql://192.168.1.131:5432/bankdemo?stringtype=unspecified
     default:
-      url: jdbc:postgresql://host.docker.internal:5431/bank?stringtype=unspecified
+      database: bank
+      ip: host.docker.internal
+      port: 5431
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: 123456
+    public:
+      database: bank
+      ip: 119.45.198.54
+      port: 5432
+      url: jdbc:postgresql://119.45.198.54:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: nhri_admin123456
   servlet:
     multipart:
       max-file-size: 1GB

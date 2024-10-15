@@ -9,11 +9,11 @@ import { useBankInfoStore } from '../store/bankInfoStore';
 //v1前缀
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',        
+    baseURL: '/api',
 })
 //v2前缀
 const newBackendInstance = axios.create({
-    baseURL: '/model/'      
+    baseURL: '/model/'
 })
 
 // const bankNameStore = useBankNameStore()
@@ -66,7 +66,6 @@ export default class BackEndRequest {
         let apiInfo = CommonUtils.getApiInfoFromCategory(dataNode.category)
         // console.log(apiInfo);
         url += apiInfo[1].toLowerCase() + apiInfo[2]
-        console.log(url)
 
         if (apiInfo[apiInfo.length - 1] != 'Item') {
             return backendInstance.get(url)      //  v1版本
@@ -157,7 +156,7 @@ export default class BackEndRequest {
         }
     }
 
-///////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////
     //v1版本    ChartData.js调用————解决
     // static getMonitorDetailByType_Code(code, type) {
     //     //data
@@ -224,7 +223,7 @@ export default class BackEndRequest {
         return newBackendInstance.get(`/data/bank/${bank}/monitorInfo/id/${id}`)
     }
 
-///////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////
     //v1版本    RealtimeStatus.vue调用————解决
     // static getMonitorDataByTypeIdWithTime(typeStr, id, timeUnit, timeCount) {
     //     return backendInstance.get(
@@ -266,7 +265,9 @@ export default class BackEndRequest {
     // v2版本
     static getDeviceNewestData(deviceCode) {
         let bank = useBankNameStore().globalBankName
+
         return newBackendInstance.get(`/data/bank/${bank}/monitorData/newest/device/${deviceCode}`)
+
     }
 
     //v1版本    BankVideo.vue调用————解决

@@ -797,6 +797,7 @@ const updateWaterInfo = async () => {
     waterConditionTime.value = dayjs().format(`YYYY年MM月DD日`)
 }
 
+let updateWaterInfoInterval = null
 onMounted(async () => {
     //////////init map
     let map = await prepareMap()
@@ -809,7 +810,7 @@ onMounted(async () => {
 
 
     updateWaterInfo()
-    setInterval(updateWaterInfo, 1000)
+    c = setInterval(updateWaterInfo, 1000 * 60 * 1)
 
 })
 
@@ -994,6 +995,8 @@ onUnmounted(async () => {
         useMapStore().getMap().remove()
         useMapStore().destroyMap()
     }
+
+    updateWaterInfoInterval && clearInterval(updateWaterInfoInterval)
 })
 
 /////////////  BBOX MAP
@@ -1302,6 +1305,7 @@ const customSort4 = (a, b) => {
                                 flex-direction: row;
                                 justify-content: flex-start;
                                 align-items: center;
+                                text-align: center;
 
                                 .subScene-title-text {
                                     color: rgb(20, 115, 196);
@@ -1754,6 +1758,7 @@ const customSort4 = (a, b) => {
         height: 100%;
         line-height: 100%;
         width: 100%;
+        text-align: center;
     }
 }
 

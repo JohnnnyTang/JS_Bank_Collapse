@@ -7,6 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -32,6 +35,26 @@ public class ZipUtil {
      * @return list //解压出的文件的路径合集
      */
     private static String zipPath = "f:/shpfile/";//zip根路径
+
+    public static MultipartFile zipFolderAndGetAsMultipartFile(String folderPath, String zipFileName) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            Path filePath = Paths.get(folderPath, zipFileName + ".tif");
+            ZipEntry zipEntry = new ZipEntry(zipFileName + "/" + zipFileName + ".tif");
+            zos.putNextEntry(zipEntry);
+            if (Files.isRegularFile(filePath)) {
+                Files.copy(filePath, zos);
+            }
+            zos.closeEntry();
+            // 创建文件夹条目
+            zipEntry = new ZipEntry(zipFileName + "/"); // 创建一个空文件夹条目
+            zos.putNextEntry(zipEntry);
+            zos.closeEntry();
+            zos.finish();
+        }
+        byte[] zippedFileBytes = baos.toByteArray();
+        return new MockMultipartFile(zipFileName+".zip", zipFileName+".zip", "application/zip", zippedFileBytes);
+    }
 
     public static MultipartFile zipFilesAndGetAsMultipartFile(List<MultipartFile> files, String zipFileName) throws IOException {
         // 创建一个ByteArrayOutputStream来存储zip文件内容

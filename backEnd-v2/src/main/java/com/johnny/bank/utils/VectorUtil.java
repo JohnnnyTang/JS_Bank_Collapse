@@ -19,8 +19,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -154,8 +153,8 @@ public class VectorUtil {
         JSONObject params = paramNode.getParams();
         params.put("filePath", shpPath);
         params.put("finalTableName", tableName);
-        params.put("dbname", "bank");params.put("user",defaultDatasource.getUsername());
-        params.put("password", defaultDatasource.getPassword());params.put("host","127.0.0.1");params.put("port", "5432");
+        params.put("dbname", defaultDatasource.getDatabase());params.put("user",defaultDatasource.getUsername());
+        params.put("password", defaultDatasource.getPassword());params.put("host",defaultDatasource.getIp());params.put("port", defaultDatasource.getPort());
         paramNode.setParams(params);
         paramNodeService.save(paramNode);
         taskNode.setParamNode(paramNode);
@@ -170,6 +169,14 @@ public class VectorUtil {
             taskNodeService.updateNodeStatusById(taskNodeId, "ERROR");
         }
         int code = cmdProcess.waitFor();
+
+        System.out.println(code);
+        InputStream errorStream = cmdProcess.getErrorStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
         cmdProcess.destroy();
         if (code == 0) {
             //update taskNode status

@@ -135,7 +135,7 @@ public class ProcessUtil {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
         commands.add(sysCmdExeStr);
-        commands.add(sysLinkStr);
+//        commands.add(sysLinkStr);
         commands.add(condaStr + condaEnv + " &&");
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
