@@ -60,16 +60,6 @@ staticData:
   draftDataPath: /usr/local/resource/data/staticData/draftData
   waterConditionPath: /usr/local/resource/data/staticData/waterCondition
 
-staticData:
-  tifTilePath: /usr/local/resource/data/staticData/tifTile
-  vectorDataPath: /usr/local/resource/data/staticData/vectorData
-  waterConditionPath: /usr/local/resource/data/staticData/waterCondition
-
-staticData:
-  tifTilePath: /usr/local/resource/data/staticData/tifTile
-  vectorDataPath: /usr/local/resource/data/staticData/vectorData
-  waterConditionPath: /usr/local/resource/data/staticData/waterCondition
-
 flowData:
   texturePath: /usr/local/resource/data/flowData/flowFieldResourceArchive/
 

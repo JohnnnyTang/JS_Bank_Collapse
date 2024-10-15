@@ -10,7 +10,6 @@ lerna-debug.log*
 node_modules
 dist
 bankFront
-front-v2/bankFront.zip
 dist-ssr
 *.local
 *.rar
