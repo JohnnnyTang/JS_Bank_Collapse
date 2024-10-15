@@ -45,6 +45,9 @@ public class BankResourceService {
     @Value("${staticData.tifTilePath}")
     String tifTilePath;
 
+    @Value("${staticData.draftDataPath}")
+    String draftDataPath;
+
     @Value("${staticData.waterConditionPath}")
     String waterConditionPath;
 
@@ -210,8 +213,10 @@ public class BankResourceService {
             deleteVector(vectorDataNode.getBank(), vectorDataNode.getName());
         }
         // 删除本地瓦片资源
-        File deleteFolder = new File(tifTilePath + "/tile/" + bank);
-        FileUtil.deleteFolder(deleteFolder);
+        File deleteTileFolder = new File(tifTilePath + "/tile/" + bank);
+        File deleteDraftFolder = new File(draftDataPath + "/tif/" + bank);
+        FileUtil.deleteFolder(deleteTileFolder);
+        FileUtil.deleteFolder(deleteDraftFolder);
         // 删除岸段所有数据节点
         List<DataNodeV2> deleteDataNodes = dataNodeRepoV2.getNodeChildByPath(bankPath);
         deleteDataNodes.add(bankDataNode);
@@ -223,11 +228,13 @@ public class BankResourceService {
     }
     public String updateBankInfo(String bank, JSONObject info) {
         JSONObject dataNodeBasicInfo = new JSONObject();
+        dataNodeBasicInfo.put("name",info.getString("name"));
         dataNodeBasicInfo.put("riskLevel",info.getString("riskLevel"));
         dataNodeBasicInfo.put("introduction",info.getString("introduction"));
         dataNodeBasicInfo.put("management",info.getJSONObject("management"));
         dataNodeBasicInfo.put("center",info.getString("center"));
-        dataNodeBasicInfo.put("name",info.getString("name"));
+        dataNodeBasicInfo.put("monitorLength",info.getString("monitorLength"));
+        dataNodeBasicInfo.put("monitorStartTime",info.getString("monitorStartTime"));
         DataNodeV2 dataNode = DataNodeV2.dataNodeBuilder()
                 .bank(bank).name(bank+"BankNode").dataOrigin("Local")
                 .category("BankNode").path(",DataNodeHead,").basicInfo(dataNodeBasicInfo)

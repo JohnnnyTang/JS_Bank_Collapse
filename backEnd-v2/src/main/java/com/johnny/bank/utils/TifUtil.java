@@ -114,7 +114,7 @@ public class TifUtil {
             taskNodeService.updateNodeStatusById(taskNodeId, "ERROR");
         }
         FileUtil.deleteFolder(new File(sourceDataPath));
-        return tifFolderPath + File.separator + name + ".tif";
+        return tifFolderPath;
     }
 
     public static void tif2tile(MultipartFile srcFile, String bank) throws IOException, InterruptedException {

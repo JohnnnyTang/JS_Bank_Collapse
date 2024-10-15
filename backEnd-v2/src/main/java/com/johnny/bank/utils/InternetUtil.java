@@ -245,6 +245,12 @@ public class InternetUtil {
                     }
                 }
             } else {
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                }
                 log.error("POST request failed with response code " + responseCode);
             }
 

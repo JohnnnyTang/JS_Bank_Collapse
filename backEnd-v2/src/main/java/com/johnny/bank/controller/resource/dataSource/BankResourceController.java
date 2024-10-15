@@ -57,6 +57,10 @@ public class BankResourceController {
     @GetMapping("/bank/calculate/dataType")
     public ResponseEntity<JSONArray> getBankStaticCalculateDataNode(@RequestParam String dataType, @RequestParam String bank) {
         DataNodeV2 dataGroupNode = bankResourceService.getCalculateDataGroupNode(dataType, bank);
+        if (dataGroupNode==null) {
+            JSONArray emptyArray = new JSONArray();
+            return ResponseEntity.ok(emptyArray);
+        }
         String path = dataGroupNode.getPath()+dataGroupNode.getName() + ",";
         List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
         return ResponseEntity.ok(DataNodeUtil.transferToFolderList_calculateDEM(dataList));
@@ -65,6 +69,10 @@ public class BankResourceController {
     @GetMapping("/bank/visual/dataType")
     public ResponseEntity<JSONArray> getBankStaticDataNode(@RequestParam String dataType, @RequestParam String bank) {
         DataNodeV2 dataGroupNode = bankResourceService.getTileVisualDataGroupNode(dataType, bank);
+        if (dataGroupNode==null) {
+            JSONArray emptyArray = new JSONArray();
+            return ResponseEntity.ok(emptyArray);
+        }
         String path = dataGroupNode.getPath()+dataGroupNode.getName() + ",";
         List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
         return ResponseEntity.ok(DataNodeUtil.transferToFolderList_visualDEM(dataList));
@@ -73,6 +81,10 @@ public class BankResourceController {
     @GetMapping("/bank/visual/vector")
     public ResponseEntity<JSONArray> getBankStaticDataNode(@RequestParam String bank) {
         DataNodeV2 dataGroupNode = bankResourceService.getVectorVisualDataGroupNode(bank);
+        if (dataGroupNode==null) {
+            JSONArray emptyArray = new JSONArray();
+            return ResponseEntity.ok(emptyArray);
+        }
         String path = dataGroupNode.getPath()+"VectorDataGroupOf"+bank+",";
         List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
         return ResponseEntity.ok(DataNodeUtil.transferToFolderList_basicInfo(dataList));
@@ -81,6 +93,10 @@ public class BankResourceController {
     @GetMapping("/bank/device/type")
     public ResponseEntity<JSONArray> getResourceDeviceData(@RequestParam String bank, @RequestParam String typeCode) {
         DataNodeV2 dataGroupNode = bankResourceService.getDeviceDataGroupNode(bank, typeCode);
+        if (dataGroupNode==null) {
+            JSONArray emptyArray = new JSONArray();
+            return ResponseEntity.ok(emptyArray);
+        }
         String path = dataGroupNode.getPath()+dataGroupNode.getName()+",";
         List<DataNodeV2> dataList = bankResourceService.getStaticDataList(path);
         return ResponseEntity.ok(DataNodeUtil.transferToFolderList_basicInfo(dataList));
@@ -214,6 +230,11 @@ public class BankResourceController {
     @DeleteMapping("/delete/local/resource/{bank}/file/{name}")
     public ResponseEntity<String> deleteVector(@PathVariable String bank, @PathVariable String name) {
         return ResponseEntity.ok(bankResourceService.deleteVector(bank, name));
+    }
+
+    @DeleteMapping("/delete/calculate/resource/{bank}/file/{dataType}/{name}")
+    public ResponseEntity<String> deleteCalculateResource(@PathVariable String bank, @PathVariable String dataType, @PathVariable String name) {
+        return ResponseEntity.ok(modelServerService.deleteCalculateResourceData(bank, dataType, name));
     }
 
     // 资源更新

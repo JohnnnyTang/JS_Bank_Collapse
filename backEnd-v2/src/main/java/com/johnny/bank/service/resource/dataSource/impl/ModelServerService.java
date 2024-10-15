@@ -39,6 +39,12 @@ public class ModelServerService implements IModelServerService {
     @Autowired
     DataNodeServiceV2 dataNodeServiceV2;
 
+    @Value("${staticData.draftDataPath}")
+    String draftDataPath;
+
+    @Value("${staticData.tifTilePath}")
+    String tifTilePath;
+
     @Value("${modelServer.url}")
     String baseUrl;
 
@@ -119,7 +125,20 @@ public class ModelServerService implements IModelServerService {
         };
     }
 
-    public String uploadCalculateResourceShapefileData(MultipartFile file, JSONObject info) {
+    public String deleteCalculateResourceData(String bank, String dataType, String name) {
+        if (dataNodeServiceV2.getDataNodeByCategoryName("BankNode", bank + "BankNode") == null) {
+            return "该岸段不存在！";
+        }
+        return switch (dataType) {
+            case "Hydrodynamic" -> deleteCalculateResource(bank, "HydrodynamicDataItem", name);
+            case "DEM" -> deleteCalculateResource(bank, "DEMDataItem", name);
+            case "Boundary" -> deleteCalculateResource(bank, "BoundaryDataItem" ,name);
+            case "RiskLevel" -> deleteCalculateResource(bank, "ConfigDataItem" ,name);
+            default -> "无法删除此数据类型";
+        };
+    }
+
+    private String uploadCalculateResourceShapefileData(MultipartFile file, JSONObject info) {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -130,8 +149,7 @@ public class ModelServerService implements IModelServerService {
         String resourceName = "shapefile";
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
-
-    public String uploadCalculateResourceGeojsonData(MultipartFile file, JSONObject info) {
+    private String uploadCalculateResourceGeojsonData(MultipartFile file, JSONObject info) {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -142,8 +160,7 @@ public class ModelServerService implements IModelServerService {
         String resourceName = "geojson";
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
-
-    public String uploadCalculateResourceHydrodynamicData(MultipartFile file, JSONObject info) {
+    private String uploadCalculateResourceHydrodynamicData(MultipartFile file, JSONObject info) {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -154,8 +171,7 @@ public class ModelServerService implements IModelServerService {
         String resourceName = "hydrodynamic";
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
-
-    public String uploadCalculateResourceTiffData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
+    private String uploadCalculateResourceTiffData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -172,8 +188,7 @@ public class ModelServerService implements IModelServerService {
         TifUtil.tif2tile(file, info.getString("segment"));
         return uploadModelServerData(upLoadFile, info, categoryName, resourceName);
     }
-
-    public String uploadCalculateResourceTxtData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
+    private String uploadCalculateResourceTxtData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -181,16 +196,19 @@ public class ModelServerService implements IModelServerService {
         if (!categoryName.equals("DEM") && !categoryName.equals("Hydrodynamic") && !categoryName.equals("Boundary") && !categoryName.equals("Config")) {
             return "无法上传此数据类别";
         }
-        String tifPath = TifUtil.txt2tif(file, info, info.getString("segment"));
-        File tifFile = new File(tifPath);
-        FileInputStream input = new FileInputStream(tifFile);
-        MultipartFile tifMultipartFile =new MockMultipartFile("file", tifFile.getName(), "text/plain", IOUtils.toByteArray(input));
-        List<MultipartFile> tifFiles = List.of(tifMultipartFile);
+        String bank = info.getString("segment");
+        String name = info.getString("name");
+        String tifFolderPath = TifUtil.txt2tif(file, info, bank);
+        try (FileInputStream inputStream = new FileInputStream(new File(tifFolderPath + File.separator + name + ".tif"))) {
+            MultipartFile tifMultipartFile = new MockMultipartFile(name + ".tif", name + ".tif", "image/tiff", inputStream);
+            TifUtil.tif2tile(tifMultipartFile, bank);
+        } catch (Exception e) {
+            log.info(e.toString());
+        }
         String resourceName = "tiff";
-        return uploadModelServerData(ZipUtil.zipFilesAndGetAsMultipartFile(tifFiles,info.getString("name")), info, categoryName, resourceName);
+        return uploadModelServerData(ZipUtil.zipFolderAndGetAsMultipartFile(tifFolderPath,info.getString("name")), info, categoryName, resourceName);
     }
-
-    public String uploadCalculateResourceAdfData(MultipartFile file, JSONObject info) {
+    private String uploadCalculateResourceAdfData(MultipartFile file, JSONObject info) {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -201,8 +219,7 @@ public class ModelServerService implements IModelServerService {
         String resourceName = "adf";
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
-
-    public String uploadCalculateResourceJsonData(MultipartFile file, JSONObject info) {
+    private String uploadCalculateResourceJsonData(MultipartFile file, JSONObject info) {
         if (!info.containsKey("category")) {
             return "请输入数据类别";
         }
@@ -213,11 +230,10 @@ public class ModelServerService implements IModelServerService {
         String resourceName = "json";
         return uploadModelServerData(file, info, categoryName, resourceName);
     }
-
     // typeName可以为"DEM","DEM","Boundary","Hydrodynamic"
     // resourceName可以为"dem","adf","shapefile", "hydrodynamic"
     // type与result需对应
-    public String uploadModelServerData(MultipartFile file, JSONObject info, String typeName, String resourceName) {
+    private String uploadModelServerData(MultipartFile file, JSONObject info, String typeName, String resourceName) {
         TaskNodeServiceV2 taskNodeServiceV2 = BeanUtil.getBean(TaskNodeServiceV2.class);
         if (!taskNodeServiceV2.checkModelServerStorage(STORAGE_LIMIT, CASE_LIMIT)) {
             return "系统内存不足无法上传！请清理系统内存";
@@ -260,5 +276,31 @@ public class ModelServerService implements IModelServerService {
         dataNodeServiceV2.save(dataNode);
         log.info(typeName + "Data " + dataNode.getName() + " uploaded" + "("+resourceName+")");
         return "Uploaded " + typeName + "Data" + "("+resourceName+") of "+bank;
+    }
+
+    private String deleteCalculateResource(String bank, String category, String name) {
+        DataNodeV2 deleteDataNode = dataNodeRepoV2.getNodeByCategoryBankAndName(category, bank, name);
+        if (category.equals("DEMDataItem")) {
+            DataNodeV2 deleteVisualDataNode = dataNodeRepoV2.getNodeByCategoryBankAndName("DEMTileDataItem", bank, name);
+            if (deleteVisualDataNode != null && deleteVisualDataNode.getUsage().containsKey("path")) {
+                FileUtil.deleteFolder(new File(tifTilePath + deleteVisualDataNode.getUsage().getString("path")));
+                dataNodeServiceV2.delete(deleteVisualDataNode.getId());
+            }
+        }
+        if (deleteDataNode == null) {
+            return bank + " 岸段模型计算资源 " + name + " 不存在！";
+        }
+        String url = baseUrl + "/v0/fs";
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("directory",deleteDataNode.getBasicInfo().getString("path"));
+        try {
+            InternetUtil.doDelete(url, requestBody);
+            FileUtil.deleteFolder(new File(draftDataPath + File.separator + "tif" + File.separator + bank + File.separator + name));
+            dataNodeServiceV2.delete(deleteDataNode.getId());
+            return bank + " 岸段模型计算资源 " + name + " 删除成功！";
+        } catch (Exception e) {
+            log.info(e.toString());
+            return bank + " 岸段模型计算资源 " + name + " 删除失败！";
+        }
     }
 }
