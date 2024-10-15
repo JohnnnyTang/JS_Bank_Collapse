@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,7 +53,7 @@ public class FileUtil {
             return "NOT EXIST";
         }
         try {
-            List<String> lines = Files.readAllLines(filePath);
+            List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
             return String.join(System.lineSeparator(), lines);
         } catch (IOException e) {
             return "ERROR";
@@ -61,7 +62,8 @@ public class FileUtil {
 
     // 修改指定路径文件内容
     public static void modifiyFileContent(String filePathStr, String content) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
+        //try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePathStr), Charset.forName("GBK"))) {
             writer.write(content);
         } catch (IOException e) {
             e.printStackTrace();
