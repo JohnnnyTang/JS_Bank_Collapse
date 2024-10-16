@@ -720,15 +720,15 @@ const realtimeConditionHandler = async () => {
         conditionConfigureData.flow = realTimeCond.flow
         conditionConfigureData.tideDif = realTimeCond.level
         ElNotification.success({
-            'offset': 80,
+            'offset': 300,
             'position': 'top-right',
             'message': `获取实时水文条件,${dayjs().format('YYYY-MM-DD hh:mm')}`
         })
 
     } catch (e) {
         ElNotification.error({
-            'offset': 120,
-            'position': 'top-left',
+            'offset': 300,
+            'position': 'top-right',
             'message': `获取实时水文条件失败`
         })
     }
@@ -2608,7 +2608,7 @@ div.risk-warn-container {
     div.hide-dom-container {
         position: absolute;
         right: 18vw;
-        top: 5vh;
+        top: 3vh;
         width: 4vh;
         height: 4vh;
         background-color: #ffffff;
@@ -2630,7 +2630,7 @@ div.risk-warn-container {
     div.condition-pannel {
         position: absolute;
         right: 1vw;
-        top: 5vh;
+        top: 3vh;
         width: 19vw;
         transition: 0.5s ease-in-out;
 
