@@ -19,8 +19,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -170,6 +169,14 @@ public class VectorUtil {
             taskNodeService.updateNodeStatusById(taskNodeId, "ERROR");
         }
         int code = cmdProcess.waitFor();
+        System.out.println("code:" + code);
+
+        InputStream errorStream = cmdProcess.getErrorStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
         cmdProcess.destroy();
         if (code == 0) {
             //update taskNode status
