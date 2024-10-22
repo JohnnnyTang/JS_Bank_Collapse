@@ -169,8 +169,8 @@ public class VectorUtil {
             taskNodeService.updateNodeStatusById(taskNodeId, "ERROR");
         }
         int code = cmdProcess.waitFor();
+        System.out.println("code:" + code);
 
-        System.out.println(code);
         InputStream errorStream = cmdProcess.getErrorStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
         String line;

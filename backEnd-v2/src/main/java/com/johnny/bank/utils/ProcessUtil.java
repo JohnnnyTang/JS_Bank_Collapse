@@ -36,7 +36,7 @@ public class ProcessUtil {
     static String pythonStr = "python";
 
 //    static String condaStr = "conda activate multiIndex &&";
-    static String condaStr = "conda activate ";
+    static String condaStr = (System.getProperties().getProperty("os.name").toLowerCase().contains("win"))? "conda activate " : "source miniconda3/bin/activate ";
 
     static Boolean ifSystemWin = System.getProperties().getProperty("os.name").toLowerCase().contains("win");
 
@@ -131,11 +131,11 @@ public class ProcessUtil {
         return processBuilder.start();
     }
 
-    public static Process buildOutSideModelServiceProcess(TaskNode taskNode, String condaEnv) throws IOException {
+    public static Process buildOutSideModelServiceProcess2(TaskNode taskNode, String condaEnv) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         List<String> commands = new ArrayList<>();
         commands.add(sysCmdExeStr);
-//        commands.add(sysLinkStr);
+        commands.add(sysLinkStr);
         commands.add(condaStr + condaEnv + " &&");
         ModelNode modelNode = taskNode.getModelNode();
         JSONObject modelUsage = modelNode.getUsage();
@@ -147,6 +147,37 @@ public class ProcessUtil {
             if(Objects.equals(paramKey, "jsonId")) continue;
             commands.add(paramObject.get(paramKey).toString());
         }
+        processBuilder.command(commands);
+        System.out.println(commands);
+        processBuilder.inheritIO(); // 继承标准输入输出
+        return processBuilder.start();
+    }
+
+    public static Process buildOutSideModelServiceProcess(TaskNode taskNode, String condaEnv) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        List<String> commands = new ArrayList<>();
+        commands.add(sysCmdExeStr);
+        commands.add(sysLinkStr);
+
+        ModelNode modelNode = taskNode.getModelNode();
+        JSONObject modelUsage = modelNode.getUsage();
+        String exePrefix = (String) modelUsage.get("exePrefix");
+        String program = taskNode.getModelNode().getProgram();
+
+        List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
+        JSONObject paramObject = taskNode.getParamNode().getParams();
+
+        StringBuilder commandBuilder = new StringBuilder();
+        commandBuilder.append(condaStr).append(condaEnv).append(" && ")
+                .append(exePrefix).append(" ").append(program);
+
+        for (String paramKey : paramKeys) {
+            if (!Objects.equals(paramKey, "jsonId")) {
+                commandBuilder.append(" ").append(paramObject.get(paramKey).toString());
+            }
+        }
+
+        commands.add(commandBuilder.toString());
         processBuilder.command(commands);
         System.out.println(commands);
         processBuilder.inheritIO(); // 继承标准输入输出
