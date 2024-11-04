@@ -36,7 +36,7 @@ mapboxgl.accessToken =
 
 const containerDom = ref(null)
 let map = null
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return

@@ -144,8 +144,9 @@
                             <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                                 <div class="video-content">
                                     <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
-                                        :key="item.key" allowfullscreen>
+                                        :key="item.key" allowfullscreen  v-if="showVideo === true">
                                     </iframe>
+                                    <div class="video-img" :id="index" v-show="showVideo === false"></div>
                                 </div>
                                 <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
                                     " @click="focusOn(index)">
@@ -222,7 +223,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onBeforeUnmount, onBeforeMount, computed, reactive } from 'vue'
+import { ref, onMounted, watch, onBeforeUnmount, onBeforeMount, computed, reactive, createApp } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
 // import { BorderBox10 as DvBorderBox10 } from '@kjgl77/datav-vue3'
@@ -242,6 +243,7 @@ import router from '../../router'
 import { useWarnInfoStore } from '../../store/mapStore'
 import DeviceHelper from './deviceHelper'
 import { useBankNameStore } from '../../store/bankNameStore'
+import domtoimage from 'dom-to-image-more';
 
 const route = useRoute()
 const props = defineProps({
@@ -465,21 +467,53 @@ const userInteractInfo = reactive({
     lastInteractTime: dayjs(),
     refreshIframe: 1
 })
+const videoRef = ref();
+const showVideo = ref(true);
 window.addEventListener('mousemove', (e) => {
     // 用户交互，更新lastInteractTime
     userInteractInfo.lastInteractTime = dayjs()
     userInteractInfo.refreshIframe = 1
+    showVideo.value = true;
+})
+window.addEventListener('keydown', async (e) => {
+    if (e.key == '1') {
+        videoList.value.forEach((item, index) => {
+            // let dom = document.querySelector('#' + item.name);
+            let dom = document.querySelector('.' + 'video-content');
+            // console.log(dom)
+            // domtoimage.toPng(dom).then((imageUrl)=> {
+            //     console.log(imageUrl)
+            //     const div = document.createElement('div')
+            // }).catch((err)=> {
+            //     console.log(err)
+            // });
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = element.offsetWidth;
+            canvas.height = element.offsetHeight;
+            context.drawImage(element, 0, 0);
+            
+            // 将Canvas内容转换为图片数据
+            const imageDataUrl = canvas.toDataURL('image/png');
+            
+            // 显示或下载图片
+            console.log(imageDataUrl);
+        })
+
+    }
 })
 const refreshInterval = setInterval(() => {
     // 检查上次交互和此次交互的分钟数
     let nowTime = dayjs()
     let diffTime = nowTime.diff(userInteractInfo.lastInteractTime, 'seconds')
     console.log(diffTime + 'seconds ' + '用户无操作')
-    if (diffTime > 60 * 5) {
+    if (diffTime > 10) {
         // close page if no user interaction for 3 minutes
-        userInteractInfo.refreshIframe = 0
+        // userInteractInfo.refreshIframe = 0
+        showVideo.value = false;
     }
-}, 1000 * 30 * 1)
+}, 1000 * 5 * 1)
 
 const refreshIframe = (val) => {
     console.log('refresh iframe ! ', val)
@@ -1726,6 +1760,7 @@ div.device-info-container {
                 background-color: #005ae0;
 
                 div.video-box {
+                    position: relative;
                     // margin-top: 1vh;
                     width: 6vw;
                     // margin-left: 0.5vw;
@@ -1734,10 +1769,33 @@ div.device-info-container {
                     // background-color: rgba(3, 63, 173, 1);
 
                     div.video-content {
+                        position: relative;
                         height: calc(100% - 3vh);
                         width: 100%;
 
                         background-color: rgb(34, 75, 165);
+
+                        div.video-img {
+                            position: absolute;
+                            top:0;
+                            left:0;
+                            height: 100%;
+                            width: 100%;
+                            // z-index:1000;
+                            background-size: cover;
+                           
+                            &[id='0'] {
+                                background-image: url('/mzs-hsmt.png');
+                            }
+
+                            &[id='1'] {
+                                background-image: url('/mzs-jtbsc.png');
+                            }
+
+                            &[id='2'] {
+                                background-image: url('/mzs-sywd.png');
+                            }
+                        }
                     }
 
                     div.video-title {

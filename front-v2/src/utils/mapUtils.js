@@ -5,7 +5,7 @@ import popUpContent from '../components/dataVisual/featureDetails/popUpContent.v
 import { layerAddFunctionMap } from '../components/dataVisual/layerUtil'
 import PureScratchMap from './WebGL/pureScratchMap'
 import BankResourceHelper from '../components/modelStore/views/bankResourceHelper'
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 const initMap = async (ref) => {
     return new Promise((resolve, reject) => {
         const map = new mapboxgl.Map({
@@ -25,7 +25,7 @@ const initMap = async (ref) => {
 }
 const addBankLayer = async (map, bankEnName) => {
     console.log('bankenname',bankEnName)
-    const tServer = import.meta.env.VITE_MAP_TILE_SERVER2
+    const tServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER2}`
 
     const bank = bankEnName
     const bankVectorLayers = (await BankResourceHelper.getBankVisualResourceList('vector', bank)).data
@@ -741,7 +741,7 @@ const getCenterCoord = (coordsArray) => {
 }
 
 const getStyleJson4base = () => {
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
     const styleJson = {
         version: 8,
         sources: {
@@ -779,7 +779,7 @@ const getStyleJson4base = () => {
     return styleJson
 }
 const getStyleJson = () => {
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
     const geojson = {
         type: 'FeatureCollection',
         features: [
@@ -5156,7 +5156,7 @@ const getHighZoomStyleJson = () => {
             },
         ],
     }
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
     const geojson = {
         type: 'FeatureCollection',
         features: [
@@ -6746,7 +6746,7 @@ const getHighZoomStyleJson = () => {
 }
 
 const getImageStyleJson = () => {
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
     return {
         // local img
         version: 8,

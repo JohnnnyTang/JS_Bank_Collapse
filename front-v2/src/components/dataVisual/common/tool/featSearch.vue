@@ -63,7 +63,7 @@ import { sourceNameMap, sourceZoomMap, sourceColumnMap } from '../../js/tilefiel
 import { tree } from '../../js/SCENES'
 
 // data
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 const defaultProps = {
     children: 'children',
     label: 'label',
