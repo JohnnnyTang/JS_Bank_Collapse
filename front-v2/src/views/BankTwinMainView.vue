@@ -278,8 +278,8 @@ const warningList = ref([])
     },
 */
 const gnssLegendInfo = {
-    icon1: '/icons/GNSS测量站.png',
-    icon2: '/icons/GNSS基准站.png',
+    icon1: import.meta.env.VITE_BASE + '/icons/GNSS测量站.png',
+    icon2: import.meta.env.VITE_BASE + '/icons/GNSS基准站.png',
     text1: '土体',
     strong: '表面位移',
     text2: '监测',
@@ -288,21 +288,21 @@ const gnssLegendInfo = {
 }
 const legendList = [
     {
-        icon: '/icons/应力桩.png',
+        icon: import.meta.env.VITE_BASE + '/icons/应力桩.png',
         text1: '土体',
         strong: '应力应变',
         text2: '监测',
         device: '应力桩',
     },
     {
-        icon: '/icons/孔隙水压力计.png',
+        icon: import.meta.env.VITE_BASE + '/icons/孔隙水压力计.png',
         text1: '土体',
         strong: '潜水位',
         text2: '监测',
         device: '孔隙水压力计',
     },
     {
-        icon: '/icons/测斜仪.png',
+        icon: import.meta.env.VITE_BASE + '/icons/测斜仪.png',
         text1: '土体',
         strong: '内部位移',
         text2: '监测',
@@ -318,7 +318,7 @@ const legendList = [
     // },
     ////////////////////////////////////////////////////////////////////////////////////////////////
     {
-        icon: '/icons/视频监控.png',
+        icon: import.meta.env.VITE_BASE + '/icons/视频监控.png',
         text1: '  ',
         strong: '视频监控',
         text2: '  ',

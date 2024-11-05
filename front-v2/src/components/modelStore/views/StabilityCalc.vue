@@ -496,7 +496,7 @@ const runMathModel = () => {
         return
     }
 
-    axios.post('/model/taskNode/start/numeric/hydrodynamic/real', formData).then(res => {
+    axios.post(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/numeric/hydrodynamic/real', formData).then(res => {
         console.log('model start res::', res.data)
         ElNotification.success({
             message: '模型开始计算',
@@ -521,10 +521,10 @@ const runMathModel = () => {
         mathModelStore.addCalculatingCase(name, newCalculatingCase)
 
         const interval = setInterval(async () => {
-            const status = (await axios.get('/model/taskNode/status/id?taskId=' + taskId)).data
+            const status = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/status/id?taskId=' + taskId)).data
             console.log('status : ', status)
             if (status === 'ERROR' || status === 'UNLOCK' || status === "NOT FOUND") {
-                await axios.get('/model/taskNode/result/id?taskId=' + taskId) // clear case
+                await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/result/id?taskId=' + taskId) // clear case
                 clearInterval(interval)
                 timeout && clearTimeout(timeout)//提前结束
                 throw new Error('模型计算失败')
@@ -605,7 +605,7 @@ const visulizationPrepare = async () => {
         let modelPostUrl = ''
         let modelParams = {}
 
-        modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
+        modelPostUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/numeric/hydrodynamic'
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
@@ -636,7 +636,7 @@ const visulizationPrepare = async () => {
         let runningStatusInterval = setInterval(async () => {
             console.log('runningStatusInterval')
             let runningStatus = (
-                await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)
+                await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/status/id?taskId=' + TASK_ID)
             ).data
             ModelRunningMessage.value = '正在加载可视化资源...'
             let randomFactor = 3.0
@@ -646,7 +646,7 @@ const visulizationPrepare = async () => {
             } else if (runningStatus === 'ERROR') {
                 globleVariable.runningStatus = 'ERROR'
 
-                const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
+                const url = `${import.meta.env.VITE_MAP_TILE_SERVER2}/taskNode/result/id?taskId=${TASK_ID}`
                 const errorLog = (await axios.get(url)).data['error-log']
                 ElNotification({
                     title: '模型运行失败',
@@ -663,18 +663,18 @@ const visulizationPrepare = async () => {
                 clearInterval(runningStatusInterval)
                 let runningResult = (
                     await axios.get(
-                        '/model/taskNode/result/id?taskId=' + TASK_ID,
+                        import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/result/id?taskId=' + TASK_ID,
                     )
                 ).data
                 console.log('runningResult ', runningResult)
 
                 globleVariable.caseID = runningResult['case-id']
-                globleVariable.pngPrefix = `/model/data/bankResource/down/modelServer/resource/file/image?name=`
-                globleVariable.binPrefix = `/model/data/bankResource/down/modelServer/resource/file/bin?name=`
+                globleVariable.pngPrefix = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/image?name=`
+                globleVariable.binPrefix = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/bin?name=`
                 globleVariable.stationBinUrl = runningResult['visualization-station-bin']
                 globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
 
-                let visulizationDescUrl = `/model/data/bankResource/down/modelServer/resource/file/json?name=${runningResult['visualization-description-json']}`
+                let visulizationDescUrl = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/json?name=${runningResult['visualization-description-json']}`
 
                 globleVariable.visualizationJsonUrl = visulizationDescUrl
                 console.log('globle data info::', globleVariable)
@@ -832,7 +832,7 @@ onMounted(async () => {
         let name = key
         let taskID = calcCaseInfo[name]['taskId']
         ////////// right now
-        axios.get('/model/taskNode/status/id?taskId=' + taskID).then(res => {
+        axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/status/id?taskId=' + taskID).then(res => {
             console.log(name, '  ', res.data)
             if (res.data === 'COMPLETE') {
                 // 运行成功，结束状态轮询，更新进度条，更新树
@@ -850,7 +850,7 @@ onMounted(async () => {
         })
         ////////// interval
         let I = setInterval(() => {
-            axios.get('/model/taskNode/status/id?taskId=' + taskID).then(res => {
+            axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/status/id?taskId=' + taskID).then(res => {
 
                 console.log(name, '  ', res.data)
                 if (res.data === 'COMPLETE') {

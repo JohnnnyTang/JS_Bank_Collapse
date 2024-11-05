@@ -64,7 +64,7 @@ let scrollLeftMax = 0
 
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER,
 })
 
 const scrollToDesc = (index) => {

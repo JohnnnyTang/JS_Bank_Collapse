@@ -1485,7 +1485,7 @@ const updateChartData = async (deviceType, deviceName, dataName) => {
         dataLoading.value = true
         deviceDataManageMap.value[deviceType][deviceName].data = (
             await axios.get(
-                `/api/data/${deviceType}Data/${deviceTypeTimeMap[deviceType]['timeUnit']}/${deviceTypeTimeMap[deviceType]['timeCount']}/device/${deviceIdMap[deviceType][deviceName]}`,
+                `${import.meta.env.VITE_MAP_TILE_SERVER}/data/${deviceType}Data/${deviceTypeTimeMap[deviceType]['timeUnit']}/${deviceTypeTimeMap[deviceType]['timeCount']}/device/${deviceIdMap[deviceType][deviceName]}`,
             )
         ).data
         deviceDataManageMap.value[deviceType][deviceName].chartData =
@@ -1560,7 +1560,7 @@ onMounted(async () => {
     dataLoading.value = true
     const deviceData = (
         await axios.get(
-            `/api/data/${curDevice.value}Data/${deviceTypeTimeMap[curDevice.value]['timeUnit']}/${deviceTypeTimeMap[curDevice.value]['timeCount']}/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
+            `${import.meta.env.VITE_MAP_TILE_SERVER}/data/${curDevice.value}Data/${deviceTypeTimeMap[curDevice.value]['timeUnit']}/${deviceTypeTimeMap[curDevice.value]['timeCount']}/device/${deviceIdMap[curDevice.value][defaultActiveMap.value[curDevice.value]]}`,
         )
     ).data
     deviceDataManageMap.value[curDevice.value][

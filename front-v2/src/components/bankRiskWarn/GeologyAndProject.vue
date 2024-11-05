@@ -64,10 +64,10 @@
 
 <script setup>
 import { ElImage } from 'element-plus';
-const srcList1 = ["/geology_structure.png"]
-const UrlPart1 = "/geology_structure.png"
-const srcList2 = ["/project_structure.jpg", "/geoStruct/民主沙右缘守护工程09.jpg", "/geoStruct/民主沙右缘守护工程12.jpg", "/geoStruct/民主沙右缘守护工程18.jpg"]
-const UrlPart2 = "/project_structure.jpg"
+const srcList1 = [import.meta.env.VITE_BASE + "/geology_structure.png"]
+const UrlPart1 = import.meta.env.VITE_BASE + "/geology_structure.png"
+const srcList2 = [import.meta.env.VITE_BASE + "/project_structure.jpg", import.meta.env.VITE_BASE + "/geoStruct/民主沙右缘守护工程09.jpg", import.meta.env.VITE_BASE + "/geoStruct/民主沙右缘守护工程12.jpg", import.meta.env.VITE_BASE + "/geoStruct/民主沙右缘守护工程18.jpg"]
+const UrlPart2 = import.meta.env.VITE_BASE + "/project_structure.jpg"
 </script>
 
 <style lang="scss" scoped>

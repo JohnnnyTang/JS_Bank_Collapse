@@ -520,7 +520,7 @@ const modelRunnning = async (type) => {
   }
   // console.log('check0 ', type)
   if (type === '0') {
-    modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
+    modelPostUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/numeric/hydrodynamic'
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": mmap[params.value.tideType],
@@ -529,7 +529,7 @@ const modelRunnning = async (type) => {
       "year": "2023",
     }
   } else if (type === '1') {
-    modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
+    modelPostUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/numeric/hydrodynamic'
     modelParams = {
       "water-qs": params.value.flow,
       "tidal-level": params.value.diffTide,
@@ -558,7 +558,7 @@ const modelRunnning = async (type) => {
     modelRunnningProgress.value = 0
     globleVariable.taskID = TASK_ID
     let runningStatusInterval = setInterval(async () => {
-      let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
+      let runningStatus = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/status/id?taskId=' + TASK_ID)).data
       console.log('runningResult ', runningStatus)
       // let runningStatus = 'RUNNING'
       modelRunnningStatusDesc.value = '运行中'
@@ -577,7 +577,7 @@ const modelRunnning = async (type) => {
         globleVariable.runningStatus = 'ERROR'
         runningMsg.value = ''
         showRunning.value = false
-        const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
+        const url = `${import.meta.env.VITE_MAP_TILE_SERVER2}/taskNode/result/id?taskId=${TASK_ID}`
         axios.get(url).then(response => {
           let errorLog = response.data['error-log']
           resolve(errorLog)
@@ -602,18 +602,18 @@ const modelRunnning = async (type) => {
         runningMsg.value = ''
         showRunning.value = false
         clearInterval(runningStatusInterval)
-        let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data
+        let runningResult = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/result/id?taskId=' + TASK_ID)).data
         console.log('runningResult ', runningResult)
 
         globleVariable.caseID = runningResult['case-id']
 
-        globleVariable.pngPrefix = `/model/data/bankResource/down/modelServer/resource/file/image?name=`
-        globleVariable.binPrefix = `/model/data/bankResource/down/modelServer/resource/file/bin?name=`
+        globleVariable.pngPrefix = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/image?name=`
+        globleVariable.binPrefix = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/bin?name=`
         globleVariable.stationBinUrl = runningResult['visualization-station-bin']
         globleVariable.uvBinUrls = runningResult['visualization-uv-bin']
 
         ///model/data/modelServer/down/resource/file/json?name=hydrodynamic/MZS/2024/test/104000xc/renderResource/flow_field_description.json
-        let visulizationDescUrl = `/model/data/bankResource/down/modelServer/resource/file/json?name=${runningResult['visualization-description-json']}`
+        let visulizationDescUrl = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/json?name=${runningResult['visualization-description-json']}`
 
         globleVariable.visualizationJsonUrl = visulizationDescUrl
         console.log('globle data info::', globleVariable)
@@ -826,7 +826,7 @@ const tidePointVelocityCalc = async (lng, lat) => {
   // console.log('pointFeature::', tidePointFeature.value)
   // console.log('getVelocity caseId::', globleVariable.caseID)
   // modelRunnningStatusDesc
-  const pointVelocityModelUrl = '/model/taskNode/start/numeric/getFlowFieldVelocities'
+  const pointVelocityModelUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/numeric/getFlowFieldVelocities'
   const params = {
     "case-id": globleVariable.caseID,
     // "case-id": '6c6496ca7c80adbbff129da890894990',

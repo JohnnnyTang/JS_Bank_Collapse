@@ -9,11 +9,11 @@ import { useBankInfoStore } from '../store/bankInfoStore';
 //v1前缀
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER,
 })
 //v2前缀
 const newBackendInstance = axios.create({
-    baseURL: '/model/'
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2
 })
 
 // const bankNameStore = useBankNameStore()

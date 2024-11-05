@@ -157,7 +157,7 @@ const moreInfo = ref({
 
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER,
 })
 
 const emit = defineEmits(['scrollToSeeMore'])

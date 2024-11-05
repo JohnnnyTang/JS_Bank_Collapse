@@ -31,7 +31,7 @@ export default class ModelRunner {
 
     getRunningStatus() {
         return new Promise((resolve, reject) => {
-            const url = `/model/taskNode/status/id?taskId=${this.taskId}`
+            const url = `${import.meta.env.VITE_MAP_TILE_SERVER2}/taskNode/status/id?taskId=${this.taskId}`
             axios.get(url).then(response => {
                 console.log('running status response! ', response)
                 this.runningStatus = response.data
@@ -45,7 +45,7 @@ export default class ModelRunner {
 
     getModelResult() {
         return new Promise((resolve, reject) => {
-            const url = `/model/taskNode/result/id?taskId=${this.taskId}`
+            const url = `${import.meta.env.VITE_MAP_TILE_SERVER2}/taskNode/result/id?taskId=${this.taskId}`
             axios.get(url).then(response => {
                 console.log('running model result! ', response.data)
                 this.runningResult = response.data
@@ -60,7 +60,7 @@ export default class ModelRunner {
 
     getErrorLog() {
         return new Promise((resolve, reject) => {
-            const url = `/model/taskNode/result/id?taskId=${this.taskId}`
+            const url = `${import.meta.env.VITE_MAP_TILE_SERVER2}/taskNode/result/id?taskId=${this.taskId}`
             axios.get(url).then(response => {
                 let errorLog = response.data['error-log']
                 resolve(errorLog)
@@ -74,9 +74,9 @@ export default class ModelRunner {
     async getModelResultFile(fileName, fileType = 'json') {
         return new Promise((resolve, reject) => {
             const MAP = {
-                'image': `/model/data/bankResource/down/modelServer/result/file/image?caseId=${this.caseId}&name=${fileName}`,
+                'image': `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/result/file/image?caseId=${this.caseId}&name=${fileName}`,
 
-                'json': `/model/data/bankResource/down/modelServer/result/file/json?caseId=${this.caseId}&name=${fileName}`
+                'json': `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/result/file/json?caseId=${this.caseId}&name=${fileName}`
             }
             let url = MAP[fileType]
             axios.get(url).then(response => {

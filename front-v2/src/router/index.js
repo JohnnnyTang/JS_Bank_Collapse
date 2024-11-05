@@ -170,7 +170,7 @@ const router = createRouter({
      * createWebHashHistory 带 # 号
      * createWebHistory 不带 # 号
      */
-    history: createWebHistory(),
+    history: createWebHistory('/cjbaweb/'),
     // 下面这个 可以写成ES6的简写 routers
     routes: routes,
 })
@@ -183,7 +183,7 @@ router.beforeEach((to, from, next) => {
         } else {
             const isLoggedIn = localStorage.getItem('token');
             if (isLoggedIn) {
-                axios.get('/model/data/bank').then(res => {
+                axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/data/bank').then(res => {
                     next()
                 }).catch(err => {
                     console.log(err)

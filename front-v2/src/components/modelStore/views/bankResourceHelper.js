@@ -2,7 +2,7 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 
 const axiosIns = axios.create({
-    baseURL: "/model/data/bankResource",
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2 + "/data/bankResource",
 })
 axiosIns.interceptors.response.use((response) => {
     if (response.data.code === 500) {
@@ -17,7 +17,7 @@ axiosIns.interceptors.response.use((response) => {
 
 
 const axiosIns4Device = axios.create({
-    baseURL: "/model/data",
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2 + "/data",
 })
 axiosIns4Device.interceptors.response.use((response) => {
     if (response.data.code === 500) {

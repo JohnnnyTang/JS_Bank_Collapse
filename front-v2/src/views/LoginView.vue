@@ -54,7 +54,7 @@ const login = () => {
         "email": username.value,
         "password": password.value
     }
-    axios.post('/api/user/login', requestBody).then(response => {
+    axios.post(import.meta.env.VITE_MAP_TILE_SERVER + '/user/login', requestBody).then(response => {
         let token
         if (token = response.data) {
             localStorage.setItem('token', token)

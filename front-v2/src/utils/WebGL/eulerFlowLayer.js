@@ -283,12 +283,12 @@ export class EulerFlowLayer {
         this.map.triggerRepaint();
     }
     async programInit_mask(gl) {
-        const maskShapeUrl = '/scratchSomething/geojson/CHENGTONG.geojson';
+        const maskShapeUrl = import.meta.env.VITE_BASE + '/scratchSomething/geojson/CHENGTONG.geojson';
         var data = await this.parsePolygon(maskShapeUrl);
         var vertexData = data.vertexData;
         var indexData = data.indexData;
-        const vsSource = (await axios.get('/scratchSomething/eulerWebGL/polygon.vert.glsl')).data;
-        const fsSource = (await axios.get('/scratchSomething/eulerWebGL/polygon.frag.glsl')).data;
+        const vsSource = (await axios.get(import.meta.env.VITE_BASE + '/scratchSomething/eulerWebGL/polygon.vert.glsl')).data;
+        const fsSource = (await axios.get(import.meta.env.VITE_BASE + '/scratchSomething/eulerWebGL/polygon.frag.glsl')).data;
         const vs = util.createShader(gl, gl.VERTEX_SHADER, vsSource);
         const fs = util.createShader(gl, gl.FRAGMENT_SHADER, fsSource);
         this.program_mask = util.createProgram(gl, vs, fs);

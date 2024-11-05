@@ -44,27 +44,27 @@ export default defineComponent({
     const list = [
       {
         name: "断面形态",
-        src: "/analyse/duanmianXT.png",
+        src: import.meta.env.VITE_BASE + "/analyse/duanmianXT.png",
         value: "section",
       },
       {
         name: "断面冲淤",
-        src: "/analyse/duanmianCY.png",
+        src: import.meta.env.VITE_BASE + "/analyse/duanmianCY.png",
         value: "sectionFlush",
       },
       {
         name: "区域冲淤",
-        src: "/analyse/quyuCY.png",
+        src: import.meta.env.VITE_BASE + "/analyse/quyuCY.png",
         value: "regionFlush",
       },
       {
         name: "冲淤等深线",
-        src: "/analyse/chongyuDSX.png",
+        src: import.meta.env.VITE_BASE + "/analyse/chongyuDSX.png",
         value: "flushContour",
       },
       {
         name: "河道容积",
-        src: "/analyse/hedaoRJ.png",
+        src: import.meta.env.VITE_BASE + "/analyse/hedaoRJ.png",
         value: "volume",
       },
       // {

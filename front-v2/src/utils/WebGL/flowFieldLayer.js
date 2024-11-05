@@ -30,10 +30,10 @@ class JsonFileParser {
             .then((response) => {
                 //console.log("parsing!!!  ", this.url);
                 for (let item of response.data['flow_fields']) {
-                    this.flowFieldResourceArr.push(item);
+                    this.flowFieldResourceArr.push(import.meta.env.VITE_BASE + item);
                 }
                 for (let item of response.data['area_masks']) {
-                    this.seedingResourceArr.push(item);
+                    this.seedingResourceArr.push(import.meta.env.VITE_BASE + item);
                 }
                 this.projection2DResource = response.data['projection'][0];
                 // this.projection3DResource = response.data['projection']['3D'];
@@ -161,13 +161,13 @@ export default class FlowFieldLayer {
         return this._timeCount;
     }
     async init2ShadersFromSrc(gl, vertURL, fragURL, XF_Varings) {
-        const vertSrc = await axios.get(vertURL)
+        const vertSrc = await axios.get(import.meta.env.VITE_BASE + vertURL)
             .then((response) => {
                 return response.data;
             }).catch((error) => {
                 //console.log('ERROR::VERTEX_SHADER FILE NOT FOUND', error);
             });
-        const fragSrc = await axios.get(fragURL)
+        const fragSrc = await axios.get(import.meta.env.VITE_BASE + fragURL)
             .then((response) => {
                 return response.data;
             }).catch((error) => {

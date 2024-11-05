@@ -28,19 +28,19 @@ const preActiveIndex = ref(-1)
 const navMenuList = ref([
     {
         name: '历史崩岸库',
-        iconUrl: '/history.png',
+        iconUrl: import.meta.env.VITE_BASE + '/history.png',
         path: '/knowledgeStore/history',
         active: false,
     },
     {
         name: '相关规划库',
-        iconUrl: '/model.png',
+        iconUrl: import.meta.env.VITE_BASE + '/model.png',
         path: '/knowledgeStore/plan',
         active: false,
     },
     {
         name: '模型参数库',
-        iconUrl: '/admin-panel.png',
+        iconUrl: import.meta.env.VITE_BASE + '/admin-panel.png',
         path: '/knowledgeStore/param',
         active: false,
     },

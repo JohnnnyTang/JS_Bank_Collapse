@@ -107,7 +107,7 @@ watch(() => useDeviceNameStore().deviceName, async (newVal) => {
         return
     }
     showPopup.value = true
-    deviceInfo.value = (await axios.get('/api/data/monitorInfo/code/' + deviceCode.value)).data
+    deviceInfo.value = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER + '/data/monitorInfo/code/' + deviceCode.value)).data
 
     if (deviceInfo.value.type === '6') {
         buttonShow.value = false

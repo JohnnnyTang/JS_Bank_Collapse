@@ -5,7 +5,8 @@ import dayjs from 'dayjs';
 
 
 export const getRealTimeStationData = async () => {
-    const stationData = (await axios.get('/model/data/bankResource/down/local/resource/waterCondition')).data
+    // let stationData = []
+    const stationData = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/data/bankResource/down/local/resource/waterCondition')).data
 
     let resultData = stationData.map(item => {
         return {
@@ -21,8 +22,8 @@ export const getRealTimeStationData = async () => {
 
 export const getRealTimeFlowAndLevelData = async () => {
 
-    const totalStationData = (await axios.get('/model/data/bankResource/down/local/resource/waterCondition')).data
-    const totalTidalRange = (await axios.get('/model/data/bankResource/down/local/resource/tidalRange')).data
+    const totalStationData = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/data/bankResource/down/local/resource/waterCondition')).data
+    const totalTidalRange = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/data/bankResource/down/local/resource/tidalRange')).data
     let flow, level
     for (let i = 0; i < totalStationData.length; i++) {
         if (totalStationData[i].station == '大通站')
@@ -30,7 +31,7 @@ export const getRealTimeFlowAndLevelData = async () => {
     }
 
     for (let i = 0; i < totalTidalRange.length; i++) {
-        if (totalTidalRange[i].station == '徐六泾站')
+        if (totalTidalRange[i].station == '天生港站')
             level = totalTidalRange[i]['tidalRange']
     }
 
@@ -38,7 +39,6 @@ export const getRealTimeFlowAndLevelData = async () => {
         flow,
         level,
     }
-    console.log(flowAndLevelData)
     return flowAndLevelData
 }
 

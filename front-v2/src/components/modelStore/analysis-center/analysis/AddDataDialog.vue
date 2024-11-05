@@ -141,7 +141,7 @@ export default defineComponent({
       if (avatar === "") {
         return '';
       } else {
-        return `/model/visual/getAvatar/${avatar}`;
+        return `${import.meta.env.VITE_MAP_TILE_SERVER2}/visual/getAvatar/${avatar}`;
       }
     };
 

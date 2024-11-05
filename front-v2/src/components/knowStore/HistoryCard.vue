@@ -9,7 +9,7 @@
                 <div class="image-wrapper">
                     <div class="image-div">
                         <img
-                            :src="'/崩岸' + (index % 3) + '.png'"
+                            :src="imgSrc"
                             alt="崩岸照片"
                         />
                     </div>
@@ -292,9 +292,11 @@ const props = defineProps({
     },
 })
 
+const imgSrc = () => import.meta.env.VITE_BASE + '/崩岸' + (props.index % 3) + '.png';
+
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER,
 })
 
 const detailInfo = ref({

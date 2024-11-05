@@ -1210,8 +1210,8 @@ const flowControlHandler = async () => {
     // timeStepFloat.value = 0
     if (showFlow.value) {
         if (nowWaterConditionType.value == '洪季') {
-            let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
-            let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
+            let backEndJsonUrl2 = import.meta.env.VITE_MAP_TILE_SERVER + '/data/flow/configJson/flood'
+            let imageSrcPrefix2 = import.meta.env.VITE_MAP_TILE_SERVER + '/data/flow/texture/flood/'
             let floodFlow = reactive(
                 new FlowFieldLayer(
                     'floodFlow',

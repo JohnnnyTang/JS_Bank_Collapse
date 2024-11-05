@@ -560,7 +560,7 @@ const run = async () => {
             let indicatorCaseId = res['multi-indicator-ids'][key]
             const result = (
                 await axios.get(
-                    `/model/data/bankResource/down/modelServer/result/caseId?caseId=${indicatorCaseId}`,
+                    `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/result/caseId?caseId=${indicatorCaseId}`,
                 )
             ).data
             indicatorResult.push(result.result)
@@ -584,7 +584,7 @@ const run = async () => {
 
     const rrr = async () => {
         const modelUrl =
-            '/model/taskNode/start/multipleIndicators/calculateRiskLevel'
+            import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/multipleIndicators/calculateRiskLevel'
         modelRunnningProgress.value = 0
 
         let TASK_ID
@@ -604,7 +604,7 @@ const run = async () => {
         console.log('TASK_ID', TASK_ID)
         const interval = setInterval(async () => {
             const status = (
-                await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)
+                await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/status/id?taskId=' + TASK_ID)
             ).data
             console.log('status :: ', status)
 
@@ -620,7 +620,7 @@ const run = async () => {
                     clearInterval(interval)
                     modelRunnningProgress.value = 100
                     const result = await axios.get(
-                        `/model/taskNode/result/id?taskId=${TASK_ID}`,
+                        `${import.meta.env.VITE_MAP_TILE_SERVER2}/taskNode/result/id?taskId=${TASK_ID}`,
                     )
                     console.log('result', result.data)
 
@@ -654,7 +654,7 @@ const run = async () => {
                     clearInterval(interval)
                     modelRunnningProgress.value = 0
                     const err = await axios.get(
-                        `/model/taskNode/result/id?taskId=${TASK_ID}`,
+                        `${import.meta.env.VITE_MAP_TILE_SERVER2}/taskNode/result/id?taskId=${TASK_ID}`,
                     )
                     console.log('err result', err)
                     modelStatus.value = 4

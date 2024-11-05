@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosIns = axios.create({
-    baseURL: "/model/data/bankResource",
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2 + "/data/bankResource",
 })
 axiosIns.interceptors.response.use((response) => {
     if (response.data.code === 500) {

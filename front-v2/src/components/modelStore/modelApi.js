@@ -5,7 +5,7 @@ const { notice } = utils;
 const requestList = new Set();
 
 const ModelInstance = axios.create({
-  baseURL: '/model',
+  baseURL: import.meta.env.VITE_MAP_TILE_SERVER2,
   timeout: 200000,
 })
 

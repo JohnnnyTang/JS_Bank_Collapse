@@ -642,7 +642,7 @@ const flytoFeature = (map, coord, zoom = 10) => {
 const loadImage = async (map, url, imageID) => {
     if (map.hasImage(imageID)) return
     return new Promise((resolve, reject) => {
-        map.loadImage(url, (err, img) => {
+        map.loadImage(import.meta.env.VITE_BASE + url, (err, img) => {
             if (err) throw err
             if (map.hasImage(imageID)) return
             else map.addImage(imageID, img)

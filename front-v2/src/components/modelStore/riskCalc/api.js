@@ -8,7 +8,7 @@
  */
 import axios from 'axios'
 const ModelInstance = axios.create({
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER,
 })
 
 export const extendFetch = async (url, option, timeout = 3000, retry = 3) => {
@@ -109,7 +109,7 @@ export const postTaskStartAPI = async (type, jsonID, condition, year) => {
     type === 'power' && (body.paramNode.params.condition = condition)
     body.paramNode.params.year = year.toString()
 
-    const response = await extendFetch('/api/taskNode/start', {
+    const response = await extendFetch(import.meta.env.VITE_MAP_TILE_SERVER + '/taskNode/start', {
         method: 'post',
         headers: new Headers({
             'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ export const postTaskStartAPI = async (type, jsonID, condition, year) => {
  * @returns
  */
 export const getTaskStatusAPI = async (taskID) => {
-    const response = await extendFetch(`/api/taskNode/${taskID}/status`)
+    const response = await extendFetch(`${import.meta.env.VITE_MAP_TILE_SERVER}/taskNode/${taskID}/status`)
         .then((res) => {
             if (res.status === 200) {
                 return res.json()
@@ -180,7 +180,7 @@ export const getTaskStatusAPI = async (taskID) => {
  * @returns
  */
 export const getTaskJsonAPI = async (taskID) => {
-    const response = await extendFetch(`/api/fileData/json/jsonStr/id/${taskID}`)
+    const response = await extendFetch(`${import.meta.env.VITE_MAP_TILE_SERVER}/fileData/json/jsonStr/id/${taskID}`)
         .then((res) => {
             if (res.status === 200) {
                 return res.json()

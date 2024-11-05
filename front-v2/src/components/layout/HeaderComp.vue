@@ -163,14 +163,14 @@ const navList = ref([
         routerLink: '/dataVisual',
         isActive: false,
         oneRow: true,
-        iconUrl: '/big-data.png',
+        iconUrl: import.meta.env.VITE_BASE + '/big-data.png',
     },
     {
         name: '实时监测预警',
         routerLink: '/bankTwin',
         isActive: false,
         oneRow: true,
-        iconUrl: '/analysis.png',
+        iconUrl: import.meta.env.VITE_BASE + '/analysis.png',
     },
 
     {
@@ -185,14 +185,14 @@ const navList = ref([
         routerLink: '/bankWarn',
         isActive: false,
         oneRow: true,
-        iconUrl: '/monitoring.png',
+        iconUrl: import.meta.env.VITE_BASE + '/monitoring.png',
     },
     {
         name: '模型与知识库',
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,
-        iconUrl: '/predictive.png',
+        iconUrl: import.meta.env.VITE_BASE + '/predictive.png',
     },
 ])
 
@@ -321,7 +321,7 @@ watch(() => useBankInfoStore().bankList, (newVal) => {
 })
 
 onBeforeMount(async () => {
-    const res = await axios.get('/model/data/bankResource/bank')
+    const res = await axios.get(import.meta.env.VITE_MAP_TILE_SERVER2 + '/data/bankResource/bank')
     useBankInfoStore().bankList = res.data
     bankList.value = res.data
 })

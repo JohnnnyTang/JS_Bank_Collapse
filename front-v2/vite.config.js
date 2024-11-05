@@ -3,8 +3,16 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import fs from 'fs'
 
+// const addPrefixPlugin = (prefix) => ({
+//     name: 'add-prefix-plugin',
+//     async transformIndexHtml(html) {
+//         return html.replace(/(href|src)="(?!http|\/\/)(?!\/cjbaweb\/)([^"]*)"/g, `$1="${prefix}$2"`)
+//     },
+// })
+
 // https://vitejs.dev/config/
 export default defineConfig({
+    // base: '/cjbaweb/',
     plugins: [vue()],
     resolve: {
         alias: [
@@ -19,7 +27,7 @@ export default defineConfig({
         port: 5173,
         proxy: {
             '/api': {
-                target: 'http://localhost:8989/api/v1',
+                target: 'http://172.21.213.243:8989/api/v1',
                 // target: 'http://172.21.212.166:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
@@ -37,7 +45,7 @@ export default defineConfig({
             '/model/': {
                 // target: 'http://172.21.212.166:8989/api/v2',
                 // target: 'http://localhost:8989/api/v2',
-                target: 'http://119.45.198.54:80/model',
+                target: 'http://172.21.213.243:8989/api/v2',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),
             },

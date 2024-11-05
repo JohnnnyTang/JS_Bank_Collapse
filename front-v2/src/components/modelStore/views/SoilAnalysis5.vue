@@ -328,7 +328,7 @@ const sectionViewModelRun = async (param) => {
 
     ModelRunningShow.value = true
     ModelRunningMessage.value = '正在计算断面形态'
-    let sectionViewModelUrl = '/model/taskNode/start/riverbedEvolution/calculateSectionView'
+    let sectionViewModelUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/riverbedEvolution/calculateSectionView'
     const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
     const taskId = await sectionViewMR.modelStart().catch(() => {
         ModelRunningShow.value = false
@@ -487,7 +487,7 @@ const BSTEMModelRun = async () => {
             offset: 130
         })
 
-        let BSTEMModelUrl = '/model/taskNode/start/erosionModel/calculateBSTEM'
+        let BSTEMModelUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/erosionModel/calculateBSTEM'
         const BSTEMMR = new ModelRunner(BSTEMModelUrl, BSTEMModelParams)
         const taskId = await BSTEMMR.modelStart().catch(() => {
             ModelRunningShow.value = false

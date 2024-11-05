@@ -844,7 +844,7 @@ const mapInit = async (map, vis) => {
             if (e.key == 'Enter') {
                 const minute = 60
                 let allWarnData = (
-                    await axios.get(`/api/data/deviceWarn/minute/${minute}`)
+                    await axios.get(`${import.meta.env.VITE_MAP_TILE_SERVER}/data/deviceWarn/minute/${minute}`)
                 ).data
                 let filteredData = filterWarnData(allWarnData)
                 let lastPos
@@ -1087,7 +1087,7 @@ const warnInterval = async (map, minute) => {
         应力桩: [],
     }
 
-    let deviceInfo = (await axios.get('/api/data/monitorInfo')).data
+    let deviceInfo = (await axios.get(import.meta.env.VITE_MAP_TILE_SERVER + '/data/monitorInfo')).data
     deviceInfo.forEach((item) => {
         const type = Number(item['type']) - 1
 
@@ -1098,7 +1098,7 @@ const warnInterval = async (map, minute) => {
     })
 
     let allWarnData = (
-        await axios.get(`/api/data/deviceWarn/danger/minute/${minute}`)
+        await axios.get(`${import.meta.env.VITE_MAP_TILE_SERVER}/data/deviceWarn/danger/minute/${minute}`)
     ).data
     console.log(allWarnData)
     // let warnType = 'GNSS'
