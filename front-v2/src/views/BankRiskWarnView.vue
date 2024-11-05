@@ -502,7 +502,7 @@ import { useRoute, onBeforeRouteUpdate, } from 'vue-router'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'

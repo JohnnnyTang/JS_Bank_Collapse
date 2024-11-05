@@ -4,7 +4,7 @@ import { filterMap } from "./tilefieldMAP"
 import axios from "axios"
 
 
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 const mapLayerStore = useMapLayerStore()
 class LayerGroup {
     constructor(title, layerIDs, map = undefined) {

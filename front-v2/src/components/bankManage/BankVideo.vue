@@ -100,7 +100,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import BackEndRequest from '../../api/backend'
 import { loadImage } from '../../utils/mapUtils'
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.hostname}${import.meta.env.VITE_MAP_TILE_SERVER}`
 // import 'viplayer/dist/index.css'
 // import { videoPlay } from 'viplayer'
 // const token = 'at.2q8ej4p4114dtudb20awr9763vfz1f6o-5j403u7nkd-1ya7mgb-wv9z5z55f'

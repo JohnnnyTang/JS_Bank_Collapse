@@ -212,7 +212,7 @@ const selectedDemChange = (val) => {
 
 
 
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 onMounted(async () => {
 
     map = await initPureScratchMap({ id: 'map' })

@@ -25,6 +25,8 @@
     "d3-voronoi": "^1.1.4",
     "dat.gui": "^0.7.9",
     "dayjs": "^1.11.10",
+    "dom-to-image": "^2.6.0",
+    "dom-to-image-more": "^3.5.0",
     "e-datav-vue3": "^0.10.0",
     "earcut": "^2.2.4",
     "echarts": "^5.5.0",

@@ -44,7 +44,7 @@ const filterWarnData = (warnDataList) => {
 
 const mapInit = async (map, vis) => {
     /*
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
     map.addSource('mzsPlaceLabelSource', {
         type: 'vector',
         tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],

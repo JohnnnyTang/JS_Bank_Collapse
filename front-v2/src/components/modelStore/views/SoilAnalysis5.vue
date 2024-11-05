@@ -610,7 +610,7 @@ const mapFlyToRiver = (mapIns) => {
 }
 const attachBaseLayer = (map) => {
     console.log('attach base layer')
-    const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+    const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
     map.addSource('mzsOverWaterSource', {
         type: 'vector',
         tiles: [

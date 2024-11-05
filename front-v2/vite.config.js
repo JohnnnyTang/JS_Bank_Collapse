@@ -33,7 +33,7 @@ export default defineConfig({
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
             '/cry': {
-                target: 'http://172.21.212.166:8989/api/v1',
+                target: 'http://localhost:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/cry/, ''),
             },
@@ -44,8 +44,13 @@ export default defineConfig({
             },
             '/model/': {
                 // target: 'http://172.21.212.166:8989/api/v2',
+<<<<<<< HEAD
                 // target: 'http://localhost:8989/api/v2',
                 target: 'http://172.21.213.243:8989/api/v2',
+=======
+                target: 'http://localhost:8989/api/v2',
+                // target: 'http://119.45.198.54:80/model',
+>>>>>>> 64d8bdaa25565da9b15e0ae6fad59492068bf2ea
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),
             },
@@ -72,3 +77,4 @@ export default defineConfig({
         },
     },
 })
+
