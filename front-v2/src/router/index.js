@@ -72,7 +72,7 @@ const routes = [
     },
     {
         path: '/test',
-        component: () => import("../components/dataVisual/test.vue")
+        component: () => import("../views/Test.vue")
     },
     {
         path: '/modelStore',

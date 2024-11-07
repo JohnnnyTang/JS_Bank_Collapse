@@ -1,9 +1,7 @@
 <template>
     <div class="bankKnowledge-container" ref="knowledgeContainer">
         <VerticalNavVue />
-        <!-- <div class="selector-container"></div> -->
         <router-view />
-        <!-- <ScrollHistoryVue :knowledgeContainerWidth="knowledgeContainerWidth" ref="scrollDom"/> -->
         <bottomWaveVue />
     </div>
 </template>
@@ -12,7 +10,7 @@
 import bottomWaveVue from './BottomWave.vue';
 import VerticalNavVue from './VerticalNav.vue';
 import { onMounted } from 'vue';
-onMounted(()=>{
+onMounted(() => {
 })
 </script>
 
@@ -23,11 +21,9 @@ div.bankKnowledge-container {
     overflow: hidden;
 
     // background-color: rgb(129, 143, 156);
-    background: linear-gradient(
-        60deg,
-        rgb(45, 30, 109) 0%,
-        rgb(5, 80, 165) 100%
-    );
+    background: linear-gradient(60deg,
+            rgb(45, 30, 109) 0%,
+            rgb(5, 80, 165) 100%);
 
     div.selector-container {
         height: 4vh;
