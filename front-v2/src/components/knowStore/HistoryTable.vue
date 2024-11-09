@@ -157,7 +157,7 @@ const moreInfo = ref({
 
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
+    baseURL: '/api/v1',
 })
 
 const emit = defineEmits(['scrollToSeeMore'])

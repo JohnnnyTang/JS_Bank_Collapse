@@ -294,7 +294,7 @@ const props = defineProps({
 
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
-    baseURL: '/api',
+    baseURL: '/api/v1',
 })
 
 const detailInfo = ref({
