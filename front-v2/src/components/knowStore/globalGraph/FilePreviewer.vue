@@ -2,7 +2,7 @@
     <el-dialog v-model="show" :title="previewInfo.title" width="fit-content" :append-to-body="true">
 
         <div class="video-container preview-container" v-if="previewInfo.fileType === 'mp4'">
-            <video controls width="100%" height="100%">
+            <video autoplay controls width="100%" height="100%" ref="videoRef">
                 <source :src="previewInfo.filePath" type="video/mp4" />
             </video>
         </div>
@@ -16,7 +16,7 @@
             <div class="loading" v-show="pdfLoading">
                 <div class="loadingIcon"></div>
             </div>
-            <VuePDF v-show="!pdfLoading" :pdf="PDF.pdf" :page="curPage" :width="500" @loaded="pdfLoadedHandler" />
+            <VuePDF v-show="!pdfLoading" :pdf="PDF.pdf" :page="curPage"  @loaded="pdfLoadedHandler" />
             <el-pagination v-show="!pdfLoading" layout="prev, pager, next" background :page-count="PDF.pages"
                 v-model:current-page="curPage" style="justify-content: center" />
         </div>
@@ -50,6 +50,9 @@ const previewInfo = computed(() => {
     }
 })
 
+///////// Video ///////////
+const videoRef = ref(null)
+
 
 
 ///////// PDF ///////////
@@ -60,12 +63,23 @@ const pdfLoadedHandler = () => {
     pdfLoading.value = false
 }
 watch(show, (newVal, oldVal) => {
-    if (previewInfo.value.fileType === 'pdf') {
-        pdfLoading.value = true
-        curPage.value = 1
-        PDF.value = usePDF(previewInfo.value.filePath)
+    // when close
+    if (oldVal) {
+        if (videoRef.value) {
+            videoRef.value.pause()
+        }
+    }
+    // when open
+    else {
+        if (previewInfo.value.fileType === 'pdf') {
+            pdfLoading.value = true
+            curPage.value = 1
+            PDF.value = usePDF(previewInfo.value.filePath)
+        }
     }
 })
+
+
 
 </script>
 

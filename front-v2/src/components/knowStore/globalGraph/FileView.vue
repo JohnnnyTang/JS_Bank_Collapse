@@ -2,9 +2,11 @@
     <div class="file-view">
 
         <div class="header">
-            <div>崩岸监测预警系统知识库管理</div>
+            <div class="tree-title-icon"></div>
+            <div class="tree-title-text">江苏省长江崩岸监测预警知识库</div>
         </div>
 
+        <!-- tree -->
         <div class="tree">
             <el-scrollbar height="80vh">
                 <el-tree style="width: 85vw" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"
@@ -17,7 +19,14 @@
                             </FileCard>
                         </div>
                         <div v-else class="title" :layer="data.layer">
-                            {{ data.label }}
+                            <span>{{ data.label }}</span>
+                            <div @click.stop="() => { }">
+                                <el-upload :file-list="[]" :limit="1"
+                                    :http-request="function (p) { fileUploadHandler(p, node) }" :show-file-list="false"
+                                    ref="uploadRef">
+                                    <div class="upload">上传</div>
+                                </el-upload>
+                            </div>
                         </div>
                     </template>
                 </el-tree>
@@ -27,10 +36,10 @@
         <!-- right menu -->
         <div v-show="showRightMenu" class="right-menu" ref="menu">
             <div class="right-memu-item" @click="downloadFileHandler">
-                <span>删除</span>
+                <span>下载</span>
             </div>
             <div class="right-memu-item" @click="deleteFileHandler">
-                <span>下载</span>
+                <span>删除</span>
             </div>
         </div>
 
@@ -71,19 +80,24 @@ const previewFileInfo = ref({
 })
 const showPreview = ref(false)
 const handleFileClick = (fileInfo, node) => {
-    ElMessage.info('预览文件 ' + fileInfo.label)
+    info('预览文件 ' + fileInfo.label)
     previewFileInfo.value = fileInfo
     showPreview.value = true
 }
 const downloadFileHandler = () => {
     const { fileInfo, node } = rightClickingFileNode
-    ElMessage.info('下载文件 ' + fileInfo.label)
-    const downloadUrl = './download/' + fileInfo.filePath
-    downloadFile(downloadUrl)
+    info('下载文件 ' + fileInfo.label)
+    const downloadUrl = ' http://localhost:5173/' + fileInfo.filePath
+    downloadFile(downloadUrl, fileInfo.label)
 }
 const deleteFileHandler = () => {
     const { fileInfo, node } = rightClickingFileNode
-    ElMessage.info('删除文件 ' + fileInfo.label)
+    info('删除文件 ' + fileInfo.label)
+}
+const uploadRef = ref(null)
+const fileUploadHandler = (file, node) => {
+    info('于' + node.data.label + '上传文件')
+    console.log(file)
 }
 
 
@@ -124,13 +138,19 @@ onMounted(() => {
 
 
 /////////////// Helper ////////////////
-const downloadFile = (url) => {
+const downloadFile = (url, name) => {
     var a = document.createElement('a');
     a.href = url;
-    a.download = url;
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+}
+const info = (msg) => {
+    ElMessage.info({
+        offset: 110,
+        message: msg
+    })
 }
 </script>
 
@@ -156,7 +176,23 @@ const downloadFile = (url) => {
         font-weight: 700;
         font-family: 'Microsoft YaHei';
         color: #0446a8;
-        text-align: center;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+        
+        background-color: rgba(204, 233, 252, 0.9);
+        backdrop-filter: blur(6px);
+
+        border-bottom: 3px solid rgb(15, 83, 230);
+
+        div.tree-title-icon {
+            height: 4vh;
+            width: 4vh;
+            background-image: url('/binary-data.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
     }
 
     .tree {
@@ -181,7 +217,6 @@ const downloadFile = (url) => {
     position: relative;
     width: 100%;
     height: 4vh;
-    // background-color: #c5e4ff;
     font-size: calc(0.7vw + 0.5vh);
     font-family: 'Microsoft YaHei';
     text-align: left;
@@ -191,18 +226,43 @@ const downloadFile = (url) => {
         font-size: calc(1.5vw + 1.2vh);
         margin: 1vh 0;
         font-weight: 800;
+        background-color: rgb(222, 226, 255);
     }
 
     &[layer="2"] {
         font-size: calc(0.9vw + 0.8vh);
         margin: 0.9vh 0;
         font-weight: 700;
+        background-color: rgb(235, 238, 255);
     }
 
     &[layer="3"] {
         font-size: calc(0.8vw + 0.7vh);
         margin: 0.8vh 0;
         font-weight: 600;
+        background-color: rgb(240, 242, 255);
+    }
+
+    .upload {
+        position: absolute;
+        right: 1vw;
+        top: 0;
+        width: 5vw;
+        height: 4vh;
+        line-height: 4vh;
+
+        cursor: pointer;
+        text-align: center;
+        font-size: calc(0.8vw + 0.6vh);
+        font-weight: bold;
+        background-color: rgb(184, 203, 255);
+        color: #002d70;
+        border-radius: 5px;
+        transition: 0.3s ease-in-out;
+
+        &:hover {
+            background-color: rgb(129, 141, 252);
+        }
     }
 }
 

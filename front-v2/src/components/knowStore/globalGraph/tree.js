@@ -1,14 +1,16 @@
 const paramTree = {
     id: 'root',
-    label: '长江崩岸监测预警知识库',
+    label: '长江崩岸监测预警\n知识库',
     layer: 1.5,
     class: 1,
+    type: 0,
     children: [
         {
             id: 'p1',
             label: '历史崩岸库',
             layer: 2,
             class: 2,
+            type: 1,
             children: [
                 {
                     id: 'p1-1',
@@ -269,6 +271,7 @@ const fileTree = [
                 id: 'p1-1',
                 label: '典型案例',
                 layer: 3,
+                upload: true,
                 children: [
                     {
                         id: 'p1-1-1',
@@ -322,6 +325,7 @@ const fileTree = [
                 id: 'p1-2',
                 label: '监测报告',
                 layer: 3,
+                upload: true,
                 children: [
                     {
                         fileCollection: [
@@ -338,6 +342,7 @@ const fileTree = [
                 id: 'p1-3',
                 label: '情况汇总',
                 layer: 3,
+                upload: true,
                 children: [
                     {
                         fileCollection: [
@@ -356,6 +361,7 @@ const fileTree = [
                 label: '相关规划库',
                 layer: 3,
                 class: 4,
+                upload: true,
                 children: [
                     {
                         fileCollection: [
@@ -424,6 +430,7 @@ const fileTree = [
                 id: 'p2-1',
                 label: '风险预警模型',
                 layer: 3,
+                upload: true,
                 children: [
                     {
                         fileCollection: [
@@ -448,6 +455,7 @@ const fileTree = [
                 id: 'p4-1',
                 label: '行洪运用预案',
                 layer: 3,
+                upload: true,
                 children: [
                     {
                         fileCollection: [
@@ -465,6 +473,7 @@ const fileTree = [
                 label: '重点防御预案',
                 layer: 3,
                 class: 4,
+                upload: true,
                 children: [
                     {
                         fileCollection: [
