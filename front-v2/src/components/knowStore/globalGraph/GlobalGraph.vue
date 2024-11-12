@@ -5,14 +5,30 @@
             <div class="tree-title-text">江苏省长江崩岸监测预警知识库</div>
         </div>
         <div class="param-tree-graph" id="param-tree"></div>
+
+
+        <!-- <div class="right-menu" ref="menu">
+            <div class="right-memu-item" @click="previewFileHandler">
+                <span>预览文件</span>
+            </div>
+            <div class="right-memu-item" @click="downloadFileHandler">
+                <span>下载文件</span>
+            </div>
+        </div> -->
+
+        <!-- preview -->
+        <FilePreviewer :fileInfo="previewFileInfo" v-model:show="showPreview"></FilePreviewer>
+
     </div>
 </template>
 
 <script setup>
 import G6 from '@antv/g6'
-import { onMounted } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { paramTree } from './tree.js'
 import { graphData } from './demo.js'
+import FilePreviewer from './FilePreviewer.vue';
+import { ElMessage } from 'element-plus';
 
 
 // onMounted(() => {
@@ -156,16 +172,63 @@ const nodeClassStrokeMap = [
     'rgba(233,233,233,0.6)',
 ]
 
+
+///// right menu /////
+// const menu = ref(null)
+
+///////////////file operation ///////////////////
+const rightClickedFileInfo = reactive({
+    label: '',
+    filePath: '',
+})
+const previewFileInfo = ref({
+    label: '',
+    filePath: '',
+})
+const showPreview = ref(false)
+const previewFileHandler = () => {
+    info('预览文件 ' + rightClickedFileInfo.label)
+    previewFileInfo.value = {
+        label: rightClickedFileInfo.label,
+        filePath: rightClickedFileInfo.filePath,
+    }
+    showPreview.value = true
+}
+const downloadFileHandler = () => {
+    const { fileInfo, node } = rightClickingFileNode
+    info('下载文件 ' + fileInfo.label)
+    const downloadUrl = ' http://localhost:5173/' + fileInfo.filePath
+    downloadFile(downloadUrl, fileInfo.label)
+}
+
 onMounted(() => {
     const container = document.getElementById('param-tree')
     // console.log(data)
     const width = container.scrollWidth
     const height = container.scrollHeight || 500
+
+    const contextMenu = new G6.Menu({
+        getContent() {
+            return `
+          <ul>
+            <li>指标详情</li>
+            <li>计算日志</li>
+          </ul>`
+        },
+        handleMenuClick: (target, item) => {
+            console.log(target, item, target.innerHTML)
+        },
+        offsetX: 10,
+        offsetY: -25,
+        itemTypes: ['node'],
+    })
+
     const graph = new G6.TreeGraph({
         container: 'param-tree',
         width,
         height,
         linkCenter: true,
+        plugins: [contextMenu],
         modes: {
             default: [
                 {
@@ -187,7 +250,6 @@ onMounted(() => {
                             setGrandChildrenCollapsed(data);
                         }
                         graph.fitView();
-                        // graph.refreshPositions(true)
                         return true;
                     },
                 },
@@ -197,9 +259,6 @@ onMounted(() => {
         },
         defaultEdge: {
             style: defaultEdgeStyle,
-        },
-        defaultNode: {
-            shape: 'rect',
         },
         layout: {
             // type: 'dendrogram',
@@ -219,25 +278,26 @@ onMounted(() => {
             getVGap: () => 80,
             getHGap: () => 100,
         },
-        maxZoom: 2,
-        minZoom: 0.5,
-        fitView: true,
-        fitViewPadding: 300,
-
+        maxZoom: 4,
+        minZoom: 0.2,
     })
 
     graph.node(function (node) {
         return {
+            _label: node.label,
             label: processString(node.label),
-            size: Math.round(256 / Math.log(node.layer + 1)),
+            
+            // shape:'rect',
+            // size: [40, 30],
+            size: Math.round(200 / Math.log(node.layer + 1)),
             labelCfg: {
                 style: {
                     fill: '#333',
-                    fontSize: 48 / Math.log(node.layer + 1),
+                    fontSize: 40 / Math.log(node.layer + 1),
                     fontWeight: 600 * Math.log(node.layer + 1),
                 },
 
-                position: node.children && node.children.length > 0 ? 'left' : 'right',
+                // position: node.children && node.children.length > 0 ? 'left' : 'right',
                 offset: 5
 
             },
@@ -245,26 +305,63 @@ onMounted(() => {
                 stroke: nodeClassStrokeMap[node.class - 1],
                 fill: nodeClassColorMap[node.class - 1],
             }
+
         }
     })
 
     graph.data(paramTree)
     graph.render()
-    graph.fitView()
 
+    // rerender
     G6.Util.traverseTree(paramTree, function (item) {
         if (item.depth > 0) {
             item.collapsed = true
         }
     })
-    // 传入数据
     graph.data(paramTree)
-    // 渲染
     graph.render()
-    // 自适应
     graph.fitView()
-    // 定位到画布中心
     graph.fitCenter()
+
+
+    // // callback
+    // graph.on('node:click', (evt) => {
+    //     const { item } = evt;
+    //     rightClickedFileInfo.label = item.get('model').label
+
+    //     const nodeData = item.get('model');
+    //     if (nodeData.filePath) {
+    //         menu.value.style.left = evt.clientX + 'px';
+    //         menu.value.style.top = evt.clientY - 50 + 'px';
+    //     }
+    // });
+
+    // ///// right click menu /////
+    // graph.on('node:contextmenu', function (evt) {
+    //     evt.preventDefault()
+    //     const { item } = evt;
+    //     rightClickedFileInfo.label = item.get('model').label
+    //     rightClickedFileInfo.filePath = item.get('model').filePath
+    //     const nodeId = item.get('id');
+    //     const nodeData = item.get('model');
+
+    //     if (nodeData.filePath) {
+    //         menu.value.style.left = evt.clientX + 'px';
+    //         menu.value.style.top = evt.clientY - 50 + 'px';
+    //     }
+
+    // });
+    // graph.on('node:mouseleave', () => {
+    //     menu.value.style.left = '-999px';
+    // });
+    // graph.on('drag', (e) => {
+    //     if (menu.value.style.left != '-999px') {
+    //         menu.value.style.left = e.clientX;
+    //     }
+    // })
+
+
+
 
     if (typeof window !== 'undefined')
         window.onresize = () => {
@@ -277,7 +374,8 @@ onMounted(() => {
 
 
 /////////// helper ////////////
-function processString(str) {
+function processString(string) {
+    let str = string;
     if (str.includes('\n')) {
         return str;
     } else if (str.length > 13) {
@@ -290,41 +388,21 @@ function processString(str) {
     }
 }
 
-const nodeDraw = (cfg, group) => {
-    const type = cfg.type; // 获取节点的 type 属性
-    const size = cfg.size ? cfg.size : 20; // 默认节点大小
-    let shape;
+const downloadFile = (url, name) => {
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
 
-    if (type === 0) {
-        // 如果 type 为 0，绘制圆形节点
-        shape = group.addShape('circle', {
-            attrs: {
-                x: 0,
-                y: 0,
-                r: size / 2, // 半径为节点大小的一半
-                fill: '#5B8FF9', // 圆形填充颜色
-                stroke: '#5B8FF9', // 圆形边框颜色
-            },
-            name: 'circle-shape',
-        });
-    } else {
-        // 如果 type 为 1，绘制矩形节点
-        shape = group.addShape('rect', {
-            attrs: {
-                x: -size / 2,
-                y: -size / 2,
-                width: size,
-                height: size,
-                fill: '#73C9E6', // 矩形填充颜色
-                stroke: '#73C9E6', // 矩形边框颜色
-            },
-            name: 'rect-shape',
-        });
-    }
-
-    return shape;
-};
-
+const info = (msg) => {
+    ElMessage.info({
+        offset: 110,
+        message: msg
+    })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -377,6 +455,40 @@ div.param-tree-container {
         }
 
         // background-color: aqua;
+    }
+
+    .right-menu {
+        z-index: 999;
+        position: absolute;
+        left: -999px;
+        width: 100px;
+        position: absolute;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        background-color: white;
+        cursor: pointer;
+
+        .right-memu-item {
+            position: relative;
+            width: 100px;
+            height: 4vh;
+            line-height: 4vh;
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            padding-left: 0.5vw;
+            box-shadow: rgba(193, 233, 255, 0.8) 1px 1px, rgba(193, 233, 255, 0.7) 2px 2px, rgba(193, 233, 255, 0.6) 3px 3px;
+            background-color: rgb(255, 255, 255);
+
+            font-family: 'Microsoft YaHei';
+            font-size: calc(0.8vw + 0.6vh);
+
+            span {
+                padding-left: 0.5vw;
+            }
+
+            &:hover {
+                background-color: rgb(195, 224, 255);
+            }
+        }
     }
 }
 </style>

@@ -1,10 +1,18 @@
 <template>
-    <div class="file-view" v-loading="loading">
+    <div class="file-view">
+
+        <div class="header">
+            <div class="tree-title-icon"></div>
+            <div class="tree-title-text">江苏省长江崩岸监测预警知识库</div>
+            <div class="upload" @click="uploadHandler">上传</div>
+        </div>
+
         <!-- tree -->
         <div class="tree">
             <el-scrollbar height="80vh">
                 <el-tree style="width: 85vw" :data="treeData" :props="defaultProps" @node-click="handleNodeClick"
-                    ref="treeRef" :default-expand-all="true">
+                    ref="treeRef" @node-expand="handleNodeExpand" @node-collapse="handleNodeCollapse"
+                    :default-expand-all="false">
                     <template #default="{ node, data }">
                         <div class="file-set" v-if="data.fileCollection">
                             <FileCard v-for="(item, index) in data.fileCollection" :fileInfo="item" :key="index"
@@ -12,7 +20,7 @@
                                 @contextmenu.prevent="rightClickHandler($event, item, node)">
                             </FileCard>
                         </div>
-                        <div v-else class="title gradient" :layer="data.layer">
+                        <div v-else class="title" :layer="data.layer">
                             <span>{{ data.label }}</span>
                             <div class="upload" @click.stop="uploadHandler(node, data)">上传</div>
                         </div>
@@ -50,11 +58,6 @@ import FilePreviewer from './FilePreviewer.vue';
 import FileUpload from './FileUpload.vue';
 import KnowStoreHelper from '../knowStoreHelper';
 
-/////////////// other //////////////////
-const loading = ref(false)
-
-
-
 
 ///////////////tree ///////////////////
 const handleNodeClick = (data, node) => {
@@ -67,6 +70,21 @@ const defaultProps = {
 
 const treeData = ref([])
 const treeRef = ref(null)
+
+
+/////////////// 节点展开和收起记录 //////////////
+const expandedNodesIds = ref([]);
+const handleNodeExpand = (node) => {
+    if (!expandedNodesIds.value.includes(node.id)) {
+        expandedNodesIds.value.push(node.id);
+    }
+};
+const handleNodeCollapse = (node) => {
+    const index = expandedNodesIds.value.indexOf(node.id);
+    if (index > -1) {
+        expandedNodesIds.value.splice(index, 1);
+    }
+};
 
 
 
@@ -153,8 +171,8 @@ const rightClickHandler = (event, fileInfo, node) => {
     if (menu.value) {
         showRightMenu.value = false;
         showRightMenu.value = true;
-        menu.value.style.left = event.clientX - 200 + "px";
-        menu.value.style.top = event.clientY - 150 + "px";
+        menu.value.style.left = event.clientX - 5 + "px";
+        menu.value.style.top = event.clientY - 80 + "px";
         window.addEventListener("click", closeRightMenu);
     }
 };
@@ -164,14 +182,11 @@ const rightClickHandler = (event, fileInfo, node) => {
 
 
 
-onMounted(() => {
-    refreshTree()
+onMounted(async () => {
+    treeData.value = await buildTree()
 
-    window.addEventListener('keydown', e => {
-        if (e.key === '1') {
-            refreshTree()
-        }
-    })
+    const gdata = await KnowStoreHelper.getGraphData()
+    console.log(gdata)
 })
 
 
@@ -183,11 +198,21 @@ const info = (msg) => {
         message: msg
     })
 }
-
+const searchPath = (node) => {
+    let path = []
+    path.push(node.data.label)
+    while (node.level !== 1) {
+        node = node.parent
+        path.push(node.data.label)
+    }
+    return path.reverse()
+}
+const buildTree = () => {
+    return KnowStoreHelper.getTreeData()
+}
 const refreshTree = async () => {
-    loading.value = true
-    treeData.value = await KnowStoreHelper.getTreeData()
-    loading.value = false
+    treeData.value = await buildTree()
+    treeRef.value.setExpandedKeys(expandedNodesIds.value)
 }
 const dpCpy = (obj) => {
     return JSON.parse(JSON.stringify(obj))
@@ -197,19 +222,70 @@ const dpCpy = (obj) => {
 <style lang="scss" scoped>
 .file-view {
     position: relative;
-    height: 74vh;
-    width: 80vw;
+    width: 100vw;
+    height: 92vh;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: #ffffff;
+
+    .header {
+        position: relative;
+        width: 85vw;
+        height: 6vh;
+        line-height: 6vh;
+        font-size: calc(1.3vw + 1vh);
+        font-weight: 700;
+        font-family: 'Microsoft YaHei';
+        color: #0446a8;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: center;
+
+        background-color: rgba(204, 233, 252, 0.9);
+        backdrop-filter: blur(6px);
+
+        border-bottom: 3px solid rgb(15, 83, 230);
+
+        div.tree-title-icon {
+            height: 4vh;
+            width: 4vh;
+            background-image: url('/binary-data.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    }
+
+    .upload {
+        position: absolute;
+        right: 1vw;
+        top: 0;
+        width: 5vw;
+        height: 4vh;
+        line-height: 4vh;
+
+        cursor: pointer;
+        text-align: center;
+        font-size: calc(0.8vw + 0.6vh);
+        font-weight: bold;
+        background-color: black;
+        color: white;
+        border-radius: 5px;
+        transition: 0.1s ease-in-out;
+
+        &:hover {
+            background-color: rgb(77, 0, 87);
+        }
+    }
 
     .tree {
         position: relative;
-        height: 74vh;
-        width: 80vw;
+        width: 85vw;
+        height: 80vh;
     }
 }
 
@@ -218,7 +294,8 @@ const dpCpy = (obj) => {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    width: 78vw;
+    width: 98vw;
+    // margin-top: 10vh;
     z-index: 2;
     flex-wrap: wrap;
 }
@@ -232,57 +309,46 @@ const dpCpy = (obj) => {
     text-align: left;
     line-height: 4vh;
 
-    &.gradient {
-        color: linear-gradient(to right, #064fec 0%, #14129e 100%);
-        font-family: "Microsoft YaHei";
-    }
-
     &[layer="1"] {
-        font-size: calc(0.9vw + 0.8vh);
+        font-size: calc(1.5vw + 1.2vh);
         margin: 1vh 0;
         font-weight: 800;
-        color: #26255e;
+        background-color: rgb(222, 226, 255);
     }
 
     &[layer="2"] {
-        font-size: calc(0.8vw + 0.6vh);
+        font-size: calc(0.9vw + 0.8vh);
         margin: 0.9vh 0;
         font-weight: 700;
-        color: #26255e;
+        background-color: rgb(235, 238, 255);
     }
 
     &[layer="3"] {
-        font-size: calc(0.65vw + 0.5vh);
+        font-size: calc(0.8vw + 0.7vh);
         margin: 0.8vh 0;
         font-weight: 600;
-        background-clip: none;
-        color: #26255e;
-
+        background-color: rgb(240, 242, 255);
     }
-
-
 
     .upload {
         position: absolute;
-        right: 7.5vw;
+        right: 1vw;
         top: 0;
-        width: 3vw;
-        height: 3vh;
-        line-height: 3vh;
-        margin: 0.5vh 0vw;
-
+        width: 5vw;
+        height: 4vh;
+        line-height: 4vh;
 
         cursor: pointer;
         text-align: center;
-        font-size: calc(0.7vw + 0.4vh);
+        font-size: calc(0.8vw + 0.6vh);
         font-weight: bold;
-        background-color: rgb(149, 174, 255);
-        color: #ffffff;
+        background-color: rgb(184, 203, 255);
+        color: #002d70;
         border-radius: 5px;
         transition: 0.3s ease-in-out;
 
         &:hover {
-            background-color: rgb(134, 146, 255);
+            background-color: rgb(129, 141, 252);
         }
     }
 }
@@ -323,11 +389,6 @@ const dpCpy = (obj) => {
 :deep(.el-tree) {
     .el-tree-node__content {
         height: fit-content;
-        margin-left: 1vw;
-    }
-
-    .el-tree-node__expand-icon {
-        font-size: 1vw;
     }
 }
 </style>

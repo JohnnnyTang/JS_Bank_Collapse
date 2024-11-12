@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container" @click="download">
         <GlobalGraph></GlobalGraph>
 
         <!-- <div class="navs">
@@ -8,15 +8,32 @@
 
         <bottomWaveVue></bottomWaveVue> -->
         <!-- <FileView></FileView> -->
+        <!-- <FileUpload v-model:uploadShow="uploadShow"></FileUpload> -->
+        <!-- <el-tree :data="treeStructure" :props="defaultProps">
 
+        </el-tree> -->
     </div>
 </template>
 
 <script setup>
 import GlobalGraph from '../components/knowStore/globalGraph/GlobalGraph.vue'
-// import NavCard from '../components/knowStore/globalGraph/NavCard.vue';
-// import bottomWaveVue from '../components/knowStore/BottomWave.vue';
 import FileView from '../components/knowStore/globalGraph/FileView.vue';
+import FileUpload from '../components/knowStore/globalGraph/FileUpload.vue';
+import axios from 'axios'
+// import { ref } from 'vue'
+
+// const uploadShow = ref(true)
+// window.addEventListener('keydown', e => {
+//     if (e.key === '1') {
+//         uploadShow.value = true
+//     }
+//     if (e.key === '2') {
+//         uploadShow.value = false
+//     }
+//     if (e.key === '3')
+//         console.log(uploadShow.value)
+
+// })
 
 </script>
 

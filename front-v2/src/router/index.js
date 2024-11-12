@@ -36,15 +36,25 @@ const routes = [
                 component: () =>
                     import('../components/knowStore/views/RiverPlan.vue'),
             },
+            // {
+            //     path: 'param',
+            //     component: () =>
+            //         import('../components/knowStore/ParamTree.vue'),
+            // },
+            // {
+            //     path: 'experience',
+            //     component: () =>
+            //         import('../components/knowStore/views/ExpertKnow.vue'),
+            // },
             {
-                path: 'param',
+                path: 'graph',
                 component: () =>
-                    import('../components/knowStore/views/ModelParams.vue'),
+                    import('../components/knowStore/KnowGraph.vue'),
             },
             {
-                path: 'experience',
+                path: 'tree',
                 component: () =>
-                    import('../components/knowStore/views/ExpertKnow.vue'),
+                    import('../components/knowStore/KnowTree.vue'),
             },
         ],
     },
@@ -70,10 +80,10 @@ const routes = [
         path: '/main',
         component: () => import("../views/BankMainView.vue")
     },
-    {
-        path: '/test',
-        component: () => import("../views/Test.vue")
-    },
+    // {
+    //     path: '/test',
+    //     component: () => import("../views/Test.vue")
+    // },
     {
         path: '/modelStore',
         redirect: '/modelStore/main',

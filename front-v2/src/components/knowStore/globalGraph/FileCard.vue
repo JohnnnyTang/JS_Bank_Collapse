@@ -23,11 +23,14 @@ const props = defineProps({
 const imgPath = {
     'pdf': '/knowledge/pdf.png',
     'png': '/knowledge/png.png',
-    'mp4': '/knowledge/mp4.png'
+    'picture': '/knowledge/png.png',
+    'mp4': '/knowledge/mp4.png',
+    'video': '/knowledge/mp4.png',
+
 }
 
 const fname = computed(() => props.fileInfo.label.length > 10 ? props.fileInfo.label.slice(0, 10) + '...' : props.fileInfo.label)
-const fimg = computed(() => imgPath[props.fileInfo.label.slice(-3)])
+const fimg = computed(() => imgPath[props.fileInfo.type])
 
 
 

@@ -1,13 +1,13 @@
 <template>
     <el-dialog v-model="show" :title="previewInfo.title" width="fit-content" :append-to-body="true">
 
-        <div class="video-container preview-container" v-if="previewInfo.fileType === 'mp4'">
+        <div class="video-container preview-container" v-if="previewInfo.fileType === 'video'">
             <video autoplay controls width="100%" height="100%" ref="videoRef">
                 <source :src="previewInfo.filePath" type="video/mp4" />
             </video>
         </div>
 
-        <div class="image-preview" v-else-if="previewInfo.fileType === 'png'">
+        <div class="image-preview" v-else-if="previewInfo.fileType === 'picture'">
             <el-image :src="previewInfo.filePath" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2"
                 :preview-src-list="previewInfo.srcList" :initial-index="0" fit="cover" />
         </div>
@@ -37,6 +37,7 @@ const props = defineProps({
         default: {
             label: '',
             filePath: '',
+            type: ''
         }
     }
 })
@@ -44,7 +45,7 @@ const show = defineModel('show')
 const previewInfo = computed(() => {
     return {
         title: props.fileInfo.label,
-        fileType: props.fileInfo.label.slice(-3),//pdf, png, mp4,
+        fileType: props.fileInfo.type,//pdf, picture, video,
         filePath: props.fileInfo.filePath,
         srcList: [props.fileInfo.filePath],
     }
@@ -90,11 +91,25 @@ watch(show, (newVal, oldVal) => {
     height: 65vh;
 }
 
+.image-preview{
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    min-width: 40vw;
+    min-height: 50vh;
+    max-width: 50vw;
+    max-height: 60vh;
+    
+}
+
 .pdf-preview {
     position: relative;
-    width: 30vw;
-    height: 90vh;
-
+    // width: 30vw;
+    // height: 90vh;
+    width: fit-content;
+    height: fit-content;
+    min-width: 30vw;
+    min-height: 90vh;
     .loading {
         position: absolute;
         top: 0vh;

@@ -7,7 +7,7 @@
             <div class="device-detail-container">
                 <div class="device-name-text">{{ DEVICETYPEMAP[(+deviceInfo.type) - 1] }}</div>
                 <div class="device-pic">
-                    <img class="device-pic-img" :src="imgSrcPrefix + deviceInfo.code + '.jpg'" alt>
+                    <img class="device-pic-img" :src="imgSrcPrefix + deviceCode + '.jpg'" alt>
                 </div>
                 <div class="bank-status-container">
                     <div class="device-bank-info">
@@ -64,6 +64,7 @@ import { onMounted, watch, ref } from 'vue'
 import { useDeviceNameStore } from '../../store/mapStore.js'
 import axios from 'axios';
 import pureChart from '../dataVisual/monitorDevice/pureChartV2.vue'
+import BackEndRequest from '../../api/backend';
 
 const deviceCode = ref('')
 const showPopup = ref(false)
@@ -95,19 +96,19 @@ const clickbuttonHandler = () => {
 
 watch(() => useDeviceNameStore().deviceName, async (newVal) => {
     console.log(' new pick up device ', newVal, nameCodeMap[newVal])
-    // const deviceMap = {
-    //     '视频': 'camera',
-    //     '应力桩': 'stress',
-    //     '测斜': 'incline',
-    //     'GNSS': 'gnss',
-    // }
+
     deviceCode.value = nameCodeMap[newVal]
+
+
     if (deviceCode.value === '') {
         showPopup.value = false
         return
     }
     showPopup.value = true
-    deviceInfo.value = (await axios.get('/api/data/monitorInfo/code/' + deviceCode.value)).data
+    // deviceInfo.value = (await axios.get('/api/data/monitorInfo/code/' + deviceCode.value)).data // 这个接口G了
+
+    deviceInfo.value = (await BackEndRequest.getMonitorInfoByCode(deviceCode.value)).data
+    console.log(' deviceInfo ', deviceInfo.value)
 
     if (deviceInfo.value.type === '6') {
         buttonShow.value = false

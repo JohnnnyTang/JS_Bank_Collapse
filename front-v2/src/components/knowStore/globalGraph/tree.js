@@ -1,3 +1,4 @@
+
 const paramTree = {
     id: 'root',
     label: '长江崩岸监测预警\n知识库',
@@ -29,18 +30,21 @@ const paramTree = {
                                     label: '扬中118崩岸抢险视频.mp4',
                                     layer: 5,
                                     class: 2,
+                                    filePath: '/test.mp4'
                                 },
                                 {
                                     id: 'p1-1-1-2',
                                     label: '指南村崩岸.jpg',
                                     layer: 5,
                                     class: 2,
+                                    filePath: '/BK0.png'
                                 },
                                 {
                                     id: 'p1-1-1-3',
                                     label: '扬中118抢险记录.pdf',
                                     layer: 5,
                                     class: 2,
+                                    filePath: '/pdf/11.长江南通段民主沙撤离预案.pdf'
                                 },
                                 {
                                     id: 'p1-1-1-4',
@@ -509,5 +513,6 @@ const fileTree = [
         ],
     },
 ]
+
 
 export { paramTree, fileTree }
