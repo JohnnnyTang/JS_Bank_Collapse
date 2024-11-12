@@ -260,8 +260,8 @@
             <bedFlowChartVue />
         </div>
 
-        <flowspeedInfoVue v-if="showFlowSpeed" :status="hydrodynamicCalcDone && !isRunningMan" :flowspeedChartLoad="flowspeedChartLoad" 
-            :time-step="timeStep" @handleDrawEvent="drawHandler" ref="flowspeedInfoRef"/>
+        <flowspeedInfoVue v-if="showFlowSpeed" :profileList="profileList" :flowspeedChartLoad="flowspeedChartLoad"
+            :type="nowWaterConditionType" @condition-change="conditionChangeHandler" />
         <div v-if="showFlowSpeed" class="flow-control-block">
             <label class="switch" style="transform: rotateZ(90deg)">
                 <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
@@ -275,7 +275,16 @@
             <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
         </div>
 
-        <waterProcessChartVue  v-if="showWaterProcessChart" :waterProcessChartLoad="flowspeedChartLoad" :timeStep="timeStep" ref="WaterProcessChartRef" />
+        <div v-if="showWaterProcessChart" style="
+                position: absolute;
+                top: 66vh;
+                left: 0.3vw;
+                width: 26vw;
+                height: 25vh;
+                z-index: 10;
+            ">
+            <waterProcessChartVue :timeStep="timeStep" :type="nowWaterConditionType" />
+        </div>
 
         <geologyAndProjectVue v-if="showGeologyAndProject" />
 
@@ -447,7 +456,7 @@
                         <div class="flex-row" style="margin-bottom: 0.8vh; margin-top: .5vh">
                             <span class="desc">冲淤起算地形：</span>
                             <el-select v-model="conditionConfigureData.refDEM" placeholder="请选择地形"
-                                style="width: 7vw; height: 3.5vh" value-key="name">
+                                style="width: 7vw; height: 3.5vh" @change="" value-key="name">
                                 <el-option v-for="(
                                   item, index
                               ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
@@ -457,7 +466,7 @@
                         <div class="flex-row">
                             <span class="desc">判别计算地形：</span>
                             <el-select v-model="conditionConfigureData.benchDEM" placeholder="请选择地形"
-                                style="width: 7vw; height: 3.5vh" value-key="name">
+                                style="width: 7vw; height: 3.5vh" @change="" value-key="name">
                                 <el-option v-for="(
                                     item, index
                                 ) in demResources" :key="index" :value="item" :label="item.name + '地形'">
@@ -535,7 +544,6 @@ import ClientStorageHelper from '../utils/ClientStorageHelper';
 import { getRealTimeFlowAndLevelData } from '../api/realtimeWaterCondition';
 import { useBankNameStore } from '../store/bankNameStore'
 import BackEndRequest from '../api/backend'
-import ModelRunner from '../components/modelStore/modelRunner'
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 const bankName = useBankNameStore().globalBankName
@@ -600,9 +608,6 @@ const showBankLine = ref(true)
 const showTerrain = ref(false)
 const infoTreeData = ref(InfoTree)
 
-const flowspeedInfoRef = ref();
-const WaterProcessChartRef = ref();
-const tideLevelPointPos = ref([120.522864, 32.035502])
 
 const nowWaterConditionType = ref('洪季')
 
@@ -797,13 +802,7 @@ const conditionConfigureDataResetHandler = async () => {
     RunningManSays.value = '模型正在运行，请稍候...'
     console.log('reset condition data!', conditionConfigureData)
 
-    try {
-        let result = await runHydrodynamicModel();
-    } catch (error) {
-        // isRunningMan.value = false;
-        // RunningManSays.value = ''
-        // return
-    }
+
 
     ///////////////////////  Run  /////////////////////// 
     runRiskLevelForAll({
@@ -814,14 +813,14 @@ const conditionConfigureDataResetHandler = async () => {
     }, {}, {
         bankEnName: useBankNameStore().globalBankName,
         setName: 'standard'
-    }).then(async (result) => {
+    }).then((result) => {
         console.log('runRiskLevelForAll result:', result)
-        
+
         if (result === null) {
             ElMessage({
                 type: 'error',
                 message: '模型运行失败',
-                offset: 300
+                offset: 260
             })
             isRunningMan.value = false
             RunningManSays.value = ''
@@ -844,12 +843,11 @@ const conditionConfigureDataResetHandler = async () => {
             map.triggerRepaint()
         }
 
-        tidePointVelocityCalc(tideLevelPointPos.value[0], tideLevelPointPos.value[1]);
-
     }).catch((error) => {
         isRunningMan.value = false
         return
     })
+
 
 }
 
@@ -1793,219 +1791,12 @@ const addBankLineRiskLayer = (map, profileList) => {
 }
 
 
-const runHydrodynamicModel = async () => {
-    return new Promise(async (resolve, reject) => {
-        let modelPostUrl = ''
-        let modelParams = {}
-        modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
-        modelParams = {
-            "water-qs": conditionConfigureData.flow,
-            "tidal-level":conditionConfigureData.tideDif,
-            "segment": useBankNameStore().globalBankName,
-            "set": "standard",
-            "year": "2023",
-        }
-        
-        console.log('check1 ', modelPostUrl, modelParams)
-        try {
-            const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
-            console.log('TASK_ID ', TASK_ID)
-
-            if (TASK_ID === 'WRONG') {
-            throw new Error()
-            }
-
-            let runningStatusInterval = setInterval(async () => {
-            let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
-            // let runningStatus = 'RUNNING'
-            if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
-                console.log('runningStatus ', runningStatus)
-            }
-            else if (runningStatus === 'ERROR') {
-                const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
-                axios.get(url).then(response => {
-                let errorLog = response.data['error-log']
-                resolve(errorLog)
-                }).catch(error => {
-                console.warn(error)
-                reject(error)
-                })
-                const errorLog = (await axios.get(url)).data['error-log']
-
-                // ElNotification({
-                // title: '水动力模型运行失败',
-                // message: `错误原因:\n` + errorLog,
-                // offset: 300,
-                // type: 'error',
-                // })
-                clearInterval(runningStatusInterval)
-                reject(new Error(errorLog))
-            }
-            else if (runningStatus === 'COMPLETE') {
-                clearInterval(runningStatusInterval)
-                let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data
-                hydrodynamicCaseID = runningResult['case-id']
-                hydrodynamicCalcDone.value = true;
-                console.log('水动力模型计算完成！');
-                resolve(runningResult)
-                // showFlowClickHandler(1)
-            }
-            }, 500)
-        } catch (error) {
-            console.log(error)
-            // ElNotification({
-            // title: '水动力模型运行失败',
-            // offset: 300,
-            // type: 'error',
-            // })
-            reject(error)
-        }
-    })
-}
 
 
-///////////
-/////////// 水动力计算部分
-///////////
-let hydrodynamicCaseID = ''
-let drawingStatus = false;
-const hydrodynamicCalcDone = ref(false);
 
-/////////////////// 潮位过程线获取
-const tidePointVelocityCalc = async (lng, lat) => {
-    // modelRunnningStatusDesc
-    const pointVelocityModelUrl =
-        '/model/taskNode/start/numeric/getFlowFieldVelocities'
-    const params = {
-        'case-id': hydrodynamicCaseID,
-        // "case-id": '6c6496ca7c80adbbff129da890894990',
-        'sample-points': [
-            {
-                lng: lng,
-                lat: lat,
-            },
-        ],
-    }
-    isRunningMan.value = true
-    RunningManSays.value = '正在提取潮位线...'
-    const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
-    await pointVelocityMR.modelStart()
 
-    console.log('===Interval')
-    let runningInterval = setInterval(async () => {
-        let runningStatus = await pointVelocityMR.getRunningStatus()
-        switch (runningStatus) {
-            case 'RUNNING':
-                break
-            case 'ERROR':
-                console.log('error')
-                clearInterval(runningInterval)
-                let errorLog = await pointVelocityMR.getErrorLog()
-                ElNotification({
-                    title: '计算失败',
-                    message: `错误原因:\n` + errorLog,
-                    offset: 300,
-                    type: 'error',
-                })
-                isRunningMan.value = false
-                RunningManSays.value = ''
-                drawingStatus = false
-                break
-            case 'COMPLETE':
-                clearInterval(runningInterval)
-                ElNotification({
-                    title: '计算成功',
-                    offset: 300,
-                    type: 'success',
-                })
-                let runningResult = await pointVelocityMR.getModelResult();
 
-                flowspeedInfoRef.value.updateData(runningResult)
-                WaterProcessChartRef.value.updateData(runningResult)
 
-                console.log('runningResult ', runningResult)
-                isRunningMan.value = false
-                RunningManSays.value = ''
-                drawingStatus = false
-                break
-        }
-    }, 1000)
-}
-
-const drawHandler = () => {
-  if (hydrodynamicCalcDone.value === false) {
-    ElNotification({
-      title: '警告',
-      message: '模型计算完成后方可提取潮位过程线',
-      type: 'warning',
-      offset: 300,
-    })
-    return
-  }
-  if (isRunningMan.value === true) {
-    ElNotification({
-      title: '警告',
-      message: '请等待当前任务完成，请稍后...',
-      type: 'warning',
-      offset: 300,
-    })
-    return
-  }
-
-  ElNotification({
-    title: '提示',
-    message: '进入绘制状态，点击地图以添加潮位点',
-    type: 'info',
-    offset: 300,
-  })
-  let map = useMapStore().getMap()
-  let dom = map.getCanvasContainer()
-  dom.style.cursor = 'crosshair'
-  if (drawingStatus === false) {
-    map.once('click', (e) => {
-        // 防止运行模型的过程中添加测点
-        if (isRunningMan.value === true) {
-            ElNotification({
-                title: '警告',
-                message: '请等待当前任务完成，请稍后...',
-                type: 'warning',
-                offset: 300,
-            })
-            dom.style.cursor = 'grab'
-            return
-        }
-        tideLevelPointPos.value = [e.lngLat.lng, e.lngLat.lat];
-        map.getSource('chaoWeiPoint').setData({
-            type: 'FeatureCollection',
-            features: [
-                {
-                    type: 'Feature',
-                    properties: {
-                        label: '潮位点',
-                    },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: tideLevelPointPos.value,
-                    },
-                },
-            ],
-        })
-        ElNotification({
-            type: 'info',
-            title: '设置潮位点',
-            message: `经度：${e.lngLat.lng.toFixed(4)}，纬度：${e.lngLat.lat.toFixed(4)}`,
-            offset: 300,
-        })
-
-        tidePointVelocityCalc(e.lngLat.lng, e.lngLat.lat)
-        dom.style.cursor = 'grab'
-    })
-    drawingStatus = true
-  }
-  else {
-    return
-  }
-}
 
 
 
@@ -2063,7 +1854,7 @@ onBeforeRouteUpdate(async (to, from) => {
                         },
                         geometry: {
                             type: 'Point',
-                            coordinates: tideLevelPointPos.value,
+                            coordinates: [120.522864, 32.035502],
                         },
                     },
                 ],
@@ -2620,7 +2411,7 @@ onMounted(async () => {
                         },
                         geometry: {
                             type: 'Point',
-                            coordinates: tideLevelPointPos.value,
+                            coordinates: [120.522864, 32.035502],
                         },
                     },
                 ],
