@@ -32,7 +32,7 @@ const navMenuList = ref([
     },
     {
         name: '相关规划图集',
-        iconUrl: '/model.png',
+        iconUrl: '/plan.png',
         path: '/knowledgeStore/plan',
         active: false,
     },
