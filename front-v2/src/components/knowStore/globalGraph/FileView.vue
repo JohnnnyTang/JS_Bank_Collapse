@@ -233,7 +233,7 @@ const dpCpy = (obj) => {
     line-height: 4vh;
 
     &.gradient {
-        color: linear-gradient(to right, #064fec 0%, #14129e 100%);
+        color: #26255e;
         font-family: "Microsoft YaHei";
     }
 
@@ -241,14 +241,13 @@ const dpCpy = (obj) => {
         font-size: calc(0.9vw + 0.8vh);
         margin: 1vh 0;
         font-weight: 800;
-        color: #26255e;
     }
 
     &[layer="2"] {
         font-size: calc(0.8vw + 0.6vh);
         margin: 0.9vh 0;
         font-weight: 700;
-        color: #26255e;
+      
     }
 
     &[layer="3"] {
@@ -256,7 +255,6 @@ const dpCpy = (obj) => {
         margin: 0.8vh 0;
         font-weight: 600;
         background-clip: none;
-        color: #26255e;
 
     }
 
