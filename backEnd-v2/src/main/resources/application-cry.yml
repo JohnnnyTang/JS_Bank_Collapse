@@ -59,6 +59,12 @@ staticData:
   vectorDataPath: E:/Data/bankProjectData/staticData/vectorData
   draftDataPath: E:\\Data\\bankProjectData\\staticData\\draftData
   waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
+  pictureDataPath: E:/Data/bankProjectData/staticData/pictureData
+  knowledgePath:
+    picture: E:/Data/bankProjectData/staticData/knowledge/picture
+    pdf: E:/Data/bankProjectData/staticData/knowledge/pdf
+    video: E:/Data/bankProjectData/staticData/knowledge/video
+    others: E:/Data/bankProjectData/staticData/knowledge/others
 
 waterCondition:
   url: http://10.32.22.202:8001

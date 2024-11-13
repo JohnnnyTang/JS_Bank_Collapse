@@ -19,10 +19,10 @@ import java.io.IOException;
  */
 @Slf4j
 @Getter
-public class TaskNode extends  {
+public class TaskNodeThread extends Thread {
     TaskNode taskNode;
 
-    public TaskNode(TaskNode taskNode) {
+    public TaskNodeThread(TaskNode taskNode) {
         this.taskNode = taskNode;
     }
 
