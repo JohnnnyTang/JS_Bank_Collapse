@@ -44,7 +44,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import RiskSceneCard from '../components/bankRisk/RiskSceneCard.vue'
 import SectionRiskVue from '../components/bankRisk/SectionRisk.vue'
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 import router from '../router/index'
 
 let map = null

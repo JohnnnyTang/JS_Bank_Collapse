@@ -175,7 +175,11 @@ export default defineComponent({
         center: [121.18, 31.723],
         zoom: 8,
         transformRequest: (url, resourceType) => {
-          if (url.startsWith(import.meta.env.VITE_APP_BACK_ADDRESS)) {
+          if (
+            url.startsWith(
+              `http://${window.location.host}${import.meta.env.VITE_APP_BACK_ADDRESS}`
+            )
+          ) {
             return {
               url: url,
               headers: { token: localStorage.getItem("token") },
@@ -257,7 +261,7 @@ export default defineComponent({
           // map.addSource(param.id, {
           //   type: "vector",
           //   tiles: [
-          //     `${import.meta.env.VITE_APP_BACK_ADDRESS}visual/getVectorTiles/${
+          //     `http://${window.location.host}${import.meta.env.VITE_APP_BACK_ADDRESS}visual/getVectorTiles/${
           //       param.visualId
           //     }/{x}/{y}/{z}`,
           //   ],
@@ -287,9 +291,9 @@ export default defineComponent({
           map.addSource(param.id, {
             type: "raster",
             tiles: [
-              `${import.meta.env.VITE_APP_BACK_ADDRESS}/visual/getRaster/${
-                param.visualId
-              }/{x}/{y}/{z}`,
+              `http://${window.location.host}${
+                import.meta.env.VITE_APP_BACK_ADDRESS
+              }/visual/getRaster/${param.visualId}/{x}/{y}/{z}`,
             ],
           });
           map.addLayer({
@@ -304,7 +308,7 @@ export default defineComponent({
         ) {
           map.addSource(param.id, {
             type: "image",
-            url: `${
+            url: `http://${window.location.host}${
               import.meta.env.VITE_APP_BACK_ADDRESS
             }data/bankResource/down/modelServer/result/file/image?caseId=${
               param.id
@@ -319,9 +323,7 @@ export default defineComponent({
         } else if (param.visualType === "volume") {
           map.addSource(param.id, {
             type: "image",
-            url: `${
-              import.meta.env.VITE_APP_BACK_ADDRESS
-            }/data/bankResource/down/modelServer/result/file/image?caseId=${
+            url: `http://${window.location.host}${import.meta.env.VITE_APP_BACK_ADDRESS}/data/bankResource/down/modelServer/result/file/image?caseId=${
               param.id
             }&name=${param.name}`,
             coordinates: param.params.extent,

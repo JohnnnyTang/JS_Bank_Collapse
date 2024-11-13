@@ -2,11 +2,11 @@ import axios from 'axios'
 
 
 ////////////////  GLOBAL CONST
-const tileServer = import.meta.env.VITE_MAP_TILE_SERVER
+const tileServer = `http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 
 ////////////////  DICT
 const Title1dict = {
-    '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '一级岸段-注记', '二级岸段-注记', '三级岸段-注记', '一级预警岸段-注记','一级岸段-点注记', '二级岸段-点注记', '三级岸段-点注记'],
+    '重点岸段': ['一级预警岸段', '二级预警岸段', '三级预警岸段', '一级岸段-注记', '二级岸段-注记', '三级岸段-注记', '一级预警岸段-注记', '一级岸段-点注记', '二级岸段-点注记', '三级岸段-点注记'],
     '长江沙洲': ['洲滩', '洲滩-注记'],
     '交通设施': ['沿江码头', '沿江码头-注记', '已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
     // '过江通道': ['已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记'],
@@ -17,9 +17,9 @@ const Title1dict = {
     '其他': ['市级行政区', '市级行政区-注记', '重点行政区边界', '水文站点', '水文站点-注记', '水库大坝', '水库大坝-注记', '大型湖泊', '大型湖泊-注记']
 }
 const Title2dict = {
-    '一级预警岸段': ['一级预警岸段', '一级岸段-注记', '一级预警岸段-注记','一级岸段-点注记'],
-    '二级预警岸段': ['二级预警岸段', '二级岸段-注记','二级岸段-点注记'],
-    '三级预警岸段': ['三级预警岸段', '三级岸段-注记','三级岸段-点注记'],
+    '一级预警岸段': ['一级预警岸段', '一级岸段-注记', '一级预警岸段-注记', '一级岸段-点注记'],
+    '二级预警岸段': ['二级预警岸段', '二级岸段-注记', '二级岸段-点注记'],
+    '三级预警岸段': ['三级预警岸段', '三级岸段-注记', '三级岸段-点注记'],
 
     '过江通道': ['已建通道', '在建通道', '规划通道', '已建通道-注记', '在建通道-注记', '规划通道-注记', '过江通道辅助线'],
     '沿江码头': ['沿江码头', '沿江码头-注记'],
@@ -208,8 +208,8 @@ const sandBarSort = [
 ]
 
 
-const getSideBarTree = async () => {
-    let bankData = (await axios.get(tileServer + `/tile/vector/importantBank/info`)).data
+const getSideBarTree = () => {
+
     let warning1 = {
         label: '一级预警岸段',
         active: true,
@@ -231,35 +231,6 @@ const getSideBarTree = async () => {
         active: true,
         children: []
     }
-    let w1 = []
-    let w2 = []
-    let w3 = []
-
-    for (let i = 0; i < bankData.length; i++) {
-        let item = bankData[i]
-        if (item['warning_level'] == 1) {
-            w1.push({ label: item['bank_name'], active: false, type: 'feature', property: item, 'lgId': '一级预警岸段' })
-        } else if (item['warning_level'] == 2) {
-            w2.push({ label: item['bank_name'], active: false, type: 'feature', property: item, 'lgId': '二级预警岸段' })
-        } else if (item['warning_level'] == 3) {
-            w3.push({ label: item['bank_name'], active: false, type: 'feature', property: item, 'lgId': '三级预警岸段' })
-        }
-    }
-
-
-    // debugger
-    w1.sort((a, b) => {
-        return bank1Sort.indexOf(a.label) - bank1Sort.indexOf(b.label);
-    })
-    w2.sort((a, b) => {
-        return bank2Sort.indexOf(a.label) - bank2Sort.indexOf(b.label);
-    })
-    w3.sort((a, b) => {
-        return bank3Sort.indexOf(a.label) - bank3Sort.indexOf(b.label);
-    })
-    warning1.children = w1
-    warning2.children = w2
-    warning3.children = w3
 
     const importantBank = {
         label: '重点岸段',
@@ -272,8 +243,9 @@ const getSideBarTree = async () => {
             warning3
         ]
     }
-    // console.log(importantBank);
-    let zt = (await axios.get(tileServer + `/tile/vector/riverBeach/info`)).data
+
+
+
     let mainZt = {
         label: '长江沙洲',
         active: true,
@@ -282,13 +254,9 @@ const getSideBarTree = async () => {
         type: 'title1',
         children: []
     }
-    zt.sort((a, b) => {
-        return sandBarSort.indexOf(a.name) - sandBarSort.indexOf(b.name);
-    })
 
-    zt.forEach((item) => {
-        mainZt.children.push({ label: item.name, active: false, type: 'feature', property: item, 'lgId': '长江沙洲' })
-    })
+
+
     // console.log('11111')
 
     let quyushuixi = {
@@ -315,7 +283,7 @@ const getSideBarTree = async () => {
             }
         ],
         // data: (await axios.get(tileServer + `/tile/vector/riverArea/info`)).data
-        data:[]
+        data: []
     }
     let sluice = {
         label: '重要水闸',
@@ -340,7 +308,7 @@ const getSideBarTree = async () => {
             }
         ],
         // data: (await axios.get(tileServer + `/tile/vector/sluiceArea/info`)).data
-        data:[]
+        data: []
     }
     let pump = {
         label: '重要泵站',
@@ -365,7 +333,7 @@ const getSideBarTree = async () => {
             }
         ],
         // data: (await axios.get(tileServer + `/tile/vector/pumpArea/info`)).data
-        data:[]
+        data: []
     }
     let treeNode1 = {
         label: '已建通道',
@@ -396,7 +364,7 @@ const getSideBarTree = async () => {
             treeNode3
         ],
         // data: (await axios.get(tileServer + `/tile/vector/riverBridge/info`)).data
-        data:[]
+        data: []
     }
     let dock = {
         label: '沿江码头',
@@ -406,7 +374,7 @@ const getSideBarTree = async () => {
         children: [
         ],
         // data: (await axios.get(tileServer + `/tile/vector/dockArea/info`)).data
-        data:[]
+        data: []
     }
     let transport = {
         label: '交通设施',
@@ -466,10 +434,86 @@ const getSideBarTree = async () => {
     return tree
 }
 
+const addChildren = (dataSource) => {
+    axios.get(tileServer + `/tile/vector/importantBank/info`).then((res) => {
+      let bankData = res.data;
+      let w1 = [];
+      let w2 = [];
+      let w3 = [];
+  
+      for (let i = 0; i < bankData.length; i++) {
+        let item = bankData[i];
+        if (item["warning_level"] == 1) {
+          w1.push({
+            label: item["bank_name"],
+            active: false,
+            type: "feature",
+            property: item,
+            lgId: "一级预警岸段",
+          });
+        } else if (item["warning_level"] == 2) {
+          w2.push({
+            label: item["bank_name"],
+            active: false,
+            type: "feature",
+            property: item,
+            lgId: "二级预警岸段",
+          });
+        } else if (item["warning_level"] == 3) {
+          w3.push({
+            label: item["bank_name"],
+            active: false,
+            type: "feature",
+            property: item,
+            lgId: "三级预警岸段",
+          });
+        }
+      }
+  
+      // debugger
+      w1.sort((a, b) => {
+        return bank1Sort.indexOf(a.label) - bank1Sort.indexOf(b.label);
+      });
+      w2.sort((a, b) => {
+        return bank2Sort.indexOf(a.label) - bank2Sort.indexOf(b.label);
+      });
+      w3.sort((a, b) => {
+        return bank3Sort.indexOf(a.label) - bank3Sort.indexOf(b.label);
+      });
+      dataSource.value[0].children[0].children = w1;
+      dataSource.value[0].children[1].children = w2;
+      dataSource.value[0].children[2].children = w3;
+    });
+  
+    axios
+      .get(tileServer + `/tile/vector/riverBeach/info`)
+      .then((res) => {
+  
+        let zt = res.data;
+        zt.sort((a, b) => {
+          return sandBarSort.indexOf(a.name) - sandBarSort.indexOf(b.name);
+        });
+  
+        zt.forEach((item) => {
+          dataSource.value[1].children.push({
+            label: item.name,
+            active: false,
+            type: "feature",
+            property: item,
+            lgId: "长江沙洲",
+          });
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
 
 export {
     hideLayers,
     showLayers,
     getSideBarTree,
+    addChildren,
     DICT
 }

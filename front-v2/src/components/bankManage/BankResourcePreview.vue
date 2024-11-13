@@ -158,7 +158,7 @@ import { useResourceStore } from '../../store/resourceStore'
 import axios from 'axios';
 import { defaultTableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
 // import UploadDialog from './UploadDialog.vue'
-import UploadDialog from './UploadDialog.vue'
+import UploadDialog from './uploadDialog.vue'
 
 //////////////////////////// global
 const warnLevelList = ["I 级预警岸段", "Ⅱ 级预警岸段", "Ⅲ 级预警岸段"]

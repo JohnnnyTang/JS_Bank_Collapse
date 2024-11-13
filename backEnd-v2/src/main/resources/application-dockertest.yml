@@ -1,0 +1,74 @@
+server:
+  port: 8989
+
+spring:
+  data:
+    mongodb:
+      database: bank
+      authentication-database: admin
+      uri: mongodb://host.docker.internal:17017/bank
+  datasource:
+    hikari:
+      maxLifeTime: 120000
+      idle-timeout: 0
+    default:
+      database: bank
+      ip: host.docker.internal
+      port: 5431
+      url: jdbc:postgresql://host.docker.internal:5431/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: 123456
+    public:
+      database: bank
+      ip: 119.45.198.54
+      port: 5432
+      url: jdbc:postgresql://119.45.198.54:5432/bank?stringtype=unspecified
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: nhri_admin123456
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+mybatis:
+  mapper-locations: classpath:mapper/resourceRepo/*/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+
+multiIndex:
+  condaEnv: Env1
+  dataPath: /usr/local/resource/data/modelData
+  wholeDataPath: /usr/local/resource/data/dataWhole
+  resPath: /usr/local/resource/data/modelRes/
+
+tile:
+  mzsTilePath: /usr/local/resource/data/bank_collapse/rasterTile/
+  worldTilePath: /usr/local/resource/data/bank_collapse/baseMap
+  nodeServicePath: /usr/local/resource/data/node/index.js
+  riverTilePath: /usr/local/resource/data/bank_collapse/riverRasterTile/
+  riverImagePath: /usr/local/resource/data/bank_collapse/imageTiles/tiles/
+
+staticData:
+  tifTilePath: /usr/local/resource/data/staticData/tifTile
+  vectorDataPath: /usr/local/resource/data/staticData/vectorData
+  draftDataPath: /usr/local/resource/data/staticData/draftData
+  waterConditionPath: /usr/local/resource/data/staticData/waterCondition
+
+flowData:
+  texturePath: /usr/local/resource/data/flowData/flowFieldResourceArchive/
+
+waterCondition:
+  url: http://10.32.37.88:8821
+
+modelServer:
+  url: http://host.docker.internal:8000
+  storageLimit: 50
+  caseLimit: 50
+
+loginFunction: "no"

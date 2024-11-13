@@ -13,17 +13,17 @@ spring:
       idle-timeout: 0
     default:
       database: bank
-      ip: 10.32.37.72;
-      port: 5432;
-      url: jdbc:postgresql://10.32.37.72:15431/bank?stringtype=unspecified
+      ip: host.docker.internal
+      port: 5431
+      url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: 123456
     public:
       database: bank
-      ip: 10.32.37.72;
-      port: 5432;
-      url: jdbc:postgresql://10.32.37.72:15432/bank?stringtype=unspecified
+      ip: 119.45.198.54
+      port: 5432
+      url: jdbc:postgresql://119.45.198.54:5432/bank?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
       password: nhri_admin123456

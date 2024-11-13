@@ -1,14 +1,12 @@
 <template>
     <div class="model-param-container">
         <ParamTreeVue />
-        <ParamMatrixVue />
     </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
 import ParamTreeVue from '../ParamTree.vue'
-import ParamMatrixVue from '../ParamMatrix.vue';
 
 onMounted(() => {})
 </script>
