@@ -48,7 +48,7 @@
         <div class="edit-pannel-container" v-if="editPannelShow">
             <div class="title">编辑页面</div>
             <div class="part">
-                <span>滩槽高程：</span>
+                <span>滩槽高差：</span>
                 <el-input v-model="inputGaochaList" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
             </div>
             <div class="part">
@@ -69,7 +69,7 @@
         <div class="text-info-container">
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年该断面滩槽高程为 <span style="color: rgb(226, 80, 80);">{{ gaochaList[profileValue - 1] }}</span> m
+                    2023年该断面滩槽高差为 <span style="color: rgb(226, 80, 80);">{{ gaochaList[profileValue - 1] }}</span> m
                 </div>
             </div>
             <div class="text-info-block">

@@ -399,7 +399,7 @@ export const InfoTree = [
                 filter: true
             },
             {
-                label: '滩槽高程',
+                label: '滩槽高差',
                 icon: '/icons/过江通道.png',
                 active: false,
                 filter: true
