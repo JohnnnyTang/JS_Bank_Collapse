@@ -7,8 +7,16 @@
         <div class="param-tree-graph" id="param-tree"></div>
 
 
-        <div class="tool">
-            <el-switch v-model="fitVue" size="large" active-text="自适应视图" />
+        <div class="tool-set">
+            <div class="tool">
+                <el-switch v-model="fitVue" size="large" active-text="自适应视图" />
+            </div>
+            <div class="tool">
+                <el-button type="primary" plain size="large" @click="expandAllHandler">展开全部节点</el-button>
+            </div>
+            <div class="tool">
+                <el-button type="primary" plain size="large" @click="resetAllHandler">重置初始视图</el-button>
+            </div>
         </div>
 
 
@@ -18,12 +26,13 @@
 
 <script setup>
 import G6 from '@antv/g6'
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch, nextTick } from 'vue'
 import KnowStoreHelper from './knowStoreHelper';
 import FilePreviewer from './globalGraph/FilePreviewer.vue';
 
 ////////// graph ////////////
 let graph = null
+let graphData = null
 const TYPEMAP = {
     'root': 0,
     'folder': 1,
@@ -31,7 +40,7 @@ const TYPEMAP = {
 const defaultEdgeStyle = {
     stroke: '#eee',
     endArrow: {
-        path: 'M 0,0 L 12, 6 L 9,0 L 12, -6 Z',
+        path: 'M 0,0 L 9, 6 L 9,0 L 9, -6 Z',
         fill: '#ffff',
         d: -25,
     },
@@ -87,14 +96,35 @@ const customModeWithoutFitView = {
         return true;
     },
 }
+const expandAllHandler = () => {
+    G6.Util.traverseTree(graphData, function (item) {
+        item.collapsed = false
+    })
+    graph.changeData(graphData)
+    graph.render()
+    graph.fitCenter();
+    graph.fitView(5);
+}
+const resetAllHandler = () => {
+    G6.Util.traverseTree(graphData, function (item) {
+        if (item.depth > 0) {
+            item.collapsed = true
+        }
+    })
+    graph.changeData(graphData)
+    graph.render()
+    graph.fitCenter();
+    graph.fitView(50);
+}
+
 
 const fitVue = ref(true)
 watch(fitVue, (newVal) => {
-    if(!!!graph) return
+    if (!!!graph) return
     if (newVal) {
         graph.removeBehaviors(['collapse-expand'])
         graph.addBehaviors([customModeWithFitView])
-    }else{
+    } else {
         graph.removeBehaviors(['collapse-expand'])
         graph.addBehaviors([customModeWithoutFitView])
     }
@@ -162,9 +192,9 @@ onMounted(async () => {
         defaultNode: {
             size: 32,
         },
-        defaultEdge: {
-            style: defaultEdgeStyle,
-        },
+        // defaultEdge: {
+        //     style: defaultEdgeStyle,
+        // },
         layout: {
             type: 'dendrogram',
             direction: 'LR',
@@ -178,7 +208,6 @@ onMounted(async () => {
             easing: 'linearEasing', // String，动画函数
         },
     })
-
 
     graph.node(function (node) {
 
@@ -201,30 +230,23 @@ onMounted(async () => {
         }
     })
 
-    const theData = await KnowStoreHelper.getGraphData()
-    graph.data(theData)
+    graphData = await KnowStoreHelper.getGraphData()
+    graph.data(graphData)
     graph.render()
-
-    // rerender
-    G6.Util.traverseTree(theData, function (item) {
-        if (item.depth > 0) {
-            item.collapsed = true
-        }
-    })
-    graph.data(theData)
-    graph.render()
-    graph.fitCenter();
-    graph.fitView();
-
-
 
     graph.on('node:click', (evt) => {
         const { item } = evt;
         const nodeData = item.get('model');
-        if (!!!TYPEMAP[nodeData.type]) {
+        console.log(nodeData)
+        if (nodeData.type != 'root' && nodeData.type != 'folder') {
             handleFileClick(nodeData)
         }
     });
+
+    // nextTick(resetAllHandler())
+
+    resetAllHandler()
+
 
 
 
@@ -297,7 +319,7 @@ div.param-tree-container {
             background-repeat: no-repeat;
         }
 
-        div.tree-title-text{
+        div.tree-title-text {
             letter-spacing: .1em;
         }
     }
@@ -307,22 +329,46 @@ div.param-tree-container {
         width: 80vw;
         background-color: rgba(88, 158, 250, 0.6);
         backdrop-filter: blur(6px);
-
-        &:hover {
-            cursor: pointer;
-        }
+        cursor: pointer !important;
+        // &:hover {
+        //     cursor: pointer;
+        // }
 
         // background-color: aqua;
     }
 
-    div.tool {
+    div.tool-set {
+
         position: absolute;
         right: 5vw;
         top: 10vh;
         padding: 5px 10px;
         border-radius: 10px;
         background-color: rgba(204, 233, 252, 0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
 
+        div.tool {
+            position: relative;
+            padding: 5px 10px;
+        }
+    }
+
+
+}
+
+:deep(.el-button){
+    span{
+        font-size: 20px;
+    }
+}
+:deep(.el-switch){
+    .el-switch__label{
+        span{
+            font-size: 20px;
+        }
     }
 }
 </style>
