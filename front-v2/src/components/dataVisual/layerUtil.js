@@ -3589,23 +3589,23 @@ const layerAddFunctionMap = {
     近年冲淤: async (map) => { },
 
     洲滩: async (map) => {
-        // !map.getSource('riverBeach') &&
-        //     map.addSource('riverBeach', {
-        //         type: 'vector',
-        //         tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
-        //     })
-        // !map.getLayer('洲滩') &&
-        //     map.addLayer({
-        //         id: '洲滩',
-        //         type: 'fill',
-        //         source: 'riverBeach',
-        //         'source-layer': 'default',
-        //         layout: {
-        //         },
-        //         paint: {
-        //             'fill-color': 'rgb(240, 239, 209)',
-        //         },
-        //     })
+        !map.getSource('riverBeach') &&
+            map.addSource('riverBeach', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+            })
+        !map.getLayer('洲滩') &&
+            map.addLayer({
+                id: '洲滩',
+                type: 'fill',
+                source: 'riverBeach',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': 'rgb(240, 239, 209)',
+                },
+            })
     },
     '洲滩-注记': async (map) => {
         !map.getSource('riverBeachCenter') &&
