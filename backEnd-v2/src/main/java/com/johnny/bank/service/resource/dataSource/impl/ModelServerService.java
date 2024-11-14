@@ -279,6 +279,9 @@ public class ModelServerService implements IModelServerService {
 
     private String deleteCalculateResource(String bank, String category, String name) {
         DataNodeV2 deleteDataNode = dataNodeRepoV2.getNodeByCategoryBankAndName(category, bank, name);
+        if (deleteDataNode == null) {
+            return bank + " 岸段模型计算资源 " + name + " 不存在！";
+        }
         if (category.equals("DEMDataItem")) {
             DataNodeV2 deleteVisualDataNode = dataNodeRepoV2.getNodeByCategoryBankAndName("DEMTileDataItem", bank, name);
             if (deleteVisualDataNode != null && deleteVisualDataNode.getUsage().containsKey("path")) {
@@ -286,12 +289,17 @@ public class ModelServerService implements IModelServerService {
                 dataNodeServiceV2.delete(deleteVisualDataNode.getId());
             }
         }
-        if (deleteDataNode == null) {
-            return bank + " 岸段模型计算资源 " + name + " 不存在！";
+        String path = deleteDataNode.getBasicInfo().getString("path");
+        // 若非水动力模型，则删除path上一层级文件夹
+        if (!category.equals("Hy")) {
+            int lastSlashIndex = path.lastIndexOf('/');
+            if (lastSlashIndex != -1) {
+                path = path.substring(0, lastSlashIndex);
+            }
         }
-        String url = baseUrl + "/v0/fs";
+        String url = baseUrl + "/v0/fs/resource";
         JSONObject requestBody = new JSONObject();
-        requestBody.put("directory",deleteDataNode.getBasicInfo().getString("path"));
+        requestBody.put("directory",path);
         try {
             InternetUtil.doDelete(url, requestBody);
             FileUtil.deleteFolder(new File(draftDataPath + File.separator + "tif" + File.separator + bank + File.separator + name));

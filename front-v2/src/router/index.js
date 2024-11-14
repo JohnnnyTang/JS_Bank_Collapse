@@ -36,15 +36,25 @@ const routes = [
                 component: () =>
                     import('../components/knowStore/views/RiverPlan.vue'),
             },
+            // {
+            //     path: 'param',
+            //     component: () =>
+            //         import('../components/knowStore/ParamTree.vue'),
+            // },
+            // {
+            //     path: 'experience',
+            //     component: () =>
+            //         import('../components/knowStore/views/ExpertKnow.vue'),
+            // },
             {
-                path: 'param',
+                path: 'graph',
                 component: () =>
-                    import('../components/knowStore/views/ModelParams.vue'),
+                    import('../components/knowStore/KnowGraph.vue'),
             },
             {
-                path: 'experience',
+                path: 'tree',
                 component: () =>
-                    import('../components/knowStore/views/ExpertKnow.vue'),
+                    import('../components/knowStore/KnowTree.vue'),
             },
         ],
     },
@@ -72,7 +82,7 @@ const routes = [
     },
     {
         path: '/test',
-        component: () => import("../components/dataVisual/test.vue")
+        component: () => import("../views/Test.vue")
     },
     {
         path: '/modelStore',
@@ -91,10 +101,10 @@ const routes = [
                 path: 'soilAnalysis',
                 component: () => import('../components/modelStore/views/SoilAnalysis5.vue'),
             },
-            {
-                path: 'stabilityAnalysis2',
-                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
-            },
+            // {
+            //     path: 'stabilityAnalysis2',
+            //     component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
+            // },
             {
                 path: 'analysisCenter',
                 component: () => import('../components/modelStore/views/AnalysisCenter.vue'),

@@ -263,6 +263,7 @@ const leaveNav = () => {
 }
 
 const navToModelPage = () => {
+    console.log('hello model')
     eleDropDownDomRef.value[0].handleClose()
     router.push('/modelStore')
     focusOnNavItem(4)

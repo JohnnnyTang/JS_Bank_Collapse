@@ -144,6 +144,7 @@ public class ProcessUtil {
         List<String> paramKeys = (List<String>) modelUsage.get("paramKeys");
         JSONObject paramObject = taskNode.getParamNode().getParams();
         for(String paramKey: paramKeys) {
+            System.out.println(paramKey);
             if(Objects.equals(paramKey, "jsonId")) continue;
             commands.add(paramObject.get(paramKey).toString());
         }
