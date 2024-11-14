@@ -14,6 +14,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import router from '../../router/index'
+import { onBeforeRouteUpdate } from 'vue-router';
 
 const preActiveIndex = ref(-1)
 
@@ -36,12 +37,12 @@ const navMenuList = ref([
         path: '/knowledgeStore/plan',
         active: false,
     },
-    {
-        name: '崩岸知识管理',
-        iconUrl: '/admin-panel.png',
-        path: '/knowledgeStore/tree',
-        active: false,
-    }
+    // {
+    //     name: '崩岸知识管理',
+    //     iconUrl: '/admin-panel.png',
+    //     path: '/knowledgeStore/tree',
+    //     active: false,
+    // }
 ])
 
 const pathIndexMap = {
@@ -62,15 +63,27 @@ function changeActive(index) {
         preActiveIndex.value = index
         router.push(navMenuList.value[preActiveIndex.value].path)
     }
-
 }
+
+onBeforeRouteUpdate((to, from, next) => {
+    // 从其他地方跳到知识库
+    if (to.path.endsWith('/home')){
+        preActiveIndex.value = -1
+        navMenuList.value.map(item => item.active = false)
+    }
+    next()
+})
 
 onMounted(() => {
 
     let pathSplit = router.currentRoute.value.path.split('/')
     let splitPath = pathSplit[pathSplit.length - 1]
 
-    if (splitPath === 'home' || splitPath === 'knowledgeStore') return
+    if (splitPath === 'home' || splitPath === 'knowledgeStore') {
+        preActiveIndex.value = -1
+        navMenuList.value.map(item => item.active = false)
+        return
+    }
     changeActive(pathIndexMap[splitPath])
 
 })

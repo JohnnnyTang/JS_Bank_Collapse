@@ -80,10 +80,10 @@ const routes = [
         path: '/main',
         component: () => import("../views/BankMainView.vue")
     },
-    // {
-    //     path: '/test',
-    //     component: () => import("../views/Test.vue")
-    // },
+    {
+        path: '/test',
+        component: () => import("../views/Test.vue")
+    },
     {
         path: '/modelStore',
         redirect: '/modelStore/main',
@@ -101,10 +101,10 @@ const routes = [
                 path: 'soilAnalysis',
                 component: () => import('../components/modelStore/views/SoilAnalysis5.vue'),
             },
-            {
-                path: 'stabilityAnalysis2',
-                component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
-            },
+            // {
+            //     path: 'stabilityAnalysis2',
+            //     component: () => import('../components/modelStore/views/StabilityAnalysis.vue'),
+            // },
             {
                 path: 'analysisCenter',
                 component: () => import('../components/modelStore/views/AnalysisCenter.vue'),
