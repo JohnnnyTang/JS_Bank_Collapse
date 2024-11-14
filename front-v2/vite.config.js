@@ -24,11 +24,6 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
-            '/cry': {
-                target: 'http://localhost:8989/api/v1',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/cry/, ''),
-            },
             '/device': {
                 // target: 'http://119.45.198.54:9999/api/v1',
                 changeOrigin: true,

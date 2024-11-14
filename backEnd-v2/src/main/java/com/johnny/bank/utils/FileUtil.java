@@ -45,6 +45,12 @@ public class FileUtil {
             log.info("Failed to delete folder: " + folder.getAbsolutePath());
         }
     }
+    // 删除指定文件
+    public static void deleteFile(File file) {
+        if (!file.delete()) {
+            log.info("Failed to delete file: " + file.getAbsolutePath());
+        }
+    }
 
     // 获取指定路径文件内容
     public static String getFileContent(String filePathStr) {
@@ -61,6 +67,26 @@ public class FileUtil {
         }
     }
 
+    // 获取文件二进制流
+    public static byte[] getByteStreamFromFile(String filePath) {
+        File pictureFile = new File(filePath);
+        if (!pictureFile.exists() || pictureFile.isDirectory()) {
+            return null;
+        }
+        try (FileInputStream fis = new FileInputStream(pictureFile)) {
+            byte[] fileContent = new byte[(int) pictureFile.length()];
+            int bytesRead = fis.read(fileContent);
+            if (bytesRead != pictureFile.length()) {
+                // 如果读取的字节数不等于文件长度，可以记录日志或抛出异常
+                throw new IOException("未能读取完整的文件内容");
+            }
+            return fileContent;
+        } catch (IOException e) {
+            log.info(e.getMessage());
+            return null; // 或者抛出自定义异常
+        }
+    }
+
     // 修改指定路径文件内容
     public static void modifiyFileContent(String filePathStr, String content) {
 //        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
@@ -74,19 +100,19 @@ public class FileUtil {
     /**
      * 将文件保存到指定路径
      */
-    public static String storeFile(MultipartFile file, String path) throws IOException {
+    public static void storeFile(MultipartFile file, String path, String name) throws IOException {
         File directory = new File(path);
         if (!directory.exists()){
             directory.mkdirs();  // 使用mkdirs()以确保创建多层目录
         }
-
         // 使用原始文件名进行存储
-        String originalFileName = file.getOriginalFilename();
-        Path targetPath = new File(directory, originalFileName).toPath();
+        String fileName = name == null ? file.getOriginalFilename() : name;
+        Path targetPath = new File(directory, fileName).toPath();
 
         Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-        return targetPath.toString();
+    }
+    public static void storeFile(MultipartFile file, String path) throws IOException {
+        storeFile(file, path, null);
     }
 
     public static Boolean storeFileLocal(String strBuffer, String filePath) {

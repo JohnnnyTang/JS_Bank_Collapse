@@ -18,7 +18,7 @@ import java.util.List;
  * @version: 1.0
  */
 @RestController
-@RequestMapping("api/v1/data/detailHistory")
+@RequestMapping("api/v1/data/detail")
 public class DetailHistoryInfoController {
 
     private final DetailCollapseInfoService collapseInfoService;

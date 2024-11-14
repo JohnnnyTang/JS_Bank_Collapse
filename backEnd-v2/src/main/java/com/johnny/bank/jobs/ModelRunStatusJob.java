@@ -1,8 +1,11 @@
 package com.johnny.bank.jobs;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.johnny.bank.model.node.DataNodeV2;
+import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.node.TaskNode;
 import com.johnny.bank.model.resource.dataResource.GnssData;
+import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.service.node.impl.TaskNodeService;
 import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import com.johnny.bank.utils.BeanUtil;
@@ -49,6 +52,12 @@ public class ModelRunStatusJob implements Job {
                 taskNodeServiceV2.updateNodeStatusResultById(taskNode.getId(), status, resObj);
                 // taskNode与case对齐
                 taskNodeServiceV2.modelServerSerialization();
+
+                // 针对真实水动力计算任务，完成后将结果写入资源节点中
+                if (taskNode.getModelNode().getId().equals("66cf190d7965ee56bc04ebf9")) {
+                    writeRealHydroToNode(taskNodeServiceV2.findById(taskNode.getId()));
+                }
+
             } catch (SchedulerException e) {
                 log.info(e.toString());
             }
@@ -65,5 +74,25 @@ public class ModelRunStatusJob implements Job {
                 log.info(e.toString());
             }
         }
+    }
+
+    private void writeRealHydroToNode(TaskNode realHydroTaskNode) {
+        DataNodeServiceV2 dataNodeServiceV2 = BeanUtil.getBean(DataNodeServiceV2.class);
+        JSONObject params = realHydroTaskNode.getParamNode().getParams();
+        JSONObject basicInfo = new JSONObject();
+        basicInfo.put("fileType","hydrodynamic");
+        String bank = params.getString("segment");basicInfo.put("bank",bank);
+        String year = params.getString("year");basicInfo.put("year",year);
+        String set = params.getString("set");basicInfo.put("set",set);
+        String name = params.getString("name");basicInfo.put("name",name);
+        String temp = params.getString("temp");basicInfo.put("temp",temp);
+        String boundary = params.getString("boundary");basicInfo.put("boundary",boundary);
+        String path = realHydroTaskNode.getResult().getString("resource-path");basicInfo.put("path",path);
+        DataNodeV2 realHydroDataNode = DataNodeV2.dataNodeBuilder()
+                .bank(bank).basicInfo(basicInfo)
+                .name(name).dataOrigin("ModelServer").category("HydrodynamicDataItem")
+                .path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf" + bank + ",ModelServerDataGroupOf" + bank + "," + "HydrodynamicDataGroupOf" + bank + ",")
+                .build();
+        dataNodeServiceV2.save(realHydroDataNode);
     }
 }
