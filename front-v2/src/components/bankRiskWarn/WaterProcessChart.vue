@@ -5,14 +5,8 @@
             class="graph-container"
             id="water-chart-container"
             v-loading="props.waterProcessChartLoad"
-            v-show="hasData === true"
         >
             <div id="water-chart" class="graph" ref="chartDom"></div>
-        </div>
-        <div class="blank-graph" v-show="hasData === false">
-            <span v-if="true" style="z-index: 10"
-                >请在计算模型后绘制潮位点以提取潮位线</span
-            >
         </div>
     </div>
 </template>
@@ -25,17 +19,14 @@ const props = defineProps(['waterProcessChartLoad', 'timeStep'])
 
 const chartDom = ref()
 
-const hasData = ref(false)
-
 const hour = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
     21, 22, 23, 24, 25,
 ]
 
 const updateData = (data) => {
-    hasData.value = true
-    let us = data.result[0].us
-    let vs = data.result[0].vs
+    let us = data[0].us
+    let vs = data[0].vs
     waterProcessData.flood = []
 
     us.forEach((u, i) => {
@@ -247,17 +238,6 @@ div.water-chart-container {
             height: 20.5vh;
             
         }
-    }
-
-    div.blank-graph {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #055279;
-        display: flex;
-        width: 100%;
-        height: calc(100% - 4.2vh);
-        background: rgb(208, 236, 255);
     }
 }
 </style>

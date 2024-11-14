@@ -24,7 +24,6 @@
             <div
                 class="graph-container flowspeed"
                 id="flowspeed-chart-container"
-                v-show="hasData === true"
             >
                 <div
                     id="flowspeed-chart"
@@ -33,11 +32,6 @@
                     v-loading="props.flowspeedChartLoad"
                     element-loading-background="rgba(255, 255, 255, 0.4)"
                 ></div>
-            </div>
-            <div class="blank-graph" v-show="hasData === false">
-                <span v-if="true" style="z-index: 10"
-                    >请在计算模型后绘制潮位点以提取潮位线</span
-                >
             </div>
         </div>
         <div class="riskInfo-item flowfield">
@@ -60,15 +54,14 @@ const emit = defineEmits(['handleDrawEvent'])
 
 let chartIns = null
 const flowspeedGraphRef = ref(null)
-const hasData = ref(false)
 
 const drawButtonClickHandler = () => {
     emit('handleDrawEvent')
 }
 
 const getTideLineDataOption = (data) => {
-    const usData = data.result[0].us
-    const vsData = data.result[0].vs
+    const usData = data[0].us
+    const vsData = data[0].vs
     const timeData = [
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25,
@@ -121,10 +114,71 @@ const getTideLineDataOption = (data) => {
 }
 
 const updateData = (data) => {
-    hasData.value = true
+    console.log(data)
     let tideLineOption = getTideLineDataOption(data)
     hydrodynamicStore.showingOption = tideLineOption
 }
+
+const defaultData = [
+    {
+        us: [
+            '0.72456875225',
+            '0.65458696795',
+            '0.41120411483',
+            '0.17161489738',
+            '0.31642125073',
+            '0.54155104957',
+            '0.70956310321',
+            '0.63356335557',
+            '0.59658627573',
+            '0.6398957933',
+            '0.64477681833',
+            '0.66071618973',
+            '0.67243264692',
+            '0.5886927053',
+            '0.24917254981',
+            '0.045899785235',
+            '0.23572885596',
+            '0.38818200666',
+            '0.5585431447',
+            '0.58730337796',
+            '0.54108509337',
+            '0.57902414439',
+            '0.62466046868',
+            '0.63069473985',
+            '0.72769589971',
+            '0.72414346019',
+        ],
+        vs: [
+            '-0.92814517566',
+            '-0.8748384524',
+            '-0.59225560009',
+            '-0.23981493733',
+            '-0.2864782849',
+            '-0.47888834013',
+            '-0.63461389673',
+            '-0.8878456969',
+            '-0.86246530897',
+            '-0.75437836442',
+            '-0.81004963998',
+            '-0.85580479137',
+            '-0.8868238064',
+            '-0.79983000236',
+            '-0.39037965986',
+            '-0.046745513799',
+            '-0.1962600264',
+            '-0.32368051254',
+            '-0.47887967646',
+            '-0.77208005288',
+            '-0.75552256759',
+            '-0.83331613899',
+            '-0.91899364294',
+            '-0.93736301143',
+            '-0.90766315818',
+            '-0.94337724743',
+        ],
+    },
+]
 
 onMounted(() => {
     chartIns = echarts.init(flowspeedGraphRef.value)
@@ -155,6 +209,8 @@ onMounted(() => {
             )
         },
     )
+
+    updateData(defaultData)
 })
 
 defineExpose({

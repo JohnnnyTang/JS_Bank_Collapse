@@ -845,7 +845,7 @@ const conditionConfigureDataResetHandler = async () => {
         }
 
         tidePointVelocityCalc(tideLevelPointPos.value[0], tideLevelPointPos.value[1]);
-
+        floodFlow.timeCount = 0.0       // 重置时间步
     }).catch((error) => {
         isRunningMan.value = false
         return
@@ -1203,6 +1203,9 @@ const onAddProfileOption = () => { }
 const onAddProfile = () => { }
 
 let floodWatcher = null
+let floodFlow = null
+
+
 // let dryWatcher = null
 const flowControlHandler = async () => {
     showFlow.value = !showFlow.value
@@ -1214,7 +1217,7 @@ const flowControlHandler = async () => {
         if (nowWaterConditionType.value == '洪季') {
             let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
             let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
-            let floodFlow = reactive(
+            floodFlow = reactive(
                 new FlowFieldLayer(
                     'floodFlow',
                     backEndJsonUrl2,
@@ -1890,7 +1893,6 @@ const tidePointVelocityCalc = async (lng, lat) => {
     RunningManSays.value = '正在提取潮位线...'
     const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
     await pointVelocityMR.modelStart()
-
     console.log('===Interval')
     let runningInterval = setInterval(async () => {
         let runningStatus = await pointVelocityMR.getRunningStatus()
@@ -1920,8 +1922,9 @@ const tidePointVelocityCalc = async (lng, lat) => {
                 })
                 let runningResult = await pointVelocityMR.getModelResult();
 
-                flowspeedInfoRef.value.updateData(runningResult)
-                WaterProcessChartRef.value.updateData(runningResult)
+                flowspeedInfoRef.value.updateData(runningResult.result)
+                WaterProcessChartRef.value.updateData(runningResult.result)
+
 
                 console.log('runningResult ', runningResult)
                 isRunningMan.value = false
