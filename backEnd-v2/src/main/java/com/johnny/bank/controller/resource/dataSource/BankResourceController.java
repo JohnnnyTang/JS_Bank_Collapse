@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNodeV2;
 import com.johnny.bank.model.resource.dataResource.MonitorInfo;
+import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.service.resource.dataSource.impl.BankResourceService;
 import com.johnny.bank.service.resource.dataSource.impl.ModelServerService;
@@ -18,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
+import static org.apache.naming.SelectorContext.prefix;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,6 +41,12 @@ public class BankResourceController {
 
     @Autowired
     ModelServerService modelServerService;
+
+    @Autowired
+    DataNodeServiceV2 dataNodeServiceV2;
+
+    @Autowired
+    IDataNodeRepoV2 iDataNodeRepoV2;
 
     // 资源节点获取
     @GetMapping("/bank")
@@ -258,4 +268,43 @@ public class BankResourceController {
             @RequestParam("file") MultipartFile file, @PathVariable String bank, @PathVariable String name, @RequestParam("data") String data) throws IOException, InterruptedException {
         return ResponseEntity.ok(bankResourceService.updateVisualizationResourceData(file, bank, name, JSONObject.parseObject(data)));
     }
+
+    // section
+    // 断面上载
+    @PostMapping("/up/section/resource/file")
+    public ResponseEntity<String> uploadResourceSectionData(@RequestParam("file") MultipartFile file, @RequestParam("info") String info) throws IOException, InterruptedException {
+        return ResponseEntity.ok(bankResourceService.uploadSectionResourceData(file, JSONObject.parse(info)));
+    }
+    // 断面删除
+    @DeleteMapping("/delete/section/resource/{bank}/file/{name}")
+    public ResponseEntity<String> deleteResourceSectionData(@PathVariable String bank, @PathVariable String name) {
+        return ResponseEntity.ok(bankResourceService.deleteSection(bank, name));
+    }
+    // 断面信息获取
+    @GetMapping("/down/section/resource/{bank}/info/{type}")
+    public ResponseEntity<JSONArray> getResourceSectionInfo(@PathVariable String bank, @PathVariable String type) {
+        DataNodeV2 dataNodeV2 = iDataNodeRepoV2.getNodeByCategoryAndBank("SectionDataItem", bank);
+        return ResponseEntity.ok().body(bankResourceService.getSectionInfo(dataNodeV2, type));
+    }
+    // 岸段名称列表获取
+    @PostMapping("/down/bank/name")
+    public ResponseEntity<List<String>> getImportantBankName(@RequestParam("prefix") String prefix) {
+        DataNodeV2 dataNodeV2 = dataNodeServiceV2.getDataNodeByCategoryName("ImportantBank", "ImportantBank");
+        return ResponseEntity.ok().body(bankResourceService.getImportantBankName(dataNodeV2, prefix));
+    }
+    // 岸段信息获取
+    @PostMapping("/down/bank/info")
+    public ResponseEntity<Map<String, String>> getImportantBankInfo(@RequestParam("name") String name) {
+        DataNodeV2 dataNodeV2 = dataNodeServiceV2.getDataNodeByCategoryName("ImportantBank", "ImportantBank");
+        return ResponseEntity.ok().body(bankResourceService.getImportantBankInfo(dataNodeV2, name));
+    }
+    // 上传模型参数
+    @PostMapping("/up/model/params")
+    public ResponseEntity<String> uploadModelParams(@RequestBody Map<String, Object> requestData) throws IOException, InterruptedException {
+        Map<String, Object> params = (Map<String, Object>) requestData.get("params");
+        String type = (String) requestData.get("type");
+        Map<String, String> info = (Map<String, String>) requestData.get("info");
+        return ResponseEntity.ok().body(bankResourceService.uploadModelParams(params, type, info));
+    }
+
 }

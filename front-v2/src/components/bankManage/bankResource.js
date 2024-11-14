@@ -8,12 +8,12 @@ export const defaultBankBasic_Style_Info = [
         type: ['half', 'left'],
         necessary: false
     },
-    {
-        key: '中心坐标',
-        val: '',
-        type: ['half', 'two-row', 'right'],
-        splitter: ' ', necessary: false
-    },
+    // {
+    //     key: '中心坐标',
+    //     val: '',
+    //     type: ['half', 'two-row', 'right'],
+    //     splitter: ' ', necessary: false
+    // },
     {
         key: '监测长度',
         val: '',
@@ -23,7 +23,7 @@ export const defaultBankBasic_Style_Info = [
     {
         key: '监测起始时间',
         val: '',
-        type: ['half', 'right'],
+        type: ['half', 'left'],
         necessary: false
     },
     {
@@ -48,15 +48,15 @@ export const getBankBasic_Style_Info = (basicInfo) => {
         {
             key: '预警级别',
             val: basicInfo["riskLevel"],
-            type: ['half', 'left'],
+            type: ['unique'],
             necessary: false
         },
-        {
-            key: '中心坐标',
-            val: basicInfo["center"],
-            type: ['half', 'right'],
-            splitter: ' ', necessary: false
-        },
+        // {
+        //     key: '中心坐标',
+        //     val: basicInfo["center"],
+        //     type: ['half', 'right'],
+        //     splitter: ' ', necessary: false
+        // },
         {
             key: '监测长度',
             val: basicInfo["monitorLength"],
@@ -77,12 +77,12 @@ export const getBankBasic_Style_Info = (basicInfo) => {
         {
             key: '管理单位',
             val: basicInfo["management"]["department"],
-            type: ['half', 'left'], necessary: false
+            type: ['half', 'left', 'medium-text'], necessary: false
         },
         {
             key: '管理单位联系方式',
             val: basicInfo["management"]["contact"],
-            type: ['half', 'right'], necessary: false
+            type: ['half', 'right', 'medium-text'], necessary: false
         }
     ]
 }
@@ -159,9 +159,9 @@ export const categoryNameDict = ['模型资源管理', '可视化资源管理', 
 
 export const resourceTypeDict = {
     // 'model': ['DEM', 'Hydrodynamic', 'Boundary', 'Config'],
-    'model': ['DEM', 'Config', 'Boundary', 'Hydrodynamic'],
+    'model': ['DEM', 'Config', 'Section', 'Hydrodynamic', 'Boundary'],
     'visual': ['DEM', 'Vector'],
-    'device': ['GNSS', 'MENOMETER', "STRESS", "INCLINE", "VEDIO"]
+    'device': ['GNSS', 'MENOMETER', "STRESS", "INCLINE", "VEDIO", "OTHER"]
 }
 
 //////////////////////// RESOURCE UPLOAD NEEDED
@@ -252,13 +252,7 @@ export const resourceUploadNeeded = {
                 required: true
             }
         ],
-        'Boundary': [
-            // {
-            //     label: '文件名',
-            //     enName: 'name',
-            //     value: '',
-            //     type: 'input',
-            // },
+        'Section': [
             {
                 label: '年份',
                 enName: 'year',
@@ -288,13 +282,13 @@ export const resourceUploadNeeded = {
                 required: false
             },
             {
-                label: '边界矢量文件',
+                label: '断面文件',
                 enName: 'file',
                 value: null,
                 type: 'file',
                 required: true
             }
-        ],
+        ],        
         'Hydrodynamic': [
             // {
             //     label: '文件名',
@@ -338,7 +332,49 @@ export const resourceUploadNeeded = {
                 required: true
             }
         ],
-
+        'Boundary': [
+            // {
+            //     label: '文件名',
+            //     enName: 'name',
+            //     value: '',
+            //     type: 'input',
+            // },
+            {
+                label: '年份',
+                enName: 'year',
+                value: '2023',
+                type: 'input',
+                required: true
+            },
+            {
+                label: '月份',
+                enName: 'month',
+                value: '04',
+                type: 'input',
+                required: true
+            },
+            {
+                label: '工况集',
+                enName: 'set',
+                value: 'standard',
+                type: 'input',
+                required: true
+            },
+            {
+                label: '备注',
+                enName: 'description',
+                value: '',
+                type: 'input',
+                required: false
+            },
+            {
+                label: '边界矢量文件',
+                enName: 'file',
+                value: null,
+                type: 'file',
+                required: true
+            }
+        ],
     },
     'visual': {
         'DEM': [
@@ -429,6 +465,15 @@ export const resourceUploadNeeded = {
                 required: true
             },
         ],
+        'OTHER': [
+            {
+                label: '设备配置文件',
+                enName: 'file',
+                value: '',
+                type: 'file',
+                required: true
+            },
+        ],
     }
 }
 
@@ -436,8 +481,9 @@ export const resourceUploadTitle = {
     'model': {
         'DEM': '地形数据',
         'Config': '配置数据',
-        'Boundary': '岸段边界数据',
+        'Section': '断面数据',
         'Hydrodynamic': '预算工况数据',
+        'Boundary': '岸段边界数据',
     },
     'visual': {
         'DEM': '栅格数据',
@@ -448,7 +494,8 @@ export const resourceUploadTitle = {
         'MENOMETER': '水压力计设备',
         'STRESS': '应力桩设备',
         'INCLINE': '测斜仪设备',
-        'VEDIO': '监控设备'
+        'VEDIO': '监控设备',
+        'OTHER': '其他设备'
     }
 }
 
@@ -457,8 +504,9 @@ export const fileTypeDict = {
         'DEM': 'tiff',
         // 'DEM': 'txt',
         'Config': 'json',
-        'Boundary': 'geojson',
+        'Section': 'shapefile',
         'Hydrodynamic': 'hydrodynamic',
+        'Boundary': 'geojson',
     }
 }
 

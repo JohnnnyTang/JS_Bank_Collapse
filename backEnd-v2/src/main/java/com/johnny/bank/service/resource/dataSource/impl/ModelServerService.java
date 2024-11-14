@@ -3,13 +3,11 @@ package com.johnny.bank.service.resource.dataSource.impl;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNodeV2;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
-import com.johnny.bank.repository.nodeRepo.base.IBaseNodeRepo;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import com.johnny.bank.service.resource.dataSource.IModelServerService;
 import com.johnny.bank.utils.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
@@ -20,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA.
@@ -247,7 +246,7 @@ public class ModelServerService implements IModelServerService {
         dataNodeBasicInfo.put("set",info.getString("set"));
         dataNodeBasicInfo.put("type","calculate");
         dataNodeBasicInfo.put("segment",bank);
-        if (info.containsKey("description")) {
+        if (info.containsKey("description") && !Objects.equals(info.getString("description"), "")) {
             dataNodeBasicInfo.put("description",info.getString("description"));
         }
         if (info.containsKey("temp")) {
