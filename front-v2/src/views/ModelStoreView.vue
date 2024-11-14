@@ -8,16 +8,16 @@
         <div class="nav-knowledge-text">知识平台</div>
     </div> -->
   <div class="model-arror a1">
-    <img src="/modelArror.png" alt="">
+    <img src="/theModelArrow.png" alt="">
   </div>
   <div class="model-arror a2">
-    <img src="/modelArror.png" alt="">
+    <img src="/theModelArrow.png" alt="">
   </div>
   <div class="model-arror a3">
-    <img class="line" src="/modelArror.png" alt="">
+    <img class="line" src="/theModelArrow.png" alt="">
   </div>
   <div class="model-arror a4">
-    <img class="line" src="/modelArror.png" alt="">
+    <img class="line" src="/theModelArrow.png" alt="">
   </div>
 </template>
 

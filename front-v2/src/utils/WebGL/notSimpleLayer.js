@@ -94,6 +94,7 @@ export default class FlowFieldLayer {
     get progressRate() {
         return this._progressRate;
     }
+
     set timeCount(value) {
         this._timeCount = value % this.timeLast;
     }

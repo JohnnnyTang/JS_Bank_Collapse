@@ -354,7 +354,7 @@ const ModelRunningMessage = ref('')
 const router = useRouter()
 const defaultProps = {
     children: 'children',
-    label: 'lable',
+    label: 'label',
 }
 
 const typeMap = {
@@ -403,7 +403,7 @@ const handleNodeClick = (nodeData, nodeInfo) => {
     console.log('nodeData', nodeData)
     console.log('nodeInfo', nodeInfo)
     if (nodeData.type === 'case') {
-        const { flow, type } = parseFlowAndType(nodeData.lable)
+        const { flow, type } = parseFlowAndType(nodeData.label)
         clickedNode.flow = flow
         clickedNode.type = type
         clickedNode.temp = nodeData.temp
@@ -446,6 +446,14 @@ const tideValue = ['xc', 'zc', 'dc']
 const handleUpload = (file) => {
     console.log('user upload file -- ', file)
 }
+const getNodeFatherInfo = (node)=>{
+    const yearNode = node.parent
+    return {
+        year:yearNode.data.label,
+        set:node.data.label
+    }
+    
+}
 const runMathModel = () => {
     // console.log('mathModelParams')
     // console.log(mathModelParams)
@@ -461,36 +469,43 @@ const runMathModel = () => {
             const file = fileList[0].raw
             formData.append(key, file)
         } else {
-            alert('文件未完全上传！')
+            ElNotification({
+                type: 'warning',
+                title: '警告',
+                message: `文件未完全上传！`,
+                offset: 250,
+            })
             return
         }
     }
     const name = mathModelParams.addToRiskJudgeFlag == 1 ? '' + mathModelParams.flow + mathModelParams.tideType : mathModelParams.customName
+    const {year, set} = getNodeFatherInfo(clickedSet.node)
     const mathModelInfo = {
         "segment": selectedBank.bankEnName,
-        "year": clickedSet.data.year,//clickedSet.data.year,
-        "set": clickedSet.data.set,//clickedSet.data.set,
+        "year": year,
+        "set": set,
         "name": name,
         "temp": mathModelParams.addToRiskJudgeFlag == 1,
         "boundary": "geojson/Mzs/2023/standard/boundary/boundary.geojson"
     }
+    console.log(mathModelInfo)
     formData.append("info", JSON.stringify(mathModelInfo))
 
 
     const parentNode = treeRef.value.getNode(clickedSet.data)
     const newChild = {
-        lable: mathModelParams.addToRiskJudgeFlag === '1' ? `${mathModelParams.flow}${mathModelParams.tideType}` : `${mathModelParams.customName}`,
+        label: mathModelParams.addToRiskJudgeFlag === '1' ? `${mathModelParams.flow}${mathModelParams.tideType}` : `${mathModelParams.customName}`,
         type: 'case',
         tag: '计算中',
         temp: mathModelParams.addToRiskJudgeFlag === '1' ? false : true,
         description: '',
         segment: 'Mzs'
     }
-    if (findByLable(treeRef.value.data[0], newChild.lable)) {
+    if (findBylabel(treeRef.value.data[0], newChild.label)) {
         ElNotification({
             type: 'warning',
             title: '警告',
-            message: `工况【${newChild.lable}】已存在，请勿重复计算`,
+            message: `工况【${newChild.label}】已存在，请勿重复计算`,
             offset: 250,
         })
         return
@@ -540,7 +555,8 @@ const runMathModel = () => {
             message: '数学模型计算失败--工况 ' + name,
             offset: 130
         })
-        delete calcCaseInfo.value[name]
+
+        if(calcCaseInfo[name]) delete calcCaseInfo[name]
         console.error('数模计算失败', err)
 
         modelStartLoading.value = false
@@ -912,12 +928,12 @@ const mapFlyToRiver = (mapIns, bankName) => {
 const updateTreeData = (treedt) => {
     treeData.value = treedt
 }
-const findByLable = (node, lable) => {
+const findBylabel = (node, label) => {
     let result
-    if (node.lable === lable) result = true
+    if (node.label === label) result = true
     else if (node.children) {
         for (let i = 0; i < node.children.length; i++) {
-            result = findByLable(node.children[i], lable)
+            result = findBylabel(node.children[i], label)
             if (result) break;
         }
     }
@@ -935,7 +951,7 @@ const getTreeDataFromJson = async (data, bankName) => {
 
     const result = [
         {
-            lable: bankName,
+            label: bankName,
             type: 'bank',
             children: [],
         },
@@ -943,21 +959,21 @@ const getTreeDataFromJson = async (data, bankName) => {
     let years = []
     for (let j = 0; j < data.length; j++) {
         let yearItem = {
-            lable: data[j]['year'],
+            label: data[j]['year'],
             type: 'year',
             children: [],
         }
         let sets = []
         for (let k = 0; k < data[j]['sets'].length; k++) {
             let setItem = {
-                lable: data[j]['sets'][k]['name'],
+                label: data[j]['sets'][k]['name'],
                 type: 'set',
                 children: [],
             }
             let cases = []
             for (let p = 0; p < data[j]['sets'][k]['list'].length; p++) {
                 let casesItem = {
-                    lable: data[j]['sets'][k]['list'][p]['name'],
+                    label: data[j]['sets'][k]['list'][p]['name'],
                     type: 'case',
                     tag: '已计算',
                     temp: data[j]['sets'][k]['list'][p]['temp'],
@@ -966,7 +982,7 @@ const getTreeDataFromJson = async (data, bankName) => {
                 cases.push(casesItem)
             }
             for (let key in mathModelStore.calculatingCases) {
-                if (setItem.lable === mathModelStore.calculatingCases[key]['treeNodeFather'].lable) {
+                if (setItem.label === mathModelStore.calculatingCases[key]['treeNodeFather'].label) {
                     cases.push(mathModelStore.calculatingCases[key]['treeNode'])
                 }
             }
