@@ -1,9 +1,7 @@
 <template>
     <div class="riskInfo-container">
         <div class="riskInfo-title">
-            <!-- <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
-            历史断面变化
-        </dv-border-box2> -->
+            <!-- <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">历史断面变化</dv-border-box2> -->
             <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
                 岸坡断面形态变化
             </dv-border-box2>
