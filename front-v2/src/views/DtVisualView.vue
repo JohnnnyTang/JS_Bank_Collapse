@@ -316,9 +316,8 @@ import { getRealTimeStationData } from "../api/realtimeWaterCondition";
 import dayjs from "dayjs";
 
 // data
-const tileServer = `http://${window.location.host}${
-  import.meta.env.VITE_MAP_TILE_SERVER
-}`;
+const tileServer = `http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`;
+console.log("输出的是：" + import.meta.env.VITE_APP_BACK_ADDRESS)
 const mapContainer = ref();
 const mapStore = useMapStore();
 const activeStatus = ref([false, false]);

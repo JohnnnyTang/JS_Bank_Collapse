@@ -1,7 +1,7 @@
 <template>
     <el-dialog v-model="dialogFormVisible" width="18vw" :show-close="false" ref="dialogRef" custom-class="dialog-class"
         :destroy-on-close="true">
-        <template #header="{ titleId, titleClass }">
+        <template #header="{ }">
             <div class="form-header">
                 {{ dialogFormTitle }}
             </div>
@@ -15,7 +15,7 @@
                 <el-radio-group v-model="dialogValues[deviceInfo[key]['mappedMonitorInfoField']]"
                     v-else-if="deviceInfo[key]['type'] === 'radios'">
                     <el-radio v-for="(_, radioIndex) in deviceInfo[key].radioLabelArray"
-                        :value='deviceInfo[key].radioValueArray[radioIndex]'> {{
+                        :value='deviceInfo[key].radioValueArray[radioIndex]' :key="radioIndex"> {{
                             deviceInfo[key].radioLabelArray[radioIndex] }} </el-radio>
                 </el-radio-group>
 

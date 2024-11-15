@@ -9,7 +9,7 @@
             </div>
 
             <div class="clash-card__unit-stats  clearfix">
-                <div :class="{ 'one-second': data.type === 'two', 'one-third': data.type === 'three', 'one-first': data.type === 'one' }"
+                <div :class="{ 'one-second': data.type === 'two', 'one-third': data.type === 'three', 'one-first': data.type === 'one', 'one-forth': data.type === 'four' }"
                     v-for="(unit, index) in data.unitInfo">
                     <div class="stat">{{ unit.value }}份</div>
                     <div class="stat-value">{{ unit.name }}</div>
@@ -57,7 +57,7 @@ $returnEasing: cubic-bezier(0.445, 0.05, 0.55, 0.95);
 .wrapper {
     // temp
     position: relative;
-    width: 23vw;
+    width: 21vw;
     height: fit-content;
     margin: 2vh 2vw;
     // background-color: aqua;
@@ -74,7 +74,7 @@ $returnEasing: cubic-bezier(0.445, 0.05, 0.55, 0.95);
 
     .clash-card {
         background: rgb(255, 255, 255);
-        width: 23vw;
+        width: 21vw;
         display: inline-block;
         margin: auto;
         border-radius: $border-radius-size;
@@ -90,7 +90,7 @@ $returnEasing: cubic-bezier(0.445, 0.05, 0.55, 0.95);
 .clash-card__image {
     position: relative;
     height: 26.5vh;
-    width: 23vw;
+    width: 21vw;
     border-top-left-radius: $border-radius-size;
     border-top-right-radius: $border-radius-size;
 
@@ -121,8 +121,9 @@ $returnEasing: cubic-bezier(0.445, 0.05, 0.55, 0.95);
 .one-third {
     width: 30%;
     float: left;
-    padding: 2vh 0.35vw;
+    padding: 2vh 0.2vw;
     border-right: 1px solid #ffffff;
+   
 
     &:last-child {
         border-right: none;
@@ -140,8 +141,19 @@ $returnEasing: cubic-bezier(0.445, 0.05, 0.55, 0.95);
     }
 }
 
+.one-forth {
+    width: 23%;
+    float: left;
+    padding: 2vh 0.1vw;
+    border-right: 1px solid #ffffff;
+
+    &:last-child {
+        border-right: none;
+    }
+}
+
 .one-first {
-    width: 90%;
+    width: 95%;
     float: left;
     padding: 2vh 0.35vw;
 }

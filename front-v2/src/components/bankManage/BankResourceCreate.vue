@@ -13,11 +13,26 @@
                         <div class="bank-name">
                             <div class="bankName-key">岸段名称</div>
                             <div class="bankName-val">
-                                <el-input v-model="bank.name" class="necessary no-number" style="
-                                width: 50%;
-                                height: 100%;
-                                font-size: calc(0.6vw + 0.6vh);
-                            " placeholder="请输入岸段名称" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
+                                                            
+                                <el-autocomplete
+                                    v-model="bank.name"
+                                    class="necessary"
+                                    style="
+                                        width: 50%;
+                                        height: 100%;
+                                    " 
+                                    :fetch-suggestions="fetch_suggestions" 
+                                    placeholder="请输入岸段名称"
+                                    :trigger-on-focus="false"
+                                    clearable
+                                    @select="handleSelect"
+                                    :debounce=500
+                                >
+                                    <template #suffix>
+                                        <span class="star">*</span>
+                                    </template>
+                                </el-autocomplete>
+                                
                                 <el-input v-model="bank.bankEnName" class="necessary no-number" style="
                                 width: 50%;
                                 height: 100%;
@@ -44,7 +59,7 @@
                                     placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
 
 
-                                <div v-else-if="item.key === '中心坐标'" class="full">
+                                <!-- <div v-else-if="item.key === '中心坐标'" class="full">
                                     <el-input v-model="lnglat.lng" style="
                                         width: 50%;
                                         height: 100%;
@@ -57,7 +72,7 @@
                                             font-size: calc(0.6vw + 0.6vh);
                                         " placeholder="请输入纬度" type="number" :step="0.0000001"
                                         :autosize="{ minRows: 4, maxRows: 6 }" />
-                                </div>
+                                </div> -->
 
                                 <el-input v-else v-model="item.val" style="
                                 width: 100%;
@@ -233,11 +248,33 @@ const createNewBankClickHandler = async () => {
 }
 
 
+const fetch_suggestions = async(queryString, cb) => {
+    console.log("开始执行")
+    console.log("queryString:", queryString)
+    let searchResults = []
+    if (bank.name.length >= 1) { // 至少输入1个字符才进行搜索
+        try {
+            const response = await BankResourceHelper.onInput(bank.name)
+            searchResults = response.data;
+            console.log("搜索结果是：", searchResults)
+        } catch (error) {
+            console.error('搜索失败', error);
+        }
+    }
+    let result = []
+    for (let item of searchResults)
+        result.push({"value": item})
+    cb(result)
+};
 
-
-
-
-
+const handleSelect = async(item) => {
+  const response = await BankResourceHelper.handleSelect(item.value)
+  console.log(response.data)
+  bankBasicInfo.value[0].val = warnLevelList[response.data.warning_level]
+  bankBasicInfo.value[1].val = response.data.monitoring_length
+  bankBasicInfo.value[2].val = response.data.create_time
+  bankBasicInfo.value[3].val = response.data.description
+}
 
 
 /////////////////////////// bank resource info
@@ -317,14 +354,6 @@ const createNewBankClickHandler = async () => {
 //     dialogFormTitle.value = `${type[resourceTypeIndex]}资源上传`
 //     dialogFormVisible.value = true
 // }
-
-
-
-
-
-
-
-
 
 onMounted(() => {
 })
@@ -736,6 +765,32 @@ div.form-header {
         height: 100%;
         font-size: calc(0.6vh + 0.6vw);
         // background-color: red;
+    }
+}
+
+:deep(.el-autocomplete) {
+    /* &.necessary {
+        ::before {
+            position: absolute;
+            top: .3vh;
+            right: .5vw;
+            font-size: 24px;
+            z-index: 5;
+            content: "*";
+            color: red;
+        }
+    } */
+    .el-input {
+        height: 100%;
+        font-size: calc(0.6vw + 0.6vh);
+    }
+    .star {
+        position: absolute;
+        top: .3vh;
+        right: .5vw;
+        font-size: 24px;
+        z-index: 5;
+        color: red;
     }
 }
 

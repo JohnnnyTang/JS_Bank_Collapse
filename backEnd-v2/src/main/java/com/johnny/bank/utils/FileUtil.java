@@ -5,6 +5,7 @@ import com.johnny.bank.model.resource.dataResource.InclinometerData;
 import com.johnny.bank.model.resource.dataResource.ManometerData;
 import com.johnny.bank.model.resource.dataResource.StressPileData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -59,8 +60,8 @@ public class FileUtil {
             return "NOT EXIST";
         }
         try {
-            //List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
-            List<String> lines = Files.readAllLines(filePath);
+            List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
+//            List<String> lines = Files.readAllLines(filePath);
             return String.join(System.lineSeparator(), lines);
         } catch (IOException e) {
             return "ERROR";
@@ -89,8 +90,8 @@ public class FileUtil {
 
     // 修改指定路径文件内容
     public static void modifiyFileContent(String filePathStr, String content) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
-        //try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePathStr), Charset.forName("GBK"))) {
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePathStr), Charset.forName("GBK"))) {
             writer.write(content);
         } catch (IOException e) {
             e.printStackTrace();
@@ -189,5 +190,17 @@ public class FileUtil {
         }
         String outStr = out.toString();
         return outStr.substring(0, outStr.length()-1);
+    }
+
+    public static MultipartFile convertFileToMultipartFile(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+
+        // 使用 MockMultipartFile 创建 MultipartFile 实例
+        return new MockMultipartFile(
+                file.getName(),           // 文件名
+                file.getName(),           // 原始文件名
+                "application/zip", // 文件类型
+                inputStream                // 文件输入流
+        );
     }
 }

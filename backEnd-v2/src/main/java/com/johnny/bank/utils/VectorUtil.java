@@ -69,6 +69,10 @@ public class VectorUtil {
         return bank.toLowerCase()+"_"+NameUtil.convertCamelCaseToSnakeCase(name);
     }
 
+    private static String section2tableName(String bank, String name) {
+        return bank.toLowerCase()+"_"+"section";
+    }
+
     public static DataNodeV2 vector2DataNode(String bank, JSONObject info) {
         String tileName = info.getString("name");
         String tableName = name2tableName(bank, tileName);
@@ -88,6 +92,32 @@ public class VectorUtil {
                 .apiPrefix(defaultDatasource.getUrl())
                 .usage(usage).basicInfo(basicInfo)
                 .path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",VectorDataGroupOf"+bank+",")
+                .build();
+    }
+
+    public static DataNodeV2 section2DataNode(String bank, JSONObject info) {
+        String dataName = info.getString("name");
+        String tableName = section2tableName(bank, dataName);
+        JSONObject usage = new JSONObject();
+        usage.put("password", defaultDatasource.getPassword());
+        usage.put("userName", defaultDatasource.getUsername());
+        usage.put("tableName",tableName);
+        JSONObject basicInfo = new JSONObject();
+        basicInfo.put("tableName", tableName);
+        basicInfo.put("fileType",info.getString("fileType"));
+        basicInfo.put("year",info.getString("year"));
+        basicInfo.put("month",info.getString("month"));
+        basicInfo.put("set",info.getString("set"));
+        basicInfo.put("type","section");
+        basicInfo.put("segment",bank);
+        basicInfo.put("path", vectorDataPath + File.separator + dataName);
+        basicInfo.put("calculate","1");
+        basicInfo.put("visualization","2");
+        return DataNodeV2.dataNodeBuilder()
+                .bank(bank).auth("all").name(info.getString("name")).category("SectionDataItem")
+                .apiPrefix(defaultDatasource.getUrl())
+                .usage(usage).basicInfo(basicInfo)
+                .path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",SectionDataGroupOf"+bank+",")
                 .build();
     }
 
@@ -123,11 +153,18 @@ public class VectorUtil {
 //        String originBasicName = srcFile.getOriginalFilename().substring(0, srcFile.getOriginalFilename().lastIndexOf("."));
         String tileName = info.getString("name");
         String tableName = name2tableName(bank, tileName);
+        if (info.get("type").equals("section")) {
+            tableName = section2tableName(bank, tileName);
+        }
         String vectorFilePath = vectorDataPath + File.separator + srcFile.getOriginalFilename();
         File vectorFile = new File(vectorFilePath);
         srcFile.transferTo(vectorFile);
         List<String> list;
-        list = ZipUtil.unZipFiles(vectorFile, vectorDataPath);
+        if (info.get("type").equals("section")){
+            list = ZipUtil.unZipFiles(vectorFile, vectorFilePath.split("\\.")[0]);
+        }else {
+            list = ZipUtil.unZipFiles(vectorFile, vectorDataPath);
+        }
         vectorFile.delete();
         String shpPath = "";
         for (String fileName : list) {

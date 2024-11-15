@@ -1,7 +1,9 @@
 package com.johnny.bank.service.resource.dataSource.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.johnny.bank.aop.DynamicNodeDataV2;
 import com.johnny.bank.model.common.DefaultDatasource;
 import com.johnny.bank.model.common.PublicDatasource;
 import com.johnny.bank.model.node.DataNodeV2;
@@ -9,10 +11,13 @@ import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.resource.dataResource.MonitorInfo;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.repository.nodeRepo.base.IBaseNodeRepo;
+import com.johnny.bank.repository.resourceRepo.dataResourceRepo.ImportantBankRepo;
+import com.johnny.bank.repository.resourceRepo.dataResourceRepo.SectionDataRepo;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.utils.FileUtil;
 import com.johnny.bank.utils.InternetUtil;
 import com.johnny.bank.utils.VectorUtil;
+import com.johnny.bank.utils.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,8 +29,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -68,6 +78,15 @@ public class BankResourceService {
     @Autowired
     @Qualifier("publicDatasource")
     PublicDatasource publicDatasource;
+
+    @Autowired
+    SectionDataRepo sectionDataRepo;
+
+    @Autowired
+    IDataNodeRepoV2 iDataNodeRepoV2;
+
+    @Autowired
+    ImportantBankRepo importantBankRepo;
 
     public Boolean ifBankExist(String bank) {
         boolean flag = false;
@@ -388,6 +407,26 @@ public class BankResourceService {
                 bank
         );
     }
+    public String uploadSectionResourceData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
+        String category = "SectionDataItem";
+        String name = info.getString("name");
+        String bank = info.getString("segment");
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        if (iDataNodeRepoV2.getNodeByCategoryAndBank(category, bank) != null) {
+            return "数据资源已存在！";
+        }
+        info.put("type","section");
+        if (!VectorUtil.shpVector2pg(file, info, bank)) {
+            return "断面 "+name+" 上传失败！";
+        } else {
+            DataNodeV2 vectorDataNode = VectorUtil.section2DataNode(bank, info);
+            dataNodeServiceV2.save(vectorDataNode);
+            return "断面 "+name+" 上传完成！";
+        }
+    }
+
     public String uploadVisualizationResourceData(MultipartFile file, String bank, JSONObject info) throws IOException, InterruptedException {
         String category = "VectorDataItem";
         String name = info.getString("name");
@@ -481,6 +520,25 @@ public class BankResourceService {
                 bank
         );
     }
+    public String deleteSection(String bank, String name) {
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        String category = "SectionDataItem";
+        DataNodeV2 sectionDataNode = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (sectionDataNode == null) {
+            return "数据资源 "+name+" 不存在！";
+        }
+        String path = sectionDataNode.getBasicInfo().getString("path");
+        FileUtil.deleteFolder(new File(path));
+        dataNodeRepoV2.deleteById(sectionDataNode.getId());
+        if (!VectorUtil.deletePgVector(sectionDataNode.getBasicInfo().getString("tableName"))) {
+            return "断面资源 " + name + " 删除失败！";
+        } else {
+            return "断面资源 " + name + " 删除成功！";
+        }
+    }
+
     public String uploadDeviceResourceData(String bank, JSONObject data) {
         DataNodeV2 dataNode = deviceDataProcess(bank, data);
         if (!ifBankExist(dataNode.getBank())) {
@@ -541,4 +599,61 @@ public class BankResourceService {
                 .basicInfo(basicInfo).usage(usage)
                 .build();
     }
+
+    @DynamicNodeDataV2
+    public JSONArray getSectionInfo(DataNodeV2 dataNodeV2, String type){
+        List<Map<String, Object>> infoList = sectionDataRepo.getSectionInfo(dataNodeV2.getBasicInfo().getString("tableName"), type);
+        JSONArray responseArray = new JSONArray();
+
+        for (Map<String, Object> info : infoList) {
+            String id = info.get("id").toString();
+            String label = info.get("label").toString();
+            JSONObject geometryData = JSONObject.parseObject((String) info.get("geometry"));
+            JSONObject response = new JSONObject();
+            response.put("id", id);
+            response.put("label", label);
+            response.put("geometry", geometryData);
+            responseArray.add(response);
+        }
+        return responseArray;
+    }
+
+    @DynamicNodeDataV2
+    public List<String> getImportantBankName(DataNodeV2 dataNodeV2, String prefix){
+        return importantBankRepo.getImportantBankNameByPrefix(dataNodeV2.getUsage().getString("tableName"), prefix);
+    }
+
+    @DynamicNodeDataV2
+    public Map<String, String> getImportantBankInfo(DataNodeV2 dataNodeV2, String name){
+        return importantBankRepo.getImportantBankInfoByName(dataNodeV2.getUsage().getString("tableName"), name);
+    }
+
+    public String uploadModelParams(Map<String, Object> params, String type, Map<String, String> info) throws IOException, InterruptedException {
+        String paramsJsonString = JSON.toJSONString(params);
+        System.out.println(paramsJsonString);
+        // 将 JSON 字符串写入文件
+        String jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", type);
+
+        // 确保目录存在
+        Path path = Paths.get(jsonFolderPath);
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+
+        String jsonPath = String.join(File.separator, jsonFolderPath, type + ".json");
+
+        try (FileWriter fileWriter = new FileWriter(jsonPath)) {
+            fileWriter.write(paramsJsonString);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String zipFileName = ZipUtil.zipFolder(new File(jsonFolderPath));
+        System.out.println(zipFileName);
+
+        System.out.println(info);
+        modelServerService.uploadCalculateResourceData(FileUtil.convertFileToMultipartFile(new File(zipFileName)), new JSONObject(info));
+
+        return "";
+    }
+
 }
