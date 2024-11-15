@@ -2,34 +2,20 @@
     <div class="riskInfo-container">
         <div class="riskInfo-title">
             <!-- <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">历史断面变化</dv-border-box2> -->
-            <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">
-                岸坡断面形态变化
-            </dv-border-box2>
-<!-- ////////////////////////////////////////////////////////////////////////////////////// -->
-            <button class="condition-button" @click="editClickHandler()" :class="{ 'active': true }">
-                编辑
-            </button>
-<!-- ////////////////////////////////////////////////////////////////////////////////////// -->
+            <dv-border-box2 :color="['rgb(63, 36, 214)', '#0c60af']">岸坡断面形态变化</dv-border-box2>
+            <button class="condition-button" @click="editClickHandler()" :class="{ 'active': true }">编辑</button>
         </div>
         <div class="riskInfo-item profileShape">
             <div class="item-title">{{ profileName }}</div>
-            <el-popover
-                placement="bottom-start"
-                content="其他年份地形"
-                :width="100"
-                trigger="hover"
-            >
+            <el-popover placement="bottom-start" content="其他年份地形" :width="100" trigger="hover">
                 <template #reference>
                     <div class="profile-show-container" @click="showOtherLine"></div>
                 </template>
             </el-popover>
             <div class="profile-selector-container">
-                <el-select v-model="profileValue" placeholder="选择断面" style="width: 10vw; height: 3.5vh"
-                    @change="calProfileData" popper-class="profile-popper">
+                <el-select v-model="profileValue" placeholder="选择断面" style="width: 10vw; height: 3.5vh" @change="calProfileData" popper-class="profile-popper">
                     <el-option v-for="item in props.profileList" :key="item.value" :label="item.label" :value="item.value">
-                        <span class="profile-name-text">
-                            {{ item.label }}
-                        </span>
+                        <span class="profile-name-text">{{ item.label }}</span>
                     </el-option>
                 </el-select>
             </div>
@@ -42,38 +28,44 @@
                 </div>
             </div>
         </div>
-        <!-- ////////////////////////////////////////////////////////////////////////////////////// -->
         <div class="edit-pannel-container" v-if="editPannelShow">
             <div class="title">编辑页面</div>
             <div class="part">
-                <span>滩槽高差：</span>
-                <el-input v-model="inputGaochaList" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
+                <span>滩槽高程：</span>
+                <!-- <el-input v-model="inputGaochaList" style="width: 4vw; height: 3.5vh" placeholder="请输入" /> -->
+                <el-input v-model="inputValues.gaocha" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
             </div>
             <div class="part">
                 <span>岸坡坡比：</span>
-                <el-input v-model="inputPobiList" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
+                <!-- <el-input v-model="inputPobiList" style="width: 4vw; height: 3.5vh" placeholder="请输入" /> -->
+                <el-input v-model="inputValues.pobi" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
             </div>
             <div class="part">
                 <span>冲刷幅度：</span>
-                <el-input v-model="inputSpeedList" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
+                <!-- <el-input v-model="inputSpeedList" style="width: 4vw; height: 3.5vh" placeholder="请输入" /> -->
+                <el-input v-model="inputValues.speed" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
             </div>
             <div class="submit">
-                <button class="submit-button" @click="editData" :class="{ 'active': true }" style="width: 4vw; height: 3vh; font-size: medium;">
+                <button class="cancel-button" @click="cancelEditData" style="width: 3vw; height: 2.5vh; font-size: medium;">
+                    取消
+                </button>
+                <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                <button class="submit-button" @click="editData" style="width: 3vw; height: 2.5vh; font-size: medium;">
                     修改
                 </button>
             </div>
         </div>
-        <!-- ////////////////////////////////////////////////////////////////////////////////////// -->
         <div class="text-info-container">
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年该断面滩槽高差为 <span style="color: rgb(226, 80, 80);">{{ gaochaList[profileValue - 1] }}</span> m
+                    <!-- 2023年该断面滩槽高程为 <span style="color: rgb(226, 80, 80);">{{ gaochaList[profileValue - 1] }}</span> m -->
+                    2023年该断面滩槽高程为 <span style="color: rgb(226, 80, 80);">{{ gaocha }}</span> m
                 </div>
             </div>
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年断面最大岸坡坡比为
-                    <span style="color: rgb(226, 80, 80);">{{ pobiList[profileValue - 1] }}</span>
+                    <!-- 2023年断面最大岸坡坡比为<span style="color: rgb(226, 80, 80);">{{ pobiList[profileValue - 1] }}</span> -->
+                    2023年断面最大岸坡坡比为<span style="color: rgb(226, 80, 80);">{{ pobi }}</span>
                     <!-- <span v-if="profileValue - 1 === 5" style="color: rgb(226, 80, 80);">1 / 1.7</span>
                     <span v-else-if="profileValue - 1 === 6" style="color: rgb(226, 80, 80);">1 / 1.8</span>
                     <span v-else-if="profileValue - 1 === 7" style="color: rgb(226, 80, 80);">1 / 2.2</span>
@@ -82,7 +74,8 @@
             </div>
             <div class="text-info-block">
                 <div class="text-info-item">
-                    1999~2023年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">{{ speedList[profileValue - 1] }}</span> m/年
+                    <!-- 1999~2023年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">{{ speedList[profileValue - 1] }}</span> m/年 -->
+                    1999~2023年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">{{ speed }}</span> m/年
                 </div>
             </div>
         </div>
@@ -93,10 +86,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineEmits } from 'vue'
-import { ElPopover, ElButton } from 'element-plus';
-import { drawShapeCompareGraph } from './util.js'
+import axios from 'axios';
 import * as echarts from 'echarts'
+import { ref, onMounted, onUnmounted, watch, defineEmits, reactive } from 'vue'
+import { ElPopover, ElButton, ElSelect, ElOption, ElInput, ElMessage } from 'element-plus';
+import { drawShapeCompareGraph } from './util.js'
+import { useBankNameStore } from '../../store/bankNameStore';
 
 // const speedList = ref([
 //     3.575, 4.725, 2.675, 5.025, 4.700, 5.650, 3.375, 3.150, 4.325, 3.850, 1.275, 0.975
@@ -109,39 +104,45 @@ import * as echarts from 'echarts'
 // ])
 //////////////////////////////////////////////////////////////////////////////////////
 // 从 localStorage 加载数据或初始化默认值
-const speedList = ref(JSON.parse(localStorage.getItem('speedList')) || [
-    3.575, 4.725, 2.675, 5.025, 4.700, 5.650, 3.375, 3.150, 4.325, 3.850, 1.275, 0.975
-])
 const gaochaList = ref(JSON.parse(localStorage.getItem('gaochaList')) || [
     38.27, 32.72, 33.56, 30.84, 34.94, 32.88, 33.65, 31.45, 28.53, 27.61, 27.01, 25.73
 ])
-// const pobiList = ref(JSON.parse(localStorage.getItem('pobiList')) || [
-//     "1/4.1", "1/3.9", "1/4.0", "1/6.3", "1/3.9", "1/3.3", "1/3.1", "1/3.1", "1/6.5", "1/7.9", "1/11.3", "1/11.0"
-// ])
 const pobiList = ref(JSON.parse(localStorage.getItem('pobiList')) || [
     "1/4.1", "1/3.9", "1/4.0", "1/6.3", "1/3.9", "1/1.7", "1/1.8", "1/2.2", "1/6.5", "1/7.9", "1/11.3", "1/11.0"
 ])
-// 定义输入框的响应式数据
-const inputSpeedList = ref()
-const inputGaochaList = ref()
-const inputPobiList = ref()
+const speedList = ref(JSON.parse(localStorage.getItem('speedList')) || [
+    3.575, 4.725, 2.675, 5.025, 4.700, 5.650, 3.375, 3.150, 4.325, 3.850, 1.275, 0.975
+])
 
-// 编辑面板的显示状态
-const editPannelShow = ref(false)
-//////////////////////////////////////////////////////////////////////////////////////
-const shapeGraphNotShow = ref(false)
-const shapeGraphRef = ref(null)
-let shapeChart = null
 let section;
 let beforeSection;
 let compareSection;
 let compareBeforeSection;
+let shapeChart = null
+let formDataTextUp = null
+let formDataTableUpdate = null
+let bank = useBankNameStore().globalBankName
 
+const shapeGraphRef = ref(null)
+const editPannelShow = ref(false)
+const shapeGraphNotShow = ref(false)
 
-const emit = defineEmits(['profileValueChange'])
-
+const inputSpeedList = ref()
+const inputGaochaList = ref()
+const inputPobiList = ref()
 const profileValue = ref(8)
 const profileName = ref('')
+const selectedLabel = ref('')
+const gaocha = ref('')
+const pobi = ref('')
+const speed = ref('')
+const inputValues = ref({
+    gaocha: '',
+    pobi: '',
+    speed: ''
+});
+
+const emit = defineEmits(['profileValueChange'])
 
 const props = defineProps({
     profileData: {
@@ -157,34 +158,101 @@ const props = defineProps({
         type: Boolean
     }
 })
-//////////////////////////////////////////////////////////////////////////////////////
-// 编辑数据的方法
-const editData = () => {
-    // 更新当前选择断面的数据
-    if (!isNaN(inputSpeedList.value) && inputSpeedList.value !== '') {
-        speedList.value[profileValue.value - 1] = parseFloat(inputSpeedList.value);
-    }
-    if (!isNaN(inputGaochaList.value) && inputGaochaList.value !== '') {
-        gaochaList.value[profileValue.value - 1] = parseFloat(inputGaochaList.value);
-    }
-    if (inputPobiList.value !== '') {
-        pobiList.value[profileValue.value - 1] = inputPobiList.value;
-    }
 
-    // 存储到 localStorage 或其他存储方式
-    localStorage.setItem('speedList', JSON.stringify(speedList.value));
-    localStorage.setItem('gaochaList', JSON.stringify(gaochaList.value));
-    localStorage.setItem('pobiList', JSON.stringify(pobiList.value));
+const cancelEditData = () => {
+    editPannelShow.value = false;
+}
 
-    // 关闭编辑面板
+const editData = async() => {
+    // if (!isNaN(inputSpeedList.value) && inputSpeedList.value !== '') {
+    //     speedList.value[profileValue.value - 1] = parseFloat(inputSpeedList.value);
+    // }
+    // if (!isNaN(inputGaochaList.value) && inputGaochaList.value !== '') {
+    //     gaochaList.value[profileValue.value - 1] = parseFloat(inputGaochaList.value);
+    // }
+    // if (inputPobiList.value !== '') {
+    //     pobiList.value[profileValue.value - 1] = inputPobiList.value;
+    // }
+    // localStorage.setItem('speedList', JSON.stringify(speedList.value));
+    // localStorage.setItem('gaochaList', JSON.stringify(gaochaList.value));
+    // localStorage.setItem('pobiList', JSON.stringify(pobiList.value));
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    // console.log(selectedLabel.value)
+    console.log("输入的内容:", inputValues.value)
+    try {
+        //更新
+        formDataTableUpdate = new FormData();
+        const data = {
+            text: inputValues.value
+        }
+        formDataTableUpdate.append('data', JSON.stringify(data))
+        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/${selectedLabel.value}`, data, {
+            headers: {
+                'Content-Type': 'application/json', // 设置请求头为 application/json
+            },
+        });
+        console.log("更新的内容是:", data)
+    } catch (error) {
+        console.error('上传失败:', error);
+        ElMessage.error('上传失败');
+    }
+    getSectionData()
     editPannelShow.value = false;
 };
 
-const editClickHandler = () => {
+const editClickHandler = async() => {
+    // selectedLabel = profileValue.value ? profileValue.label : '';
+    getSectionData()
+    console.log("编辑的断面是:", selectedLabel.value)
+    try {
+        formDataTextUp = new FormData();
+        const info = {
+            name: selectedLabel.value, 
+            text: selectedLabel.value
+        };
+        formDataTextUp.append('info', JSON.stringify(info));
+        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    } catch (error) {
+        console.error('上传失败:', error);
+        // ElMessage.error('上传失败');
+    }
+    // getSectionData()
     editPannelShow.value = !editPannelShow.value;
 };
-//////////////////////////////////////////////////////////////////////////////////////
-const calProfileData = () => {
+
+const getSectionData = async () => {
+    try {
+        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/bank/text?bank=${bank}`);
+        const data = response.data;
+        console.log("获取断面数据的是:", selectedLabel.value)
+        const textItem = data.find(item => item.name === selectedLabel.value);
+        gaocha.value = textItem.text.gaocha;
+        pobi.value = textItem.text.pobi; 
+        speed.value = textItem.text.speed; 
+        inputValues.value.gaocha = textItem.text.gaocha;
+        inputValues.value.pobi = textItem.text.pobi;
+        inputValues.value.speed = textItem.text.speed;
+        console.log("获取的断面流速是:", inputValues.speed.value )
+    } catch (error) {
+        console.error('获取地质结构描述失败:', error);
+        // ElMessage.error('获取地质结构描述失败');
+    }
+};
+
+// const calProfileData = () => {
+const calProfileData = (value) => {
+    getSectionData()
+    editPannelShow.value = false;
+    const selectedOption = props.profileList.find(option => option.value === value);
+    if (selectedOption) {
+        selectedLabel.value = selectedOption.label;
+    }
+/////////////////////////////////////////////////////////////////////////////////////////
     emit('profileValueChange', profileValue.value)
     shapeGraphNotShow.value = false
     const profileDataItem = props.profileData[profileValue.value - 1]
@@ -215,13 +283,9 @@ const calProfileData = () => {
     }
     DrawGraph(section, beforeSection, compareSection, compareBeforeSection)
 
-    // // 更新输入框的值
     inputSpeedList.value = speedList.value[profileValue.value - 1]
     inputGaochaList.value = gaochaList.value[profileValue.value - 1]
     inputPobiList.value = pobiList.value[profileValue.value - 1]
-    // console.log(inputSpeedList)
-    // console.log(inputGaochaList)
-    // console.log(inputPobiList)
 }
 
 const showOtherLine = () => {
@@ -250,7 +314,16 @@ const DrawGraph = (section, beforesection, compareSection, compareBeforeSection)
 }
 
 onMounted(() => {
+    if (props.profileList.length > 0) {
+        // 设置默认选中的 value，这里假设默认选中第一个选项
+        profileValue.value = props.profileList[7].value;
+        // 更新 selectedLabel
+        calProfileData(profileValue.value);
+    }
     calProfileData()
+    getSectionData()
+    // console.log("select:",profileValue)
+    // console.log("option:", props.profileList)
 })
 
 watch(() => props.profileData, () => {
@@ -482,7 +555,7 @@ div.riskInfo-container {
                 backdrop-filter: blur(6px);
                 border-radius: 5px;
                 height: 26%;
-                width: 50%;
+                width: 40%;
                 font-family: 'Microsoft YaHei', 'sans-serif';
 
                 div.title {
@@ -510,6 +583,8 @@ div.riskInfo-container {
                     font-size: calc(0.6vw + 0.5vh);
                     font-weight: 700;
                     color: #444;
+                    align-items: center;
+                    justify-content: center;
                 }
 
                 div.submit {
@@ -530,7 +605,22 @@ div.riskInfo-container {
                         cursor: pointer;
                         z-index: 4;
                         transition: 0.3s linear;
-
+                        &:hover {
+                            background: #348cffd0;
+                        }
+                    }
+                    .cancel-button {
+                        background: #ffffff;
+                        color: #000000;
+                        font-family: 'Microsoft YaHei';
+                        font-weight: 900;
+                        font-size: calc(0.3vw + 0.7vh);
+                        border: #167aec 1px solid;
+                        border-radius: 0.4em;
+                        box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+                        cursor: pointer;
+                        z-index: 4;
+                        transition: 0.3s linear;
                         &:hover {
                             background: #348cffd0;
                         }

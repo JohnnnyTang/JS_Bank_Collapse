@@ -126,7 +126,8 @@
             </div>
         </div>
         <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <div v-if="showFactorRisk" class="risk-factor-container">
+        <!-- <div v-if="showFactorRisk" class="risk-factor-container"> -->
+        <div class="risk-factor-container">
             <div class="risk-item-title">崩岸风险因素分析</div>
             <div class="risk-item-container">
                 <div class="risk-item" :class="{ active: showWaterPower }">
