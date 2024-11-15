@@ -163,8 +163,8 @@ public class BankResourceService {
         // 信息数据节点(3)
         dataNodeServiceV2.addDataGroupNode(bank, "InformationDataGroupOf"+bank, "InformationDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
         // 图片，文本，pdf数据节点(4)
-        dataNodeServiceV2.addDataGroupNode(bank, "PictureDataGroupOf"+bank, "PictureDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",PictureServerDataGroupOf"+bank+",");
-        dataNodeServiceV2.addDataGroupNode(bank, "TextDataGroupOf"+bank, "TextDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",TextServerDataGroupOf"+bank+",");
+        dataNodeServiceV2.addDataGroupNode(bank, "PictureDataGroupOf"+bank, "PictureDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",PictureDataGroupOf"+bank+",");
+        dataNodeServiceV2.addDataGroupNode(bank, "TextDataGroupOf"+bank, "TextDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",TextDataGroupOf"+bank+",");
 //        dataNodeServiceV2.addDataGroupNode(bank, "PdfDataGroupOf"+bank, "PdfDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",PdfServerDataGroupOf"+bank+",");
         // 设备数据节点（2）
         dataNodeServiceV2.addDataGroupNode(bank, "RealtimeDeviceGroupOf"+bank, "RealtimeDeviceGroup",",DataNodeHead,"+bank+"BankNode,");
