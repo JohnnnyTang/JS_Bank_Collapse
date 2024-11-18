@@ -1,7 +1,117 @@
 <template>
     <div class="risk-warn-container">
         <div class="map-container" id="map" ref="mapContainer"></div>
-
+        <!-- <div class="selector-container">
+            <div class="place-selector-container selector-item-container">
+                <div class="place-title selector-title">岸段选择：</div> -->
+        <!-- <div class="confirm-button" @click="confirmProfileTime">
+                    <div class="confirm-button-text">确认选择</div>
+                </div> -->
+        <!-- <div class="place selector-content">
+                    <el-select
+                        class="side"
+                        v-model="placeValue"
+                        placeholder="选择岸段"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="sceneSelectChange"
+                        popper-class="risk-popper"
+                    >
+                        <el-option
+                            v-for="item in placeList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                            :disabled="item.disabled"
+                        >
+                            <span class="section-name-text">{{
+                            -    item.label
+                            }}</span>
+                        </el-option>
+                    </el-select>
+                </div>
+            </div>
+            <div class="scene-selector-container selector-item-container"> -->
+        <!-- 11<div class="scene-title selector-title">评估情景：</div> -->
+        <!-- <div class="before-scene-title selector-title">对比地形:</div>
+                <div class="before-scene selector-content">
+                    <el-select
+                        class="before"
+                        v-model="sceneBeforeValue"
+                        placeholder="选择专题"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="sceneBeforeSelectChange"
+                        popper-class="risk-popper"
+                    >
+                        <el-option
+                            v-for="item in sceneList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
+                            <span
+                                style="float: left"
+                                class="section-name-text"
+                                >{{ item.year }}</span
+                            >
+                            <span
+                                style="float: right"
+                                class="section-class-text"
+                                >{{ item.time }}</span
+                            >
+                        </el-option> -->
+        <!-- 11<template #footer>
+                            <div class="add-select-button">新增评估情景</div>
+                        </template> -->
+        <!-- </el-select>
+                </div>
+                <div class="now-scene-title selector-title">当前地形:</div>
+                <div class="now-scene selector-content">
+                    <el-select
+                        class="now"
+                        v-model="sceneNowValue"
+                        placeholder="选择专题"
+                        style="width: 10vw; height: 3.5vh"
+                        @change="sceneNowSelectChange(sceneNowValue)"
+                        popper-class="risk-popper"
+                    >
+                        <el-option
+                            v-for="item in sceneList"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                        >
+                            <span
+                                style="float: left"
+                                class="section-name-text"
+                                >{{ item.year }}</span
+                            >
+                            <span
+                                style="float: right"
+                                class="section-class-text"
+                                >{{ item.time }}</span
+                            >
+                        </el-option> -->
+        <!-- 11<template #footer>
+                            <div class="add-select-button">新增评估情景</div>
+                        </template> -->
+        <!-- </el-select>
+                </div> -->
+        <!-- <div class="risk-year-container">
+                    <div class="risk-year-title">风险评估数据时效：</div>
+                    <div class="risk-year-content">2023年汛后</div>
+                </div>
+            </div>
+        </div> -->
+        <!-- <div class="test" style="
+      position: absolute;
+      top: 2vh;
+      left: 2vh;
+      background-color: red;
+      width: 10vw;
+      height: 20vh;
+    ">
+      123123123
+    </div> -->
         <div class="basic-info-container">
             <div class="basic-info-content">
                 <div class="title-container">{{ bankBCInfo.name }}示范段</div>
@@ -16,7 +126,7 @@
             </div>
         </div>
         <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <div class="risk-factor-container">
+        <div v-if="showFactorRisk" class="risk-factor-container">
             <div class="risk-item-title">崩岸风险因素分析</div>
             <div class="risk-item-container">
                 <div class="risk-item" :class="{ active: showWaterPower }">
@@ -38,10 +148,17 @@
                         <div class="risk-item-text">地质与工程治理</div>
                     </div>
                 </div>
+                <!-- <div class="risk-item" :class="{ active: showGeologyAndProject }">
+                <div class="risk-main-index outproject" @click="showGeologyAndProjectFunc">
+                    <dv-border-box-12 :color="['rgb(165, 142, 78)', '#e5ee98']"
+                        v-if="showGeologyAndProject"></dv-border-box-12>
+                    <div class="risk-item-text">外部因素</div>
+                </div>
+            </div> -->
             </div>
         </div>
         <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <div class="raster-control-block"  v-if="showControls">
+        <div class="raster-control-block" v-if="showRasterControl">
             <label class="switch">
                 <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
                 <span class="slider"></span>
@@ -51,7 +168,7 @@
             </div>
         </div>
 
-        <div class="bankLine-control-block" v-if="showControls">
+        <div class="bankLine-control-block">
             <label class="switch">
                 <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
                 <span class="slider"></span>
@@ -61,7 +178,7 @@
             </div>
         </div>
 
-        <div class="terrain-control-block" v-if="showControls">
+        <div class="terrain-control-block" v-if="showTerrain3DControl">
             <label class="switch">
                 <input type="checkbox" :checked="showTerrain" @click="TerrainControlHandler()" />
                 <span class="slider"></span>
@@ -104,12 +221,35 @@
             </div>
         </div>
 
+        <!-- <div class="button-container">
+            <button @click="showYearlyProfileShapeFunc">单一断面形态</button>
+            <button @click="showProfileShapeFunc">断面形态</button>
+            <button @click="showProfileSlopeFunc">岸坡最大坡比</button>
+            <button @click="showProfileErosionFunc">近岸冲刷速率</button>
+            <button @click="showBedFlowChartFunc">造床流量当量指标</button>
+            <button @click="showFlowSpeedFunc">流速指标</button>
+            <button @click="showWaterProcessChartFunc">水位变幅指标</button>
+            <button @click="showGeologyAndProjectFunc">地质条件</button>
+        </div> -->
 
-        <profileShapeVue v-if="showRiverBed" @profile-value-change="changeProfileValue" :profileData="profileData"
+        <profileInfoVue v-if="showProfileInfo" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :shapeChartLoad="shapeChartLoad" :erosionChartLoad="erosionChartLoad" />
+
+        <profileShapeYearlyVue v-if="false" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :shapeYearlyChartLoad="shapeYearlyChartLoad" />
+
+        <profileShapeVue v-if="showProfileShape" @profile-value-change="changeProfileValue" :profileData="profileData"
             :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
 
+        <!-- <div class="drag profileSlope" v-if="showProfileSlope" v-draggable="{ bounds: 'body', cancel: 'div.content' }"> -->
+        <profileSlopeVue v-if="showProfileSlope" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :slopeChartLoad="slopeChartLoad" />
+        <!-- </div> -->
 
-        <div v-if="showWaterPower" style="
+        <profileErosionVue v-if="showProfileErosion" @profile-value-change="changeProfileValue" :profileData="profileData"
+            :profileList="profileList" :slopeChartLoad="erosionChartLoad" />
+
+        <div v-if="showBedFlowChart" style="
                 position: absolute;
                 top: 16.25vh;
                 left: 0.3vw;
@@ -120,37 +260,150 @@
             <bedFlowChartVue />
         </div>
 
-        <div v-if="showWaterPower">
-            <flowspeedInfoVue  :status="hydrodynamicCalcDone && !isRunningMan" :flowspeedChartLoad="flowspeedChartLoad" 
-                :time-step="timeStep" @handleDrawEvent="drawHandler" ref="flowspeedInfoRef"/>
-            <div class="flow-control-block">
-                <label class="switch" style="transform: rotateZ(90deg)">
-                    <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
-                    <span class="slider"></span>
-                </label>
-                <div class="text-block">
-                    <div class="text">流场展示</div>
-                </div>
-            </div>
-            <div class="time-shower-block">
-                <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
+        <flowspeedInfoVue v-if="showFlowSpeed" :status="hydrodynamicCalcDone && !isRunningMan" :flowspeedChartLoad="flowspeedChartLoad" 
+            :time-step="timeStep" @handleDrawEvent="drawHandler" ref="flowspeedInfoRef"/>
+        <div v-if="showFlowSpeed" class="flow-control-block">
+            <label class="switch" style="transform: rotateZ(90deg)">
+                <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
+                <span class="slider"></span>
+            </label>
+            <div class="text-block">
+                <div class="text">流场展示</div>
             </div>
         </div>
+        <div v-if="showFlowSpeed" class="time-shower-block">
+            <flowTimeShower :type="'exp'" :time-step="timeStep" :total-count="25"></flowTimeShower>
+        </div>
 
-        <waterProcessChartVue v-if="showWaterPower" :waterProcessChartLoad="flowspeedChartLoad" :timeStep="timeStep" ref="WaterProcessChartRef" />
+        <waterProcessChartVue  v-if="showWaterProcessChart" :waterProcessChartLoad="flowspeedChartLoad" :timeStep="timeStep" ref="WaterProcessChartRef" />
 
         <geologyAndProjectVue v-if="showGeologyAndProject" />
 
+        <!-- <riskResultBarVue
+            :riskDataIndex="riskDataIndex"
+            :showRiskResult="showRiskResult"
+        /> -->
 
         <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <riskResultVue :profileList="profileList" />
         </div>
-       
+
+        <div class="raster-legend-container" v-if="showRaster && showRasterControl">
+            <img src="/rasterLegend1.png" alt="比例尺" />
+        </div>
+
+        <!-- <div class="profile-draw-content">
+            <div class="profile-draw-title">自定义断面：</div>
+            <div class="current-param-container">
+                <div class="current-param-title">当前绘制断面</div>
+                <div
+                    class="current-param-content"
+                    :class="{ 'two-line': sectionLineLabel != '' }"
+                >
+                    {{
+                        sectionLineLabel == ''
+                            ? '暂未绘制'
+                            : '起点：' + sectionLineLabel
+                    }}
+                </div>
+                <div
+                    class="current-param-content two-line"
+                    v-if="sectionLineLabel != ''"
+                >
+                    {{ '终点：' + sectionLineLabelSec }}
+                </div>
+            </div>
+            <div class="profile-info-container">
+                <div class="profile-info-item title">断面信息：</div>
+                <div
+                    class="profile-info-item name"
+                    v-if="tempProfileName != ''"
+                >
+                    断面名称: {{ tempProfileName }}
+                </div>
+                <div
+                    class="profile-info-item risk"
+                    v-if="tempProfileRisk != ''"
+                >
+                    风险等级:
+                    {{
+                        tempProfileRisk == 'low'
+                            ? '低风险'
+                            : tempProfileRisk == 'middle'
+                              ? '中风险'
+                              : '高风险'
+                    }}
+                </div>
+                <div class="profile-info-item now" v-if="tempProfileRisk != ''">
+                    当前地形: {{ tempProfileBefore }}
+                </div>
+                <div
+                    class="profile-info-item before"
+                    v-if="tempProfileRisk != ''"
+                >
+                    对比地形: {{ tempProfileNow }}
+                </div>
+
+                <div class="null-text" v-if="tempProfileName == ''">
+                    暂无断面信息
+                </div>
+            </div>
+        </div> -->
+
+        <el-dialog v-model="sectionConfirmShow" title="绘制断面确认" width="40vh">
+            <span>确认使用此断面进行计算</span>
+            <el-input v-model="tempProfileName" style="width: 240px; margin-bottom: 10px; margin-left: 2vw"
+                placeholder="请输入断面名称" clearable />
+            <template #footer>
+                <div class="dialog-footer">
+                    <div style="text-align: right">
+                        <el-button @click="cancelSectionRese">取消</el-button>
+                        <el-button type="primary" @click="sureSectionRese">
+                            确认
+                        </el-button>
+                    </div>
+                </div>
+            </template>
+        </el-dialog>
+        <el-dialog v-model="sceneConfirmShow" title="切换场景确认" width="40vh">
+            <span>确认使用以下年份地形数据进行计算：</span>
+            <div style="position: absolute; top: 6.5vh; font-weight: bold">
+                {{ sceneBefore.name }}
+            </div>
+            <div style="position: absolute; top: 8.5vh; font-weight: bold">
+                {{ sceneNow.name }}
+            </div>
+            <template #footer>
+                <div class="dialog-footer">
+                    <div style="text-align: right">
+                        <el-button @click="cancelSceneRese">取消</el-button>
+                        <el-button type="primary" @click="sureSceneRese">
+                            确认
+                        </el-button>
+                    </div>
+                </div>
+            </template>
+        </el-dialog>
         <div class="loading-container" v-show="isRunning">
             <dv-loading class="loading-icon">
                 <div class="loading-message">{{ loading_message }}</div>
             </dv-loading>
         </div>
+
+        <!-- <div class="hydro-pannel">
+            <div class="title">
+                实时水文信息
+                <el-icon @click="showHydroPannel = !showHydroPannel" style="margin-left: 50%" class="iconn">
+                    <More />
+                </el-icon>
+            </div>
+
+            <el-table :data="waterTableData" border style="width: 15vw" v-show="showHydroPannel">
+                <el-table-column prop="station" label="站点" />
+                <el-table-column prop="flow" label="流量" />
+                <el-table-column prop="level" label="水位" />
+            </el-table>
+        </div> -->
 
         <div class="hide-dom-container" :class="{ translate: !conditionPannelShow }" @click="hideDomClickHandler()">
             <HideDomButtom :direction="conditionPannelShow ? 'right' : 'left'"></HideDomButtom>
@@ -299,11 +552,21 @@ const riskResultVue = defineAsyncComponent(
 const flowspeedInfoVue = defineAsyncComponent(
     () => import('../components/bankRiskWarn/flowspeedInfo.vue'),
 )
-
+const profileInfoVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileInfo.vue'),
+)
+const profileShapeYearlyVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileShapeYearly.vue'),
+)
 const profileShapeVue = defineAsyncComponent(
     () => import('../components/bankRiskWarn/profileShapeCompare.vue'),
 )
-
+const profileSlopeVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileSlope.vue'),
+)
+const profileErosionVue = defineAsyncComponent(
+    () => import('../components/bankRiskWarn/profileErosion.vue'),
+)
 const bedFlowChartVue = defineAsyncComponent(
     () => import('../components/bankRiskWarn/BedFlowChart.vue'),
 )
@@ -330,6 +593,7 @@ const timeStepFloat = ref(0)
 // const timeStepFloat = computed(()=>{
 //     return timeStep.value
 // })
+const showFactorRisk = ref(false)
 const showFlow = ref(false)
 const showRaster = ref(false)
 const showBankLine = ref(true)
@@ -476,6 +740,32 @@ const conditionConfigureDataResetHandler = async () => {
     console.log(window.location.pathname)
     //// debug ////
 
+    // 模型参数
+    // const kkey = ClientStorageHelper.generateKey(window.location.pathname)
+    // if(ClientStorageHelper.get(kkey)){
+    //     let paramsValue = ClientStorageHelper.get(kkey)
+    // }
+
+    // const paramsValue = toRaw(conditionConfigureData)
+    // ClientStorageHelper.save(kkey, paramsValue)
+
+    // // 模型结果
+    // const k 2ey = ClientStorageHelper.generateKey(paramsValue)
+
+    // if (ClientStorageHelper.get(key)) {
+    //     let result = ClientStorageHelper.get(key)
+    //     console.log('get result from client storage and show', result)
+    //     return
+    // }
+    // else {
+    //     console.log('run model and show result')
+    //     const result = 'result'
+    //     ClientStorageHelper.save(key, result)
+    //     return
+    // }
+
+
+    // return
 
 
     ///////////////////////  check  /////////////////////// 
@@ -645,6 +935,45 @@ const getRiskAreasAll = () => {
 }
 
 // 场景选择
+const cancelSceneRese = () => {
+    sceneConfirmShow.value = false
+}
+const sureSceneRese = async () => {
+    getProfileTime()
+    sceneConfirmShow.value = false
+    if (sceneNow.dateShort <= sceneBefore.dateShort) {
+        ElMessage.error('当前地形时间不能早于或等于对比地形时间！')
+        return
+    }
+    if (
+        preSceneBeforeValue.value === sceneBeforeValue.value &&
+        preSceneNowValue.value === sceneNowValue.value
+    ) {
+        ElMessage.error('当前地形时间与对比地形时间未发生变化！')
+        return
+    }
+    // 添加栅格图层
+    loading_message.value = '冲淤图层加载中...'
+    isRunning.value = true
+    shapeChartLoad.value = true
+    erosionChartLoad.value = true
+    flowspeedChartLoad.value = true
+    const time = sceneNow.dateShort + sceneBefore.dateShort
+    if (!showRaster.value) {
+        showRaster.value = true
+    }
+    mapInstance.removeLayer('mapRaster')
+    mapInstance.removeSource('mapRaster')
+    addRasterLayer(mapInstance, time, 'mapRaster')
+    mapInstance.moveLayer('mapRaster', 'mzsLine')
+    // 计算各个断面数据
+    ProfileLoadingProcess(
+        sceneBefore,
+        sceneNow,
+        sceneCompareBefore,
+        sceneCompareNow,
+    )
+}
 
 const changeProfileValue = (value) => {
     mapInstance.setFilter(
@@ -877,10 +1206,13 @@ let floodWatcher = null
 let floodFlow = null
 
 
+// let dryWatcher = null
 const flowControlHandler = async () => {
     showFlow.value = !showFlow.value
     let map = useMapStore().getMap()
+    // console.log(showFlow.value);
     timeStep.value = 0
+    // timeStepFloat.value = 0
     if (showFlow.value) {
         if (nowWaterConditionType.value == '洪季') {
             let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
@@ -892,8 +1224,7 @@ const flowControlHandler = async () => {
                     imageSrcPrefix2,
                 ),
             )
-
-            map.getLayer('chaoWeiPointLable') ? map.addLayer(floodFlow, 'chaoWeiPointLable') : map.addLayer(floodFlow)
+            map.addLayer(floodFlow, 'chaoWeiPointLable')
 
             floodWatcher = watch(
                 () => floodFlow._progressRate,
@@ -909,7 +1240,31 @@ const flowControlHandler = async () => {
 
             console.log('add 洪季')
         }
+        // else if (nowWaterConditionType.value == '枯季') {
+        //     let backEndJsonUrl1 = '/api/data/flow/configJson/dry'
+        //     let imageSrcPrefix1 = '/api/data/flow/texture/dry/'
+        //     let dryFlow = reactive(
+        //         new FlowFieldLayer('dryFlow', backEndJsonUrl1, imageSrcPrefix1),
+        //     )
+        //     map.addLayer(dryFlow, 'chaoWeiPointLable')
 
+        //     // dryWatcher = watch(
+        //     //     () => dryFlow.currentResourcePointer,
+        //     //     (v) => {
+        //     //         timeStep.value = dryFlow.currentResourcePointer
+        //     //     },
+        //     // )
+        //     dryWatcher = watch(
+        //         () => dryFlow._progressRate,
+        //         (v) => {
+        //             let val = parseFloat(
+        //                 (dryFlow.timeCount / dryFlow.timePerFrame).toFixed(1),
+        //             )
+        //             timeStep.value = val
+        //         },
+        //     )
+        //     console.log('add 枯季')
+        // }
     } else {
         if (nowWaterConditionType.value == '洪季') {
             if (map.getLayer('floodFlow')) {
@@ -918,21 +1273,60 @@ const flowControlHandler = async () => {
                 floodWatcher = null
             }
         }
-
+        // else if (nowWaterConditionType.value == '枯季') {
+        //     if (map.getLayer('dryFlow')) {
+        //         map.removeLayer('dryFlow')
+        //         dryWatcher()
+        //         dryWatcher = null
+        //     }
+        // }
     }
 
-
+    // if (showFlow.value) {
+    //     if (map) {
+    //         if (map.getLayer('FlowLayer')) {
+    //             // flow.show()
+    //             map.setLayoutProperty('FlowLayer', 'visibility', 'visible');
+    //         } else {
+    //             // flow = reactive(new FlowFieldLayer('/scratchSomething/flowWebGL/json/flow_field_description.json'))
+    //             // flow = reactive(new )
+    //             map.addLayer(flow)
+    //             watch(
+    //                 () => flow.currentResourcePointer,
+    //                 (v) => {
+    //                     // console.log(flow.currentResourcePointer)
+    //                     timeStep.value = flow.currentResourcePointer
+    //                 },
+    //             )
+    //         }
+    //     } else {
+    //         ElMessage({
+    //             type: 'warning',
+    //             message: '地图尚未加载，请等待',
+    //         })
+    //     }
+    // } else {
+    //     // flow.hide()
+    //     map.setLayoutProperty('FlowLayer', 'visibility', 'none');
+    // }
 }
 
-const RasterControlHandler = () => {
+// watch(
+//     () => flow.currentResourcePointer,
+//     (v) => {
+//         // console.log(flow.currentResourcePointer)
+//         timeStep.value = flow.currentResourcePointer
+//     },
+// )
 
-    if (showRaster.value) {
+const RasterControlHandler = () => {
+    if (showRaster.value && showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
         showRaster.value = !showRaster.value
-    } else if (!showRaster.value ) {
+    } else if (!showRaster.value && showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
         showRaster.value = !showRaster.value
-    } else if (showRaster.value ) {
+    } else if (showRaster.value && !showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
         showRaster.value = !showRaster.value
     } else {
@@ -977,15 +1371,43 @@ const showYearlyProfileShape = ref(false)
 const showYearlyProfileShapeFunc = () => {
     showYearlyProfileShape.value = !showYearlyProfileShape.value
 }
-
+const showProfileShape = ref(false)
+const showProfileShapeFunc = () => {
+    showProfileShape.value = !showProfileShape.value
+}
+const showProfileSlope = ref(false)
+const showProfileSlopeFunc = () => {
+    showProfileSlope.value = !showProfileSlope.value
+}
+const showProfileErosion = ref(false)
+const showProfileErosionFunc = () => {
+    showProfileErosion.value = !showProfileErosion.value
+}
 const showRiskResult = ref(false)
 const showRiskResultFunc = () => {
     showRiskResult.value = !showRiskResult.value
 }
-
-
+const showBedFlowChart = ref(false)
+const showBedFlowChartFunc = () => {
+    showBedFlowChart.value = !showBedFlowChart.value
+}
+const showWaterProcessChart = ref(false)
+const showWaterProcessChartFunc = () => {
+    showWaterProcessChart.value = !showWaterProcessChart.value
+}
+const showFlowSpeed = ref(false)
+const showFlowSpeedFunc = async () => {
+    if (showFlow.value === false && showFlowSpeed.value === true) {
+        showFlowSpeed.value = false
+        return
+    }
+    showFlowSpeed.value = !showFlowSpeed.value
+    timeStep.value = 0
+    // timeStepFloat.value = 0
+    await flowControlHandler()
+}
 const showRasterControl = ref(false)
-const showControls = ref(false)
+const showTerrain3DControl = ref(false)
 const showRasterControlFunc = () => {
     RasterControlHandler()
     showRasterControl.value = !showRasterControl.value
@@ -995,23 +1417,22 @@ const showRasterControlFunc = () => {
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
 const showWaterPower = ref(false)
 const showWaterPowerFunc = async () => {
-    console.log('1111')
+    if (!(useBankNameStore().globalBankName === 'Mzs')) return
     if (showRiverBed.value === true) {
         showRiverBedFunc()
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
-
-    timeStep.value = 0
-    // timeStepFloat.value = 0
-    await flowControlHandler()
-    mapInstance.getLayer('mapRaster') && mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')        //TODO:??
-
+    showBedFlowChartFunc()
+    showWaterProcessChartFunc()
+    await showFlowSpeedFunc()
+    mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
     showWaterPower.value = !showWaterPower.value
 }
 
 const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
+    if (!(useBankNameStore().globalBankName === 'Mzs')) return
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
     } else if (showGeologyAndProject.value === true) {
@@ -1019,14 +1440,16 @@ const showRiverBedFunc = () => {
     }
 
     if (
-        (showRaster.value === false) ||
-        (showRaster.value === true)
+        (showRaster.value === false && showProfileShape.value === true) ||
+        (showRaster.value === true && showProfileShape.value === false)
     ) {
+        showProfileShapeFunc()
         showYearlyProfileShapeFunc()
         showRasterControlFunc()
         showRiverBed.value = !showRiverBed.value
         return
     }
+    showProfileShapeFunc()
     showYearlyProfileShapeFunc()
     showRasterControlFunc()
     showRiverBed.value = !showRiverBed.value
@@ -1035,6 +1458,7 @@ const showRiverBedFunc = () => {
 
 const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
+    if (!(useBankNameStore().globalBankName === 'Mzs')) return
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
     } else if (showRiverBed.value === true) {
@@ -1554,10 +1978,7 @@ const drawHandler = () => {
             return
         }
         tideLevelPointPos.value = [e.lngLat.lng, e.lngLat.lat];
-        if (!map.getSource('chaoWeiPoint')) {
-            addTideLevelPoint()
-        } else {        
-            map.getSource('chaoWeiPoint').setData({
+        map.getSource('chaoWeiPoint').setData({
             type: 'FeatureCollection',
             features: [
                 {
@@ -1571,7 +1992,7 @@ const drawHandler = () => {
                     },
                 },
             ],
-        })}
+        })
         ElNotification({
             type: 'info',
             title: '设置潮位点',
@@ -1589,66 +2010,14 @@ const drawHandler = () => {
   }
 }
 
-// 添加潮位点
-const addTideLevelPoint = () => {
-    let map = useMapStore().getMap()
-    const chaoWeiPoint = {
-        type: 'FeatureCollection',
-            features: [
-                {
-                    type: 'Feature',
-                    properties: {
-                        label: '潮位点',
-                    },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: tideLevelPointPos.value,
-                    },
-                },
-            ],
-        }
-        map.addSource('chaoWeiPoint', {
-            type: 'geojson',
-            data: chaoWeiPoint,
-        })
-        map.addLayer({
-            id: 'chaoWeiPoint',
-            type: 'circle',
-            source: 'chaoWeiPoint',
-            paint: {
-                'circle-radius': 7,
-                'circle-color': 'rgb(255, 0,0)',
-            },
-        })
-        map.addLayer(
-            {
-                id: 'chaoWeiPointLable',
-                type: 'symbol',
-                source: 'chaoWeiPoint',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                        'Arial Unicode MS Bold',
-                    ],
-                    'text-anchor': 'top',
-                    'text-offset': [0.0, 0.5],
-                    'text-size': 18,
-                    'text-allow-overlap': true,
-                },
-                paint: {
-                    'text-color': 'rgb(255,255,255)',
-                },
-            },
-            'chaoWeiPoint',
-        )
-}
+
 
 onBeforeRouteUpdate(async (to, from) => {
     useBankNameStore().globalBankName = to.params.id
     let bank = to.params.id
 
     if (useBankNameStore().globalBankName === 'Mzs') {
+        showFactorRisk.value = true
         conditionConfigureData.refDEM = {
             "sets": "standard",
             "year": "2012",
@@ -1667,6 +2036,7 @@ onBeforeRouteUpdate(async (to, from) => {
         }
 
     } else {
+        showFactorRisk.value = false
         conditionConfigureData.refDEM = null
         conditionConfigureData.benchDEM = null
     }
@@ -1675,7 +2045,7 @@ onBeforeRouteUpdate(async (to, from) => {
     bankBCInfo.value = bcInfo
 
     demResources.value = await getDemResource(bank)
-    showWaterPower.value = false    // 确保切换岸段时面板显示
+
 
     let map = useMapStore().getMap()
     mapFlyToRiver(map)
@@ -1686,7 +2056,56 @@ onBeforeRouteUpdate(async (to, from) => {
             map.setLayoutProperty('mapRaster', 'visibility', 'none')
             map.addLayer(new TerrainLayer(14))
             map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
-            addTideLevelPoint()
+            const chaoWeiPoint = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {
+                            label: '潮位点',
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: tideLevelPointPos.value,
+                        },
+                    },
+                ],
+            }
+            map.addSource('chaoWeiPoint', {
+                type: 'geojson',
+                data: chaoWeiPoint,
+            })
+            map.addLayer({
+                id: 'chaoWeiPoint',
+                type: 'circle',
+                source: 'chaoWeiPoint',
+                paint: {
+                    'circle-radius': 7,
+                    'circle-color': 'rgb(255, 0,0)',
+                },
+            })
+            map.addLayer(
+                {
+                    id: 'chaoWeiPointLable',
+                    type: 'symbol',
+                    source: 'chaoWeiPoint',
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        'text-anchor': 'top',
+                        'text-offset': [0.0, 0.5],
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(255,255,255)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
             map.getLayer('岸段预警') && map.removeLayer('岸段预警')
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer, 'chaoWeiPoint')
@@ -1694,8 +2113,14 @@ onBeforeRouteUpdate(async (to, from) => {
             getProfileTime()
             showRiskStatus.value = true
             showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
             showRiskResult.value = false
-            showControls.value = true
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = true
             await ProfileLoadingProcess(
                 sceneBefore,
                 sceneNow,
@@ -1711,7 +2136,6 @@ onBeforeRouteUpdate(async (to, from) => {
             map.getLayer('floodFlow') && map.removeLayer('floodFlow')
             // add invisible bank Warn layer
             map.getLayer('岸段预警') && map.removeLayer('岸段预警')
-
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer)
             map.setLayoutProperty('岸段预警', 'visibility', 'none')
@@ -1719,14 +2143,18 @@ onBeforeRouteUpdate(async (to, from) => {
             // do nothing temp
             showRiskStatus.value = true
             showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
             showRiskResult.value = false
-            showControls.value = false
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = false
 
             // risk level
             totalResult.desc = '暂无'
             riskAreas.value = []
-
-            showWaterPowerFunc()
         }
     })
 
@@ -1739,7 +2167,8 @@ onMounted(async () => {
     useBankNameStore().globalBankName = route.params.id
     let bk = route.params.id
 
-    if (bk === 'Mzs') {
+    if (useBankNameStore().globalBankName === 'Mzs') {
+        showFactorRisk.value = true
         conditionConfigureData.refDEM = {
             "sets": "standard",
             "year": "2012",
@@ -1758,6 +2187,7 @@ onMounted(async () => {
         }
 
     } else {
+        showFactorRisk.value = false
         conditionConfigureData.refDEM = null
         conditionConfigureData.benchDEM = null
     }
@@ -1774,6 +2204,406 @@ onMounted(async () => {
             mapInstance = map
 
             mapFlyToRiver(map)
+
+            /*
+            map.addSource('mzsPlaceLabelSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsPlaceLabel/{x}/{y}/{z}'],
+            })
+            map.addSource('mzsPlaceLineSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsPlaceLine/{x}/{y}/{z}'],
+            })
+            map.addSource('mzsBankAreaSSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsBankAreaOne/{x}/{y}/{z}'],
+            })
+            map.addSource('mzsBankLineSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/mzsBankLine/{x}/{y}/{z}'],
+            })
+            map.addSource('dockAreaSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/dockArea/{x}/{y}/{z}'],
+            })
+            map.addSource('dockAreaLabelSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/center/dockArea/{x}/{y}/{z}'],
+            })
+            map.addSource('fixProjectAreaSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/fixProjectArea/{x}/{y}/{z}'],
+            })
+            map.addSource('fixProjectLineSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/fjsFixLine/{x}/{y}/{z}'],
+            })
+            map.addSource('fixProjectAreaLabelSource', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/center/fixProjectArea/{x}/{y}/{z}',
+                ],
+            })
+            map.addSource('riverPlaceLabel', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/placeLabel/{x}/{y}/{z}'],
+            })
+            map.addSource('riverBeachSource', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+            })
+            map.addSource('zjgLine', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/zjgBridgeLine/{x}/{y}/{z}'],
+            })
+            map.addLayer({
+                id: 'riverBeachArea',
+                type: 'fill',
+                source: 'riverBeachSource',
+                'source-layer': 'default',
+                paint: {
+                    'fill-color': 'rgba(210,244,247, 1)',
+                },
+            })
+            map.addLayer({
+                id: 'zjgBridge',
+                type: 'line',
+                source: 'zjgLine',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 0.6,
+                    // 'line-pattern': 'test',
+                    'line-color': 'rgb(183, 189, 183)',
+                    'line-width': 2.0,
+                },
+            })
+        
+            addRasterLayer(map, 23032209, 'mapRaster')
+        
+            map.setLayoutProperty('mapRaster', 'visibility', 'none')
+        
+            map.addLayer(new TerrainLayer(14))
+            map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+        
+            map.addLayer({
+                id: 'mzsLine',
+                type: 'line',
+                source: 'mzsPlaceLineSource',
+                'source-layer': 'default',
+                // filter:['==', '$type', 'LineString'],
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': 'rgba(26, 87, 138, 0.6)',
+                    'line-width': 2,
+                },
+            })
+            map.addLayer({
+                id: 'fjsFixLine',
+                type: 'line',
+                source: 'fixProjectLineSource',
+                'source-layer': 'default',
+                layout: {
+                    'line-cap': 'round',
+                    'line-join': 'round',
+                },
+                paint: {
+                    'line-opacity': 1,
+                    'line-color': 'rgba(216, 217, 228, 0.5)',
+                    'line-width': 4,
+                },
+            })
+            map.addLayer({
+                id: 'fixProjectFillLayer',
+                type: 'fill',
+                source: 'fixProjectAreaSource',
+                'source-layer': 'default',
+                paint: {
+                    'fill-color': 'rgba(220,224,237, 0.8)',
+                    'fill-outline-color': 'rgba(220,224,237, 0.8)',
+                },
+            })
+            map.addLayer({
+                id: 'fixProjectAreaLabel',
+                type: 'symbol',
+                source: 'fixProjectAreaLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'layer'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'right',
+                    'text-size': 12,
+                },
+                paint: {
+                    'text-color': 'rgba(31, 44, 126, 0.6)',
+                },
+            })
+            map.addLayer({
+                id: 'mzsLabel',
+                type: 'symbol',
+                source: 'mzsPlaceLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                },
+                paint: {
+                    'text-color': 'rgba(31, 14, 126, 0.75)',
+                },
+            })
+            map.addLayer({
+                id: 'dockArea',
+                type: 'fill',
+                source: 'dockAreaSource',
+                'source-layer': 'default',
+                paint: {
+                    'fill-color': 'rgb(172,214,239)',
+                },
+            })
+            map.addLayer({
+                id: 'dockAreaLabel',
+                type: 'symbol',
+                source: 'dockAreaLabelSource',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'project_name'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'bottom',
+                    'text-size': 12,
+                },
+                paint: {
+                    'text-color': 'rgba(31, 44, 126, 0.6)',
+                },
+            })
+            map.addLayer({
+                id: 'riverPlaceLabel',
+                type: 'symbol',
+                source: 'riverPlaceLabel',
+                'source-layer': 'default',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                    // 'text-offset': [0, 1.25],
+                    'text-anchor': 'left',
+                    'text-size': 18,
+                },
+                paint: {
+                    'text-color': 'rgba(31, 44, 226, 1)',
+                },
+            })
+            // map.addLayer({
+            //     id: 'mzsSectionArea1',
+            //     type: 'fill',
+            //     source: 'mzsBankAreaSSource',
+            //     'source-layer': 'default',
+            //     paint: {
+            //         'fill-color': [
+            //             'match',
+            //             ['get', 'stability'],
+            //             '较稳定',
+            //             '#18b915',
+            //             '稳定',
+            //             '#06bef1',
+            //             '不稳定',
+            //             '#df8105',
+            //             '较不稳定',
+            //             '#ee3603',
+            //             '#18b915',
+            //         ],
+            //     },
+            // })
+            // const jsonUrl = '/bankWarn/bankWarn.json'
+            // map.addLayer({
+            //     id: 'mzsBankLine',
+            //     type: 'line',
+            //     source: 'mzsBankLineSource',
+            //     'source-layer': 'default',
+            //     filter: ['all'],
+            //     layout: {
+            //         'line-cap': 'round',
+            //         'line-join': 'round',
+            //     },
+            //     paint: {
+            //         'line-opacity': 1,
+            //         'line-color': 'rgba(31, 14, 223, 0.5)',
+            //         'line-width': 4,
+            //     },
+            // })
+        
+            map.addSource('mzsSectionLabel', {
+                type: 'vector',
+                tiles: [
+                    tileServer + '/tile/vector/geomCenter/mzsBankLine/{x}/{y}/{z}',
+                ],
+            })
+        
+            const chaoWeiPoint = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {
+                            label: '潮位点',
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [120.522864, 32.035502],
+                        },
+                    },
+                ],
+            }
+            map.addSource('chaoWeiPoint', {
+                type: 'geojson',
+                data: chaoWeiPoint,
+            })
+            map.addLayer({
+                id: 'chaoWeiPoint',
+                type: 'circle',
+                source: 'chaoWeiPoint',
+                paint: {
+                    'circle-radius': 7,
+                    'circle-color': 'rgb(255, 0,0)',
+                },
+            })
+            map.addLayer(
+                {
+                    id: 'chaoWeiPointLable',
+                    type: 'symbol',
+                    source: 'chaoWeiPoint',
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        'text-anchor': 'top',
+                        'text-offset': [0.0, 0.5],
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(255,255,255)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
+            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+            map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+        
+            map.addLayer(
+                {
+                    id: 'mzsBankLineChoosen',
+                    type: 'line',
+                    source: 'mzsBankLineSource',
+                    'source-layer': 'default',
+                    filter: profileList.value[1].filter,
+                    layout: {
+                        'line-cap': 'round',
+                        'line-join': 'round',
+                    },
+                    paint: {
+                        'line-opacity': 1,
+                        'line-color': 'rgb(134, 245, 230)',
+                        'line-width': 10,
+                    },
+                },
+                'chaoWeiPoint',
+            )
+        
+            map.addLayer(
+                {
+                    id: 'mzsSectionLabelLayer-important',
+                    type: 'symbol',
+                    source: 'mzsSectionLabel',
+                    'source-layer': 'default',
+                    maxzoom: 12,
+                    minzoom: 8,
+                    filter: ['==', 'label', 'MZ08海事码头'],
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        'text-offset': [-1.0, 1.15],
+                        'text-anchor': 'top',
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(100, 2, 125)',
+                        // 'text-color': 'rgb(255, 0,0)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
+        
+            map.addLayer(
+                {
+                    id: 'mzsSectionLabelLayer',
+                    type: 'symbol',
+                    source: 'mzsSectionLabel',
+                    'source-layer': 'default',
+                    maxzoom: 22,
+                    minzoom: 12,
+                    layout: {
+                        'text-field': ['get', 'label'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold',
+                        ],
+                        // 'text-font':['Open Sans Bold','Arial Unicode MS Bold'],
+                        'text-offset': [-1.0, 1.15],
+                        'text-anchor': 'top',
+                        'text-size': 18,
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgb(0, 22, 145)',
+                    },
+                },
+                'chaoWeiPoint',
+            )
+        
+            // !map.getSource('mzsBankLabel') &&
+            //     map.addSource('mzsBankLabel', {
+            //         type: 'vector',
+            //         tiles: [tileServer + '/tile/vector/mzsBankLabel/{x}/{y}/{z}'],
+            //     })
+            // !map.getLayer('民主沙岸段注记') &&
+            //     map.addLayer({
+            //         id: '民主沙岸段注记',
+            //         type: 'symbol',
+            //         source: 'mzsBankLabel',
+            //         'source-layer': 'default',
+            //         layout: {
+            //             'text-field': ['get', 'label'],
+            //             'text-font': [
+            //                 'Open Sans Semibold',
+            //                 'Arial Unicode MS Bold',
+            //             ],
+            //             'text-anchor': 'center',
+            //             'text-size': 20
+            //         },
+            //         paint: {
+            //             'text-color': 'rgb(28,13,106)',
+            //         },
+            //     })
+        
+            // map.addControl(draw)
+        
+            */
 
             refreshMap(map)
             await addBankLayer(map, bk)
@@ -1842,8 +2672,14 @@ onMounted(async () => {
             getProfileTime()
             showRiskStatus.value = true
             showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
             showRiskResult.value = false
-            showControls.value = true
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = true
             await ProfileLoadingProcess(
                 sceneBefore,
                 sceneNow,
@@ -1862,8 +2698,6 @@ onMounted(async () => {
 
         demResources.value = await getDemResource(bk)
         initPureScratchMap(mapContainer.value).then(async (map) => {
-            mapInstance = map
-
             mapFlyToRiver(map)
             refreshMap(map)
 
@@ -1879,15 +2713,18 @@ onMounted(async () => {
             // do nothing temp
             showRiskStatus.value = true
             showProfileInfo.value = false
+            showProfileShape.value = false
+            showProfileSlope.value = false
+            showProfileErosion.value = false
             showRiskResult.value = false
-            showControls.value = false
+            showFlowSpeed.value = false
+            showBedFlowChart.value = false
+            showWaterProcessChart.value = false
+            showTerrain3DControl.value = false
 
             // risk level
             totalResult.desc = '暂无'
             riskAreas.value = []
-            console.log(showWaterPower.value)
-            showWaterPowerFunc()
-            console.log(showWaterPower.value)
         })
 
 

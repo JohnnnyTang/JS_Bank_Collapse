@@ -4,9 +4,12 @@
         <div
             class="graph-container"
             id="water-chart-container"
-            v-loading="props.waterProcessChartLoad"
+            v-show="hasData === true"
         >
             <div id="water-chart" class="graph" ref="chartDom"></div>
+        </div>
+        <div class="blank-graph" v-show="hasData === false">
+            <span v-if="true" style="z-index: 10">暂无数据</span>
         </div>
     </div>
 </template>
@@ -14,6 +17,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 
 const props = defineProps(['waterProcessChartLoad', 'timeStep'])
 
@@ -24,7 +28,11 @@ const hour = [
     21, 22, 23, 24, 25,
 ]
 
+const hasData = ref(false)
+const route = useRoute()
+
 const updateData = (data) => {
+    hasData.value = true
     let us = data[0].us
     let vs = data[0].vs
     waterProcessData.flood = []
@@ -161,14 +169,25 @@ const option = {
 }
 
 let chart
-let maxVal
-let minVal
 
 onMounted(() => {
     chart = echarts.init(chartDom.value)
-    maxVal = Math.max(...waterProcessData['flood'])
-    minVal = Math.min(...waterProcessData['flood'])
-    chart.setOption(option)
+
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        chart.setOption(option)
+        hasData.value = true
+    }
+})
+
+onBeforeRouteUpdate(() => {
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        chart.setOption(option)
+        hasData.value = true
+    } else {
+        hasData.value = false
+    }
 })
 
 watch(
@@ -236,8 +255,18 @@ div.water-chart-container {
         #water-chart {
             width: 25vw;
             height: 20.5vh;
-            
         }
+    }
+
+    div.blank-graph {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #055279;
+        display: flex;
+        width: 100%;
+        height: calc(100% - 4.2vh);
+        background: rgb(208, 236, 255);
     }
 }
 </style>

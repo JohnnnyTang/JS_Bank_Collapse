@@ -2,6 +2,9 @@
     <div class="bed-chart-container">
         <div class="bed-chart-title">年径流过程</div>
         <div class="bed-chart-content" ref="chartDom"></div>
+        <div class="blank-graph" v-show="hasData === false">
+            <span v-if="true" style="z-index: 10">暂无数据</span>
+        </div>
         <!-- <div class="bed-desc-text">2023年无超过造床流量(45000)时期</div> -->
         <!-- <div class="bed-desc-equa"></div> -->
     </div>
@@ -11,8 +14,11 @@
 import { onMounted, ref } from 'vue'
 import * as echarts from 'echarts'
 import { bedFlowTime, bedFlowValue, bedResData } from './staticData'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 
 const chartDom = ref()
+const hasData = ref(false)
+const route = useRoute()
 
 const option = {
     tooltip: {
@@ -24,14 +30,19 @@ const option = {
         boundaryGap: false,
         axisLabel: {
             fontSize: 12,
-            formatter: function(value, index) { // 坐标轴文字展示样式处理
-              const date = new Date(value)
-              const year = date.getFullYear().toString()
-              const texts = [year.substring(2, year.length), (date.getMonth() + 1), date.getDate()]
-              return texts.join('/')
-              // echarts自带的日期格式化方法
-              // return echarts.format.formatTime('yyyy-MM-dd', value)
-            }
+            formatter: function (value, index) {
+                // 坐标轴文字展示样式处理
+                const date = new Date(value)
+                const year = date.getFullYear().toString()
+                const texts = [
+                    year.substring(2, year.length),
+                    date.getMonth() + 1,
+                    date.getDate(),
+                ]
+                return texts.join('/')
+                // echarts自带的日期格式化方法
+                // return echarts.format.formatTime('yyyy-MM-dd', value)
+            },
         },
     },
     yAxis: {
@@ -57,12 +68,12 @@ const option = {
     dataZoom: [
         {
             type: 'inside',
-            startValue: "2023/01/01 00:00:00",
-            endValue: "2023/12/31 23:00:00",
+            startValue: '2023/01/01 00:00:00',
+            endValue: '2023/12/31 23:00:00',
         },
         {
-            startValue: "2023/01/01 00:00:00",
-            endValue: "2023/12/31 23:00:00",
+            startValue: '2023/01/01 00:00:00',
+            endValue: '2023/12/31 23:00:00',
         },
     ],
     grid: {
@@ -102,16 +113,35 @@ const option = {
                 label: {
                     position: 'middle',
                     color: '#FF0000',
-                    fontSize: 14
-                }
+                    fontSize: 14,
+                },
             },
         },
     ],
 }
 
+let chart
+
 onMounted(() => {
-    let chart = echarts.init(chartDom.value)
-    chart.setOption(option)
+    chart = echarts.init(chartDom.value)
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        hasData.value = true
+
+        setTimeout(() => {
+            chart.setOption(option)
+        }, 0)
+    }
+})
+
+onBeforeRouteUpdate(() => {
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        chart.setOption(option)
+        hasData.value = true
+    } else {
+        hasData.value = false
+    }
 })
 </script>
 
@@ -145,6 +175,20 @@ div.bed-chart-container {
         background-color: rgb(208, 236, 255);
     }
 
+    div.blank-graph {
+        position: absolute;
+        top: 4.2vh;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #055279;
+        display: flex;
+        width: 100%;
+        height: calc(100% - 4.2vh);
+        background: rgb(208, 236, 255);
+    }
+
     div.bed-desc-text {
         position: absolute;
         height: 2vh;
@@ -168,7 +212,6 @@ div.bed-chart-container {
         background-image: url('/math.png');
         background-size: contain;
         background-repeat: no-repeat;
-        
     }
 }
 </style>
