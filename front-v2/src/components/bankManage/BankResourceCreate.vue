@@ -13,26 +13,17 @@
                         <div class="bank-name">
                             <div class="bankName-key">岸段名称</div>
                             <div class="bankName-val">
-                                                            
-                                <el-autocomplete
-                                    v-model="bank.name"
-                                    class="necessary"
-                                    style="
+
+                                <el-autocomplete v-model="bank.name" class="necessary" style="
                                         width: 50%;
                                         height: 100%;
-                                    " 
-                                    :fetch-suggestions="fetch_suggestions" 
-                                    placeholder="请输入岸段名称"
-                                    :trigger-on-focus="false"
-                                    clearable
-                                    @select="handleSelect"
-                                    :debounce=500
-                                >
+                                    " :fetch-suggestions="fetch_suggestions" placeholder="请输入岸段名称"
+                                    :trigger-on-focus="false" clearable @select="handleSelect" :debounce=500>
                                     <template #suffix>
                                         <span class="star">*</span>
                                     </template>
                                 </el-autocomplete>
-                                
+
                                 <el-input v-model="bank.bankEnName" class="necessary no-number" style="
                                 width: 50%;
                                 height: 100%;
@@ -227,12 +218,12 @@ const createNewBankClickHandler = async () => {
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
             "center": center,
-            "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val ? nowBasicInfo[3].val.toISOString() : (new Date()).toISOString(),
-            "introduction": nowBasicInfo[4].val,
+            "monitorLength": nowBasicInfo[1].val,
+            "monitorStartTime": nowBasicInfo[2].val ? nowBasicInfo[2].val.toISOString() : (new Date()).toISOString(),
+            "introduction": nowBasicInfo[3].val,
             "management": {
-                "department": nowBasicInfo[5].val,
-                "contact": nowBasicInfo[6].val,
+                "department": nowBasicInfo[4].val,
+                "contact": nowBasicInfo[5].val,
             }
         }
         const createMsg = (await BankResourceHelper.createNewBank(bank.bankEnName, ReqBody)).data
@@ -248,7 +239,7 @@ const createNewBankClickHandler = async () => {
 }
 
 
-const fetch_suggestions = async(queryString, cb) => {
+const fetch_suggestions = async (queryString, cb) => {
     console.log("开始执行")
     console.log("queryString:", queryString)
     let searchResults = []
@@ -263,17 +254,17 @@ const fetch_suggestions = async(queryString, cb) => {
     }
     let result = []
     for (let item of searchResults)
-        result.push({"value": item})
+        result.push({ "value": item })
     cb(result)
 };
 
-const handleSelect = async(item) => {
-  const response = await BankResourceHelper.handleSelect(item.value)
-  console.log(response.data)
-  bankBasicInfo.value[0].val = warnLevelList[response.data.warning_level]
-  bankBasicInfo.value[1].val = response.data.monitoring_length
-  bankBasicInfo.value[2].val = response.data.create_time
-  bankBasicInfo.value[3].val = response.data.description
+const handleSelect = async (item) => {
+    const response = await BankResourceHelper.handleSelect(item.value)
+    console.log(response.data)
+    bankBasicInfo.value[0].val = warnLevelList[response.data.warning_level]
+    bankBasicInfo.value[1].val = response.data.monitoring_length
+    // bankBasicInfo.value[2].val = response.data.create_time
+    bankBasicInfo.value[3].val = response.data.description
 }
 
 
@@ -769,6 +760,7 @@ div.form-header {
 }
 
 :deep(.el-autocomplete) {
+
     /* &.necessary {
         ::before {
             position: absolute;
@@ -784,6 +776,7 @@ div.form-header {
         height: 100%;
         font-size: calc(0.6vw + 0.6vh);
     }
+
     .star {
         position: absolute;
         top: .3vh;

@@ -330,13 +330,13 @@ export default class BankResourceHelper {
                 'Boundary': async () => {
                     const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', bankEnName)).data
                     let result = this.BoundaryResourcetoList(_ogBound)
-                    proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
+                    proxy[_proxyCategoryDICI['model']][4]['resourceList'] = result
 
                 },
                 'Hydrodynamic': async () => {
                     const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
                     let result = this.HydrodynamicResourcetoList(_ogHydro)
-                    proxy[_proxyCategoryDICI['model']][4]['resourceList'] = result
+                    proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
 
                 },
 
