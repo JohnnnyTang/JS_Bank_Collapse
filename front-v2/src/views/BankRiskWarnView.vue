@@ -41,7 +41,7 @@
             </div>
         </div>
         <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <div class="raster-control-block"  v-if="showControls">
+        <div class="raster-control-block"  v-if="showControls && showRasterControl">
             <label class="switch">
                 <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
                 <span class="slider"></span>
@@ -105,7 +105,7 @@
         </div>
 
 
-        <profileShapeVue v-if="showRiverBed" @profile-value-change="changeProfileValue" :profileData="profileData"
+        <profileShapeVue v-if="showRiverBed"  :profileData="profileData"
             :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
 
 
@@ -644,14 +644,7 @@ const getRiskAreasAll = () => {
     return resultString
 }
 
-// 场景选择
 
-const changeProfileValue = (value) => {
-    mapInstance.setFilter(
-        'mzsBankLineChoosen',
-        profileList.value[value - 1].filter,
-    )
-}
 
 // 加载断面数据和图层1
 const ProfileLoadingProcess = async (
@@ -925,19 +918,25 @@ const flowControlHandler = async () => {
 }
 
 const RasterControlHandler = () => {
-
-    if (showRaster.value) {
+    console.log(showRaster.value)
+    if (showRaster.value && showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-        showRaster.value = !showRaster.value
-    } else if (!showRaster.value ) {
+        showRaster.value = false
+    } else if (!showRaster.value && showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
-        showRaster.value = !showRaster.value
-    } else if (showRaster.value ) {
+        showRaster.value = true
+    } else if (showRaster.value && !showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-        showRaster.value = !showRaster.value
+        showRaster.value = false
     } else {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
     }
+
+    // mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
+
+    // if(!showRaster.value && showRasterControl.value){
+    //  showRaster.value = true
+    // }
 }
 
 const BankLineControlHandler = () => {
@@ -973,10 +972,8 @@ let sceneCompareNow
 // 窗口显示变量
 const showRiskStatus = ref(true)
 const showProfileInfo = ref(false)
-const showYearlyProfileShape = ref(false)
-const showYearlyProfileShapeFunc = () => {
-    showYearlyProfileShape.value = !showYearlyProfileShape.value
-}
+
+
 
 const showRiskResult = ref(false)
 const showRiskResultFunc = () => {
@@ -986,16 +983,11 @@ const showRiskResultFunc = () => {
 
 const showRasterControl = ref(false)
 const showControls = ref(false)
-const showRasterControlFunc = () => {
-    RasterControlHandler()
-    showRasterControl.value = !showRasterControl.value
-}
 
 // 展示水动力因素指标，包括:
 // 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
 const showWaterPower = ref(false)
 const showWaterPowerFunc = async () => {
-    console.log('1111')
     if (showRiverBed.value === true) {
         showRiverBedFunc()
     } else if (showGeologyAndProject.value === true) {
@@ -1013,29 +1005,23 @@ const showWaterPowerFunc = async () => {
 const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
     if (showWaterPower.value === true) {
+        showFlow.value = true
         showWaterPowerFunc()
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
 
-    if (
-        (showRaster.value === false) ||
-        (showRaster.value === true)
-    ) {
-        showYearlyProfileShapeFunc()
-        showRasterControlFunc()
-        showRiverBed.value = !showRiverBed.value
-        return
-    }
-    showYearlyProfileShapeFunc()
-    showRasterControlFunc()
     showRiverBed.value = !showRiverBed.value
-    // RasterControlHandler()
+    if (showControls.value === true){    
+        RasterControlHandler()
+    }
+    showRasterControl.value = !showRasterControl.value
 }
 
 const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
     if (showWaterPower.value === true) {
+        showFlow.value = true
         showWaterPowerFunc()
     } else if (showRiverBed.value === true) {
         showRiverBedFunc()
@@ -1706,12 +1692,11 @@ onBeforeRouteUpdate(async (to, from) => {
             riskAreas.value = getRiskAreas('high')
             showWaterPowerFunc()
         } else {
-
             // remove flow layer
             map.getLayer('floodFlow') && map.removeLayer('floodFlow')
             // add invisible bank Warn layer
             map.getLayer('岸段预警') && map.removeLayer('岸段预警')
-
+            map.getLayer('TerrainLayer') && map.removeLayer('TerrainLayer')
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer)
             map.setLayoutProperty('岸段预警', 'visibility', 'none')
