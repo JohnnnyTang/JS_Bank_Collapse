@@ -8,7 +8,7 @@
             style="position: absolute; height: 8.5vh; width: 25vw; left: 0.7vw;" />
         <div class="item-container geology">
             <div class="img-container geology">
-                <el-image class="geology" style="width: 100%; height: 100%;" :src="image1Url" :key="image1Key" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" :preview-src-list="srcList1" alt="地质结构" />
+                <el-image class="geology" style="width: 100%; height: 100%;" :src="image1Url" :key="image1Key" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" preview-teleported :preview-src-list="srcList1" alt="地质结构" />
             </div>
             <div class="geology-content content">
                 <!-- <div class="part1-content">粉质黏土 1.5m</div>
@@ -51,7 +51,7 @@
             style="position: absolute; height: 86vh; width: 25vw; left: 0.7vw;" />
         <div class="item-container project">
             <div class="img-container project">
-                <el-image style="width: 100%; height: 100%;" :src="image2Url" :key="image2Key" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" :preview-src-list="srcList2" alt="项目结构" />
+                <el-image style="width: 100%; height: 100%;" :src="image2Url" :key="image2Key" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" preview-teleported :initial-index="4" :preview-src-list="srcList2" alt="项目结构" />
             </div>
             <div class="item-context project">
                 <!-- 2017年 马洲岛外江堤修复加固工程
@@ -77,7 +77,7 @@
                     :http-request="handlePic1Upload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
-                        <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+                        <em>拖拽图片至此处</em>或<em>点击</em>进行上传
                     </div>
                 </el-upload>
             </div>
@@ -129,7 +129,7 @@
                     :http-request="handlePic2Upload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
-                        <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+                        <em>拖拽图片至此处</em>或<em>点击</em>进行上传
                     </div>
                 </el-upload>
             </div>
@@ -195,6 +195,10 @@ const projectText = ref('')
 const formationData = ref('')
 const image1Key = ref()
 const image2Key = ref()
+
+const newBackendInstance = axios.create({
+    baseURL: '/model/'
+})
 
 const colorMap = reactive(new Map())
 
@@ -345,7 +349,7 @@ const handlePic1Upload = async (file1) => {
             info: 'testing1'
         };
         formDataPicUp1.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp1, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp1, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -357,7 +361,7 @@ const handlePic1Upload = async (file1) => {
             info: 'testing1'
         };
         formDataPicUpdate1.append('data', JSON.stringify(data));
-        const responseUpdate = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/picture/${bank}/testing1`, formDataPicUpdate1, {
+        const responseUpdate = await newBackendInstance.post(`/data/bankResource/update/local/resource/picture/${bank}/testing1`, formDataPicUpdate1, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -381,7 +385,7 @@ const handlePic2Upload = async (file2) => {
             info: 'testing2'
         };
         formDataPicUp2.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp2, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp2, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -393,7 +397,7 @@ const handlePic2Upload = async (file2) => {
             info: 'testing2'
         };
         formDataPicUpdate2.append('data', JSON.stringify(data));
-        const responseUpdate = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/picture/${bank}/testing2`, formDataPicUpdate2, {
+        const responseUpdate = await newBackendInstance.post(`/data/bankResource/update/local/resource/picture/${bank}/testing2`, formDataPicUpdate2, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -415,7 +419,7 @@ const handleText1Upload = async() => {
             text:  textarea1.value
         };
         formDataTextUp1.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp1, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp1, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -426,7 +430,7 @@ const handleText1Upload = async() => {
             text: textarea1.value
         }
         formDataTextUpdate1.append('data', JSON.stringify(data))
-        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/testing1`, data, {
+        const responseUpdate = await newBackendInstance.put(`/data/bankResource/update/local/resource/text/${bank}/testing1`, data, {
             headers: {
                 'Content-Type': 'application/json', // 设置请求头为 application/json
             },
@@ -446,7 +450,7 @@ const handleText2Upload = async() => {
             text:  textarea2.value
         };
         formDataTextUp2.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp2, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp2, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -457,7 +461,7 @@ const handleText2Upload = async() => {
             text: textarea2.value
         }
         formDataTextUpdate2.append('data', JSON.stringify(data))
-        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/testing2`, data, {
+        const responseUpdate = await newBackendInstance.put(`/data/bankResource/update/local/resource/text/${bank}/testing2`, data, {
             headers: {
                 'Content-Type': 'application/json', // 设置请求头为 application/json
             },
@@ -477,7 +481,7 @@ const handleTableUpload = async() => {
             text:  tableData.value
         };
         formDataTableUp.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTableUp, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/text`, formDataTableUp, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -488,7 +492,7 @@ const handleTableUpload = async() => {
             text: tableData.value
         }
         formDataTableUpdate.append('data', JSON.stringify(data))
-        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/tableData`, data, {
+        const responseUpdate = await newBackendInstance.put(`/data/bankResource/update/local/resource/text/${bank}/tableData`, data, {
             headers: {
                 'Content-Type': 'application/json', // 设置请求头为 application/json
             },
@@ -502,7 +506,7 @@ const handleTableUpload = async() => {
 const getImageUrls = async () => {
     try {
         // 获取第一张图片
-        const response1 = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/down/local/resource/${bank}/picture/testing1`,  {
+        const response1 = await newBackendInstance.get(`/data/bankResource/down/local/resource/${bank}/picture/testing1`,  {
             responseType: 'blob'
         });
         const url1 = window.URL.createObjectURL(new Blob([response1.data]));
@@ -515,7 +519,7 @@ const getImageUrls = async () => {
         }
 
         // 获取第二张图片
-        const response2 = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/down/local/resource/${bank}/picture/testing2`,  {
+        const response2 = await newBackendInstance.get(`/data/bankResource/down/local/resource/${bank}/picture/testing2`,  {
             responseType: 'blob'
         });
         const url2 = window.URL.createObjectURL(new Blob([response2.data]));
@@ -532,7 +536,7 @@ const getImageUrls = async () => {
 };
 // const getImage1Url = async () => {
 //     try {
-//         const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/down/local/resource/${bank}/picture/testing1`, {
+//         const response = await axios.get(`/data/bankResource/down/local/resource/${bank}/picture/testing1`, {
 //             responseType: 'blob' // 重要：设置响应类型为 'blob'
 //         });
 //         // 将 blob 数据转换为 URL
@@ -547,7 +551,7 @@ const getImageUrls = async () => {
 
 const getGeologyText = async () => {
     try {
-        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/bank/text?bank=${bank}`);
+        const response = await newBackendInstance.get(`/data/bankResource/bank/text?bank=${bank}`);
         const data = response.data;
         const textItem = data.find(item => item.name === "testing1");
         geologyText.value = textItem.text; // 设置地质结构描述的文本
@@ -560,7 +564,7 @@ const getGeologyText = async () => {
 
 const getProjectText = async () => {
     try {
-        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/bank/text?bank=${bank}`);
+        const response = await newBackendInstance.get(`/data/bankResource/bank/text?bank=${bank}`);
         const data = response.data;
         const textItem = data.find(item => item.name === "testing2");
         projectText.value = textItem.text; // 设置工程因素描述的文本
@@ -573,7 +577,8 @@ const getProjectText = async () => {
 
 const getTableData = async () => {
     try {
-        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/bank/text?bank=${bank}`);
+        // const response = await axios.get(`/data/bankResource/bank/text?bank=${bank}`);
+        const response = await newBackendInstance.get(`/data/bankResource/bank/text?bank=${bank}`);
         const data = response.data;
         const tableDataItem = data.find(item => item.name === "tableData");
         // if (tableDataItem) {
@@ -618,7 +623,7 @@ const confirmUploadHandler = async () => {
     await handleText2Upload();
     await handleTableUpload();
     editPannelShow.value = !editPannelShow.value;
-    addFormationPannelShow.value = false;
+    addFormationPannelShow.value = false; 
     getImageUrls();
     // getImage1Url();
     // getImage2Url();
