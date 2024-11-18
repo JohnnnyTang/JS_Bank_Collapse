@@ -29,8 +29,9 @@
                         "></div>
                     <template #dropdown>
                         <el-dropdown-menu v-if="index == 4">
-                            <el-dropdown-item @click="navToModelPage">崩岸模型库</el-dropdown-item>
-                            <el-dropdown-item @click="navToKnowledgePage">崩岸知识库</el-dropdown-item>
+                            <el-dropdown-item @click="navToModelPage">模型管理</el-dropdown-item>
+                            <el-dropdown-item @click="navToKnowledgePage">知识管理</el-dropdown-item>
+                            <el-dropdown-item @click="bankManageClickHandler">岸段管理</el-dropdown-item>
                         </el-dropdown-menu>
                         <el-dropdown-menu v-if="index == 1 || index == 3">
                             <el-dropdown-item v-for="(item, idx) in bankList" @click="clickBankItem(item, index)">
@@ -79,7 +80,7 @@
                         <el-dropdown-item v-if="LOGIN === 'YES' && statusStore.loginStatus"
                             @click="logout">退出登录</el-dropdown-item>
                         <el-dropdown-item v-if="MANAGEMENT === 'YES'"
-                            @click="bankManageClickHandler">岸段管理</el-dropdown-item>
+                            @click="bankManageClickHandler">权限管理</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -89,7 +90,7 @@
                 <div class="user-avatar-icon"></div>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item @click="bankManageClickHandler">岸段管理</el-dropdown-item>
+                        <el-dropdown-item :disabled="true" @click="bankManageClickHandler">权限管理</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
@@ -188,7 +189,7 @@ const navList = ref([
         iconUrl: '/monitoring.png',
     },
     {
-        name: '模型与知识库',
+        name: '崩岸系统管理',
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,

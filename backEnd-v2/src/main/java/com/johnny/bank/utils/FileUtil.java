@@ -5,6 +5,7 @@ import com.johnny.bank.model.resource.dataResource.InclinometerData;
 import com.johnny.bank.model.resource.dataResource.ManometerData;
 import com.johnny.bank.model.resource.dataResource.StressPileData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -189,5 +190,17 @@ public class FileUtil {
         }
         String outStr = out.toString();
         return outStr.substring(0, outStr.length()-1);
+    }
+
+    public static MultipartFile convertFileToMultipartFile(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+
+        // 使用 MockMultipartFile 创建 MultipartFile 实例
+        return new MockMultipartFile(
+                file.getName(),           // 文件名
+                file.getName(),           // 原始文件名
+                "application/zip", // 文件类型
+                inputStream                // 文件输入流
+        );
     }
 }

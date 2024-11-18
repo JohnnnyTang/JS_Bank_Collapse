@@ -7,12 +7,12 @@
                         <div class="title-text">一级指标</div>
                     </div>
                 </el-col>
-                <el-col :span="5">
+                <el-col :span="6">
                     <div class="title">
                         <div class="title-text">二级指标</div>
                     </div>
                 </el-col>
-                <el-col :span="10">
+                <el-col :span="9">
                     <div class="title">
                         <div class="title-text">风险阈值</div>
                     </div>
@@ -36,7 +36,7 @@
                         </div>
                     </div>
                 </el-col>
-                <el-col :span="5">
+                <el-col :span="6">
                     <el-row>
                         <el-col :span="24">
                             <div class="indicator-2">
@@ -59,7 +59,7 @@
                         </el-col>
                     </el-row>
                 </el-col>
-                <el-col :span="10">
+                <el-col :span="9">
                     <el-row>
                         <el-col :span="8">
                             <div class="full">
@@ -148,7 +148,7 @@
                         </div>
                     </div>
                 </el-col>
-                <el-col :span="5">
+                <el-col :span="6">
                     <el-row>
                         <el-col :span="24">
                             <div class="indicator-2">
@@ -171,7 +171,7 @@
                         </el-col>
                     </el-row>
                 </el-col>
-                <el-col :span="10">
+                <el-col :span="9">
                     <el-row>
                         <el-col :span="8">
                             <div class="full">
@@ -260,7 +260,7 @@
                         </div>
                     </div>
                 </el-col>
-                <el-col :span="5">
+                <el-col :span="6">
                     <el-row>
                         <el-col :span="24">
                             <div class="indicator-2">
@@ -283,7 +283,7 @@
                         </el-col>
                     </el-row>
                 </el-col>
-                <el-col :span="10">
+                <el-col :span="9">
                     <el-row>
                         <el-col :span="8">
                             <div class="full">
@@ -429,7 +429,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .threshold-form {
     position: relative;
-    width: 50vw;
+    width: 28vw;
     // height: 54vh;
 
     display: flex;
@@ -440,7 +440,7 @@ onMounted(() => {
 
     .form-container {
         position: relative;
-        width: 45vw;
+        width: 27vw;
         height: 48vh;
         padding: calc(0.5vw + 0.5vh);
         border-radius: 3px;
@@ -554,7 +554,7 @@ onMounted(() => {
                 height: 3.5vh;
                 line-height: 3.5vh;
                 font-weight: 700;
-                font-size: calc(0.7vw + 0.7vh);
+                font-size: calc(0.6vw + 0.5vh);
                 color: rgb(0, 40, 170);
 
                 margin-top: 1vh;
@@ -572,7 +572,7 @@ onMounted(() => {
                     height: 3vh;
                     line-height: 3vh;
                     font-weight: 400;
-                    font-size: calc(0.5vw + 0.6vh);
+                    font-size: calc(0.2vw + 0.8vh);
                     margin-right: .2vw;
                     padding: 0vh .5vw;
                     background-color: rgb(194, 232, 252);
@@ -582,7 +582,7 @@ onMounted(() => {
 
                     input {
                         height: 2.8vh;
-                        width: 2.5vw;
+                        width: 2vw;
 
                         border: none !important;
                         // border-right: 2px solid rgb(2, 143, 199) !important;
@@ -620,7 +620,7 @@ onMounted(() => {
                 line-height: 4.5vh;
                 text-align: center;
                 width: 95%;
-                font-size: calc(0.5vw + 0.7vh);
+                font-size: calc(0.4vw + 0.7vh);
                 font-weight: 400;
                 border-radius: 5px;
             }

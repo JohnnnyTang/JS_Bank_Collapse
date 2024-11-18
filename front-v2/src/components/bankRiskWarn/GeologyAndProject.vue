@@ -3,25 +3,19 @@
         <div class="title-context geology">
             地质结构
         </div>
-        <button class="edit-button" @click="editClickHandler()" :class="{ 'active': true }">
-            编辑
-        </button>
+        <button class="edit-button" @click="editClickHandler()" :class="{ 'active': true }">编辑</button>
         <dv-decoration10 :Dur="1" :color="['rgba(231, 137, 15, 0.7)', 'rgba(171, 184, 197, 0.8)']"
             style="position: absolute; height: 8.5vh; width: 25vw; left: 0.7vw;" />
         <div class="item-container geology">
             <div class="img-container geology">
-                <!-- <el-image class="geology" style="width: 100%; height: 100%;" :src="UrlPart1" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" :preview-src-list="srcList1" alt="地质结构" /> -->
-                <el-image class="geology" style="width: 100%; height: 100%;" :src="image1Url" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" :preview-src-list="srcList1" alt="地质结构" />
+                <el-image class="geology" style="width: 100%; height: 100%;" :src="image1Url" :key="image1Key" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" preview-teleported :preview-src-list="srcList1" alt="地质结构" />
             </div>
             <div class="geology-content content">
                 <!-- <div class="part1-content">粉质黏土 1.5m</div>
                 <div class="part2-content">粉砂 2m</div>
                 <div class="part3-content">淤泥质粉质黏土<br>7.5m</div>
                 <div class="part4-content">粉砂 28m</div> -->
-                <div class="part1-content" :style="{ height: height1 }">粉质黏土 {{ part1 }}m</div>
-                <div class="part2-content" :style="{ height: height2 }">粉砂 {{ part2 }}m</div>
-                <div class="part3-content" :style="{ height: height3 }">淤泥质粉质黏土<br>{{ part3 }}m</div>
-                <div class="part4-content" :style="{ height: height4 }">粉砂 {{ part4 }}m</div>
+                <div v-for="(item, index) in formationData" class="part-content" :style="{...getHeightStyle(item.height), backgroundColor: getColorForName(item.name), borderLeft: `4px solid ${getColorForName(item.name)}`}" :key="index">{{ item.name }}{{ item.height }}</div>
                 <div class="edit-pannel-container" v-if="addFormationPannelShow">
                     <div class="title">添加土层</div>
                     <div class="part">
@@ -30,15 +24,17 @@
                     </div>
                     <div class="part">
                         <span>土层高度：</span>
-                        <el-input v-model="formationHeight" @input="handleHeightInput" style="width: 6vw; height: 3.1vh" placeholder="请输入" /> m
+                        <el-input v-model="formationHeight" @input="handleHeightInput" style="width: 6vw; height: 3.1vh" placeholder="请输入" /> 
                     </div>
                     <div class="submit">
-                        <button class="cancel-button" @click="cancelAddFormation" :class="{ 'active': true }" style="width: 4vw; height: 3vh; font-size: medium;">
-                            取消
-                        </button>
-                        <button class="submit-button" @click="editData" :class="{ 'active': true }" style="width: 4vw; height: 3vh; font-size: medium;">
-                            确认
-                        </button>
+                        <div>
+                            <button class="cancel-button" @click="cancelAddFormation" :class="{ 'active': true }" style="width: 3vw; height: 2.6vh; font-size: medium;">取消</button>                            
+                        </div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                        <div>
+                            <button class="submit-button" @click="editData" :class="{ 'active': true }" style="width: 3vw; height: 2.6vh; font-size: medium;">确认</button>
+                        </div>
+
                     </div>
                 </div>
             </div>  
@@ -55,103 +51,97 @@
             style="position: absolute; height: 86vh; width: 25vw; left: 0.7vw;" />
         <div class="item-container project">
             <div class="img-container project">
-                <!-- <el-image style="width: 100%; height: 100%" :src="UrlPart2" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" :preview-src-list="srcList2" alt="项目结构" /> -->
-                <el-image style="width: 100%; height: 100%;" :src="image2Url" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :initial-index="4" :preview-src-list="srcList2" alt="项目结构" />
+                <el-image style="width: 100%; height: 100%;" :src="image2Url" :key="image2Key" :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" preview-teleported :initial-index="4" :preview-src-list="srcList2" alt="项目结构" />
             </div>
             <div class="item-context project">
-                2017年 马洲岛外江堤修复加固工程
+                <!-- 2017年 马洲岛外江堤修复加固工程
                 <br>
-                2023年 张皋过江通道工程民主沙右缘守护工程
+                2023年 张皋过江通道工程民主沙右缘守护工程 -->
+                {{ projectText }}
             </div>
         </div>
     </div>
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
 <!-- ///////////////////////////////////////////////////////////////////////////////////////// -->
-    <div class="geologyAndProject-container" v-if="editPannelShow">
+    <div class="geologyAndProject-container edit" v-if="editPannelShow">
         <div class="title-context geology">地质结构</div>
         <button class="edit-button cancel" @click="editClickHandler()">取消</button>
         <button class="edit-button submit" @click="confirmUploadHandler()">完成</button>
         <dv-decoration10 :Dur="1" :color="['rgba(231, 137, 15, 0.7)', 'rgba(171, 184, 197, 0.8)']" style="position: absolute; height: 8.5vh; width: 25vw; left: 0.7vw;"/>
         <div class="item-container geology">
             <div class="img-container geology-upload">
-                <el-upload style="height: fit-content; width: 100%;" drag="true" action="#" list-type="picture-card"
+                <el-upload style="height: fit-content; width: fit-content;" drag="true" action="#" list-type="text"
                     :multiple="false" :show-file-list="true" ref="uploadPicRef1" :auto-upload="false" 
-                    :file-list="fileList" :accept="'image/png, image/jpeg, image/tiff, image/bmp'"
-                    :on-preview="handlePicturePreview" :on-remove="handlePictureRemove"
+                    :file-list="fileList1" :accept="'image/png, image/jpeg, image/tiff, image/bmp'"
+                    :on-preview="handlePicturePreview" :on-remove="handlePicture1Remove"
                     :http-request="handlePic1Upload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
-                        <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+                        <em>拖拽图片至此处</em>或<em>点击</em>进行上传
                     </div>
                 </el-upload>
             </div>
             <div class="geology-content edit">  
                 <div class="resource-box-container">
-                    <!-- <div class="one-type-resource-container" v-for="(key, resourceCatogoryIndex) in Object.keys(resourceInfo)" :ref=handleRef> -->
-                        <div class="resource-content-container">
-                            <div class="resource-title">
-                                    <div class="resource-title-text">地表土层</div>
-                                    <div class="resource-upload-btn" @click="addFormationHandler()" :class="{ 'active': true }">添加</div>
-                            </div>
-                            <div class="resource-content">
-                                <el-table :data="tableData" style="width: 95%; margin-left: 2.5%;" max-height="25vh">
-                                    <el-table-column min-width="45%" align="center" prop="name" label="土层名称">
-                                    </el-table-column>
-                                    <el-table-column min-width="25%" align="center" prop="height" label="高度">
-                                    </el-table-column>
-                                    <el-table-column min-width="30%" align="center" prop="operation" label="操作">
-                                        <template #default="scope">
-                                            <el-button link type="danger" size="small" @click="deleteFormation(scope.$index)">
-                                                删除
-                                            </el-button>
-                                            <el-button link type="warning" size="small" @click="editFormation(scope.$index)">
-                                                修改
-                                            </el-button>
-                                        </template>
-                                    </el-table-column>                                    
-                                </el-table>
-                            </div>
-                        </div>
-
+                    <div class="resource-title">
+                            <div class="resource-title-text">地表土层</div>
+                            <div class="resource-upload-btn" @click="addFormationHandler()" :class="{ 'active': true }">添加</div>
+                    </div>
+                    <div class="resource-content">
+                        <el-table :data="tableData" style="width: 95%; margin-left: 2.5%;" max-height="25vh">
+                            <el-table-column min-width="45%" class-name="custom-label-color" align="center" prop="name" label="土层名称"></el-table-column>
+                            <el-table-column min-width="25%" class-name="custom-label-color" align="center" prop="height" label="高度"></el-table-column>
+                            <el-table-column min-width="30%" class-name="custom-label-color" align="center" prop="operation" label="操作">
+                                <template #default="scope">
+                                    <el-button link type="danger" size="small" @click="deleteFormation(scope.$index)">
+                                        删除
+                                    </el-button>
+                                    <el-button link type="warning" size="small" @click="editFormation(scope.$index)">
+                                        修改
+                                    </el-button>
+                                </template>
+                            </el-table-column>                                    
+                        </el-table>
+                    </div>
                 </div>
             </div>  
         <div class="item-context geology-edit">
-            地质结构描述：
-            <el-input v-model="textarea1" maxlength="60" style="width: 460px" placeholder="请输入"
+            <div>地质结构描述：</div>
+            <div>
+                <el-input v-model="textarea1" maxlength="60" style="width: 18.4vw" placeholder="请输入"
                 :resize="none" :autosize="{ minRows: 2, maxRows: 2.5 }"
-                show-word-limit type="textarea" :http-request="handleText1Upload"
-            />          
+                show-word-limit type="textarea" :http-request="handleText1Upload"/>  
+            </div>
         </div>
  
         </div>
         <div class="title-context project">
             工程因素
-
         </div>
         <dv-decoration10 :Dur="1" :color="['rgba(231, 137, 15, 0.7)', 'rgba(171, 184, 197, 0.8)']"
         style="position: absolute; height: 86vh; width: 25vw; left: 0.7vw;" />
         <div class="item-container project">
             <div class="img-container project">
-                <el-upload style="height: fit-content; width: 100%;" drag="true" action="#" list-type="picture-card" 
-                    ref="uploadPicRef2" :multiple="false" :show-file-list="true" :auto-upload="false" :file-list="fileList"
+                <el-upload style="height: fit-content; width: fit-content;" drag="true" action="#" list-type="text" 
+                    ref="uploadPicRef2" :multiple="false" :show-file-list="true" :auto-upload="false" :file-list="fileList2"
                     :accept="'image/png, image/jpeg, image/tiff, image/bmp'"
-                    :on-preview="handlePicturePreview" :on-remove="handlePictureRemove"
+                    :on-preview="handlePicturePreview" :on-remove="handlePicture2Remove"
                     :http-request="handlePic2Upload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
-                        <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+                        <em>拖拽图片至此处</em>或<em>点击</em>进行上传
                     </div>
                 </el-upload>
             </div>
-            <div class="item-context project">
-                工程因素描述：
-                <el-input
-                    v-model="textarea2" maxlength="60" style="width: 460px" placeholder="请输入"
+            <div class="item-context project-edit">
+                <div>工程因素描述：</div>
+                <div>
+                    <el-input
+                    v-model="textarea2" maxlength="60" style="width: 18.4vw" placeholder="请输入"
                     :resize="none" :autosize="{ minRows: 2, maxRows: 2.5 }"
                     show-word-limit type="textarea"
-                    :http-request="handleText2Upload"
-                /> 
-            />    
+                    :http-request="handleText2Upload"/>   
+                </div>
             </div>
         </div>
     </div>
@@ -160,29 +150,17 @@
 
 <script setup>
 import axios from 'axios';
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, reactive } from 'vue';
 import { useBankNameStore } from '../../store/bankNameStore';
 import { ElImage, ElInput, ElButton, ElMessage } from 'element-plus';
 
+// const UrlPart1 = "/geology_structure.png"
+// const UrlPart2 = "/project_structure.jpg"
 // const srcList1 = ["/geology_structure.png"]
-const srcList1 = ref([])
-const UrlPart1 = "/geology_structure.png"
 // const srcList2 = ["/project_structure.jpg", "/geoStruct/民主沙右缘守护工程09.jpg", "/geoStruct/民主沙右缘守护工程12.jpg", "/geoStruct/民主沙右缘守护工程18.jpg"]
+const srcList1 = ref([])
 const srcList2 = ref([])
-const UrlPart2 = "/project_structure.jpg"
 
-//////////////////////////////////////////////////////////////////
-//各地层part米数
-const part1 = ref(localStorage.getItem('part1') || 1.5);
-const part2 = ref(localStorage.getItem('part2') || 2);
-const part3 = ref(localStorage.getItem('part3') || 7.5);
-const part4 = ref(localStorage.getItem('part4') || 28);
-const inputPart1 = ref(part1.value);
-const inputPart2 = ref(part2.value);
-const inputPart3 = ref(part3.value);
-const inputPart4 = ref(part4.value);
-
-let nextId = 1
 let formDataPicUp1 = null
 let formDataPicUpdate1 = null
 let formDataPicUp2 = null
@@ -195,14 +173,16 @@ let formDataTableUp = null
 let formDataTableUpdate = null
 let bank = useBankNameStore().globalBankName
 
+
 const upLoading = ref(false)
 const editPannelShow = ref(false);
 const addFormationPannelShow = ref(false)
 const uploadPicRef1 = ref(null)
 const uploadPicRef2 = ref(null)
-
 const currentFormation = ref(null);
-const fileList = ref([])
+
+const fileList1 = ref([])
+const fileList2 = ref([])
 const tableData = ref([]);
 const formationName = ref('')
 const formationHeight = ref('')
@@ -211,18 +191,59 @@ const textarea2 = ref('')
 const image1Url = ref('')
 const image2Url = ref('')
 const geologyText = ref('')
+const projectText = ref('')
+const formationData = ref('')
+const image1Key = ref()
+const image2Key = ref()
 
-// 计算每个标签的高度
-const height1 = computed(() => `${part1.value * 100}%`);
-const height2 = computed(() => `${part2.value * 100}%`);
-const height3 = computed(() => `${part3.value * 100}%`);
-const height4 = computed(() => `${part4.value * 100}%`);
+const newBackendInstance = axios.create({
+    baseURL: '/model/'
+})
+
+const colorMap = reactive(new Map())
+
+const getColorForName = (name) => {
+    if (colorMap.has(name)) {
+        return colorMap.get(name);
+    }
+    // 生成偏向土色、黄色、橙色和棕色的随机颜色，但不包含鲜红色
+    const r = Math.floor(Math.random() * 100 + 155); // 155-255
+    const g = Math.floor(Math.random() * 100 + 100); // 100-200
+    const b = Math.floor(Math.random() * 50);        // 0-49
+    const randomColor = `rgb(${r}, ${g}, ${b})`;
+    colorMap.set(name, randomColor);
+    return randomColor;
+}
+
+// const getFormationClass = (name) => {
+//     switch (name) {
+//         case '粉砂':
+//             return 'part2-content';
+//         case '粉质黏土':
+//             return 'part1-content';
+//         case '淤泥质粉质黏土':
+//             return 'part3-content';
+//         default:
+//             return 'part4-content';
+//     }
+// }
+
+const getHeightStyle = (height) => {
+    const heightValue = parseFloat(height.replace('m', '')); // 移除'm'并转换为数字
+    const percentageHeight = (heightValue) * 100;
+    return {
+        height: `${percentageHeight}%`,
+    };
+}
 
 const handlePicturePreview = (file) => {
     console.log("预览", file)
 }
-const handlePictureRemove = (file, fileList) => {
-    console.log("删除", file, fileList)
+const handlePicture1Remove = (file, fileList1) => {
+    console.log("删除", file, fileList1)
+}
+const handlePicture2Remove = (file, fileList1) => {
+    console.log("删除", file, fileList1)
 }
 const editClickHandler = () => {
     editPannelShow.value = !editPannelShow.value;
@@ -234,13 +255,37 @@ const handleNameInput = (value) => {
 }
 
 const handleHeightInput = (value) => {
-    const numericValue = value.replace(/\D/g, '')
-    if (value !== numericValue) {
-        formationHeight.value = numericValue
+    const numericValue = value.replace(/[^0-9.]/g, '');     // 替换掉任何非数字和小数点的字符
+    // 如果输入值中包含小数点，则只允许一个
+    if (numericValue.includes('.')) {
+        const parts = numericValue.split('.');
+        // 如果小数点数量超过1，则移除多余的小数点
+        if (parts.length > 2) {
+            numericValue = parts[0] + '.' + parts.slice(1).join('');
+        }
     }
+    formationHeight.value = numericValue;
+};
+
+function generateUniqueId() {
+    let newId = Math.floor(Math.random() * 10000).toString(36); // 生成一个随机的六位十六进制数
+    return newId;
 }
 
+// function checkAndFixDuplicateIds() {
+//     const ids = new Set(); 
+//     for (let i = 0; i < tableData.value.length; i++) {
+//         if (ids.has(tableData.value[i].id)) {
+//             tableData.value[i].id = generateUniqueId();
+//             console.warn(`重复的 id 找到: ${tableData.value[i].id}`);
+//         } else {
+//             ids.add(tableData.value[i].id);
+//         }
+//     }
+// }
+
 const editData = () => {
+    // checkAndFixDuplicateIds(); // 在添加新土层之前检查并修复重复的 id
     if (!formationHeight.value.match(/^\d*\.?\d+$/) || !formationName.value) {
         ElMessage.error('土层名称和高度不能为空,且高度必须为数字');
         return; 
@@ -256,7 +301,7 @@ const editData = () => {
         }
     } 
     else if (formationName.value && formationHeight.value) {
-        const newId = nextId++; // 生成一个新的唯一 id
+        const newId = generateUniqueId(); // 生成一个新的唯一 id
         tableData.value.push({
             id: newId,
             name: formationName.value,
@@ -271,6 +316,7 @@ const editData = () => {
 
 const deleteFormation = (index) => {
     tableData.value.splice(index, 1);
+    addFormationPannelShow.value = false;
 };
 
 const editFormation = (index) => {
@@ -279,7 +325,7 @@ const editFormation = (index) => {
     currentFormation.value = { ...item }; 
     formationName.value = item.name;
     formationHeight.value = item.height.replace('m', '');
-    addFormationPannelShow.value = true;
+    addFormationPannelShow.value = true
 };
 
 const addFormationHandler = () => {
@@ -292,30 +338,30 @@ const cancelAddFormation = () => {
     addFormationPannelShow.value = false;
 }
 
-const handlePic1Upload = async (file) => {
-    console.log('上传文件!!', file);
+const handlePic1Upload = async (file1) => {
+    console.log('上传文件!!', file1);
     try {
         //上传
         formDataPicUp1 = new FormData();
-        formDataPicUp1.append('file', file.file);
+        formDataPicUp1.append('file', file1.file);
         const info = {
             name: 'testing1',
             info: 'testing1'
         };
         formDataPicUp1.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp1, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp1, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
         //更新
         formDataPicUpdate1 = new FormData();
-        formDataPicUpdate1.append('file', file.file);
+        formDataPicUpdate1.append('file', file1.file);
         const data = {
             info: 'testing1'
         };
         formDataPicUpdate1.append('data', JSON.stringify(data));
-        const responseUpdate = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/picture/${bank}/testing1`, formDataPicUpdate1, {
+        const responseUpdate = await newBackendInstance.post(`/data/bankResource/update/local/resource/picture/${bank}/testing1`, formDataPicUpdate1, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -328,30 +374,30 @@ const handlePic1Upload = async (file) => {
     }
 };
 
-const handlePic2Upload = async (file) => {
-    console.log('上传文件!!', file);
+const handlePic2Upload = async (file2) => {
+    console.log('上传文件!!', file2);
     try {
         //上传
         formDataPicUp2 = new FormData();
-        formDataPicUp2.append('file', file.file);
+        formDataPicUp2.append('file', file2.file);
         const info = {
             name: 'testing2',
             info: 'testing2'
         };
         formDataPicUp2.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp2, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/picture`, formDataPicUp2, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
         //更新
         formDataPicUpdate2 = new FormData();
-        formDataPicUpdate2.append('file', file.file);
+        formDataPicUpdate2.append('file', file2.file);
         const data = {
             info: 'testing2'
         };
         formDataPicUpdate2.append('data', JSON.stringify(data));
-        const responseUpdate = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/picture/${bank}/testing2`, formDataPicUpdate2, {
+        const responseUpdate = await newBackendInstance.post(`/data/bankResource/update/local/resource/picture/${bank}/testing2`, formDataPicUpdate2, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -365,7 +411,6 @@ const handlePic2Upload = async (file) => {
 };
 
 const handleText1Upload = async() => {
-    console.log("上传内容是:", textarea1.value);
     try {
         //上传
         formDataTextUp1 = new FormData();
@@ -374,7 +419,7 @@ const handleText1Upload = async() => {
             text:  textarea1.value
         };
         formDataTextUp1.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp1, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp1, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -385,7 +430,7 @@ const handleText1Upload = async() => {
             text: textarea1.value
         }
         formDataTextUpdate1.append('data', JSON.stringify(data))
-        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/testing1`, data, {
+        const responseUpdate = await newBackendInstance.put(`/data/bankResource/update/local/resource/text/${bank}/testing1`, data, {
             headers: {
                 'Content-Type': 'application/json', // 设置请求头为 application/json
             },
@@ -397,7 +442,6 @@ const handleText1Upload = async() => {
 }
 
 const handleText2Upload = async() => {
-    console.log("上传内容是:", textarea2.value);
     try {
         //上传
         formDataTextUp2 = new FormData();
@@ -406,7 +450,7 @@ const handleText2Upload = async() => {
             text:  textarea2.value
         };
         formDataTextUp2.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp2, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp2, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -417,7 +461,7 @@ const handleText2Upload = async() => {
             text: textarea2.value
         }
         formDataTextUpdate2.append('data', JSON.stringify(data))
-        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/testing2`, data, {
+        const responseUpdate = await newBackendInstance.put(`/data/bankResource/update/local/resource/text/${bank}/testing2`, data, {
             headers: {
                 'Content-Type': 'application/json', // 设置请求头为 application/json
             },
@@ -429,7 +473,6 @@ const handleText2Upload = async() => {
 }
 
 const handleTableUpload = async() => {
-    console.log("上传内容是:", tableData.value);
     try {
         //上传
         formDataTableUp = new FormData();
@@ -438,7 +481,7 @@ const handleTableUpload = async() => {
             text:  tableData.value
         };
         formDataTableUp.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTableUp, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/text`, formDataTableUp, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -449,7 +492,7 @@ const handleTableUpload = async() => {
             text: tableData.value
         }
         formDataTableUpdate.append('data', JSON.stringify(data))
-        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/tableData`, data, {
+        const responseUpdate = await newBackendInstance.put(`/data/bankResource/update/local/resource/text/${bank}/tableData`, data, {
             headers: {
                 'Content-Type': 'application/json', // 设置请求头为 application/json
             },
@@ -460,157 +503,220 @@ const handleTableUpload = async() => {
     }
 }
 
-const getImage1Url = async () => {
+const getImageUrls = async () => {
     try {
-        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/down/local/resource/${bank}/picture/testing1`, {
-            responseType: 'blob' // 重要：设置响应类型为 'blob'
+        // 获取第一张图片
+        const response1 = await newBackendInstance.get(`/data/bankResource/down/local/resource/${bank}/picture/testing1`,  {
+            responseType: 'blob'
         });
-        // 将 blob 数据转换为 URL
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        image1Url.value = url;
-        srcList1.value.push(url); 
-    } catch (error) {
-        console.error('获取图片失败:', error);
-        ElMessage.error('获取图片失败');
-    }
-}
+        const url1 = window.URL.createObjectURL(new Blob([response1.data]));
+        image1Url.value = url1;
 
-const getImage2Url = async () => {
-    try {
-        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/down/local/resource/${bank}/picture/testing2`, {
-            responseType: 'blob' // 重要：设置响应类型为 'blob'
+        // srcList1.value.push(url1);
+        // 只有当 srcList1 中不包含 url1 时，才添加 url1
+        if (!srcList1.value.includes(url1)) {
+            srcList1.value.push(url1);
+        }
+
+        // 获取第二张图片
+        const response2 = await newBackendInstance.get(`/data/bankResource/down/local/resource/${bank}/picture/testing2`,  {
+            responseType: 'blob'
         });
-        // 将 blob 数据转换为 URL
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        image2Url.value = url;
-        srcList2.value.push(url); 
+        const url2 = window.URL.createObjectURL(new Blob([response2.data]));
+        image2Url.value = url2;
+        // srcList2.value.push(url2);
+        // 只有当 srcList2 中不包含 url2 时，才添加 url2
+        if (!srcList2.value.includes(url2)) {
+            srcList2.value.push(url2);
+        }
     } catch (error) {
         console.error('获取图片失败:', error);
         ElMessage.error('获取图片失败');
     }
-}
+};
+// const getImage1Url = async () => {
+//     try {
+//         const response = await axios.get(`/data/bankResource/down/local/resource/${bank}/picture/testing1`, {
+//             responseType: 'blob' // 重要：设置响应类型为 'blob'
+//         });
+//         // 将 blob 数据转换为 URL
+//         const url = window.URL.createObjectURL(new Blob([response.data]));
+//         image1Url.value = url;
+//         srcList1.value.push(url); 
+//     } catch (error) {
+//         console.error('获取图片失败:', error);
+//         ElMessage.error('获取图片失败');
+//     }
+// }
 
 const getGeologyText = async () => {
     try {
-        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/bank/text?bank=${bank}`);
-        // 假设返回的数据格式如您所提供的，我们需要找到 "name": "testing1" 对应的 "text"
+        const response = await newBackendInstance.get(`/data/bankResource/bank/text?bank=${bank}`);
         const data = response.data;
         const textItem = data.find(item => item.name === "testing1");
-        geologyText.value = data; // 设置地质结构描述的文本
-        // if (textItem) {
-        //     geologyText.value = textItem.text; // 设置地质结构描述的文本
-        // }
+        geologyText.value = textItem.text; // 设置地质结构描述的文本
+        textarea1.value = textItem.text; // 设置地质结构描述的文本
     } catch (error) {
         console.error('获取地质结构描述失败:', error);
         ElMessage.error('获取地质结构描述失败');
     }
 };
 
+const getProjectText = async () => {
+    try {
+        const response = await newBackendInstance.get(`/data/bankResource/bank/text?bank=${bank}`);
+        const data = response.data;
+        const textItem = data.find(item => item.name === "testing2");
+        projectText.value = textItem.text; // 设置工程因素描述的文本
+        textarea2.value = textItem.text; // 设置工程因素描述的文本
+    } catch (error) {
+        console.error('获取工程因素描述失败:', error);
+        ElMessage.error('获取工程因素描述失败');
+    }
+};
+
+const getTableData = async () => {
+    try {
+        // const response = await axios.get(`/data/bankResource/bank/text?bank=${bank}`);
+        const response = await newBackendInstance.get(`/data/bankResource/bank/text?bank=${bank}`);
+        const data = response.data;
+        const tableDataItem = data.find(item => item.name === "tableData");
+        // if (tableDataItem) {
+        //     nextId = Math.max(...tableDataItem.text.map(item => item.id)) + 1;
+        //     checkAndFixDuplicateIds(tableDataItem.text);
+        //     formationData.value = tableDataItem.text;
+        //     tableData.value = tableDataItem.text;
+        //     } else {
+        //         // 如果tableDataItem不存在，nextId保持初始值
+        //         nextId = 1;
+        //     }
+        formationData.value = tableDataItem.text; // 设置表格描述的文本
+        tableData.value = tableDataItem.text; // 设置表格描述的文本
+    } catch (error) {
+        console.error('获取土层描述失败:', error);
+        ElMessage.error('获取土层描述失败');
+    }
+};
+
 onMounted(() => {
-    getImage1Url();
-    getImage2Url();
+    getImageUrls();
+    // await getImage1Url();
+    // await getImage2Url();
     getGeologyText();
+    getProjectText();
+    getTableData();
+    // image1Key.value = new Date().getTime();
+    // image2Key.value = new Date().getTime();
 })
 
 onUnmounted(() => {
-    if (image1Url.value && image2Url.value) {
-        window.URL.revokeObjectURL(image1Url.value);
-        window.URL.revokeObjectURL(image2Url.value);
-    }
+    window.URL.revokeObjectURL(image1Url.value);
+    window.URL.revokeObjectURL(image2Url.value);
 });
 
 const confirmUploadHandler = async () => {
     uploadPicRef1.value && uploadPicRef1.value.submit()
     uploadPicRef2.value && uploadPicRef2.value.submit()
+    // await uploadPicRef1.value.submit()
+    // await uploadPicRef2.value.submit()
     await handleText1Upload();
     await handleText2Upload();
     await handleTableUpload();
     editPannelShow.value = !editPannelShow.value;
-    addFormationPannelShow.value = false;
+    addFormationPannelShow.value = false; 
+    getImageUrls();
+    // getImage1Url();
+    // getImage2Url();
+    getGeologyText();
+    getProjectText();
+    getTableData();
+    image1Key.value = new Date().getTime();
+    image2Key.value = new Date().getTime();
 }
 </script>
 
 <style lang="scss" scoped>
 div.edit-pannel-container {
-                position: absolute;
-                left: 25.8vw;
-                display: flex;
-                flex-direction: column;
-                border: 2px solid #e0cfcf;
-                background-color: rgba(238, 235, 205, 0.6);
-                backdrop-filter: blur(6px);
-                border-radius: 5px;
-                height: 80%;
-                width: 50%;
-                font-family: 'Microsoft YaHei', 'sans-serif';
+    position: absolute;
+    left: 25.8vw;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #e0cfcf;
+    background-color: rgba(238, 235, 205, 0.6);
+    backdrop-filter: blur(6px);
+    border-radius: 5px;
+    height: 70%;
+    width: 45%;
+    font-family: 'Microsoft YaHei', 'sans-serif';
+    align-items: center; // 水平居中
 
-                div.title {
-                    display: flex;
-                    width: 100%;
-                    height: 30%;
-                    color: #e48f0f;
-                    letter-spacing: 0.1vw;
-                    font-weight: bold;
+    div.title {
+        display: flex;
+        width: 100%;
+        height: 25%;
+        color: #e48f0f;
+        letter-spacing: 0.1vw;
+        font-weight: bold;
+        font-size: calc(0.8vw + 0.6vh);
+        line-height: 8vh;
+        justify-content: center;
+        // align-items: center;
+        text-shadow:
+            #121214 1px 1px,
+            #5c5e63 2px 2px,
+            #6493ff 3px 3px;
+    }
 
-                    font-size: calc(0.8vw + 0.6vh);
-                    line-height: 4vh;
-                    justify-content: center;
-                    align-items: center;
-                    text-shadow:
-                        #121214 1px 1px,
-                        #5c5e63 2px 2px,
-                        #6493ff 3px 3px;
-                }
+    div.part {
+        line-height: 3vh;
+        display: flex;
+        height: 28%;
+        left: 5vw;
+        font-size: calc(0.6vw + 0.5vh);
+        font-weight: 700;
+        color: #444;
+        justify-content: center; // 垂直居中
+        align-items: center; // 水平居中
+        // line-height: 8vh
+    }
 
-                div.part {
-                    display: flex;
-                    height: 20%;
-                    left: 5vw;
-                    font-size: calc(0.6vw + 0.5vh);
-                    font-weight: 700;
-                    color: #444;
-                }
+    div.submit {
+        height: 25%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
 
-                div.submit {
-                    height: 20%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    .cancel-button {
-                        background: #ffffff;
-                        color: #000000;
-                        font-family: 'Microsoft YaHei';
-                        font-weight: 900;
-                        font-size: calc(0.3vw + 0.7vh);
-                        border: 1px solid rgb(167, 131, 3);
-                        border-radius: 0.4em;
-                        box-shadow: rgb(114, 90, 3) 0.05em 0.05em;
-                        cursor: pointer;
-                        // z-index: 4;
-                        transition: 0.3s linear;
-                        &:hover {
-                            background: #e2b168;
-                        }
-                    }
-                    .submit-button {
-                        background: #e48f0f;
-                        color: #fff;
-                        font-family: 'Microsoft YaHei';
-                        font-weight: 900;
-                        font-size: calc(0.3vw + 0.7vh);
-                        border: 1px solid rgb(167, 131, 3);
-                        border-radius: 0.4em;
-                        box-shadow: rgb(114, 90, 3) 0.05em 0.05em;
-                        cursor: pointer;
-                        // z-index: 4;
-                        transition: 0.3s linear;
-                        &:hover {
-                            background: #e2b168;
-                        }
-                    }
-                }
+        .cancel-button {
+            background: #ffffff;
+            color: #000000;
+            font-family: 'Microsoft YaHei';
+            font-weight: 900;
+            font-size: calc(0.3vw + 0.7vh);
+            border-radius: 0.4em;
+            cursor: pointer;
+            transition: 0.3s linear;
+            box-shadow: rgb(85, 85, 85) 0.05em 0.05em;
+            border: 1px solid rgb(255, 255, 255);
+        }
+        .submit-button {
+            background: #e48f0f;
+            color: #fff;
+            font-family: 'Microsoft YaHei';
+            font-weight: 900;
+            font-size: calc(0.3vw + 0.7vh);
+            border: 1px solid rgb(167, 131, 3);
+            border-radius: 0.4em;
+            box-shadow: rgb(114, 90, 3) 0.05em 0.05em;
+            cursor: pointer;
+            // z-index: 4;
+            transition: 0.3s linear;
+            &:hover {
+                background: #e2b168;
             }
+        }
+    }
+}
 
 div.geologyAndProject-container {
     display: flex;
@@ -624,6 +730,15 @@ div.geologyAndProject-container {
     border: 2px solid #e0cfcf;
     border-radius: 10px;
     backdrop-filter: blur(6px);
+    .custom-label-color .el-table__header-wrapper .el-table-column--label {
+        color: #ccb024 !important; // 修改 label 颜色
+    }
+
+    .el-upload {
+        --el-upload-dragger-padding-horizontal: 40px;
+        --el-upload-dragger-padding-vertical: 10px;
+        cursor: pointer;
+    }
 
     .edit-button {
         position: absolute;
@@ -636,9 +751,10 @@ div.geologyAndProject-container {
         font-family: 'Microsoft YaHei';
         font-weight: 900;
         font-size: calc(0.3vw + 0.7vh);
+        box-shadow: rgb(114, 90, 3) 0.05em 0.05em;
         border: 1px solid rgb(167, 131, 3);
         border-radius: 0.4em;
-        box-shadow: rgb(114, 90, 3) 0.05em 0.05em;
+
         cursor: pointer;
         z-index: 2;
         transition: 0.3s linear;
@@ -648,11 +764,15 @@ div.geologyAndProject-container {
         }
 
         &.cancel {
+            box-shadow: rgb(85, 85, 85) 0.05em 0.05em;
+            border: 1px solid rgb(255, 255, 255);
             background: #ffffff;
             color: #000000;
         }
 
         &.submit {
+            box-shadow: rgb(114, 90, 3) 0.05em 0.05em;
+            border: 1px solid rgb(167, 131, 3);
             right: 5vw;
         }
     }
@@ -674,7 +794,6 @@ div.geologyAndProject-container {
 
         &.geology {
             top: -0.2vh;
-            
         }
 
         &.project {
@@ -692,12 +811,10 @@ div.geologyAndProject-container {
         &.geology {
             top: 5vh;
             height: 35vh;
-            // background-color: #121214;
         }
 
         &.project {
             top: 44vh;
-            // background-color: #67679e;
         }
 
         div.img-container {
@@ -720,8 +837,6 @@ div.geologyAndProject-container {
             &.geology-upload {
                 width: 40%;
             }
-
-            
         }
 
         div.geology-content {
@@ -736,7 +851,7 @@ div.geologyAndProject-container {
                 width: 60%;
             }
 
-            div.part1-content {
+            div.part-content {
                 margin-left: 0.1vw;
                 border-left: rgb(214, 142, 8) 4px solid;
                 display: flex;
@@ -751,51 +866,9 @@ div.geologyAndProject-container {
                 color: #573606;
             }
 
-            div.part2-content {
-                margin-left: 0.1vw;
-                border-left: rgb(173, 171, 5) 4px solid;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                // height: 5.128%;
-                height: 15%;
-                background-color: rgba(218, 219, 137, 0.6);
-                font-size: calc(0.6vw + 0.3vh);
-                font-family: 'Microsoft YaHei';
-                font-weight: bolder;
-                color: #363a20;
-            }
-
-            div.part3-content {
-                margin-left: 0.1vw;
-                border-left: rgb(202, 113, 238) 4px solid;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                // height: 19.231%;
-                height: 25%;
-                background-color: rgba(189, 163, 223, 0.6);
-                font-size: calc(0.6vw + 0.3vh);
-                font-family: 'Microsoft YaHei';
-                font-weight: bolder;
-                color: #331577;
-            }
-
-            div.part4-content {
-                margin-left: 0.1vw;
-                border-left: rgb(173, 171, 5) 4px solid;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 50%;
-                background-color: rgba(218, 219, 137, 0.6);
-                font-size: calc(0.6vw + 0.3vh);
-                font-family: 'Microsoft YaHei';
-                font-weight: bolder;
-                color: #3a2c20;
-            }
-
             div.resource-box-container {
+                // background-color: rgba(224, 178, 134, 0.6);
+
                 div.resource-title {
                     position: relative;
                     height: 3vh;
@@ -804,12 +877,16 @@ div.geologyAndProject-container {
                     font-family: 'Microsoft YaHei';
                     font-size: calc(0.6vw + 0.4vh);
                     font-weight: bold;
-                    border-bottom: 2px solid #5b9dff;
-                    color: #001d7a;
+                    border-bottom: 2px solid rgb(214, 142, 8);
 
                     div.resource-title-text {
                         position: absolute;
                         left: 1vw;
+                        color: #e48f0f;
+                        text-shadow:
+                            #121214 1px 1px,
+                            #5c5e63 1px 1px,
+                            #6493ff 1px 1px;
                     }
 
                     div.resource-upload-btn {
@@ -817,8 +894,8 @@ div.geologyAndProject-container {
                         top: 0.6vh;
                         right: 0.65vw;
                         width: 3vw;
-                        height: 2vh;
-                        border: 1px solid rgb(1, 6, 61);
+                        height: 2.1vh;
+                        border: 1px solid rgb(167, 131, 3);
                         border-radius: 0.4em;
                         line-height: 2vh;
                         justify-content: center;
@@ -827,14 +904,14 @@ div.geologyAndProject-container {
                         font-size: calc(0.5vw + 0.3vh);
                         font-family: 'Microsoft YaHei';
                         font-weight: bold;
-                        background-color: rgb(64, 102, 206);
+                        background-color: #e48f0f;
                         color: #ffffff;
                         box-shadow: rgb(0, 6, 54) 0.05em 0.05em;
                         z-index: 1;
                         transition: 0.3s linear;
                         cursor: pointer;
                         &:hover {
-                            background-color: rgb(93, 169, 255);
+                            background-color: #e2b168;
                         }
                     }
                 }
@@ -858,10 +935,16 @@ div.geologyAndProject-container {
         &.geology-edit {
             top: 29vh;
             z-index: 1;
+            display: flex;
         }
 
         &.project {
             top: 25.5vh;
+            white-space: pre-wrap; 
+        }
+        &.project-edit {
+            top: 25.5vh;
+            display: flex;
         }
     }
 }

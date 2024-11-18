@@ -91,7 +91,7 @@ export default class BankResourceHelper {
     //////////////// MODEL RESOURCE ////////////////
     /**
      * 
-     * @param {"Hydrodynamic" | "DEM" | "Boundary" | "Config"} dataType 
+     * @param {"Hydrodynamic" | "DEM" | "Boundary" | "Config | "Section"} dataType 
      * @param {*} bankEnName 
      */
     static getBankCalculateResourceList(dataType, bankEnName) {
@@ -106,9 +106,14 @@ export default class BankResourceHelper {
      * @param {FormData} formData 
      */
     static uploadBankCalculateResourceFile(formData) {
-
         return axiosIns.post(`/up/modelServer/resource/file`, formData)
-
+    }
+    /**
+     * 
+     * @param {FormData} formData 
+     */
+    static uploadBankSectionResourceFile(formData) {
+        return axiosIns.post(`/up/section/resource/file`, formData)
     }
 
     static updateBankCalculateResourceFile(dataType, bankEnName, fileInput, fileInfo) {
@@ -125,8 +130,30 @@ export default class BankResourceHelper {
         return axiosIns.delete(`/delete/calculate/resource/${bankEnName}/file/${dataType}/${fileName}`)
     }
 
+    static deleteSectionResourceFile(bankEnName, fileName) {
+        return axiosIns.delete(`/delete/section/resource/${bankEnName}/file/${fileName}`)
+    }
 
+    static onInput(prefix) {
+        const formData = new FormData()
+        formData.append('prefix', prefix)
+        return axiosIns.post(`/down/bank/name`, formData)
+    }
 
+    static handleSelect(bankName) {
+        const formData = new FormData()
+        formData.append('name', bankName)
+        return axiosIns.post(`/down/bank/info`, formData)
+    }
+
+    static handleModelParamsUpload(paramData, type, modelParamsInfoData){
+        const requestData = {
+            params: paramData,
+            type: type,
+            info: modelParamsInfoData
+          };
+        return axiosIns.post(`/up/model/params`, requestData)
+    }
 
 
     ////////////// VISUAL RESOURCE ////////////////
@@ -294,16 +321,22 @@ export default class BankResourceHelper {
                     proxy[_proxyCategoryDICI['model']][1]['resourceList'] = result
 
                 },
+                'Section': async () => {
+                    const _ogSection = (await BankResourceHelper.getBankCalculateResourceList('Section', bankEnName)).data
+                    let result = this.SectionResourcetoList(_ogSection)
+                    proxy[_proxyCategoryDICI['model']][2]['resourceList'] = result
+
+                },
                 'Boundary': async () => {
                     const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', bankEnName)).data
                     let result = this.BoundaryResourcetoList(_ogBound)
-                    proxy[_proxyCategoryDICI['model']][2]['resourceList'] = result
+                    proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
 
                 },
                 'Hydrodynamic': async () => {
                     const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
                     let result = this.HydrodynamicResourcetoList(_ogHydro)
-                    proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
+                    proxy[_proxyCategoryDICI['model']][4]['resourceList'] = result
 
                 },
 
@@ -416,6 +449,10 @@ export default class BankResourceHelper {
     }
 
     static ConfigResourcetoList(originalData) {
+        return this.toList(originalData)
+    }
+
+    static SectionResourcetoList(originalData) {
         return this.toList(originalData)
     }
 

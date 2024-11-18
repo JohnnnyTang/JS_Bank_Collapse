@@ -1,6 +1,6 @@
 package com.johnny.bank.controller.resource.dataSource;
 
-import com.johnny.bank.model.resource.dataResource.DetailHistory;
+import com.johnny.bank.model.resource.dataResource.                                               DetailHistory;
 import com.johnny.bank.service.resource.dataSource.impl.DetailCollapseInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

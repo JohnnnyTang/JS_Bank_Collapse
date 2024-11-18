@@ -1,7 +1,7 @@
 <template>
     <el-dialog v-model="dialogFormVisible" width="18vw" :show-close="false" ref="dialogRef" custom-class="dialog-class"
         :destroy-on-close="true">
-        <template #header="{ titleId, titleClass }">
+        <template #header="{ }">
             <div class="form-header">
                 {{ dialogFormTitle }}
             </div>
@@ -17,13 +17,14 @@
                 <el-input v-if="item.type === 'input'" v-model="item.value" autocomplete="off" />
 
                 <el-radio-group v-model="item.value" v-else-if="item.type === 'radios'">
-                    <el-radio v-for="(_, radioIndex) in item.radioLabelArray" :value='item.radioValueArray[radioIndex]'> {{
+                    <el-radio v-for="(_, radioIndex) in item.radioLabelArray" :value='item.radioValueArray[radioIndex]' :key="radioIndex"> {{
                         item.radioLabelArray[radioIndex] }} </el-radio>
                 </el-radio-group>
 
                 <el-upload v-else-if="item.type === 'file'" style="height: fit-content;" drag action="#" :multiple="false"
                     :show-file-list="true" ref="uploadRef" :auto-upload="false" :file-list="fileList"
                     :on-preview="handlePreview" :on-remove="handleRemove" :on-change="handleFileChange"
+                    accept=".zip"
                     :http-request="handleFileUpload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
@@ -180,12 +181,24 @@ const handleFileUpload = (file) => {
 
 
         /// http request
-        BankResourceHelper.uploadBankCalculateResourceFile(formData).then(res => {
-            normalSuccessCallback(res)
-        }).catch(err => {
-            normalFailCallback(err)
-        })
-
+        if(props.subType == 'Section'){
+            BankResourceHelper.uploadBankSectionResourceFile(formData).then(res => {
+                if(res.data == "数据资源已存在！"){
+                    normalFailCallback(res)
+                }else{
+                    normalSuccessCallback(res)
+                }
+            }).catch(err => {
+                normalFailCallback(err)
+            })
+        }else{
+            BankResourceHelper.uploadBankCalculateResourceFile(formData).then(res => {
+                normalSuccessCallback(res)
+            }).catch(err => {
+                normalFailCallback(err)
+            })
+        }
+        
     }
     else if (props.type === 'visual') {
 
