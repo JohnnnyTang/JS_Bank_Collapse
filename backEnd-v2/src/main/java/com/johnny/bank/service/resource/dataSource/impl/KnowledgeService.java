@@ -38,16 +38,6 @@ public class KnowledgeService {
     @Autowired
     DataNodeServiceV2 dataNodeServiceV2;
 
-    public static String generateNewFileName(String originalFilename) {
-        String fileName = new File(originalFilename).getName();
-        int dotIndex = fileName.lastIndexOf(".");
-        if (dotIndex == -1) {
-            return fileName + "_" + System.currentTimeMillis();
-        } else {
-            return fileName.substring(0, dotIndex) + "_" + System.currentTimeMillis() + fileName.substring(dotIndex);
-        }
-    }
-
     public byte[] getKnowledgeData(String type, String name) {
         String basePath;
         String category;
@@ -87,7 +77,7 @@ public class KnowledgeService {
             return "该数据资源已存在，请更换名称";
         }
         JSONObject usage = new JSONObject();
-        String storeFileName = generateNewFileName(file.getOriginalFilename());
+        String storeFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
         FileUtil.storeFile(file, basePath, storeFileName);
         usage.put("name",storeFileName);
         DataNodeV2 knowledgeDataNode = DataNodeV2.dataNodeBuilder()
@@ -116,7 +106,7 @@ public class KnowledgeService {
             return "数据资源 "+name+" 不存在！";
         }
         FileUtil.deleteFile(new File(basePath+"/"+knowledgeDataNode.getUsage().getString("name")));
-        String storeFileName = generateNewFileName(file.getOriginalFilename());
+        String storeFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
         FileUtil.storeFile(file, basePath, storeFileName);
         JSONObject usage = new JSONObject();
         usage.put("name",storeFileName);

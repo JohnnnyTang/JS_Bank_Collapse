@@ -28,6 +28,17 @@ import java.util.List;
 @Slf4j
 public class FileUtil {
 
+    // 生成带时间戳的文件名
+    public static String generateNewFileName(String originalFilename) {
+        String fileName = new File(originalFilename).getName();
+        int dotIndex = fileName.lastIndexOf(".");
+        if (dotIndex == -1) {
+            return fileName + "_" + System.currentTimeMillis();
+        } else {
+            return fileName.substring(0, dotIndex) + "_" + System.currentTimeMillis() + fileName.substring(dotIndex);
+        }
+    }
+
     // 删除指定路径文件夹以及其中文件
     public static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
@@ -60,8 +71,8 @@ public class FileUtil {
             return "NOT EXIST";
         }
         try {
-            List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
-//            List<String> lines = Files.readAllLines(filePath);
+//            List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
+            List<String> lines = Files.readAllLines(filePath);
             return String.join(System.lineSeparator(), lines);
         } catch (IOException e) {
             return "ERROR";

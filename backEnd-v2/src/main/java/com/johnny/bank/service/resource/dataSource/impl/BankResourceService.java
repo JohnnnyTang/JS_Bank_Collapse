@@ -163,8 +163,9 @@ public class BankResourceService {
                 .bank(bank).name(bank+"BankNode").dataOrigin("Local").auth("all")
                 .category("BankNode").path(",DataNodeHead,").basicInfo(dataNodeBasicInfo)
                 .build();
-        // 根节点(1)
+        // 岸段根节点(1)
         dataNodeServiceV2.save(dataNode);
+
         // 静态数据节点(2)
         dataNodeServiceV2.addDataGroupNode(bank, "StaticDataGroupOf"+bank, "StaticDataGroup", ",DataNodeHead,"+bank+"BankNode,");
         // 可视化数据节点(3)
@@ -173,7 +174,7 @@ public class BankResourceService {
         dataNodeServiceV2.addDataGroupNode(bank, "DEMTileDataGroupOf"+bank, "DEMTileDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",");
         dataNodeServiceV2.addDataGroupNode(bank, "VectorDataGroupOf"+bank, "VectorDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",VisualizationDataGroupOf"+bank+",");
         // 模型计算数据节点(3)
-        dataNodeServiceV2.addDataGroupNode(bank, "ModelDataG   roupOf"+bank, "ModelDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
+        dataNodeServiceV2.addDataGroupNode(bank, "ModelDataGroupOf"+bank, "ModelDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
         // 水动力，边界，dem，配置数据节点(4)
         dataNodeServiceV2.addDataGroupNode(bank, "HydrodynamicDataGroupOf"+bank, "HydrodynamicDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
         dataNodeServiceV2.addDataGroupNode(bank, "BoundaryDataGroupOf"+bank, "BoundaryDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
@@ -182,9 +183,11 @@ public class BankResourceService {
         // 信息数据节点(3)
         dataNodeServiceV2.addDataGroupNode(bank, "InformationDataGroupOf"+bank, "InformationDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
         // 图片，文本，pdf数据节点(4)
-        dataNodeServiceV2.addDataGroupNode(bank, "PictureDataGroupOf"+bank, "PictureDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",PictureDataGroupOf"+bank+",");
-        dataNodeServiceV2.addDataGroupNode(bank, "TextDataGroupOf"+bank, "TextDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",TextDataGroupOf"+bank+",");
-//        dataNodeServiceV2.addDataGroupNode(bank, "PdfDataGroupOf"+bank, "PdfDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",PdfServerDataGroupOf"+bank+",");
+        dataNodeServiceV2.addDataGroupNode(bank, "PictureDataGroupOf"+bank, "PictureDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",InformationDataGroupOf"+bank+",");
+        dataNodeServiceV2.addDataGroupNode(bank, "TextDataGroupOf"+bank, "TextDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",InformationDataGroupOf"+bank+",");
+        // 断面数据节点(3)
+        dataNodeServiceV2.addDataGroupNode(bank, "SectionDataGroupOf"+bank, "SectionDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
+
         // 设备数据节点（2）
         dataNodeServiceV2.addDataGroupNode(bank, "RealtimeDeviceGroupOf"+bank, "RealtimeDeviceGroup",",DataNodeHead,"+bank+"BankNode,");
         // 四种设备数据节点（3）
@@ -277,8 +280,9 @@ public class BankResourceService {
             return "数据资源 "+name+" 已存在！请更换名称";
         }
         String filePath = pictureDataPath + "/" + bank;
-        FileUtil.storeFile(file, filePath);
-        usage.put("path", "/"+bank+"/");usage.put("name",file.getOriginalFilename());
+        String storeFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
+        FileUtil.storeFile(file, filePath, storeFileName);
+        usage.put("path", "/"+bank);usage.put("name",storeFileName);
         DataNodeV2 pictureDataNode = DataNodeV2.dataNodeBuilder()
                 .bank(bank).auth("all").name(name).category("PictureDataItem")
                 .usage(usage).basicInfo(info)
@@ -305,12 +309,13 @@ public class BankResourceService {
         if (Objects.equals(pictureDataNode.getName(), infoName)) {
             return "数据资源 "+name+" 已存在！请更换名称";
         }
-        String filePath = pictureDataNode.getUsage().getString("path");
+        String filePath = pictureDataPath + pictureDataNode.getUsage().getString("path");
         String fileName = pictureDataNode.getUsage().getString("name");
-        FileUtil.deleteFile(new File(pictureDataPath+filePath+fileName));
-        FileUtil.storeFile(file, pictureDataPath+filePath);
+        FileUtil.deleteFile(new File(filePath+"/"+fileName));
+        String storeFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
+        FileUtil.storeFile(file, filePath, storeFileName);
         JSONObject usage = new JSONObject();
-        usage.put("path", "/"+bank+"/"); usage.put("name",file.getOriginalFilename());
+        usage.put("path", "/"+bank+"/"); usage.put("name",storeFileName);
         pictureDataNode.setUsage(usage);
         pictureDataNode.setBasicInfo(info);
         pictureDataNode.setName(String.valueOf(infoName == null ? name : infoName ));
@@ -328,7 +333,7 @@ public class BankResourceService {
         }
         String filePath = pictureDataNode.getUsage().getString("path");
         String fileName = pictureDataNode.getUsage().getString("name");
-        FileUtil.deleteFile(new File(pictureDataPath+filePath+fileName));
+        FileUtil.deleteFile(new File(pictureDataPath+filePath+"/"+fileName));
         dataNodeRepoV2.deleteById(pictureDataNode.getId());
         return "静态图片资源 "+name+" 删除完成！";
     }
@@ -632,7 +637,12 @@ public class BankResourceService {
         String paramsJsonString = JSON.toJSONString(params);
         System.out.println(paramsJsonString);
         // 将 JSON 字符串写入文件
-        String jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", type);
+        String jsonFolderPath;
+        if (type.equals("template")) {
+            jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", "RiskLevel");
+        } else {
+            jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", type);
+        }
 
         // 确保目录存在
         Path path = Paths.get(jsonFolderPath);
@@ -647,11 +657,17 @@ public class BankResourceService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String zipFileName = ZipUtil.zipFolder(new File(jsonFolderPath));
-        System.out.println(zipFileName);
+//        String zipFileName = ZipUtil.zipFolder(new File(jsonFolderPath));
+//        System.out.println(zipFileName);
+//
+//        System.out.println(info);
+//        modelServerService.uploadCalculateResourceData(FileUtil.convertFileToMultipartFile(new File(zipFileName)), new JSONObject(info));
 
-        System.out.println(info);
-        modelServerService.uploadCalculateResourceData(FileUtil.convertFileToMultipartFile(new File(zipFileName)), new JSONObject(info));
+        String typeName = type;
+        if (Objects.equals(type, "PQ")) {
+            typeName = "pq";
+        }
+        modelServerService.uploadCalculateResourceData(ZipUtil.zipFolderAndGetAsMultipartFileV2(jsonFolderPath, typeName), JSONObject.from(info));
 
         return "";
     }
