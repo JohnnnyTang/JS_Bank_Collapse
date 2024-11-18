@@ -28,7 +28,8 @@
                     :http-request="handleFileUpload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
-                        <em>拖拽文件至此处</em>或<em>点击</em>进行上传
+                        拖拽文件至此或点击进行上传,
+                        请上传<em>符合要求</em>的文件！
                     </div>
                 </el-upload>
 
