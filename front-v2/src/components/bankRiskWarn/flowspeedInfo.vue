@@ -24,6 +24,7 @@
             <div
                 class="graph-container flowspeed"
                 id="flowspeed-chart-container"
+                v-show="hasData === true"
             >
                 <div
                     id="flowspeed-chart"
@@ -33,7 +34,11 @@
                     element-loading-background="rgba(255, 255, 255, 0.4)"
                 ></div>
             </div>
+            <div class="blank-graph" v-show="hasData === false">
+                <span v-if="true" style="z-index: 10">暂无数据</span>
+            </div>
         </div>
+
         <div class="riskInfo-item flowfield">
             <div class="item-title">流场信息：</div>
         </div>
@@ -45,15 +50,19 @@ import * as echarts from 'echarts'
 import { ref, onMounted, watch, toRaw } from 'vue'
 import { drawFlowspeedGraph } from './util.js'
 import { useHydrodynamicStore } from '../../store/modelStore'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 
 const hydrodynamicStore = useHydrodynamicStore()
 
 const props = defineProps(['status', 'flowspeedChartLoad', 'timeStep'])
 
+const route = useRoute()
+
 const emit = defineEmits(['handleDrawEvent'])
 
 let chartIns = null
 const flowspeedGraphRef = ref(null)
+const hasData = ref(false)
 
 const drawButtonClickHandler = () => {
     emit('handleDrawEvent')
@@ -114,6 +123,7 @@ const getTideLineDataOption = (data) => {
 }
 
 const updateData = (data) => {
+    hasData.value = true
     console.log(data)
     let tideLineOption = getTideLineDataOption(data)
     hydrodynamicStore.showingOption = tideLineOption
@@ -210,7 +220,19 @@ onMounted(() => {
         },
     )
 
-    updateData(defaultData)
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        updateData(defaultData)
+    }
+})
+
+onBeforeRouteUpdate(() => {
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        updateData(defaultData)
+    } else {
+        hasData.value = false
+    }
 })
 
 defineExpose({

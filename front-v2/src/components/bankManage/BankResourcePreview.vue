@@ -333,12 +333,12 @@ const commitModify = () => {
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
             "center": center,
-            "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val,
-            "introduction": nowBasicInfo[4].val,
+            "monitorLength": nowBasicInfo[1].val,
+            "monitorStartTime": nowBasicInfo[2].val,
+            "introduction": nowBasicInfo[3].val,
             "management": {
-                "department": nowBasicInfo[5].val,
-                "contact": nowBasicInfo[6].val,
+                "department": nowBasicInfo[4].val,
+                "contact": nowBasicInfo[5].val,
             }
         }
         const updateMsg = (await BankResourceHelper.updateBankBasicInfo(bank.bankEnName, ReqBody)).data

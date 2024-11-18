@@ -4,9 +4,12 @@
         <div
             class="graph-container"
             id="water-chart-container"
-            v-loading="props.waterProcessChartLoad"
+            v-show="hasData === true"
         >
             <div id="water-chart" class="graph" ref="chartDom"></div>
+        </div>
+        <div class="blank-graph" v-show="hasData === false">
+            <span v-if="true" style="z-index: 10">暂无数据</span>
         </div>
     </div>
 </template>
@@ -14,6 +17,7 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 
 const props = defineProps(['waterProcessChartLoad', 'timeStep'])
 
@@ -24,7 +28,11 @@ const hour = [
     21, 22, 23, 24, 25,
 ]
 
+const hasData = ref(false)
+const route = useRoute()
+
 const updateData = (data) => {
+    hasData.value = true
     let us = data[0].us
     let vs = data[0].vs
     waterProcessData.flood = []
@@ -40,33 +48,61 @@ const updateData = (data) => {
 }
 
 const waterProcessData = {
+    // flood: [
+    //     [0, 1.90906518],
+    //     [1, 1.625544928],
+    //     [2, 1.361989229],
+    //     [3, 1.15482551],
+    //     [4, 1.002231171],
+    //     [5, 1.430845246],
+    //     [6, 2.648756158],
+    //     [7, 3.300643076],
+    //     [8, 3.213302443],
+    //     [9, 2.918754921],
+    //     [10, 2.497299605],
+    //     [11, 2.090891478],
+    //     [12, 1.860660024],
+    //     [13, 1.618100393],
+    //     [14, 1.366590593],
+    //     [15, 1.15848487],
+    //     [16, 1.010662534],
+    //     [17, 1.412416559],
+    //     [18, 2.708489015],
+    //     [19, 3.495843863],
+    //     [20, 3.470899626],
+    //     [21, 3.164357677],
+    //     [22, 2.729099025],
+    //     [23, 2.275285539],
+    //     [24, 2.016365196],
+    //     [25, 1.75218237],
+    // ],
     flood: [
-        [0, 1.90906518],
-        [1, 1.625544928],
-        [2, 1.361989229],
-        [3, 1.15482551],
-        [4, 1.002231171],
-        [5, 1.430845246],
-        [6, 2.648756158],
-        [7, 3.300643076],
-        [8, 3.213302443],
-        [9, 2.918754921],
-        [10, 2.497299605],
-        [11, 2.090891478],
-        [12, 1.860660024],
-        [13, 1.618100393],
-        [14, 1.366590593],
-        [15, 1.15848487],
-        [16, 1.010662534],
-        [17, 1.412416559],
-        [18, 2.708489015],
-        [19, 3.495843863],
-        [20, 3.470899626],
-        [21, 3.164357677],
-        [22, 2.729099025],
-        [23, 2.275285539],
-        [24, 2.016365196],
-        [25, 1.75218237],
+        [0, 1.177477534324139],
+        [1, 1.092623638956984],
+        [2, 0.7210100692022892],
+        [3, 0.29489468826911713],
+        [4, 0.4268398009005054],
+        [5, 0.72291879322842],
+        [6, 0.951953042623343],
+        [7, 1.0907210949756885],
+        [8, 1.0486951862033644],
+        [9, 0.9892185516800777],
+        [10, 1.0353345182536344],
+        [11, 1.0811788586090547],
+        [12, 1.1129340179191316],
+        [13, 0.9931198990799803],
+        [14, 0.46312335118327413],
+        [15, 0.06551284870124045],
+        [16, 0.3067345619501316],
+        [17, 0.5054249147922384],
+        [18, 0.735728339142784],
+        [19, 0.9700684851176283],
+        [20, 0.9292940484071809],
+        [21, 1.014733830759462],
+        [22, 1.1111930601365585],
+        [23, 1.1297899229819577],
+        [24, 1.1633545165477452],
+        [25, 1.1892621165683155],
     ],
 }
 
@@ -161,14 +197,25 @@ const option = {
 }
 
 let chart
-let maxVal
-let minVal
 
 onMounted(() => {
     chart = echarts.init(chartDom.value)
-    maxVal = Math.max(...waterProcessData['flood'])
-    minVal = Math.min(...waterProcessData['flood'])
-    chart.setOption(option)
+
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        chart.setOption(option)
+        hasData.value = true
+    }
+})
+
+onBeforeRouteUpdate(() => {
+    let bk = route.params.id
+    if (bk === 'Mzs') {
+        chart.setOption(option)
+        hasData.value = true
+    } else {
+        hasData.value = false
+    }
 })
 
 watch(
@@ -236,8 +283,18 @@ div.water-chart-container {
         #water-chart {
             width: 25vw;
             height: 20.5vh;
-            
         }
+    }
+
+    div.blank-graph {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #055279;
+        display: flex;
+        width: 100%;
+        height: calc(100% - 4.2vh);
+        background: rgb(208, 236, 255);
     }
 }
 </style>

@@ -142,6 +142,10 @@ const inputValues = ref({
     speed: ''
 });
 
+const newBackendInstance = axios.create({
+    baseURL: '/model/'
+})
+
 const emit = defineEmits(['profileValueChange'])
 
 const props = defineProps({
@@ -164,20 +168,6 @@ const cancelEditData = () => {
 }
 
 const editData = async() => {
-    // if (!isNaN(inputSpeedList.value) && inputSpeedList.value !== '') {
-    //     speedList.value[profileValue.value - 1] = parseFloat(inputSpeedList.value);
-    // }
-    // if (!isNaN(inputGaochaList.value) && inputGaochaList.value !== '') {
-    //     gaochaList.value[profileValue.value - 1] = parseFloat(inputGaochaList.value);
-    // }
-    // if (inputPobiList.value !== '') {
-    //     pobiList.value[profileValue.value - 1] = inputPobiList.value;
-    // }
-    // localStorage.setItem('speedList', JSON.stringify(speedList.value));
-    // localStorage.setItem('gaochaList', JSON.stringify(gaochaList.value));
-    // localStorage.setItem('pobiList', JSON.stringify(pobiList.value));
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
     // console.log(selectedLabel.value)
     console.log("输入的内容:", inputValues.value)
     try {
@@ -187,7 +177,7 @@ const editData = async() => {
             text: inputValues.value
         }
         formDataTableUpdate.append('data', JSON.stringify(data))
-        const responseUpdate = await axios.put(`http://172.21.212.166:8989/api/v2/data/bankResource/update/local/resource/text/${bank}/${selectedLabel.value}`, data, {
+        const responseUpdate = await newBackendInstance.put(`/data/bankResource/update/local/resource/text/${bank}/${selectedLabel.value}`, data, {
             headers: {
                 'Content-Type': 'application/json', // 设置请求头为 application/json
             },
@@ -212,7 +202,7 @@ const editClickHandler = async() => {
             text: selectedLabel.value
         };
         formDataTextUp.append('info', JSON.stringify(info));
-        const responseUp = await axios.post(`http://172.21.212.166:8989/api/v2/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp, {
+        const responseUp = await newBackendInstance.post(`/data/bankResource/up/local/resource/${bank}/text`, formDataTextUp, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -227,7 +217,7 @@ const editClickHandler = async() => {
 
 const getSectionData = async () => {
     try {
-        const response = await axios.get(`http://172.21.212.166:8989/api/v2/data/bankResource/bank/text?bank=${bank}`);
+        const response = await newBackendInstance.get(`/data/bankResource/bank/text?bank=${bank}`);
         const data = response.data;
         console.log("获取断面数据的是:", selectedLabel.value)
         const textItem = data.find(item => item.name === selectedLabel.value);
