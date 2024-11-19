@@ -27,9 +27,6 @@
                     :on-preview="handlePreview" :on-remove="handleRemove" :on-change="handleFileChange" accept=".zip"
                     :http-request="handleFileUpload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                    <!-- <div class="el-upload__text">
-                        {{ uploadDescription }}
-                    </div> -->
                     <div class="el-upload__text" v-html="uploadDescription"></div>
                 </el-upload>
 
@@ -69,6 +66,10 @@ const props = defineProps({
     bankEnName: {
         type: String,
         default: 'Mzs'
+    },
+    attachInfo: {
+        type: Object,
+        default: {}
     }
 })
 const dialogRef = ref(null)
@@ -76,7 +77,12 @@ const dialogRef = ref(null)
 const resourceStore = useResourceStore()
 
 
-
+watch(() => props.attachInfo, (val, oldVal) => {
+    console.log('attachInfo changed', val)
+    if(val.configRadioValue) { //从配置列表中的占位行点击了上传
+        dialogInfo.value[props.type][props.subType][1].value = val.configRadioValue
+    }
+})
 
 
 ///////////////// special //////////////////
@@ -105,14 +111,6 @@ const uploadingStart = () => {
     })
     dialogFormVisible.value = false
 }
-// let loadingInstance = null
-// watch(upLoading, (val) => {
-//     if (val) {
-//         loadingInstance = ElLoading.service({ target: '.dialog-class', text: '正在上传中...', lock: true, background: 'rgba(255, 255, 255, 0.715)', parent: dialogRef.value })
-//     } else {
-//         loadingInstance.close()
-//     }
-// })
 
 const handlePreview = (file) => {
     console.log('preview! ', file)
@@ -128,6 +126,9 @@ const handleFileChange = (file) => {
 }
 const handleFileUpload = (file) => {
     console.log('handleFileUpload!!', file, fileList.value)
+
+    console.log(props.type, props.subType)
+    console.log(dialogInfo.value[props.type][props.subType])
 
     if (props.type === 'device') {
         // 前端解析json后构建请求体
@@ -166,6 +167,8 @@ const handleFileUpload = (file) => {
         // 上传文件至后端
         upLoading.value = true
         uploadingStart()
+
+
         ///// file info 
         const fileInfo = parseInfoFromArray(dialogInfo.value[props.type][props.subType])
         if (!fileInfo) {
@@ -198,6 +201,29 @@ const handleFileUpload = (file) => {
                 normalFailCallback(err)
             })
         } else {
+
+            if (props.subType == 'Config') {
+                let _realSubType = "Boundary"
+                if (dialogInfo.value[props.type][props.subType][1].value === _realSubType) {
+                    const _name = dialogInfo.value[props.type][props.subType][0].value ?
+                        dialogInfo.value[props.type][props.subType][0].value : 'Boundary'
+                    const info = {
+                        'name': _name,
+                        'fileType': fileTypeDict[props.type][_realSubType],
+                        'segment': props.bankEnName,
+                        'category': _realSubType,
+                        'year': '2023',// 写死了, 参数文件应不必要年份月份
+                        'month': '04', // 写死了, 参数文件应不必要年份月份
+                        'set': 'standard',// 工况集这个概念前端体现不明显, 默认standard
+                        'description': '',
+                    }
+                    console.log(info)
+                    // 更新info
+                    formData.delete('info')
+                    formData.append('info', JSON.stringify(info))
+                }
+            }
+
             BankResourceHelper.uploadBankCalculateResourceFile(formData).then(res => {
                 normalSuccessCallback(res)
             }).catch(err => {
@@ -259,10 +285,11 @@ const stringToHTML = (str) => {
 }
 
 const uploadDescription = computed(() => {
-    if(props.type === 'model' && props.subType === 'Config'){
-
-        console.log(dialogInfo.value[props.type][props.subType])
-        stringToHTML(uploadDescriptionMap[props.type][props.subType][0]).innerHTML
+    if (props.type === 'model' && props.subType === 'Config') {
+        if (dialogInfo.value[props.type][props.subType][1].value === "Boundary") {
+            return stringToHTML(uploadDescriptionMap[props.type][props.subType][1]).innerHTML
+        }
+        return stringToHTML(uploadDescriptionMap[props.type][props.subType][0]).innerHTML
     }
     return stringToHTML(uploadDescriptionMap[props.type][props.subType]).innerHTML
 })

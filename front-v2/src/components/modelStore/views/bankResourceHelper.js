@@ -17,6 +17,7 @@ axiosIns.interceptors.response.use((response) => {
 })
 
 
+
 const axiosIns4Device = axios.create({
     baseURL: "/model/data",
 })
@@ -117,6 +118,21 @@ export default class BankResourceHelper {
     }
     /**
      * 
+     * @param {string} bankEnName 
+     * @param {"short" | "long"} type 
+     */
+    static getBankSectionGeometry(bankEnName, type) {
+        const m = {
+            "short": 1,
+            "long": 2
+        }
+        return axiosIns.get(`/down/section/resource/${bankEnName}/info/${m[type]}`)
+    }
+
+
+
+    /**
+     * 
      * @param {FormData} formData 
      */
     static uploadBankCalculateResourceFile(formData) {
@@ -129,6 +145,8 @@ export default class BankResourceHelper {
     static uploadBankSectionResourceFile(formData) {
         return axiosIns.post(`/up/section/resource/file`, formData)
     }
+
+
 
     static updateBankCalculateResourceFile(dataType, bankEnName, fileInput, fileInfo) {
 
@@ -332,6 +350,8 @@ export default class BankResourceHelper {
                     const _demList = BankResourceHelper.DEMResourcetoList(_ogDEM)
                     const demList = BankResourceHelper.prepareData(_demList, 'DEM')
                     proxy[_proxyCategoryDICI['model']][0]['resourceList'] = demList
+
+                    notEnoughDataNotice['DEM'](_ogDEM)
                 },
                 'Config': async () => {
                     // const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
@@ -346,6 +366,7 @@ export default class BankResourceHelper {
                     const confList = BankResourceHelper.prepareData(_confList, 'Config')
                     proxy[_proxyCategoryDICI['model']][1]['resourceList'] = confList
 
+                    notEnoughDataNotice['Config'](confList)
                 },
                 'Section': async () => {
                     // const _ogSection = (await BankResourceHelper.getBankCalculateResourceList('Section', bankEnName)).data
@@ -357,6 +378,8 @@ export default class BankResourceHelper {
                     const sectionList = BankResourceHelper.prepareData(_sectionList, 'Section')
                     proxy[_proxyCategoryDICI['model']][2]['resourceList'] = sectionList
 
+
+                    notEnoughDataNotice['Section'](sectionList)
                 },
                 'Boundary': async () => {
                     // const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', bankEnName)).data
@@ -375,6 +398,7 @@ export default class BankResourceHelper {
                     const hydroList = BankResourceHelper.prepareData(_hydroList, 'Hydrodynamic')
                     proxy[_proxyCategoryDICI['model']][3]['resourceList'] = hydroList
 
+                    notEnoughDataNotice['Hydrodynamic'](_hydroList)
                 },
 
             },
@@ -542,7 +566,9 @@ export default class BankResourceHelper {
         return result
     }
 
-
+    static notEnoughDataNotice(data, type) {
+        notEnoughDataNotice[type](data)
+    }
 
 }
 
@@ -598,4 +624,36 @@ const preccessing = {
 
         return hydroList
     },
+}
+
+
+const notEnoughDataNotice = {
+    'DEM': (demList) => {
+        if (demList.length < 2) {
+            ElMessage.warning({
+                offset: 120,
+                message: '请至少上传两年的地形文件以支撑综合研判！'
+            })
+        }
+    },
+    'Config': (data) => {
+        if (data.length < 3) {
+            ElMessage.warning({
+                offset: 120,
+                message: '请配置或上传三类模型参数文件以支撑综合研判！'
+            })
+        }
+    },
+    'Section': () => {
+
+    },
+    'Hydrodynamic': (data) => {
+        if (data.length < 6) {
+            ElMessage.warning({
+                offset: 120,
+                message: '请配置或上传两级流量的大中小潮条件下的预算工况以支撑综合研判！'
+            })
+        }
+    }
+
 }

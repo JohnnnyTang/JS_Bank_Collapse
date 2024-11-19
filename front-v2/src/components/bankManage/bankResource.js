@@ -493,7 +493,7 @@ export const resourceUploadNeeded = {
                 type: 'radios',
                 radioLabelArray: ['造床流量系数', '权重阈值参数', '岸段边界文件'],
                 required: true,
-                radioValueArray: ['PQ', 'template', 'boundary']
+                radioValueArray: ['PQ', 'template', 'Boundary']
             },
             {
                 label: '模型配置文件',
@@ -766,7 +766,7 @@ export const uploadDescriptionMap = {
         'DEM': '请上传打包为ZIP的<em>TIFF地形文件</em>，文件应<em>以年份月份命名</em>，如：202304.zip',
         'Config': [
             '请上传打包为ZIP的<em>JSON模型参数文件</em>，文件应<em>与配置文件同名</em>，如：pq.zip, template.zip',
-            '请上传打包为ZIP的<em>ESRI Shapefile</em>或<em>GeoJSON文件</em>，文件内容应至少包含shp，dbf，shx等文件'
+            '请上传打包为ZIP的<em>GeoJSON岸段边界矢量面文件</em>，如：boundary.zip'
         ],
         'Section': '请上传打包为ZIP的<em>ESRI Shapefile文件</em>，文件内容应至少包含shp，dbf，shx等文件',
         'Hydrodynamic': '请上传打包为ZIP的<em>预算水动力工况文件</em>，文件内容应包含fort.14, fort.63, fort.64等文件',

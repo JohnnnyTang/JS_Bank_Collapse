@@ -162,7 +162,7 @@
     </div>
 
     <UploadDialog ref="uploadDialogRef" :type="uploadDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
-        :bank-en-name="uploadDialogBaseInfo.bankEnName"></UploadDialog>
+        :bank-en-name="uploadDialogBaseInfo.bankEnName" :attach-info="uploadAttachInfo"></UploadDialog>
 
     <UpdateDialog ref="updateDialogRef" :type="updateDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
         :bank-en-name="updateDialogBaseInfo.bankEnName" :resource-item-info="updateDialogBaseInfo.itemInfo"></UpdateDialog>
@@ -404,6 +404,7 @@ const resourceInfo = ref({})
 
 ///////////// bank resource upload
 const uploadDialogRef = ref(null)
+const uploadAttachInfo = ref({})
 const uploadDialogBaseInfo = computed(() => {
     return {
         type: typeDict[nowTypeIndex.value],
@@ -414,7 +415,6 @@ const uploadDialogBaseInfo = computed(() => {
 
 const resourceUploadClickHandler = (resourceTypeIndex) => {
     nowSubTypeIndex.value = resourceTypeIndex
-    console.log(uploadDialogBaseInfo.value)
     uploadDialogRef.value.dialogFormVisible = true
 }
 
@@ -471,7 +471,18 @@ const settingRow = (rowIndex, resourceTypeIndex, info) => {
     showSetDialog.value = true
 }
 const uploadRow = (rowIndex, resourceTypeIndex, info) => {
-    console.log('click upload from row')
+    console.log('click upload from row', info, resourceTypeIndex)
+
+    const configRadioMap = {
+        "岸段边界文件": "Boundary",
+        "造床流量系数": "PQ",
+        "权重阈值参数": "template",
+    }
+    if ("模型参数文件" === resourceInfo.value[categoryNameDict[nowTypeIndex.value]][resourceTypeIndex].key) {
+        uploadAttachInfo.value = {
+            "configRadioValue": configRadioMap[info.name],
+        }
+    }
     resourceUploadClickHandler(resourceTypeIndex)
 }
 const deleteRow = (rowIndex, resourceTypeIndex, info) => {
@@ -558,10 +569,25 @@ const updateRow = (rowIndex, resourceTypeIndex, info) => {
 }
 
 
+
+
+
 const loading = ref(false)
 onMounted(async () => {
     const _thisBankEnName = route.params.id
     await initOneBank(_thisBankEnName)
+
+    window.addEventListener('keydown', E => {
+        if (E.key === 'e') {
+            // BankResourceHelper.getBankSectionGeometry(bank.bankEnName, "short").then(res => {
+            //     console.log(res.data)
+            // })
+            ElMessage.success({
+                'offset': 100,
+                'message': 'e键按下'
+            })
+        }
+    })
 
     // for refresh
     watch(() => resourceStore.resourceInfo, (newVal, oldVal) => {
@@ -623,7 +649,7 @@ const initOneBank = async (bankEnName) => {
             calculate: false,
             set: true,
             update: false,
-            delete: true,
+            delete: false,
             resourceList: confList
         },
         {
@@ -851,6 +877,7 @@ const handleSetConfirm = async () => {
         info.name = 'PQ'
         BankResourceHelper.handleModelParamsUpload(PQData, 'PQ', info).then(res => {
             ElMessage.success({ message: '上传成功！', offset: 100 })
+            BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, bank.bankEnName, 'model', 'Config')
         }).catch(e => {
             ElMessage.error({ message: '上传失败！', offset: 100 })
         })
@@ -859,6 +886,7 @@ const handleSetConfirm = async () => {
         info.name = 'template'
         BankResourceHelper.handleModelParamsUpload(setThresholdFormRef.value.thresholdParmas, 'template', info).then(res => {
             ElMessage.success({ message: '上传成功！', offset: 100 })
+            BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, bank.bankEnName, 'model', 'Config')
         }).catch(e => {
             ElMessage.error({ message: '上传失败！', offset: 100 })
         })
