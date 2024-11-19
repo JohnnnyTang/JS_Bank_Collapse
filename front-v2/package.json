@@ -39,6 +39,7 @@
     "pinia": "^2.1.7",
     "pinia-plugin-persist": "^1.0.0",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "pinyin-pro": "^3.26.0",
     "prettier": "^3.2.5",
     "proj4": "^2.11.0",
     "punycode": "^2.3.1",

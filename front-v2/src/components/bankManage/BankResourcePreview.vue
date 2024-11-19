@@ -85,8 +85,8 @@
         </div>
 
         <div class="resource-box-container">
-            <div class="one-type-resource-container" v-for="(key, resourceCatogoryIndex) in  Object.keys(resourceInfo)  " :key="resourceCatogoryIndex"
-                :ref=handleRef>
+            <div class="one-type-resource-container" v-for="(key, resourceCatogoryIndex) in  Object.keys(resourceInfo)  "
+                :key="resourceCatogoryIndex" :ref=handleRef>
                 <div class="title-container">
                     <span @click="typeIndexChange(0)" class="page left" :class="{ ban: nowTypeIndex === 0 }">上一页</span>
                     <span>{{ key }}</span>
@@ -102,8 +102,7 @@
                                 <div class="resource-caculate-btn" v-show="item.calculate"
                                     @click="resourceCaculateClickHandler">计算
                                 </div>
-                                <div class="resource-set-btn" v-show="item.set"
-                                    @click="handleSetClick">设置
+                                <div class="resource-set-btn" v-show="item.set" @click="handleSetClick">设置
                                 </div>
                                 <div class="resource-upload-btn" v-show="item.upload"
                                     @click="resourceUploadClickHandler(resourceTypeIndex)">上传
@@ -111,16 +110,16 @@
                             </div>
                             <div class="resource-content">
 
-                                <el-table :data="item.resourceList" style="width: 95%; margin-left: 2.5%;"
-                                    max-height="25vh">
+                                <el-table :data="item.resourceList" style="width: 95%; margin-left: 2.5%;" max-height="25vh"
+                                    :row-class-name="tableRowClassName">
                                     <el-table-column label="序号" align="center" :min-width="20">
                                         <template #default="scope">
                                             {{ scope.$index + 1 }}
                                         </template>
                                     </el-table-column>
-                                    <el-table-column v-for="(  column, index  ) in  tableColumnInfo[key]  " :key="index"
-                                        :prop="column.prop" :label="column.label" :min-width="column['min-width']"
-                                        align="center">
+                                    <el-table-column v-for="(  column, index  ) in  tableColumnInfo[key][item.key]  "
+                                        :key="index" :prop="column.prop" :label="column.label"
+                                        :min-width="column['min-width']" align="center">
                                         <template #default="scope" v-if="column.asTag">
                                             <div style="display: flex; align-items: center;justify-content: center;">
                                                 <el-tag>{{ scope.row.fileType }}</el-tag>
@@ -129,13 +128,23 @@
                                     </el-table-column>
 
                                     <el-table-column fixed="right" label="操作" min-width="20%" align="center"
-                                        v-if="item.delete || item.update">
+                                        v-if="(item.delete || item.update)">
                                         <template #default="scope">
-                                            <el-button link type="danger" size="small" v-if="item.delete"
+                                            <el-button link type="primary" size="small" v-if="scope.row.setting"
+                                                @click.prevent="settingRow(scope.$index, resourceTypeIndex, scope.row)">
+                                                设置
+                                            </el-button>
+                                            <el-button link type="primary" size="small" v-if="scope.row.upload"
+                                                @click.prevent="uploadRow(scope.$index, resourceTypeIndex, scope.row)">
+                                                上传
+                                            </el-button>
+                                            <el-button link type="danger" size="small"
+                                                v-if="item.delete && !scope.row.placeHolder"
                                                 @click.prevent="deleteRow(scope.$index, resourceTypeIndex, scope.row)">
                                                 删除
                                             </el-button>
-                                            <el-button link type="warning" size="small" v-if="item.update"
+                                            <el-button link type="warning" size="small"
+                                                v-if="item.update && !scope.row.placeHolder"
                                                 @click.prevent="updateRow(scope.$index, resourceTypeIndex, scope.row)">
                                                 更新
                                             </el-button>
@@ -160,29 +169,25 @@
 
     <!-- 弹出对话框 -->
 
-    <el-dialog 
-        v-model="showSetDialog" 
-        style="height: 60vh;width: 30vw;overflow-y: scroll;"
-        :show-close="false"
-    >
+    <el-dialog v-model="showSetDialog" style="height: 60vh;width: 30vw;overflow-y: scroll;" :show-close="false">
         <div class="form-header">
-            模型参数设置
+            {{ selectedValue === 'PQ' ? '造床流量系数设置' : '权重阈值参数设置' }}
         </div>
 
-        <div style="display: flex;justify-content: center;">
+        <!-- <div style="display: flex;justify-content: center;">
             <el-form :model="modelParamsInfoData" style="margin-top: 3vh;width: 20vw;" class="custom">
-                <el-form-item v-for="index in modelParamsInfoRange" :key="index" :label="modelParamsInfoData[index][0]" label-width="4vw">
+                <el-form-item v-for="index in modelParamsInfoRange" :key="index" :label="modelParamsInfoData[index][0]"
+                    label-width="4vw">
                     <input v-model="modelParamsInfoData[index][1]" type="text" />
                 </el-form-item>
             </el-form>
-        </div>
-        
+        </div> -->
 
         <!-- 初始值选择项 -->
-        <div class="set-radio-group-container">
+        <div class="set-radio-group-container" v-if="intoTheSetDialogByTitleButton">
             <el-radio-group v-model="selectedValue" style="margin-top: 10px;">
-                <el-radio value="PQ" size="large">造床流量指标</el-radio>
-                <el-radio value="template" size="large">风险阈值和指标权重</el-radio>
+                <el-radio value="PQ" size="large">造床流量系数</el-radio>
+                <el-radio value="template" size="large">权重阈值参数</el-radio>
             </el-radio-group>
         </div>
 
@@ -198,7 +203,7 @@
             </el-form>
         </div>
 
-        <SetThresholdForm ref="setThresholdFormRef" v-if="selectedValue == 'template'"/>
+        <SetThresholdForm ref="setThresholdFormRef" v-if="selectedValue == 'template'" />
 
         <template #footer>
             <div class="dialog-footer">
@@ -217,7 +222,7 @@ import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue'
 import { useResourceStore } from '../../store/resourceStore'
 import axios from 'axios';
-import { defaultTableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
+import { initialTableDatas, tableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
 // import UploadDialog from './UploadDialog.vue'
 import UploadDialog from './uploadDialog.vue'
 import UpdateDialog from './updateDialog.vue'
@@ -443,9 +448,32 @@ const resourceItemUpdateClickHandler = () => {
 
 
 ///////////// bank resource table operation
-const tableColumnInfo = defaultTableColumns
+const tableColumnInfo = tableColumns
 
-
+const tableRowClassName = ({
+    row,
+    rowIndex,
+}) => {
+    if (row.placeHolder) {
+        return 'placeholder-row'
+    }
+    return ''
+}
+const settingRow = (rowIndex, resourceTypeIndex, info) => {
+    console.log('click setting from row', console.log(info))
+    if (info.placeHolder) {
+        if (info.name === "造床流量系数")
+            selectedValue.value = 'PQ'
+        else if (info.name === "权重阈值参数")
+            selectedValue.value = 'template'
+    }
+    intoTheSetDialogByTitleButton.value = false
+    showSetDialog.value = true
+}
+const uploadRow = (rowIndex, resourceTypeIndex, info) => {
+    console.log('click upload from row')
+    resourceUploadClickHandler(resourceTypeIndex)
+}
 const deleteRow = (rowIndex, resourceTypeIndex, info) => {
 
     // console.log('now catogory index', nowTypeIndex.value)
@@ -474,13 +502,13 @@ const deleteRow = (rowIndex, resourceTypeIndex, info) => {
             case 'model':
                 let subType = resourceTypeDict[typeDict[nowTypeIndex.value]][resourceTypeIndex]
                 console.log('subType', subType)
-                if(subType == 'Section'){
+                if (subType == 'Section') {
                     BankResourceHelper.deleteSectionResourceFile(bank.bankEnName, info.name).then(res => {
                         console.log(res)
                     }).catch(e => {
                         console.warn(e)
                     })
-                }else{
+                } else {
                     BankResourceHelper.deleteBankCalculateResourceFile(subType, bank.bankEnName, info.name).then(res => {
                         console.log(res)
                     }).catch(e => {
@@ -512,14 +540,16 @@ const deleteRow = (rowIndex, resourceTypeIndex, info) => {
             'message': '删除成功！'
         })
 
+        let _type = typeDict[nowTypeIndex.value]
+        let _subType = resourceTypeDict[_type][resourceTypeIndex]
+        BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, bank.bankEnName, _type, _subType)
+
     }).catch(_ => {
         console.log('取消删除', _);
     })
 }
 const updateRow = (rowIndex, resourceTypeIndex, info) => {
-    // console.log('now catogory index', nowTypeIndex.value)
-    // console.log('now resource index', resourceTypeIndex)
-    // console.log('now item index', rowIndex)
+
     nowSubTypeIndex.value = resourceTypeIndex
     operatingResourceItem.value = info
 
@@ -543,6 +573,7 @@ onMounted(async () => {
 
 
 ////////////////// helper ///////////////////
+
 const initOneBank = async (bankEnName) => {
     loading.value = true
     const _thisBankEnName = bankEnName
@@ -550,14 +581,32 @@ const initOneBank = async (bankEnName) => {
 
     // // bank resource init
     const _ogDEM = (await BankResourceHelper.getBankCalculateResourceList('DEM', _thisBankEnName)).data
-    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', _thisBankEnName)).data
-    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', _thisBankEnName)).data
     const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', _thisBankEnName)).data
+    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', _thisBankEnName)).data
     const _ogSection = (await BankResourceHelper.getBankCalculateResourceList('Section', _thisBankEnName)).data
+    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', _thisBankEnName)).data
+
+    // prepare
+    const _demList = BankResourceHelper.DEMResourcetoList(_ogDEM)
+    const demList = BankResourceHelper.prepareData(_demList, 'DEM')
+
+    const _configList = BankResourceHelper.ConfigResourcetoList(_ogConfig)
+    const _boundList = BankResourceHelper.BoundaryResourcetoList(_ogBound)
+    const _confList = _configList.concat(_boundList)
+    const confList = BankResourceHelper.prepareData(_confList, 'Config')
+
+    const _sectionList = BankResourceHelper.SectionResourcetoList(_ogSection)
+    const sectionList = BankResourceHelper.prepareData(_sectionList, 'Section')
+
+    const _hydroList = BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
+    const hydroList = BankResourceHelper.prepareData(_hydroList, 'Hydrodynamic')
+
+
     // const _ogDEM = []
     // const _ogHydro = []
     // const _ogBound = []
     // const _ogConfig = []
+    // const _ogSection = []
     const _thisBankResourceInfo = [
         {
             key: '岸段地形资源',
@@ -566,7 +615,7 @@ const initOneBank = async (bankEnName) => {
             set: false,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.DEMResourcetoList(_ogDEM)
+            resourceList: demList
         },
         {
             key: '模型参数文件',
@@ -575,7 +624,7 @@ const initOneBank = async (bankEnName) => {
             set: true,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.ConfigResourcetoList(_ogConfig)
+            resourceList: confList
         },
         {
             key: '判别断面文件',
@@ -584,7 +633,7 @@ const initOneBank = async (bankEnName) => {
             set: false,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.SectionResourcetoList(_ogSection)
+            resourceList: sectionList
         },
         {
             key: '水动力预算工况',
@@ -593,17 +642,17 @@ const initOneBank = async (bankEnName) => {
             set: false,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
+            resourceList: hydroList
         },
-        {
-            key: '岸段边界矢量',
-            upload: true,
-            calculate: false,
-            set: false,
-            update: false,
-            delete: true,
-            resourceList: BankResourceHelper.BoundaryResourcetoList(_ogBound)
-        },
+        // {
+        //     key: '岸段边界矢量',
+        //     upload: true,
+        //     calculate: false,
+        //     set: false,
+        //     update: false,
+        //     delete: true,
+        //     resourceList: BankResourceHelper.BoundaryResourcetoList(_ogBound)
+        // },
     ]
 
     // visual resource init
@@ -711,6 +760,14 @@ const initOneBank = async (bankEnName) => {
     loading.value = false
 }
 
+
+
+
+
+
+
+
+
 ////////////////// set ///////////////////
 const showSetDialog = ref(false)
 
@@ -731,7 +788,7 @@ const PQData = reactive({
     2022: 1.10,
     2023: 0.0
 })
-const PQRange = ref([2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023])
+const PQRange = ref([2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023])
 
 const addPQData = () => {
     const nextYear = PQRange.value[PQRange.value.length - 1] + 1; // 获取下一年
@@ -746,8 +803,7 @@ const deletePQData = () => {
 
 // 当前选择的初始值
 const selectedValue = ref('PQ')
-
-const modelParamsInfoData =  reactive({
+const modelParamsInfoData = reactive({
     'year': ['年份', '2023'],
     'month': ['月份', '04'],
     'set': ['工况集', 'standard'],
@@ -756,14 +812,19 @@ const modelParamsInfoData =  reactive({
 
 const modelParamsInfoRange = ['year', 'month', 'set', 'description']
 
+const intoTheSetDialogByTitleButton = ref(false)
 const handleSetClick = () => {
+    intoTheSetDialogByTitleButton.value = true
     showSetDialog.value = true
 }
 
 const setThresholdFormRef = ref(null)
 
-const handleSetConfirm = async() => {
-
+const handleSetConfirm = async () => {
+    ElMessage.info({
+        message: '正在将参数上传至后台服务,请稍后...',
+        offset: 100
+    })
     const info = {
         'name': '',
         'fileType': 'json',
@@ -775,25 +836,32 @@ const handleSetConfirm = async() => {
         'description': modelParamsInfoData.description[1],
     }
 
-    console.log(info)
 
-    if(info.year == '' || info.month == '' || info.set == ''){
+    if (info.year == '' || info.month == '' || info.set == '') {
         ElMessage({
             message: '年份、月份、工况集为必填项',
             type: 'warning',
         })
-    }else{
+    } else {
         showSetDialog.value = false
     }
 
-    if(selectedValue.value == 'PQ'){
+    if (selectedValue.value == 'PQ') {
         console.log(toRaw(PQData))
         info.name = 'PQ'
-        await BankResourceHelper.handleModelParamsUpload(PQData, 'PQ', info)
-    }else{
+        BankResourceHelper.handleModelParamsUpload(PQData, 'PQ', info).then(res => {
+            ElMessage.success({ message: '上传成功！', offset: 100 })
+        }).catch(e => {
+            ElMessage.error({ message: '上传失败！', offset: 100 })
+        })
+    } else {
         console.log(toRaw(setThresholdFormRef.value.thresholdParmas))
         info.name = 'template'
-        await BankResourceHelper.handleModelParamsUpload(setThresholdFormRef.value.thresholdParmas, 'template', info)
+        BankResourceHelper.handleModelParamsUpload(setThresholdFormRef.value.thresholdParmas, 'template', info).then(res => {
+            ElMessage.success({ message: '上传成功！', offset: 100 })
+        }).catch(e => {
+            ElMessage.error({ message: '上传失败！', offset: 100 })
+        })
     }
 }
 
@@ -1209,6 +1277,7 @@ div.bank-resouce-create-container {
                                 background-color: rgb(93, 169, 255);
                             }
                         }
+
                         div.resource-caculate-btn {
                             position: absolute;
                             right: 7vw;
@@ -1228,6 +1297,7 @@ div.bank-resouce-create-container {
                                 background-color: rgb(93, 169, 255);
                             }
                         }
+
                         div.resource-set-btn {
                             position: absolute;
                             right: 7vw;
@@ -1317,9 +1387,10 @@ div.full {
 }
 
 .set-radio-group-container {
-  display: flex;
-  justify-content: center; /* 水平居中 */
-  margin-bottom: 2vh;
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    margin-bottom: 2vh;
 }
 
 div.form-header {
@@ -1331,6 +1402,7 @@ div.form-header {
     color: #0539a8;
     letter-spacing: .3rem;
     font-weight: 800;
+    margin-bottom: 1vh;
 }
 
 input {
@@ -1361,11 +1433,31 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
 }
+
 input[type="number"] {
     -moz-appearance: textfield;
 }
 
 .custom {
-  font-weight: bold;
+    font-weight: bold;
+}
+
+:deep(.el-table__row) {
+
+    --el-table-row-hover-bg-color: rgb(194, 206, 238);
+
+    &.placeholder-row {
+        background-color: rgb(214, 214, 214);
+        color: rgb(143, 143, 143);
+    }
+}
+
+:deep(.el-button.is-link) {
+    font-size: medium;
+    color: #375699;
+
+    &:hover {
+        color: #0051ff;
+    }
 }
 </style>

@@ -185,7 +185,7 @@ const normalSuccessCallback = (res) => {
     ElMessage.success({ message: '更新成功！', offset: 100 })
     console.log('SUCCESS::', res.data)
     dialogFormVisible.value = false
-    BankResourceHelper.refreshBankVisualResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
+    BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
     upLoading.value = false
 }
 const normalFailCallback = (err) => {

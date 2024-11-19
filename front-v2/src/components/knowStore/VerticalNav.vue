@@ -49,7 +49,7 @@ const pathIndexMap = {
     graph: 0,
     history: 1,
     plan: 2,
-    tree: 3,
+    manage: 3,
 }
 
 function changeActive(index) {
@@ -59,15 +59,17 @@ function changeActive(index) {
         if (preActiveIndex.value != -1) {
             navMenuList.value[preActiveIndex.value].active = false
         }
-        navMenuList.value[index].active = true
-        preActiveIndex.value = index
-        router.push(navMenuList.value[preActiveIndex.value].path)
+        if (index < navMenuList.value.length) {
+            navMenuList.value[index].active = true
+            preActiveIndex.value = index
+            router.push(navMenuList.value[preActiveIndex.value].path)
+        }
     }
 }
 
 onBeforeRouteUpdate((to, from, next) => {
     // 从其他地方跳到知识库
-    if (to.path.endsWith('/home')){
+    if (to.path.endsWith('/home')) {
         preActiveIndex.value = -1
         navMenuList.value.map(item => item.active = false)
     }

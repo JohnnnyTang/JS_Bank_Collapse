@@ -52,7 +52,7 @@ const routes = [
                     import('../components/knowStore/KnowGraph.vue'),
             },
             {
-                path: 'tree',
+                path: 'manage',
                 component: () =>
                     import('../components/knowStore/KnowTree.vue'),
             },

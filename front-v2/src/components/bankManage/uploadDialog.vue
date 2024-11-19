@@ -17,20 +17,20 @@
                 <el-input v-if="item.type === 'input'" v-model="item.value" autocomplete="off" />
 
                 <el-radio-group v-model="item.value" v-else-if="item.type === 'radios'">
-                    <el-radio v-for="(_, radioIndex) in item.radioLabelArray" :value='item.radioValueArray[radioIndex]' :key="radioIndex"> {{
-                        item.radioLabelArray[radioIndex] }} </el-radio>
+                    <el-radio v-for="(_, radioIndex) in item.radioLabelArray" :value='item.radioValueArray[radioIndex]'
+                        :key="radioIndex"> {{
+                            item.radioLabelArray[radioIndex] }} </el-radio>
                 </el-radio-group>
 
                 <el-upload v-else-if="item.type === 'file'" style="height: fit-content;" drag action="#" :multiple="false"
                     :show-file-list="true" ref="uploadRef" :auto-upload="false" :file-list="fileList"
-                    :on-preview="handlePreview" :on-remove="handleRemove" :on-change="handleFileChange"
-                    accept=".zip"
+                    :on-preview="handlePreview" :on-remove="handleRemove" :on-change="handleFileChange" accept=".zip"
                     :http-request="handleFileUpload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                    <div class="el-upload__text">
-                        拖拽文件至此或点击进行上传,
-                        请上传<em>符合要求</em>的文件！
-                    </div>
+                    <!-- <div class="el-upload__text">
+                        {{ uploadDescription }}
+                    </div> -->
+                    <div class="el-upload__text" v-html="uploadDescription"></div>
                 </el-upload>
 
             </el-form-item>
@@ -52,9 +52,10 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { ElLoading, ElMessage } from 'element-plus'
 import axios from 'axios'
-import { resourceUploadNeeded, resourceUploadTitle, fileTypeDict } from './bankResource'
+import { resourceUploadNeeded, resourceUploadTitle, fileTypeDict, uploadDescriptionMap } from './bankResource'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { useResourceStore } from '../../store/resourceStore';
+
 
 const props = defineProps({
     type: {
@@ -73,6 +74,10 @@ const props = defineProps({
 const dialogRef = ref(null)
 
 const resourceStore = useResourceStore()
+
+
+
+
 
 ///////////////// special //////////////////
 // const DEMFileType = ref('txt')
@@ -182,24 +187,24 @@ const handleFileUpload = (file) => {
 
 
         /// http request
-        if(props.subType == 'Section'){
+        if (props.subType == 'Section') {
             BankResourceHelper.uploadBankSectionResourceFile(formData).then(res => {
-                if(res.data == "数据资源已存在！"){
+                if (res.data == "数据资源已存在！") {
                     normalFailCallback(res)
-                }else{
+                } else {
                     normalSuccessCallback(res)
                 }
             }).catch(err => {
                 normalFailCallback(err)
             })
-        }else{
+        } else {
             BankResourceHelper.uploadBankCalculateResourceFile(formData).then(res => {
                 normalSuccessCallback(res)
             }).catch(err => {
                 normalFailCallback(err)
             })
         }
-        
+
     }
     else if (props.type === 'visual') {
 
@@ -242,6 +247,25 @@ const confirmUploadHandler = (e) => {
 
 }
 
+
+
+
+
+//////////////// 上传时的文本描述 //////////////////
+const stringToHTML = (str) => {
+    var dom = document.createElement('span');
+    dom.innerHTML = str;
+    return dom;
+}
+
+const uploadDescription = computed(() => {
+    if(props.type === 'model' && props.subType === 'Config'){
+
+        console.log(dialogInfo.value[props.type][props.subType])
+        stringToHTML(uploadDescriptionMap[props.type][props.subType][0]).innerHTML
+    }
+    return stringToHTML(uploadDescriptionMap[props.type][props.subType]).innerHTML
+})
 
 
 
@@ -298,15 +322,15 @@ const extractFileNameAndType = (res) => {
 
 const normalSuccessCallback = (res) => {
     ElMessage.success({ message: '上传成功！', offset: 100 })
-    console.log('SUCCESS::', res.data)
+    console.log('上传成功！', res.data)
     dialogFormVisible.value = false
-    BankResourceHelper.refreshBankVisualResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
+    BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
     upLoading.value = false
 }
 const normalFailCallback = (err) => {
-    console.error('上传失败！', err)
     ElMessage.error({ message: '上传失败！', offset: 100 })
-    BankResourceHelper.refreshBankVisualResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
+    console.error('上传失败！', err)
+    BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, props.bankEnName, props.type, props.subType)
     upLoading.value = false
 }
 

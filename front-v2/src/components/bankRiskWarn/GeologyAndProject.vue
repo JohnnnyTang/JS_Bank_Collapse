@@ -255,7 +255,7 @@ const handleNameInput = (value) => {
 }
 
 const handleHeightInput = (value) => {
-    const numericValue = value.replace(/[^0-9.]/g, '');     // 替换掉任何非数字和小数点的字符
+    let numericValue = value.replace(/[^0-9.]/g, '');     // 替换掉任何非数字和小数点的字符
     // 如果输入值中包含小数点，则只允许一个
     if (numericValue.includes('.')) {
         const parts = numericValue.split('.');
