@@ -105,8 +105,10 @@
         </div>
 
 
-        <profileShapeVue v-if="showRiverBed" :profileData="profileData" :profileDataCompare="profileDataCompare"
-            :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
+        <!-- <profileShapeVue v-if="showRiverBed" :profileData="profileData" :profileDataCompare="profileDataCompare"
+            :profileList="profileList" :shapeChartLoad="shapeChartLoad" /> -->
+
+        <profileShapeVue v-if="showRiverBed" :now-d-e-ms="nowDEM" />
 
 
         <div v-if="showWaterPower" style="
@@ -394,6 +396,12 @@ const mapFlyToMzs = (mapIns) => {
 }
 
 /////////////// 初始岸段资源获取
+const nowDEM = computed(() => {
+    return [
+        conditionConfigureData.refDEM,
+        conditionConfigureData.benchDEM,
+    ]
+})
 const demResources = ref([])
 const getDemResource = async (bankEnName) => {
     const _bankEnName = bankEnName
@@ -1826,12 +1834,12 @@ onMounted(async () => {
             showProfileInfo.value = false
             showRiskResult.value = false
             showControls.value = true
-            await ProfileLoadingProcess(
-                sceneBefore,
-                sceneNow,
-                sceneCompareBefore,
-                sceneCompareNow,
-            )
+            // await ProfileLoadingProcess(
+            //     sceneBefore,
+            //     sceneNow,
+            //     sceneCompareBefore,
+            //     sceneCompareNow,
+            // )
             totalResult.desc = '高风险'
             riskAreas.value = getRiskAreas('high')
             showWaterPowerFunc()

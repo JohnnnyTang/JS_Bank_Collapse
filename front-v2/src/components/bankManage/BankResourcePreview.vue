@@ -128,7 +128,7 @@
                                     </el-table-column>
 
                                     <el-table-column fixed="right" label="操作" min-width="20%" align="center"
-                                        v-if="(item.delete || item.update)">
+                                        v-if="(item.delete || item.update || item.u)">
                                         <template #default="scope">
                                             <el-button link type="primary" size="small" v-if="scope.row.setting"
                                                 @click.prevent="settingRow(scope.$index, resourceTypeIndex, scope.row)">
@@ -260,11 +260,6 @@ let originalBank = {
     bankEnName: ''
 }
 const startModify = () => {
-    // console.log('进入修改状态')
-    // let center = typeof bankBasicInfo.value[1].val === 'string' ? JSON.parse(bankBasicInfo.value[1].val) : bankBasicInfo.value[1].val
-    // lnglat.lng = center[0]
-    // lnglat.lat = center[1]
-    // console.log('lnglat', lnglat)
 
     changeStatus.value = true
     originalBankBasicInfo = bankBasicInfo.value.map(item => ({ ...item })) // deep copy
@@ -650,6 +645,7 @@ const initOneBank = async (bankEnName) => {
             set: true,
             update: false,
             delete: false,
+            u:true,
             resourceList: confList
         },
         {
@@ -767,6 +763,7 @@ const initOneBank = async (bankEnName) => {
     //////////////////
     bank.name = _thisBankBasicInfo.name
     bank.bankEnName = _thisBankEnName
+    console.log(_thisBankBasicInfo)
     bankBasicInfo.value = getBankBasic_Style_Info(_thisBankBasicInfo)
     console.log(bankBasicInfo.value)
     resourceInfo.value = {

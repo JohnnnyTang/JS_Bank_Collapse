@@ -123,8 +123,8 @@ export default class BankResourceHelper {
      */
     static getBankSectionGeometry(bankEnName, type) {
         const m = {
-            "short": 1,
-            "long": 2
+            "short": 2,
+            "long": 1
         }
         return axiosIns.get(`/down/section/resource/${bankEnName}/info/${m[type]}`)
     }

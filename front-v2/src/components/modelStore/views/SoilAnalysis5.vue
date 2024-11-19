@@ -424,7 +424,6 @@ let globalSectionJson = null
 
 const calSectionViewClickHandler = () => {
     mapInputVisible.value = true
-
     let sectionViewParams = {
         'dem-id': selectedDem.value,
         'section-geometry': sectionGeojson.value,
@@ -755,7 +754,6 @@ const attachBaseLayer = (map) => {
     })
 }
 const dataGenerate = (origin) => {
-    console.log('origin', origin)
     const lineData = []
     const lineDataStep = origin['step']
     const pointData = []
