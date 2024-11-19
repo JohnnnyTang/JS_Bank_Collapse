@@ -58,22 +58,29 @@ public class ZipUtil {
 
     public static MultipartFile zipFolderAndGetAsMultipartFileV2(String folderPath, String zipFileName) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        String zipFolderName = zipFileName;
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            if (zipFileName.equals("PQ")) {
+                zipFileName = "pq";
+                zipFolderName = "PQ";
+            } else if (zipFileName.equals("template")) {
+                zipFolderName = "RiskLevel";
+            }
             Path filePath = Paths.get(folderPath, zipFileName + ".json");
-            ZipEntry zipEntry = new ZipEntry(zipFileName + "/" + zipFileName + ".json");
+            ZipEntry zipEntry = new ZipEntry(zipFolderName + "/" + zipFileName + ".json");
             zos.putNextEntry(zipEntry);
             if (Files.isRegularFile(filePath)) {
                 Files.copy(filePath, zos);
             }
             zos.closeEntry();
             // 创建文件夹条目
-            zipEntry = new ZipEntry(zipFileName + "/"); // 创建一个空文件夹条目
+            zipEntry = new ZipEntry(zipFolderName + "/"); // 创建一个空文件夹条目
             zos.putNextEntry(zipEntry);
             zos.closeEntry();
             zos.finish();
         }
         byte[] zippedFileBytes = baos.toByteArray();
-        return new MockMultipartFile(zipFileName+".zip", zipFileName+".zip", "application/zip", zippedFileBytes);
+        return new MockMultipartFile(zipFolderName+".zip", zipFolderName+".zip", "application/zip", zippedFileBytes);
     }
 
     public static MultipartFile zipFilesAndGetAsMultipartFile(List<MultipartFile> files, String zipFileName) throws IOException {
