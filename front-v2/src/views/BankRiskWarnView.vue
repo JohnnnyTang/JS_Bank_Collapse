@@ -41,7 +41,7 @@
             </div>
         </div>
         <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <div class="raster-control-block"  v-if="showControls && showRasterControl">
+        <div class="raster-control-block" v-if="showControls && showRasterControl">
             <label class="switch">
                 <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
                 <span class="slider"></span>
@@ -105,8 +105,10 @@
         </div>
 
 
-        <profileShapeVue v-if="showRiverBed"  :profileData="profileData"
-            :profileDataCompare="profileDataCompare" :profileList="profileList" :shapeChartLoad="shapeChartLoad" />
+        <!-- <profileShapeVue v-if="showRiverBed" :profileData="profileData" :profileDataCompare="profileDataCompare"
+            :profileList="profileList" :shapeChartLoad="shapeChartLoad" /> -->
+
+        <profileShapeVue v-if="showRiverBed" :now-d-e-ms="nowDEM" />
 
 
         <div v-if="showWaterPower" style="
@@ -121,8 +123,8 @@
         </div>
 
         <div v-if="showWaterPower">
-            <flowspeedInfoVue  :status="hydrodynamicCalcDone && !isRunningMan" :flowspeedChartLoad="flowspeedChartLoad" 
-                :time-step="timeStep" @handleDrawEvent="drawHandler" ref="flowspeedInfoRef"/>
+            <flowspeedInfoVue :status="hydrodynamicCalcDone && !isRunningMan" :flowspeedChartLoad="flowspeedChartLoad"
+                :time-step="timeStep" @handleDrawEvent="drawHandler" ref="flowspeedInfoRef" />
             <div class="flow-control-block">
                 <label class="switch" style="transform: rotateZ(90deg)">
                     <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
@@ -137,7 +139,8 @@
             </div>
         </div>
 
-        <waterProcessChartVue v-if="showWaterPower" :waterProcessChartLoad="flowspeedChartLoad" :timeStep="timeStep" ref="WaterProcessChartRef" />
+        <waterProcessChartVue v-if="showWaterPower" :waterProcessChartLoad="flowspeedChartLoad" :timeStep="timeStep"
+            ref="WaterProcessChartRef" />
 
         <geologyAndProjectVue v-if="showGeologyAndProject" />
 
@@ -145,7 +148,7 @@
         <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
             <riskResultVue :profileList="profileList" />
         </div>
-       
+
         <div class="loading-container" v-show="isRunning">
             <dv-loading class="loading-icon">
                 <div class="loading-message">{{ loading_message }}</div>
@@ -240,7 +243,7 @@ import { useRoute, onBeforeRouteUpdate, } from 'vue-router'
 import { EBorderBox3 } from 'e-datav-vue3'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
+const tileServer = `http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 import router from '../router/index'
 import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
 import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
@@ -368,6 +371,17 @@ const conditionChangeHandler = (lable) => {
 }
 
 const mapFlyToRiver = (mapIns) => {
+    if (!mapIns) return;
+    mapIns.fitBounds(
+        [
+            [118.40770531586725, 31.015473926104463],
+            [122.06874017956159, 32.73217294711945],
+        ],
+        { pitch: 0, duration: 1500 }
+    );
+};
+
+const mapFlyToMzs = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
         [
@@ -380,25 +394,14 @@ const mapFlyToRiver = (mapIns) => {
         },
     )
 }
-const mapJumpToRiver = (mapIns) => {
-    if (!mapIns) return
-    mapIns.jumpTo({
-        center: [120.529, 32.032],
-        zoom: 11.5,
-    })
-    // mapIns.fitBounds(
-    //     [
-    //         [120.46987922676836, 32.03201616423072],
-    //         [120.61089640208264, 32.052171362618625],
-    //     ],
-    //     {
-    //         duration: 500,
-    //         zoom: 11.5,
-    //     },
-    // )
-}
 
 /////////////// 初始岸段资源获取
+const nowDEM = computed(() => {
+    return [
+        conditionConfigureData.refDEM,
+        conditionConfigureData.benchDEM,
+    ]
+})
 const demResources = ref([])
 const getDemResource = async (bankEnName) => {
     const _bankEnName = bankEnName
@@ -526,7 +529,7 @@ const conditionConfigureDataResetHandler = async () => {
         setName: 'standard'
     }).then(async (result) => {
         console.log('runRiskLevelForAll result:', result)
-        
+
         if (result === null) {
             ElMessage({
                 type: 'error',
@@ -1012,7 +1015,7 @@ const showRiverBedFunc = () => {
     }
 
     showRiverBed.value = !showRiverBed.value
-    if (showControls.value === true){    
+    if (showControls.value === true) {
         RasterControlHandler()
     }
     showRasterControl.value = !showRasterControl.value
@@ -1365,56 +1368,56 @@ const runHydrodynamicModel = async () => {
         modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
         modelParams = {
             "water-qs": conditionConfigureData.flow,
-            "tidal-level":conditionConfigureData.tideDif,
+            "tidal-level": conditionConfigureData.tideDif,
             "segment": useBankNameStore().globalBankName,
             "set": "standard",
             "year": "2023",
         }
-        
+
         console.log('check1 ', modelPostUrl, modelParams)
         try {
             const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
             console.log('TASK_ID ', TASK_ID)
 
             if (TASK_ID === 'WRONG') {
-            throw new Error()
+                throw new Error()
             }
 
             let runningStatusInterval = setInterval(async () => {
-            let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
-            // let runningStatus = 'RUNNING'
-            if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
-                console.log('runningStatus ', runningStatus)
-            }
-            else if (runningStatus === 'ERROR') {
-                const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
-                axios.get(url).then(response => {
-                let errorLog = response.data['error-log']
-                resolve(errorLog)
-                }).catch(error => {
-                console.warn(error)
-                reject(error)
-                })
-                const errorLog = (await axios.get(url)).data['error-log']
+                let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
+                // let runningStatus = 'RUNNING'
+                if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
+                    console.log('runningStatus ', runningStatus)
+                }
+                else if (runningStatus === 'ERROR') {
+                    const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
+                    axios.get(url).then(response => {
+                        let errorLog = response.data['error-log']
+                        resolve(errorLog)
+                    }).catch(error => {
+                        console.warn(error)
+                        reject(error)
+                    })
+                    const errorLog = (await axios.get(url)).data['error-log']
 
-                // ElNotification({
-                // title: '水动力模型运行失败',
-                // message: `错误原因:\n` + errorLog,
-                // offset: 300,
-                // type: 'error',
-                // })
-                clearInterval(runningStatusInterval)
-                reject(new Error(errorLog))
-            }
-            else if (runningStatus === 'COMPLETE') {
-                clearInterval(runningStatusInterval)
-                let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data
-                hydrodynamicCaseID = runningResult['case-id']
-                hydrodynamicCalcDone.value = true;
-                console.log('水动力模型计算完成！');
-                resolve(runningResult)
-                // showFlowClickHandler(1)
-            }
+                    // ElNotification({
+                    // title: '水动力模型运行失败',
+                    // message: `错误原因:\n` + errorLog,
+                    // offset: 300,
+                    // type: 'error',
+                    // })
+                    clearInterval(runningStatusInterval)
+                    reject(new Error(errorLog))
+                }
+                else if (runningStatus === 'COMPLETE') {
+                    clearInterval(runningStatusInterval)
+                    let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data
+                    hydrodynamicCaseID = runningResult['case-id']
+                    hydrodynamicCalcDone.value = true;
+                    console.log('水动力模型计算完成！');
+                    resolve(runningResult)
+                    // showFlowClickHandler(1)
+                }
             }, 500)
         } catch (error) {
             console.log(error)
@@ -1498,81 +1501,82 @@ const tidePointVelocityCalc = async (lng, lat) => {
 }
 
 const drawHandler = () => {
-  if (hydrodynamicCalcDone.value === false) {
-    ElNotification({
-      title: '警告',
-      message: '模型计算完成后方可提取潮位过程线',
-      type: 'warning',
-      offset: 300,
-    })
-    return
-  }
-  if (isRunningMan.value === true) {
-    ElNotification({
-      title: '警告',
-      message: '请等待当前任务完成，请稍后...',
-      type: 'warning',
-      offset: 300,
-    })
-    return
-  }
-
-  ElNotification({
-    title: '提示',
-    message: '进入绘制状态，点击地图以添加潮位点',
-    type: 'info',
-    offset: 300,
-  })
-  let map = useMapStore().getMap()
-  let dom = map.getCanvasContainer()
-  dom.style.cursor = 'crosshair'
-  if (drawingStatus === false) {
-    map.once('click', (e) => {
-        // 防止运行模型的过程中添加测点
-        if (isRunningMan.value === true) {
-            ElNotification({
-                title: '警告',
-                message: '请等待当前任务完成，请稍后...',
-                type: 'warning',
-                offset: 300,
-            })
-            dom.style.cursor = 'grab'
-            return
-        }
-        tideLevelPointPos.value = [e.lngLat.lng, e.lngLat.lat];
-        if (!map.getSource('chaoWeiPoint')) {
-            addTideLevelPoint()
-        } else {        
-            map.getSource('chaoWeiPoint').setData({
-            type: 'FeatureCollection',
-            features: [
-                {
-                    type: 'Feature',
-                    properties: {
-                        label: '潮位点',
-                    },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: tideLevelPointPos.value,
-                    },
-                },
-            ],
-        })}
+    if (hydrodynamicCalcDone.value === false) {
         ElNotification({
-            type: 'info',
-            title: '设置潮位点',
-            message: `经度：${e.lngLat.lng.toFixed(4)}，纬度：${e.lngLat.lat.toFixed(4)}`,
+            title: '警告',
+            message: '模型计算完成后方可提取潮位过程线',
+            type: 'warning',
             offset: 300,
         })
+        return
+    }
+    if (isRunningMan.value === true) {
+        ElNotification({
+            title: '警告',
+            message: '请等待当前任务完成，请稍后...',
+            type: 'warning',
+            offset: 300,
+        })
+        return
+    }
 
-        tidePointVelocityCalc(e.lngLat.lng, e.lngLat.lat)
-        dom.style.cursor = 'grab'
+    ElNotification({
+        title: '提示',
+        message: '进入绘制状态，点击地图以添加潮位点',
+        type: 'info',
+        offset: 300,
     })
-    drawingStatus = true
-  }
-  else {
-    return
-  }
+    let map = useMapStore().getMap()
+    let dom = map.getCanvasContainer()
+    dom.style.cursor = 'crosshair'
+    if (drawingStatus === false) {
+        map.once('click', (e) => {
+            // 防止运行模型的过程中添加测点
+            if (isRunningMan.value === true) {
+                ElNotification({
+                    title: '警告',
+                    message: '请等待当前任务完成，请稍后...',
+                    type: 'warning',
+                    offset: 300,
+                })
+                dom.style.cursor = 'grab'
+                return
+            }
+            tideLevelPointPos.value = [e.lngLat.lng, e.lngLat.lat];
+            if (!map.getSource('chaoWeiPoint')) {
+                addTideLevelPoint()
+            } else {
+                map.getSource('chaoWeiPoint').setData({
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            properties: {
+                                label: '潮位点',
+                            },
+                            geometry: {
+                                type: 'Point',
+                                coordinates: tideLevelPointPos.value,
+                            },
+                        },
+                    ],
+                })
+            }
+            ElNotification({
+                type: 'info',
+                title: '设置潮位点',
+                message: `经度：${e.lngLat.lng.toFixed(4)}，纬度：${e.lngLat.lat.toFixed(4)}`,
+                offset: 300,
+            })
+
+            tidePointVelocityCalc(e.lngLat.lng, e.lngLat.lat)
+            dom.style.cursor = 'grab'
+        })
+        drawingStatus = true
+    }
+    else {
+        return
+    }
 }
 
 // 添加潮位点
@@ -1580,54 +1584,54 @@ const addTideLevelPoint = () => {
     let map = useMapStore().getMap()
     const chaoWeiPoint = {
         type: 'FeatureCollection',
-            features: [
-                {
-                    type: 'Feature',
-                    properties: {
-                        label: '潮位点',
-                    },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: tideLevelPointPos.value,
-                    },
-                },
-            ],
-        }
-        map.addSource('chaoWeiPoint', {
-            type: 'geojson',
-            data: chaoWeiPoint,
-        })
-        map.addLayer({
-            id: 'chaoWeiPoint',
-            type: 'circle',
-            source: 'chaoWeiPoint',
-            paint: {
-                'circle-radius': 7,
-                'circle-color': 'rgb(255, 0,0)',
-            },
-        })
-        map.addLayer(
+        features: [
             {
-                id: 'chaoWeiPointLable',
-                type: 'symbol',
-                source: 'chaoWeiPoint',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': [
-                        'Open Sans Semibold',
-                        'Arial Unicode MS Bold',
-                    ],
-                    'text-anchor': 'top',
-                    'text-offset': [0.0, 0.5],
-                    'text-size': 18,
-                    'text-allow-overlap': true,
+                type: 'Feature',
+                properties: {
+                    label: '潮位点',
                 },
-                paint: {
-                    'text-color': 'rgb(255,255,255)',
+                geometry: {
+                    type: 'Point',
+                    coordinates: tideLevelPointPos.value,
                 },
             },
-            'chaoWeiPoint',
-        )
+        ],
+    }
+    map.addSource('chaoWeiPoint', {
+        type: 'geojson',
+        data: chaoWeiPoint,
+    })
+    map.addLayer({
+        id: 'chaoWeiPoint',
+        type: 'circle',
+        source: 'chaoWeiPoint',
+        paint: {
+            'circle-radius': 7,
+            'circle-color': 'rgb(255, 0,0)',
+        },
+    })
+    map.addLayer(
+        {
+            id: 'chaoWeiPointLable',
+            type: 'symbol',
+            source: 'chaoWeiPoint',
+            layout: {
+                'text-field': ['get', 'label'],
+                'text-font': [
+                    'Open Sans Semibold',
+                    'Arial Unicode MS Bold',
+                ],
+                'text-anchor': 'top',
+                'text-offset': [0.0, 0.5],
+                'text-size': 18,
+                'text-allow-overlap': true,
+            },
+            paint: {
+                'text-color': 'rgb(255,255,255)',
+            },
+        },
+        'chaoWeiPoint',
+    )
 }
 
 onBeforeRouteUpdate(async (to, from) => {
@@ -1664,10 +1668,11 @@ onBeforeRouteUpdate(async (to, from) => {
     showWaterPower.value = false    // 确保切换岸段时面板显示
 
     let map = useMapStore().getMap()
-    mapFlyToRiver(map)
+
     refreshMap(map)
     addBankLayer(map, bank).then(async (_) => {
         if (bank === 'Mzs') {
+            mapFlyToMzs(map)
             addRasterLayer(map, 23032209, 'mapRaster')
             map.setLayoutProperty('mapRaster', 'visibility', 'none')
             map.addLayer(new TerrainLayer(14))
@@ -1692,6 +1697,7 @@ onBeforeRouteUpdate(async (to, from) => {
             riskAreas.value = getRiskAreas('high')
             showWaterPowerFunc()
         } else {
+            mapFlyToRiver(map)
             // remove flow layer
             map.getLayer('floodFlow') && map.removeLayer('floodFlow')
             // add invisible bank Warn layer
@@ -1752,13 +1758,12 @@ onMounted(async () => {
         const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
         bankBCInfo.value = bcInfo
 
-
         demResources.value = await getDemResource(bk)
 
         initPureScratchMap(mapContainer.value).then(async (map) => {
-            mapInstance = map
+            mapFlyToMzs(map)
 
-            mapFlyToRiver(map)
+            mapInstance = map
 
             refreshMap(map)
             await addBankLayer(map, bk)
@@ -1829,12 +1834,12 @@ onMounted(async () => {
             showProfileInfo.value = false
             showRiskResult.value = false
             showControls.value = true
-            await ProfileLoadingProcess(
-                sceneBefore,
-                sceneNow,
-                sceneCompareBefore,
-                sceneCompareNow,
-            )
+            // await ProfileLoadingProcess(
+            //     sceneBefore,
+            //     sceneNow,
+            //     sceneCompareBefore,
+            //     sceneCompareNow,
+            // )
             totalResult.desc = '高风险'
             riskAreas.value = getRiskAreas('high')
             showWaterPowerFunc()
@@ -1848,8 +1853,9 @@ onMounted(async () => {
         demResources.value = await getDemResource(bk)
         initPureScratchMap(mapContainer.value).then(async (map) => {
             mapInstance = map
-
             mapFlyToRiver(map)
+
+
             refreshMap(map)
 
             await addBankLayer(map, bk)

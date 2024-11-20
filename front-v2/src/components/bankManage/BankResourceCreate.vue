@@ -86,55 +86,7 @@
         </div>
 
 
-        <!-- <div class="resource-box-container">
-            <div class="title-container">岸段资源上传</div>
-            <div class="resource-content-container">
-                <el-scrollbar height="75vh">
-                    <div class="resource-box-item" v-for="(item, resourceTypeIndex) in resourceInfo"
-                        :key="resourceTypeIndex">
-                        <div class="resource-title">
-                            {{ resourceTypeIndex + 1 + ' ' + item.key }}
-                            <div class="resource-upload-btn" @click="resourceUploadClickHandler(resourceTypeIndex)">上传</div>
-                        </div>
-                        <div class="resource-content">
-
-                            <el-table :data="item.resourceList" style="width: 100%" max-height="25vh">
-                                <el-table-column v-for="(column, index) in tableColumnInfo" :key="index" :prop="column.prop"
-                                    :label="column.label" :min-width="column['min-width']" align="center">
-                                    <template #default="scope" v-if="column.asTag">
-                                        <div style="display: flex; align-items: center;justify-content: center;">
-                                            <el-tag>{{ scope.row.fileType }}</el-tag>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </div>
-                </el-scrollbar>
-            </div>
-        </div> -->
     </div>
-
-    <!-- <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
-        <template #header="{ titleId, titleClass }">
-            <div class="form-header" style="">
-                {{ '● ' + dialogFormTitle }}
-            </div>
-        </template>
-        <el-form :model="dialogInfo">
-            <el-form-item v-for="(item, index) in dialogInfo" :key="index" :label="item.label">
-                <el-input v-model="item.value" autocomplete="off" />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">
-                    确定
-                </el-button>
-            </div>
-        </template>
-    </el-dialog> -->
 </template>
 
 <script setup>
@@ -142,8 +94,7 @@ import { ref, onMounted, reactive } from 'vue'
 import { defaultBankBasic_Style_Info } from './bankResource'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
-import { number } from 'echarts';
-
+import { pinyin } from 'pinyin-pro';
 
 const emit = defineEmits(['refresh-bank-list'])
 
@@ -162,32 +113,6 @@ const lnglat = reactive({
 
 const bankBasicInfo = ref(defaultBankBasic_Style_Info)
 
-////////////////// DEBUG ////////////////
-// window.addEventListener('keydown', e => {
-//     if (e.key === 'e') {
-//         const parseLonLat = (inputStr) => {
-//             const coordinates = inputStr.slice(1, -1).split(',');
-//             const longitude = parseFloat(coordinates[0]);
-//             const latitude = parseFloat(coordinates[1]);
-//             return [longitude, latitude]
-//         }
-//         let nowBasicInfo = bankBasicInfo.value
-//         let ReqBody = {
-//             "bank": bank.bankEnName,
-//             "name": bank.name,
-//             "riskLevel": nowBasicInfo[0].val,
-//             "center": parseLonLat(nowBasicInfo[1].val),
-//             "monitorLength": nowBasicInfo[2].val,
-//             "monitorStartTime": nowBasicInfo[3].val.toISOString(),
-//             "introduction": nowBasicInfo[4].val,
-//             "management": {
-//                 "department": nowBasicInfo[5].val,
-//                 "contact": nowBasicInfo[6].val,
-//             }
-//         }
-//         console.log(ReqBody)
-//     }
-// })
 
 const createNewBankClickHandler = async () => {
     const haveNULL = Object.values(bank).some(item => item === '' || item === null || item === undefined)
@@ -219,7 +144,7 @@ const createNewBankClickHandler = async () => {
             "riskLevel": nowBasicInfo[0].val,
             "center": center,
             "monitorLength": nowBasicInfo[1].val,
-            "monitorStartTime": nowBasicInfo[2].val ? nowBasicInfo[2].val.toISOString() : (new Date()).toISOString(),
+            "monitorStartTime": nowBasicInfo[2].val ? new Date(nowBasicInfo[2].val).toISOString() : (new Date()).toISOString(),
             "introduction": nowBasicInfo[3].val,
             "management": {
                 "department": nowBasicInfo[4].val,
@@ -260,91 +185,19 @@ const fetch_suggestions = async (queryString, cb) => {
 
 const handleSelect = async (item) => {
     const response = await BankResourceHelper.handleSelect(item.value)
-    console.log(response.data)
+
+    // bank.bankEnName = pinyin(bank.name, { pattern: 'first' })
+    let py = pinyin(bank.name, { pattern: 'first' })
+    py = py.split(' ').join('')
+    bank.bankEnName = py.toUpperCase()
+
     bankBasicInfo.value[0].val = warnLevelList[response.data.warning_level]
-    bankBasicInfo.value[1].val = response.data.monitoring_length
-    // bankBasicInfo.value[2].val = response.data.create_time
+    bankBasicInfo.value[1].val = response.data.monitoring_length + ' 千米'
+    bankBasicInfo.value[2].val = response.data.create_time
     bankBasicInfo.value[3].val = response.data.description
 }
 
 
-/////////////////////////// bank resource info
-// const resourceInfo = defaultBankResouceList
-// const tableColumnInfo = [
-//     {
-//         prop: "name",
-//         label: "名称",
-//         "min-width": "25%",
-//         asTag: false
-//     },
-//     {
-//         prop: "sets",
-//         label: "工况集",
-//         "min-width": "25%",
-//         asTag: false
-//     },
-//     {
-//         prop: "year",
-//         label: "年份",
-//         "min-width": "25%",
-//         asTag: false
-//     },
-//     {
-//         prop: "fileType",
-//         label: "文件类型",
-//         "min-width": "25%",
-//         asTag: true
-//     },
-// ]
-
-// ///////////// bank resource upload
-// const dialogFormVisible = ref(false)
-// const dialogFormTitle = ref('资源上传')
-// const dialogInfo = ref([
-//     {
-//         label: '岸段',
-//         enName: 'segment',
-//         value: bank.name
-//     },
-//     {
-//         label: '年份',
-//         enName: 'year',
-//         value: '2023'
-//     },
-//     {
-//         label: '工况集',
-//         enName: 'set',
-//         value: 'standard'
-//     },
-//     // {
-//     //     label: '文件类型',
-//     //     enName: 'category',
-//     //     value: 'DEM'    (DEM|Hydrodynamic|Boundary|Config)
-//     // }
-//     {
-//         label: '备注',
-//         enName: 'description',
-//         value: ''
-//     },
-//     {
-//         label: '边界',
-//         enName: '',
-//         value: ''
-//     },
-//     // {
-//     //     label: '其他',
-//     //     enName: 'temp',
-//     //     value: ''
-//     // },
-
-// ])
-
-
-// const resourceUploadClickHandler = (resourceTypeIndex) => {
-//     const type = ['地形', '水动力', '边界', '配置']
-//     dialogFormTitle.value = `${type[resourceTypeIndex]}资源上传`
-//     dialogFormVisible.value = true
-// }
 
 onMounted(() => {
 })

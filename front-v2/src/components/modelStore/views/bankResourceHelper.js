@@ -1,4 +1,5 @@
 import axios from "axios";
+import { initialTableDatas } from '../../bankManage/bankResource'
 import { ElMessage } from "element-plus";
 
 const axiosIns = axios.create({
@@ -14,6 +15,7 @@ axiosIns.interceptors.response.use((response) => {
     }
     return response;
 })
+
 
 
 const axiosIns4Device = axios.create({
@@ -95,12 +97,40 @@ export default class BankResourceHelper {
      * @param {*} bankEnName 
      */
     static getBankCalculateResourceList(dataType, bankEnName) {
+        // const params = {
+        //     dataType: dataType,
+        //     bank: bankEnName
+        // }
+        // return axiosIns.get(`/bank/calculate/dataType`, { params: params })
         const params = {
             dataType: dataType,
             bank: bankEnName
         }
-        return axiosIns.get(`/bank/calculate/dataType`, { params: params })
+        return new Promise((resolve, reject) => {
+            axiosIns.get(`/bank/calculate/dataType`, { params: params })
+                .then(response => {
+                    resolve(response)
+                })
+                .catch(error => {
+                    reject(error)
+                })
+        })
     }
+    /**
+     * 
+     * @param {string} bankEnName 
+     * @param {"short" | "long"} type 
+     */
+    static getBankSectionGeometry(bankEnName, type) {
+        const m = {
+            "short": 2,
+            "long": 1
+        }
+        return axiosIns.get(`/down/section/resource/${bankEnName}/info/${m[type]}`)
+    }
+
+
+
     /**
      * 
      * @param {FormData} formData 
@@ -115,6 +145,8 @@ export default class BankResourceHelper {
     static uploadBankSectionResourceFile(formData) {
         return axiosIns.post(`/up/section/resource/file`, formData)
     }
+
+
 
     static updateBankCalculateResourceFile(dataType, bankEnName, fileInput, fileInfo) {
 
@@ -146,12 +178,12 @@ export default class BankResourceHelper {
         return axiosIns.post(`/down/bank/info`, formData)
     }
 
-    static handleModelParamsUpload(paramData, type, modelParamsInfoData){
+    static handleModelParamsUpload(paramData, type, modelParamsInfoData) {
         const requestData = {
             params: paramData,
             type: type,
             info: modelParamsInfoData
-          };
+        };
         return axiosIns.post(`/up/model/params`, requestData)
     }
 
@@ -298,7 +330,7 @@ export default class BankResourceHelper {
      * @param {*} category 
      * @param {*} type 
      */
-    static refreshBankVisualResource(proxy, bankEnName, category, type) {
+    static refreshBankResource(proxy, bankEnName, category, type) {
 
         console.log('refresh resource!')
         const _proxyCategoryDICI = {
@@ -311,33 +343,62 @@ export default class BankResourceHelper {
         const _listDataDict = {
             'model': {
                 'DEM': async () => {
+                    // const _ogDEM = (await BankResourceHelper.getBankCalculateResourceList('DEM', bankEnName)).data
+                    // let result = this.DEMResourcetoList(_ogDEM)
+                    // proxy[_proxyCategoryDICI['model']][0]['resourceList'] = result
                     const _ogDEM = (await BankResourceHelper.getBankCalculateResourceList('DEM', bankEnName)).data
-                    let result = this.DEMResourcetoList(_ogDEM)
-                    proxy[_proxyCategoryDICI['model']][0]['resourceList'] = result
+                    const _demList = BankResourceHelper.DEMResourcetoList(_ogDEM)
+                    const demList = BankResourceHelper.prepareData(_demList, 'DEM')
+                    proxy[_proxyCategoryDICI['model']][0]['resourceList'] = demList
+
+                    notEnoughDataNotice['DEM'](_ogDEM)
                 },
                 'Config': async () => {
-                    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
-                    let result = this.ConfigResourcetoList(_ogConfig)
-                    proxy[_proxyCategoryDICI['model']][1]['resourceList'] = result
+                    // const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
+                    // let result = this.ConfigResourcetoList(_ogConfig)
+                    // proxy[_proxyCategoryDICI['model']][1]['resourceList'] = result
 
+                    const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', bankEnName)).data
+                    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', bankEnName)).data
+                    const _configList = BankResourceHelper.ConfigResourcetoList(_ogConfig)
+                    const _boundList = BankResourceHelper.BoundaryResourcetoList(_ogBound)
+                    const _confList = _configList.concat(_boundList)
+                    const confList = BankResourceHelper.prepareData(_confList, 'Config')
+                    proxy[_proxyCategoryDICI['model']][1]['resourceList'] = confList
+
+                    notEnoughDataNotice['Config'](confList)
                 },
                 'Section': async () => {
-                    const _ogSection = (await BankResourceHelper.getBankCalculateResourceList('Section', bankEnName)).data
-                    let result = this.SectionResourcetoList(_ogSection)
-                    proxy[_proxyCategoryDICI['model']][2]['resourceList'] = result
+                    // const _ogSection = (await BankResourceHelper.getBankCalculateResourceList('Section', bankEnName)).data
+                    // let result = this.SectionResourcetoList(_ogSection)
+                    // proxy[_proxyCategoryDICI['model']][2]['resourceList'] = result
 
+                    const _ogSection = (await BankResourceHelper.getBankCalculateResourceList('Section', bankEnName)).data
+                    const _sectionList = BankResourceHelper.SectionResourcetoList(_ogSection)
+                    const sectionList = BankResourceHelper.prepareData(_sectionList, 'Section')
+                    proxy[_proxyCategoryDICI['model']][2]['resourceList'] = sectionList
+
+
+                    notEnoughDataNotice['Section'](sectionList)
                 },
                 'Boundary': async () => {
-                    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', bankEnName)).data
-                    let result = this.BoundaryResourcetoList(_ogBound)
-                    proxy[_proxyCategoryDICI['model']][4]['resourceList'] = result
+                    // const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', bankEnName)).data
+                    // let result = this.BoundaryResourcetoList(_ogBound)
+                    // proxy[_proxyCategoryDICI['model']][4]['resourceList'] = result
+
+                    console.log(' no this type in table anymore')
 
                 },
                 'Hydrodynamic': async () => {
+                    // const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
+                    // let result = this.HydrodynamicResourcetoList(_ogHydro)
+                    // proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
                     const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', bankEnName)).data
-                    let result = this.HydrodynamicResourcetoList(_ogHydro)
-                    proxy[_proxyCategoryDICI['model']][3]['resourceList'] = result
+                    const _hydroList = BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
+                    const hydroList = BankResourceHelper.prepareData(_hydroList, 'Hydrodynamic')
+                    proxy[_proxyCategoryDICI['model']][3]['resourceList'] = hydroList
 
+                    notEnoughDataNotice['Hydrodynamic'](_hydroList)
                 },
 
             },
@@ -402,6 +463,12 @@ export default class BankResourceHelper {
 
 
     ///////////////////////////////////////////// DATA PROCESS
+
+    static prepareData(ogList, type) {
+        return preccessing[type](ogList)
+    }
+
+
     static toList(originalData) {
         const _list = []
         for (let i = 0; i < originalData.length; i++) {
@@ -499,6 +566,94 @@ export default class BankResourceHelper {
         return result
     }
 
+    static notEnoughDataNotice(data, type) {
+        notEnoughDataNotice[type](data)
+    }
 
+}
+
+
+
+const actualName = {
+    'PQ': "造床流量系数",
+    'template': "权重阈值参数",
+    "boundary": "岸段边界文件"
+}
+/**
+ * 灰色的表格行引导处理函数
+ */
+const preccessing = {
+    'DEM': (ogList) => {
+        const _demList = ogList
+        const demList = _demList.concat(initialTableDatas['模型资源管理']['岸段地形资源'])
+
+        const placeHolderLength = initialTableDatas['模型资源管理']['岸段地形资源'].length
+        demList.splice(_demList.length, _demList.length > placeHolderLength ? placeHolderLength : _demList.length)
+
+        return demList
+    },
+    'Config': (ogList) => {
+        const _confList = ogList
+
+        // const confList = initialTableDatas['模型资源管理']['模型参数文件'].concat(_confList)
+        const confList = _confList.concat(initialTableDatas['模型资源管理']['模型参数文件'])
+
+        confList.findIndex(item => item.name == 'boundary') > -1 && confList.splice(confList.findIndex(item => item.name == "岸段边界文件"), 1)
+        confList.findIndex(item => item.name == 'template') > -1 && confList.splice(confList.findIndex(item => item.name == "权重阈值参数"), 1)
+        confList.findIndex(item => item.name == 'PQ') > -1 && confList.splice(confList.findIndex(item => item.name == "造床流量系数"), 1)
+
+        confList.map(item => {
+            if (item.name in Object.keys(actualName)) item.name = actualName[item.name]
+        })
+
+        return confList
+    },
+    'Section': (ogList) => {
+        const _sectionList = ogList
+        const sectionList = initialTableDatas['模型资源管理']['判别断面文件'].concat(_sectionList)
+        sectionList.splice(0, _sectionList.length > 1 ? 1 : _sectionList.length)
+        return sectionList
+    },
+    'Hydrodynamic': (ogList) => {
+        const _hydroList = ogList
+        const hydroList = _hydroList.concat(initialTableDatas['模型资源管理']['水动力预算工况'])
+
+
+        const placeHolderLength = initialTableDatas['模型资源管理']['水动力预算工况'].length
+        hydroList.splice(_hydroList.length, _hydroList.length > placeHolderLength ? placeHolderLength : _hydroList.length)
+
+        return hydroList
+    },
+}
+
+
+const notEnoughDataNotice = {
+    'DEM': (demList) => {
+        if (demList.length < 2) {
+            ElMessage.warning({
+                offset: 120,
+                message: '请至少上传两年的地形文件以支撑综合研判！'
+            })
+        }
+    },
+    'Config': (data) => {
+        if (data.length < 3) {
+            ElMessage.warning({
+                offset: 120,
+                message: '请配置或上传三类模型参数文件以支撑综合研判！'
+            })
+        }
+    },
+    'Section': () => {
+
+    },
+    'Hydrodynamic': (data) => {
+        if (data.length < 6) {
+            ElMessage.warning({
+                offset: 120,
+                message: '请配置或上传两级流量的大中小潮条件下的预算工况以支撑综合研判！'
+            })
+        }
+    }
 
 }

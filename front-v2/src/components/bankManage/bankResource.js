@@ -89,49 +89,121 @@ export const getBankBasic_Style_Info = (basicInfo) => {
 
 
 ////////////////////////// BANK RESOURCE TABLE COLUMN
-export const defaultTableColumns = {
-    '模型资源管理': [
-        {
-            prop: "name",
-            label: "名称",
-            "min-width": "20%",
-            asTag: false
-        },
-        {
-            prop: "sets",
-            label: "工况集",
-            "min-width": "20%",
-            asTag: false
-        },
-        {
-            prop: "year",
-            label: "年份",
-            "min-width": "20%",
-            asTag: false
-        },
-        {
-            prop: "fileType",
-            label: "文件类型",
-            "min-width": "20%",
-            asTag: true
-        },
-    ],
-    '可视化资源管理': [
-        {
-            prop: "name",
-            label: "名称",
-            "min-width": "40%",
-            asTag: false
-        },
-        {
-            prop: "type",
-            label: "类型",
-            "min-width": "40%",
-            asTag: true
-        },
-    ],
-    '设备资源管理': [
-        {
+export const tableColumns = {
+    '模型资源管理': {
+        '岸段地形资源': [
+            {
+                prop: "name",
+                label: "名称",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "sets",
+                label: "工况集",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "year",
+                label: "年份",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "fileType",
+                label: "文件类型",
+                "min-width": "20%",
+                asTag: true
+            },
+        ],
+        '模型参数文件': [
+            {
+                prop: "name",
+                label: "名称",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "fileType",
+                label: "文件类型",
+                "min-width": "20%",
+                asTag: true
+            },
+        ],
+        '判别断面文件': [
+            {
+                prop: "name",
+                label: "名称",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "fileType",
+                label: "文件类型",
+                "min-width": "20%",
+                asTag: true
+            },
+        ],
+        '水动力预算工况': [
+            {
+                prop: "name",
+                label: "名称",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "sets",
+                label: "工况集",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "year",
+                label: "年份",
+                "min-width": "20%",
+                asTag: false
+            },
+            {
+                prop: "fileType",
+                label: "文件类型",
+                "min-width": "20%",
+                asTag: true
+            },
+        ]
+    },
+    '可视化资源管理': {
+        '栅格可视化资源': [
+            {
+                prop: "name",
+                label: "名称",
+                "min-width": "40%",
+                asTag: false
+            },
+            {
+                prop: "type",
+                label: "类型",
+                "min-width": "40%",
+                asTag: true
+            },
+        ],
+        '其他可视化资源': [
+            {
+                prop: "name",
+                label: "名称",
+                "min-width": "40%",
+                asTag: false
+            },
+            {
+                prop: "type",
+                label: "类型",
+                "min-width": "40%",
+                asTag: true
+            },
+        ]
+    },
+    '设备资源管理': {
+        'GNSS设备': [{
             prop: "name",
             label: "设备名",
             "min-width": "24%",
@@ -148,9 +220,205 @@ export const defaultTableColumns = {
             label: "纬度",
             "min-width": "23%",
             asTag: false
+        }],
+        '孔隙水压力计设备': [{
+            prop: "name",
+            label: "设备名",
+            "min-width": "24%",
+            asTag: false
         },
-    ]
+        {
+            prop: "latitude",
+            label: "经度",
+            "min-width": "23%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "纬度",
+            "min-width": "23%",
+            asTag: false
+        }],
+        '应力桩设备': [{
+            prop: "name",
+            label: "设备名",
+            "min-width": "24%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "经度",
+            "min-width": "23%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "纬度",
+            "min-width": "23%",
+            asTag: false
+        }],
+        "测斜仪设备": [{
+            prop: "name",
+            label: "设备名",
+            "min-width": "24%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "经度",
+            "min-width": "23%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "纬度",
+            "min-width": "23%",
+            asTag: false
+        }],
+        "监控摄像设备": [{
+            prop: "name",
+            label: "设备名",
+            "min-width": "24%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "经度",
+            "min-width": "23%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "纬度",
+            "min-width": "23%",
+            asTag: false
+        }],
+        "其他设备": [{
+            prop: "name",
+            label: "设备名",
+            "min-width": "24%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "经度",
+            "min-width": "23%",
+            asTag: false
+        },
+        {
+            prop: "latitude",
+            label: "纬度",
+            "min-width": "23%",
+            asTag: false
+        }]
+    }
 }
+
+export const initialTableDatas = {
+    '模型资源管理': {
+        '岸段地形资源': [
+            {
+                name: '起始地形',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+            {
+                name: '计算地形',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+        ],
+        '模型参数文件': [
+            {
+                name: '造床流量系数',
+                fileType: 'xxx',
+                setting: true,
+                upload: true,
+                placeHolder: true
+            },
+            {
+                name: '权重阈值参数',
+                fileType: 'xxx',
+                setting: true,
+                upload: true,
+                placeHolder: true
+            },
+            {
+                name: '岸段边界文件',
+                fileType: 'xxx',
+                upload: true,
+                placeHolder: true
+            }
+        ],
+        '判别断面文件': [
+            {
+                name: '风险研判断面',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true
+            },
+        ],
+        '水动力预算工况': [
+            {
+                name: '一级流量小潮工况',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+            {
+                name: '一级流量中潮工况',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+            {
+                name: '一级流量大潮工况',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+            {
+                name: '二级流量小潮工况',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+            {
+                name: '二级流量中潮工况',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+            {
+                name: '二级流量大潮工况',
+                sets: 'xxxx',
+                year: '20xx',
+                fileType: 'xxx',
+                placeHolder: true,
+                upload: true,
+            },
+        ]
+    },
+}
+
+
+
 
 ///////////////////////// BANK RESOURCE DICTS
 export const typeDict = ['model', 'visual', 'device']
@@ -211,38 +479,21 @@ export const resourceUploadNeeded = {
             }
         ],
         'Config': [
-            // {
-            //     label: '文件名',
-            //     enName: 'name',
-            //     value: '',
-            //     type: 'input',
-            // },
             {
-                label: '年份',
-                enName: 'year',
-                value: '2023',
-                type: 'input',
-                required: true
-            },
-            {
-                label: '月份',
-                enName: 'month',
-                value: '04',
-                type: 'input',
-                required: true
-            },
-            {
-                label: '工况集',
-                enName: 'set',
-                value: 'standard',
-                type: 'input',
-                required: true
-            },
-            {
-                label: '备注',
-                enName: 'description',
+                label: '文件名',
+                enName: 'name',
                 value: '',
+                required: true,
                 type: 'input',
+            },
+            {
+                label: '参数类型',
+                enName: 'type',
+                value: '',
+                type: 'radios',
+                radioLabelArray: ['造床流量系数', '权重阈值参数', '岸段边界文件'],
+                required: true,
+                radioValueArray: ['PQ', 'template', 'Boundary']
             },
             {
                 label: '模型配置文件',
@@ -288,7 +539,7 @@ export const resourceUploadNeeded = {
                 type: 'file',
                 required: true
             }
-        ],        
+        ],
         'Hydrodynamic': [
             // {
             //     label: '文件名',
@@ -480,7 +731,7 @@ export const resourceUploadNeeded = {
 export const resourceUploadTitle = {
     'model': {
         'DEM': '地形数据',
-        'Config': '配置数据',
+        'Config': '模型参数',
         'Section': '断面数据',
         'Hydrodynamic': '预算工况数据',
         'Boundary': '岸段边界数据',
@@ -507,6 +758,31 @@ export const fileTypeDict = {
         'Section': 'shapefile',
         'Hydrodynamic': 'hydrodynamic',
         'Boundary': 'geojson',
+    }
+}
+
+export const uploadDescriptionMap = {
+    'model': {
+        'DEM': '请上传打包为ZIP的<em>TIFF地形文件</em>，文件应<em>以年份月份命名</em>，如：202304.zip',
+        'Config': [
+            '请上传打包为ZIP的<em>JSON模型参数文件</em>，文件应<em>与配置文件同名</em>，如：pq.zip, template.zip',
+            '请上传打包为ZIP的<em>GeoJSON岸段边界矢量面文件</em>，如：boundary.zip'
+        ],
+        'Section': '请上传打包为ZIP的<em>ESRI Shapefile文件</em>，文件内容应至少包含shp，dbf，shx等文件',
+        'Hydrodynamic': '请上传打包为ZIP的<em>预算水动力工况文件</em>，文件内容应包含fort.14, fort.63, fort.64等文件',
+        'Boundary': '请上传打包为ZIP的<em>ESRI Shapefile</em>或<em>GeoJSON文件</em>，文件内容应至少包含shp，dbf，shx等文件',
+    },
+    'visual': {
+        'DEM': '',
+        'Vector': '请上传打包为ZIP的<em>ESRI Shapefile文件</em>，文件内容应至少包含shp，dbf，shx等文件'
+    },
+    'device': {
+        'GNSS': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
+        'MENOMETER': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
+        'STRESS': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
+        'INCLINE': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
+        'VEDIO': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
+        'OTHER': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段'
     }
 }
 
