@@ -78,13 +78,14 @@ import { ref, onMounted, onUnmounted, watch, defineEmits, reactive, computed } f
 import { ElPopover, ElButton, ElSelect, ElOption, ElInput, ElMessage } from 'element-plus';
 import { drawShapeCompareGraph } from './util.js'
 import { useBankNameStore } from '../../store/bankNameStore';
+import { useSectionStore } from '../../store/sectionStore';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import ModelRunner from '../modelStore/modelRunner';
 
 
 
 
-
+const sectionStore = useSectionStore()
 let formDataTextUp = null
 let formDataTableUpdate = null
 let bank = useBankNameStore().globalBankName
@@ -141,7 +142,8 @@ const calculating = ref(false)
 const emptyMessage = ref('正在提取断面形态，请稍后...')
 const sectionList = ref([])
 const selectedSection = ref({})
-const sectionDataCache = new Map()
+
+// window.sectionDataCache = new Map()
 
 const selectedLabel = computed(() => {
     return selectedSection.value.label
@@ -169,15 +171,16 @@ const sectionSelectHandler = async () => {
     console.log(sectionGeojson)
 
     let data = null;
-    if (sectionDataCache.get(selectedSection.value.label)) {
-        data = sectionDataCache.get(selectedSection.value.label)
+
+    if (sectionStore.sectionDataCache.get(selectedSection.value.label)) {
+        data = sectionStore.sectionDataCache.get(selectedSection.value.label)
         console.log("cache hit:", data)
 
     } else {
         data = await calculatTwoSectionView(dem1, dem2, sectionGeojson)
         console.log("计算的结果是:", data)
         if (data)
-            sectionDataCache.set(selectedSection.value.label, data)
+            sectionStore.sectionDataCache.set(selectedSection.value.label, data)
     }
 
 
