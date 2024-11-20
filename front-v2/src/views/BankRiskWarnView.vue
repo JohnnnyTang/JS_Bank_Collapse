@@ -1367,8 +1367,8 @@ const runHydrodynamicModel = async () => {
         let modelParams = {}
         modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
         modelParams = {
-            "water-qs": conditionConfigureData.flow,
-            "tidal-level": conditionConfigureData.tideDif,
+            "water-qs": parseFloat(conditionConfigureData.flow),
+            "tidal-level": parseFloat(conditionConfigureData.tideDif),
             "segment": useBankNameStore().globalBankName,
             "set": "standard",
             "year": "2023",
