@@ -153,8 +153,10 @@ public class VectorUtil {
 //        String originBasicName = srcFile.getOriginalFilename().substring(0, srcFile.getOriginalFilename().lastIndexOf("."));
         String tileName = info.getString("name");
         String tableName = name2tableName(bank, tileName);
+        boolean forCal = false;
         if (info.get("type").equals("section")) {
             tableName = section2tableName(bank, tileName);
+            forCal = true;
         }
         String vectorFilePath = vectorDataPath + File.separator + srcFile.getOriginalFilename();
         File vectorFile = new File(vectorFilePath);
@@ -188,10 +190,9 @@ public class VectorUtil {
         paramNode.setId(null);
         paramNode.setName(paramNode.getName()+"-"+timestampStr);
         JSONObject params = paramNode.getParams();
-        params.put("filePath", shpPath);
-        params.put("finalTableName", tableName);
-        params.put("dbname", defaultDatasource.getDatabase());params.put("user",defaultDatasource.getUsername());
-        params.put("password", defaultDatasource.getPassword());params.put("host",defaultDatasource.getIp());params.put("port", defaultDatasource.getPort());
+        params.put("filePath", shpPath); params.put("finalTableName", tableName); params.put("dbname", defaultDatasource.getDatabase());
+        params.put("user",defaultDatasource.getUsername()); params.put("password", defaultDatasource.getPassword());
+        params.put("host",defaultDatasource.getIp()); params.put("port", defaultDatasource.getPort()); params.put("forCal", forCal);
         paramNode.setParams(params);
         paramNodeService.save(paramNode);
         taskNode.setParamNode(paramNode);

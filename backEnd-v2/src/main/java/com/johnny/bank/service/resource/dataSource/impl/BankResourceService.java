@@ -653,7 +653,7 @@ public class BankResourceService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        String zipFileName = ZipUtil.zipFolder(new File(jsonFolderPath));
+//        String zipFileName` = ZipUtil.zipFolder(new File(jsonFolderPath));
 //        System.out.println(zipFileName);
 //
 //        System.out.println(info);

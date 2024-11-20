@@ -51,7 +51,7 @@ public class ModelRunStatusJob implements Job {
                 // 更新任务节点结果
                 taskNodeServiceV2.updateNodeStatusResultById(taskNode.getId(), status, resObj);
                 // taskNode与case对齐
-                taskNodeServiceV2.modelServerSerialization();
+//                taskNodeServiceV2.modelServerSerialization();
 
                 // 针对真实水动力计算任务，完成后将结果写入资源节点中
                 if (taskNode.getModelNode().getId().equals("66cf190d7965ee56bc04ebf9")) {
@@ -69,7 +69,7 @@ public class ModelRunStatusJob implements Job {
                 JSONObject errorLog = ProcessUtilV2.getCaseErrorLog(modelServerUrl,taskNode.getCaseId());
                 taskNodeServiceV2.updateTaskNodeResultById(taskNode.getId(), errorLog);
                 // taskNode与case对齐
-                taskNodeServiceV2.modelServerSerialization();
+//                taskNodeServiceV2.modelServerSerialization();
             } catch (SchedulerException e) {
                 log.info(e.toString());
             }

@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @projectName: backEnd
@@ -56,6 +58,15 @@ public class QuartzSchedulerManager {
         startGetWaterConditionJob(scheduler);
         startModelServerHandShakeJob(scheduler);
         scheduler.start();
+    }
+
+    // 确保所有Job中没有重复case的模型任务
+    public Boolean checkDuplication() throws SchedulerException {
+        List<JobExecutionContext> executingJobs = scheduler.getCurrentlyExecutingJobs();
+        for (JobExecutionContext executionJob : executingJobs) {
+            System.out.println(executionJob);
+        }
+        return false;
     }
 
     // 执行模型服务定时器
@@ -216,7 +227,7 @@ public class QuartzSchedulerManager {
 
     private void modelRunningStatusJob(Scheduler scheduler, TaskNode taskNode) throws SchedulerException {
         JobDetail jobDetail = JobBuilder.newJob(ModelRunStatusJob.class)
-                .withIdentity(taskNode.getCaseId(), "modelTaskGroup")
+                .withIdentity(taskNode.getId(), "modelTaskGroup")
                 .build();
         jobDetail.getJobDataMap().put("taskNode", taskNode);
         jobDetail.getJobDataMap().put("modelServerUrl", MODEL_SERVER_URL);
