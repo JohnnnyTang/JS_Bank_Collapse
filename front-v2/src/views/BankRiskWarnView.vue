@@ -1723,7 +1723,7 @@ onBeforeRouteUpdate(async (to, from) => {
         // risk level
         totalResult.desc = '暂无'
         riskAreas.value = []
-
+        showFlow.value = true // 关闭
         showWaterPowerFunc()
     }
 
@@ -1890,6 +1890,7 @@ onMounted(async () => {
             // risk level
             totalResult.desc = '暂无'
             riskAreas.value = []
+            showFlow.value = true // 关闭
             showWaterPowerFunc()
         })
 

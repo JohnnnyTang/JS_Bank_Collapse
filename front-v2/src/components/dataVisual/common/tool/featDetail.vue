@@ -9,7 +9,7 @@
                 <el-descriptions-item align="center">
                     <template #label>
                         <div class="cell-item">
-                            所属城市
+                            所在地区
                         </div>
                     </template>
                     <el-scrollbar max-height="10vh">

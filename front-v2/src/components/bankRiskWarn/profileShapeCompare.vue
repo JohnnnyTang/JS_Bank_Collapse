@@ -78,14 +78,14 @@ import { ref, onMounted, onUnmounted, watch, defineEmits, reactive, computed } f
 import { ElPopover, ElButton, ElSelect, ElOption, ElInput, ElMessage } from 'element-plus';
 import { drawShapeCompareGraph } from './util.js'
 import { useBankNameStore } from '../../store/bankNameStore';
-import { useSectionStore } from '../../store/sectionStore';
+// import { useSectionStore } from '../../store/sectionStore';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import ModelRunner from '../modelStore/modelRunner';
 
 
 
 
-const sectionStore = useSectionStore()
+// const sectionStore = useSectionStore()
 let formDataTextUp = null
 let formDataTableUpdate = null
 let bank = useBankNameStore().globalBankName
@@ -172,16 +172,16 @@ const sectionSelectHandler = async () => {
 
     let data = null;
 
-    if (sectionStore.sectionDataCache.get(selectedSection.value.label)) {
-        data = sectionStore.sectionDataCache.get(selectedSection.value.label)
-        console.log("cache hit:", data)
+    // if (sectionStore.sectionDataCache.get(selectedSection.value.label)) {
+    //     data = sectionStore.sectionDataCache.get(selectedSection.value.label)
+    //     console.log("cache hit:", data)
 
-    } else {
+    // } else {
         data = await calculatTwoSectionView(dem1, dem2, sectionGeojson)
-        console.log("计算的结果是:", data)
-        if (data)
-            sectionStore.sectionDataCache.set(selectedSection.value.label, data)
-    }
+    //     console.log("计算的结果是:", data)
+    //     if (data)
+    //         sectionStore.sectionDataCache.set(selectedSection.value.label, data)
+    // }
 
 
 
