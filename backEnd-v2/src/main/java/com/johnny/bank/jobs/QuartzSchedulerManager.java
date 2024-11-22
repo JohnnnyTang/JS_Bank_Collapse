@@ -61,16 +61,20 @@ public class QuartzSchedulerManager {
     }
 
     // 确保所有Job中没有重复case的模型任务
-    public Boolean checkDuplication() throws SchedulerException {
+    public Boolean checkDuplication(String identity) throws SchedulerException {
         List<JobExecutionContext> executingJobs = scheduler.getCurrentlyExecutingJobs();
         for (JobExecutionContext executionJob : executingJobs) {
-            System.out.println(executionJob);
+            JobDetail executionJobDetail = executionJob.getJobDetail();
+            if (identity.equals(executionJobDetail.getKey().getName())) {
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     // 执行模型服务定时器
     public void startModelTaskStatusJob(TaskNode taskNode) throws SchedulerException {
+//        checkDuplication();
         log.info("start Modeltaskjob "+ taskNode.getName() +" here");
         modelRunningStatusJob(scheduler,taskNode);
         scheduler.start();
