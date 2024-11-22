@@ -10,40 +10,24 @@
                     </dv-decoration-11>
                     <hr class="hr_gradient"> -->
           <div class="scenes-tree-container" v-loading="sideBarLoading">
-            <el-tree
-              style="max-width: 400px"
-              :data="dataSource"
-              :expand-on-click-node="false"
-              node-key="label"
-              :default-expanded-keys="expandKey"
-            >
+            <el-tree style="max-width: 400px" :data="dataSource" :expand-on-click-node="false" node-key="label"
+              :default-expanded-keys="expandKey">
               <template #default="{ node, data }">
                 <span class="custom-tree-node">
                   <div class="scene-card" v-if="data.type == 'title1'">
-                    <div
-                      class="scene-top-section"
-                      :class="{ active: data.active }"
-                      @click="treeNodeClickHandler(node, data)"
-                    >
+                    <div class="scene-top-section" :class="{ active: data.active }"
+                      @click="treeNodeClickHandler(node, data)">
                       <div class="scene-title">
                         <div class="scene-title-text">
                           {{ data.label }}
                         </div>
                       </div>
                     </div>
-                    <el-switch
-                      v-model="data.active"
-                      :active-action-icon="View"
-                      :inactive-action-icon="Hide"
-                      size="large"
-                      @change="viewChange(node, data)"
-                    />
+                    <el-switch v-model="data.active" :active-action-icon="View" :inactive-action-icon="Hide" size="large"
+                      @change="viewChange(node, data)" />
                   </div>
 
-                  <div
-                    class="subScene-container"
-                    v-else-if="data.type == 'title2' || data.type == 'title3'"
-                  >
+                  <div class="subScene-container" v-else-if="data.type == 'title2' || data.type == 'title3'">
                     <div class="card" :class="{ active: data.active }">
                       <div class="top-section" @click="treeNodeClickHandler(node, data)">
                         <div class="title">
@@ -51,63 +35,34 @@
                             {{ data.label }}
                           </div>
                           <div class="detail-icon">
-                            <el-button
-                              type="info"
-                              :icon="List"
-                              circle
-                              size="default"
-                              @click.stop="layerGroupClickHandler(node, data)"
-                              v-show="
-                                !(
+                            <el-button type="info" :icon="List" circle size="default"
+                              @click.stop="layerGroupClickHandler(node, data)" v-show="!(
                                   node.parent.data.label.includes('岸段') ||
                                   node.parent.data.label.includes('其他') ||
                                   data.label.includes('其他') ||
                                   data.label.includes('过江通道') ||
                                   data.label.includes('沿江码头')
                                 )
-                              "
-                            />
+                                " />
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div
-                    class="feature-container"
-                    v-else-if="
-                      data.type == 'feature' && node.parent.data.label.includes('岸段')
-                    "
-                    @click="featureNodeClick(node, data)"
-                  >
-                    <div
-                      class="feature-content"
-                      :class="{ smaller: data.label.length > 10 }"
-                    >
+                  <div class="feature-container" v-else-if="data.type == 'feature' && node.parent.data.label.includes('岸段')
+                    " @click="featureNodeClick(node, data)">
+                    <div class="feature-content" :class="{ smaller: data.label.length > 10 }">
                       {{ data.label }}
                     </div>
                   </div>
-                  <div
-                    class="feature-container"
-                    v-else-if="
-                      data.type == 'feature' && node.parent.data.label.includes('沙洲')
-                    "
-                    @click="featureNodeClick(node, data)"
-                  >
-                    <div
-                      class="feature-content"
-                      :class="{ smaller: data.label.length > 10 }"
-                    >
+                  <div class="feature-container" v-else-if="data.type == 'feature' && node.parent.data.label.includes('沙洲')
+                    " @click="featureNodeClick(node, data)">
+                    <div class="feature-content" :class="{ smaller: data.label.length > 10 }">
                       <div>{{ data.label }}</div>
-                      <el-icon
-                        v-if="node.data.property['洲滩信息_人口活动'] == '2'"
-                        style="margin-left: 0.6vw"
-                      >
+                      <el-icon v-if="node.data.property['洲滩信息_人口活动'] == '2'" style="margin-left: 0.6vw">
                         <House />
                       </el-icon>
-                      <el-icon
-                        v-else-if="node.data.property['洲滩信息_人口活动'] == '1'"
-                        style="margin-left: 0.6vw"
-                      >
+                      <el-icon v-else-if="node.data.property['洲滩信息_人口活动'] == '1'" style="margin-left: 0.6vw">
                         <UserFilled />
                       </el-icon>
                     </div>
@@ -124,12 +79,7 @@
     </div>
     <div class="tools-container">
       <div class="icon-container" v-for="i in 2" :key="i">
-        <div
-          class="icon"
-          :style="styles[i - 1]"
-          @click="toolClick(i - 1)"
-          :class="{ active: activeStatus[i - 1] }"
-        ></div>
+        <div class="icon" :style="styles[i - 1]" @click="toolClick(i - 1)" :class="{ active: activeStatus[i - 1] }"></div>
       </div>
     </div>
 
@@ -140,73 +90,35 @@
             <layerCtrl @close="closeHandler"></layerCtrl>
         </div> -->
 
-    <div
-      class="legend-pos"
-      v-show="activeStatus[0]"
-      v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-    >
+    <div class="legend-pos" v-show="activeStatus[0]" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
       <mapLegend @close="closeHandler(0)" :legendList="legendList"></mapLegend>
     </div>
 
-    <div
-      class="featDetail"
-      v-show="showDetail"
-      v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-      v-click-out-side="detailClickOutSideHandler"
-    >
+    <div class="featDetail" v-show="showDetail" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+      v-click-out-side="detailClickOutSideHandler">
       <!-- v-click-out-side="() => showDetail = false" -->
-      <featDetail
-        :column="featureInfo.column"
-        :ogData="featureInfo.ogData"
-        :sourceId="featureInfo.sourceId"
-        @close="showDetail = false"
-        @pin="pinHandler"
-      ></featDetail>
+      <featDetail :column="featureInfo.column" :ogData="featureInfo.ogData" :sourceId="featureInfo.sourceId"
+        @close="showDetail = false" @pin="pinHandler"></featDetail>
     </div>
 
-    <div
-      class="infomation-pannel"
-      v-show="showInfoPannel"
-      v-draggable="{ bounds: 'body', cancel: 'div.content' }"
-      v-loading="false"
-      v-click-out-side="listClickOutSideHandler"
-    >
+    <div class="infomation-pannel" v-show="showInfoPannel" v-draggable="{ bounds: 'body', cancel: 'div.content' }"
+      v-loading="pannelLoading" v-click-out-side="listClickOutSideHandler">
       <div class="title-block">
         <div class="title">{{ infoPannelTitle }}</div>
-        <div
-          class="miniIcon"
-          :style="iconBackStyle"
-          @click="listPinState = !listPinState"
-        ></div>
+        <div class="miniIcon" :style="iconBackStyle" @click="listPinState = !listPinState"></div>
       </div>
       <!-- <div class="close" @click="showInfoPannel = false; showDetail = false"></div> -->
       <div class="important-feature">
-        <el-table
-          :data="infoTableData_filtered"
-          height="30vh"
-          stripe
-          border
-          class="infomation-table"
-          v-loading="pannelLoading"
-        >
-          <el-table-column
-            v-for="(item, index) in infoTableHeader"
-            :key="index"
-            :prop="item.prop"
-            :label="item.label"
-          ></el-table-column>
+        <el-table :data="infoTableData_filtered" height="30vh" stripe border class="infomation-table">
+          <el-table-column v-for="(item, index) in infoTableHeader" :key="index" :prop="item.prop"
+            :label="item.label"></el-table-column>
 
           <el-table-column align="right">
             <template #header>
               <el-input v-model="search" size="small" placeholder="输入关键字搜索" />
             </template>
             <template #default="scope">
-              <el-button
-                link
-                type="primary"
-                size="small"
-                @click="detailClickHandler4Feature(scope.row)"
-              >
+              <el-button link type="primary" size="small" @click="detailClickHandler4Feature(scope.row)">
                 查看详情
               </el-button>
             </template>
@@ -224,36 +136,11 @@
         </el-icon>
       </div>
 
-      <el-table
-        :data="waterTableData"
-        border
-        style="width: 100%"
-        v-show="showHydroPannel"
-      >
-        <el-table-column
-          prop="station"
-          label="站点"
-          :min-width="'20%'"
-          :align="'center'"
-        />
-        <el-table-column
-          prop="flow"
-          label="流量(m³/s)"
-          :min-width="'30%'"
-          :align="'center'"
-        />
-        <el-table-column
-          prop="level"
-          label="水位(m)"
-          :min-width="'25%'"
-          :align="'center'"
-        />
-        <el-table-column
-          prop="time"
-          label="更新时间"
-          :min-width="'30%'"
-          :align="'center'"
-        />
+      <el-table :data="waterTableData" border style="width: 100%" v-show="showHydroPannel">
+        <el-table-column prop="station" label="站点" :min-width="'20%'" :align="'center'" />
+        <el-table-column prop="flow" label="流量(m³/s)" :min-width="'30%'" :align="'center'" />
+        <el-table-column prop="level" label="水位(m)" :min-width="'25%'" :align="'center'" />
+        <el-table-column prop="time" label="更新时间" :min-width="'30%'" :align="'center'" />
       </el-table>
     </div>
 
@@ -379,9 +266,6 @@ const infoTableData_filtered = computed(() => {
       res.sort(customSort4);
     }
   }
-
-  pannelLoading.value = false;
-
   return res;
 });
 
@@ -499,7 +383,7 @@ const layerGroupClickHandler = async (node, data) => {
     infoTableData.value = tableData;
     infoTableHeader.value = { ...process(tableHeadData) };
     nowSource = DICT.LGIDSourceMap["过江通道"];
-  } else if (parentLabel === "骨干河道") {
+  } else if (parentLabel === "重点河道") {
     showInfoPannel.value = true;
     infoTableData.value = [];
     infoTableHeader.value = [];
@@ -527,7 +411,7 @@ const layerGroupClickHandler = async (node, data) => {
     infoTableData.value = tableData;
     infoTableHeader.value = { ...process(tableHeadData) };
     nowSource = DICT.LGIDSourceMap["骨干河道"];
-  } else if (parentLabel === "重要水闸") {
+  } else if (parentLabel === "重点水闸") {
     showInfoPannel.value = true;
     infoTableData.value = [];
     infoTableHeader.value = [];
@@ -556,7 +440,7 @@ const layerGroupClickHandler = async (node, data) => {
     infoTableData.value = tableData;
     infoTableHeader.value = { ...process(tableHeadData) };
     nowSource = DICT.LGIDSourceMap["重要水闸"];
-  } else if (parentLabel === "重要泵站") {
+  } else if (parentLabel === "重点泵站") {
     showInfoPannel.value = true;
     infoTableData.value = [];
     infoTableHeader.value = [];
@@ -585,6 +469,10 @@ const layerGroupClickHandler = async (node, data) => {
     infoTableHeader.value = { ...process(tableHeadData) };
     nowSource = DICT.LGIDSourceMap["重要泵站"];
   }
+
+  setTimeout(() => {
+    pannelLoading.value = false;
+  }, 1);
 };
 
 const baseMapChangeHandler = async () => {
@@ -1389,12 +1277,10 @@ const customSort4 = (a, b) => {
         border: 0;
         height: 0.4vh;
         width: 90%;
-        background-image: linear-gradient(
-          to right,
-          rgb(167, 233, 255),
-          rgb(14, 155, 219),
-          rgb(167, 233, 255)
-        );
+        background-image: linear-gradient(to right,
+            rgb(167, 233, 255),
+            rgb(14, 155, 219),
+            rgb(167, 233, 255));
       }
 
       .scenes-tree-container {
@@ -1603,8 +1489,7 @@ const customSort4 = (a, b) => {
                   color: rgb(234, 244, 252);
                 }
 
-                .detail-icon {
-                }
+                .detail-icon {}
               }
             }
           }
@@ -1680,7 +1565,7 @@ const customSort4 = (a, b) => {
         transform: translateX(-1%);
       }
 
-      .el-tree-node__content > .el-tree-node__expand-icon {
+      .el-tree-node__content>.el-tree-node__expand-icon {
         padding: 0px;
       }
 

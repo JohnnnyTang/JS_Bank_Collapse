@@ -30,7 +30,7 @@
         <div class="edit-pannel-container" v-if="editPannelShow">
             <div class="title">编辑页面</div>
             <div class="part">
-                <span>滩槽高程：</span>
+                <span>滩槽高差：</span>
                 <el-input v-model="inputValues.gaocha" style="width: 4vw; height: 3.5vh" placeholder="请输入" />
             </div>
             <div class="part">
@@ -54,7 +54,7 @@
         <div class="text-info-container">
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年该断面滩槽高程为 <span style="color: rgb(226, 80, 80);">{{ gaocha }}</span> m
+                    2023年该断面滩槽高差为 <span style="color: rgb(226, 80, 80);">{{ gaocha }}</span> m
                 </div>
             </div>
             <div class="text-info-block">
@@ -78,13 +78,14 @@ import { ref, onMounted, onUnmounted, watch, defineEmits, reactive, computed } f
 import { ElPopover, ElButton, ElSelect, ElOption, ElInput, ElMessage } from 'element-plus';
 import { drawShapeCompareGraph } from './util.js'
 import { useBankNameStore } from '../../store/bankNameStore';
+// import { useSectionStore } from '../../store/sectionStore';
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import ModelRunner from '../modelStore/modelRunner';
 
 
 
 
-
+// const sectionStore = useSectionStore()
 let formDataTextUp = null
 let formDataTableUpdate = null
 let bank = useBankNameStore().globalBankName
@@ -141,6 +142,9 @@ const calculating = ref(false)
 const emptyMessage = ref('正在提取断面形态，请稍后...')
 const sectionList = ref([])
 const selectedSection = ref({})
+
+// window.sectionDataCache = new Map()
+
 const selectedLabel = computed(() => {
     return selectedSection.value.label
 })
@@ -164,8 +168,23 @@ const sectionSelectHandler = async () => {
 
     calculating.value = true
 
-    const data = await calculatTwoSectionView(dem1, dem2, sectionGeojson)
-    console.log("计算的结果是:", data)
+    console.log(sectionGeojson)
+
+    let data = null;
+
+    // if (sectionStore.sectionDataCache.get(selectedSection.value.label)) {
+    //     data = sectionStore.sectionDataCache.get(selectedSection.value.label)
+    //     console.log("cache hit:", data)
+
+    // } else {
+        data = await calculatTwoSectionView(dem1, dem2, sectionGeojson)
+    //     console.log("计算的结果是:", data)
+    //     if (data)
+    //         sectionStore.sectionDataCache.set(selectedSection.value.label, data)
+    // }
+
+
+
 
     calculating.value = false
 
@@ -287,11 +306,13 @@ onMounted(async () => {
 
 ////////////////////// HELPERS //////////
 const calculatTwoSectionView = async (dem1, dem2, sectionGeojson) => {
+    if (!(dem1 && dem2 && sectionGeojson)) return null
+
     return new Promise(async (resolve, reject) => {
 
         const result1 = await sectionViewModelRun(dem1.path, sectionGeojson).catch(reject)
         const result2 = await sectionViewModelRun(dem2.path, sectionGeojson).catch(reject)
-
+        console.log(result1, result2)
         resolve({
             sec1: {
                 demName: dem1.name + '地形',
@@ -323,7 +344,6 @@ const sectionViewModelRun = async (demid, sectionGeojson, successCallback, error
                 offset: 130
             })
         })
-        console.log('task id', taskId, sectionViewMR.taskId)
         let statusInterval = setInterval(async () => {
             const status = await sectionViewMR.getRunningStatus()
             console.log('status', status)
@@ -331,13 +351,11 @@ const sectionViewModelRun = async (demid, sectionGeojson, successCallback, error
                 case 'RUNNING':
                 case 'LOCK':
                 case 'UNLOCK':
-                    console.log('unlock ，应该是G了')
                     reject()
                     break
                 case 'COMPLETE':
                     clearInterval(statusInterval)
                     const result = await sectionViewMR.getModelResult()
-                    console.log('result', result)
                     let sectionFileName = result['raw-json']
                     const sectionJson = await sectionViewMR.getModelResultFile(sectionFileName, 'json').catch((err) => {
                         ElNotification({
@@ -347,7 +365,6 @@ const sectionViewModelRun = async (demid, sectionGeojson, successCallback, error
                             title: '错误',
                             message: '断面形态计算完毕，但获取断面信息失败！',
                         })
-                        console.log(err)
                         reject()
                     })
                     successCallback && successCallback(sectionJson)
@@ -357,7 +374,6 @@ const sectionViewModelRun = async (demid, sectionGeojson, successCallback, error
                 case 'ERROR':
                     clearInterval(statusInterval)
                     let errorLog = await sectionViewMR.getErrorLog()
-                    console.log('error', errorLog)
 
                     errorCallback && errorCallback()
                     reject()

@@ -1367,8 +1367,8 @@ const runHydrodynamicModel = async () => {
         let modelParams = {}
         modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
         modelParams = {
-            "water-qs": conditionConfigureData.flow,
-            "tidal-level": conditionConfigureData.tideDif,
+            "water-qs": parseFloat(conditionConfigureData.flow),
+            "tidal-level": parseFloat(conditionConfigureData.tideDif),
             "segment": useBankNameStore().globalBankName,
             "set": "standard",
             "year": "2023",
@@ -1670,9 +1670,10 @@ onBeforeRouteUpdate(async (to, from) => {
     let map = useMapStore().getMap()
 
     refreshMap(map)
-    addBankLayer(map, bank).then(async (_) => {
-        if (bank === 'Mzs') {
-            mapFlyToMzs(map)
+
+    if (bank === 'Mzs') {
+        mapFlyToMzs(map)
+        addBankLayer(map, bank).then(() => {
             addRasterLayer(map, 23032209, 'mapRaster')
             map.setLayoutProperty('mapRaster', 'visibility', 'none')
             map.addLayer(new TerrainLayer(14))
@@ -1682,22 +1683,26 @@ onBeforeRouteUpdate(async (to, from) => {
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer, 'chaoWeiPoint')
 
-            getProfileTime()
-            showRiskStatus.value = true
-            showProfileInfo.value = false
-            showRiskResult.value = false
-            showControls.value = true
-            await ProfileLoadingProcess(
-                sceneBefore,
-                sceneNow,
-                sceneCompareBefore,
-                sceneCompareNow,
-            )
-            totalResult.desc = '高风险'
-            riskAreas.value = getRiskAreas('high')
-            showWaterPowerFunc()
-        } else {
-            mapFlyToRiver(map)
+        })
+
+        getProfileTime()
+        showRiskStatus.value = true
+        showProfileInfo.value = false
+        showRiskResult.value = false
+        showControls.value = true
+        // await ProfileLoadingProcess(
+        //     sceneBefore,
+        //     sceneNow,
+        //     sceneCompareBefore,
+        //     sceneCompareNow,
+        // )
+        totalResult.desc = '高风险'
+        riskAreas.value = "MZ03顺堤尾; MZ04江滩办; MZ05小港池; MZ06张靖皋桥位; MZ07桥位下游; MZ08海事码头; MZ09码头下游; "
+        showWaterPowerFunc()
+    } else {
+        mapFlyToRiver(map)
+
+        addBankLayer(map, bank).then(() => {
             // remove flow layer
             map.getLayer('floodFlow') && map.removeLayer('floodFlow')
             // add invisible bank Warn layer
@@ -1706,20 +1711,22 @@ onBeforeRouteUpdate(async (to, from) => {
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer)
             map.setLayoutProperty('岸段预警', 'visibility', 'none')
+        })
 
-            // do nothing temp
-            showRiskStatus.value = true
-            showProfileInfo.value = false
-            showRiskResult.value = false
-            showControls.value = false
 
-            // risk level
-            totalResult.desc = '暂无'
-            riskAreas.value = []
+        // do nothing temp
+        showRiskStatus.value = true
+        showProfileInfo.value = false
+        showRiskResult.value = false
+        showControls.value = false
 
-            showWaterPowerFunc()
-        }
-    })
+        // risk level
+        totalResult.desc = '暂无'
+        riskAreas.value = []
+        showFlow.value = true // 关闭
+        showWaterPowerFunc()
+    }
+
 
 
 })
@@ -1766,65 +1773,68 @@ onMounted(async () => {
             mapInstance = map
 
             refreshMap(map)
-            await addBankLayer(map, bk)
-
-            //////////////////// special layer
-            addRasterLayer(map, 23032209, 'mapRaster')
-            map.setLayoutProperty('mapRaster', 'visibility', 'none')
-            map.addLayer(new TerrainLayer(14))
-            map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
-            const chaoWeiPoint = {
-                type: 'FeatureCollection',
-                features: [
-                    {
-                        type: 'Feature',
-                        properties: {
-                            label: '潮位点',
+            // await addBankLayer(map, bk)
+            addBankLayer(map, bk).then(() => {
+                //////////////////// special layer
+                addRasterLayer(map, 23032209, 'mapRaster')
+                map.setLayoutProperty('mapRaster', 'visibility', 'none')
+                map.addLayer(new TerrainLayer(14))
+                map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+                const chaoWeiPoint = {
+                    type: 'FeatureCollection',
+                    features: [
+                        {
+                            type: 'Feature',
+                            properties: {
+                                label: '潮位点',
+                            },
+                            geometry: {
+                                type: 'Point',
+                                coordinates: tideLevelPointPos.value,
+                            },
                         },
-                        geometry: {
-                            type: 'Point',
-                            coordinates: tideLevelPointPos.value,
-                        },
-                    },
-                ],
-            }
-            map.addSource('chaoWeiPoint', {
-                type: 'geojson',
-                data: chaoWeiPoint,
-            })
-            map.addLayer({
-                id: 'chaoWeiPoint',
-                type: 'circle',
-                source: 'chaoWeiPoint',
-                paint: {
-                    'circle-radius': 7,
-                    'circle-color': 'rgb(255, 0,0)',
-                },
-            })
-            map.addLayer(
-                {
-                    id: 'chaoWeiPointLable',
-                    type: 'symbol',
+                    ],
+                }
+                map.addSource('chaoWeiPoint', {
+                    type: 'geojson',
+                    data: chaoWeiPoint,
+                })
+                map.addLayer({
+                    id: 'chaoWeiPoint',
+                    type: 'circle',
                     source: 'chaoWeiPoint',
-                    layout: {
-                        'text-field': ['get', 'label'],
-                        'text-font': [
-                            'Open Sans Semibold',
-                            'Arial Unicode MS Bold',
-                        ],
-                        'text-anchor': 'top',
-                        'text-offset': [0.0, 0.5],
-                        'text-size': 18,
-                        'text-allow-overlap': true,
-                    },
                     paint: {
-                        'text-color': 'rgb(255,255,255)',
+                        'circle-radius': 7,
+                        'circle-color': 'rgb(255, 0,0)',
                     },
-                },
-                'chaoWeiPoint',
-            )
-            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
-            map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+                })
+                map.addLayer(
+                    {
+                        id: 'chaoWeiPointLable',
+                        type: 'symbol',
+                        source: 'chaoWeiPoint',
+                        layout: {
+                            'text-field': ['get', 'label'],
+                            'text-font': [
+                                'Open Sans Semibold',
+                                'Arial Unicode MS Bold',
+                            ],
+                            'text-anchor': 'top',
+                            'text-offset': [0.0, 0.5],
+                            'text-size': 18,
+                            'text-allow-overlap': true,
+                        },
+                        paint: {
+                            'text-color': 'rgb(255,255,255)',
+                        },
+                    },
+                    'chaoWeiPoint',
+                )
+                bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+                map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+            })
+
+
             //////////////////// special layer
 
             useMapStore().setMap(map)
@@ -1839,9 +1849,10 @@ onMounted(async () => {
             //     sceneNow,
             //     sceneCompareBefore,
             //     sceneCompareNow,
-            // )
+            // ) // fuxed it
             totalResult.desc = '高风险'
-            riskAreas.value = getRiskAreas('high')
+            riskAreas.value = "MZ03顺堤尾; MZ04江滩办; MZ05小港池; MZ06张靖皋桥位; MZ07桥位下游; MZ08海事码头; MZ09码头下游; "
+            console.log('riskAreas', riskAreas.value)
             showWaterPowerFunc()
 
         })
@@ -1858,14 +1869,17 @@ onMounted(async () => {
 
             refreshMap(map)
 
-            await addBankLayer(map, bk)
+            // await addBankLayer(map, bk)
+            addBankLayer(map, bk).then(() => {
+                // add invisible bank warn layer
+                map.getLayer('岸段预警') && map.removeLayer('岸段预警')
+                bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
+                map.addLayer(bankWarnLayer)
+                map.setLayoutProperty('岸段预警', 'visibility', 'none')
+
+            })
             useMapStore().setMap(map)
 
-            // add invisible bank warn layer
-            map.getLayer('岸段预警') && map.removeLayer('岸段预警')
-            bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
-            map.addLayer(bankWarnLayer)
-            map.setLayoutProperty('岸段预警', 'visibility', 'none')
 
             // do nothing temp
             showRiskStatus.value = true
@@ -1876,9 +1890,8 @@ onMounted(async () => {
             // risk level
             totalResult.desc = '暂无'
             riskAreas.value = []
-            console.log(showWaterPower.value)
+            showFlow.value = true // 关闭
             showWaterPowerFunc()
-            console.log(showWaterPower.value)
         })
 
 

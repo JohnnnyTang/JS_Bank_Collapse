@@ -154,7 +154,7 @@ const runRiskLevelForAll = (data, refs, info) => {
                         })
 
                         Promise.all(resultPromises).then(async (res) => {
-                            notice('模型运行成功', 'success')
+                            // notice('模型运行成功', 'success')
 
                             const resultList = res.map(item => item.data)
 

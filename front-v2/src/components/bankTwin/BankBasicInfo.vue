@@ -12,7 +12,7 @@
                 </div> -->
                 <div class="key-val-container">
                     <div class="key-text">预警级别：</div>
-                    <div class="val-text">{{ info["riskLevel"] }}</div>
+                    <div class="val-text" style="font-size: calc(0.6vw + 0.5vh);">{{ info["riskLevel"] }}</div>
                 </div>
                 <div class="key-val-container">
                     <div class="key-text">监测长度：</div>

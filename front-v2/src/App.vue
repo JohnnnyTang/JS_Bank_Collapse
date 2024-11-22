@@ -12,7 +12,7 @@ import router from './router/index'
 import { useDeviceNameStore } from './store/mapStore';
 
 onMounted(async () => {
-    
+
     const infoBoxDiv = document.createElement('div')
     infoBoxDiv.style.position = 'absolute'
     infoBoxDiv.style.zIndex = '999'
@@ -188,7 +188,7 @@ body,
 
         ul {
             text-align: center;
-            background-color:#2587E3;
+            background-color: #2587E3;
             padding-bottom: 1px;
             z-index: 9999;
         }
@@ -507,23 +507,77 @@ body,
 }
 
 .el-popper.is-light.el-popover {
-    background: rgba(255,255,255,0.8);
-    color:#134dcc;
+    background: rgba(255, 255, 255, 0.8);
+    color: #134dcc;
     border: #1248bb 1px solid;
     border-radius: 5px;
     box-shadow: 0 0 4px #1248bb;
     font-size: 20px;
-    font-weight: bold;;
+    font-weight: bold;
+    ;
+}
+
+.el-popper.is-light.el-popover.device-indicator-popover {
+    background: rgba(255, 255, 255, 0.942);
+    border: #1248bb 1px solid;
+    border-radius: 5px;
+    box-shadow: 0 0 4px #1248bb;
+
+    div.device-indicator-info {
+        position: relative;
+        width: 14vw;
+        height: 30vh;
+        color: rgb(1, 24, 74);
+
+        .device-indicator-info-title {
+            position: relative;
+            width: 100%;
+            height: 3vh;
+            line-height: 3vh;
+            text-align: left;
+            font-size: calc(0.5vw + 0.4vh);
+            font-weight: bold;
+        }
+
+        .device-indicator-info-content {
+            position: relative;
+            width: 100%;
+            height: 26vh;
+            font-size: calc(0.4vw + 0.3vh);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            // overflow-y: auto;
+
+            .indicator-info {
+                position: relative;
+                height: fit-content;
+                margin-top: .5vh;
+                margin-bottom: .5vh;
+                .indicator-name {
+                    font-size: calc(0.4vw + 0.4vh);
+                    color: rgb(1, 67, 165);
+                }
+
+                .indicator-desc {
+                    color: #191919;
+                    text-align: left;
+                    margin-left: .7vw;
+                }
+            }
+        }
+    }
 }
 
 
-.el-overlay{
-    .el-drawer{
+
+
+.el-overlay {
+    .el-drawer {
         margin-top: 13vh;
-        background-color: rgb(244,244,244);
+        background-color: rgb(244, 244, 244);
         width: 18% !important;
         height: 87vh !important;
     }
 }
-
 </style>
