@@ -15,10 +15,17 @@ import { onMounted, ref } from 'vue'
 import * as echarts from 'echarts'
 import { bedFlowTime, bedFlowValue, bedResData } from './staticData'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useBankNameStore } from '../../store/bankNameStore'
 
 const chartDom = ref()
 const hasData = ref(false)
 const route = useRoute()
+
+document.addEventListener('keydown', function (event) {
+    if (event.key === '1') {
+        console.log(hasData.value)
+    }
+})
 
 const option = {
     tooltip: {
@@ -122,27 +129,31 @@ const option = {
 
 let chart
 
+// 切换岸段时会重载组件
 onMounted(() => {
     chart = echarts.init(chartDom.value)
-    let bk = route.params.id
+    let bk = useBankNameStore().globalBankName
+
     if (bk === 'Mzs') {
         hasData.value = true
-
         setTimeout(() => {
             chart.setOption(option)
         }, 0)
-    }
-})
-
-onBeforeRouteUpdate(() => {
-    let bk = route.params.id
-    if (bk === 'Mzs') {
-        chart.setOption(option)
-        hasData.value = true
     } else {
         hasData.value = false
     }
 })
+
+// onBeforeRouteUpdate((to, from) => {
+//     let bk = to.params.id // 切换前岸段
+//     console.log('bk', bk)
+//     if (bk === 'Mzs') {
+//         chart.setOption(option)
+//         hasData.value = true
+//     } else {
+//         hasData.value = false
+//     }
+// })
 </script>
 
 <style lang="scss" scoped>

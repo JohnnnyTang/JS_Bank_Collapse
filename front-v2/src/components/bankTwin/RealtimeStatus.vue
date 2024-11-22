@@ -161,16 +161,18 @@
                         <div class="video-content-container">
                             <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                                 <div class="video-content">
-                                    <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
+                                    <div :id="item.name" style="width:100%; height:100%"></div>
+                                    <!-- <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
                                         :key="item.key" allowfullscreen v-if="showVideo === true">
-                                    </iframe>
-                                    <div class="video-img" :id="index" v-show="showVideo === false"></div>
+                                    </iframe> -->
+                                    <div class="video-img" v-show="showVideo === false" 
+                                        :style="{ backgroundImage: `url('${item.screenshotImg}')` }"></div>
                                 </div>
                                 <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
                                     " @click="focusOn(index)">
                                     {{ item.name }}
                                 </div>
-                                <div class="small-pic" v-if="item.order == 0" :id="index"></div>
+                                <div class="small-pic" v-if="item.order == 0" :id="'sp' + index"></div>
                             </div>
                         </div>
                         <div class="video-control-opener" :class="{ open: videoControlOpen }">
@@ -262,6 +264,7 @@ import { useWarnInfoStore } from '../../store/mapStore'
 import DeviceHelper from './deviceHelper'
 import { useBankNameStore } from '../../store/bankNameStore'
 import { InfoFilled } from '@element-plus/icons-vue'
+import EZUIKit from 'ezuikit-js'
 
 const route = useRoute()
 const props = defineProps({
@@ -437,7 +440,8 @@ const videoList = ref([
         position: '32.0316674, 120.5402574',
         deviceId: 'FB5033035',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033035/1.live',
         order: 0,
         presetPt: [
             { name: '上游岸段', status: 'normal' },
@@ -447,13 +451,16 @@ const videoList = ref([
         ],
         warn: false,
         key: 0,
+        uikitInstance: null,
+        screenshotImg: null
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
         deviceId: 'FB5033037',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033037/1.live',
         order: 1,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
@@ -463,13 +470,16 @@ const videoList = ref([
         ],
         warn: false,
         key: 1,
+        uikitInstance: null,
+        screenshotImg: null
     },
     {
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
         deviceId: 'FB5033036',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033036/1.live',
         order: 2,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
@@ -479,6 +489,8 @@ const videoList = ref([
         ],
         warn: false,
         key: 2,
+        uikitInstance: null,
+        screenshotImg: null
     },
 ])
 const userInteractInfo = reactive({
@@ -487,48 +499,36 @@ const userInteractInfo = reactive({
 })
 const videoRef = ref();
 const showVideo = ref(true);
+const videoImgs64 = ref([])
 window.addEventListener('mousemove', (e) => {
     // 用户交互，更新lastInteractTime
     userInteractInfo.lastInteractTime = dayjs()
     userInteractInfo.refreshIframe = 1
+    videoList.value.forEach((item, index) => {
+        if (!item.uikitInstance) return
+        // item.uikitInstance.play()
+    })
     showVideo.value = true;
 })
-window.addEventListener('keydown', async (e) => {
-    if (e.key == '1') {
-        videoList.value.forEach((item, index) => {
-            // let dom = document.querySelector('#' + item.name);
-            let dom = document.querySelector('.' + 'video-content');
-            // console.log(dom)
-            // domtoimage.toPng(dom).then((imageUrl)=> {
-            //     console.log(imageUrl)
-            //     const div = document.createElement('div')
-            // }).catch((err)=> {
-            //     console.log(err)
-            // });
 
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = element.offsetWidth;
-            canvas.height = element.offsetHeight;
-            context.drawImage(element, 0, 0);
-
-            // 将Canvas内容转换为图片数据
-            const imageDataUrl = canvas.toDataURL('image/png');
-
-            // 显示或下载图片
-            console.log(imageDataUrl);
-        })
-
-    }
-})
 const refreshInterval = setInterval(() => {
     // 检查上次交互和此次交互的分钟数
     let nowTime = dayjs()
     let diffTime = nowTime.diff(userInteractInfo.lastInteractTime, 'seconds')
     console.log(diffTime + 'seconds ' + '用户无操作')
-    if (diffTime > 10) {
-        // close page if no user interaction for 3 minutes
-        // userInteractInfo.refreshIframe = 0
+    if (diffTime > 5) {
+        videoList.value.forEach((item, index) => {
+            if (!item.uikitInstance) return
+            const capturePicturePromise = item.uikitInstance.capturePicture();
+            capturePicturePromise.then((data) => {
+                let base64Img = data.data.base64
+                item.screenshotImg = base64Img
+                // item.uikitInstance.stop()
+            }).catch((err)=> {
+                console.error('capture failed', err)
+            });
+        })
+
         showVideo.value = false;
     }
 }, 1000 * 5 * 1)
@@ -578,6 +578,10 @@ const functionIndexList = [0, 1, 2, 3, 8, 9, 10, 11]
 let curBigVideoIndex = ref(0)
 
 const focusOn = (index) => {
+    for (let item of videoList.value) {
+        if (!item.uikitInstance) return
+    }
+
     ;[
         videoList.value[curBigVideoIndex.value].order,
         videoList.value[index].order,
@@ -586,6 +590,23 @@ const focusOn = (index) => {
             videoList.value[curBigVideoIndex.value].order,
         ]
     curBigVideoIndex.value = index
+
+    reSizeVideos()
+}
+
+
+
+// 调整播放器尺寸
+const reSizeVideos = () => {
+    videoList.value.forEach(item => {
+        const videoBox = document.getElementById(item.order);
+        const videoDom = videoBox.querySelectorAll('.video-content')[0]
+        if (videoDom) {
+            const width = videoDom.offsetWidth;
+            const height = videoDom.offsetHeight;
+            item.uikitInstance.reSize(width, height)
+        }
+    })
 }
 
 const navToMoreData = () => {
@@ -1388,6 +1409,22 @@ onMounted(async () => {
     }, 10)
 
 
+    videoList.value.forEach((item, index) => {
+        item.uikitInstance = new EZUIKit.EZUIKitPlayer({
+            id: item.name,
+            url: item.videoUrl,
+            accessToken:token.value,
+            download: false
+        })
+    })
+
+    let timeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            reSizeVideos()
+        }, 300);
+    });
 })
 
 onBeforeUnmount(async () => {
@@ -1924,18 +1961,6 @@ div.device-info-container {
                             width: 100%;
                             // z-index:1000;
                             background-size: cover;
-
-                            &[id='0'] {
-                                background-image: url('/mzs-hsmt.png');
-                            }
-
-                            &[id='1'] {
-                                background-image: url('/mzs-jtbsc.png');
-                            }
-
-                            &[id='2'] {
-                                background-image: url('/mzs-sywd.png');
-                            }
                         }
                     }
 
@@ -1993,15 +2018,15 @@ div.device-info-container {
                         background-repeat: no-repeat;
                         background-position: 50% 50%;
 
-                        &[id='0'] {
+                        &[id='sp0'] {
                             background-image: url('/mzsBase-monitor3.png');
                         }
 
-                        &[id='1'] {
+                        &[id='sp1'] {
                             background-image: url('/mzsBase-monitor2.png');
                         }
 
-                        &[id='2'] {
+                        &[id='sp2'] {
                             background-image: url('/mzsBase-monitor1.png');
                         }
                     }
@@ -2076,7 +2101,7 @@ div.device-info-container {
 
                 div.control-open-text {
                     background-color: #001885;
-
+                    font-size: calc(0.5vw + 0.55vh);
                     &:hover {
                         cursor: pointer;
                         font-weight: bold;

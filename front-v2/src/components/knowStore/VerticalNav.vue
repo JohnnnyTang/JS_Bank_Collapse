@@ -31,12 +31,12 @@ const navMenuList = ref([
         path: '/knowledgeStore/history',
         active: false,
     },
-    {
-        name: '相关规划图集',
-        iconUrl: '/plan.png',
-        path: '/knowledgeStore/plan',
-        active: false,
-    },
+    // {
+    //     name: '相关规划图集',
+    //     iconUrl: '/plan.png',
+    //     path: '/knowledgeStore/plan',
+    //     active: false,
+    // },
     // {
     //     name: '崩岸知识管理',
     //     iconUrl: '/admin-panel.png',
