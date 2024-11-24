@@ -54,17 +54,17 @@
         <div class="text-info-container">
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年该断面滩槽高差为 <span style="color: rgb(226, 80, 80);">{{ gaocha }}</span> m
+                    {{ endYear }}年该断面滩槽高差为 <span style="color: rgb(226, 80, 80);">{{ gaocha }}</span> m
                 </div>
             </div>
             <div class="text-info-block">
                 <div class="text-info-item">
-                    2023年断面最大岸坡坡比为<span style="color: rgb(226, 80, 80);">{{ pobi }}</span>
+                    {{ endYear }}年断面最大岸坡坡比为<span style="color: rgb(226, 80, 80);">{{ pobi }}</span>
                 </div>
             </div>
             <div class="text-info-block">
                 <div class="text-info-item">
-                    1999~2023年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">{{ speed }}</span> m/年
+                    {{ startYear }}~{{ endYear }}年断面年最大冲刷幅度为 <span style="color: rgb(226, 80, 80);">{{ speed }}</span> m/年
                 </div>
             </div>
         </div>
@@ -111,25 +111,17 @@ const newBackendInstance = axios.create({
 const emit = defineEmits(['profileValueChange'])
 
 const props = defineProps({
-    // profileData: {
-    //     type: Object,
-    // },
-    // profileDataCompare: {
-    //     type: Object,
-    // },
-    // profileList: {
-    //     type: Object
-    // },
-    // shapeChartLoad: {
-    //     type: Boolean
-    // }
     nowDEMs: {
         type: Array,
         default: []
     }
 })
+const endYear = ref('2023')
+const startYear = ref('2012')
 watch(() => props.nowDEMs, (newVal) => {
     console.log("nowDEMs的值是:", newVal)
+    startYear.value = newVal[0].year
+    endYear.value = newVal[1].year
     // 换地形了，重新算
     sectionSelectHandler()
 })
@@ -177,7 +169,7 @@ const sectionSelectHandler = async () => {
     //     console.log("cache hit:", data)
 
     // } else {
-        data = await calculatTwoSectionView(dem1, dem2, sectionGeojson)
+    data = await calculatTwoSectionView(dem1, dem2, sectionGeojson)
     //     console.log("计算的结果是:", data)
     //     if (data)
     //         sectionStore.sectionDataCache.set(selectedSection.value.label, data)
