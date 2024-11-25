@@ -119,7 +119,7 @@
                 :time-step="timeStep" @handleDrawEvent="drawHandler" ref="flowspeedInfoRef" />
             <div class="flow-control-block">
                 <label class="switch" style="transform: rotateZ(90deg)">
-                    <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
+                    <input type="checkbox" :checked="showFlow" @click.prevent="flowControlHandler()" />
                     <span class="slider"></span>
                 </label>
                 <div class="text-block">
@@ -438,10 +438,10 @@ const conditionConfigureDataResetHandler = async () => {
             return
         }
 
-       
+
         ///////////////////// result ////////////////////////
         // 更新潮位线
-        
+
         const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result)
         console.log('riskAreassss:', riskAreassss)
 
@@ -547,7 +547,6 @@ const showWaterPowerFunc = async () => {
 const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
     if (showWaterPower.value === true) {
-        // showFlow.value = true
         showWaterPowerFunc()
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
@@ -958,6 +957,7 @@ const flowControlHandler = async () => {
     if (hydrodynamicCaseID != '' && hydrodynamicRunningResult['visualization-description-json']) {
         showFlow.value = !showFlow.value
         flowControl(showFlow.value)
+
     } else {
         ElNotification({
             title: '警告',
@@ -999,11 +999,16 @@ onBeforeRouteUpdate(async (to, from, next) => {
         })
         return
     }
-
+    //////////// 更新岸段时，信息重置
+    showWaterPower.value = false
+    showRiverBed.value = false
+    showGeologyAndProject.value = false
+    hydrodynamicCaseID = ''
+    hydrodynamicRunningResult = {}
+    hydrodynamicCalcDone.value = false;
 
     useBankNameStore().globalBankName = to.params.id
     let bank = to.params.id
-    showWaterPower.value = false    // 确保切换岸段时面板显示
 
 
     //////// 01 基本信息
