@@ -630,8 +630,7 @@ const visulizationPrepare = async () => {
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
-            // segment: 'Mzs',
-            segment: selectedBank.bankEnName,
+            segment: 'Mzs', // 后端纹理资源生产有问题，这里用Mzs的资源  2024-11-25
             set: 'standard',
             year: '2023',
         }

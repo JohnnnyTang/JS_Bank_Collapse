@@ -626,7 +626,8 @@ const runHydrodynamicModel = async () => {
         modelParams = {
             "water-qs": parseFloat(conditionConfigureData.flow),
             "tidal-level": parseFloat(conditionConfigureData.tideDif),
-            "segment": useBankNameStore().globalBankName,
+            // "segment": useBankNameStore().globalBankName,
+            segment: 'Mzs', // 后端流场纹理资源生产有问题，这里用Mzs的资源  2024-11-25
             "set": "standard",
             "year": "2023",
         }
