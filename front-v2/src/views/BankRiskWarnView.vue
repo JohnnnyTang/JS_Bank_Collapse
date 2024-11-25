@@ -425,9 +425,8 @@ const conditionConfigureDataResetHandler = async () => {
         bankEnName: useBankNameStore().globalBankName,
         setName: 'standard'
     }).then(async (result) => {
-        console.log('runRiskLevelForAll result:', result)
-
         if (result === null) {
+            console.log('runRiskLevelForAll result is null')
             ElMessage({
                 type: 'error',
                 message: '模型运行失败',
@@ -440,25 +439,30 @@ const conditionConfigureDataResetHandler = async () => {
 
 
         ///////////////////// result ////////////////////////
-        // 更新潮位线
+        // 更新风险条带
+        BankResourceHelper.getBankSectionGeometry(useBankNameStore().globalBankName, "short").then(res => {
+            
+            const shortSectionFeatures = res.data
+            const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result, shortSectionFeatures)
 
-        const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result)
-        console.log('riskAreassss:', riskAreassss)
+            totalResult.desc = finalResult
+            riskAreas.value = riskAreassss.join('; ')
+            let map = useMapStore().getMap()
+            if (bankWarnLayer && map) {
+                bankWarnLayer.update(warnLayerData)
+                map.setLayoutProperty('岸段预警', 'visibility', 'visible')
+                map.triggerRepaint()
+            }
+            ElNotification({
+                title: '模型计算成功',
+                offset: 300,
+                type: 'success',
+            })
 
-        totalResult.desc = finalResult
-        riskAreas.value = riskAreassss.join('; ')
-        let map = useMapStore().getMap()
-        if (bankWarnLayer && map) {
-            bankWarnLayer.update(warnLayerData)
-            map.setLayoutProperty('岸段预警', 'visibility', 'visible')
-            map.triggerRepaint()
-        }
-        ElNotification({
-            title: '模型计算成功',
-            offset: 300,
-            type: 'success',
+            tidePointVelocityCalc(tideLevelPointPos.value[0], tideLevelPointPos.value[1]);
         })
-        await tidePointVelocityCalc(tideLevelPointPos.value[0], tideLevelPointPos.value[1]);
+
+
 
 
     }).catch((error) => {
@@ -490,7 +494,6 @@ let defaultWarnLayerData = defaultWarnLayerDataInput
 
 
 const RasterControlHandler = () => {
-    console.log(showRaster.value)
     if (showRaster.value && showRasterControl.value) {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
         showRaster.value = false
@@ -628,7 +631,6 @@ const runHydrodynamicModel = async () => {
             "year": "2023",
         }
 
-        console.log('check1 ', modelPostUrl, modelParams)
         try {
             const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
             console.log('TASK_ID ', TASK_ID)
@@ -718,7 +720,6 @@ const tidePointVelocityCalc = async (lng, lat) => {
     RunningManSays.value = '正在提取潮位线...'
     const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
     await pointVelocityMR.modelStart()
-    console.log('===Interval')
 
     let runningInterval = (
         function loop() {
@@ -924,7 +925,17 @@ const flowControl = (showOrHide) => {
             'floodFlow',
             visualizationJsonUrl,
             pngPrefix,
-            true
+            true,
+            () => {
+                ElNotification({
+                    title: '警告',
+                    message: '流场可视化数据正在生产中，请稍后尝试',
+                    type: 'warning',
+                    offset: 300,
+                })
+                showFlow.value = false
+                flowControl(showFlow.value)
+            }
         ))
 
         map.getLayer('chaoWeiPointLable') ? map.addLayer(floodFlow, 'chaoWeiPointLable') : map.addLayer(floodFlow)
@@ -1006,6 +1017,8 @@ onBeforeRouteUpdate(async (to, from, next) => {
     hydrodynamicCaseID = ''
     hydrodynamicRunningResult = {}
     hydrodynamicCalcDone.value = false;
+    totalResult.desc = '暂无'
+    riskAreas.value = []
 
     useBankNameStore().globalBankName = to.params.id
     let bank = to.params.id
@@ -1099,9 +1112,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
         /////// 隐藏特殊图层的控制按钮
         showControls.value = false
 
-        // risk level
-        totalResult.desc = '暂无'
-        riskAreas.value = []
+
     }
 
     next(true)

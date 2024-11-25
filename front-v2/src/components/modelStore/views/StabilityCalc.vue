@@ -382,7 +382,7 @@ const treeRef = ref(null)
 const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
-
+    console.log(selectedBank.bankEnName)
     updateTreeFromBack(selectedBank.bankEnName)
     mapFlyToRiver(mapStore.getMap(map), bank.name)
 
@@ -630,7 +630,8 @@ const visulizationPrepare = async () => {
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
-            segment: 'Mzs',
+            // segment: 'Mzs',
+            segment: selectedBank.bankEnName,
             set: 'standard',
             year: '2023',
         }
