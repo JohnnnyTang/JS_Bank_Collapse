@@ -51,6 +51,9 @@ import { ref, onMounted, watch, toRaw } from 'vue'
 import { drawFlowspeedGraph } from './util.js'
 import { useHydrodynamicStore } from '../../store/modelStore'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useBankNameStore } from '../../store/bankNameStore'
+
+const bankName = useBankNameStore().globalBankName
 
 const hydrodynamicStore = useHydrodynamicStore()
 
@@ -220,20 +223,22 @@ onMounted(() => {
         },
     )
 
-    let bk = route.params.id
-    if (bk === 'Mzs') {
-        updateData(defaultData)
-    }
-})
-
-onBeforeRouteUpdate(() => {
-    let bk = route.params.id
+    let bk = useBankNameStore().globalBankName
     if (bk === 'Mzs') {
         updateData(defaultData)
     } else {
         hasData.value = false
     }
 })
+
+// onBeforeRouteUpdate(() => {
+//     let bk = route.params.id
+//     if (bk === 'Mzs') {
+//         updateData(defaultData)
+//     } else {
+//         hasData.value = false
+//     }
+// })
 
 defineExpose({
     updateData,

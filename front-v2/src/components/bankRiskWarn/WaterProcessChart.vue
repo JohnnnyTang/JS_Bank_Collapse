@@ -18,6 +18,9 @@
 import { onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useBankNameStore } from '../../store/bankNameStore'
+
+const bankName = useBankNameStore().globalBankName
 
 const props = defineProps(['waterProcessChartLoad', 'timeStep'])
 
@@ -200,16 +203,8 @@ let chart
 
 onMounted(() => {
     chart = echarts.init(chartDom.value)
+    let bk = useBankNameStore().globalBankName
 
-    let bk = route.params.id
-    if (bk === 'Mzs') {
-        chart.setOption(option)
-        hasData.value = true
-    }
-})
-
-onBeforeRouteUpdate(() => {
-    let bk = route.params.id
     if (bk === 'Mzs') {
         chart.setOption(option)
         hasData.value = true
@@ -217,6 +212,16 @@ onBeforeRouteUpdate(() => {
         hasData.value = false
     }
 })
+
+// onBeforeRouteUpdate(() => {
+//     let bk = route.params.id
+//     if (bk === 'Mzs') {
+//         chart.setOption(option)
+//         hasData.value = true
+//     } else {
+//         hasData.value = false
+//     }
+// })
 
 watch(
     // 监视timeStep变量移动

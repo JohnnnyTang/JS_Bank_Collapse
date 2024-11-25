@@ -1,7 +1,10 @@
 <template>
     <div
         class="realtime-video-container"
-        :class="[props.active ? 'active' : 'in-active', {'hide-right': props.domHide}]"
+        :class="[
+            props.active ? 'active' : 'in-active',
+            { 'hide-right': props.domHide },
+        ]"
     >
         <div class="realtime-video-title">实时视频监控</div>
         <div
@@ -10,15 +13,15 @@
             :key="index"
             :id="item.order"
         >
-            <div class="video-content">
-                <iframe
+            <div class="video-content" :id="'video' + item.order">
+                <!-- <iframe
                     :src="item.videoUrl + token"
                     width="100%"
                     height="100%"
                     :id="item.name"
                     allowfullscreen
                 >
-                </iframe>
+                </iframe> -->
             </div>
             <div
                 class="video-title"
@@ -161,6 +164,7 @@ import {
 import axios from 'axios'
 import BackEndRequest from '../../api/backend'
 import { useWarnInfoStore } from '../../store/mapStore'
+import EZUIKit from 'ezuikit-js'
 
 const deviceIdMap = {
     'MZS120.51749289_32.04059243_1': 'CL-01',
@@ -300,7 +304,8 @@ const videoList = ref([
         name: '民主沙海事码头监控',
         position: '32.0316674, 120.5402574',
         deviceId: 'FB5033035',
-        videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033035/1.live',
+        // videoUrl: `https://open.ys7.com/ezopen`,
         // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
         order: 0,
         presetPt: [
@@ -315,7 +320,8 @@ const videoList = ref([
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
         deviceId: 'FB5033037',
-        videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033037/1.live',
+        // videoUrl: `https://open.ys7.com/ezopen`,
         // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
         order: 1,
         presetPt: [
@@ -330,7 +336,8 @@ const videoList = ref([
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
         deviceId: 'FB5033036',
-        videoUrl: `https://open.ys7.com/ezopen`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033036/1.live',
+        // videoUrl: `https://open.ys7.com/ezopen`,
         // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
         order: 2,
         presetPt: [
@@ -457,6 +464,13 @@ onMounted(() => {
     //     params: {accessToken: token.value, ...controlParam}
     // })
     // console.log('zooooom', res.data)
+    videoList.value.forEach((item, index) => {
+        let UIKit = new EZUIKit.EZUIKitPlayer({
+            id: `video${item.order}`,
+            url: item.videoUrl,
+            accessToken:token.value,
+        })
+    })
 })
 
 onBeforeUnmount(async () => {

@@ -74,9 +74,7 @@
         <div class="risk-line-container">
             <div class="risk-line-title">风险等级图例：</div>
             <div class="risk-line"></div>
-            <!-- <div class="risk-line-arrow" :class="riskDataAll[riskDataIndex-1].value">
-                <img src="/up_triangle.png" alt="图例标记">
-            </div> -->
+
             <div class="risk-line-arrow" :class="styleMap[totalResult.desc]">
                 <img src="/down_triangle.png" alt="图例标记" />
             </div>
@@ -85,14 +83,12 @@
             <div class="risk-line-mark high">高风险</div>
         </div>
 
-        <div class="warn-status-container" v-if="showRiskStatus">
+        <div class="warn-status-container">
             <div class="warn-status-title">风险评估结果</div>
-            <!-- <div class="warn-status-content" :class="riskDataAll[riskDataIndex-1].value">
-                {{ riskDataAll[riskDataIndex-1].label }}
-            </div> -->
+
             <div class="warn-status-content" :class="styleMap[totalResult.desc]">{{ totalResult.desc }}</div>
         </div>
-        <div v-if="showRiskStatus" class="warn-detail-container" :class="styleMap[totalResult.desc]">
+        <div class="warn-detail-container" :class="styleMap[totalResult.desc]">
             <div class="warn-detail-profile">
                 <div class="warn-detail-text">
                     <span class="warn-detail-span"> </span>
@@ -103,10 +99,6 @@
                 </div>
             </div>
         </div>
-
-
-        <!-- <profileShapeVue v-if="showRiverBed" :profileData="profileData" :profileDataCompare="profileDataCompare"
-            :profileList="profileList" :shapeChartLoad="shapeChartLoad" /> -->
 
         <profileShapeVue v-if="showRiverBed" :now-d-e-ms="nowDEM" />
 
@@ -127,7 +119,7 @@
                 :time-step="timeStep" @handleDrawEvent="drawHandler" ref="flowspeedInfoRef" />
             <div class="flow-control-block">
                 <label class="switch" style="transform: rotateZ(90deg)">
-                    <input type="checkbox" :checked="showFlow" @click="flowControlHandler()" />
+                    <input type="checkbox" :checked="showFlow" @click.prevent="flowControlHandler()" />
                     <span class="slider"></span>
                 </label>
                 <div class="text-block">
@@ -145,16 +137,6 @@
         <geologyAndProjectVue v-if="showGeologyAndProject" />
 
 
-        <div class="drag riskResult" v-if="showRiskResult" v-draggable="{ bounds: 'body', cancel: 'div.content' }">
-            <riskResultVue :profileList="profileList" />
-        </div>
-
-        <div class="loading-container" v-show="isRunning">
-            <dv-loading class="loading-icon">
-                <div class="loading-message">{{ loading_message }}</div>
-            </dv-loading>
-        </div>
-
         <div class="hide-dom-container" :class="{ translate: !conditionPannelShow }" @click="hideDomClickHandler()">
             <HideDomButtom :direction="conditionPannelShow ? 'right' : 'left'"></HideDomButtom>
         </div>
@@ -164,8 +146,8 @@
                 <div class="flex-row" style="justify-content: space-between; align-items: center;">
                     <div class="flex-row" style="margin-right: .5vw">
                         <span class="desc">流量:</span>
-                        <el-input v-model="conditionConfigureData.flow" style="width: 3.5vw; height: 3.5vh"
-                            placeholder="请输入" />
+                        <el-input v-model="conditionConfigureData.flow" type="number" :step="1" class="no-arrow"
+                            style="width: 3.5vw; height: 3.5vh" placeholder="请输入" />
                         <span style="
                                 height: 3.5vh;
                                 line-height: 3.5vh;
@@ -174,8 +156,8 @@
                     </div>
                     <div class="flex-row">
                         <span class="desc">潮差:</span>
-                        <el-input v-model="conditionConfigureData.tideDif" style="width: 2.1vw; height: 3.5vh"
-                            placeholder="请输入" />
+                        <el-input v-model="conditionConfigureData.tideDif" type="number" :step="0.1" class="no-arrow"
+                            style="width: 2.1vw; height: 3.5vh" placeholder="请输入" />
                         <span style="
                                 height: 3.5vh;
                                 line-height: 3.5vh;
@@ -183,8 +165,6 @@
                             ">m</span>
                     </div>
                     <el-button type="primary" style="
-                            /* margin-left: 1.1vw;
-                            margin-top: -.5vh; */
                             width:3vw;
                             height: 4.5vh;
                             font-size: medium;
@@ -239,136 +219,53 @@
 import {
     onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw,
 } from 'vue'
-import { useRoute, onBeforeRouteUpdate, } from 'vue-router'
-import { EBorderBox3 } from 'e-datav-vue3'
-import mapboxgl from 'mapbox-gl'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import 'mapbox-gl/dist/mapbox-gl.css'
-const tileServer = `http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
-import router from '../router/index'
-import { BorderBox2 as DvBorderBox2 } from '@kjgl77/datav-vue3'
-import { bankRiskWarn } from '../components/bankRiskWarn/api.js'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { addBankLayer, initPureScratchMap, refreshMap } from '../utils/mapUtils'
-// import SteadyFlowLayer from '../utils/m_demLayer/newFlow_mask'
-import FlowFieldLayer from '../utils/WebGL/notSimpleLayer'
+import FlowFieldLayer from '../utils/WebGL/flowFieldLayer'
 import TerrainLayer from '../utils/WebGL/terrainLayer'
-// import BankWarnLayer from '../utils/m_demLayer/bankWarnLayer';
 import BankWarnLayer from '../components/dataVisual/js/bankWarnLayer'
 import { useMapStore } from '../store/mapStore'
-import { useResourceStore } from '../store/resourceStore.js'
-import * as echarts from 'echarts'
 import { ElMessage, ElNotification, dayjs } from 'element-plus'
 import axios from 'axios'
-import { filterFields } from 'element-plus/es/components/form/src/utils'
-import MapboxDraw from '@mapbox/mapbox-gl-draw'
-import { convertToMercator } from '../components/bankRiskWarn/coordConvert.js'
 import { rasterMM } from '../components/bankRiskWarn/rasterMM'
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import HideDomButtom from '../components/bankTwin/HideDomButtom.vue'
-import { connectionExists } from '@vue-flow/core'
 import {
     defaultWarnLayerDataInput,
-    defaultWarnLayerDataInput2,
     profileListInput,
-    sceneListInput,
-    placeList,
-    InfoTree,
-    waterCondition,
 } from '../components/bankRiskWarn/data'
-import { loadImage } from '../utils/mapUtils'
 import BankResourceHelper from '../components/modelStore/views/bankResourceHelper';
 import { runRiskLevelForAll, riskWarnResultParse } from '../components/bankRiskWarn/runRiskLevelForAll'
-// import riskResultVue from '../components/bankRiskWarn/riskResult.vue'
-// import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
-// import profileInfo from '../components/bankRiskWarn/profileInfo.vue'
-import ClientStorageHelper from '../utils/ClientStorageHelper';
 import { getRealTimeFlowAndLevelData } from '../api/realtimeWaterCondition';
 import { useBankNameStore } from '../store/bankNameStore'
 import BackEndRequest from '../api/backend'
 import ModelRunner from '../components/modelStore/modelRunner'
+import flowspeedInfoVue from '../components/bankRiskWarn/flowspeedInfo.vue'
+import profileShapeVue from '../components/bankRiskWarn/profileShapeCompare.vue'
+import bedFlowChartVue from '../components/bankRiskWarn/BedFlowChart.vue'
+import waterProcessChartVue from '../components/bankRiskWarn/WaterProcessChart.vue'
+import geologyAndProjectVue from '../components/bankRiskWarn/GeologyAndProject.vue'
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-const bankName = useBankNameStore().globalBankName
-console.log(bankName)
-////////////////////////////////////////////////////////////////////////////////////////////////
-const curActiveIndex = ref(-1)
-
-const riskResultBarVue = defineAsyncComponent(
-    () => import('../components/bankRiskWarn/riskResultBar.vue'),
-)
-const riskResultVue = defineAsyncComponent(
-    () => import('../components/bankRiskWarn/riskResult.vue'),
-)
-const flowspeedInfoVue = defineAsyncComponent(
-    () => import('../components/bankRiskWarn/flowspeedInfo.vue'),
-)
-
-const profileShapeVue = defineAsyncComponent(
-    () => import('../components/bankRiskWarn/profileShapeCompare.vue'),
-)
-
-const bedFlowChartVue = defineAsyncComponent(
-    () => import('../components/bankRiskWarn/BedFlowChart.vue'),
-)
-const waterProcessChartVue = defineAsyncComponent(
-    () => import('../components/bankRiskWarn/WaterProcessChart.vue'),
-)
-const geologyAndProjectVue = defineAsyncComponent(
-    () => import('../components/bankRiskWarn/GeologyAndProject.vue'),
-)
-
+const tileServer = `http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 const route = useRoute()
 
-// const activeStatus = ref([true, false, false])
-// 地图与基本信息展示
 const loading_message = ref('自定义断面信息计算中...')
 const mapContainer = ref()
 const timeStep = ref(0)
-const showHydroPannel = ref(false)
 const conditionPannelShow = ref(true)
 const hideDomClickHandler = () => {
     conditionPannelShow.value = !conditionPannelShow.value
 }
-const timeStepFloat = ref(0)
-// const timeStepFloat = computed(()=>{
-//     return timeStep.value
-// })
+
 const showFlow = ref(false)
 const showRaster = ref(false)
 const showBankLine = ref(true)
 const showTerrain = ref(false)
-const infoTreeData = ref(InfoTree)
 
 const flowspeedInfoRef = ref();
 const WaterProcessChartRef = ref();
 const tideLevelPointPos = ref([120.522864, 32.035502])
-
-const nowWaterConditionType = ref('洪季')
-
-const conditionChangeHandler = (lable) => {
-    nowWaterConditionType.value = lable
-    console.log(nowWaterConditionType.value)
-    showFlow.value = false
-    timeStep.value = 0
-    // timeStepFloat.value = 0
-    // remove layer
-    let map = useMapStore().getMap()
-    if (map.getLayer('floodFlow')) {
-        map.removeLayer('floodFlow')
-        if (floodWatcher) {
-            floodWatcher()
-            floodWatcher = null
-        }
-    }
-
-    // if (map.getLayer('dryFlow')) {
-    //     map.removeLayer('dryFlow')
-    //     if (dryWatcher) {
-    //         dryWatcher()
-    //         dryWatcher = null
-    //     }
-    // }
-}
 
 const mapFlyToRiver = (mapIns) => {
     if (!mapIns) return;
@@ -377,10 +274,9 @@ const mapFlyToRiver = (mapIns) => {
             [118.40770531586725, 31.015473926104463],
             [122.06874017956159, 32.73217294711945],
         ],
-        { pitch: 0, duration: 1500 }
+        { pitch: 0, duration: 3000 }
     );
 };
-
 const mapFlyToMzs = (mapIns) => {
     if (!mapIns) return
     mapIns.fitBounds(
@@ -389,7 +285,7 @@ const mapFlyToMzs = (mapIns) => {
             [120.59089640208264, 32.052171362618625],
         ],
         {
-            duration: 1500,
+            duration: 3000,
             // zoom: 11.5,
         },
     )
@@ -407,7 +303,6 @@ const getDemResource = async (bankEnName) => {
     const _bankEnName = bankEnName
     const _demData = (await BankResourceHelper.getBankCalculateResourceList('DEM', _bankEnName)).data
     return BankResourceHelper.DEMResourcetoList(_demData)
-    // return [{ name: '1' }, { name: '2' }]
 }
 const bankBCInfo = ref({
     name: '',
@@ -519,6 +414,8 @@ const conditionConfigureDataResetHandler = async () => {
     }
 
     ///////////////////////  Run  /////////////////////// 
+    isRunningMan.value = true
+    RunningManSays.value = '正在计算岸段风险，请稍候...'
     runRiskLevelForAll({
         waterQS: parseFloat(conditionConfigureData.flow),
         tidalLevel: parseFloat(conditionConfigureData.tideDif),
@@ -541,9 +438,9 @@ const conditionConfigureDataResetHandler = async () => {
             return
         }
 
-        isRunningMan.value = false
-        RunningManSays.value = ''
+
         ///////////////////// result ////////////////////////
+        // 更新潮位线
 
         const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result)
         console.log('riskAreassss:', riskAreassss)
@@ -556,9 +453,14 @@ const conditionConfigureDataResetHandler = async () => {
             map.setLayoutProperty('岸段预警', 'visibility', 'visible')
             map.triggerRepaint()
         }
+        ElNotification({
+            title: '模型计算成功',
+            offset: 300,
+            type: 'success',
+        })
+        await tidePointVelocityCalc(tideLevelPointPos.value[0], tideLevelPointPos.value[1]);
 
-        tidePointVelocityCalc(tideLevelPointPos.value[0], tideLevelPointPos.value[1]);
-        floodFlow.timeCount = 0.0       // 重置时间步
+
     }).catch((error) => {
         isRunningMan.value = false
         return
@@ -582,343 +484,10 @@ const conditionConfigureDataResetHandler = async () => {
 
 
 // 数据
-const profileList = ref(profileListInput)
-const sceneList = ref(sceneListInput)
 let defaultWarnLayerData = defaultWarnLayerDataInput
-const riskDataAll = ref([
-    {
-        value: 'low',
-        label: '低风险',
-    },
-    {
-        value: 'middle',
-        label: '中风险',
-    },
-    {
-        value: 'high',
-        label: '高风险',
-    },
-])
-const placeValue = ref('mzs')
-
-// 场景与地形选择
-const sceneBeforeSelectChange = () => { }
-
-const sceneNowSelectChange = () => { }
-
-const confirmProfileTime = () => {
-    sceneConfirmShow.value = true
-}
-
-// 获取当前场景内容
-const getProfileTime = () => {
-    sceneBefore = sceneList.value.find(
-        (item) => item.value === sceneBeforeValue.value,
-    )
-    sceneNow = sceneList.value.find(
-        (item) => item.value === sceneNowValue.value,
-    )
-    sceneCompareBefore = sceneList.value.find(
-        (item) => item.value === sceneCompareBeforeValue.value,
-    )
-    sceneCompareNow = sceneList.value.find(
-        (item) => item.value === sceneCompareNowValue.value,
-    )
-    // tempProfileBefore.value = sceneBefore.label
-    // tempProfileNow.value = sceneNow.label
-    // tempProfileAfter.value = sceneAfter.label
-}
-
-const getRiskAreas = (riskLevel) => {
-    let resultString = ''
-    profileList.value.map((item) => {
-        if (item.risk === riskLevel) {
-            resultString = resultString + item.name + '; '
-        }
-    })
-    return resultString
-}
-
-const getRiskAreasAll = () => {
-    let resultString = ''
-    profileList.value.map((item) => {
-        resultString + item.nickname + ' '
-    })
-    return resultString
-}
 
 
 
-// 加载断面数据和图层1
-const ProfileLoadingProcess = async (
-    sceneBefore,
-    sceneNow,
-    sceneCompareBefore,
-    sceneCompareNow,
-) => {
-    const before = sceneBefore.date
-    const now = sceneNow.date
-    const compareBefore = sceneCompareBefore.date
-    const compareNow = sceneCompareNow.date
-    loading_message.value = '确认计算结果是否存在...'
-    isRunning.value = true
-    let exist
-    let existCompare
-    exist = await profileDataExist(before, now)
-    existCompare = await profileDataExist(compareBefore, compareNow)
-    if (exist && existCompare) {
-        loading_message.value = '地形对比数据加载中...'
-        profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(
-            compareBefore,
-            compareNow,
-        )
-    } else if (exist && !existCompare) {
-        loading_message.value = '地形对比数据加载中...'
-        await CalProfile(compareBefore, compareNow)
-        loading_message.value = '地形对比数据加载中...'
-        profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(
-            compareBefore,
-            compareNow,
-        )
-    } else if (!exist && existCompare) {
-        loading_message.value = '地形对比数据加载中...'
-        await CalProfile(before, now)
-        loading_message.value = '地形对比数据加载中...'
-        profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(
-            compareBefore,
-            compareNow,
-        )
-    } else {
-        loading_message.value = '地形对比数据加载中...'
-        await CalProfile(compareBefore, compareNow)
-        await CalProfile(before, now)
-        loading_message.value = '地形对比数据加载中...'
-        profileData.value = await getProfileData(before, now)
-        profileDataCompare.value = await getProfileData(
-            compareBefore,
-            compareNow,
-        )
-    }
-    // loading_message.value = "地形对比结果计算中..."
-    // await CalProfile(before, now)
-    // loading_message.value = "地形对比数据加载中..."
-    // profileData = await getProfileData(before, now)
-    isRunning.value = false
-    shapeChartLoad.value = false
-    slopeChartLoad.value = false
-    erosionChartLoad.value = false
-    flowspeedChartLoad.value = false
-    // changeProfileData(profileData.value)
-    changeProfileListForShow() //展示高风险
-    CalProfileListForShow(profileData.value)
-    // CalProfileList(profileData.value)
-    // if (mapInstance.getLayer('mzsBankLineLowRisk') !== undefined) {
-    //     mapInstance.removeLayer('mzsBankLineLowRisk')
-    //     addBankLineRiskLayer(mapInstance, profileList)
-    // } else {
-    //     addBankLineRiskLayer(mapInstance, profileList)
-    // }
-    showRiskStatus.value = true
-    preSceneBeforeValue.value = sceneBeforeValue.value
-    preSceneNowValue.value = sceneNowValue.value
-}
-
-// 判断断面数据是否存在1-1
-const profileDataExist = async (before, now) => {
-    const promises = []
-    let result = true
-    try {
-        for (let i = 0; i < 12; i++) {
-            promises.push(bankRiskWarn.getProfileData(before, now, i + 1))
-        }
-        const allResponses = await Promise.all(promises)
-        allResponses.forEach((response) => {
-            if (!response || !response.data || response.data.length === 0) {
-                result = false
-            } else {
-                // console.log(response);
-            }
-        })
-    } catch (error) {
-        result = false
-    }
-    return result
-}
-
-// 获取断面数据1-2(1)
-const getProfileData = async (before, now) => {
-    const promises = []
-    const result = []
-    for (let i = 0; i < 12; i++) {
-        promises.push(bankRiskWarn.getProfileData(before, now, i + 1))
-    }
-    const allResponses = await Promise.all(promises)
-
-    // 确保每个响应都有 data 属性
-    allResponses.forEach((response) => {
-        if (response && response.data) {
-            result.push(response.data)
-        } else {
-            // console.log(response);
-        }
-    })
-    return result
-}
-
-// 计算断面详细信息1-2(2)
-const CalProfile = async (before, now) => {
-    const promises = []
-    for (let i = 0; i < profileList.value.length; i++) {
-        promises.push(CalProfileById(before, now, i))
-    }
-    await Promise.all(promises)
-}
-const CalProfileById = async (before, now, id) => {
-    const taskId = await bankRiskWarn.runProfileModel_long(before, now, id + 1)
-    let RunStatus
-    for (; ;) {
-        try {
-            RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
-        } catch (error) {
-            // console.log(error)
-        }
-        if (RunStatus.data == 2) {
-            break
-        } else if (RunStatus.data == -1) {
-            // alert("模型运行结果失败")
-            return
-        } else if (RunStatus.data == -2) {
-            // alert("模型运行生成json失败")
-            return
-        } else if (RunStatus.data == 1) {
-            // alert("模型运行中")
-        }
-        await wait(100)
-    }
-}
-
-// 获取断面风险和流速信息1-2(2)
-const CalProfileList = (profileData) => {
-    let lowNum = 0,
-        middleNum = 0,
-        highNum = 0
-    profileData.map((value, index) => {
-        const riskLevel = value.risk[2]
-        // defaultWarnLayerData[index].warnValue = value.risk[2]
-        if (riskLevel < 0.25) {
-            profileList.value[index].risk = 'low'
-            profileList.value[index].color = 'rgb(31, 110, 209)'
-            lowNum++
-        } else if (riskLevel < 0.5) {
-            profileList.value[index].risk = 'middle'
-            profileList.value[index].color = 'rgb(220, 126, 37)'
-            middleNum++
-        } else {
-            profileList.value[index].risk = 'high'
-            profileList.value[index].color = 'rgb(250, 55, 36)'
-            highNum++
-        }
-        if (highNum > 0) {
-            riskDataIndex.value = 2
-        } else if (middleNum > 0) {
-            riskDataIndex.value = 1
-        } else {
-            riskDataIndex.value = 0
-        }
-        try {
-            profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) { }
-    })
-    // let map = useMapStore().getMap()
-    // if (map) {
-    //     // console.log('12312321', defaultWarnLayerData)
-    //     // map.removeLayer('岸段预警')
-    //     // map.addLayer(new BankWarnLayer(defaultWarnLayerData))
-    // }
-}
-const CalProfileListForShow = (profileData) => {
-    profileData.map((value, index) => {
-        // defaultWarnLayerData[index].warnValue = value.risk[2]
-        if (profileList.value[index].risk === 'low') {
-            profileList.value[index].color = 'rgb(31, 110, 209)'
-        } else if (profileList.value[index].risk === 'middle') {
-            profileList.value[index].color = 'rgb(220, 126, 37)'
-        } else {
-            profileList.value[index].color = 'rgb(250, 55, 36)'
-        }
-        try {
-            profileList.value[index].flowspeed = value.deepestPoint[2]
-        } catch (error) { }
-    })
-    let map = useMapStore().getMap()
-    if (map) {
-        // console.log('12312321', defaultWarnLayerData)
-        // map.removeLayer('岸段预警')
-        // map.addLayer(new BankWarnLayer(defaultWarnLayerData))
-    }
-}
-
-const sceneSelectChange = () => { }
-
-const onAddOption = () => { }
-
-const onAddProfileOption = () => { }
-
-const onAddProfile = () => { }
-
-let floodWatcher = null
-let floodFlow = null
-
-
-const flowControlHandler = async () => {
-    showFlow.value = !showFlow.value
-    let map = useMapStore().getMap()
-    timeStep.value = 0
-    if (showFlow.value) {
-        if (nowWaterConditionType.value == '洪季') {
-            let backEndJsonUrl2 = '/api/data/flow/configJson/flood'
-            let imageSrcPrefix2 = '/api/data/flow/texture/flood/'
-            floodFlow = reactive(
-                new FlowFieldLayer(
-                    'floodFlow',
-                    backEndJsonUrl2,
-                    imageSrcPrefix2,
-                ),
-            )
-
-            map.getLayer('chaoWeiPointLable') ? map.addLayer(floodFlow, 'chaoWeiPointLable') : map.addLayer(floodFlow)
-
-            floodWatcher = watch(
-                () => floodFlow._progressRate,
-                (v) => {
-                    let val = parseFloat(
-                        (floodFlow.timeCount / floodFlow.timePerFrame).toFixed(
-                            1,
-                        ),
-                    )
-                    timeStep.value = val
-                },
-            )
-
-            console.log('add 洪季')
-        }
-
-    } else {
-        if (nowWaterConditionType.value == '洪季') {
-            if (map.getLayer('floodFlow')) {
-                map.removeLayer('floodFlow')
-                floodWatcher()
-                floodWatcher = null
-            }
-        }
-
-    }
-
-
-}
 
 const RasterControlHandler = () => {
     console.log(showRaster.value)
@@ -935,11 +504,6 @@ const RasterControlHandler = () => {
         mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
     }
 
-    // mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-
-    // if(!showRaster.value && showRasterControl.value){
-    //  showRaster.value = true
-    // }
 }
 
 const BankLineControlHandler = () => {
@@ -958,37 +522,13 @@ const TerrainControlHandler = () => {
     showTerrain.value = !showTerrain.value
 }
 
-// 地形对比变量
-const sceneBeforeValue = ref('2019before')
-const sceneNowValue = ref('2023before1')
-const sceneCompareBeforeValue = ref('1999before')
-const sceneCompareNowValue = ref('2012after')
-const preSceneBeforeValue = ref('2019before')
-const preSceneNowValue = ref('2023before1')
-const preSceneCompareBeforeValue = ref('2012after')
-const presceneCompareNowValue = ref('2012after')
-let sceneBefore
-let sceneNow
-let sceneCompareBefore
-let sceneCompareNow
-
-// 窗口显示变量
-const showRiskStatus = ref(true)
-const showProfileInfo = ref(false)
 
 
-
-const showRiskResult = ref(false)
-const showRiskResultFunc = () => {
-    showRiskResult.value = !showRiskResult.value
-}
 
 
 const showRasterControl = ref(false)
 const showControls = ref(false)
 
-// 展示水动力因素指标，包括:
-// 当前年份断面（探槽高差+坡比文字）+三年图+近岸冲刷速率值
 const showWaterPower = ref(false)
 const showWaterPowerFunc = async () => {
     if (showRiverBed.value === true) {
@@ -998,8 +538,7 @@ const showWaterPowerFunc = async () => {
     }
 
     timeStep.value = 0
-    // timeStepFloat.value = 0
-    await flowControlHandler()
+    // await flowControlHandler()
     mapInstance.getLayer('mapRaster') && mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')        //TODO:??
 
     showWaterPower.value = !showWaterPower.value
@@ -1008,7 +547,6 @@ const showWaterPowerFunc = async () => {
 const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
     if (showWaterPower.value === true) {
-        showFlow.value = true
         showWaterPowerFunc()
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
@@ -1024,7 +562,6 @@ const showRiverBedFunc = () => {
 const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
     if (showWaterPower.value === true) {
-        showFlow.value = true
         showWaterPowerFunc()
     } else if (showRiverBed.value === true) {
         showRiverBedFunc()
@@ -1033,236 +570,15 @@ const showGeologyAndProjectFunc = () => {
     showGeologyAndProject.value = !showGeologyAndProject.value
 }
 
-const profileData = ref([])
-const profileDataCompare = ref([])
-const riskDataIndex = ref(0)
 const riskAreas = ref([])
-const tempProfile = ref(null)
-const tempProfileData = ref(null)
 
-// 断面图表变量
-const shapeYearlyChartLoad = ref(true)
-const shapeChartLoad = ref(true)
-const slopeChartLoad = ref(true)
-const erosionChartLoad = ref(true)
+
 const flowspeedChartLoad = ref(true)
 
-const tempProfileName = ref('')
-const tempProfileRisk = ref('')
-const tempProfileBefore = ref('')
-const tempProfileNow = ref('')
 
 // 断面绘制变量
 let mapInstance
-const sectionConfirmShow = ref(false)
-const sceneConfirmShow = ref(false)
-const sectionLineLabel = ref('')
-const sectionLineLabelSec = ref('')
-const isRunning = ref(false)
 
-let StartPtX
-let StartPtY
-let EndPtX
-let EndPtY
-const draw = new MapboxDraw({
-    displayControlsDefault: false,
-    // Select which mapbox-gl-draw control buttons to add to the map.
-    controls: {
-        line_string: true,
-        trash: true,
-    },
-    // Set mapbox-gl-draw to draw by default.
-    // The user does not have to click the polygon control button first.
-    // defaultMode: '',
-    styles: [
-        // ACTIVE (being drawn)
-        // line stroke
-        {
-            id: 'gl-draw-line',
-            type: 'line',
-            filter: [
-                'all',
-                ['==', '$type', 'LineString'],
-                ['==', 'mode', 'draw_line_string'],
-            ],
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-color': '#D20C0C',
-                'line-dasharray': [0.2, 2],
-                'line-width': 2,
-            },
-        },
-        // vertex point halos
-        {
-            id: 'gl-draw-polygon-and-line-vertex-halo-active',
-            type: 'circle',
-            filter: [
-                'all',
-                ['==', 'meta', 'vertex'],
-                ['==', '$type', 'Point'],
-                ['==', 'mode', 'draw_line_string'],
-            ],
-            paint: {
-                'circle-radius': 5,
-                'circle-color': '#FFF',
-            },
-        },
-        // vertex points
-        {
-            id: 'gl-draw-polygon-and-line-vertex-active',
-            type: 'circle',
-            filter: [
-                'all',
-                ['==', 'meta', 'vertex'],
-                ['==', '$type', 'Point'],
-                ['==', 'mode', 'draw_line_string'],
-            ],
-            paint: {
-                'circle-radius': 3,
-                'circle-color': '#D20C0C',
-            },
-        },
-        // INACTIVE (static, already drawn)
-        // line stroke
-        {
-            id: 'gl-draw-line-static',
-            type: 'line',
-            filter: [
-                'all',
-                ['==', '$type', 'LineString'],
-                ['!=', 'mode', 'draw_line_string'],
-            ],
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-color': '#000',
-                'line-width': 3,
-            },
-        },
-    ],
-})
-const cancelSectionRese = () => {
-    sectionConfirmShow.value = false
-}
-// 两年版本
-const sureSectionRese = async () => {
-    if (tempProfileName.value === '') {
-        ElMessage.error('断面名称不为空！')
-        return
-    } else if (
-        profileList.value.find((item) => item.name === tempProfileName.value)
-    ) {
-        ElMessage.error('断面名称已存在！')
-        return
-    }
-    isRunning.value = true
-    shapeYearlyChartLoad.value = true
-    shapeChartLoad.value = true
-    slopeChartLoad.value = true
-    erosionChartLoad.value = true
-    loading_message.value = '自定义断面信息计算中...'
-    sectionConfirmShow.value = false
-    const before = sceneList.value.find(
-        (item) => item.value == sceneBeforeValue.value,
-    ).date
-    const after = sceneList.value.find(
-        (item) => item.value == sceneNowValue.value,
-    ).date
-    const taskId = await CalProfileByPoint(
-        before,
-        after,
-        StartPtX,
-        StartPtY,
-        EndPtX,
-        EndPtY,
-    )
-    let RunStatus = ''
-    for (; ;) {
-        try {
-            RunStatus = await bankRiskWarn.getRunStatus(taskId.data)
-        } catch (error) {
-            // console.log(error)
-        }
-        if (RunStatus.data == 2) {
-            break
-        } else if (RunStatus.data == -1) {
-            // alert("模型运行结果失败")
-            return
-        } else if (RunStatus.data == -2) {
-            // alert("模型运行生成json失败")
-            return
-        } else if (RunStatus.data == 1) {
-            // alert("模型运行中")
-        }
-        await wait(500)
-    }
-    const profileResult = await bankRiskWarn.getRunResult(taskId.data)
-    putDataInList(profileResult.data)
-    profileData.value.push(profileResult.data)
-    isRunning.value = false
-    shapeYearlyChartLoad.value = false
-    shapeChartLoad.value = false
-    slopeChartLoad.value = false
-    erosionChartLoad.value = false
-}
-
-async function wait(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-const CalProfileByPoint = async (
-    before,
-    now,
-    StartPtX,
-    StartPtY,
-    EndPtX,
-    EndPtY,
-) => {
-    const taskId = await bankRiskWarn.runProfileModelByLine(
-        before,
-        now,
-        StartPtX,
-        StartPtY,
-        EndPtX,
-        EndPtY,
-    )
-    return taskId
-}
-
-const putDataInList = (profileDataItem) => {
-    let tempRisk
-    if (profileDataItem.risk[2] < 0.25) {
-        tempRisk = 'low'
-    } else if (profileDataItem.risk[2] < 0.5) {
-        tempRisk = 'middle'
-    } else {
-        tempRisk = 'high'
-    }
-    tempProfileRisk.value = tempRisk
-    tempProfile.value = {
-        value: profileList.value.length + 1,
-        label: tempProfileName.value,
-        name: tempProfileName.value,
-        filter: ['==', '$type', `${tempProfileName.value}`],
-        flowspeed: profileDataItem.deepestPoint[2],
-        risk: tempRisk,
-    }
-    tempProfileData.value = profileDataItem
-    profileList.value.push(tempProfile.value)
-}
-
-const changeSceneBefore = (value) => {
-    sceneBeforeValue.value = value
-}
-
-const changeSceneNow = (value) => {
-    sceneNowValue.value = value
-}
 
 const addRasterLayer = (map, time, name) => {
     map.addSource(name, {
@@ -1298,68 +614,6 @@ const addRasterLayer = (map, time, name) => {
     })
 }
 
-const changeProfileListForShow = () => {
-    for (let i = 0; i < 12; i++) {
-        if (defaultWarnLayerDataInput[i].warnValue < 0.25) {
-            profileList.value[i].risk = 'low'
-        } else if (defaultWarnLayerDataInput[i].warnValue < 0.5) {
-            profileList.value[i].risk = 'middle'
-        } else {
-            profileList.value[i].risk = 'high'
-        }
-    }
-}
-
-const addBankLineRiskLayer = (map, profileList) => {
-    map.addLayer(
-        {
-            id: 'mzsBankLineLowRisk',
-            type: 'line',
-            source: 'mzsBankLineSource',
-            'source-layer': 'default',
-            layout: {
-                'line-cap': 'round',
-                'line-join': 'round',
-            },
-            paint: {
-                'line-opacity': 1,
-                // 'line-color': [
-                //     'match',
-                //     ['get', 'name'],
-                //     'JC01',
-                //     `${profileList.value[0].color}`,
-                //     'JC02',
-                //     `${profileList.value[1].color}`,
-                //     'JC03',
-                //     `${profileList.value[2].color}`,
-                //     'JC04',
-                //     `${profileList.value[3].color}`,
-                //     'JC05',
-                //     `${profileList.value[4].color}`,
-                //     'JC06',
-                //     `${profileList.value[5].color}`,
-                //     'JC07',
-                //     `${profileList.value[6].color}`,
-                //     'JC08',
-                //     `${profileList.value[7].color}`,
-                //     'JC09',
-                //     `${profileList.value[8].color}`,
-                //     'JC10',
-                //     `${profileList.value[9].color}`,
-                //     'JC11',
-                //     `${profileList.value[10].color}`,
-                //     'JC12',
-                //     `${profileList.value[11].color}`,
-                //     'rgb(255, 255, 255)',
-                // ],
-                'line-color': 'rgba(255, 0, 0, 1)',
-                'line-width': 3,
-            },
-        },
-        'mzsSectionLabelLayer',
-    )
-}
-
 
 const runHydrodynamicModel = async () => {
     return new Promise(async (resolve, reject) => {
@@ -1383,42 +637,47 @@ const runHydrodynamicModel = async () => {
                 throw new Error()
             }
 
-            let runningStatusInterval = setInterval(async () => {
-                let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data
-                // let runningStatus = 'RUNNING'
-                if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
-                    console.log('runningStatus ', runningStatus)
-                }
-                else if (runningStatus === 'ERROR') {
-                    const url = `/model/taskNode/result/id?taskId=${TASK_ID}`
-                    axios.get(url).then(response => {
-                        let errorLog = response.data['error-log']
-                        resolve(errorLog)
-                    }).catch(error => {
-                        console.warn(error)
-                        reject(error)
-                    })
-                    const errorLog = (await axios.get(url)).data['error-log']
+            let runningStatusInterval = (function loop() {
+                return setTimeout(async () => {
+                    let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data;
 
-                    // ElNotification({
-                    // title: '水动力模型运行失败',
-                    // message: `错误原因:\n` + errorLog,
-                    // offset: 300,
-                    // type: 'error',
-                    // })
-                    clearInterval(runningStatusInterval)
-                    reject(new Error(errorLog))
-                }
-                else if (runningStatus === 'COMPLETE') {
-                    clearInterval(runningStatusInterval)
-                    let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data
-                    hydrodynamicCaseID = runningResult['case-id']
-                    hydrodynamicCalcDone.value = true;
-                    console.log('水动力模型计算完成！');
-                    resolve(runningResult)
-                    // showFlowClickHandler(1)
-                }
-            }, 500)
+                    if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
+                        console.log('runningStatus ', runningStatus);
+                    }
+                    else if (runningStatus === 'ERROR') {
+                        const url = `/model/taskNode/result/id?taskId=${TASK_ID}`;
+                        axios.get(url).then(response => {
+                            let errorLog = response.data['error-log'];
+                            resolve(errorLog);
+                        }).catch(error => {
+                            console.warn(error);
+                            reject(error);
+                        });
+                        const errorLog = (await axios.get(url)).data['error-log'];
+
+                        // clearTimeout(runningStatusInterval);
+                        reject(new Error(errorLog));
+                    }
+                    else if (runningStatus === 'COMPLETE') {
+                        console.log('COMPLETE and Clear ');
+                        // clearTimeout(runningStatusInterval);
+
+                        let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data;
+                        hydrodynamicCaseID = runningResult['case-id'];
+                        hydrodynamicRunningResult = runningResult;
+                        hydrodynamicCalcDone.value = true;
+                        console.log('水动力模型计算完成！', hydrodynamicRunningResult);
+
+                        // 更新流场
+                        showFlow.value = true;
+                        flowControl(showFlow.value)
+                        resolve(runningResult);
+                        return;
+                    }
+                    loop(); // 如果任务未完成，再次调用loop函数，相当于继续循环等待下一次检查
+                }, 500);
+            })();
+
         } catch (error) {
             console.log(error)
             // ElNotification({
@@ -1436,6 +695,7 @@ const runHydrodynamicModel = async () => {
 /////////// 水动力计算部分
 ///////////
 let hydrodynamicCaseID = ''
+let hydrodynamicRunningResult = {}
 let drawingStatus = false;
 const hydrodynamicCalcDone = ref(false);
 
@@ -1459,45 +719,45 @@ const tidePointVelocityCalc = async (lng, lat) => {
     const pointVelocityMR = new ModelRunner(pointVelocityModelUrl, params)
     await pointVelocityMR.modelStart()
     console.log('===Interval')
-    let runningInterval = setInterval(async () => {
-        let runningStatus = await pointVelocityMR.getRunningStatus()
-        switch (runningStatus) {
-            case 'RUNNING':
-                break
-            case 'ERROR':
-                console.log('error')
-                clearInterval(runningInterval)
-                let errorLog = await pointVelocityMR.getErrorLog()
-                ElNotification({
-                    title: '计算失败',
-                    message: `错误原因:\n` + errorLog,
-                    offset: 300,
-                    type: 'error',
-                })
-                isRunningMan.value = false
-                RunningManSays.value = ''
-                drawingStatus = false
-                break
-            case 'COMPLETE':
-                clearInterval(runningInterval)
-                ElNotification({
-                    title: '计算成功',
-                    offset: 300,
-                    type: 'success',
-                })
-                let runningResult = await pointVelocityMR.getModelResult();
 
-                flowspeedInfoRef.value.updateData(runningResult.result)
-                WaterProcessChartRef.value.updateData(runningResult.result)
+    let runningInterval = (
+        function loop() {
+            return setTimeout(async () => {
+                let runningStatus = await pointVelocityMR.getRunningStatus()
+                switch (runningStatus) {
+                    case 'RUNNING':
+                        break
+                    case 'ERROR':
+                        console.log('error')
+                        let errorLog = await pointVelocityMR.getErrorLog()
+                        ElNotification({
+                            title: '计算失败',
+                            message: `错误原因:\n` + errorLog,
+                            offset: 300,
+                            type: 'error',
+                        })
+                        isRunningMan.value = false
+                        RunningManSays.value = ''
+                        drawingStatus = false
+                        return;
+                    case 'COMPLETE':
+                        ElNotification({
+                            title: '潮位线提取成功',
+                            offset: 300,
+                            type: 'success',
+                        })
+                        let runningResult = await pointVelocityMR.getModelResult();
+                        flowspeedInfoRef.value.updateData(runningResult.result)
+                        WaterProcessChartRef.value.updateData(runningResult.result)
+                        drawingStatus = false
+                        isRunningMan.value = false
 
-
-                console.log('runningResult ', runningResult)
-                isRunningMan.value = false
-                RunningManSays.value = ''
-                drawingStatus = false
-                break
+                        return;
+                }
+                loop()
+            }, 500)
         }
-    }, 1000)
+    )();
 }
 
 const drawHandler = () => {
@@ -1569,7 +829,10 @@ const drawHandler = () => {
                 offset: 300,
             })
 
-            tidePointVelocityCalc(e.lngLat.lng, e.lngLat.lat)
+            tidePointVelocityCalc(e.lngLat.lng, e.lngLat.lat).then(() => {
+                console.log('潮位线提取完成')
+            })
+
             dom.style.cursor = 'grab'
         })
         drawingStatus = true
@@ -1634,11 +897,130 @@ const addTideLevelPoint = () => {
     )
 }
 
-onBeforeRouteUpdate(async (to, from) => {
+/////////// 水动力模型中的流场控制部分
+let floodWatcher = null
+let floodFlow = null
+
+const flowControl = (showOrHide) => {
+    let map = useMapStore().getMap()
+    if (showOrHide) {
+        // 新加流场，先移除之前的流场
+        if (map.getLayer('floodFlow')) {
+            timeStep.value = 0
+            map.removeLayer('floodFlow')
+            if (floodWatcher) {
+                floodWatcher()
+                floodWatcher = null
+            }
+
+        }
+
+        timeStep.value = 0
+
+        let pngPrefix = `/model/data/bankResource/down/modelServer/resource/file/image?name=`
+        let visualizationJsonUrl = `/model/data/bankResource/down/modelServer/resource/file/json?name=${hydrodynamicRunningResult['visualization-description-json']}`
+
+        floodFlow = reactive(new FlowFieldLayer(
+            'floodFlow',
+            visualizationJsonUrl,
+            pngPrefix,
+            true
+        ))
+
+        map.getLayer('chaoWeiPointLable') ? map.addLayer(floodFlow, 'chaoWeiPointLable') : map.addLayer(floodFlow)
+        floodWatcher = watch(
+            () => floodFlow._progressRate,
+            (v) => {
+                let val = parseFloat(
+                    (floodFlow.timeCount / floodFlow.timePerFrame).toFixed(
+                        1,
+                    ),
+                )
+                timeStep.value = val
+            },
+        )
+
+    } else {
+        if (map.getLayer('floodFlow')) {
+            timeStep.value = 0
+            map.removeLayer('floodFlow')
+            if (floodWatcher) {
+                floodWatcher()
+                floodWatcher = null
+            }
+        }
+    }
+}
+
+
+const flowControlHandler = async () => {
+    if (hydrodynamicCaseID != '' && hydrodynamicRunningResult['visualization-description-json']) {
+        showFlow.value = !showFlow.value
+        flowControl(showFlow.value)
+
+    } else {
+        ElNotification({
+            title: '警告',
+            message: '尚未完成水动力模型计算，无法控制流场',
+            type: 'warning',
+            offset: 300,
+        })
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+onBeforeRouteUpdate(async (to, from, next) => {
+
+    if (isRunningMan.value) {
+        next(false)
+        ElMessage.warning({
+            message: '请等待当前任务完成，请稍后...',
+            offset: 80,
+        })
+        return
+    }
+    //////////// 更新岸段时，信息重置
+    showWaterPower.value = false
+    showRiverBed.value = false
+    showGeologyAndProject.value = false
+    hydrodynamicCaseID = ''
+    hydrodynamicRunningResult = {}
+    hydrodynamicCalcDone.value = false;
+
     useBankNameStore().globalBankName = to.params.id
     let bank = to.params.id
 
-    if (useBankNameStore().globalBankName === 'Mzs') {
+
+    //////// 01 基本信息
+    const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
+    bankBCInfo.value = bcInfo
+
+    ////////// 02 地形资源
+    demResources.value = await getDemResource(bank)
+
+
+    /////////// 设置默认地形参数 //////////////
+    if (bank === 'Mzs') {
         conditionConfigureData.refDEM = {
             "sets": "standard",
             "year": "2012",
@@ -1661,82 +1043,86 @@ onBeforeRouteUpdate(async (to, from) => {
         conditionConfigureData.benchDEM = null
     }
 
-    const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
-    bankBCInfo.value = bcInfo
 
-    demResources.value = await getDemResource(bank)
-    showWaterPower.value = false    // 确保切换岸段时面板显示
-
+    ////////// 03 地图初始化
     let map = useMapStore().getMap()
-
+    mapInstance = map
     refreshMap(map)
 
     if (bank === 'Mzs') {
+        // 其他岸段转民主沙
         mapFlyToMzs(map)
+
         addBankLayer(map, bank).then(() => {
+            //////////////////// 添加，民主沙特有的栅格图层、地形图层、潮位点图层，前两者不展示
             addRasterLayer(map, 23032209, 'mapRaster')
             map.setLayoutProperty('mapRaster', 'visibility', 'none')
             map.addLayer(new TerrainLayer(14))
             map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
             addTideLevelPoint()
+
+            //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
             map.getLayer('岸段预警') && map.removeLayer('岸段预警')
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+            map.setLayoutProperty('岸段预警', 'visibility', 'none')
 
+            showFlow.value = false // 初始时关闭流场
+            showWaterPowerFunc() // 打开水流动力面板
+            conditionConfigureDataResetHandler() // 跑模型
         })
 
-        getProfileTime()
-        showRiskStatus.value = true
-        showProfileInfo.value = false
-        showRiskResult.value = false
+        /////// 展示特殊图层的控制按钮
         showControls.value = true
-        // await ProfileLoadingProcess(
-        //     sceneBefore,
-        //     sceneNow,
-        //     sceneCompareBefore,
-        //     sceneCompareNow,
-        // )
-        totalResult.desc = '高风险'
-        riskAreas.value = "MZ03顺堤尾; MZ04江滩办; MZ05小港池; MZ06张靖皋桥位; MZ07桥位下游; MZ08海事码头; MZ09码头下游; "
-        showWaterPowerFunc()
+
     } else {
+
+        // 民主沙转至其他岸段
+
+        // 删除特殊图层
+        map.getLayer('floodFlow') && map.removeLayer('floodFlow')
+        map.getLayer('TerrainLayer') && map.removeLayer('TerrainLayer')
+        map.getLayer('岸段预警') && map.removeLayer('岸段预警')
+
         mapFlyToRiver(map)
 
         addBankLayer(map, bank).then(() => {
-            // remove flow layer
-            map.getLayer('floodFlow') && map.removeLayer('floodFlow')
-            // add invisible bank Warn layer
-            map.getLayer('岸段预警') && map.removeLayer('岸段预警')
-            map.getLayer('TerrainLayer') && map.removeLayer('TerrainLayer')
+
+            //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer)
             map.setLayoutProperty('岸段预警', 'visibility', 'none')
+
+            showFlow.value = false // 初始时关闭流场
+            showWaterPowerFunc() // 打开水流动力面板
         })
-
-
-        // do nothing temp
-        showRiskStatus.value = true
-        showProfileInfo.value = false
-        showRiskResult.value = false
+        /////// 隐藏特殊图层的控制按钮
         showControls.value = false
 
         // risk level
         totalResult.desc = '暂无'
         riskAreas.value = []
-        showFlow.value = true // 关闭
-        showWaterPowerFunc()
     }
 
-
-
+    next(true)
 })
-
 
 
 onMounted(async () => {
     useBankNameStore().globalBankName = route.params.id
     let bk = route.params.id
 
+
+
+
+    //////// 01 基本信息
+    const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
+    bankBCInfo.value = bcInfo
+
+    ////////// 02 地形资源
+    demResources.value = await getDemResource(bk)
+
+    /////////// 设置默认地形参数 //////////////
     if (bk === 'Mzs') {
         conditionConfigureData.refDEM = {
             "sets": "standard",
@@ -1761,21 +1147,17 @@ onMounted(async () => {
     }
 
     if (bk === 'Mzs') {
-
-        const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
-        bankBCInfo.value = bcInfo
-
-        demResources.value = await getDemResource(bk)
-
+        ////////// 03 地图初始化
         initPureScratchMap(mapContainer.value).then(async (map) => {
+
             mapFlyToMzs(map)
-
             mapInstance = map
-
             refreshMap(map)
-            // await addBankLayer(map, bk)
+
             addBankLayer(map, bk).then(() => {
-                //////////////////// special layer
+
+
+                //////////////////// 添加，民主沙特有的栅格图层、地形图层、潮位点图层，前两者不展示
                 addRasterLayer(map, 23032209, 'mapRaster')
                 map.setLayoutProperty('mapRaster', 'visibility', 'none')
                 map.addLayer(new TerrainLayer(14))
@@ -1830,71 +1212,59 @@ onMounted(async () => {
                     },
                     'chaoWeiPoint',
                 )
+
+
+                //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
                 bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
                 map.addLayer(bankWarnLayer, 'chaoWeiPoint')
+                map.setLayoutProperty('岸段预警', 'visibility', 'none')
+
+
+                showFlow.value = false // 初始时关闭流场
+                showWaterPowerFunc() // 打开水流动力面板
+                conditionConfigureDataResetHandler() // 进页面跑一次
             })
 
 
-            //////////////////// special layer
-
+            ///////// 存地图实例
             useMapStore().setMap(map)
 
-            getProfileTime()
-            showRiskStatus.value = true
-            showProfileInfo.value = false
-            showRiskResult.value = false
+            /////// 展示特殊图层的控制按钮
             showControls.value = true
-            // await ProfileLoadingProcess(
-            //     sceneBefore,
-            //     sceneNow,
-            //     sceneCompareBefore,
-            //     sceneCompareNow,
-            // ) // fuxed it
-            totalResult.desc = '高风险'
-            riskAreas.value = "MZ03顺堤尾; MZ04江滩办; MZ05小港池; MZ06张靖皋桥位; MZ07桥位下游; MZ08海事码头; MZ09码头下游; "
-            console.log('riskAreas', riskAreas.value)
-            showWaterPowerFunc()
 
         })
     } else {
 
-        const bcInfo = (await BackEndRequest.getBankBasicInfo()).data
-        bankBCInfo.value = bcInfo
 
-        demResources.value = await getDemResource(bk)
+        ////////// 03 地图初始化
         initPureScratchMap(mapContainer.value).then(async (map) => {
             mapInstance = map
             mapFlyToRiver(map)
-
-
             refreshMap(map)
 
-            // await addBankLayer(map, bk)
             addBankLayer(map, bk).then(() => {
-                // add invisible bank warn layer
+
+                //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
                 map.getLayer('岸段预警') && map.removeLayer('岸段预警')
                 bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
                 map.addLayer(bankWarnLayer)
                 map.setLayoutProperty('岸段预警', 'visibility', 'none')
 
             })
+            ///////// 存地图实例
             useMapStore().setMap(map)
 
 
-            // do nothing temp
-            showRiskStatus.value = true
-            showProfileInfo.value = false
-            showRiskResult.value = false
+            /////// 隐藏特殊图层的控制按钮
             showControls.value = false
 
             // risk level
             totalResult.desc = '暂无'
             riskAreas.value = []
-            showFlow.value = true // 关闭
-            showWaterPowerFunc()
+
+            showFlow.value = false // 初始时关闭流场
+            showWaterPowerFunc() // 打开水流动力面板
         })
-
-
     }
 
 
@@ -2050,6 +1420,15 @@ div.risk-warn-container {
                 font-size: calc(0.6vw + 0.5vh);
                 font-weight: 700;
                 color: #444;
+            }
+        }
+
+        :deep(.el-input__inner) {
+            appearance: textfield;
+
+            &::-webkit-inner-spin-button,
+            &::-webkit-outer-spin-button {
+                -webkit-appearance: none;
             }
         }
     }

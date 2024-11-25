@@ -114,7 +114,7 @@ export default class FlowFieldLayer {
 
     stepProgressRate = 0.0
 
-    constructor(layerID, jsonUrl, resourcePrefix) {
+    constructor(layerID, jsonUrl, resourcePrefix, hideGUI = false) {
         this.id = layerID;
         this.type = 'custom';
         this.renderingMode = '2d';
@@ -122,6 +122,7 @@ export default class FlowFieldLayer {
         this.parser = new JsonFileParser(jsonUrl);
         this.resourcePrefix = resourcePrefix;
         this.controller = new FlowFieldController();
+        this.hideGUI = hideGUI;
     }
     set progressRate(value) {
         //phaseCount is the texSrc NUM
@@ -571,12 +572,12 @@ export default class FlowFieldLayer {
     async onAdd(map, gl) {
         this.GL = gl;
         // //console.log('Custom flow field layer is being added...');
-        this.initGUI();
+        if (this.hideGUI === false) this.initGUI();
         this.map = map;
         await this.prepare(gl);
     }
     onRemove() {
-        this.gui.destroy();
+        if(this.gui) this.gui.destroy();
     }
     render(gl, matrix) {
         if (!this.isReady) {
