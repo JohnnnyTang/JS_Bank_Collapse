@@ -27,13 +27,65 @@ import BottomWaveVue from '../components/modelStore/BottomWave.vue'
 import { infoItemList } from '../components/modelStore/modelInfoList.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
-import { onMounted } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import BankResourceHelper from '../components/modelStore/views/bankResourceHelper';
 
 const navToKnowLedge = () => {
   router.push('/knowledgeStore');
 }
+
+////// shift + j + k + l 组合键 删除模型所有case   2024/11/26
+let oKeyPressed = false;
+let gKeyPressed = false;
+let mKeyPressed = false;
+let sKeyPressed = false;
+const handleOGMSKeyDown = (event) => {
+  if (event.key === 'o' || event.key === 'O') {
+    oKeyPressed = true;
+  }
+  if (event.key === 'g' || event.key === 'G') {
+    gKeyPressed = true;
+  }
+  if (event.key === 'm' || event.key === 'M') {
+    mKeyPressed = true;
+  }
+  if (event.key === 's' || event.key === 'S') {
+    sKeyPressed = true;
+  }
+  if (oKeyPressed && gKeyPressed && mKeyPressed && sKeyPressed) {
+    let result = window.confirm("确认删除所有模型CASE吗？");
+    if (result) {
+      // performAction();
+      axios.delete('/model/taskNode/delete/all').then(res => {
+        console.log(res.data)
+      }).catch(e => {
+        console.log(e)
+      })
+    } else {
+    }
+    oKeyPressed = false;
+    gKeyPressed = false;
+    mKeyPressed = false;
+    sKeyPressed = false;
+  }
+}
+
+const handleOGMSKeyUp = (event) => {
+  if (event.key === 'o' || event.key === 'O') {
+    oKeyPressed = false;
+  }
+  if (event.key === 'g' || event.key === 'G') {
+    gKeyPressed = false;
+  }
+  if (event.key === 'm' || event.key === 'M') {
+    mKeyPressed = false;
+  }
+  if (event.key === 's' || event.key === 'S') {
+    sKeyPressed = false;
+  }
+}
+
 
 onMounted(async () => {
 
@@ -54,6 +106,16 @@ onMounted(async () => {
   // console.log('---------------')
   // console.log(await BankResourceHelper.getBankCalculateResourceList('Boundary', 'Mzs'))
   // console.log('---------------')
+
+
+
+  document.addEventListener('keydown', handleOGMSKeyDown);
+  document.addEventListener('keyup', handleOGMSKeyUp);
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleOGMSKeyDown);
+  document.removeEventListener('keyup', handleOGMSKeyUp);
 })
 
 </script>
