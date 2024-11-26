@@ -182,7 +182,7 @@ class DataPioneer {
         features.forEach((feat) => {
             switch (feat['properties']['type']) {
                 case '1':
-                    if (feat['properties']['name'] === 'GNSS-JZ') {
+                    if (feat['properties']['name'].includes('JZ')) {
                         gnssJZ.push(feat)
                     } else
                         gnss.push(feat)
