@@ -75,62 +75,11 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
 import { ElImage } from 'element-plus';
-const srcList1 = [import.meta.env.VITE_BASE + "/geology_structure.png"]
-const UrlPart1 = import.meta.env.VITE_BASE + "/geology_structure.png"
-const srcList2 = [import.meta.env.VITE_BASE + "/project_structure.jpg", import.meta.env.VITE_BASE + "/geoStruct/民主沙右缘守护工程09.jpg", import.meta.env.VITE_BASE + "/geoStruct/民主沙右缘守护工程12.jpg", import.meta.env.VITE_BASE + "/geoStruct/民主沙右缘守护工程18.jpg"]
-const UrlPart2 = import.meta.env.VITE_BASE + "/project_structure.jpg"
-=======
-import { ref, computed } from 'vue';
-import { ElImage, ElInput, ElButton } from 'element-plus';
-const srcList1 = ["/geology_structure.png"]
-const UrlPart1 = "/geology_structure.png"
-const srcList2 = ["/project_structure.jpg", "/geoStruct/民主沙右缘守护工程09.jpg", "/geoStruct/民主沙右缘守护工程12.jpg", "/geoStruct/民主沙右缘守护工程18.jpg"]
-const UrlPart2 = "/project_structure.jpg"
-
-//////////////////////////////////////////////////////////////////
-//各地层part米数
-const part1 = ref(localStorage.getItem('part1') || 1.5);
-const part2 = ref(localStorage.getItem('part2') || 2);
-const part3 = ref(localStorage.getItem('part3') || 7.5);
-const part4 = ref(localStorage.getItem('part4') || 28);
-const inputPart1 = ref(part1.value);
-const inputPart2 = ref(part2.value);
-const inputPart3 = ref(part3.value);
-const inputPart4 = ref(part4.value);
-
-// 编辑面板的显示状态
-const editPannelShow = ref(false);
-
-const editClickHandler = () => {
-    editPannelShow.value = !editPannelShow.value;
-};
-
-const editData = () => {
-  // 更新 part1 至 part4 的值
-  if (!isNaN(inputPart1.value) && inputPart1.value !== '') part1.value = parseFloat(inputPart1.value);
-  if (!isNaN(inputPart2.value) && inputPart2.value !== '') part2.value = parseFloat(inputPart2.value);
-  if (!isNaN(inputPart3.value) && inputPart3.value !== '') part3.value = parseFloat(inputPart3.value);
-  if (!isNaN(inputPart4.value) && inputPart4.value !== '') part4.value = parseFloat(inputPart4.value);
-
-  // 存储到 localStorage
-  localStorage.setItem('part1', part1.value);
-  localStorage.setItem('part2', part2.value);
-  localStorage.setItem('part3', part3.value);
-  localStorage.setItem('part4', part4.value);
-
-  // 关闭编辑面板
-  editPannelShow.value = false;
-};
-
-// 计算每个标签的高度，这里假设总高度为100%，根据实际需要调整
-const height1 = computed(() => `${part1.value * 100}%`);
-const height2 = computed(() => `${part2.value * 100}%`);
-const height3 = computed(() => `${part3.value * 100}%`);
-const height4 = computed(() => `${part4.value * 100}%`);
-//////////////////////////////////////////////////////////////////
->>>>>>> 64d8bdaa25565da9b15e0ae6fad59492068bf2ea
+const srcList1 = [import.meta.env.BASE_URL + "/geology_structure.png"]
+const UrlPart1 = import.meta.env.BASE_URL + "/geology_structure.png"
+const srcList2 = [import.meta.env.BASE_URL + "/project_structure.jpg", import.meta.env.BASE_URL + "/geoStruct/民主沙右缘守护工程09.jpg", import.meta.env.BASE_URL + "/geoStruct/民主沙右缘守护工程12.jpg", import.meta.env.BASE_URL + "/geoStruct/民主沙右缘守护工程18.jpg"]
+const UrlPart2 = import.meta.env.BASE_URL + "/project_structure.jpg"
 </script>
 
 <style lang="scss" scoped>

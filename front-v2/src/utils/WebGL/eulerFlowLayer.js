@@ -99,6 +99,11 @@ export class EulerFlowLayer {
     arrowColor = [255, 255, 255];
 
     stepProgressRate = 0.0
+
+    axiosIns = axios.create({
+        baseURL: import.meta.env.BASE_URL,
+    })
+
     constructor(id, stationUrl, uvUrls, prefix) {
         this.id = id;
         this.stationUrl = stationUrl;
@@ -283,12 +288,12 @@ export class EulerFlowLayer {
         this.map.triggerRepaint();
     }
     async programInit_mask(gl) {
-        const maskShapeUrl = import.meta.env.VITE_BASE + '/scratchSomething/geojson/CHENGTONG.geojson';
+        const maskShapeUrl = '/scratchSomething/geojson/CHENGTONG.geojson';
         var data = await this.parsePolygon(maskShapeUrl);
         var vertexData = data.vertexData;
         var indexData = data.indexData;
-        const vsSource = (await axios.get(import.meta.env.VITE_BASE + '/scratchSomething/eulerWebGL/polygon.vert.glsl')).data;
-        const fsSource = (await axios.get(import.meta.env.VITE_BASE + '/scratchSomething/eulerWebGL/polygon.frag.glsl')).data;
+        const vsSource = (await this.axiosIns.get('/scratchSomething/eulerWebGL/polygon.vert.glsl')).data;
+        const fsSource = (await this.axiosIns.get('/scratchSomething/eulerWebGL/polygon.frag.glsl')).data;
         const vs = util.createShader(gl, gl.VERTEX_SHADER, vsSource);
         const fs = util.createShader(gl, gl.FRAGMENT_SHADER, fsSource);
         this.program_mask = util.createProgram(gl, vs, fs);
@@ -330,8 +335,8 @@ export class EulerFlowLayer {
         // // console.log('vertexData', vertexData_station)
         // // console.log('velocityData', velocityData)
         ////////// 1st::: delaunay program to get uv texture
-        const vsSource_delaunay = (await axios.get('/scratchSomething/eulerWebGL/delaunay.vert.glsl')).data;
-        const fsSource_delaunay = (await axios.get('/scratchSomething/eulerWebGL/delaunay.frag.glsl')).data;
+        const vsSource_delaunay = (await this.axiosIns.get('/scratchSomething/eulerWebGL/delaunay.vert.glsl')).data;
+        const fsSource_delaunay = (await this.axiosIns.get('/scratchSomething/eulerWebGL/delaunay.frag.glsl')).data;
         // // console.log(vsSource_delaunay, fsSource_delaunay)
         const vs_delaunay = util.createShader(gl, gl.VERTEX_SHADER, vsSource_delaunay);
         const fs_delaunay = util.createShader(gl, gl.FRAGMENT_SHADER, fsSource_delaunay);
@@ -370,8 +375,8 @@ export class EulerFlowLayer {
     }
     async programInit_showing(gl) {
         ////////// 2nd::: show uvTexture program
-        const vsSource_showing = (await axios.get('/scratchSomething/eulerWebGL/showing.vert.glsl')).data;
-        const fsSource_showing = (await axios.get('/scratchSomething/eulerWebGL/showing.frag.glsl')).data;
+        const vsSource_showing = (await this.axiosIns.get('/scratchSomething/eulerWebGL/showing.vert.glsl')).data;
+        const fsSource_showing = (await this.axiosIns.get('/scratchSomething/eulerWebGL/showing.frag.glsl')).data;
         const vs_showing = util.createShader(gl, gl.VERTEX_SHADER, vsSource_showing);
         const fs_showing = util.createShader(gl, gl.FRAGMENT_SHADER, fsSource_showing);
         this.program_showing = util.createProgram(gl, vs_showing, fs_showing);
@@ -407,8 +412,8 @@ export class EulerFlowLayer {
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
     }
     async programInit_pointShowing(gl) {
-        let VSS = (await axios.get('/scratchSomething/eulerWebGL/point.vert.glsl'));
-        let FSS = (await axios.get('/scratchSomething/eulerWebGL/point.frag.glsl'));
+        let VSS = (await this.axiosIns.get('/scratchSomething/eulerWebGL/point.vert.glsl'));
+        let FSS = (await this.axiosIns.get('/scratchSomething/eulerWebGL/point.frag.glsl'));
         let VS = util.createShader(gl, gl.VERTEX_SHADER, VSS.data);
         let FS = util.createShader(gl, gl.FRAGMENT_SHADER, FSS.data);
         this.program_point = util.createProgram(gl, VS, FS);
@@ -438,8 +443,8 @@ export class EulerFlowLayer {
         gl.bindVertexArray(null);
     }
     async programInit_simulate(gl) {
-        const VSS = (await axios.get('/scratchSomething/eulerWebGL/simulate.vert.glsl'));
-        const FSS = (await axios.get('/scratchSomething/eulerWebGL/simulate.frag.glsl'));
+        const VSS = (await this.axiosIns.get('/scratchSomething/eulerWebGL/simulate.vert.glsl'));
+        const FSS = (await this.axiosIns.get('/scratchSomething/eulerWebGL/simulate.frag.glsl'));
         const VS = util.createShader(gl, gl.VERTEX_SHADER, VSS.data);
         const FS = util.createShader(gl, gl.FRAGMENT_SHADER, FSS.data);
         const outVaryings = ['out_endPos'];
@@ -463,8 +468,8 @@ export class EulerFlowLayer {
         gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
     }
     async programInit_segmentShowing(gl) {
-        const vss = (await axios.get('/scratchSomething/eulerWebGL/segment.vert.glsl'));
-        const fss = (await axios.get('/scratchSomething/eulerWebGL/segment.frag.glsl'));
+        const vss = (await this.axiosIns.get('/scratchSomething/eulerWebGL/segment.vert.glsl'));
+        const fss = (await this.axiosIns.get('/scratchSomething/eulerWebGL/segment.frag.glsl'));
         const vs = util.createShader(gl, gl.VERTEX_SHADER, vss.data);
         const fs = util.createShader(gl, gl.FRAGMENT_SHADER, fss.data);
         this.program_segmentShowing = util.createProgram(gl, vs, fs);
@@ -489,8 +494,8 @@ export class EulerFlowLayer {
         gl.bindVertexArray(null);
     }
     async programInit_arrowShowing(gl) {
-        const vss = (await axios.get('/scratchSomething/eulerWebGL/arrow.vert.glsl'));
-        const fss = (await axios.get('/scratchSomething/eulerWebGL/arrow.frag.glsl'));
+        const vss = (await this.axiosIns.get('/scratchSomething/eulerWebGL/arrow.vert.glsl'));
+        const fss = (await this.axiosIns.get('/scratchSomething/eulerWebGL/arrow.frag.glsl'));
         const vs = util.createShader(gl, gl.VERTEX_SHADER, vss.data);
         const fs = util.createShader(gl, gl.FRAGMENT_SHADER, fss.data);
         this.program_arrowShowing = util.createProgram(gl, vs, fs);
@@ -672,7 +677,7 @@ export class EulerFlowLayer {
         return 0;
     }
     async parsePolygon(url) {
-        const geojson = (await axios.get(url)).data;
+        const geojson = (await this.axiosIns.get(url)).data;
         let coordinate = geojson.features[0].geometry.coordinates[0];
         var data = earcut.flatten(coordinate);
         var triangle = earcut(data.vertices, data.holes, data.dimensions);
@@ -785,8 +790,8 @@ export const simpleArrow = async () => {
     const vs = util.createShader(gl, gl.VERTEX_SHADER, vss);
     const fs = util.createShader(gl, gl.FRAGMENT_SHADER, fss);
     const program = util.createProgram(gl, vs, fs);
-    const vss2 = (await axios.get('/scratchSomething/eulerWebGL/demoArrow.vert.glsl')).data;
-    const fss2 = (await axios.get('/scratchSomething/eulerWebGL/demoArrow.frag.glsl')).data;
+    const vss2 = (await this.axiosIns.get('/scratchSomething/eulerWebGL/demoArrow.vert.glsl')).data;
+    const fss2 = (await this.axiosIns.get('/scratchSomething/eulerWebGL/demoArrow.frag.glsl')).data;
     const vs2 = util.createShader(gl, gl.VERTEX_SHADER, vss2);
     const fs2 = util.createShader(gl, gl.FRAGMENT_SHADER, fss2);
     const program2 = util.createProgram(gl, vs2, fs2);

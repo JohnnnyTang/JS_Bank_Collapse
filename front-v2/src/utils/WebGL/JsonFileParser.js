@@ -16,6 +16,11 @@ export class JsonFileParser {
     maxSegmentNum = 0.0;
     maxTrajectoryNum = 0.0;
     maxTextureSize = 0.0;
+
+    axiosIns = axios.create({
+        baseURL: import.meta.env.BASE_URL
+    })
+
     constructor(fileurl) {
         this.url = fileurl;
     }

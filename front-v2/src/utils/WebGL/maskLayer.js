@@ -2,7 +2,6 @@ import axios from 'axios'
 import * as THREE from 'three'
 
 export default class MaskLayer {
-
     constructor() {
 
         // Layer
@@ -139,7 +138,7 @@ function enableAllExtensions(gl) {
 async function createShader(gl, url) {
 
     let shaderCode = ''
-    await axios.get(url)
+    await axios.get(import.meta.env.BASE_URL + url)
         .then(response => shaderCode += response.data)
     const vertexShaderStage = compileShader(gl, shaderCode, gl.VERTEX_SHADER)
     const fragmentShaderStage = compileShader(gl, shaderCode, gl.FRAGMENT_SHADER)

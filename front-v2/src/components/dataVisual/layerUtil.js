@@ -525,7 +525,7 @@ const layerAddFunctionMap = {
                     data: stress,
                 })
         }
-        await loadImage(map, import.meta.env.VITE_BASE + '/geoStyle/incline-rect.png', 'incline-static')
+        await loadImage(map, import.meta.env.BASE_URL + '/geoStyle/incline-rect.png', 'incline-static')
 
         !map.getLayer('测斜仪') &&
             map.addLayer({
@@ -575,7 +575,7 @@ const layerAddFunctionMap = {
                     data: stress,
                 })
         }
-        await loadImage(map, import.meta.env.VITE_BASE + '/icons/孔隙水压力计.png', 'manometer-static')
+        await loadImage(map, import.meta.env.BASE_URL + '/icons/孔隙水压力计.png', 'manometer-static')
 
         !map.getLayer('孔隙水压力计') &&
             map.addLayer({
@@ -712,7 +712,7 @@ const layerAddFunctionMap = {
                     tileServer + '/tile/vector/cityBoundaryLine/{x}/{y}/{z}',
                 ],
             })
-        await loadImage(map, import.meta.env.VITE_BASE + '/legend/shijie.png', '市界')
+        await loadImage(map, '/legend/shijie.png', '市界')
         !map.getLayer('市级行政区') &&
             map.addLayer({
                 id: '市级行政区',
@@ -2886,9 +2886,9 @@ const layerAddFunctionMap = {
                 type: 'vector',
                 tiles: [tileServer + '/tile/vector/riverCityBoundary/{x}/{y}/{z}'],
             })
-        await loadImage(map, import.meta.env.VITE_BASE + '/legend/shijie.png', '市界')
-        await loadImage(map, import.meta.env.VITE_BASE + '/legend/shengjie.png', '省界')
-        await loadImage(map, import.meta.env.VITE_BASE + '/legend/haianxian.png', '海岸线')
+        await loadImage(map, '/legend/shijie.png', '市界')
+        await loadImage(map, '/legend/shengjie.png', '省界')
+        await loadImage(map, '/legend/haianxian.png', '海岸线')
         !map.getLayer('重点行政区边界') &&
             map.addLayer({
                 id: '重点行政区边界',

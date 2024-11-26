@@ -1,17 +1,10 @@
 <template>
     <div class="knowledge-card-container">
         <div class="knowledge-card-wrapper">
-            <div
-                class="knowledge-card"
-                :class="[infoItem.firstPage ? 'active' : 'inactive']"
-                @click="changeInfoPage"
-            >
+            <div class="knowledge-card" :class="[infoItem.firstPage ? 'active' : 'inactive']" @click="changeInfoPage">
                 <div class="image-wrapper">
                     <div class="image-div">
-                        <img
-                            :src="imgSrc"
-                            alt="崩岸照片"
-                        />
+                        <img :src="imgSrc" alt="崩岸照片" />
                     </div>
                 </div>
                 <div class="knowledge-title-container">
@@ -34,12 +27,9 @@
                         </div>
                         <div class="content-item-container center">
                             <div class="content-item-title">类别</div>
-                            <div
-                                class="content-item-text"
-                                :class="{
-                                    'no-data': infoItem.type === null,
-                                }"
-                            >
+                            <div class="content-item-text" :class="{
+                                'no-data': infoItem.type === null,
+                            }">
                                 {{ infoItem.type || '无数据' }}
                             </div>
                         </div>
@@ -51,23 +41,17 @@
                     <div class="content-row-container">
                         <div class="content-item-container left">
                             <div class="content-item-title">岸别</div>
-                            <div
-                                class="content-item-text"
-                                :class="{
-                                    'no-data': infoItem.side === null,
-                                }"
-                            >
+                            <div class="content-item-text" :class="{
+                                'no-data': infoItem.side === null,
+                            }">
                                 {{ infoItem.side || '无数据' }}
                             </div>
                         </div>
                         <div class="content-item-container center">
                             <div class="content-item-title">口门长度</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.length === null,
-                                }"
-                            >
+                            <div class="content-item-text number" :class="{
+                                'no-data': infoItem.length === null,
+                            }">
                                 {{ infoItem.length || '无数据' }}
                             </div>
                         </div>
@@ -79,34 +63,25 @@
                     <div class="content-row-container">
                         <div class="content-item-container left">
                             <div class="content-item-title">崩窝宽度</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.width === null,
-                                }"
-                            >
+                            <div class="content-item-text number" :class="{
+                                'no-data': infoItem.width === null,
+                            }">
                                 {{ infoItem.width || '无数据' }}
                             </div>
                         </div>
                         <div class="content-item-container center">
                             <div class="content-item-title">岸高</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.height === null,
-                                }"
-                            >
+                            <div class="content-item-text number" :class="{
+                                'no-data': infoItem.height === null,
+                            }">
                                 {{ infoItem.height || '无数据' }}
                             </div>
                         </div>
                         <div class="content-item-container right">
                             <div class="content-item-title">崩窝进口夹角</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.angle === null,
-                                }"
-                            >
+                            <div class="content-item-text number" :class="{
+                                'no-data': infoItem.angle === null,
+                            }">
                                 {{ infoItem.angle || '无数据' }}
                             </div>
                         </div>
@@ -114,75 +89,51 @@
                     <div class="content-row-container">
                         <div class="content-item-container left">
                             <div class="content-item-title">宽深比</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.ratio === null,
-                                }"
-                            >
+                            <div class="content-item-text number" :class="{
+                                'no-data': infoItem.ratio === null,
+                            }">
                                 {{ infoItem.ratio || '无数据' }}
                             </div>
                         </div>
                         <div class="content-item-container center">
                             <div class="content-item-title">崩塌土方量</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.volume === null,
-                                }"
-                            >
+                            <div class="content-item-text number" :class="{
+                                'no-data': infoItem.volume === null,
+                            }">
                                 {{ infoItem.volume || '无数据' }}
                             </div>
                         </div>
                         <div class="content-item-container right">
                             <div class="content-item-title">崩窝窝顶曲率</div>
-                            <div
-                                class="content-item-text number"
-                                :class="{
-                                    'no-data': infoItem.curvature1 === null,
-                                }"
-                            >
+                            <div class="content-item-text number" :class="{
+                                'no-data': infoItem.curvature1 === null,
+                            }">
                                 {{ infoItem.curvature1 || '无数据' }}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div
-                class="see-more-button"
-                @click="directChangeInfoPage"
-                :class="[infoItem.firstPage ? 'active' : 'inactive']"
-            >
+            <div class="see-more-button" @click="directChangeInfoPage"
+                :class="[infoItem.firstPage ? 'active' : 'inactive']">
                 <div class="button-text">
                     {{ infoItem.firstPage ? '更多信息' : '基本信息' }}
                 </div>
                 <div class="button-arrow"></div>
             </div>
-            <div
-                class="knowledge-card"
-                :class="[infoItem.firstPage ? 'inactive' : 'active']"
-                @click="changeInfoPage"
-            >
+            <div class="knowledge-card" :class="[infoItem.firstPage ? 'inactive' : 'active']" @click="changeInfoPage">
                 <div class="knowledge-content-container second">
                     <el-scrollbar class="accordion-scroll">
-                        <el-collapse
-                            v-model="activeNames"
-                            @change="handleChange"
-                        >
+                        <el-collapse v-model="activeNames" @change="handleChange">
                             <el-collapse-item title="基本情况" name="1">
                                 <div class="content-row-container desc">
                                     <div class="content-item-container">
                                         <el-scrollbar>
-                                            <div
-                                                class="content-item-text number"
-                                                :class="{
-                                                    'no-data':
-                                                        detailInfo.basic ===
-                                                        null,
-                                                }"
-                                                ref="scrollTextDom"
-                                                :data-key="index"
-                                            >
+                                            <div class="content-item-text number" :class="{
+                                                'no-data':
+                                                    detailInfo.basic ===
+                                                    null,
+                                            }" ref="scrollTextDom" :data-key="index">
                                                 &nbsp;&nbsp;{{
                                                     detailInfo.basic || '无数据'
                                                 }}
@@ -195,16 +146,11 @@
                                 <div class="content-row-container desc">
                                     <div class="content-item-container">
                                         <el-scrollbar>
-                                            <div
-                                                class="content-item-text number"
-                                                :class="{
-                                                    'no-data':
-                                                        detailInfo.cause ===
-                                                        null,
-                                                }"
-                                                ref="scrollTextDom"
-                                                :data-key="index"
-                                            >
+                                            <div class="content-item-text number" :class="{
+                                                'no-data':
+                                                    detailInfo.cause ===
+                                                    null,
+                                            }" ref="scrollTextDom" :data-key="index">
                                                 &nbsp;&nbsp;{{
                                                     detailInfo.cause || '无数据'
                                                 }}
@@ -217,16 +163,11 @@
                                 <div class="content-row-container desc">
                                     <div class="content-item-container">
                                         <el-scrollbar>
-                                            <div
-                                                class="content-item-text number"
-                                                :class="{
-                                                    'no-data':
-                                                        detailInfo.plan ===
-                                                        null,
-                                                }"
-                                                ref="scrollTextDom"
-                                                :data-key="index"
-                                            >
+                                            <div class="content-item-text number" :class="{
+                                                'no-data':
+                                                    detailInfo.plan ===
+                                                    null,
+                                            }" ref="scrollTextDom" :data-key="index">
                                                 &nbsp;&nbsp;{{
                                                     detailInfo.plan || '无数据'
                                                 }}
@@ -239,16 +180,11 @@
                                 <div class="content-row-container desc">
                                     <div class="content-item-container">
                                         <el-scrollbar>
-                                            <div
-                                                class="content-item-text number"
-                                                :class="{
-                                                    'no-data':
-                                                        detailInfo.after ===
-                                                        null,
-                                                }"
-                                                ref="scrollTextDom"
-                                                :data-key="index"
-                                            >
+                                            <div class="content-item-text number" :class="{
+                                                'no-data':
+                                                    detailInfo.after ===
+                                                    null,
+                                            }" ref="scrollTextDom" :data-key="index">
                                                 &nbsp;&nbsp;{{
                                                     detailInfo.after || '无数据'
                                                 }}
@@ -260,13 +196,8 @@
                             <el-collapse-item title="新闻视频" name="5">
                                 <div class="content-row-container desc">
                                     <div class="content-item-container">
-                                        <video
-                                            controls
-                                            autoplay
-                                            :src="detailInfo.video"
-                                            class="video-box"
-                                            style="height: 36vh; width: 100%"
-                                        ></video>
+                                        <video controls autoplay :src="detailInfo.video" class="video-box"
+                                            style="height: 36vh; width: 100%"></video>
                                     </div>
                                 </div>
                             </el-collapse-item>
@@ -279,7 +210,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 
 const props = defineProps({
@@ -292,7 +223,10 @@ const props = defineProps({
     },
 })
 
-const imgSrc = () => import.meta.env.VITE_BASE + '/崩岸' + (props.index % 3) + '.png';
+const imgSrc = computed(() => {
+    return `${import.meta.env.BASE_URL}/崩岸${props.index % 3}.png`;
+})
+
 
 const backendInstance = axios.create({
     // baseURL: Vue.prototype.baseURL,
@@ -442,8 +376,7 @@ div.knowledge-card-container {
                         object-fit: cover;
                         width: 100%;
                         height: 100%;
-                        filter: contrast(1.1) hue-rotate(12deg) brightness(0.9)
-                            saturate(0.8);
+                        filter: contrast(1.1) hue-rotate(12deg) brightness(0.9) saturate(0.8);
                         border-radius: 6px;
                     }
                 }
@@ -490,11 +423,13 @@ div.knowledge-card-container {
                     :deep(.el-collapse) {
                         --el-collapse-border-color: #104da8;
                         --el-collapse-header-height: 8vh;
+
                         .el-collapse-item__header {
                             background-color: aliceblue;
                             padding-left: 3vw;
                             font-weight: bold;
                             font-size: calc(0.6vw + 0.7vh);
+
                             &.is-active {
                                 color: #0453fd;
                             }
@@ -504,9 +439,11 @@ div.knowledge-card-container {
                             background-color: transparent;
                         }
                     }
+
                     :deep(.el-collapse-item__wrap) {
                         background-color: transparent !important;
                     }
+
                     // background-color: #2bc5fc;
                 }
 
@@ -535,11 +472,9 @@ div.knowledge-card-container {
                             line-height: 4vh;
                             // background-color: aquamarine;
                             // color: #0050b1;
-                            background: linear-gradient(
-                                to right,
-                                #064fec 0%,
-                                #14129e 100%
-                            );
+                            background: linear-gradient(to right,
+                                    #064fec 0%,
+                                    #14129e 100%);
                             -webkit-background-clip: text;
                             -webkit-text-fill-color: transparent;
 
@@ -640,6 +575,7 @@ div.knowledge-card-container {
             background: linear-gradient(135deg, #3011d4 0%, #0453fd 100%);
             color: #fff;
             transition: all 0.4s cubic-bezier(0.68, -0.45, 0.265, 1.45);
+
             &:hover {
                 cursor: pointer;
                 right: 1.8vw;

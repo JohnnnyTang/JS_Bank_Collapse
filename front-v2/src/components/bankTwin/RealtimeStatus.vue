@@ -243,7 +243,6 @@ import router from '../../router'
 import { useWarnInfoStore } from '../../store/mapStore'
 import DeviceHelper from './deviceHelper'
 import { useBankNameStore } from '../../store/bankNameStore'
-import domtoimage from 'dom-to-image-more';
 
 const route = useRoute()
 const props = defineProps({
@@ -508,11 +507,11 @@ const refreshInterval = setInterval(() => {
     let nowTime = dayjs()
     let diffTime = nowTime.diff(userInteractInfo.lastInteractTime, 'seconds')
     console.log(diffTime + 'seconds ' + '用户无操作')
-    if (diffTime > 10) {
-        // close page if no user interaction for 3 minutes
-        // userInteractInfo.refreshIframe = 0
-        showVideo.value = false;
-    }
+    // if (diffTime > 10) {
+    //     // close page if no user interaction for 3 minutes
+    //     // userInteractInfo.refreshIframe = 0
+    //     showVideo.value = false;
+    // }
 }, 1000 * 5 * 1)
 
 const refreshIframe = (val) => {

@@ -101,13 +101,13 @@ export default class FlowFieldLayer {
         return this._timeCount;
     }
     async init2ShadersFromSrc(gl, vertURL, fragURL, XF_Varings) {
-        const vertSrc = await axios.get(vertURL)
+        const vertSrc = await axios.get(import.meta.env.BASE_URL + vertURL)
             .then((response) => {
             return response.data;
         }).catch((error) => {
             console.log('ERROR::VERTEX_SHADER FILE NOT FOUND', error);
         });
-        const fragSrc = await axios.get(fragURL)
+        const fragSrc = await axios.get(import.meta.env.BASE_URL + fragURL)
             .then((response) => {
             return response.data;
         }).catch((error) => {

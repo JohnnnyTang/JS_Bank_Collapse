@@ -51,7 +51,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-const images = [import.meta.env.VITE_BASE + '/plan-clipped.png', import.meta.env.VITE_BASE + import.meta.env.VITE_BASE + '/plan-clipped2.png', '/plan-clipped3.png']
+const images = [import.meta.env.BASE_URL + '/plan-clipped.png', import.meta.env.BASE_URL + '/plan-clipped2.png', import.meta.env.BASE_URL + '/plan-clipped3.png']
 
 const planNotActive = ref(true)
 

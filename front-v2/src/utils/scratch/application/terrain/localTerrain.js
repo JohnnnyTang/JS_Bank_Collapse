@@ -133,9 +133,9 @@ export class LocalTerrain {
             filterMinMag: ['linear', 'linear'],
             addressModeUVW: ['clamp-to-edge', 'clamp-to-edge'],
         })
-        this.demTexture = imageLoader.load('Texture (DEM)', import.meta.env.VITE_BASE + '/scratchSomething/terrain_flow/image/dem.png')
-        this.borderTexture = imageLoader.load('Texture (DEM Border)', import.meta.env.VITE_BASE + '/scratchSomething/terrain_flow/image/border.png')
-        this.paletteTexture = imageLoader.load('Texture (DEM Palette)', import.meta.env.VITE_BASE + '/scratchSomething/terrain_flow/image/blueDemPalette.png')
+        this.demTexture = imageLoader.load('Texture (DEM)', import.meta.env.BASE_URL + '/scratchSomething/terrain_flow/image/dem.png')
+        this.borderTexture = imageLoader.load('Texture (DEM Border)', import.meta.env.BASE_URL + '/scratchSomething/terrain_flow/image/border.png')
+        this.paletteTexture = imageLoader.load('Texture (DEM Palette)', import.meta.env.BASE_URL + '/scratchSomething/terrain_flow/image/blueDemPalette.png')
         
         this.lodMapTexture = texture({
             name: 'Texture (LOD Map)',

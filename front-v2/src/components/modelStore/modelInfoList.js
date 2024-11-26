@@ -1,10 +1,10 @@
 export const infoItemList = [
     {
         firstPage: false,
-        picsrc: import.meta.env.VITE_BASE + "/dataInterpretation.png",
+        picsrc: import.meta.env.BASE_URL + "/dataInterpretation.png",
         // routerPath: "dataInterpretation2",
         routerPath:"/bankManage/monitor/gnss",
-        processPicSrc: import.meta.env.VITE_BASE + "/model-process.png",
+        processPicSrc: import.meta.env.BASE_URL + "/model-process.png",
         name: "数据融合解译模型",
         description: "数据融合解译模型是一个实时数据解析系统，旨在将GNSS、孔隙水压力计、应力桩和测斜仪等部署在河岸的设备实时传输的数据进行解析入库，以监测河岸稳定性、水文地质勘测和工程安全预警。用户可以通过该模型可以获取到河岸边各设备传来的测量数据。",
         application: "河岸稳定性监测，水文地质勘测，工程安全预警",
@@ -14,9 +14,9 @@ export const infoItemList = [
     },
     {
         firstPage: false,
-        picsrc: import.meta.env.VITE_BASE + "/soilAnalysis.png",
+        picsrc: import.meta.env.BASE_URL + "/soilAnalysis.png",
         routerPath: "soilAnalysis",
-        processPicSrc: import.meta.env.VITE_BASE + "/model-process.png",
+        processPicSrc: import.meta.env.BASE_URL + "/model-process.png",
         name: "土体变形分析模型",
         description: "土体变形分析模型描述了土体受剪切引起的崩塌和由河道水流冲刷及河岸坡脚物质迁移引起的侵蚀两种不同的过程,包括土体稳定性分析和河岸坡脚侵蚀分析。土体稳定分析主要采用极限平衡法计算多层土体岸坡的安全系数(Fs)，以分析河岸是否稳定。坡脚侵蚀分析用来预测由水流冲刷引起的河岸坡脚侵蚀速率及侵蚀量, 当侵蚀量到达一定程度时反馈作用于岸坡土体。",
         application: "土体变形分析，河岸侵蚀研究",
@@ -26,9 +26,9 @@ export const infoItemList = [
     },
     {
         firstPage: false,
-        picsrc: import.meta.env.VITE_BASE + "/stabilityAnalysis.png",
+        picsrc: import.meta.env.BASE_URL + "/stabilityAnalysis.png",
         routerPath: "stabilityAnalysis",
-        processPicSrc: import.meta.env.VITE_BASE + "/model-process.png",
+        processPicSrc: import.meta.env.BASE_URL + "/model-process.png",
         name: "岸坡稳定性分析模型",
         description: "岸坡稳定性分析模型用于分析引起崩岸的近岸动力变化和演变因素，并实现相关指标的自动化提取。具体功能包括近岸动力分析功能：计算典型水文条件下的近岸动力，提供水动力分析，包括水位分析、流速分析等功能；近岸演变分析功能：提供岸坡坡度分析、近岸滩槽高差分析等近岸岸坡演变分析功能。",
         application: "土地利用规划，自然灾害风险评估，生态环境保护，水资源管理",
@@ -38,9 +38,9 @@ export const infoItemList = [
     },
     {
         firstPage: false,
-        picsrc: import.meta.env.VITE_BASE + "/riskWarning.png",
+        picsrc: import.meta.env.BASE_URL + "/riskWarning.png",
         routerPath: "riskWarning",
-        processPicSrc: import.meta.env.VITE_BASE + "/model-process.png",
+        processPicSrc: import.meta.env.BASE_URL + "/model-process.png",
         name: "风险预警模型",
         description: "风险预警模型模型用于提供岸坡断面的实时预警和风险评估。具体功能包括单指标实时预警和多指标风险评估功能。单指标实时预警通过土体表面位移，内部变形、孔隙水压力和应力应变等实时监测数据，实现崩岸实时预警。多指标风险评估功能综合考虑近岸动力条件和冲淤变化，根据相关预警指标体系、权重和阈值计算，实现指定断面崩岸风险大小的评估。",
         application: "河岸管理与规划，灾害风险管理，城市规划与建设",

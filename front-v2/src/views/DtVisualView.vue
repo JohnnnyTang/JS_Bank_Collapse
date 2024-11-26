@@ -323,9 +323,8 @@ const mapContainer = ref();
 const mapStore = useMapStore();
 const activeStatus = ref([false, false]);
 const styles = [
-<<<<<<< HEAD
-    { backgroundImage: `url('${import.meta.env.VITE_BASE}/icons/legend.png')` },
-    { backgroundImage: `url('${import.meta.env.VITE_BASE}/icons/full.png')` },
+    { backgroundImage: `url('${import.meta.env.BASE_URL}/icons/legend.png')` },
+    { backgroundImage: `url('${import.meta.env.BASE_URL}/icons/full.png')` },
 ]
 const featureInfo = ref({})
 const showDetail = ref(false)
@@ -348,32 +347,6 @@ const baseMapRadio = ref(1)
 const dataSource = ref([])
 const detailPinState = ref(false)
 const listPinState = ref(false)
-=======
-  { backgroundImage: `url('/icons/legend.png')` },
-  { backgroundImage: `url('/icons/full.png')` },
-];
-const featureInfo = ref({});
-const showDetail = ref(false);
-const showHydroPannel = ref(false);
-const featureTableLoading = ref(true);
-const showInfoPannel = ref(false);
-const sideBarLoading = ref(true);
-const legendList = ref([]);
-const infoPannelTitle = ref("");
-const search = ref("");
-const realtimeZoom = ref(0);
-var latestLGID = "";
-const waterTableData = ref([]);
-const infoTableData = ref([]);
-const infoTableHeader = ref([]);
-let nowSource;
-let nowLayerGroup;
-const pannelLoading = ref(true);
-const baseMapRadio = ref(1);
-const dataSource = ref([]);
-const detailPinState = ref(false);
-const listPinState = ref(false);
->>>>>>> 64d8bdaa25565da9b15e0ae6fad59492068bf2ea
 const iconBackStyle = computed(() => {
   return listPinState.value
     ? { backgroundImage: `url('/icons/pin.png')` }
@@ -1063,19 +1036,11 @@ onMounted(async () => {
   dataSource.value = getSideBarTree();
   initSortedLayer(map);
 
-<<<<<<< HEAD
-    updateWaterInfo()
-    updateWaterInfoInterval = setInterval(updateWaterInfo, 1000 * 60 * 1)
-
-    addChildren(dataSource);
-})
-=======
   updateWaterInfo();
   updateWaterInfoInterval = setInterval(updateWaterInfo, 1000 * 60 * 1);
 
   addChildren(dataSource);
 });
->>>>>>> 64d8bdaa25565da9b15e0ae6fad59492068bf2ea
 
 //////////// DEBUG FUNCTIONS
 const getLayerFeatureArray = async (mapInstance, layerName) => {

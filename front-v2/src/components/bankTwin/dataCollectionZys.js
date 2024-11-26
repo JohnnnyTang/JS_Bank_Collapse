@@ -109,19 +109,19 @@ const getButtonInfoList = () => {
         {
             index: 0,
             name: '南通段预案',
-            url: '/pdf/11.长江南通段民主沙撤离预案.pdf',
+            url: import.meta.env.BASE_URL + '/pdf/11.长江南通段民主沙撤离预案.pdf',
             pageNum: '29',
         },
         {
             index: 1,
             name: '靖江段预案',
-            url: '/pdf/30.靖江市民主沙行洪运用预案.pdf',
+            url: import.meta.env.BASE_URL + '/pdf/30.靖江市民主沙行洪运用预案.pdf',
             pageNum: '41',
         },
         {
             index: 2,
             name: '重点防御预案',
-            url: '/pdf/75靖江市民主沙(右缘)险工段重点防御预案.pdf',
+            url: import.meta.env.BASE_URL + '/pdf/75靖江市民主沙(右缘)险工段重点防御预案.pdf',
             pageNum: '63',
         },
     ]

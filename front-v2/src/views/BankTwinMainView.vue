@@ -29,12 +29,7 @@
                         {{ `暂无报警信息` }}
                     </div>
                     <div v-else class="warn-block" v-for="(warningString, index) in warningList" :key="index">
-                        <div style="
-                                background-size: contain;
-                                background-image: url('/icons/warning.png');
-                                width: 3vh;
-                                height: 3vh;
-                            "></div>
+                        <div class="warn-block-icon"></div>
                         <div style="
                                 font-size: calc(0.7vw + 1vh);
                                 color: rgb(254, 14, 11);
@@ -278,8 +273,8 @@ const warningList = ref([])
     },
 */
 const gnssLegendInfo = {
-    icon1: import.meta.env.VITE_BASE + '/icons/GNSS测量站.png',
-    icon2: import.meta.env.VITE_BASE + '/icons/GNSS基准站.png',
+    icon1: import.meta.env.BASE_URL + '/icons/GNSS测量站.png',
+    icon2: import.meta.env.BASE_URL + '/icons/GNSS基准站.png',
     text1: '土体',
     strong: '表面位移',
     text2: '监测',
@@ -288,21 +283,21 @@ const gnssLegendInfo = {
 }
 const legendList = [
     {
-        icon: import.meta.env.VITE_BASE + '/icons/应力桩.png',
+        icon: import.meta.env.BASE_URL + '/icons/应力桩.png',
         text1: '土体',
         strong: '应力应变',
         text2: '监测',
         device: '应力桩',
     },
     {
-        icon: import.meta.env.VITE_BASE + '/icons/孔隙水压力计.png',
+        icon: import.meta.env.BASE_URL + '/icons/孔隙水压力计.png',
         text1: '土体',
         strong: '潜水位',
         text2: '监测',
         device: '孔隙水压力计',
     },
     {
-        icon: import.meta.env.VITE_BASE + '/icons/测斜仪.png',
+        icon: import.meta.env.BASE_URL + '/icons/测斜仪.png',
         text1: '土体',
         strong: '内部位移',
         text2: '监测',
@@ -318,7 +313,7 @@ const legendList = [
     // },
     ////////////////////////////////////////////////////////////////////////////////////////////////
     {
-        icon: import.meta.env.VITE_BASE + '/icons/视频监控.png',
+        icon: import.meta.env.BASE_URL + '/icons/视频监控.png',
         text1: '  ',
         strong: '视频监控',
         text2: '  ',
@@ -550,7 +545,7 @@ const viewChangeClick = (value) => {
         threeDLoading.value = true
         const script = document.createElement('script')
         script.src =
-            '/scratchSomething/unity/collapseBank/build/output.loader.js'
+            import.meta.env.BASE_URL + '/scratchSomething/unity/collapseBank/build/output.loader.js'
         document.head.appendChild(script)
         script.onload = async () => {
             // DeviceInfoBox
@@ -1023,6 +1018,13 @@ div.twin-main-container {
                         align-items: center;
                         width: fit-content;
                         margin-right: 2vw;
+
+                        .warn-block-icon {
+                            background-size: contain;
+                            background-image: url('/icons/warning.png');
+                            width: 3vh;
+                            height: 3vh;
+                        }
                     }
 
                     div.no-warn-block {

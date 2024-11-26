@@ -22,6 +22,11 @@ class JsonFileParser {
     maxSegmentNum = 0.0;
     maxTrajectoryNum = 0.0;
     maxTextureSize = 0.0;
+
+    axiosIns = axios.create({
+        baseURL: import.meta.env.BASE_URL
+    })
+
     constructor(fileurl) {
         this.url = fileurl;
     }
@@ -30,10 +35,10 @@ class JsonFileParser {
             .then((response) => {
                 //console.log("parsing!!!  ", this.url);
                 for (let item of response.data['flow_fields']) {
-                    this.flowFieldResourceArr.push(import.meta.env.VITE_BASE + item);
+                    this.flowFieldResourceArr.push(item);
                 }
                 for (let item of response.data['area_masks']) {
-                    this.seedingResourceArr.push(import.meta.env.VITE_BASE + item);
+                    this.seedingResourceArr.push(item);
                 }
                 this.projection2DResource = response.data['projection'][0];
                 // this.projection3DResource = response.data['projection']['3D'];
@@ -114,6 +119,10 @@ export default class FlowFieldLayer {
 
     stepProgressRate = 0.0
 
+    axiosIns = axios.create({
+        baseURL: import.meta.env.BASE_URL
+    })
+
     constructor(layerID, jsonUrl, resourcePrefix) {
         this.id = layerID;
         this.type = 'custom';
@@ -161,13 +170,13 @@ export default class FlowFieldLayer {
         return this._timeCount;
     }
     async init2ShadersFromSrc(gl, vertURL, fragURL, XF_Varings) {
-        const vertSrc = await axios.get(import.meta.env.VITE_BASE + vertURL)
+        const vertSrc = await this.axiosIns.get(vertURL)
             .then((response) => {
                 return response.data;
             }).catch((error) => {
                 //console.log('ERROR::VERTEX_SHADER FILE NOT FOUND', error);
             });
-        const fragSrc = await axios.get(import.meta.env.VITE_BASE + fragURL)
+        const fragSrc = await this.axiosIns.get(fragURL)
             .then((response) => {
                 return response.data;
             }).catch((error) => {
@@ -201,7 +210,7 @@ export default class FlowFieldLayer {
     }
     async FillTextureByImage(gl, Tex, format, filter, width, height, imgSrc, type) {
         let imgSrc_backEnd = this.resourcePrefix + imgSrc;
-        // //console.log(imgSrc_backEnd)
+        console.log(imgSrc_backEnd)
         //reparsing 
         if (type === 'Float') {
             axios.get(imgSrc_backEnd, { responseType: 'blob' })

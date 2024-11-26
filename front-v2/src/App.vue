@@ -11,8 +11,21 @@ import HeaderComp from './components/layout/HeaderComp.vue'
 import router from './router/index'
 import { useDeviceNameStore } from './store/mapStore';
 
+import axios from 'axios'
+
+window.addEventListener('keydown', function (event) {
+    if (event.ctrlKey && event.altKey && event.key === 'z') {
+        const url = 'http://' + window.location.host + import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/delete/all'
+        axios.delete(url).then((res) => {
+            console.log(res)
+        }).catch((err)=>{
+            console.error(err)
+        })
+    }
+});
+
 onMounted(async () => {
-    
+
     const infoBoxDiv = document.createElement('div')
     infoBoxDiv.style.position = 'absolute'
     infoBoxDiv.style.zIndex = '999'
@@ -188,7 +201,7 @@ body,
 
         ul {
             text-align: center;
-            background-color:#2587E3;
+            background-color: #2587E3;
             padding-bottom: 1px;
             z-index: 9999;
         }
@@ -507,23 +520,23 @@ body,
 }
 
 .el-popper.is-light.el-popover {
-    background: rgba(255,255,255,0.8);
-    color:#134dcc;
+    background: rgba(255, 255, 255, 0.8);
+    color: #134dcc;
     border: #1248bb 1px solid;
     border-radius: 5px;
     box-shadow: 0 0 4px #1248bb;
     font-size: 20px;
-    font-weight: bold;;
+    font-weight: bold;
+    ;
 }
 
 
-.el-overlay{
-    .el-drawer{
+.el-overlay {
+    .el-drawer {
         margin-top: 13vh;
-        background-color: rgb(244,244,244);
+        background-color: rgb(244, 244, 244);
         width: 18% !important;
         height: 87vh !important;
     }
 }
-
 </style>

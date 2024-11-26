@@ -12,7 +12,7 @@ import fs from 'fs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    // base: '/cjbaweb/',
+    base: '/cjbaweb/',
     plugins: [vue()],
     resolve: {
         alias: [
@@ -42,15 +42,10 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/device/, ''),
             },
-            '/model/': {
+            '/api2': {
                 // target: 'http://172.21.212.166:8989/api/v2',
-<<<<<<< HEAD
                 // target: 'http://localhost:8989/api/v2',
                 target: 'http://172.21.213.243:8989/api/v2',
-=======
-                target: 'http://localhost:8989/api/v2',
-                // target: 'http://119.45.198.54:80/model',
->>>>>>> 64d8bdaa25565da9b15e0ae6fad59492068bf2ea
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/model/, ''),
             },

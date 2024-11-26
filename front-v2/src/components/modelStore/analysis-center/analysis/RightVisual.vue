@@ -310,7 +310,7 @@ export default defineComponent({
             type: "image",
             url: `http://${window.location.host}${
               import.meta.env.VITE_APP_BACK_ADDRESS
-            }data/bankResource/down/modelServer/result/file/image?caseId=${
+            }/data/bankResource/down/modelServer/result/file/image?caseId=${
               param.id
             }&name=${param.name}`,
             coordinates: param.params.extent,
