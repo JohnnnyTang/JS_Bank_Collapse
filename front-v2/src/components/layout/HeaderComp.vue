@@ -313,7 +313,9 @@ const logout = () => {
     router.push('/login')
 }
 const bankManageClickHandler = () => {
+    eleDropDownDomRef.value[0].handleClose()
     router.push('/bankManage')
+    focusOnNavItem(4)
 }
 
 

@@ -709,7 +709,7 @@ onMounted(async () => {
     warnInfoStore.warnInfo.length ? mapFlyToRiver(map) : mapFlyToRiver2(map)
 
     useMapStore().setMap(map)
-    await mapInit(map, true)
+    mapInit(map, true)
 
 
     // const videoAccessKey = (await axios.post(

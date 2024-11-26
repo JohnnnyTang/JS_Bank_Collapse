@@ -239,8 +239,12 @@ const genGnssOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     gnssOption.xAxis.data = []
     let gnssDataInterval = [[], [], [], []]
 
-    deviceDataList.length ? gnssOption.graphic.invisible = true : gnssOption.graphic.invisible = false
-
+    // deviceDataList.length ? gnssOption.graphic.invisible = true : gnssOption.graphic.invisible = false
+    gnssOption.graphic.invisible = true
+    if (!deviceDataList.length) {
+        gnssOption.graphic.invisible = false
+        return gnssOption
+    }
 
     deviceDataList.map(function (item) {
         gnssOption.xAxis.data.push(
@@ -445,7 +449,12 @@ const genStressOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     stressOption.xAxis.data = []
     let dataInterval = [[], [], [], [], [], [], [], []]
 
-    deviceDataList.length ? stressOption.graphic.invisible = true : stressOption.graphic.invisible = false
+    // deviceDataList.length ? stressOption.graphic.invisible = true : stressOption.graphic.invisible = false
+    stressOption.graphic.invisible = true
+    if (!deviceDataList.length) {
+        stressOption.graphic.invisible = false
+        return stressOption
+    }
 
     deviceDataList.map(function (item) {
         stressOption.xAxis.data.push(
@@ -719,8 +728,13 @@ const genIncinometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     incinometerOption.xAxis.data = []
     let dataInterval = [[], [], [], [], [], []]
     let noArea = false
-    
-    deviceDataList.length ? incinometerOption.graphic.invisible = true : incinometerOption.graphic.invisible = false
+
+    // deviceDataList.length ? incinometerOption.graphic.invisible = true : incinometerOption.graphic.invisible = false
+    incinometerOption.graphic.invisible = true
+    if (!deviceDataList.length) {
+        incinometerOption.graphic.invisible = false
+        return incinometerOption
+    }
 
     deviceDataList.map(function (item) {
         incinometerOption.xAxis.data.push(
@@ -957,8 +971,12 @@ const genManometerOptionOfDevice = (deviceDataList, halfError, dataMode) => {
     manometerOption.xAxis.data = []
     let dataInterval = [[], [], []]
     let noArea = false
-    
-    deviceDataList.length ? manometerOption.graphic.invisible = true : manometerOption.graphic.invisible = false
+
+    manometerOption.graphic.invisible = true
+    if (!deviceDataList.length) {
+        manometerOption.graphic.invisible = false
+        return manometerOption
+    }
 
 
     deviceDataList.map(function (item) {

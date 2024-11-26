@@ -28,7 +28,6 @@ class JsonFileParser {
     async Parsing() {
         await axios.get(this.url)
             .then((response) => {
-                //console.log("parsing!!!  ", this.url);
                 for (let item of response.data['flow_fields']) {
                     this.flowFieldResourceArr.push(item);
                 }
@@ -114,7 +113,7 @@ export default class FlowFieldLayer {
 
     stepProgressRate = 0.0
 
-    constructor(layerID, jsonUrl, resourcePrefix, hideGUI = false) {
+    constructor(layerID, jsonUrl, resourcePrefix, hideGUI = false, errcallback = null) {
         this.id = layerID;
         this.type = 'custom';
         this.renderingMode = '2d';
@@ -123,6 +122,7 @@ export default class FlowFieldLayer {
         this.resourcePrefix = resourcePrefix;
         this.controller = new FlowFieldController();
         this.hideGUI = hideGUI;
+        this.errcallback = errcallback;
     }
     set progressRate(value) {
         //phaseCount is the texSrc NUM
@@ -285,7 +285,9 @@ export default class FlowFieldLayer {
         }
     }
     async prepare(gl) {
-        await this.parser.Parsing();
+        await this.parser.Parsing().catch(err=>{
+            this.errcallback && this.errcallback(err)
+        })
         //console.log(this.parser);
         //get gl extensions 
         const extensions = gl.getSupportedExtensions();
@@ -577,7 +579,7 @@ export default class FlowFieldLayer {
         await this.prepare(gl);
     }
     onRemove() {
-        if(this.gui) this.gui.destroy();
+        if (this.gui) this.gui.destroy();
     }
     render(gl, matrix) {
         if (!this.isReady) {

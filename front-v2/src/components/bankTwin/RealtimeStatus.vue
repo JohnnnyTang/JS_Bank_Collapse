@@ -124,7 +124,7 @@
                                 <el-button @click="goBack" v-if="showButton">返回原表</el-button>
                             </div>
                             <div class="infoButton">
-                                <el-popover placement="top-start" :width="300" trigger="click"
+                                <el-popover placement="top-start" trigger="click"
                                     :popper-class="'device-indicator-popover'">
                                     <template #reference>
                                         <el-button type="primary" plain :icon="InfoFilled" circle />
@@ -161,12 +161,12 @@
                         <div class="video-content-container">
                             <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                                 <div class="video-content">
-                                    <div :id="item.name" style="width:100%; height:100%"></div>
+                                    <div :id="item.name" style="width:100%; height:100%" @dblclick="fullScreen(index)"></div>
                                     <!-- <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
                                         :key="item.key" allowfullscreen v-if="showVideo === true">
                                     </iframe> -->
-                                    <div class="video-img" v-show="showVideo === false" 
-                                        :style="{ backgroundImage: `url('${item.screenshotImg}')` }"></div>
+                                    <!-- <div class="video-img" v-show="!item.playing" 
+                                        :style="{ backgroundImage: `url('${item.screenshotImg}')` }"></div> -->
                                 </div>
                                 <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
                                     " @click="focusOn(index)">
@@ -398,7 +398,7 @@ const deviceTypeTimeMap = {
     },
     应力桩: {
         timeUnit: 'hour',
-        timeCount: 24,
+        timeCount: 12,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '1分钟',
@@ -451,8 +451,9 @@ const videoList = ref([
         ],
         warn: false,
         key: 0,
-        uikitInstance: null,
-        screenshotImg: null
+        // show: true,
+        playing: true,
+        screenshotImg: null,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
@@ -470,7 +471,8 @@ const videoList = ref([
         ],
         warn: false,
         key: 1,
-        uikitInstance: null,
+        // show: true,
+        playing: true,
         screenshotImg: null
     },
     {
@@ -489,63 +491,84 @@ const videoList = ref([
         ],
         warn: false,
         key: 2,
-        uikitInstance: null,
+        // show: true,
+        playing: true,
         screenshotImg: null
     },
 ])
+const uikitInstances = []
 const userInteractInfo = reactive({
     lastInteractTime: dayjs(),
     refreshIframe: 1
 })
 const videoRef = ref();
-const showVideo = ref(true);
 const videoImgs64 = ref([])
 window.addEventListener('mousemove', (e) => {
     // 用户交互，更新lastInteractTime
     userInteractInfo.lastInteractTime = dayjs()
     userInteractInfo.refreshIframe = 1
     videoList.value.forEach((item, index) => {
-        if (!item.uikitInstance) return
+        if (!uikitInstances[index]) return
+        if (item.playing) return
+        item.playing = true
+        const playPromise = uikitInstances[index].play();
+        playPromise.then(() => {
+            console.log("播放视频" + index)
+        });
         // item.uikitInstance.play()
     })
-    showVideo.value = true;
 })
+
+const fullScreen = (index) => {
+    uikitInstances[index].fullScreen()
+}
 
 const refreshInterval = setInterval(() => {
     // 检查上次交互和此次交互的分钟数
     let nowTime = dayjs()
     let diffTime = nowTime.diff(userInteractInfo.lastInteractTime, 'seconds')
     console.log(diffTime + 'seconds ' + '用户无操作')
-    if (diffTime > 5) {
+    if (diffTime > 10) {
         videoList.value.forEach((item, index) => {
-            if (!item.uikitInstance) return
-            const capturePicturePromise = item.uikitInstance.capturePicture();
-            capturePicturePromise.then((data) => {
-                let base64Img = data.data.base64
-                item.screenshotImg = base64Img
-                // item.uikitInstance.stop()
-            }).catch((err)=> {
-                console.error('capture failed', err)
-            });
+            if (!item.playing) return
+            let uikitInstance = uikitInstances[index]
+            if (!uikitInstance) return
+            // const capturePicturePromise = uikitInstance.capturePicture();
+            // capturePicturePromise.then((data) => {
+            //     let base64Img = data.data.base64
+            //     item.screenshotImg = base64Img
+            //     const stopPromise = uikitInstance.stop();
+            //     stopPromise.then(() => {
+            //         item.playing = false
+            //     });           
+            // }).catch((err)=> {
+            //     console.error('capture failed', err)
+            // });
+            const pausePromise = uikitInstance.pause();
+            pausePromise.then(() => {
+                console.log("暂停视频" + index)
+                item.playing = false
+            }).catch((err)=>{
+                console.error("暂停失败", err)
+            }); 
         })
 
-        showVideo.value = false;
     }
 }, 1000 * 5 * 1)
 
 const refreshIframe = (val) => {
     console.log('refresh iframe ! ', val)
-    if (val) {  // show iframe
-        token.value = validToken
-        videoList.value.forEach((item) => {
-            item.key += 1
-        })
-    } else { // hide iframe
-        token.value = ''
-        videoList.value.forEach((item) => {
-            item.key += 1
-        })
-    }
+    // if (val) {  // show iframe
+    //     token.value = validToken
+    //     videoList.value.forEach((item) => {
+    //         item.key += 1
+    //     })
+    // } else { // hide iframe
+    //     token.value = ''
+    //     videoList.value.forEach((item) => {
+    //         item.key += 1
+    //     })
+    // }
 }
 
 watch(() => userInteractInfo.refreshIframe, (val) => {
@@ -578,11 +601,8 @@ const functionIndexList = [0, 1, 2, 3, 8, 9, 10, 11]
 let curBigVideoIndex = ref(0)
 
 const focusOn = (index) => {
-    for (let item of videoList.value) {
-        if (!item.uikitInstance) return
-    }
-
-    ;[
+    if (uikitInstances.length !== 3) return;
+    [
         videoList.value[curBigVideoIndex.value].order,
         videoList.value[index].order,
     ] = [
@@ -598,13 +618,13 @@ const focusOn = (index) => {
 
 // 调整播放器尺寸
 const reSizeVideos = () => {
-    videoList.value.forEach(item => {
+    videoList.value.forEach((item, index) => {
         const videoBox = document.getElementById(item.order);
         const videoDom = videoBox.querySelectorAll('.video-content')[0]
         if (videoDom) {
             const width = videoDom.offsetWidth;
             const height = videoDom.offsetHeight;
-            item.uikitInstance.reSize(width, height)
+            uikitInstances[index].reSize(width, height)
         }
     })
 }
@@ -665,6 +685,7 @@ const toggleChartOptionFromData = (deviceData) => {
         deviceTypeErrorMap[selectedDeviceType.value],
         selectedDataMode.value,
     )
+    echartIns.clear()
     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
     // if (selectedDeviceType.value == '位移测量站') {
     //     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[selectedDeviceType.value](
@@ -1203,7 +1224,8 @@ onBeforeRouteUpdate(async (to, from) => {
 
     useBankNameStore().globalBankName = to.params.id
     deviceStatusLoading.value = true
-
+    chartDataLoading.value = true
+    updateTimeLoading.value = true
 
     const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(to.params.id))
     monitorInfo.value = importantInfo
@@ -1327,7 +1349,7 @@ onMounted(async () => {
     setTimeout(() => {
         console.log('init with new token!!')
         refreshIframe(1)
-    }, 1000);
+    }, 1);
     // await updateNewestTime()
     // let myDate = new Date()
     // deviceStatusDataList.value[4].time =
@@ -1410,10 +1432,10 @@ onMounted(async () => {
 
 
     videoList.value.forEach((item, index) => {
-        item.uikitInstance = new EZUIKit.EZUIKitPlayer({
+        uikitInstances[index] = new EZUIKit.EZUIKitPlayer({
             id: item.name,
             url: item.videoUrl,
-            accessToken:token.value,
+            accessToken: token.value,
             download: false
         })
     })
@@ -1429,19 +1451,15 @@ onMounted(async () => {
 
 onBeforeUnmount(async () => {
     await moveBack2Origin()
+    videoList.value.forEach((item, index) => {
+        let stopPromise = uikitInstances[index].stop()
+        stopPromise.then(() => {
+            uikitInstances[index].destroy()
+        })
+
+    })
     refreshInterval && clearInterval(refreshInterval)
 })
-
-
-// (1) 顶端角度：反映应力桩顶端在受力过程中的倾斜角度变化，该角度的改变可以间接反映出岸坡顶部土壤应力的分布和变化情况，对于评估岸坡顶部的稳定性和可能的变形模式具有一定的参考价值。
-// (2) 中部角度：测量应力桩中部的倾斜角度，中部角度的变化能够体现岸坡中部土壤应力的调整和转移，有助于分析岸坡内部结构的受力状态和潜在的薄弱环节。
-// (3) 底端角度：监测应力桩底端的倾斜角度，底端角度的改变对于判断岸坡底部土壤的应力集中和稳定性至关重要，结合其他部位的角度变化，可以全面了解应力桩在岸坡不同深度处的受力响应。
-// (4) 顶端最大应变：表示应力桩顶端在受力过程中所产生的最大应变值，应变是应力作用下物体变形程度的度量，顶端最大应变能够反映岸坡顶部土壤应力的强度和变化幅度，为评估岸坡顶部的承载能力提供重要依据。
-// (5) 中部最大应变：指应力桩中部所承受的最大应变，中部最大应变的大小和变化趋势可以帮助分析岸坡中部土壤的应力分布和承载能力，对于确定岸坡内部的关键受力区域具有重要意义。
-// (6) 底端最大应变：体现应力桩底端的最大变形程度，底端最大应变的监测数据对于评估岸坡底部土壤的应力状态和稳定性至关重要，结合顶端和中部的最大应变，可以全面了解应力桩在岸坡不同深度处的受力变形情况。
-// (7) 顶端应力：直接测量应力桩顶端所承受的应力大小，顶端应力的变化反映了岸坡顶部土壤对桩体的作用力变化，对于判断岸坡顶部的承载能力和稳定性具有关键作用。
-// (8) 中部应力：测量应力桩中部的应力值，中部应力的分布和变化情况可以帮助分析岸坡内部土壤应力的传递和分布规律，为评估岸坡的整体稳定性提供重要参考。
-// (9) 底端应力：监测应力桩底端的应力大小，底端应力的大小直接关系到岸坡底部的稳定性，通过对底端应力的监测，可以及时发现岸坡底部可能存在的应力集中和不稳定因素。
 
 
 
@@ -2102,6 +2120,7 @@ div.device-info-container {
                 div.control-open-text {
                     background-color: #001885;
                     font-size: calc(0.5vw + 0.55vh);
+
                     &:hover {
                         cursor: pointer;
                         font-weight: bold;
