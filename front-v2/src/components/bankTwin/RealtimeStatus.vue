@@ -124,7 +124,7 @@
                                 <el-button @click="goBack" v-if="showButton">返回原表</el-button>
                             </div>
                             <div class="infoButton">
-                                <el-popover placement="top-start" :width="300" trigger="click"
+                                <el-popover placement="top-start"  trigger="click"
                                     :popper-class="'device-indicator-popover'">
                                     <template #reference>
                                         <el-button type="primary" plain :icon="InfoFilled" circle />
