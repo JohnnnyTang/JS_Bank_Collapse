@@ -1224,7 +1224,8 @@ onBeforeRouteUpdate(async (to, from) => {
 
     useBankNameStore().globalBankName = to.params.id
     deviceStatusLoading.value = true
-
+    chartDataLoading.value = true
+    updateTimeLoading.value = true
 
     const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(to.params.id))
     monitorInfo.value = importantInfo
