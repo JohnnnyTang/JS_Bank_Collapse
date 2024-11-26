@@ -398,7 +398,7 @@ const deviceTypeTimeMap = {
     },
     应力桩: {
         timeUnit: 'hour',
-        timeCount: 24,
+        timeCount: 12,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '1分钟',
@@ -535,17 +535,17 @@ const refreshInterval = setInterval(() => {
 
 const refreshIframe = (val) => {
     console.log('refresh iframe ! ', val)
-    if (val) {  // show iframe
-        token.value = validToken
-        videoList.value.forEach((item) => {
-            item.key += 1
-        })
-    } else { // hide iframe
-        token.value = ''
-        videoList.value.forEach((item) => {
-            item.key += 1
-        })
-    }
+    // if (val) {  // show iframe
+    //     token.value = validToken
+    //     videoList.value.forEach((item) => {
+    //         item.key += 1
+    //     })
+    // } else { // hide iframe
+    //     token.value = ''
+    //     videoList.value.forEach((item) => {
+    //         item.key += 1
+    //     })
+    // }
 }
 
 watch(() => userInteractInfo.refreshIframe, (val) => {
@@ -665,6 +665,7 @@ const toggleChartOptionFromData = (deviceData) => {
         deviceTypeErrorMap[selectedDeviceType.value],
         selectedDataMode.value,
     )
+    echartIns.clear()
     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
     // if (selectedDeviceType.value == '位移测量站') {
     //     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[selectedDeviceType.value](
@@ -1429,19 +1430,12 @@ onMounted(async () => {
 
 onBeforeUnmount(async () => {
     await moveBack2Origin()
+    videoList.value.forEach((item, index) => {
+        item.uikitInstance.destroy()
+        item.uikitInstance = null
+    })
     refreshInterval && clearInterval(refreshInterval)
 })
-
-
-// (1) 顶端角度：反映应力桩顶端在受力过程中的倾斜角度变化，该角度的改变可以间接反映出岸坡顶部土壤应力的分布和变化情况，对于评估岸坡顶部的稳定性和可能的变形模式具有一定的参考价值。
-// (2) 中部角度：测量应力桩中部的倾斜角度，中部角度的变化能够体现岸坡中部土壤应力的调整和转移，有助于分析岸坡内部结构的受力状态和潜在的薄弱环节。
-// (3) 底端角度：监测应力桩底端的倾斜角度，底端角度的改变对于判断岸坡底部土壤的应力集中和稳定性至关重要，结合其他部位的角度变化，可以全面了解应力桩在岸坡不同深度处的受力响应。
-// (4) 顶端最大应变：表示应力桩顶端在受力过程中所产生的最大应变值，应变是应力作用下物体变形程度的度量，顶端最大应变能够反映岸坡顶部土壤应力的强度和变化幅度，为评估岸坡顶部的承载能力提供重要依据。
-// (5) 中部最大应变：指应力桩中部所承受的最大应变，中部最大应变的大小和变化趋势可以帮助分析岸坡中部土壤的应力分布和承载能力，对于确定岸坡内部的关键受力区域具有重要意义。
-// (6) 底端最大应变：体现应力桩底端的最大变形程度，底端最大应变的监测数据对于评估岸坡底部土壤的应力状态和稳定性至关重要，结合顶端和中部的最大应变，可以全面了解应力桩在岸坡不同深度处的受力变形情况。
-// (7) 顶端应力：直接测量应力桩顶端所承受的应力大小，顶端应力的变化反映了岸坡顶部土壤对桩体的作用力变化，对于判断岸坡顶部的承载能力和稳定性具有关键作用。
-// (8) 中部应力：测量应力桩中部的应力值，中部应力的分布和变化情况可以帮助分析岸坡内部土壤应力的传递和分布规律，为评估岸坡的整体稳定性提供重要参考。
-// (9) 底端应力：监测应力桩底端的应力大小，底端应力的大小直接关系到岸坡底部的稳定性，通过对底端应力的监测，可以及时发现岸坡底部可能存在的应力集中和不稳定因素。
 
 
 

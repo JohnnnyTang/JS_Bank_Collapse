@@ -1473,8 +1473,8 @@ const deviceTypeTimeMap = {
         timeCount: 7,
     },
     stress: {
-        timeUnit: 'day',
-        timeCount: 2,
+        timeUnit: 'hour',
+        timeCount: 8,
     },
 }
 
