@@ -16,7 +16,7 @@
             <div class="loading" v-show="pdfLoading">
                 <div class="loadingIcon"></div>
             </div>
-            <VuePDF v-show="!pdfLoading" :pdf="PDF.pdf" :page="curPage"  @loaded="pdfLoadedHandler" />
+            <VuePDF v-show="!pdfLoading" :pdf="PDF.pdf" :page="curPage" @loaded="pdfLoadedHandler" />
             <el-pagination v-show="!pdfLoading" layout="prev, pager, next" background :page-count="PDF.pages"
                 v-model:current-page="curPage" style="justify-content: center" />
         </div>
@@ -91,7 +91,7 @@ watch(show, (newVal, oldVal) => {
     height: 65vh;
 }
 
-.image-preview{
+.image-preview {
     position: relative;
     width: fit-content;
     height: fit-content;
@@ -99,7 +99,7 @@ watch(show, (newVal, oldVal) => {
     min-height: 50vh;
     max-width: 50vw;
     max-height: 60vh;
-    
+
 }
 
 .pdf-preview {
@@ -110,6 +110,7 @@ watch(show, (newVal, oldVal) => {
     height: fit-content;
     min-width: 30vw;
     min-height: 90vh;
+
     .loading {
         position: absolute;
         top: 0vh;
@@ -123,15 +124,7 @@ watch(show, (newVal, oldVal) => {
         justify-content: center;
         align-items: center;
 
-        @keyframes load {
-            0% {
-                transform: rotate(0deg);
-            }
 
-            100% {
-                transform: rotate(360deg);
-            }
-        }
 
         .loadingIcon {
             animation: load 3s linear infinite;
@@ -142,6 +135,16 @@ watch(show, (newVal, oldVal) => {
             border-radius: 50%;
             margin: auto;
         }
+    }
+}
+
+@keyframes load {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
     }
 }
 </style>

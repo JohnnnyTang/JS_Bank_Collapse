@@ -1451,9 +1451,9 @@ onMounted(async () => {
 onBeforeUnmount(async () => {
     await moveBack2Origin()
     videoList.value.forEach((item, index) => {
-        let stopPromise = item.uikitInstance.stop()
+        let stopPromise = uikitInstances[index].stop()
         stopPromise.then(() => {
-            item.uikitInstance.destroy()
+            uikitInstances[index].destroy()
         })
 
     })
