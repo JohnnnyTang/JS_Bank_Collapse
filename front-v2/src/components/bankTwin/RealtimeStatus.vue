@@ -124,7 +124,7 @@
                                 <el-button @click="goBack" v-if="showButton">返回原表</el-button>
                             </div>
                             <div class="infoButton">
-                                <el-popover placement="top-start"  trigger="click"
+                                <el-popover placement="top-start" trigger="click"
                                     :popper-class="'device-indicator-popover'">
                                     <template #reference>
                                         <el-button type="primary" plain :icon="InfoFilled" circle />
@@ -165,7 +165,7 @@
                                     <!-- <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
                                         :key="item.key" allowfullscreen v-if="showVideo === true">
                                     </iframe> -->
-                                    <div class="video-img" v-show="showVideo === false" 
+                                    <div class="video-img" v-show="showVideo === false"
                                         :style="{ backgroundImage: `url('${item.screenshotImg}')` }"></div>
                                 </div>
                                 <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
@@ -524,7 +524,7 @@ const refreshInterval = setInterval(() => {
                 let base64Img = data.data.base64
                 item.screenshotImg = base64Img
                 // item.uikitInstance.stop()
-            }).catch((err)=> {
+            }).catch((err) => {
                 console.error('capture failed', err)
             });
         })
@@ -1414,7 +1414,7 @@ onMounted(async () => {
         item.uikitInstance = new EZUIKit.EZUIKitPlayer({
             id: item.name,
             url: item.videoUrl,
-            accessToken:token.value,
+            accessToken: token.value,
             download: false
         })
     })
@@ -1431,8 +1431,11 @@ onMounted(async () => {
 onBeforeUnmount(async () => {
     await moveBack2Origin()
     videoList.value.forEach((item, index) => {
-        item.uikitInstance.destroy()
-        item.uikitInstance = null
+        let stopPromise = item.uikitInstance.stop()
+        stopPromise.then(() => {
+            item.uikitInstance.destroy()
+        })
+
     })
     refreshInterval && clearInterval(refreshInterval)
 })
@@ -2096,6 +2099,7 @@ div.device-info-container {
                 div.control-open-text {
                     background-color: #001885;
                     font-size: calc(0.5vw + 0.55vh);
+
                     &:hover {
                         cursor: pointer;
                         font-weight: bold;
