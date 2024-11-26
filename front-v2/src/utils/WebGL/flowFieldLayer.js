@@ -28,7 +28,6 @@ class JsonFileParser {
     async Parsing() {
         await axios.get(this.url)
             .then((response) => {
-                //console.log("parsing!!!  ", this.url);
                 for (let item of response.data['flow_fields']) {
                     this.flowFieldResourceArr.push(item);
                 }
@@ -114,7 +113,7 @@ export default class FlowFieldLayer {
 
     stepProgressRate = 0.0
 
-    constructor(layerID, jsonUrl, resourcePrefix) {
+    constructor(layerID, jsonUrl, resourcePrefix, hideGUI = false, errcallback = null) {
         this.id = layerID;
         this.type = 'custom';
         this.renderingMode = '2d';
@@ -122,6 +121,8 @@ export default class FlowFieldLayer {
         this.parser = new JsonFileParser(jsonUrl);
         this.resourcePrefix = resourcePrefix;
         this.controller = new FlowFieldController();
+        this.hideGUI = hideGUI;
+        this.errcallback = errcallback;
     }
     set progressRate(value) {
         //phaseCount is the texSrc NUM
@@ -284,7 +285,9 @@ export default class FlowFieldLayer {
         }
     }
     async prepare(gl) {
-        await this.parser.Parsing();
+        await this.parser.Parsing().catch(err=>{
+            this.errcallback && this.errcallback(err)
+        })
         //console.log(this.parser);
         //get gl extensions 
         const extensions = gl.getSupportedExtensions();
@@ -571,12 +574,12 @@ export default class FlowFieldLayer {
     async onAdd(map, gl) {
         this.GL = gl;
         // //console.log('Custom flow field layer is being added...');
-        this.initGUI();
+        if (this.hideGUI === false) this.initGUI();
         this.map = map;
         await this.prepare(gl);
     }
     onRemove() {
-        this.gui.destroy();
+        if (this.gui) this.gui.destroy();
     }
     render(gl, matrix) {
         if (!this.isReady) {

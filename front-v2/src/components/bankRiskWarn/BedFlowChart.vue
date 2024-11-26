@@ -134,14 +134,20 @@ onMounted(() => {
     chart = echarts.init(chartDom.value)
     let bk = useBankNameStore().globalBankName
 
-    if (bk === 'Mzs') {
-        hasData.value = true
-        setTimeout(() => {
-            chart.setOption(option)
-        }, 0)
-    } else {
-        hasData.value = false
-    }
+    // if (bk === 'Mzs') {
+    //     hasData.value = true
+    //     setTimeout(() => {
+    //         chart.setOption(option)
+    //     }, 0)
+    // } else {
+    //     hasData.value = false
+    // }
+
+    /// 张帆一说，换岸段也用这套年径流数据   2024/11/24 更改
+    hasData.value = true
+    setTimeout(() => {
+        chart.setOption(option)
+    }, 0)
 })
 
 // onBeforeRouteUpdate((to, from) => {

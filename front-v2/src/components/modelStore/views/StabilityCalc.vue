@@ -382,7 +382,7 @@ const treeRef = ref(null)
 const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
-
+    console.log(selectedBank.bankEnName)
     updateTreeFromBack(selectedBank.bankEnName)
     mapFlyToRiver(mapStore.getMap(map), bank.name)
 
@@ -630,7 +630,7 @@ const visulizationPrepare = async () => {
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
-            segment: 'Mzs',
+            segment: 'Mzs', // 后端纹理资源生产有问题，这里用Mzs的资源  2024-11-25
             set: 'standard',
             year: '2023',
         }

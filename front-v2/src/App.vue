@@ -522,6 +522,7 @@ body,
     border: #1248bb 1px solid;
     border-radius: 5px;
     box-shadow: 0 0 4px #1248bb;
+    width: 15vw !important;
 
     div.device-indicator-info {
         position: relative;
