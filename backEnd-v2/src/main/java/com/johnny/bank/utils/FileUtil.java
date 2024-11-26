@@ -5,6 +5,7 @@ import com.johnny.bank.model.resource.dataResource.InclinometerData;
 import com.johnny.bank.model.resource.dataResource.ManometerData;
 import com.johnny.bank.model.resource.dataResource.StressPileData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -27,6 +28,17 @@ import java.util.List;
 @Slf4j
 public class FileUtil {
 
+    // 生成带时间戳的文件名
+    public static String generateNewFileName(String originalFilename) {
+        String fileName = new File(originalFilename).getName();
+        int dotIndex = fileName.lastIndexOf(".");
+        if (dotIndex == -1) {
+            return fileName + "_" + System.currentTimeMillis();
+        } else {
+            return fileName.substring(0, dotIndex) + "_" + System.currentTimeMillis() + fileName.substring(dotIndex);
+        }
+    }
+
     // 删除指定路径文件夹以及其中文件
     public static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
@@ -45,6 +57,12 @@ public class FileUtil {
             log.info("Failed to delete folder: " + folder.getAbsolutePath());
         }
     }
+    // 删除指定文件
+    public static void deleteFile(File file) {
+        if (!file.delete()) {
+            log.info("Failed to delete file: " + file.getAbsolutePath());
+        }
+    }
 
     // 获取指定路径文件内容
     public static String getFileContent(String filePathStr) {
@@ -53,7 +71,7 @@ public class FileUtil {
             return "NOT EXIST";
         }
         try {
-            //List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
+//            List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
             List<String> lines = Files.readAllLines(filePath);
             return String.join(System.lineSeparator(), lines);
         } catch (IOException e) {
@@ -61,10 +79,30 @@ public class FileUtil {
         }
     }
 
+    // 获取文件二进制流
+    public static byte[] getByteStreamFromFile(String filePath) {
+        File pictureFile = new File(filePath);
+        if (!pictureFile.exists() || pictureFile.isDirectory()) {
+            return null;
+        }
+        try (FileInputStream fis = new FileInputStream(pictureFile)) {
+            byte[] fileContent = new byte[(int) pictureFile.length()];
+            int bytesRead = fis.read(fileContent);
+            if (bytesRead != pictureFile.length()) {
+                // 如果读取的字节数不等于文件长度，可以记录日志或抛出异常
+                throw new IOException("未能读取完整的文件内容");
+            }
+            return fileContent;
+        } catch (IOException e) {
+            log.info(e.getMessage());
+            return null; // 或者抛出自定义异常
+        }
+    }
+
     // 修改指定路径文件内容
     public static void modifiyFileContent(String filePathStr, String content) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
-        //try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePathStr), Charset.forName("GBK"))) {
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePathStr, false))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePathStr), Charset.forName("GBK"))) {
             writer.write(content);
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,19 +112,19 @@ public class FileUtil {
     /**
      * 将文件保存到指定路径
      */
-    public static String storeFile(MultipartFile file, String path) throws IOException {
+    public static void storeFile(MultipartFile file, String path, String name) throws IOException {
         File directory = new File(path);
         if (!directory.exists()){
             directory.mkdirs();  // 使用mkdirs()以确保创建多层目录
         }
-
         // 使用原始文件名进行存储
-        String originalFileName = file.getOriginalFilename();
-        Path targetPath = new File(directory, originalFileName).toPath();
+        String fileName = name == null ? file.getOriginalFilename() : name;
+        Path targetPath = new File(directory, fileName).toPath();
 
         Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-        return targetPath.toString();
+    }
+    public static void storeFile(MultipartFile file, String path) throws IOException {
+        storeFile(file, path, null);
     }
 
     public static Boolean storeFileLocal(String strBuffer, String filePath) {
@@ -163,5 +201,17 @@ public class FileUtil {
         }
         String outStr = out.toString();
         return outStr.substring(0, outStr.length()-1);
+    }
+
+    public static MultipartFile convertFileToMultipartFile(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+
+        // 使用 MockMultipartFile 创建 MultipartFile 实例
+        return new MockMultipartFile(
+                file.getName(),           // 文件名
+                file.getName(),           // 原始文件名
+                "application/zip", // 文件类型
+                inputStream                // 文件输入流
+        );
     }
 }

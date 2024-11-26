@@ -687,6 +687,15 @@ onMounted(async () => {
 
     //////////return loaded Map
     map = await initPureScratchMap(mapDom.value)
+    // TODO：： 不同岸段的BBOX
+    map.fitBounds(
+        [
+            [120.45997922676836, 32.00001616423072],
+            [120.60909640208264, 32.084171362618625],
+        ], {
+        duration: 1500,
+    }
+    )
     // map = await initBaseMap(mapDom.value)
     map.on('render', () => {
         map.triggerRepaint()
@@ -695,7 +704,7 @@ onMounted(async () => {
     warnInfoStore.warnInfo.length ? mapFlyToRiver(map) : mapFlyToRiver2(map)
 
     useMapStore().setMap(map)
-    await mapInit(map, true)
+    mapInit(map, true)
 
 
     // const videoAccessKey = (await axios.post(

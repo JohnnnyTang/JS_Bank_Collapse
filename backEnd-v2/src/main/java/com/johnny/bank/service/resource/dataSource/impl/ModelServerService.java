@@ -3,13 +3,11 @@ package com.johnny.bank.service.resource.dataSource.impl;
 import com.alibaba.fastjson2.JSONObject;
 import com.johnny.bank.model.node.DataNodeV2;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
-import com.johnny.bank.repository.nodeRepo.base.IBaseNodeRepo;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.service.node.impl.TaskNodeServiceV2;
 import com.johnny.bank.service.resource.dataSource.IModelServerService;
 import com.johnny.bank.utils.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
@@ -20,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created with IntelliJ IDEA.
@@ -247,7 +246,7 @@ public class ModelServerService implements IModelServerService {
         dataNodeBasicInfo.put("set",info.getString("set"));
         dataNodeBasicInfo.put("type","calculate");
         dataNodeBasicInfo.put("segment",bank);
-        if (info.containsKey("description")) {
+        if (info.containsKey("description") && !Objects.equals(info.getString("description"), "")) {
             dataNodeBasicInfo.put("description",info.getString("description"));
         }
         if (info.containsKey("temp")) {
@@ -280,6 +279,9 @@ public class ModelServerService implements IModelServerService {
 
     private String deleteCalculateResource(String bank, String category, String name) {
         DataNodeV2 deleteDataNode = dataNodeRepoV2.getNodeByCategoryBankAndName(category, bank, name);
+        if (deleteDataNode == null) {
+            return bank + " 岸段模型计算资源 " + name + " 不存在！";
+        }
         if (category.equals("DEMDataItem")) {
             DataNodeV2 deleteVisualDataNode = dataNodeRepoV2.getNodeByCategoryBankAndName("DEMTileDataItem", bank, name);
             if (deleteVisualDataNode != null && deleteVisualDataNode.getUsage().containsKey("path")) {
@@ -287,12 +289,17 @@ public class ModelServerService implements IModelServerService {
                 dataNodeServiceV2.delete(deleteVisualDataNode.getId());
             }
         }
-        if (deleteDataNode == null) {
-            return bank + " 岸段模型计算资源 " + name + " 不存在！";
+        String path = deleteDataNode.getBasicInfo().getString("path");
+        // 若非水动力模型，则删除path上一层级文件夹
+        if (!category.equals("Hy")) {
+            int lastSlashIndex = path.lastIndexOf('/');
+            if (lastSlashIndex != -1) {
+                path = path.substring(0, lastSlashIndex);
+            }
         }
-        String url = baseUrl + "/v0/fs";
+        String url = baseUrl + "/v0/fs/resource";
         JSONObject requestBody = new JSONObject();
-        requestBody.put("directory",deleteDataNode.getBasicInfo().getString("path"));
+        requestBody.put("directory",path);
         try {
             InternetUtil.doDelete(url, requestBody);
             FileUtil.deleteFolder(new File(draftDataPath + File.separator + "tif" + File.separator + bank + File.separator + name));

@@ -1,6 +1,6 @@
 package com.johnny.bank.controller.resource.dataSource;
 
-import com.johnny.bank.model.resource.dataResource.DetailHistory;
+import com.johnny.bank.model.resource.dataResource.                                               DetailHistory;
 import com.johnny.bank.service.resource.dataSource.impl.DetailCollapseInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.List;
  * @version: 1.0
  */
 @RestController
-@RequestMapping("api/v1/data/detailHistory")
+@RequestMapping("api/v1/data/detail")
 public class DetailHistoryInfoController {
 
     private final DetailCollapseInfoService collapseInfoService;

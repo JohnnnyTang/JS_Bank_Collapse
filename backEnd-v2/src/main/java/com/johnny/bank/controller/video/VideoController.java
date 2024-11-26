@@ -20,7 +20,7 @@ import java.nio.file.Paths;
  * @Description:
  */
 @RestController
-@RequestMapping("api/v1/video")
+@RequestMapping("api/v1/")
 public class VideoController {
     private final VideoPath videoPath;
     private final VideoHttpRequestHandler videoHttpRequestHandler;

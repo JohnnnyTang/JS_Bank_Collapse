@@ -1,6 +1,6 @@
 <template>
     <div class="bank-resouce-create-container" v-loading="loading">
-        <div class="main-title">岸段管理</div>
+        <div class="main-title">已建岸段</div>
         <div class="desc-box-container">
             <div class="change-button-container delete" v-show="bank.bankEnName != 'Mzs' && bank.bankEnName != ''">
                 <div class="change-button delete" v-if="!changeStatus" @click="deleteBank">
@@ -48,7 +48,7 @@
                             </el-select>
                             <el-date-picker v-else-if="item.key === '监测起始时间'" v-model="item.val" type="date"
                                 placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
-                            <div v-else-if="item.key === '中心坐标'" class="full">
+                            <!-- <div v-else-if="item.key === '中心坐标'" class="full">
                                 <el-input v-model="lnglat.lng" style="
                                         width: 50%;
                                         height: 100%;
@@ -61,7 +61,7 @@
                                             font-size: calc(0.6vw + 0.6vh);
                                         " placeholder="请输入纬度" type="number" :step="0.0000001"
                                     :autosize="{ minRows: 4, maxRows: 6 }" />
-                            </div>
+                            </div> -->
                             <el-input v-else v-model="item.val" style="
                                 width: 100%;
                                 height: 100%;
@@ -85,8 +85,8 @@
         </div>
 
         <div class="resource-box-container">
-            <div class="one-type-resource-container" v-for="(key, resourceCatogoryIndex) in   Object.keys(resourceInfo)  "
-                :ref=handleRef>
+            <div class="one-type-resource-container" v-for="(key, resourceCatogoryIndex) in  Object.keys(resourceInfo)  "
+                :key="resourceCatogoryIndex" :ref=handleRef>
                 <div class="title-container">
                     <span @click="typeIndexChange(0)" class="page left" :class="{ ban: nowTypeIndex === 0 }">上一页</span>
                     <span>{{ key }}</span>
@@ -99,17 +99,27 @@
                             :key="resourceTypeIndex">
                             <div class="resource-title">
                                 {{ item.key }}
+                                <div class="resource-caculate-btn" v-show="item.calculate"
+                                    @click="resourceCaculateClickHandler">计算
+                                </div>
+                                <div class="resource-set-btn" v-show="item.set" @click="handleSetClick">设置
+                                </div>
                                 <div class="resource-upload-btn" v-show="item.upload"
                                     @click="resourceUploadClickHandler(resourceTypeIndex)">上传
                                 </div>
                             </div>
                             <div class="resource-content">
 
-                                <el-table :data="item.resourceList" style="width: 95%; margin-left: 2.5%;"
-                                    max-height="25vh">
-                                    <el-table-column v-for="(  column, index  ) in  tableColumnInfo[key]  " :key="index"
-                                        :prop="column.prop" :label="column.label" :min-width="column['min-width']"
-                                        align="center">
+                                <el-table :data="item.resourceList" style="width: 95%; margin-left: 2.5%;" max-height="25vh"
+                                    :row-class-name="tableRowClassName">
+                                    <el-table-column label="序号" align="center" :min-width="20">
+                                        <template #default="scope">
+                                            {{ scope.$index + 1 }}
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column v-for="(  column, index  ) in  tableColumnInfo[key][item.key]  "
+                                        :key="index" :prop="column.prop" :label="column.label"
+                                        :min-width="column['min-width']" align="center">
                                         <template #default="scope" v-if="column.asTag">
                                             <div style="display: flex; align-items: center;justify-content: center;">
                                                 <el-tag>{{ scope.row.fileType }}</el-tag>
@@ -118,13 +128,23 @@
                                     </el-table-column>
 
                                     <el-table-column fixed="right" label="操作" min-width="20%" align="center"
-                                        v-if="item.delete || item.update">
+                                        v-if="(item.delete || item.update || item.u)">
                                         <template #default="scope">
-                                            <el-button link type="danger" size="small" v-if="item.delete"
+                                            <el-button link type="primary" size="small" v-if="scope.row.setting"
+                                                @click.prevent="settingRow(scope.$index, resourceTypeIndex, scope.row)">
+                                                设置
+                                            </el-button>
+                                            <el-button link type="primary" size="small" v-if="scope.row.upload"
+                                                @click.prevent="uploadRow(scope.$index, resourceTypeIndex, scope.row)">
+                                                上传
+                                            </el-button>
+                                            <el-button link type="danger" size="small"
+                                                v-if="item.delete && !scope.row.placeHolder"
                                                 @click.prevent="deleteRow(scope.$index, resourceTypeIndex, scope.row)">
                                                 删除
                                             </el-button>
-                                            <el-button link type="warning" size="small" v-if="item.update"
+                                            <el-button link type="warning" size="small"
+                                                v-if="item.update && !scope.row.placeHolder"
                                                 @click.prevent="updateRow(scope.$index, resourceTypeIndex, scope.row)">
                                                 更新
                                             </el-button>
@@ -142,10 +162,56 @@
     </div>
 
     <UploadDialog ref="uploadDialogRef" :type="uploadDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
-        :bank-en-name="uploadDialogBaseInfo.bankEnName"></UploadDialog>
+        :bank-en-name="uploadDialogBaseInfo.bankEnName" :attach-info="uploadAttachInfo"></UploadDialog>
 
     <UpdateDialog ref="updateDialogRef" :type="updateDialogBaseInfo.type" :sub-type="uploadDialogBaseInfo.subType"
         :bank-en-name="updateDialogBaseInfo.bankEnName" :resource-item-info="updateDialogBaseInfo.itemInfo"></UpdateDialog>
+
+    <!-- 弹出对话框 -->
+
+    <el-dialog v-model="showSetDialog" style="height: 60vh;width: 30vw;overflow-y: scroll;" :show-close="false">
+        <div class="form-header">
+            {{ selectedValue === 'PQ' ? '造床流量系数设置' : '权重阈值参数设置' }}
+        </div>
+
+        <!-- <div style="display: flex;justify-content: center;">
+            <el-form :model="modelParamsInfoData" style="margin-top: 3vh;width: 20vw;" class="custom">
+                <el-form-item v-for="index in modelParamsInfoRange" :key="index" :label="modelParamsInfoData[index][0]"
+                    label-width="4vw">
+                    <input v-model="modelParamsInfoData[index][1]" type="text" />
+                </el-form-item>
+            </el-form>
+        </div> -->
+
+        <!-- 初始值选择项 -->
+        <div class="set-radio-group-container" v-if="intoTheSetDialogByTitleButton">
+            <el-radio-group v-model="selectedValue" style="margin-top: 10px;">
+                <el-radio value="PQ" size="large">造床流量系数</el-radio>
+                <el-radio value="template" size="large">权重阈值参数</el-radio>
+            </el-radio-group>
+        </div>
+
+        <div style="display: flex;justify-content: center;">
+            <el-form :model="PQData" v-if="selectedValue == 'PQ'" style="width: 20vw;">
+                <el-form-item v-for="index in PQRange" :key="index" :label="`${index}年`" class="custom">
+                    <input v-model="PQData[index]" type="number" />
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="addPQData" type="primary" style="width: 2vw;">+</el-button>
+                    <el-button @click="deletePQData" type="primary" style="width: 2vw;">-</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+
+        <SetThresholdForm ref="setThresholdFormRef" v-if="selectedValue == 'template'" />
+
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="showSetDialog = false">取消</el-button>
+                <el-button type="primary" @click=handleSetConfirm>确认</el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -156,9 +222,11 @@ import { ElMessage, ElMessageBox, ElNotification } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue'
 import { useResourceStore } from '../../store/resourceStore'
 import axios from 'axios';
-import { defaultTableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
+import { initialTableDatas, tableColumns, typeDict, resourceTypeDict, getBankBasic_Style_Info, categoryNameDict } from './bankResource'
 // import UploadDialog from './UploadDialog.vue'
 import UploadDialog from './uploadDialog.vue'
+import UpdateDialog from './updateDialog.vue'
+import SetThresholdForm from '../modelStore/riskWarn/SetThresholdForm.vue'
 
 //////////////////////////// global
 const warnLevelList = ["I 级预警岸段", "Ⅱ 级预警岸段", "Ⅲ 级预警岸段"]
@@ -173,9 +241,6 @@ onBeforeRouteUpdate(async (to, from) => {
 const emit = defineEmits(['refresh-bank-list'])
 
 const resourceStore = useResourceStore()
-
-
-
 
 
 //////////////////////////// bank basic info ////////////////////////////
@@ -195,11 +260,6 @@ let originalBank = {
     bankEnName: ''
 }
 const startModify = () => {
-    // console.log('进入修改状态')
-    let center = typeof bankBasicInfo.value[1].val === 'string' ? JSON.parse(bankBasicInfo.value[1].val) : bankBasicInfo.value[1].val
-    lnglat.lng = center[0]
-    lnglat.lat = center[1]
-    console.log('lnglat', lnglat)
 
     changeStatus.value = true
     originalBankBasicInfo = bankBasicInfo.value.map(item => ({ ...item })) // deep copy
@@ -273,12 +333,12 @@ const commitModify = () => {
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
             "center": center,
-            "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val,
-            "introduction": nowBasicInfo[4].val,
+            "monitorLength": nowBasicInfo[1].val,
+            "monitorStartTime": nowBasicInfo[2].val,
+            "introduction": nowBasicInfo[3].val,
             "management": {
-                "department": nowBasicInfo[5].val,
-                "contact": nowBasicInfo[6].val,
+                "department": nowBasicInfo[4].val,
+                "contact": nowBasicInfo[5].val,
             }
         }
         const updateMsg = (await BankResourceHelper.updateBankBasicInfo(bank.bankEnName, ReqBody)).data
@@ -301,8 +361,6 @@ const commitModify = () => {
         changeStatus.value = false
     })
 }
-
-
 
 
 /////////////////////////// bank resource info ///////////////////////////
@@ -341,6 +399,7 @@ const resourceInfo = ref({})
 
 ///////////// bank resource upload
 const uploadDialogRef = ref(null)
+const uploadAttachInfo = ref({})
 const uploadDialogBaseInfo = computed(() => {
     return {
         type: typeDict[nowTypeIndex.value],
@@ -351,8 +410,11 @@ const uploadDialogBaseInfo = computed(() => {
 
 const resourceUploadClickHandler = (resourceTypeIndex) => {
     nowSubTypeIndex.value = resourceTypeIndex
-    console.log(uploadDialogBaseInfo.value)
     uploadDialogRef.value.dialogFormVisible = true
+}
+
+const resourceCaculateClickHandler = () => {
+    router.push('/modelStore/stabilityCalc')
 }
 
 
@@ -381,9 +443,43 @@ const resourceItemUpdateClickHandler = () => {
 
 
 ///////////// bank resource table operation
-const tableColumnInfo = defaultTableColumns
+const tableColumnInfo = tableColumns
 
+const tableRowClassName = ({
+    row,
+    rowIndex,
+}) => {
+    if (row.placeHolder) {
+        return 'placeholder-row'
+    }
+    return ''
+}
+const settingRow = (rowIndex, resourceTypeIndex, info) => {
+    console.log('click setting from row', console.log(info))
+    if (info.placeHolder) {
+        if (info.name === "造床流量系数")
+            selectedValue.value = 'PQ'
+        else if (info.name === "权重阈值参数")
+            selectedValue.value = 'template'
+    }
+    intoTheSetDialogByTitleButton.value = false
+    showSetDialog.value = true
+}
+const uploadRow = (rowIndex, resourceTypeIndex, info) => {
+    console.log('click upload from row', info, resourceTypeIndex)
 
+    const configRadioMap = {
+        "岸段边界文件": "Boundary",
+        "造床流量系数": "PQ",
+        "权重阈值参数": "template",
+    }
+    if ("模型参数文件" === resourceInfo.value[categoryNameDict[nowTypeIndex.value]][resourceTypeIndex].key) {
+        uploadAttachInfo.value = {
+            "configRadioValue": configRadioMap[info.name],
+        }
+    }
+    resourceUploadClickHandler(resourceTypeIndex)
+}
 const deleteRow = (rowIndex, resourceTypeIndex, info) => {
 
     // console.log('now catogory index', nowTypeIndex.value)
@@ -408,36 +504,40 @@ const deleteRow = (rowIndex, resourceTypeIndex, info) => {
         resourceList.splice(rowIndex, 1)
 
         // backend delete 。。。
-        if (bank.bankEnName != 'Mzs') {
-
-            switch (typeDict[nowTypeIndex.value]) {
-                case 'model':
-                    let subType = resourceTypeDict[typeDict[nowTypeIndex.value]][nowSubTypeIndex.value]
-                    console.log('subType', subType)
+        switch (typeDict[nowTypeIndex.value]) {
+            case 'model':
+                let subType = resourceTypeDict[typeDict[nowTypeIndex.value]][resourceTypeIndex]
+                console.log('subType', subType)
+                if (subType == 'Section') {
+                    BankResourceHelper.deleteSectionResourceFile(bank.bankEnName, info.name).then(res => {
+                        console.log(res)
+                    }).catch(e => {
+                        console.warn(e)
+                    })
+                } else {
                     BankResourceHelper.deleteBankCalculateResourceFile(subType, bank.bankEnName, info.name).then(res => {
                         console.log(res)
                     }).catch(e => {
                         console.warn(e)
                     })
-                    break;
+                }
+                break;
 
-                case 'visual':
-                    BankResourceHelper.deleteBankVisualResourceFile(info.tileName, bank.bankEnName).then(res => {
-                        console.log(res)
-                    }).catch(e => {
-                        console.warn(e)
-                    })
-                    break;
+            case 'visual':
+                BankResourceHelper.deleteBankVisualResourceFile(info.tileName, bank.bankEnName).then(res => {
+                    console.log(res)
+                }).catch(e => {
+                    console.warn(e)
+                })
+                break;
 
-                case 'device':
-                    BankResourceHelper.deleteBankDevice(info.code).then(res => {
-                        console.log(res)
-                    }).catch(e => {
-                        console.warn(e)
-                    })
-                    break;
-
-            }
+            case 'device':
+                BankResourceHelper.deleteBankDevice(info.code).then(res => {
+                    console.log(res)
+                }).catch(e => {
+                    console.warn(e)
+                })
+                break;
 
         }
 
@@ -446,14 +546,16 @@ const deleteRow = (rowIndex, resourceTypeIndex, info) => {
             'message': '删除成功！'
         })
 
+        let _type = typeDict[nowTypeIndex.value]
+        let _subType = resourceTypeDict[_type][resourceTypeIndex]
+        BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, bank.bankEnName, _type, _subType)
+
     }).catch(_ => {
         console.log('取消删除', _);
     })
 }
 const updateRow = (rowIndex, resourceTypeIndex, info) => {
-    // console.log('now catogory index', nowTypeIndex.value)
-    // console.log('now resource index', resourceTypeIndex)
-    // console.log('now item index', rowIndex)
+
     nowSubTypeIndex.value = resourceTypeIndex
     operatingResourceItem.value = info
 
@@ -462,10 +564,25 @@ const updateRow = (rowIndex, resourceTypeIndex, info) => {
 }
 
 
+
+
+
 const loading = ref(false)
 onMounted(async () => {
     const _thisBankEnName = route.params.id
     await initOneBank(_thisBankEnName)
+
+    window.addEventListener('keydown', E => {
+        if (E.key === 'e') {
+            // BankResourceHelper.getBankSectionGeometry(bank.bankEnName, "short").then(res => {
+            //     console.log(res.data)
+            // })
+            ElMessage.success({
+                'offset': 100,
+                'message': 'e键按下'
+            })
+        }
+    })
 
     // for refresh
     watch(() => resourceStore.resourceInfo, (newVal, oldVal) => {
@@ -477,6 +594,7 @@ onMounted(async () => {
 
 
 ////////////////// helper ///////////////////
+
 const initOneBank = async (bankEnName) => {
     loading.value = true
     const _thisBankEnName = bankEnName
@@ -484,42 +602,79 @@ const initOneBank = async (bankEnName) => {
 
     // // bank resource init
     const _ogDEM = (await BankResourceHelper.getBankCalculateResourceList('DEM', _thisBankEnName)).data
-    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', _thisBankEnName)).data
-    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', _thisBankEnName)).data
     const _ogConfig = (await BankResourceHelper.getBankCalculateResourceList('Config', _thisBankEnName)).data
+    const _ogBound = (await BankResourceHelper.getBankCalculateResourceList('Boundary', _thisBankEnName)).data
+    const _ogSection = (await BankResourceHelper.getBankCalculateResourceList('Section', _thisBankEnName)).data
+    const _ogHydro = (await BankResourceHelper.getBankCalculateResourceList('Hydrodynamic', _thisBankEnName)).data
+
+    // prepare
+    const _demList = BankResourceHelper.DEMResourcetoList(_ogDEM)
+    const demList = BankResourceHelper.prepareData(_demList, 'DEM')
+
+    const _configList = BankResourceHelper.ConfigResourcetoList(_ogConfig)
+    const _boundList = BankResourceHelper.BoundaryResourcetoList(_ogBound)
+    const _confList = _configList.concat(_boundList)
+    const confList = BankResourceHelper.prepareData(_confList, 'Config')
+
+    const _sectionList = BankResourceHelper.SectionResourcetoList(_ogSection)
+    const sectionList = BankResourceHelper.prepareData(_sectionList, 'Section')
+
+    const _hydroList = BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
+    const hydroList = BankResourceHelper.prepareData(_hydroList, 'Hydrodynamic')
+
+
     // const _ogDEM = []
     // const _ogHydro = []
     // const _ogBound = []
     // const _ogConfig = []
+    // const _ogSection = []
     const _thisBankResourceInfo = [
         {
             key: '岸段地形资源',
             upload: true,
+            calculate: false,
+            set: false,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.DEMResourcetoList(_ogDEM)
+            resourceList: demList
         },
         {
             key: '模型参数文件',
             upload: true,
+            calculate: false,
+            set: true,
             update: false,
-            delete: true,
-            resourceList: BankResourceHelper.ConfigResourcetoList(_ogConfig)
+            delete: false,
+            u:true,
+            resourceList: confList
         },
         {
-            key: '岸段边界矢量',
+            key: '判别断面文件',
             upload: true,
+            calculate: false,
+            set: false,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.BoundaryResourcetoList(_ogBound)
+            resourceList: sectionList
         },
         {
             key: '水动力预算工况',
             upload: true,
+            calculate: true,
+            set: false,
             update: false,
             delete: true,
-            resourceList: BankResourceHelper.HydrodynamicResourcetoList(_ogHydro)
+            resourceList: hydroList
         },
+        // {
+        //     key: '岸段边界矢量',
+        //     upload: true,
+        //     calculate: false,
+        //     set: false,
+        //     update: false,
+        //     delete: true,
+        //     resourceList: BankResourceHelper.BoundaryResourcetoList(_ogBound)
+        // },
     ]
 
     // visual resource init
@@ -540,12 +695,12 @@ const initOneBank = async (bankEnName) => {
             resourceList: demTileList
         },
         {
-            key: '矢量可视化资源',
+            key: '其他可视化资源',
             upload: true,
             update: false,
             delete: true,
             resourceList: vectorTileList
-        },
+        }
     ]
 
     // device resource init
@@ -598,10 +753,17 @@ const initOneBank = async (bankEnName) => {
             delete: true,
             resourceList: _Vedio
         },
+        {
+            key: '其他设备',
+            upload: true,
+            update: true,
+            delete: true
+        }
     ]
     //////////////////
     bank.name = _thisBankBasicInfo.name
     bank.bankEnName = _thisBankEnName
+    console.log(_thisBankBasicInfo)
     bankBasicInfo.value = getBankBasic_Style_Info(_thisBankBasicInfo)
     console.log(bankBasicInfo.value)
     resourceInfo.value = {
@@ -624,6 +786,109 @@ const initOneBank = async (bankEnName) => {
 
 
 
+
+
+
+
+
+////////////////// set ///////////////////
+const showSetDialog = ref(false)
+
+// 定义两种模型参数初始值
+const PQData = reactive({
+    2010: 2.59,
+    2011: 0.15,
+    2012: 2.42,
+    2013: 0.00,
+    2014: 0.67,
+    2015: 1.29,
+    2016: 3.2,
+    2017: 1.1,
+    2018: 0.29,
+    2019: 1.68,
+    2020: 3.68,
+    2021: 1.35,
+    2022: 1.10,
+    2023: 0.0
+})
+const PQRange = ref([2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023])
+
+const addPQData = () => {
+    const nextYear = PQRange.value[PQRange.value.length - 1] + 1; // 获取下一年
+    PQRange.value.push(nextYear); // 将下一年加入PQRange
+    PQData[nextYear] = 0
+}
+const deletePQData = () => {
+    const finalYear = PQRange.value[PQRange.value.length - 1];
+    PQRange.value.pop(finalYear);
+    delete PQData[finalYear]
+}
+
+// 当前选择的初始值
+const selectedValue = ref('PQ')
+const modelParamsInfoData = reactive({
+    'year': ['年份', '2023'],
+    'month': ['月份', '04'],
+    'set': ['工况集', 'standard'],
+    'description': ['备注', ''],
+})
+
+const modelParamsInfoRange = ['year', 'month', 'set', 'description']
+
+const intoTheSetDialogByTitleButton = ref(false)
+const handleSetClick = () => {
+    intoTheSetDialogByTitleButton.value = true
+    showSetDialog.value = true
+}
+
+const setThresholdFormRef = ref(null)
+
+const handleSetConfirm = async () => {
+    ElMessage.info({
+        message: '正在将参数上传至后台服务,请稍后...',
+        offset: 100
+    })
+    const info = {
+        'name': '',
+        'fileType': 'json',
+        'segment': bank.bankEnName,
+        'category': 'Config',
+        'year': modelParamsInfoData.year[1],
+        'month': modelParamsInfoData.month[1],
+        'set': modelParamsInfoData.set[1],
+        'description': modelParamsInfoData.description[1],
+    }
+
+
+    if (info.year == '' || info.month == '' || info.set == '') {
+        ElMessage({
+            message: '年份、月份、工况集为必填项',
+            type: 'warning',
+        })
+    } else {
+        showSetDialog.value = false
+    }
+
+    if (selectedValue.value == 'PQ') {
+        console.log(toRaw(PQData))
+        info.name = 'PQ'
+        BankResourceHelper.handleModelParamsUpload(PQData, 'PQ', info).then(res => {
+            ElMessage.success({ message: '上传成功！', offset: 100 })
+            BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, bank.bankEnName, 'model', 'Config')
+        }).catch(e => {
+            ElMessage.error({ message: '上传失败！', offset: 100 })
+        })
+    } else {
+        console.log(toRaw(setThresholdFormRef.value.thresholdParmas))
+        info.name = 'template'
+        BankResourceHelper.handleModelParamsUpload(setThresholdFormRef.value.thresholdParmas, 'template', info).then(res => {
+            ElMessage.success({ message: '上传成功！', offset: 100 })
+            BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, bank.bankEnName, 'model', 'Config')
+        }).catch(e => {
+            ElMessage.error({ message: '上传失败！', offset: 100 })
+        })
+    }
+}
 
 </script>
 
@@ -671,7 +936,7 @@ div.bank-resouce-create-container {
         position: absolute;
         top: 6vh;
 
-        width: 43vw;
+        width: 30vw;
         height: 82vh;
 
         margin-top: 1vh;
@@ -690,7 +955,7 @@ div.bank-resouce-create-container {
         overflow: hidden;
 
         div.title-container {
-            width: 42vw;
+            width: 30vw;
             height: 7vh;
             margin-left: 0.5vw;
 
@@ -707,7 +972,7 @@ div.bank-resouce-create-container {
 
         div.change-button-container {
             position: absolute;
-            width: 8vw;
+            width: 6vw;
             height: 4vh;
             top: 1.8vh;
             right: 2.5vw;
@@ -804,7 +1069,7 @@ div.bank-resouce-create-container {
         }
 
         div.detail-content-container {
-            width: 38vw;
+            width: 25vw;
             margin-left: 2.5vw;
             // padding-right: 0.5vw;
             height: fit-content;
@@ -844,7 +1109,7 @@ div.bank-resouce-create-container {
             }
 
             div.detail-box-item {
-                width: 19vw;
+                width: 12.5vw;
                 height: 16vh;
                 font-size: calc(0.8vw + 0.8vh);
                 border-bottom: 3px solid rgb(31, 123, 209);
@@ -871,8 +1136,36 @@ div.bank-resouce-create-container {
                     width: 38vw;
                 }
 
+                &.unique {
+                    width: 38vw;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    height: 8vh;
+
+                    div.detail-key {
+                        width: 50%;
+                    }
+
+                    div.detail-val {
+                        width: 50%;
+                        height: 8vh;
+                        line-height: 8vh;
+                        text-align: right;
+                    }
+                }
+
                 &.long-text {
-                    height: 24vh;
+                    height: 35vh;
+
+                    div.detail-val {
+                        line-height: normal;
+                        height: 16vh;
+                    }
+                }
+
+                &.medium-text {
+                    height: 15vh;
 
                     div.detail-val {
                         line-height: normal;
@@ -902,7 +1195,7 @@ div.bank-resouce-create-container {
         top: 6vh;
         right: 0;
 
-        width: 43vw;
+        width: 55vw;
         height: 82vh;
 
         margin-top: 1vh;
@@ -927,7 +1220,7 @@ div.bank-resouce-create-container {
 
             div.title-container {
                 position: relative;
-                width: 42vw;
+                width: 54vw;
                 height: 7vh;
                 margin-left: 0.5vw;
 
@@ -969,19 +1262,19 @@ div.bank-resouce-create-container {
 
             div.resource-content-container {
                 position: relative;
-                width: 42vw;
+                width: 55vw;
                 margin-left: 0.5vw;
                 height: 75vh;
 
                 div.resource-box-item {
                     position: relative;
-                    width: 41vw;
+                    width: 53vw;
                     margin-left: 0.5vw;
                     height: fit-content;
 
                     div.resource-title {
                         position: relative;
-                        width: 41vw;
+                        width: 53vw;
                         height: 5vh;
                         line-height: 5vh;
                         text-align: left;
@@ -1009,11 +1302,51 @@ div.bank-resouce-create-container {
                                 background-color: rgb(93, 169, 255);
                             }
                         }
+
+                        div.resource-caculate-btn {
+                            position: absolute;
+                            right: 7vw;
+                            top: .5vh;
+                            width: 5vw;
+                            height: 4vh;
+                            line-height: 4vh;
+                            text-align: center;
+                            font-size: calc(0.8vw + 0.7vh);
+                            font-weight: bold;
+                            background-color: rgb(64, 102, 206);
+                            color: #ffffff;
+                            border-radius: 5px;
+
+                            &:hover {
+                                cursor: pointer;
+                                background-color: rgb(93, 169, 255);
+                            }
+                        }
+
+                        div.resource-set-btn {
+                            position: absolute;
+                            right: 7vw;
+                            top: .5vh;
+                            width: 5vw;
+                            height: 4vh;
+                            line-height: 4vh;
+                            text-align: center;
+                            font-size: calc(0.8vw + 0.7vh);
+                            font-weight: bold;
+                            background-color: rgb(64, 102, 206);
+                            color: #ffffff;
+                            border-radius: 5px;
+
+                            &:hover {
+                                cursor: pointer;
+                                background-color: rgb(93, 169, 255);
+                            }
+                        }
                     }
 
                     div.resource-content {
                         position: relative;
-                        width: 41vw;
+                        width: 53vw;
                         // height: 25vh;
                         height: fit-content;
                         letter-spacing: 0.1rem;
@@ -1076,5 +1409,80 @@ div.full {
     }
 
     -moz-appearance: textfield;
+}
+
+.set-radio-group-container {
+    display: flex;
+    justify-content: center;
+    /* 水平居中 */
+    margin-bottom: 2vh;
+}
+
+div.form-header {
+    position: relative;
+    height: 4vh;
+    margin-top: -1vh;
+    text-align: center;
+    font-size: calc(0.9vw + 1vh);
+    color: #0539a8;
+    letter-spacing: .3rem;
+    font-weight: 800;
+    margin-bottom: 1vh;
+}
+
+input {
+    position: relative;
+    height: 3.5vh;
+    width: 90%;
+
+    border: none !important;
+    border-right: 2px solid rgb(2, 143, 199) !important;
+    border-bottom: 1px solid rgb(5, 88, 121) !important;
+    border-radius: 5px;
+    text-align: center;
+    background-color: rgb(187, 230, 255);
+
+    display: grid;
+    place-items: center;
+    font-size: calc(0.6vw + 0.5vh);
+    transition: .3s ease-in-out;
+
+    &:focus {
+        background-color: rgb(236, 245, 254);
+        color: rgb(3, 99, 177);
+        font-weight: bold;
+    }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.custom {
+    font-weight: bold;
+}
+
+:deep(.el-table__row) {
+
+    --el-table-row-hover-bg-color: rgb(194, 206, 238);
+
+    &.placeholder-row {
+        background-color: rgb(214, 214, 214);
+        color: rgb(143, 143, 143);
+    }
+}
+
+:deep(.el-button.is-link) {
+    font-size: medium;
+    color: #375699;
+
+    &:hover {
+        color: #0051ff;
+    }
 }
 </style>

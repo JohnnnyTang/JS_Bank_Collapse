@@ -1,7 +1,9 @@
 package com.johnny.bank.service.resource.dataSource.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.johnny.bank.aop.DynamicNodeDataV2;
 import com.johnny.bank.model.common.DefaultDatasource;
 import com.johnny.bank.model.common.PublicDatasource;
 import com.johnny.bank.model.node.DataNodeV2;
@@ -9,9 +11,14 @@ import com.johnny.bank.model.node.ParamNode;
 import com.johnny.bank.model.resource.dataResource.MonitorInfo;
 import com.johnny.bank.repository.nodeRepo.IDataNodeRepoV2;
 import com.johnny.bank.repository.nodeRepo.base.IBaseNodeRepo;
+import com.johnny.bank.repository.resourceRepo.dataResourceRepo.ImportantBankRepo;
+import com.johnny.bank.repository.resourceRepo.dataResourceRepo.SectionDataRepo;
 import com.johnny.bank.service.node.impl.DataNodeServiceV2;
 import com.johnny.bank.utils.FileUtil;
+import com.johnny.bank.utils.InternetUtil;
 import com.johnny.bank.utils.VectorUtil;
+import com.johnny.bank.utils.ZipUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +29,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 import static java.awt.SystemColor.info;
 
@@ -40,6 +51,7 @@ import static java.awt.SystemColor.info;
  */
 
 @Service("BankResourceService")
+@Slf4j
 public class BankResourceService {
 
     @Value("${staticData.tifTilePath}")
@@ -47,6 +59,9 @@ public class BankResourceService {
 
     @Value("${staticData.draftDataPath}")
     String draftDataPath;
+
+    @Value("${staticData.pictureDataPath}")
+    String pictureDataPath;
 
     @Value("${staticData.waterConditionPath}")
     String waterConditionPath;
@@ -64,6 +79,15 @@ public class BankResourceService {
     @Qualifier("publicDatasource")
     PublicDatasource publicDatasource;
 
+    @Autowired
+    SectionDataRepo sectionDataRepo;
+
+    @Autowired
+    IDataNodeRepoV2 iDataNodeRepoV2;
+
+    @Autowired
+    ImportantBankRepo importantBankRepo;
+
     public Boolean ifBankExist(String bank) {
         boolean flag = false;
         List<DataNodeV2> bankNodes = getBankList("BankNode");
@@ -74,7 +98,6 @@ public class BankResourceService {
         }
         return flag;
     }
-
     public List<DataNodeV2> getBankList(String category) {
         // 获取所有岸段基本信息
         List<DataNodeV2> dataNodeList = dataNodeRepoV2.getNodeByCategory(category);
@@ -84,16 +107,7 @@ public class BankResourceService {
         return dataNodeList;
     }
 
-    public String getBankInfo(String category, String name) {
-        // 获取岸段详细信息
-        DataNodeV2 bankDataNode = dataNodeRepoV2.getNodeByCategoryAndName(category, name);
-        if (bankDataNode == null) {
-            return "无此岸段信息";
-        } else {
-            return bankDataNode.getBasicInfo().toString();
-        }
-    }
-
+    // 模型计算资源操作
     public DataNodeV2 getCalculateDataGroupNode(String dataType, String bank) {
         // 获取指定岸段的某种类型数据
         return dataNodeRepoV2.getNodeByCategoryAndBank(
@@ -102,41 +116,7 @@ public class BankResourceService {
         );
     }
 
-    public DataNodeV2 getTileVisualDataGroupNode(String dataType, String bank) {
-        // 获取指定岸段的某种类型数据
-        return dataNodeRepoV2.getNodeByCategoryAndBank(
-                dataType + "TileDataGroup",
-                bank
-        );
-    }
-
-    public DataNodeV2 getVectorVisualDataGroupNode(String bank) {
-        // 获取指定岸段的某种类型数据
-        return dataNodeRepoV2.getNodeByCategoryAndBank(
-                "VectorDataGroup",
-                bank
-        );
-    }
-
-    public DataNodeV2 getDeviceDataGroupNode(String bank, String typeCode) {
-        // 获取指定岸段的某种类型数据
-        String groupName;
-        switch (typeCode) {
-            case "1" -> {groupName = "GnssGroup";}
-            case "2" -> {groupName = "StressGroup";}
-            case "3" -> {groupName = "ManometerGroup";}
-            case "4" -> {groupName = "InclinometerGroup";}
-            case "6" -> {groupName = "VideoGroup";}
-            default -> {
-                return DataNodeV2.dataNodeBuilder().build();
-            }
-        }
-        return dataNodeRepoV2.getNodeByCategoryAndBank(
-                groupName,
-                bank
-        );
-    }
-
+    // 静态资源获取
     public List<DataNodeV2> getStaticDataList(String path) {
         // 获取某路径下数据列表
         List<DataNodeV2> dataNodeList = dataNodeRepoV2.getNodeChildByPath(path);
@@ -146,6 +126,7 @@ public class BankResourceService {
         return dataNodeList;
     }
 
+    // 实时水情资源获取
     public JSONArray getWaterCondition() {
         String waterCondition = waterConditionPath + File.separator + "water.json";
         return JSONArray.parseArray(FileUtil.getFileContent(waterCondition));
@@ -155,6 +136,16 @@ public class BankResourceService {
         return JSONArray.parseArray(FileUtil.getFileContent(tidalRange));
     }
 
+    // 岸段资源操作
+    public String getBankInfo(String category, String name) {
+        // 获取岸段详细信息
+        DataNodeV2 bankDataNode = dataNodeRepoV2.getNodeByCategoryAndName(category, name);
+        if (bankDataNode == null) {
+            return "无此岸段信息";
+        } else {
+            return bankDataNode.getBasicInfo().toString();
+        }
+    }
     public String addNewBank(String bank, JSONObject info) {
         // 新建岸段
         if (dataNodeServiceV2.getDataNodeByCategoryName("BankNode", bank + "BankNode") != null) {
@@ -172,8 +163,9 @@ public class BankResourceService {
                 .bank(bank).name(bank+"BankNode").dataOrigin("Local").auth("all")
                 .category("BankNode").path(",DataNodeHead,").basicInfo(dataNodeBasicInfo)
                 .build();
-        // 根节点(1)
+        // 岸段根节点(1)
         dataNodeServiceV2.save(dataNode);
+
         // 静态数据节点(2)
         dataNodeServiceV2.addDataGroupNode(bank, "StaticDataGroupOf"+bank, "StaticDataGroup", ",DataNodeHead,"+bank+"BankNode,");
         // 可视化数据节点(3)
@@ -188,6 +180,14 @@ public class BankResourceService {
         dataNodeServiceV2.addDataGroupNode(bank, "BoundaryDataGroupOf"+bank, "BoundaryDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
         dataNodeServiceV2.addDataGroupNode(bank, "DEMDataGroupOf"+bank, "DEMDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
         dataNodeServiceV2.addDataGroupNode(bank, "ConfigDataGroupOf"+bank, "ConfigDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",ModelServerDataGroupOf"+bank+",");
+        // 信息数据节点(3)
+        dataNodeServiceV2.addDataGroupNode(bank, "InformationDataGroupOf"+bank, "InformationDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
+        // 图片，文本，pdf数据节点(4)
+        dataNodeServiceV2.addDataGroupNode(bank, "PictureDataGroupOf"+bank, "PictureDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",InformationDataGroupOf"+bank+",");
+        dataNodeServiceV2.addDataGroupNode(bank, "TextDataGroupOf"+bank, "TextDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",InformationDataGroupOf"+bank+",");
+        // 断面数据节点(3)
+        dataNodeServiceV2.addDataGroupNode(bank, "SectionDataGroupOf"+bank, "SectionDataGroup", ",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",");
+
         // 设备数据节点（2）
         dataNodeServiceV2.addDataGroupNode(bank, "RealtimeDeviceGroupOf"+bank, "RealtimeDeviceGroup",",DataNodeHead,"+bank+"BankNode,");
         // 四种设备数据节点（3）
@@ -215,8 +215,10 @@ public class BankResourceService {
         // 删除本地瓦片资源
         File deleteTileFolder = new File(tifTilePath + "/tile/" + bank);
         File deleteDraftFolder = new File(draftDataPath + "/tif/" + bank);
+        File deletePictureFolder = new File(pictureDataPath + "/" + bank);
         FileUtil.deleteFolder(deleteTileFolder);
         FileUtil.deleteFolder(deleteDraftFolder);
+        FileUtil.deleteFolder(deletePictureFolder);
         // 删除岸段所有数据节点
         List<DataNodeV2> deleteDataNodes = dataNodeRepoV2.getNodeChildByPath(bankPath);
         deleteDataNodes.add(bankDataNode);
@@ -244,6 +246,192 @@ public class BankResourceService {
         return "岸段 " + info.getString("name") + " 信息更新成功！";
     }
 
+    // 信息资源操作
+    public DataNodeV2 getPictureDataGroupNode(String bank) {
+        return dataNodeRepoV2.getNodeByCategoryAndBank(
+                "PictureDataGroup",
+                bank
+        );
+    }
+    public byte[] getPictureResourceByteDataByBankAndName(String bank, String name) {
+        String category = "PictureDataItem";
+        if (!ifBankExist(bank)) {
+            return null;
+        }
+        DataNodeV2 pictureDataNode = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (pictureDataNode == null) {
+            return null;
+        }
+        String path = pictureDataNode.getUsage().getString("path");
+        String fileName = pictureDataNode.getUsage().getString("name");
+        String filePath = pictureDataPath + path + fileName;
+        return FileUtil.getByteStreamFromFile(filePath);
+    }
+
+    public String uploadPictureResourceData(MultipartFile file, String bank, JSONObject info) throws IOException {
+        String category = "PictureDataItem";
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        JSONObject usage = new JSONObject();
+        String name = info.getString("name");
+        DataNodeV2 pictureDataNodeBefore = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (pictureDataNodeBefore != null) {
+            return "数据资源 "+name+" 已存在！请更换名称";
+        }
+        String filePath = pictureDataPath + "/" + bank;
+        String storeFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
+        FileUtil.storeFile(file, filePath, storeFileName);
+        usage.put("path", "/"+bank);usage.put("name",storeFileName);
+        DataNodeV2 pictureDataNode = DataNodeV2.dataNodeBuilder()
+                .bank(bank).auth("all").name(name).category("PictureDataItem")
+                .usage(usage).basicInfo(info)
+                .path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",InformationDataGroupOf"+bank+",PictureDataGroupOf"+bank+",")
+                .build();
+        dataNodeServiceV2.save(pictureDataNode);
+        return "静态图片资源 "+name+" 上传完成！";
+    }
+    public String updatePictureResourceData(MultipartFile file, String bank, JSONObject info, String name) throws IOException {
+        String infoName = null;
+        if (info.containsKey("name")) {
+            infoName = info.getString("name");
+        } else {
+            info.put("name",name);
+        }
+        String category = "PictureDataItem";
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        DataNodeV2 pictureDataNode = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (pictureDataNode == null) {
+            return "数据资源 "+name+" 不存在！";
+        }
+        if (Objects.equals(pictureDataNode.getName(), infoName)) {
+            return "数据资源 "+name+" 已存在！请更换名称";
+        }
+        String filePath = pictureDataPath + pictureDataNode.getUsage().getString("path");
+        String fileName = pictureDataNode.getUsage().getString("name");
+        FileUtil.deleteFile(new File(filePath+"/"+fileName));
+        String storeFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
+        FileUtil.storeFile(file, filePath, storeFileName);
+        JSONObject usage = new JSONObject();
+        usage.put("path", "/"+bank+"/"); usage.put("name",storeFileName);
+        pictureDataNode.setUsage(usage);
+        pictureDataNode.setBasicInfo(info);
+        pictureDataNode.setName(String.valueOf(infoName == null ? name : infoName ));
+        dataNodeServiceV2.updateNodeById(pictureDataNode.getId(), pictureDataNode);
+        return "静态图片资源 "+name+" 更新完成！";
+    }
+    public String deletePictureResourceData(String bank, String name) {
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        String category = "PictureDataItem";
+        DataNodeV2 pictureDataNode = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (pictureDataNode == null) {
+            return "数据资源 "+name+" 不存在！";
+        }
+        String filePath = pictureDataNode.getUsage().getString("path");
+        String fileName = pictureDataNode.getUsage().getString("name");
+        FileUtil.deleteFile(new File(pictureDataPath+filePath+"/"+fileName));
+        dataNodeRepoV2.deleteById(pictureDataNode.getId());
+        return "静态图片资源 "+name+" 删除完成！";
+    }
+    public DataNodeV2 getTextDataGroupNode(String bank) {
+        return dataNodeRepoV2.getNodeByCategoryAndBank(
+                "TextDataGroup",
+                bank
+        );
+    }
+    public String  uploadTextResourceData(String bank, JSONObject info) {
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        String category = "TextDataItem";
+        String name = info.getString("name");
+        DataNodeV2 textDataNodeBefore = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (textDataNodeBefore != null) {
+            return "数据资源 "+name+" 已存在！请更换名称";
+        }
+        DataNodeV2 pictureDataNode = DataNodeV2.dataNodeBuilder()
+                .bank(bank).auth("all").name(name).category("TextDataItem")
+                .basicInfo(info)
+                .path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf"+bank+",InformationDataGroupOf"+bank+",TextDataGroupOf"+bank+",")
+                .build();
+        dataNodeServiceV2.save(pictureDataNode);
+        return "静态文本资源 "+name+" 上传完成！";
+    }
+    public String updateTextResourceData(String bank, JSONObject info, String name) {
+        String infoName = null;
+        if (info.containsKey("name")) {
+            infoName = info.getString("name");
+        } else {
+            info.put("name",name);
+        }
+        String category = "TextDataItem";
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        DataNodeV2 textDataNode = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (textDataNode == null) {
+            return "数据资源 "+name+" 不存在！";
+        }
+        if (Objects.equals(textDataNode.getName(), infoName)) {
+            return "数据资源 "+name+" 已存在！请更换名称";
+        }
+        textDataNode.setBasicInfo(info);
+        textDataNode.setName(String.valueOf(infoName==null ? name : infoName));
+        dataNodeServiceV2.updateNodeById(textDataNode.getId(), textDataNode);
+        return "静态文本资源 "+name+" 更新完成！";
+    }
+    public String deleteTextResourceData(String bank, String name) {
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        String category = "TextDataItem";
+        DataNodeV2 textDataNode = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (textDataNode == null) {
+            return "数据资源 "+name+" 不存在！";
+        }
+        dataNodeRepoV2.deleteById(textDataNode.getId());
+        return "静态文本资源 "+name+" 删除完成！";
+    }
+
+    // 可视化资源操作
+    public DataNodeV2 getTileVisualDataGroupNode(String dataType, String bank) {
+        // 获取指定岸段的某种类型数据
+        return dataNodeRepoV2.getNodeByCategoryAndBank(
+                dataType + "TileDataGroup",
+                bank
+        );
+    }
+    public DataNodeV2 getVectorVisualDataGroupNode(String bank) {
+        // 获取指定岸段的某种类型数据
+        return dataNodeRepoV2.getNodeByCategoryAndBank(
+                "VectorDataGroup",
+                bank
+        );
+    }
+    public String uploadSectionResourceData(MultipartFile file, JSONObject info) throws IOException, InterruptedException {
+        String category = "SectionDataItem";
+        String name = info.getString("name");
+        String bank = info.getString("segment");
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        if (iDataNodeRepoV2.getNodeByCategoryAndBank(category, bank) != null) {
+            return "数据资源已存在！";
+        }
+        info.put("type","section");
+        if (!VectorUtil.shpVector2pg(file, info, bank)) {
+            return "断面 "+name+" 上传失败！";
+        } else {
+            DataNodeV2 vectorDataNode = VectorUtil.section2DataNode(bank, info);
+            dataNodeServiceV2.save(vectorDataNode);
+            return "断面 "+name+" 上传完成！";
+        }
+    }
+
     public String uploadVisualizationResourceData(MultipartFile file, String bank, JSONObject info) throws IOException, InterruptedException {
         String category = "VectorDataItem";
         String name = info.getString("name");
@@ -251,7 +439,7 @@ public class BankResourceService {
             return "岸段 "+bank+" 不存在！";
         }
         if (dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name) != null) {
-            return "数据资源 "+name+" 已存在！";
+            return "数据资源 "+name+" 已存在！请更换名称";
         }
         if (!VectorUtil.shpVector2pg(file, info, bank)) {
             return "矢量可视化资源 "+name+" 上传失败！";
@@ -318,6 +506,44 @@ public class BankResourceService {
         }
     }
 
+    // 设备资源操作
+    public DataNodeV2 getDeviceDataGroupNode(String bank, String typeCode) {
+        // 获取指定岸段的某种类型数据
+        String groupName;
+        switch (typeCode) {
+            case "1" -> {groupName = "GnssGroup";}
+            case "2" -> {groupName = "StressGroup";}
+            case "3" -> {groupName = "ManometerGroup";}
+            case "4" -> {groupName = "InclinometerGroup";}
+            case "6" -> {groupName = "VideoGroup";}
+            default -> {
+                return DataNodeV2.dataNodeBuilder().build();
+            }
+        }
+        return dataNodeRepoV2.getNodeByCategoryAndBank(
+                groupName,
+                bank
+        );
+    }
+    public String deleteSection(String bank, String name) {
+        if (!ifBankExist(bank)) {
+            return "岸段 "+bank+" 不存在！";
+        }
+        String category = "SectionDataItem";
+        DataNodeV2 sectionDataNode = dataNodeServiceV2.getDataNodeByCategoryBankName(category, bank, name);
+        if (sectionDataNode == null) {
+            return "数据资源 "+name+" 不存在！";
+        }
+        String path = sectionDataNode.getBasicInfo().getString("path");
+        FileUtil.deleteFolder(new File(path));
+        dataNodeRepoV2.deleteById(sectionDataNode.getId());
+        if (!VectorUtil.deletePgVector(sectionDataNode.getBasicInfo().getString("tableName"))) {
+            return "断面资源 " + name + " 删除失败！";
+        } else {
+            return "断面资源 " + name + " 删除成功！";
+        }
+    }
+
     public String uploadDeviceResourceData(String bank, JSONObject data) {
         DataNodeV2 dataNode = deviceDataProcess(bank, data);
         if (!ifBankExist(dataNode.getBank())) {
@@ -378,4 +604,72 @@ public class BankResourceService {
                 .basicInfo(basicInfo).usage(usage)
                 .build();
     }
+
+    @DynamicNodeDataV2
+    public JSONArray getSectionInfo(DataNodeV2 dataNodeV2, String type){
+        List<Map<String, Object>> infoList = sectionDataRepo.getSectionInfo(dataNodeV2.getBasicInfo().getString("tableName"), type);
+        JSONArray responseArray = new JSONArray();
+
+        for (Map<String, Object> info : infoList) {
+            String id = info.get("id").toString();
+            String label = info.get("label").toString();
+            JSONObject geometryData = JSONObject.parseObject((String) info.get("geometry"));
+            JSONObject response = new JSONObject();
+            response.put("id", id);
+            response.put("label", label);
+            response.put("geometry", geometryData);
+            responseArray.add(response);
+        }
+        return responseArray;
+    }
+
+    @DynamicNodeDataV2
+    public List<String> getImportantBankName(DataNodeV2 dataNodeV2, String prefix){
+        return importantBankRepo.getImportantBankNameByPrefix(dataNodeV2.getUsage().getString("tableName"), prefix);
+    }
+
+    @DynamicNodeDataV2
+    public Map<String, String> getImportantBankInfo(DataNodeV2 dataNodeV2, String name){
+        return importantBankRepo.getImportantBankInfoByName(dataNodeV2.getUsage().getString("tableName"), name);
+    }
+
+    public String uploadModelParams(Map<String, Object> params, String type, Map<String, String> info) throws IOException, InterruptedException {
+        String paramsJsonString = JSON.toJSONString(params);
+        System.out.println(paramsJsonString);
+        // 将 JSON 字符串写入文件
+        String jsonFolderPath;
+        if (type.equals("template")) {
+            jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", "RiskLevel");
+        } else {
+            jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", type);
+        }
+
+        // 确保目录存在
+        Path path = Paths.get(jsonFolderPath);
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+
+        String jsonPath = String.join(File.separator, jsonFolderPath, type + ".json");
+
+        try (FileWriter fileWriter = new FileWriter(jsonPath)) {
+            fileWriter.write(paramsJsonString);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+//        String zipFileName = ZipUtil.zipFolder(new File(jsonFolderPath));
+//        System.out.println(zipFileName);
+//
+//        System.out.println(info);
+//        modelServerService.uploadCalculateResourceData(FileUtil.convertFileToMultipartFile(new File(zipFileName)), new JSONObject(info));
+
+        String typeName = type;
+        if (Objects.equals(type, "PQ")) {
+            typeName = "pq";
+        }
+        modelServerService.uploadCalculateResourceData(ZipUtil.zipFolderAndGetAsMultipartFileV2(jsonFolderPath, typeName), JSONObject.from(info));
+
+        return "";
+    }
+
 }

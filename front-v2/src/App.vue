@@ -530,6 +530,61 @@ body,
     ;
 }
 
+.el-popper.is-light.el-popover.device-indicator-popover {
+    background: rgba(255, 255, 255, 0.942);
+    border: #1248bb 1px solid;
+    border-radius: 5px;
+    box-shadow: 0 0 4px #1248bb;
+    width: 15vw !important;
+
+    div.device-indicator-info {
+        position: relative;
+        width: 14vw;
+        height: 30vh;
+        color: rgb(1, 24, 74);
+
+        .device-indicator-info-title {
+            position: relative;
+            width: 100%;
+            height: 3vh;
+            line-height: 3vh;
+            text-align: left;
+            font-size: calc(0.5vw + 0.4vh);
+            font-weight: bold;
+        }
+
+        .device-indicator-info-content {
+            position: relative;
+            width: 100%;
+            height: 26vh;
+            font-size: calc(0.4vw + 0.3vh);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            // overflow-y: auto;
+
+            .indicator-info {
+                position: relative;
+                height: fit-content;
+                margin-top: .5vh;
+                margin-bottom: .5vh;
+                .indicator-name {
+                    font-size: calc(0.4vw + 0.4vh);
+                    color: rgb(1, 67, 165);
+                }
+
+                .indicator-desc {
+                    color: #191919;
+                    text-align: left;
+                    margin-left: .7vw;
+                }
+            }
+        }
+    }
+}
+
+
+
 
 .el-overlay {
     .el-drawer {

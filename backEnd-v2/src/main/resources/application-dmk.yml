@@ -12,6 +12,9 @@ spring:
       maxLifeTime: 120000
       idle-timeout: 0
     default:
+      database: bank
+      ip: localhost
+      port: 5432
       url: jdbc:postgresql://localhost:5432/bank?stringtype=unspecified
       driver-class-name: org.postgresql.Driver
       username: postgres
@@ -44,10 +47,21 @@ tile:
   riverImagePath: H:/data/bank/images/dataFolders/back/data/bank_collapse/imageTiles/tiles/
   tifTilePath: D:\data\bank_data\tifTile
 
+staticData:
+  tifTilePath: E:/Data/bankProjectData/staticData/tifTile
+  vectorDataPath: H:/data/bank/images/dataFolders/back/data/staticData/vectorData
+  draftDataPath: H:/data/bank/images/dataFolders/back/data/staticData/draftData
+  waterConditionPath: E:/Data/bankProjectData/staticData/waterCondition
+
+waterCondition:
+  url: http://10.32.22.202:8001
+
 flowData:
   texturePath: H:/data/bank/images/dataFolders/back/data/flowData/flowFieldResourceArchive/
 
 modelServer:
-  url: http://172.21.212.216:8000
+  url: http://172.21.212.166:8000
   storageLimit: 30
   caseLimit: 20
+
+loginFunction: "no"

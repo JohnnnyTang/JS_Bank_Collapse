@@ -56,6 +56,26 @@ public class ZipUtil {
         return new MockMultipartFile(zipFileName+".zip", zipFileName+".zip", "application/zip", zippedFileBytes);
     }
 
+    public static MultipartFile zipFolderAndGetAsMultipartFileV2(String folderPath, String zipFileName) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            Path filePath = Paths.get(folderPath, zipFileName + ".json");
+            ZipEntry zipEntry = new ZipEntry(zipFileName + "/" + zipFileName + ".json");
+            zos.putNextEntry(zipEntry);
+            if (Files.isRegularFile(filePath)) {
+                Files.copy(filePath, zos);
+            }
+            zos.closeEntry();
+            // 创建文件夹条目
+            zipEntry = new ZipEntry(zipFileName + "/"); // 创建一个空文件夹条目
+            zos.putNextEntry(zipEntry);
+            zos.closeEntry();
+            zos.finish();
+        }
+        byte[] zippedFileBytes = baos.toByteArray();
+        return new MockMultipartFile(zipFileName+".zip", zipFileName+".zip", "application/zip", zippedFileBytes);
+    }
+
     public static MultipartFile zipFilesAndGetAsMultipartFile(List<MultipartFile> files, String zipFileName) throws IOException {
         // 创建一个ByteArrayOutputStream来存储zip文件内容
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -94,13 +114,20 @@ public class ZipUtil {
      * @return list 解压文件的路径合集
      * @throws RuntimeException 解压失败会抛出运行时异常
      */
-    public static List<String> unZipFiles(File srcFile, String destDirPath) throws RuntimeException {
+    public static List<String> unZipFiles(File srcFile, String destDirPath) throws RuntimeException, IOException {
         List<String> list = new ArrayList<>();
         long start = System.currentTimeMillis();
         // 判断源文件是否存在
         if (!srcFile.exists()) {
             throw new RuntimeException(srcFile.getPath() + "所指文件不存在");
         }
+
+        // 判断目标路径是否存在
+        Path path = Paths.get(destDirPath);
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+        }
+
         // 开始解压
         ZipFile zipFile = null;
         try {
@@ -175,5 +202,59 @@ public class ZipUtil {
             }
         }
         log.info("临时文件删除完成");
+    }
+
+    //压缩文件夹，传入文件夹，返回压缩包路径
+    public static String zipFolder(File file){
+        String rootDirName = file.getName();
+        String zipFileName = rootDirName + ".zip";
+        String outputPath = String.join(File.separator, file.getParent(), zipFileName);
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(Path.of(outputPath)))) {
+            // 这里的rootDirName就是压缩包中的根文件夹名字
+            Files.walk(Path.of(file.getAbsolutePath()))
+                .forEach(path -> {
+                    try {
+                        // 获取文件或文件夹的相对路径，加上根目录名称以包含整个目录结构
+                        Path relativePath = file.toPath().relativize(path);
+                        String zipEntryName = String.join(File.separator, rootDirName, relativePath.toString().replace("\\", File.separator));
+                        ZipEntry zipEntry = new ZipEntry(zipEntryName);
+
+                        zipOutputStream.putNextEntry(zipEntry);
+
+                        // 如果是文件，则复制内容，否则只创建文件夹条目
+                        if (Files.isRegularFile(path)) {
+                            Files.copy(path, zipOutputStream);
+                        }
+
+                        zipOutputStream.closeEntry();
+                    } catch (IOException e) {
+                        System.err.println("Failed to zip file or folder: " + path);
+                        e.printStackTrace();
+                    }
+                });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return outputPath;
+    }
+
+    public static MultipartFile zipFolderAndGetAsMultipartFile2(String folderPath, String zipFileName) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            Path filePath = Paths.get(folderPath, zipFileName + ".json");
+            ZipEntry zipEntry = new ZipEntry(zipFileName + "/" + zipFileName + ".json");
+            zos.putNextEntry(zipEntry);
+            if (Files.isRegularFile(filePath)) {
+                Files.copy(filePath, zos);
+            }
+            zos.closeEntry();
+            // 创建文件夹条目
+            zipEntry = new ZipEntry(zipFileName + "/"); // 创建一个空文件夹条目
+            zos.putNextEntry(zipEntry);
+            zos.closeEntry();
+            zos.finish();
+        }
+        byte[] zippedFileBytes = baos.toByteArray();
+        return new MockMultipartFile(zipFileName+".zip", zipFileName+".zip", "application/zip", zippedFileBytes);
     }
 }

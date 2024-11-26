@@ -1,18 +1,10 @@
 <template>
     <div class="vertical-nav-container">
-        <div
-            class="nav-item-container"
-            v-for="(navMenuItem, index) in navMenuList"
-            :key="index"
-            :class="{ active: navMenuItem.active }"
-            @click="changeActive(index)"
-        >
-            <div
-                class="nav-item-icon"
-                :style="{
-                    'background-image': 'url(' + navMenuItem.iconUrl + ')',
-                }"
-            ></div>
+        <div class="nav-item-container" v-for="(navMenuItem, index) in navMenuList" :key="index"
+            :class="{ active: navMenuItem.active }" @click="changeActive(index)">
+            <div class="nav-item-icon" :style="{
+                'background-image': 'url(' + navMenuItem.iconUrl + ')',
+            }"></div>
             <div class="nav-item-text">{{ navMenuItem.name }}</div>
         </div>
         <div class="active-bg-container" :active-id="preActiveIndex"></div>
@@ -22,41 +14,42 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import router from '../../router/index'
+import { onBeforeRouteUpdate } from 'vue-router';
 
 const preActiveIndex = ref(-1)
 
 const navMenuList = ref([
     {
-        name: '历史崩岸库',
-        iconUrl: import.meta.env.BASE_URL + '/history.png',
+        name: '崩岸知识网络',
+        iconUrl: '/binary-data.png',
+        path: '/knowledgeStore/graph',
+        active: false,
+    },
+    {
+        name: '历史崩岸列表',
+        iconUrl: '/history.png',
         path: '/knowledgeStore/history',
         active: false,
     },
-    {
-        name: '相关规划库',
-        iconUrl: import.meta.env.BASE_URL + '/model.png',
-        path: '/knowledgeStore/plan',
-        active: false,
-    },
-    {
-        name: '模型参数库',
-        iconUrl: import.meta.env.BASE_URL + '/admin-panel.png',
-        path: '/knowledgeStore/param',
-        active: false,
-    },
     // {
-    //     name: '专家经验库',
-    //     iconUrl: '/rating.png',
-    //     path: '/knowledgeStore/experience',
+    //     name: '相关规划图集',
+    //     iconUrl: '/plan.png',
+    //     path: '/knowledgeStore/plan',
     //     active: false,
     // },
+    // {
+    //     name: '崩岸知识管理',
+    //     iconUrl: '/admin-panel.png',
+    //     path: '/knowledgeStore/tree',
+    //     active: false,
+    // }
 ])
 
 const pathIndexMap = {
-    history: 0,
-    plan: 1,
-    param: 2,
-    experience: 3,
+    graph: 0,
+    history: 1,
+    plan: 2,
+    manage: 3,
 }
 
 function changeActive(index) {
@@ -66,27 +59,35 @@ function changeActive(index) {
         if (preActiveIndex.value != -1) {
             navMenuList.value[preActiveIndex.value].active = false
         }
-        navMenuList.value[index].active = true
-        preActiveIndex.value = index
-        router.push(navMenuList.value[preActiveIndex.value].path)
+        if (index < navMenuList.value.length) {
+            navMenuList.value[index].active = true
+            preActiveIndex.value = index
+            router.push(navMenuList.value[preActiveIndex.value].path)
+        }
     }
 }
 
+onBeforeRouteUpdate((to, from, next) => {
+    // 从其他地方跳到知识库
+    if (to.path.endsWith('/home')) {
+        preActiveIndex.value = -1
+        navMenuList.value.map(item => item.active = false)
+    }
+    next()
+})
+
 onMounted(() => {
-    // console.log(router.currentRoute.value.path)
 
     let pathSplit = router.currentRoute.value.path.split('/')
     let splitPath = pathSplit[pathSplit.length - 1]
-    // console.log(splitPath)
+
     if (splitPath === 'home' || splitPath === 'knowledgeStore') {
+        preActiveIndex.value = -1
+        navMenuList.value.map(item => item.active = false)
         return
-    } else if (pathIndexMap[splitPath] != preActiveIndex.value) {
-        if (preActiveIndex.value != -1) {
-            navMenuList.value[preActiveIndex.value].active = false
-        }
-        navMenuList.value[pathIndexMap[splitPath]].active = true
-        preActiveIndex.value = pathIndexMap[splitPath]
     }
+    changeActive(pathIndexMap[splitPath])
+
 })
 </script>
 
@@ -108,13 +109,14 @@ div.vertical-nav-container {
 
     overflow: hidden;
     transition: all 0.6s cubic-bezier(0.68, -0.25, 0.265, 1.25);
+
     &:hover {
-        width: 9.6vw;
+        width: 11vw;
         cursor: pointer;
     }
 
     div.nav-item-container {
-        width: 9.6vw;
+        width: 11vw;
         height: 4vw;
         // padding-top: 1vh;
         padding-bottom: 0.5vw;
@@ -144,6 +146,7 @@ div.vertical-nav-container {
             // transition-delay: 0.4s;
             color: aliceblue;
             font-weight: 600;
+
             div.nav-item-text {
                 font-weight: bold;
             }
@@ -160,7 +163,7 @@ div.vertical-nav-container {
         }
 
         div.nav-item-text {
-            width: 5.5vw;
+            width: 7vw;
             line-height: 4vw;
             height: 4vw;
             font-size: calc(0.8vw + 0.4vh);
@@ -172,16 +175,14 @@ div.vertical-nav-container {
 
     div.active-bg-container {
         position: absolute;
-        width: 9.6vw;
+        width: 11vw;
         height: 4.5vw;
         top: 0vh;
         border-radius: 6px;
-        background: linear-gradient(
-            to right,
-            #4a62cc 0%,
-            #0b0edf 40%,
-            #0b0edf 100%
-        );
+        background: linear-gradient(to right,
+                #4a62cc 0%,
+                #0b0edf 40%,
+                #0b0edf 100%);
         transition: all 0.4s cubic-bezier(0.68, -0.25, 0.265, 1.25);
 
         z-index: 10;
@@ -193,12 +194,15 @@ div.vertical-nav-container {
         &[active-id='0'] {
             top: 0vh;
         }
+
         &[active-id='1'] {
             top: 4.5vw;
         }
+
         &[active-id='2'] {
             top: 9vw;
         }
+
         &[active-id='3'] {
             top: 13.5vw;
         }

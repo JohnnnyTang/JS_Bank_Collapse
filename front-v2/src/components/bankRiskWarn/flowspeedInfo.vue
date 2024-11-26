@@ -1,18 +1,14 @@
 <template>
     <div class="flowspeed-content">
         <div class="flowspeed-title">
-            近岸计算流速
-        </div>
-        <div class="profile-selector-container" v-show="false">
-            <div class="select-descriptiopn">水文条件选择：</div>
-            <el-select v-model="waterConditionValue" placeholder="选择水文条件" style="width: 5vw; height: 3.5vh"
-                @change="calFlowspeedData" popper-class="water-condition-popper">
-                <el-option v-for="item in waterCondition" :key="item.value" :label="item.label" :value="item.value">
-                    <span class="profile-name-text">
-                        {{ item.label }}
-                    </span>
-                </el-option>
-            </el-select>
+            计算流速过程
+            <div
+                class="btn-draw"
+                @click="drawButtonClickHandler"
+                :class="{ forbbidden: props.status === false }"
+            >
+                测点绘制
+            </div>
         </div>
         <div class="riskInfo-item flowspeed">
             <!-- <div class="item-title">
@@ -25,82 +21,227 @@
                 </div>
             </div> -->
             <!-- <div ref="flowGraphRef" class="flowspeed graph" element-loading-background="rgba(214, 235, 255,0.8)"></div> -->
-            <div class="graph-container flowspeed" id="flowspeed-chart-container">
-                <div id="flowspeed-chart" ref="flowspeedGraphRef" class="flowspeed graph" v-loading="props.flowspeedChartLoad"
-                    element-loading-background="rgba(255, 255, 255, 0.4)"></div>
+            <div
+                class="graph-container flowspeed"
+                id="flowspeed-chart-container"
+                v-show="hasData === true"
+            >
+                <div
+                    id="flowspeed-chart"
+                    ref="flowspeedGraphRef"
+                    class="flowspeed graph"
+                    v-loading="props.flowspeedChartLoad"
+                    element-loading-background="rgba(255, 255, 255, 0.4)"
+                ></div>
+            </div>
+            <div class="blank-graph" v-show="hasData === false">
+                <span v-if="true" style="z-index: 10">暂无数据</span>
             </div>
         </div>
+
         <div class="riskInfo-item flowfield">
-            <div class="item-title">
-                流场信息：
-            </div>
+            <div class="item-title">流场信息：</div>
         </div>
     </div>
 </template>
 
 <script setup>
 import * as echarts from 'echarts'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, toRaw } from 'vue'
 import { drawFlowspeedGraph } from './util.js'
-const props = defineProps({
-    profileList: {
-        type: Object,
-    },
-    // waterCondition: {
-    //     type: Object,
-    // },
-    flowspeedChartLoad: {
-        type: Boolean,
-    },
-    type: {
-        type: String
-    }
-})
-const emit = defineEmits(['conditionChange'])
-const waterCondition = [
-    {
-        value: 1,
-        label: "洪季"
-    },
-    {
-        value: 2,
-        label: "枯季"
-    },
-]
+import { useHydrodynamicStore } from '../../store/modelStore'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useBankNameStore } from '../../store/bankNameStore'
 
-let flowspeedChart = null
+const bankName = useBankNameStore().globalBankName
+
+const hydrodynamicStore = useHydrodynamicStore()
+
+const props = defineProps(['status', 'flowspeedChartLoad', 'timeStep'])
+
+const route = useRoute()
+
+const emit = defineEmits(['handleDrawEvent'])
+
+let chartIns = null
 const flowspeedGraphRef = ref(null)
-const waterConditionValue = ref(1)
+const hasData = ref(false)
 
-const calFlowspeedData = (val) => {
-    console.log('changed', val)
-    let res = waterCondition.find((item) => {
-        return item.value === val
-    })
-    emit('conditionChange', res.label)
-    drawFlowspeedGraph(flowspeedChart, flowSpeedList[val - 1])
+const drawButtonClickHandler = () => {
+    emit('handleDrawEvent')
 }
 
-const flowSpeedList = [
-    [0.418, 0.452, 0.516, 1.243, 1.547, 1.37, 1.525, 1.167, 0.999, 1.043, 1.21, 0.951],
-    [0.218, 0.182, 0.316, 0.543, 0.947, 0.843, 1.125, 1.07, 0.789, 0.643, 0.38, 0.451],
-    [0.488, 0.472, 0.632, 0.988, 1.142, 1.623, 1.512, 1.647, 1.199, 1.043, 1.121, 0.843],
+const getTideLineDataOption = (data) => {
+    const usData = data[0].us
+    const vsData = data[0].vs
+    const timeData = [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        20, 21, 22, 23, 24, 25,
+    ]
+
+    const tideLineOption = {
+        grid: {
+            left: '1%',
+            right: '3%',
+            bottom: '12%',
+            top: '17%',
+            containLabel: true,
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        xAxis: {
+            type: 'category',
+            data: timeData,
+            name: '时间步',
+            nameLocation: 'middle',
+            nameGap: 23,
+            nameTextStyle: {
+                fontWeight: 'bold',
+            },
+        },
+        yAxis: {
+            type: 'value',
+            name: '速度(m/s)',
+            nameTextStyle: {
+                fontWeight: 'bold',
+            },
+        },
+        series: [
+            {
+                name: '东西向流速',
+                data: usData,
+                type: 'line',
+                symbol: 'none',
+            },
+            {
+                name: '南北向流速',
+                data: vsData,
+                type: 'line',
+                symbol: 'none',
+            },
+        ],
+    }
+    return tideLineOption
+}
+
+const updateData = (data) => {
+    hasData.value = true
+    console.log(data)
+    let tideLineOption = getTideLineDataOption(data)
+    hydrodynamicStore.showingOption = tideLineOption
+}
+
+const defaultData = [
+    {
+        us: [
+            '0.72456875225',
+            '0.65458696795',
+            '0.41120411483',
+            '0.17161489738',
+            '0.31642125073',
+            '0.54155104957',
+            '0.70956310321',
+            '0.63356335557',
+            '0.59658627573',
+            '0.6398957933',
+            '0.64477681833',
+            '0.66071618973',
+            '0.67243264692',
+            '0.5886927053',
+            '0.24917254981',
+            '0.045899785235',
+            '0.23572885596',
+            '0.38818200666',
+            '0.5585431447',
+            '0.58730337796',
+            '0.54108509337',
+            '0.57902414439',
+            '0.62466046868',
+            '0.63069473985',
+            '0.72769589971',
+            '0.72414346019',
+        ],
+        vs: [
+            '-0.92814517566',
+            '-0.8748384524',
+            '-0.59225560009',
+            '-0.23981493733',
+            '-0.2864782849',
+            '-0.47888834013',
+            '-0.63461389673',
+            '-0.8878456969',
+            '-0.86246530897',
+            '-0.75437836442',
+            '-0.81004963998',
+            '-0.85580479137',
+            '-0.8868238064',
+            '-0.79983000236',
+            '-0.39037965986',
+            '-0.046745513799',
+            '-0.1962600264',
+            '-0.32368051254',
+            '-0.47887967646',
+            '-0.77208005288',
+            '-0.75552256759',
+            '-0.83331613899',
+            '-0.91899364294',
+            '-0.93736301143',
+            '-0.90766315818',
+            '-0.94337724743',
+        ],
+    },
 ]
-
-const DrawGraph = () => {
-    flowspeedChart = echarts.init(flowspeedGraphRef.value)
-    // const flowspeed = props.profileList.map(item => item.flowspeed)
-    const flowspeed = [0.418, 0.452, 0.516, 1.243, 1.547, 1.37, 1.525, 1.167, 0.999, 1.043, 1.21, 0.951]
-
-    drawFlowspeedGraph(flowspeedChart, flowspeed)
-}
 
 onMounted(() => {
-    DrawGraph()
+    chartIns = echarts.init(flowspeedGraphRef.value)
+
+    let tidePointWatcher = null
+    let markLineWatcher = null
+
+    tidePointWatcher = watch(
+        () => hydrodynamicStore.showingOption,
+        (newVal) => {
+            markLineWatcher && markLineWatcher() // rm watcher
+
+            let option = JSON.parse(JSON.stringify(toRaw(newVal))) // deep copy
+            console.log('showing option change!::', option)
+            chartIns.setOption(option)
+
+            markLineWatcher = watch(
+                () => props.timeStep,
+                (newVal) => {
+                    hydrodynamicStore.flowFieldCurrentTimeStep = newVal
+                    let showingOption = JSON.parse(
+                        JSON.stringify(toRaw(hydrodynamicStore.showingOption)),
+                    ) // deep copy
+                    let markLineOption = hydrodynamicStore.getMarkLineOption()
+                    showingOption.series[0].markLine = markLineOption
+                    chartIns.setOption(showingOption)
+                },
+            )
+        },
+    )
+
+    let bk = useBankNameStore().globalBankName
+    if (bk === 'Mzs') {
+        updateData(defaultData)
+    } else {
+        hasData.value = false
+    }
 })
 
-watch(props.profileList, () => {
-    DrawGraph()
+// onBeforeRouteUpdate(() => {
+//     let bk = route.params.id
+//     if (bk === 'Mzs') {
+//         updateData(defaultData)
+//     } else {
+//         hasData.value = false
+//     }
+// })
+
+defineExpose({
+    updateData,
 })
 </script>
 
@@ -136,6 +277,37 @@ div.flowspeed-content {
         color: rgb(0, 138, 218);
         background-color: rgb(240, 248, 255);
         display: flex;
+        align-items: center;
+
+        .btn-draw {
+            position: absolute;
+            right: 0.8vw;
+            width: 4vw;
+            height: 2.5vh;
+            text-align: center;
+            line-height: 3vh;
+            background: #0254bed0;
+            color: #fff;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: calc(0.4vw + 0.7vh);
+            border: 1px solid rgb(3, 107, 167);
+            border-radius: 0.4em;
+            box-shadow: rgb(0, 68, 114) 0.05em 0.05em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s linear;
+
+            &:hover {
+                background: #348cffd0;
+            }
+
+            &.forbbidden {
+                cursor: not-allowed;
+            }
+        }
     }
 
     div.riskInfo-item {
@@ -167,8 +339,6 @@ div.flowspeed-content {
             // color: #a231e4;
             // text-shadow: 1px 0px 1px #8bcfdb, 0px 1px 1px #11ffc4, 2px 1px 1px #CCCCCC, 1px 2px 1px #0d60fa, 1px 2px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 3px 4px 1px #EEEEEE, 2px 1px 1px #CCCCCC, 2px 1px 1px #EEEEEE, 1px 2px 1px #CCCCCC, 1px 2px 1px #EEEEEE, 1px 2px 1px #0f41e7;
         }
-
-
 
         div.profile-condition-container {
             position: absolute;
@@ -218,9 +388,16 @@ div.flowspeed-content {
                 }
             }
         }
+
+        div.blank-graph {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #055279;
+            height: 100%;
+            width: 100%;
+        }
     }
-
-
 }
 
 div.profile-selector-container {
@@ -291,11 +468,11 @@ div.profile-selector-container {
     }
 }
 
-div#flowspeed-chart-container{
+div#flowspeed-chart-container {
     margin-top: 0;
 }
 
-div#flowspeed-chart{
+div#flowspeed-chart {
     width: 17.5vw;
     height: 18vh;
 }

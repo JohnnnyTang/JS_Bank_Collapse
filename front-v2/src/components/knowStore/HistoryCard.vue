@@ -269,7 +269,7 @@ const handleChange = (val) => {
 
 onMounted(async () => {
     const requestInfo = await backendInstance.get(
-        '/data/detailHistory/uuid/' + infoItem.value.uuid,
+        '/data/detail/uuid/' + infoItem.value.uuid,
     )
     // console.log(requestInfo.data)
     detailInfo.value = requestInfo.data

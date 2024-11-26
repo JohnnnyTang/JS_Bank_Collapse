@@ -118,13 +118,31 @@
                                     </el-option>
                                 </el-select>
                             </div>
-                            <!-- <div class="nav-data-button" @click="navToMoreData">
-                                    更多数据
-                                </div> -->
                         </div>
                         <div>
                             <div class="goBack">
                                 <el-button @click="goBack" v-if="showButton">返回原表</el-button>
+                            </div>
+                            <div class="infoButton">
+                                <el-popover placement="top-start" trigger="click"
+                                    :popper-class="'device-indicator-popover'">
+                                    <template #reference>
+                                        <el-button type="primary" plain :icon="InfoFilled" circle />
+                                    </template>
+                                    <div class="device-indicator-info">
+                                        <div class="device-indicator-info-title">{{ selectedDeviceType }}</div>
+                                        <el-scrollbar :style="{ height: '26vh' }">
+                                            <div class="device-indicator-info-content">
+                                                <div class="indicator-info"
+                                                    v-for="(item, idx) in indicatorDescriptionMap[shitMap[selectedDeviceType]]">
+                                                    <div class="indicator-name">➤ {{ item.name }}</div>
+                                                    <div class="indicator-desc">{{ item.desc }}</div>
+                                                </div>
+                                            </div>
+                                        </el-scrollbar>
+
+                                    </div>
+                                </el-popover>
                             </div>
                             <div class="device-chart-dom" ref="chartDom" v-loading="chartDataLoading"
                                 @dblclick="navToMoreData"></div>
@@ -143,16 +161,18 @@
                         <div class="video-content-container">
                             <div class="video-box" v-for="(item, index) in videoList" :key="index" :id="item.order">
                                 <div class="video-content">
-                                    <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
-                                        :key="item.key" allowfullscreen  v-if="showVideo === true">
-                                    </iframe>
-                                    <div class="video-img" :id="index" v-show="showVideo === false"></div>
+                                    <div :id="item.name" style="width:100%; height:100%" @dblclick="fullScreen(index)"></div>
+                                    <!-- <iframe :src="getIframeUrl(item)" width="100%" height="100%" :id="item.name"
+                                        :key="item.key" allowfullscreen v-if="showVideo === true">
+                                    </iframe> -->
+                                    <!-- <div class="video-img" v-show="!item.playing" 
+                                        :style="{ backgroundImage: `url('${item.screenshotImg}')` }"></div> -->
                                 </div>
                                 <div class="video-title" :class="videoList[index].warn ? 'warn' : 'normal'
                                     " @click="focusOn(index)">
                                     {{ item.name }}
                                 </div>
-                                <div class="small-pic" v-if="item.order == 0" :id="index"></div>
+                                <div class="small-pic" v-if="item.order == 0" :id="'sp' + index"></div>
                             </div>
                         </div>
                         <div class="video-control-opener" :class="{ open: videoControlOpen }">
@@ -243,6 +263,8 @@ import router from '../../router'
 import { useWarnInfoStore } from '../../store/mapStore'
 import DeviceHelper from './deviceHelper'
 import { useBankNameStore } from '../../store/bankNameStore'
+import { InfoFilled } from '@element-plus/icons-vue'
+import EZUIKit from 'ezuikit-js'
 
 const route = useRoute()
 const props = defineProps({
@@ -376,7 +398,7 @@ const deviceTypeTimeMap = {
     },
     应力桩: {
         timeUnit: 'hour',
-        timeCount: 24,
+        timeCount: 12,
         realTimeCount: 1,
         realTimeUnit: 'hour',
         freq: '1分钟',
@@ -418,7 +440,8 @@ const videoList = ref([
         position: '32.0316674, 120.5402574',
         deviceId: 'FB5033035',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033035/1.hd.live&autoplay=1&accessToken=`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033035/1.live',
         order: 0,
         presetPt: [
             { name: '上游岸段', status: 'normal' },
@@ -428,13 +451,17 @@ const videoList = ref([
         ],
         warn: false,
         key: 0,
+        // show: true,
+        playing: true,
+        screenshotImg: null,
     },
     {
         name: '民主沙靖江市江滩办事处外堤监控',
         position: '32.0381061, 120.5263473',
         deviceId: 'FB5033037',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033037/1.live&autoplay=1&accessToken=`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033037/1.live',
         order: 1,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
@@ -444,13 +471,17 @@ const videoList = ref([
         ],
         warn: false,
         key: 1,
+        // show: true,
+        playing: true,
+        screenshotImg: null
     },
     {
         name: '民主沙上游围堤监控',
         position: '32.0432963, 120.5122242',
         deviceId: 'FB5033036',
         // videoUrl: `https://open.ys7.com/ezopen`,
-        videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        // videoUrl: `https://open.ys7.com/ezopen/h5/iframe?url=ezopen://open.ys7.com/FB5033036/1.live&autoplay=1&accessToken=`,
+        videoUrl: 'ezopen://open.ys7.com/FB5033036/1.live',
         order: 2,
         presetPt: [
             { name: '下游岸段', status: 'normal' },
@@ -460,73 +491,84 @@ const videoList = ref([
         ],
         warn: false,
         key: 2,
+        // show: true,
+        playing: true,
+        screenshotImg: null
     },
 ])
+const uikitInstances = []
 const userInteractInfo = reactive({
     lastInteractTime: dayjs(),
     refreshIframe: 1
 })
 const videoRef = ref();
-const showVideo = ref(true);
+const videoImgs64 = ref([])
 window.addEventListener('mousemove', (e) => {
     // 用户交互，更新lastInteractTime
     userInteractInfo.lastInteractTime = dayjs()
     userInteractInfo.refreshIframe = 1
-    showVideo.value = true;
+    videoList.value.forEach((item, index) => {
+        if (!uikitInstances[index]) return
+        if (item.playing) return
+        item.playing = true
+        const playPromise = uikitInstances[index].play();
+        playPromise.then(() => {
+            console.log("播放视频" + index)
+        });
+        // item.uikitInstance.play()
+    })
 })
-window.addEventListener('keydown', async (e) => {
-    if (e.key == '1') {
-        videoList.value.forEach((item, index) => {
-            // let dom = document.querySelector('#' + item.name);
-            let dom = document.querySelector('.' + 'video-content');
-            // console.log(dom)
-            // domtoimage.toPng(dom).then((imageUrl)=> {
-            //     console.log(imageUrl)
-            //     const div = document.createElement('div')
-            // }).catch((err)=> {
-            //     console.log(err)
-            // });
-            
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = element.offsetWidth;
-            canvas.height = element.offsetHeight;
-            context.drawImage(element, 0, 0);
-            
-            // 将Canvas内容转换为图片数据
-            const imageDataUrl = canvas.toDataURL('image/png');
-            
-            // 显示或下载图片
-            console.log(imageDataUrl);
-        })
 
-    }
-})
+const fullScreen = (index) => {
+    uikitInstances[index].fullScreen()
+}
+
 const refreshInterval = setInterval(() => {
     // 检查上次交互和此次交互的分钟数
     let nowTime = dayjs()
     let diffTime = nowTime.diff(userInteractInfo.lastInteractTime, 'seconds')
     console.log(diffTime + 'seconds ' + '用户无操作')
-    // if (diffTime > 10) {
-    //     // close page if no user interaction for 3 minutes
-    //     // userInteractInfo.refreshIframe = 0
-    //     showVideo.value = false;
-    // }
+    if (diffTime > 10) {
+        videoList.value.forEach((item, index) => {
+            if (!item.playing) return
+            let uikitInstance = uikitInstances[index]
+            if (!uikitInstance) return
+            // const capturePicturePromise = uikitInstance.capturePicture();
+            // capturePicturePromise.then((data) => {
+            //     let base64Img = data.data.base64
+            //     item.screenshotImg = base64Img
+            //     const stopPromise = uikitInstance.stop();
+            //     stopPromise.then(() => {
+            //         item.playing = false
+            //     });           
+            // }).catch((err)=> {
+            //     console.error('capture failed', err)
+            // });
+            const pausePromise = uikitInstance.pause();
+            pausePromise.then(() => {
+                console.log("暂停视频" + index)
+                item.playing = false
+            }).catch((err)=>{
+                console.error("暂停失败", err)
+            }); 
+        })
+
+    }
 }, 1000 * 5 * 1)
 
 const refreshIframe = (val) => {
     console.log('refresh iframe ! ', val)
-    if (val) {  // show iframe
-        token.value = validToken
-        videoList.value.forEach((item) => {
-            item.key += 1
-        })
-    } else { // hide iframe
-        token.value = ''
-        videoList.value.forEach((item) => {
-            item.key += 1
-        })
-    }
+    // if (val) {  // show iframe
+    //     token.value = validToken
+    //     videoList.value.forEach((item) => {
+    //         item.key += 1
+    //     })
+    // } else { // hide iframe
+    //     token.value = ''
+    //     videoList.value.forEach((item) => {
+    //         item.key += 1
+    //     })
+    // }
 }
 
 watch(() => userInteractInfo.refreshIframe, (val) => {
@@ -559,7 +601,8 @@ const functionIndexList = [0, 1, 2, 3, 8, 9, 10, 11]
 let curBigVideoIndex = ref(0)
 
 const focusOn = (index) => {
-    ;[
+    if (uikitInstances.length !== 3) return;
+    [
         videoList.value[curBigVideoIndex.value].order,
         videoList.value[index].order,
     ] = [
@@ -567,6 +610,23 @@ const focusOn = (index) => {
             videoList.value[curBigVideoIndex.value].order,
         ]
     curBigVideoIndex.value = index
+
+    reSizeVideos()
+}
+
+
+
+// 调整播放器尺寸
+const reSizeVideos = () => {
+    videoList.value.forEach((item, index) => {
+        const videoBox = document.getElementById(item.order);
+        const videoDom = videoBox.querySelectorAll('.video-content')[0]
+        if (videoDom) {
+            const width = videoDom.offsetWidth;
+            const height = videoDom.offsetHeight;
+            uikitInstances[index].reSize(width, height)
+        }
+    })
 }
 
 const navToMoreData = () => {
@@ -625,6 +685,7 @@ const toggleChartOptionFromData = (deviceData) => {
         deviceTypeErrorMap[selectedDeviceType.value],
         selectedDataMode.value,
     )
+    echartIns.clear()
     echartIns.setOption(deviceOptionMap[selectedDeviceType.value])
     // if (selectedDeviceType.value == '位移测量站') {
     //     deviceOptionMap[selectedDeviceType.value] = deviceGenOptionMap[selectedDeviceType.value](
@@ -1163,7 +1224,8 @@ onBeforeRouteUpdate(async (to, from) => {
 
     useBankNameStore().globalBankName = to.params.id
     deviceStatusLoading.value = true
-
+    chartDataLoading.value = true
+    updateTimeLoading.value = true
 
     const importantInfo = (await DeviceHelper.getProcessedMonitorInfo(to.params.id))
     monitorInfo.value = importantInfo
@@ -1287,7 +1349,7 @@ onMounted(async () => {
     setTimeout(() => {
         console.log('init with new token!!')
         refreshIframe(1)
-    }, 1000);
+    }, 1);
     // await updateNewestTime()
     // let myDate = new Date()
     // deviceStatusDataList.value[4].time =
@@ -1369,12 +1431,133 @@ onMounted(async () => {
     }, 10)
 
 
+    videoList.value.forEach((item, index) => {
+        uikitInstances[index] = new EZUIKit.EZUIKitPlayer({
+            id: item.name,
+            url: item.videoUrl,
+            accessToken: token.value,
+            download: false
+        })
+    })
+
+    let timeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            reSizeVideos()
+        }, 300);
+    });
 })
 
 onBeforeUnmount(async () => {
     await moveBack2Origin()
+    videoList.value.forEach((item, index) => {
+        let stopPromise = uikitInstances[index].stop()
+        stopPromise.then(() => {
+            uikitInstances[index].destroy()
+        })
+
+    })
     refreshInterval && clearInterval(refreshInterval)
 })
+
+
+
+
+const indicatorDescriptionMap = {
+    'GNSS': [{
+        name: 'X位移',
+        desc: '表示岸坡在水平方向上沿 X 轴的位移变化，正值和负值分别表示在 X 轴正方向和负方向上的位移，可用于判断岸坡在该方向上的移动趋势和幅度'
+    }, {
+        name: 'Y位移',
+        desc: '反映岸坡在水平方向上沿 Y 轴的位移情况，与 X 位移共同确定岸坡在水平平面内的位移矢量，有助于全面了解岸坡的水平移动状态。'
+    }, {
+        name: 'Z位移',
+        desc: '即岸坡在垂直方向上的位移，对于评估岸坡的沉降或隆起等垂直方向的变形至关重要，结合 X、Y 位移可得到岸坡的三维位移信息。'
+    }, {
+        name: '三维累计位移',
+        desc: '是岸坡在三维空间中位移的累积值，综合了 X、Y、Z三个方向的位移变化，能够直观地反映出岸坡在一段时间内的总体位移规模，对于长期监测和评估岸坡的稳定性具有重要意义。'
+    }, {
+        name: '五小时相对变化',
+        desc: '指在连续的五个小时内，岸坡位移的相对变化量，通过该指标可以了解岸坡在短期内的位移速率和变化趋势，及时发现可能存在的快速变形情况，为及时采取措施提供依据。'
+    }],
+    'STRESS': [
+        {
+            name: '顶端角度',
+            desc: '反映应力桩顶端在受力过程中的倾斜角度变化，该角度的改变可以间接反映出岸坡顶部土壤应力的分布和变化情况，对于评估岸坡顶部的稳定性和可能的变形模式具有一定的参考价值。'
+        },
+        {
+            name: '中部角度',
+            desc: '测量应力桩中部的倾斜角度，中部角度的变化能够体现岸坡中部土壤应力的调整和转移，有助于分析岸坡内部结构的受力状态和潜在的薄弱环节。'
+        },
+        {
+            name: '底端角度',
+            desc: '监测应力桩底端的倾斜角度，底端角度的改变对于判断岸坡底部土壤的应力集中和稳定性至关重要，结合其他部位的角度变化，可以全面了解应力桩在岸坡不同深度处的受力响应。'
+        },
+        {
+            name: '顶端最大应变',
+            desc: '表示应力桩顶端在受力过程中所产生的最大应变值，应变是应力作用下物体变形程度的度量，顶端最大应变能够反映岸坡顶部土壤应力的强度和变化幅度，为评估岸坡顶部的承载能力提供重要依据。'
+        },
+        {
+            name: '中部最大应变',
+            desc: '指应力桩中部所承受的最大应变，中部最大应变的大小和变化趋势可以帮助分析岸坡中部土壤的应力分布和承载能力，对于确定岸坡内部的关键受力区域具有重要意义。'
+        },
+        {
+            name: '底端最大应变',
+            desc: '体现应力桩底端的最大变形程度，底端最大应变的监测数据对于评估岸坡底部土壤的应力状态和稳定性至关重要，结合顶端和中部的最大应变，可以全面了解应力桩在岸坡不同深度处的受力变形情况。'
+        },
+        {
+            name: '顶端应力',
+            desc: '直接测量应力桩顶端所承受的应力大小，顶端应力的变化反映了岸坡顶部土壤对桩体的作用力变化，对于判断岸坡顶部的承载能力和稳定性具有关键作用。'
+        },
+        {
+            name: '中部应力',
+            desc: '测量应力桩中部的应力值，中部应力的分布和变化情况可以帮助分析岸坡内部土壤应力的传递和分布规律，为评估岸坡的整体稳定性提供重要参考。'
+        },
+        {
+            name: '底端应力',
+            desc: '监测应力桩底端的应力大小，底端应力的大小直接关系到岸坡底部的稳定性，通过对底端应力的监测，可以及时发现岸坡底部可能存在的应力集中和不稳定因素。'
+        }
+    ],
+    'MENOMETER': [
+        {
+            name: '频率',
+            desc: '频率是其测量孔隙水压力的关键指标。当孔隙水压力变化时，会引起传感器内钢弦张力的变化，从而导致钢弦振动频率的改变，通过测量频率的变化即可间接得到孔隙水压力的大小。'
+        },
+        {
+            name: '温度',
+            desc: '孔隙水压力计内部通常会内置温度传感器，用于对外界温度影响产生的变化进行温度修正，以提高测量数据的准确性，确保监测结果能够真实反映孔隙水压力的实际情况.'
+        },
+        {
+            name: '水位高度',
+            desc: '在潜水层，孔隙水压力计测出的是孔隙水压力计上方的水头压力，通过换算可以得到水位高度，而水位高度的变化与孔隙水压力密切相关，对于分析岸坡内部的水文地质条件和水分分布情况具有重要意义。'
+        }
+    ],
+    'INCLINE': [
+        {
+            name: '顶部位移',
+            desc: '指岸坡顶部在一定时间内的水平位移变化，反映了岸坡上部的移动情况，对于判断岸坡顶部的稳定性和可能的变形趋势具有重要作用。'
+        }, {
+            name: '中部位移',
+            desc: '监测岸坡中部的水平位移，中部的位移情况往往能反映岸坡整体的变形趋势，是评估岸坡稳定性的关键指标之一，其变化可能预示着岸坡内部结构的变化和潜在的不稳定因素。'
+        }, {
+            name: '底部位移',
+            desc: '测量岸坡底部的水平位移，由于底部的稳定性对于整个岸坡的稳定至关重要，底部移动的监测数据可以帮助判断岸坡是否存在底部滑动或不均匀沉降等问题。'
+        },
+        {
+            name: '顶部日累计移动',
+            desc: '记录岸坡顶部一天内的累计水平位移，通过对每日累计移动的分析，可以了解岸坡顶部在短期内的位移发展趋势，及时发现异常的位移增长情况。'
+        },
+        {
+            name: '中部日累计移动',
+            desc: '反映岸坡中部一天内的水平位移累积量，有助于分析岸坡中部在日常情况下的变形规律和稳定性变化，为长期的岸坡监测和维护提供数据支持。'
+        },
+        {
+            name: '底部日累计移动',
+            desc: '统计岸坡底部一天内的累计水平位移，对于评估岸坡底部的长期稳定性和潜在风险具有重要意义，结合其他部位的日累计移动数据，可以全面了解岸坡的整体变形状况。'
+        }
+    ]
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1597,6 +1780,20 @@ div.device-info-container {
                     // background-color: #2a5fdb;
                 }
 
+                div.infoButton {
+                    z-index: 9999;
+                    position: absolute;
+                    width: 20px;
+                    height: 20px;
+                    bottom: 0vh;
+                    left: 0vw;
+                    margin-left: 0.3%;
+                    margin-bottom: 4.5%;
+
+
+
+                }
+
                 div.goBack {
                     z-index: 9999;
                     position: absolute;
@@ -1776,24 +1973,12 @@ div.device-info-container {
 
                         div.video-img {
                             position: absolute;
-                            top:0;
-                            left:0;
+                            top: 0;
+                            left: 0;
                             height: 100%;
                             width: 100%;
                             // z-index:1000;
                             background-size: cover;
-                           
-                            &[id='0'] {
-                                background-image: url('/mzs-hsmt.png');
-                            }
-
-                            &[id='1'] {
-                                background-image: url('/mzs-jtbsc.png');
-                            }
-
-                            &[id='2'] {
-                                background-image: url('/mzs-sywd.png');
-                            }
                         }
                     }
 
@@ -1851,15 +2036,15 @@ div.device-info-container {
                         background-repeat: no-repeat;
                         background-position: 50% 50%;
 
-                        &[id='0'] {
+                        &[id='sp0'] {
                             background-image: url('/mzsBase-monitor3.png');
                         }
 
-                        &[id='1'] {
+                        &[id='sp1'] {
                             background-image: url('/mzsBase-monitor2.png');
                         }
 
-                        &[id='2'] {
+                        &[id='sp2'] {
                             background-image: url('/mzsBase-monitor1.png');
                         }
                     }
@@ -1934,6 +2119,7 @@ div.device-info-container {
 
                 div.control-open-text {
                     background-color: #001885;
+                    font-size: calc(0.5vw + 0.55vh);
 
                     &:hover {
                         cursor: pointer;

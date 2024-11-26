@@ -133,11 +133,16 @@
                                     <el-button style="
                                             margin-left: 3vw;
                                             background-color: rgb(197,232,252);
-                                            color: rgb(7, 82, 119);
+                                            color: rgb(0, 109, 155);
                                             font-weight: 700;
                                             border: 0;
                                             font-size: calc(0.65vw + 0.5vh);
                                             padding: 3px 10px;
+                                            transition: .3s ease-in-out;
+                                            cursor: pointer;
+                                            :hover{
+                                                background-color: #b6faff;
+                                            }
                                         " type="info" plane @click="visulizationPrepare">加载可视化资源</el-button>
                                 </div>
                                 <div class="content">
@@ -377,7 +382,7 @@ const treeRef = ref(null)
 const confirmBankHandler = async (bank) => {
     selectedBank.name = bank.name
     selectedBank.bankEnName = bank.bankEnName
-
+    console.log(selectedBank.bankEnName)
     updateTreeFromBack(selectedBank.bankEnName)
     mapFlyToRiver(mapStore.getMap(map), bank.name)
 
@@ -446,13 +451,13 @@ const tideValue = ['xc', 'zc', 'dc']
 const handleUpload = (file) => {
     console.log('user upload file -- ', file)
 }
-const getNodeFatherInfo = (node)=>{
+const getNodeFatherInfo = (node) => {
     const yearNode = node.parent
     return {
-        year:yearNode.data.label,
-        set:node.data.label
+        year: yearNode.data.label,
+        set: node.data.label
     }
-    
+
 }
 const runMathModel = () => {
     // console.log('mathModelParams')
@@ -479,7 +484,7 @@ const runMathModel = () => {
         }
     }
     const name = mathModelParams.addToRiskJudgeFlag == 1 ? '' + mathModelParams.flow + mathModelParams.tideType : mathModelParams.customName
-    const {year, set} = getNodeFatherInfo(clickedSet.node)
+    const { year, set } = getNodeFatherInfo(clickedSet.node)
     const mathModelInfo = {
         "segment": selectedBank.bankEnName,
         "year": year,
@@ -556,7 +561,7 @@ const runMathModel = () => {
             offset: 130
         })
 
-        if(calcCaseInfo[name]) delete calcCaseInfo[name]
+        if (calcCaseInfo[name]) delete calcCaseInfo[name]
         console.error('数模计算失败', err)
 
         modelStartLoading.value = false
@@ -625,7 +630,7 @@ const visulizationPrepare = async () => {
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
-            segment: 'Mzs',
+            segment: 'Mzs', // 后端纹理资源生产有问题，这里用Mzs的资源  2024-11-25
             set: 'standard',
             year: '2023',
         }

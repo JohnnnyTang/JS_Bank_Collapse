@@ -6,22 +6,25 @@
         </div>
         <el-scrollbar>
             <el-menu class="el-menu-vertical-demo" :default-active="defaultActive" @select="handleSelect">
-                <el-sub-menu index="4" v-if="MANAGEMENT === 'YES'">
+                <el-sub-menu index="4" v-if="MANAGEMENT === 'YES' && !/(\/monitor)/.test($route.path) && !/(\/warn)/.test($route.path)">
                     <template #title>
                         <el-icon>
                             <FolderOpened />
                         </el-icon>
                         <span>岸段管理</span>
                     </template>
+
+                    <el-menu-item index="create"
+                        style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item>
+
                     <el-sub-menu index="4-1">
-                        <template #title>岸段列表</template>
+                        <template #title>已建岸段</template>
                         <el-menu-item v-for="bankItem in bankList" :index="'preview/' + bankItem.bank">{{ bankItem.name
                         }}</el-menu-item>
                     </el-sub-menu>
-                    <el-menu-item index="create"
-                        style="font-size: calc(0.7vw + 0.4vh);font-weight: 800;">新建岸段</el-menu-item>
+                    
                 </el-sub-menu>
-                <el-sub-menu index="2">
+                <el-sub-menu index="2" v-if="!/(\/preview)/.test($route.path) && !/(\/create)/.test($route.path)">
                     <template #title>
                         <el-icon>
                             <View />
@@ -37,7 +40,7 @@
                         <el-menu-item index="monitor/stress">应力桩</el-menu-item>
                     </el-sub-menu>
                 </el-sub-menu>
-                <el-sub-menu index="3">
+                <!-- <el-sub-menu index="3" v-if="!/(\/preview)/.test($route.path) && !/(\/create)/.test($route.path)">
                     <template #title>
                         <el-icon>
                             <WarningFilled />
@@ -53,15 +56,15 @@
                         <el-menu-item index="warn/risk">实时风险</el-menu-item>
                         <el-menu-item index="warn/stable">岸坡稳定</el-menu-item>
                     </el-sub-menu>
-                    <!-- <el-sub-menu index="3-2">
+                    <el-sub-menu index="3-2">
                         <template #title>报警记录</template>
                         <el-menu-item index="3-2-1">断面</el-menu-item>
                         <el-menu-item index="3-2-2">GNSS</el-menu-item>
                         <el-menu-item index="3-2-3">测斜仪</el-menu-item>
                         <el-menu-item index="3-2-4">孔隙水压力计</el-menu-item>
                         <el-menu-item index="3-2-5">应力桩</el-menu-item>
-                    </el-sub-menu> -->
-                </el-sub-menu>
+                    </el-sub-menu>
+                </el-sub-menu> -->
                 <!-- <el-sub-menu index="4">
                     <template #title>
                         <el-icon><Document /></el-icon>

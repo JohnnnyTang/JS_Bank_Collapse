@@ -197,12 +197,12 @@
                         </el-col>
                         <el-col :span="8">
                             <div class="full">
-                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['Ln'][0]">
+                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['Ln'][1]">
                             </div>
                         </el-col>
                         <el-col :span="8">
                             <div class="full">
-                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['Ln'][0]">
+                                <input type="number" name="" :step="0.01" v-model="thresholdParmas['Ln'][2]">
                             </div>
                         </el-col>
                     </el-row>

@@ -13,11 +13,17 @@
                         <div class="bank-name">
                             <div class="bankName-key">岸段名称</div>
                             <div class="bankName-val">
-                                <el-input v-model="bank.name" class="necessary no-number" style="
-                                width: 50%;
-                                height: 100%;
-                                font-size: calc(0.6vw + 0.6vh);
-                            " placeholder="请输入岸段名称" :type="'text'" :autosize="{ minRows: 4, maxRows: 6 }" />
+
+                                <el-autocomplete v-model="bank.name" class="necessary" style="
+                                        width: 50%;
+                                        height: 100%;
+                                    " :fetch-suggestions="fetch_suggestions" placeholder="请输入岸段名称"
+                                    :trigger-on-focus="false" clearable @select="handleSelect" :debounce=500>
+                                    <template #suffix>
+                                        <span class="star">*</span>
+                                    </template>
+                                </el-autocomplete>
+
                                 <el-input v-model="bank.bankEnName" class="necessary no-number" style="
                                 width: 50%;
                                 height: 100%;
@@ -44,7 +50,7 @@
                                     placeholder="请选择监测起始时间" format="YYYY-MM-DD" date-format="MMM DD, YYYY" />
 
 
-                                <div v-else-if="item.key === '中心坐标'" class="full">
+                                <!-- <div v-else-if="item.key === '中心坐标'" class="full">
                                     <el-input v-model="lnglat.lng" style="
                                         width: 50%;
                                         height: 100%;
@@ -57,7 +63,7 @@
                                             font-size: calc(0.6vw + 0.6vh);
                                         " placeholder="请输入纬度" type="number" :step="0.0000001"
                                         :autosize="{ minRows: 4, maxRows: 6 }" />
-                                </div>
+                                </div> -->
 
                                 <el-input v-else v-model="item.val" style="
                                 width: 100%;
@@ -80,55 +86,7 @@
         </div>
 
 
-        <!-- <div class="resource-box-container">
-            <div class="title-container">岸段资源上传</div>
-            <div class="resource-content-container">
-                <el-scrollbar height="75vh">
-                    <div class="resource-box-item" v-for="(item, resourceTypeIndex) in resourceInfo"
-                        :key="resourceTypeIndex">
-                        <div class="resource-title">
-                            {{ resourceTypeIndex + 1 + ' ' + item.key }}
-                            <div class="resource-upload-btn" @click="resourceUploadClickHandler(resourceTypeIndex)">上传</div>
-                        </div>
-                        <div class="resource-content">
-
-                            <el-table :data="item.resourceList" style="width: 100%" max-height="25vh">
-                                <el-table-column v-for="(column, index) in tableColumnInfo" :key="index" :prop="column.prop"
-                                    :label="column.label" :min-width="column['min-width']" align="center">
-                                    <template #default="scope" v-if="column.asTag">
-                                        <div style="display: flex; align-items: center;justify-content: center;">
-                                            <el-tag>{{ scope.row.fileType }}</el-tag>
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </div>
-                </el-scrollbar>
-            </div>
-        </div> -->
     </div>
-
-    <!-- <el-dialog v-model="dialogFormVisible" width="20vw" :show-close="false">
-        <template #header="{ titleId, titleClass }">
-            <div class="form-header" style="">
-                {{ '● ' + dialogFormTitle }}
-            </div>
-        </template>
-        <el-form :model="dialogInfo">
-            <el-form-item v-for="(item, index) in dialogInfo" :key="index" :label="item.label">
-                <el-input v-model="item.value" autocomplete="off" />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false">
-                    确定
-                </el-button>
-            </div>
-        </template>
-    </el-dialog> -->
 </template>
 
 <script setup>
@@ -136,8 +94,7 @@ import { ref, onMounted, reactive } from 'vue'
 import { defaultBankBasic_Style_Info } from './bankResource'
 import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
-import { number } from 'echarts';
-
+import { pinyin } from 'pinyin-pro';
 
 const emit = defineEmits(['refresh-bank-list'])
 
@@ -156,32 +113,6 @@ const lnglat = reactive({
 
 const bankBasicInfo = ref(defaultBankBasic_Style_Info)
 
-////////////////// DEBUG ////////////////
-// window.addEventListener('keydown', e => {
-//     if (e.key === 'e') {
-//         const parseLonLat = (inputStr) => {
-//             const coordinates = inputStr.slice(1, -1).split(',');
-//             const longitude = parseFloat(coordinates[0]);
-//             const latitude = parseFloat(coordinates[1]);
-//             return [longitude, latitude]
-//         }
-//         let nowBasicInfo = bankBasicInfo.value
-//         let ReqBody = {
-//             "bank": bank.bankEnName,
-//             "name": bank.name,
-//             "riskLevel": nowBasicInfo[0].val,
-//             "center": parseLonLat(nowBasicInfo[1].val),
-//             "monitorLength": nowBasicInfo[2].val,
-//             "monitorStartTime": nowBasicInfo[3].val.toISOString(),
-//             "introduction": nowBasicInfo[4].val,
-//             "management": {
-//                 "department": nowBasicInfo[5].val,
-//                 "contact": nowBasicInfo[6].val,
-//             }
-//         }
-//         console.log(ReqBody)
-//     }
-// })
 
 const createNewBankClickHandler = async () => {
     const haveNULL = Object.values(bank).some(item => item === '' || item === null || item === undefined)
@@ -212,12 +143,12 @@ const createNewBankClickHandler = async () => {
             "name": bank.name,
             "riskLevel": nowBasicInfo[0].val,
             "center": center,
-            "monitorLength": nowBasicInfo[2].val,
-            "monitorStartTime": nowBasicInfo[3].val ? nowBasicInfo[3].val.toISOString() : (new Date()).toISOString(),
-            "introduction": nowBasicInfo[4].val,
+            "monitorLength": nowBasicInfo[1].val,
+            "monitorStartTime": nowBasicInfo[2].val ? new Date(nowBasicInfo[2].val).toISOString() : (new Date()).toISOString(),
+            "introduction": nowBasicInfo[3].val,
             "management": {
-                "department": nowBasicInfo[5].val,
-                "contact": nowBasicInfo[6].val,
+                "department": nowBasicInfo[4].val,
+                "contact": nowBasicInfo[5].val,
             }
         }
         const createMsg = (await BankResourceHelper.createNewBank(bank.bankEnName, ReqBody)).data
@@ -233,96 +164,38 @@ const createNewBankClickHandler = async () => {
 }
 
 
+const fetch_suggestions = async (queryString, cb) => {
+    console.log("开始执行")
+    console.log("queryString:", queryString)
+    let searchResults = []
+    if (bank.name.length >= 1) { // 至少输入1个字符才进行搜索
+        try {
+            const response = await BankResourceHelper.onInput(bank.name)
+            searchResults = response.data;
+            console.log("搜索结果是：", searchResults)
+        } catch (error) {
+            console.error('搜索失败', error);
+        }
+    }
+    let result = []
+    for (let item of searchResults)
+        result.push({ "value": item })
+    cb(result)
+};
 
+const handleSelect = async (item) => {
+    const response = await BankResourceHelper.handleSelect(item.value)
 
+    // bank.bankEnName = pinyin(bank.name, { pattern: 'first' })
+    let py = pinyin(bank.name, { pattern: 'first' })
+    py = py.split(' ').join('')
+    bank.bankEnName = py.toUpperCase()
 
-
-
-
-
-/////////////////////////// bank resource info
-// const resourceInfo = defaultBankResouceList
-// const tableColumnInfo = [
-//     {
-//         prop: "name",
-//         label: "名称",
-//         "min-width": "25%",
-//         asTag: false
-//     },
-//     {
-//         prop: "sets",
-//         label: "工况集",
-//         "min-width": "25%",
-//         asTag: false
-//     },
-//     {
-//         prop: "year",
-//         label: "年份",
-//         "min-width": "25%",
-//         asTag: false
-//     },
-//     {
-//         prop: "fileType",
-//         label: "文件类型",
-//         "min-width": "25%",
-//         asTag: true
-//     },
-// ]
-
-// ///////////// bank resource upload
-// const dialogFormVisible = ref(false)
-// const dialogFormTitle = ref('资源上传')
-// const dialogInfo = ref([
-//     {
-//         label: '岸段',
-//         enName: 'segment',
-//         value: bank.name
-//     },
-//     {
-//         label: '年份',
-//         enName: 'year',
-//         value: '2023'
-//     },
-//     {
-//         label: '工况集',
-//         enName: 'set',
-//         value: 'standard'
-//     },
-//     // {
-//     //     label: '文件类型',
-//     //     enName: 'category',
-//     //     value: 'DEM'    (DEM|Hydrodynamic|Boundary|Config)
-//     // }
-//     {
-//         label: '备注',
-//         enName: 'description',
-//         value: ''
-//     },
-//     {
-//         label: '边界',
-//         enName: '',
-//         value: ''
-//     },
-//     // {
-//     //     label: '其他',
-//     //     enName: 'temp',
-//     //     value: ''
-//     // },
-
-// ])
-
-
-// const resourceUploadClickHandler = (resourceTypeIndex) => {
-//     const type = ['地形', '水动力', '边界', '配置']
-//     dialogFormTitle.value = `${type[resourceTypeIndex]}资源上传`
-//     dialogFormVisible.value = true
-// }
-
-
-
-
-
-
+    bankBasicInfo.value[0].val = warnLevelList[response.data.warning_level]
+    bankBasicInfo.value[1].val = response.data.monitoring_length + ' 千米'
+    bankBasicInfo.value[2].val = response.data.create_time
+    bankBasicInfo.value[3].val = response.data.description
+}
 
 
 
@@ -736,6 +609,34 @@ div.form-header {
         height: 100%;
         font-size: calc(0.6vh + 0.6vw);
         // background-color: red;
+    }
+}
+
+:deep(.el-autocomplete) {
+
+    /* &.necessary {
+        ::before {
+            position: absolute;
+            top: .3vh;
+            right: .5vw;
+            font-size: 24px;
+            z-index: 5;
+            content: "*";
+            color: red;
+        }
+    } */
+    .el-input {
+        height: 100%;
+        font-size: calc(0.6vw + 0.6vh);
+    }
+
+    .star {
+        position: absolute;
+        top: .3vh;
+        right: .5vw;
+        font-size: 24px;
+        z-index: 5;
+        color: red;
     }
 }
 

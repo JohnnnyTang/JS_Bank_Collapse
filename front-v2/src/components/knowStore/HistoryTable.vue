@@ -10,115 +10,55 @@
                     variant="rect"
                     style="width: 28vw; height: 72vh"
                 /> -->
-                <div
-                    style="
+                <div style="
                         display: flex;
                         flex-flow: row wrap;
                         justify-content: space-around;
                         align-items: center;
                         justify-items: space-between;
                         height: 70vh;
-                    "
-                >
-                    <el-skeleton-item
-                        variant="text"
-                        style="width: 30%; height: 4vh"
-                        v-for="i in 30"
-                        :key="i"
-                    />
+                    ">
+                    <el-skeleton-item variant="text" style="width: 30%; height: 4vh" v-for="i in 30" :key="i" />
                 </div>
             </template>
             <template #default>
                 <div class="history-search-cntainer">
                     <div class="history-search-input">
-                        <el-input
-                            v-model="searchInput"
-                            style="width: 100%"
-                            placeholder="请输入筛选内容"
-                            clearable
-                        />
+                        <el-input v-model="searchInput" style="width: 100%" placeholder="请输入筛选内容" clearable />
                     </div>
-                    <div class="history-search-icon"></div>
+                    <div class="history-search-icon" @click="searchHandler"></div>
                 </div>
                 <div class="history-list-container">
-                    <el-table
-                        :data="historyList"
-                        stripe
-                        style="width: 100%"
-                        height="65vh"
-                        row-class-name="history-table-row"
-                    >
-                        <el-table-column
-                            prop="time"
-                            label="时间"
-                            :width="tableColWidthList[0]"
-                        />
-                        <el-table-column
-                            prop="place"
-                            label="位置"
-                            :width="tableColWidthList[1]"
-                        />
-                        <el-table-column
-                            prop="river"
-                            label="类别"
-                            :width="tableColWidthList[2]"
-                        />
-                        <el-table-column
-                            prop="side"
-                            label="岸别"
-                            :width="tableColWidthList[3]"
-                        />
-                        <el-table-column
-                            label="更多"
-                            :width="tableColWidthList[4]"
-                        >
+                    <el-table :data="filteredList" stripe style="width: 100%" height="65vh"
+                        row-class-name="history-table-row">
+                        <el-table-column prop="time" label="时间" :width="tableColWidthList[0]" />
+                        <el-table-column prop="place" label="位置" :width="tableColWidthList[1]" />
+                        <el-table-column prop="river" label="河段" :width="tableColWidthList[2]" />
+                        <el-table-column prop="side" label="岸别" :width="tableColWidthList[3]" />
+                        <el-table-column label="更多" :width="tableColWidthList[4]">
                             <template #default="scope">
-                                <div
-                                    class="more-info-button"
-                                    @click="
-                                        handleClick(scope.$index, scope.row)
-                                    "
-                                    :class="{
-                                        'in-scroll':
-                                            (scope.row.detail != null)
-                                    }"
-                                ></div>
+                                <div class="more-info-button" @click="
+                                    handleClick(scope.$index, scope.row)
+                                  " :class="{
+                                    'in-scroll':
+                                        (scope.row.detail != null)
+                                }"></div>
                             </template>
                         </el-table-column>
                     </el-table>
                 </div>
                 <el-dialog v-model="dialogTableVisible" width="800">
                     <el-descriptions :title="dialogTitleText" border>
-                        <el-descriptions-item label="类别"
-                            >{{moreInfo.type}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="口门长度"
-                            >{{moreInfo.length}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="崩窝宽度"
-                            >{{moreInfo.width}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="岸高"
-                            >{{moreInfo.height}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="宽深比"
-                            >{{moreInfo.ratio}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="崩塌土方量"
-                            >{{moreInfo.volume}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="近岸冲刷"
-                            >无数据</el-descriptions-item
-                        >
-                        <el-descriptions-item label="坡陡"
-                            >{{moreInfo.steep}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="崩窝进口夹角"
-                            >{{moreInfo.angle}}</el-descriptions-item
-                        >
-                        <el-descriptions-item label="崩窝窝顶曲率"
-                            >{{moreInfo.curvature1}}</el-descriptions-item
-                        >
+                        <el-descriptions-item label="类别">{{ moreInfo.type }}</el-descriptions-item>
+                        <el-descriptions-item label="口门长度">{{ moreInfo.length }}</el-descriptions-item>
+                        <el-descriptions-item label="崩窝宽度">{{ moreInfo.width }}</el-descriptions-item>
+                        <el-descriptions-item label="岸高">{{ moreInfo.height }}</el-descriptions-item>
+                        <el-descriptions-item label="宽深比">{{ moreInfo.ratio }}</el-descriptions-item>
+                        <el-descriptions-item label="崩塌土方量">{{ moreInfo.volume }}</el-descriptions-item>
+                        <el-descriptions-item label="近岸冲刷">无数据</el-descriptions-item>
+                        <el-descriptions-item label="坡陡">{{ moreInfo.steep }}</el-descriptions-item>
+                        <el-descriptions-item label="崩窝进口夹角">{{ moreInfo.angle }}</el-descriptions-item>
+                        <el-descriptions-item label="崩窝窝顶曲率">{{ moreInfo.curvature1 }}</el-descriptions-item>
                     </el-descriptions>
                 </el-dialog>
             </template>
@@ -127,14 +67,15 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import axios from 'axios'
 import { number } from 'echarts'
 
 const loading = ref(false)
 const dialogTableVisible = ref(false)
 
-const historyList = ref([])
+let historyList = []
+const filteredList = ref([])
 
 const tableColWidthList = ref([0, 0, 0, 0])
 
@@ -167,11 +108,11 @@ function handleClick(index, row) {
     if (row.detail && row.detail != '') {
         emit('scrollToSeeMore', index)
     } else {
-        for(let key in moreInfo.value) {
+        for (let key in moreInfo.value) {
             // console.log(key, row[key])
-            if(row[key] && row[key] != '') {
+            if (row[key] && row[key] != '') {
                 // console.log(key, typeof(row[key]), Number.isFinite(row[key]))
-                if(Number.isFinite(row[key])) {
+                if (Number.isFinite(row[key])) {
                     // console.log(1, row[key])
                     moreInfo.value[key] = row[key].toFixed(2)
                 }
@@ -184,12 +125,33 @@ function handleClick(index, row) {
         dialogTableVisible.value = true
     }
 }
+function searchHandler() {
+    const searchText = searchInput.value.trim()
+    if (searchText == '') {
+        filteredList.value = historyList;
+        return
+    }
+    const filteredListTemp = historyList.filter(item => {
+        let keys = ['place', 'river', 'time', 'side']
+        for (let key of keys) {
+            if (item[key] && item[key] != '' && item[key].toString().includes(searchText)) {
+                return true
+            }
+        }
+        return false
+    })
+    filteredList.value = filteredListTemp
+}
+watch(searchInput, (newVal, oldVal) => {
+    if (newVal === '') filteredList.value = historyList;
+})
 
 onMounted(async () => {
     const requestInfo = await backendInstance.get('/data/historyInfo/desc/sort')
-    historyList.value = requestInfo.data
-    // console.log(historyList.value[0])
-    // console.log(requestInfo.data)
+    historyList = requestInfo.data
+    filteredList.value = requestInfo.data
+
+
     let vw = window.innerWidth / 100
     let vh = window.innerHeight / 100
     let tableWidth = 27 * vw
@@ -274,7 +236,7 @@ div.history-table-container {
         div.history-search-icon {
             height: 3.2vh;
             width: 3.2vh;
-
+            margin-left: 1vw;
             background-image: url('/search.png');
 
             background-size: contain;
@@ -309,9 +271,11 @@ div.history-table-container {
             transform: translateX(-50%);
 
             background-image: url('/three-dots.png');
+
             &.in-scroll {
                 background-image: url('/next.png');
             }
+
             background-size: contain;
             background-repeat: no-repeat;
             transition: all 0.4s cubic-bezier(0.68, -0.45, 0.265, 1.45);
@@ -322,7 +286,7 @@ div.history-table-container {
             }
         }
     }
-} 
+}
 
 :deep(.el-scrollbar__wrap) {
     scroll-behavior: smooth;
@@ -349,11 +313,13 @@ div.history-table-container {
     border-right: inset 2px #157acc;
     border-bottom: inset 4px #05a3ff;
     text-shadow: #4bb0f3 1px 1px;
+
     div.cell {
         text-align: center;
         height: 3vh;
         line-height: 3vh;
     }
+
     // box-shadow:
     //     rgba(46, 82, 240, 0.75) 1px 0px,
     //     rgba(46, 82, 240, 0.4) 2px 0px,
@@ -365,6 +331,7 @@ div.history-table-container {
         border-top-right-radius: 8px;
         border-bottom-right-radius: 8px;
     }
+
     &:first-child {
         width: 2vw;
         border-top-left-radius: 8px;
@@ -381,17 +348,18 @@ div.history-table-container {
     transition: all 0.6s cubic-bezier(0.68, -0.45, 0.265, 1.45);
     height: fit-content;
     border-radius: 4px;
+
     div.cell {
         text-align: center;
         height: fit-content;
         line-height: 2vh;
         font-size: calc(0.5vw + 0.3vh);
     }
-    box-shadow:
-        rgba(46, 82, 240, 0.75) 1px 0px,
-        rgba(46, 82, 240, 0.4) 2px 0px,
-        rgba(46, 82, 240, 0.2) 3px 0px,
-        rgba(46, 82, 240, 0.2) 4px 0px;
+
+    box-shadow: rgba(46, 82, 240, 0.75) 1px 0px,
+    rgba(46, 82, 240, 0.4) 2px 0px,
+    rgba(46, 82, 240, 0.2) 3px 0px,
+    rgba(46, 82, 240, 0.2) 4px 0px;
 }
 
 :deep(.el-table tbody tr:nth-child(2n)) {
@@ -446,6 +414,7 @@ div.history-table-container {
 
 :deep(.el-input__wrapper) {
     box-shadow: 0 0 0 1px #6442fa inset;
+
     &:hover {
         box-shadow: 0 0 0 2px #6442fa inset;
     }

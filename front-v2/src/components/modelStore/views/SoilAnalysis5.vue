@@ -27,17 +27,17 @@
                                     </div>
 
                                     <div class="table">
-                                        <div class="row">
+                                        <div class="row" :class="{ 'not-allow': !sectionInited }" @click="checkInited">
                                             <!-- <div class="cell" v-for="(item, index) in xzData" :key="index">{{
                                                 keepFloat2(item[0]) }}</div> -->
-                                            <input type="number" class="cell" v-for="(item, index) in xzData"
+                                            <input type="number" class="cell" v-for="( item, index ) in  xzData "
                                                 v-model="item[0]" :key="index">
                                         </div>
-                                        <div class="row">
+                                        <div class="row" :class="{ 'not-allow': !sectionInited }" @click="checkInited">
                                             <!-- <div class="cell" v-for="(item, index) in xzData" :key="index">{{
                                                 keepFloat2(item[1]) }}</div> -->
 
-                                            <input type="number" class="cell" v-for="(item, index) in xzData"
+                                            <input type="number" class="cell" v-for="( item, index ) in  xzData "
                                                 v-model="item[1]" :key="index">
                                         </div>
                                     </div>
@@ -49,7 +49,7 @@
                                     <div class="title2">土壤分层详情</div>
 
                                     <div class="content flex-row">
-                                        <div class="keyValue flex-row" v-for="i in 5">
+                                        <div class="keyValue flex-row" v-for=" i  in  5 ">
                                             <div class="key">{{ thicknessName[i - 1] }}</div>
                                             <!-- <div class="value">{{ keepFloat2(thicknessData[i - 1]) }}</div> -->
                                             <input type="number" class="value" :key="i" v-model="thicknessData[i - 1]">
@@ -132,7 +132,7 @@
         </div>
     </div>
 
-    <el-dialog v-model="mapInputVisible" title="地图选择" width="41.5vw" @opened="showSectionDraw = true">
+    <el-dialog v-model="mapInputVisible" title="地图绘制" width="41.5vw" @opened="showSectionDraw = true">
         <div class="main-content" v-if="showSectionDraw">
             <sectionDraw ref="sectionDrawRef" v-on:section-draw="sectionDrawHandler" v-on:dem-select="demSelectHandler"
                 :demResources="demResources">
@@ -176,6 +176,17 @@ const uploadJson = ref({})
 
 
 let chart = null
+let sectionInited = ref(false)
+const checkInited = () => {
+    if (sectionInited.value === false)
+        ElNotification({
+            position: 'top-left',
+            type: 'warning',
+            message: '请先进行断面信息录入！',
+            title: '警告',
+            offset: 130
+        })
+}
 
 const thicknessData = ref([1.93, -4.07, -11.57, -26.57, -36.57])
 const thicknessName = ['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5']
@@ -234,6 +245,7 @@ watch(uploadJson, async (newValue, oldValue) => {
     elevationOfFlow.value = result.flowElevation
     thicknessData.value = result.thicknessData
     xzData.value = result.pointData
+    sectionInited.value = true
     if (chart) {
         showSkeleton.value = false
         setTimeout(() => {
@@ -367,7 +379,7 @@ const sectionViewModelRun = async (param) => {
                 console.log('section json', sectionJson)
                 sectionViewMR.sectionJson = sectionJson
                 globalSectionJson = sectionJson
-
+                sectionInited.value = true
                 ModelRunningShow.value = false
                 ModelRunningMessage.value = ''
                 ElNotification({
@@ -412,7 +424,6 @@ let globalSectionJson = null
 
 const calSectionViewClickHandler = () => {
     mapInputVisible.value = true
-
     let sectionViewParams = {
         'dem-id': selectedDem.value,
         'section-geometry': sectionGeojson.value,
@@ -572,7 +583,7 @@ const drawChartFromMap = () => {
 
     thicknessData.value = thicknessdata.map((item) => Math.round(item * 1000) / 1000)
     xzData.value = xzdata.map((item) => [Math.round(item[0] * 1000) / 1000, Math.round(item[1] * 1000) / 1000])
-
+    sectionInited.value = true
     if (chart) {
         let option = chart.getBaseOption2(xzData.value, thicknessData.value)
         chart.myChart.setOption(option)
@@ -610,7 +621,7 @@ const mapFlyToRiver = (mapIns) => {
 }
 const attachBaseLayer = (map) => {
     console.log('attach base layer')
-    const tileServer =`http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
+    const tileServer = `http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
     map.addSource('mzsOverWaterSource', {
         type: 'vector',
         tiles: [
@@ -743,7 +754,6 @@ const attachBaseLayer = (map) => {
     })
 }
 const dataGenerate = (origin) => {
-    console.log('origin', origin)
     const lineData = []
     const lineDataStep = origin['step']
     const pointData = []
@@ -1025,6 +1035,14 @@ div.main-content {
                                         flex-direction: row;
                                         justify-content: space-between;
                                         align-items: center;
+
+                                        &.not-allow {
+                                            cursor: not-allowed;
+
+                                            input {
+                                                pointer-events: none;
+                                            }
+                                        }
 
                                     }
 

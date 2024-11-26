@@ -47,10 +47,10 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
     private IDataNodeRepo dataNodeRepo;
     private IModelNodeRepo modelNodeRepo;
     private IParamNodeRepo paramNodeRepo;
-    private final Map<String, String> numericModelNodeCollection;
     private final Map<String, String> numericParamNodeCollection;
     private final Map<String, String> riverBedEvolutionModelNodeCollection;
     private final Map<String, String> riverBedEvolutionParamNodeCollection;
+    private final Map<String, String> numericModelNodeCollection;
     private final Map<String, String> multipleIndicatorsModelNodeCollection;
     private final Map<String, String> multipleIndicatorsParamNodeCollection;
     private final Map<String, String> soilErosionModelCollection;

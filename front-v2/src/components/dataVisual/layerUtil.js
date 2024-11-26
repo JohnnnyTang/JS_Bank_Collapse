@@ -2365,6 +2365,7 @@ const layerAddFunctionMap = {
                 'icon-image': '水闸',
                 "icon-size": 0.2,
                 'icon-allow-overlap': true,
+                // 'icon-allow-overlap': false,
                 'icon-rotate': ['get', 'rotation_angle']
             },
             paint: {
@@ -2427,6 +2428,7 @@ const layerAddFunctionMap = {
                     'icon-image': '水闸',
                     "icon-size": 0.18,
                     'icon-allow-overlap': true,
+                    // 'icon-allow-overlap': false,
                     'icon-rotate': ['get', 'rotation_angle']
                 },
                 paint: {
@@ -2460,7 +2462,8 @@ const layerAddFunctionMap = {
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, 0.5],
                     'text-size': 18,
-                    'text-allow-overlap': true,
+                    // 'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                 },
                 paint: {
                     "text-color": "rgba(73, 83, 92,0.8)",
@@ -2626,6 +2629,7 @@ const layerAddFunctionMap = {
                         ['literal', 1.8],
                     ],
                     'icon-allow-overlap': true,
+                    // 'icon-allow-overlap': false,
                 },
                 paint: {
                 },
@@ -2655,7 +2659,8 @@ const layerAddFunctionMap = {
                     ],
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, -1.0],
-                    'text-allow-overlap': true,
+                    // 'text-allow-overlap': true,
+                    'text-allow-overlap': false,
                     'text-size': 21,
                 },
                 paint: {
@@ -2687,6 +2692,7 @@ const layerAddFunctionMap = {
                     'icon-image': '泵站',
                     'icon-size': 1.3,
                     'icon-allow-overlap': true,
+                    // 'icon-allow-overlap': false,
                 },
                 paint: {
                 },
@@ -2718,7 +2724,6 @@ const layerAddFunctionMap = {
                     'text-variable-anchor': ["top", "top-left", "top-right", "bottom-left", "bottom-right", "left", "right"],
                     'text-offset': [0, -1.0],
                     'text-allow-overlap': false,
-
                     'text-size': 16,
                 },
                 paint: {
@@ -3589,23 +3594,23 @@ const layerAddFunctionMap = {
     近年冲淤: async (map) => { },
 
     洲滩: async (map) => {
-        // !map.getSource('riverBeach') &&
-        //     map.addSource('riverBeach', {
-        //         type: 'vector',
-        //         tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
-        //     })
-        // !map.getLayer('洲滩') &&
-        //     map.addLayer({
-        //         id: '洲滩',
-        //         type: 'fill',
-        //         source: 'riverBeach',
-        //         'source-layer': 'default',
-        //         layout: {
-        //         },
-        //         paint: {
-        //             'fill-color': 'rgb(240, 239, 209)',
-        //         },
-        //     })
+        !map.getSource('riverBeach') &&
+            map.addSource('riverBeach', {
+                type: 'vector',
+                tiles: [tileServer + '/tile/vector/riverBeach/{x}/{y}/{z}'],
+            })
+        !map.getLayer('洲滩') &&
+            map.addLayer({
+                id: '洲滩',
+                type: 'fill',
+                source: 'riverBeach',
+                'source-layer': 'default',
+                layout: {
+                },
+                paint: {
+                    'fill-color': 'rgb(240, 239, 209)',
+                },
+            })
     },
     '洲滩-注记': async (map) => {
         !map.getSource('riverBeachCenter') &&
