@@ -197,7 +197,7 @@ const image1Key = ref()
 const image2Key = ref()
 
 const newBackendInstance = axios.create({
-    baseURL: '/model/'
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2
 })
 
 const colorMap = reactive(new Map())

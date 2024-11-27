@@ -21,13 +21,13 @@ const preActiveIndex = ref(-1)
 const navMenuList = ref([
     {
         name: '崩岸知识网络',
-        iconUrl: '/binary-data.png',
+        iconUrl: import.meta.env.BASE_URL + '/binary-data.png',
         path: '/knowledgeStore/graph',
         active: false,
     },
     {
         name: '历史崩岸列表',
-        iconUrl: '/history.png',
+        iconUrl: import.meta.env.BASE_URL + '/history.png',
         path: '/knowledgeStore/history',
         active: false,
     },

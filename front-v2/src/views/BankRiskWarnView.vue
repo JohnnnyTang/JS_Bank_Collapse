@@ -247,6 +247,10 @@ import bedFlowChartVue from '../components/bankRiskWarn/BedFlowChart.vue'
 import waterProcessChartVue from '../components/bankRiskWarn/WaterProcessChart.vue'
 import geologyAndProjectVue from '../components/bankRiskWarn/GeologyAndProject.vue'
 
+const axiosIns = axios.create({
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2,
+})
+
 const tileServer = `http://${window.location.host}${import.meta.env.VITE_MAP_TILE_SERVER}`
 const route = useRoute()
 
@@ -622,7 +626,7 @@ const runHydrodynamicModel = async () => {
     return new Promise(async (resolve, reject) => {
         let modelPostUrl = ''
         let modelParams = {}
-        modelPostUrl = '/model/taskNode/start/numeric/hydrodynamic'
+        modelPostUrl = '/taskNode/start/numeric/hydrodynamic'
         modelParams = {
             "water-qs": parseFloat(conditionConfigureData.flow),
             "tidal-level": parseFloat(conditionConfigureData.tideDif),
@@ -633,7 +637,7 @@ const runHydrodynamicModel = async () => {
         }
 
         try {
-            const TASK_ID = (await axios.post(modelPostUrl, modelParams)).data
+            const TASK_ID = (await axiosIns.post(modelPostUrl, modelParams)).data
             console.log('TASK_ID ', TASK_ID)
 
             if (TASK_ID === 'WRONG') {
@@ -642,13 +646,13 @@ const runHydrodynamicModel = async () => {
 
             let runningStatusInterval = (function loop() {
                 return setTimeout(async () => {
-                    let runningStatus = (await axios.get('/model/taskNode/status/id?taskId=' + TASK_ID)).data;
+                    let runningStatus = (await axiosIns.get('/taskNode/status/id?taskId=' + TASK_ID)).data;
 
                     if (runningStatus === 'LOCK' || runningStatus === 'UNLOCK' || runningStatus === 'RUNNING') {
                         console.log('runningStatus ', runningStatus);
                     }
                     else if (runningStatus === 'ERROR') {
-                        const url = `/model/taskNode/result/id?taskId=${TASK_ID}`;
+                        const url = `/taskNode/result/id?taskId=${TASK_ID}`;
                         axios.get(url).then(response => {
                             let errorLog = response.data['error-log'];
                             resolve(errorLog);
@@ -656,7 +660,7 @@ const runHydrodynamicModel = async () => {
                             console.warn(error);
                             reject(error);
                         });
-                        const errorLog = (await axios.get(url)).data['error-log'];
+                        const errorLog = (await axiosIns.get(url)).data['error-log'];
 
                         // clearTimeout(runningStatusInterval);
                         reject(new Error(errorLog));
@@ -665,7 +669,7 @@ const runHydrodynamicModel = async () => {
                         console.log('COMPLETE and Clear ');
                         // clearTimeout(runningStatusInterval);
 
-                        let runningResult = (await axios.get('/model/taskNode/result/id?taskId=' + TASK_ID)).data;
+                        let runningResult = (await axiosIns.get('/taskNode/result/id?taskId=' + TASK_ID)).data;
                         hydrodynamicCaseID = runningResult['case-id'];
                         hydrodynamicRunningResult = runningResult;
                         hydrodynamicCalcDone.value = true;
@@ -706,7 +710,7 @@ const hydrodynamicCalcDone = ref(false);
 const tidePointVelocityCalc = async (lng, lat) => {
     // modelRunnningStatusDesc
     const pointVelocityModelUrl =
-        '/model/taskNode/start/numeric/getFlowFieldVelocities'
+        import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/numeric/getFlowFieldVelocities'
     const params = {
         'case-id': hydrodynamicCaseID,
         // "case-id": '6c6496ca7c80adbbff129da890894990',
@@ -919,8 +923,8 @@ const flowControl = (showOrHide) => {
 
         timeStep.value = 0
 
-        let pngPrefix = `/model/data/bankResource/down/modelServer/resource/file/image?name=`
-        let visualizationJsonUrl = `/model/data/bankResource/down/modelServer/resource/file/json?name=${hydrodynamicRunningResult['visualization-description-json']}`
+        let pngPrefix = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/image?name=`
+        let visualizationJsonUrl = `${import.meta.env.VITE_MAP_TILE_SERVER2}/data/bankResource/down/modelServer/resource/file/json?name=${hydrodynamicRunningResult['visualization-description-json']}`
 
         floodFlow = reactive(new FlowFieldLayer(
             'floodFlow',

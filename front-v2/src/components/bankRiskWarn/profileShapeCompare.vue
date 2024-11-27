@@ -105,7 +105,7 @@ const inputValues = ref({
 });
 
 const newBackendInstance = axios.create({
-    baseURL: '/model/'
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2
 })
 
 const emit = defineEmits(['profileValueChange'])
@@ -326,7 +326,7 @@ const sectionViewModelRun = async (demid, sectionGeojson, successCallback, error
             'section-geometry': sectionGeojson,
         }
 
-        let sectionViewModelUrl = '/model/taskNode/start/riverbedEvolution/calculateSectionView'
+        let sectionViewModelUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/riverbedEvolution/calculateSectionView'
         const sectionViewMR = new ModelRunner(sectionViewModelUrl, param)
         const taskId = await sectionViewMR.modelStart().catch(() => {
             ElNotification({

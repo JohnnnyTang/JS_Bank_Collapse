@@ -20,10 +20,10 @@ import BankResourceHelper from '../modelStore/views/bankResourceHelper';
 //         { "type": "Feature", "properties": { "id": 11, "label": "MZ12沙尾" }, "geometry": { "type": "LineString", "coordinates": [[120.564634835598596, 32.024005776133073], [120.556805942576688, 31.997794491370112]] } }
 //     ]
 // }
-const BSTEMModelUrl = '/model/taskNode/start/erosionModel/calculateBSTEM'
-const RiskLevelModelUrl = '/model/taskNode/start/multipleIndicators/calculateRiskLevel'
-const modelStatusUrlPrefix = '/model/taskNode/status/id?taskId='
-const modelResultUrlPrefix = '/model/taskNode/result/id?taskId='
+const BSTEMModelUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/erosionModel/calculateBSTEM'
+const RiskLevelModelUrl = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/start/multipleIndicators/calculateRiskLevel'
+const modelStatusUrlPrefix = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/status/id?taskId='
+const modelResultUrlPrefix = import.meta.env.VITE_MAP_TILE_SERVER2 + '/taskNode/result/id?taskId='
 
 const ModelInfoMap = new Map()
 

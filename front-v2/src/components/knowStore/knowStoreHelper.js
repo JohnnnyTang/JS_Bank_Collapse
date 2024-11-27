@@ -15,7 +15,7 @@ export const MIME_TYPE = {
 }
 
 const knowAPI = axios.create({
-    baseURL: '/model/data/knowledge',
+    baseURL: import.meta.env.VITE_MAP_TILE_SERVER2 + '/data/knowledge',
     timeout: 5000
 })
 
