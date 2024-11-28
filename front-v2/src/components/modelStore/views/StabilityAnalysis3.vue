@@ -551,7 +551,8 @@ const modelRunnning = async (type) => {
     console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
 
     if (TASK_ID === 'WRONG') {
-      throw new Error()
+      showRunning.value = false
+      throw new Error("TASK_ID为WRONG")
     }
 
     modelRunnningStatusDesc.value = '运行中'
@@ -630,7 +631,7 @@ const modelRunnning = async (type) => {
     }, 500)
   } catch (error) {
     ElNotification({
-      title: '模型运行失败',
+      title: '模型运行失败，' + error.message,
       offset: 200,
       type: 'error',
     })
@@ -1014,14 +1015,15 @@ const updateRealtimeWaterCondition = async () => {
 }
 
 
+let tidePointWatcher = null
+let markLineWatcher = null
 
 onMounted(async () => {
   let map = await initFineMap(mapRef.value)
   mapStore.setMap(map)
   chartIns = echarts.init(tideLineChartDom.value)
 
-  let tidePointWatcher = null
-  let markLineWatcher = null
+
 
   tidePointWatcher = watch(() => hydrodynamicStore.showingOption, (newVal) => {
 

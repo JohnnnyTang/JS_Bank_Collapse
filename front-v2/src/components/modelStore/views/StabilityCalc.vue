@@ -646,11 +646,22 @@ const visulizationPrepare = async () => {
             ModelRunningMessage.value = ''
             ElNotification({
                 type: 'error',
-                title: '断面形态计算模型启动失败',
+                title: '水动力模型启动失败',
                 offset: 130
             })
         })
         const TASK_ID = response.data
+        if (TASK_ID === 'WRONG') {
+            ModelRunningShow.value = false
+            ModelRunningMessage.value = ''
+            ElNotification({
+                type: 'error',
+                title: '水动力模型启动失败',
+                offset: 130
+            })
+            throw new Error("TASK_ID is WRONG")
+        }
+
         // const TASK_ID = '1'
         console.log('TASK_ID ', TASK_ID) // 66a23664bec8e12b68c9ce86
         globleVariable.taskID = TASK_ID
@@ -840,7 +851,6 @@ const showFlowClickHandler = async (id) => {
 
 ///////////////////// router
 const jump2Model = (value) => {
-    console.log(value == '1')
     const routeMap = {
         1: '/modelStore/stabilityAnalysis',
         2: '/modelStore/stabilityCalc',

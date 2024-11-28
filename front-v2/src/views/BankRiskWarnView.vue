@@ -374,7 +374,8 @@ const RunningManSays = ref('')
 const conditionConfigureDataResetHandler = async () => {
     console.log(window.location.pathname)
 
-
+    if (showWaterPower.value === false)
+        showWaterPowerFunc()
     ///////////////////////  check  /////////////////////// 
 
     const nullCheck = (val) => {
@@ -550,11 +551,8 @@ const showWaterPowerFunc = async () => {
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
-    
-    timeStep.value = 0
-    // await flowControlHandler()
-    mapInstance.getLayer('mapRaster') && mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')        //TODO:??
 
+    timeStep.value = 0
     showWaterPower.value = !showWaterPower.value
 }
 
@@ -562,7 +560,7 @@ const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
-        conditionPannelShow.value = false
+        // conditionPannelShow.value = false
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
@@ -574,7 +572,7 @@ const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
-        conditionPannelShow.value = false
+        // conditionPannelShow.value = false
     } else if (showRiverBed.value === true) {
         showRiverBedFunc()
     }
