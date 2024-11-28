@@ -5,19 +5,21 @@
             <button class="condition-button" @click="editClickHandler()" :class="{ 'active': true }">编辑</button>
         </div>
         <div class="riskInfo-item profileShape">
+
             <div class="item-title">{{ selectedSection.label }}</div>
             <div class="profile-selector-container">
                 <el-select v-model="selectedSection" placeholder="选择断面" @change="sectionSelectHandler"
-                    style="width: 8vw; height: 3.5vh;" value-key="label">
+                    v-loading="sectionRequesting" style="width: 8vw; height: 3.5vh;" value-key="label">
                     <el-option v-for="(
                                   item, index
                               ) in sectionList" :key="index" :value="item" :label="item.label">
                     </el-option>
                 </el-select>
             </div>
+
             <div class="graph-container shape">
                 <div ref="shapeGraphRef" class="shape graph"></div>
-                <div v-if="calculating" v-loading="calculating" class="empty-graph"
+                <div v-if="calculating || emptyStatus" v-loading="calculating" class="empty-graph"
                     element-loading-background="rgba(255, 255, 255, 0.243)">
                     <span style="margin-top: 6vh;">{{ emptyMessage }}</span>
                 </div>
@@ -92,7 +94,7 @@ let bank = useBankNameStore().globalBankName
 
 const shapeGraphRef = ref(null)
 const editPannelShow = ref(false)
-
+const sectionRequesting = ref(true)
 
 
 const gaocha = ref('')
@@ -119,9 +121,8 @@ const props = defineProps({
 const endYear = ref('2023')
 const startYear = ref('2012')
 watch(() => props.nowDEMs, (newVal) => {
-    console.log("nowDEMs的值是:", newVal)
-    startYear.value = newVal[0].year
-    endYear.value = newVal[1].year
+    startYear.value = newVal[0] && newVal[0].year
+    endYear.value = newVal[1] && newVal[1].year
     // 换地形了，重新算
     sectionSelectHandler()
 })
@@ -131,6 +132,7 @@ watch(() => props.nowDEMs, (newVal) => {
 //////////////// 断面选择，调用模型，复用断面形态 /////////////////
 let chartIns = null
 const calculating = ref(false)
+const emptyStatus = ref(false)
 const emptyMessage = ref('正在提取断面形态，请稍后...')
 const sectionList = ref([])
 const selectedSection = ref({})
@@ -158,9 +160,19 @@ const sectionSelectHandler = async () => {
     const dem2 = props.nowDEMs[1]
     const sectionGeojson = selectedSection.value
 
+    console.log(dem1, dem2)
+    if (!(dem1 && dem2)) {
+        emptyStatus.value = true
+        emptyMessage.value = '请配置地形条件'
+        return
+    }
+    emptyStatus.value = false
+    emptyMessage.value = '正在提取断面形态，请稍后...'
+
+
+
     calculating.value = true
 
-    console.log(sectionGeojson)
 
     let data = null;
 
@@ -170,19 +182,16 @@ const sectionSelectHandler = async () => {
 
     // } else {
     data = await calculatTwoSectionView(dem1, dem2, sectionGeojson)
-    //     console.log("计算的结果是:", data)
-    //     if (data)
-    //         sectionStore.sectionDataCache.set(selectedSection.value.label, data)
-    // }
-
-
-
 
     calculating.value = false
-
     const option = genChartOption(data.sec1, data.sec2)
     chartIns.resize()
     chartIns.setOption(option)
+
+
+
+
+
 
 
 
@@ -264,13 +273,18 @@ const getSectionData = async () => {
         const data = response.data;
         console.log("获取断面数据的是:", selectedLabel.value)
         const textItem = data.find(item => item.name === selectedLabel.value);
-        gaocha.value = textItem.text.gaocha;
-        pobi.value = textItem.text.pobi;
-        speed.value = textItem.text.speed;
-        inputValues.value.gaocha = textItem.text.gaocha;
-        inputValues.value.pobi = textItem.text.pobi;
-        inputValues.value.speed = textItem.text.speed;
-        console.log("获取的断面流速是:", inputValues.value.speed)
+        if (textItem) {
+            gaocha.value = textItem.text.gaocha;
+            pobi.value = textItem.text.pobi;
+            speed.value = textItem.text.speed;
+            inputValues.value.gaocha = textItem.text.gaocha;
+            inputValues.value.pobi = textItem.text.pobi;
+            inputValues.value.speed = textItem.text.speed;
+        } else {
+            gaocha.value = '';
+            pobi.value = '';
+            speed.value = '';
+        }
     } catch (error) {
         console.error('获取地质结构描述失败:', error);
         // ElMessage.error('获取地质结构描述失败');
@@ -282,6 +296,8 @@ onMounted(async () => {
 
     // 获取断面列表, 设置初始断面
     await initSectionList()
+
+    sectionRequesting.value = false
 
     // 获取初始断面的下面几行文本
     await getSectionData()

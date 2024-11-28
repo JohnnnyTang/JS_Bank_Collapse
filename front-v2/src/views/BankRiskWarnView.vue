@@ -41,9 +41,9 @@
             </div>
         </div>
         <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <div class="raster-control-block" v-if="showControls && showRasterControl">
+        <div class="raster-control-block" v-if="showControls">
             <label class="switch">
-                <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
+                <input type="checkbox" :checked="showRaster" @click.prevent="RasterControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -53,7 +53,7 @@
 
         <div class="bankLine-control-block" v-if="showControls">
             <label class="switch">
-                <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
+                <input type="checkbox" :checked="showBankLine" @click.prevent="BankLineControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -63,7 +63,7 @@
 
         <div class="terrain-control-block" v-if="showControls">
             <label class="switch">
-                <input type="checkbox" :checked="showTerrain" @click="TerrainControlHandler()" />
+                <input type="checkbox" :checked="showTerrain" @click.prevent="TerrainControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -506,42 +506,41 @@ let defaultWarnLayerData = defaultWarnLayerDataInput
 
 
 const RasterControlHandler = () => {
-    if (showRaster.value && showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-        showRaster.value = false
-    } else if (!showRaster.value && showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
-        showRaster.value = true
-    } else if (showRaster.value && !showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-        showRaster.value = false
-    } else {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-    }
+    setTimeout(() => {
+        if (showRaster.value) {
+            mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
+        } else {
+            mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
+        }
+        showRaster.value = !showRaster.value
+    }, 1)
 
 }
 
 const BankLineControlHandler = () => {
-    if (showBankLine.value) {
-        mapInstance.setLayoutProperty('岸段预警', 'visibility', 'none')
-    } else {
-        mapInstance.setLayoutProperty('岸段预警', 'visibility', 'visible')
-    }
-    showBankLine.value = !showBankLine.value
+    setTimeout(() => {
+        if (showBankLine.value) {
+            mapInstance.setLayoutProperty('岸段预警', 'visibility', 'none')
+        } else {
+            mapInstance.setLayoutProperty('岸段预警', 'visibility', 'visible')
+        }
+        showBankLine.value = !showBankLine.value
+    }, 1);
 }
 
 const TerrainControlHandler = () => {
-    showTerrain.value
-        ? mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'none')
-        : mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'visible')
-    showTerrain.value = !showTerrain.value
+    setTimeout(() => {
+        showTerrain.value
+            ? mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+            : mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'visible')
+        showTerrain.value = !showTerrain.value
+    }, 1);
 }
 
 
 
 
 
-const showRasterControl = ref(false)
 const showControls = ref(false)
 
 const showWaterPower = ref(false)
@@ -568,10 +567,6 @@ const showRiverBedFunc = () => {
     }
 
     showRiverBed.value = !showRiverBed.value
-    if (showControls.value === true) {
-        RasterControlHandler()
-    }
-    showRasterControl.value = !showRasterControl.value
 }
 
 const showGeologyAndProject = ref(false)
@@ -1203,58 +1198,62 @@ onMounted(async () => {
                 map.setLayoutProperty('mapRaster', 'visibility', 'none')
                 map.addLayer(new TerrainLayer(14))
                 map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
-                const chaoWeiPoint = {
-                    type: 'FeatureCollection',
-                    features: [
-                        {
-                            type: 'Feature',
-                            properties: {
-                                label: '潮位点',
-                            },
-                            geometry: {
-                                type: 'Point',
-                                coordinates: tideLevelPointPos.value,
-                            },
-                        },
-                    ],
-                }
-                map.addSource('chaoWeiPoint', {
-                    type: 'geojson',
-                    data: chaoWeiPoint,
-                })
-                map.addLayer({
-                    id: 'chaoWeiPoint',
-                    type: 'circle',
-                    source: 'chaoWeiPoint',
-                    paint: {
-                        'circle-radius': 7,
-                        'circle-color': 'rgb(255, 0,0)',
-                    },
-                })
-                map.addLayer(
-                    {
-                        id: 'chaoWeiPointLable',
-                        type: 'symbol',
-                        source: 'chaoWeiPoint',
-                        layout: {
-                            'text-field': ['get', 'label'],
-                            'text-font': [
-                                'Open Sans Semibold',
-                                'Arial Unicode MS Bold',
-                            ],
-                            'text-anchor': 'top',
-                            'text-offset': [0.0, 0.5],
-                            'text-size': 18,
-                            'text-allow-overlap': true,
-                        },
-                        paint: {
-                            'text-color': 'rgb(255,255,255)',
-                        },
-                    },
-                    'chaoWeiPoint',
-                )
+                addTideLevelPoint()
+
+                // const chaoWeiPoint = {
+                //     type: 'FeatureCollection',
+                //     features: [
+                //         {
+                //             type: 'Feature',
+                //             properties: {
+                //                 label: '潮位点',
+                //             },
+                //             geometry: {
+                //                 type: 'Point',
+                //                 coordinates: tideLevelPointPos.value,
+                //             },
+                //         },
+                //     ],
+                // }
+                // map.addSource('chaoWeiPoint', {
+                //     type: 'geojson',
+                //     data: chaoWeiPoint,
+                // })
+                // map.addLayer({
+                //     id: 'chaoWeiPoint',
+                //     type: 'circle',
+                //     source: 'chaoWeiPoint',
+                //     paint: {
+                //         'circle-radius': 7,
+                //         'circle-color': 'rgb(255, 0,0)',
+                //     },
+                // })
+                // map.addLayer(
+                //     {
+                //         id: 'chaoWeiPointLable',
+                //         type: 'symbol',
+                //         source: 'chaoWeiPoint',
+                //         layout: {
+                //             'text-field': ['get', 'label'],
+                //             'text-font': [
+                //                 'Open Sans Semibold',
+                //                 'Arial Unicode MS Bold',
+                //             ],
+                //             'text-anchor': 'top',
+                //             'text-offset': [0.0, 0.5],
+                //             'text-size': 18,
+                //             'text-allow-overlap': true,
+                //         },
+                //         paint: {
+                //             'text-color': 'rgb(255,255,255)',
+                //         },
+                //     },
+                //     'chaoWeiPoint',
+                // )
 
 
+                //////////////////// 潮位点还是默认加上，不然其他地方要加好多判断  20241128
+ 
                 //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
                 bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
                 map.addLayer(bankWarnLayer, 'chaoWeiPoint')
