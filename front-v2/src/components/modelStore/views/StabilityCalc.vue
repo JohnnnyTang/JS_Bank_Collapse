@@ -630,7 +630,8 @@ const visulizationPrepare = async () => {
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
-            segment: 'Mzs', // 后端纹理资源生产有问题，这里用Mzs的资源  2024-11-25
+            // segment: 'Mzs', // 后端纹理资源生产有问题，这里用Mzs的资源  2024-11-25
+            segment: selectedBank.bankEnName,
             set: 'standard',
             year: '2023',
         }
@@ -757,11 +758,24 @@ const flowLayerControl = (type, show) => {
         lagrange: {
             add: () => {
                 console.log('add lagrenge')
-                let flow = new FlowFieldLayer(
+
+                let flow = reactive(new FlowFieldLayer(
                     globleVariable.lagrangeLayer,
                     globleVariable.visualizationJsonUrl,
                     globleVariable.pngPrefix,
-                )
+                    false,
+                    () => {
+                        ElNotification({
+                            title: '警告',
+                            message: '流场可视化数据正在生产中，请稍后尝试',
+                            type: 'warning',
+                            offset: 300,
+                        })
+                        showFlow.value = 0
+                        flowLayerControl('lagrange', false)
+                    }
+                ))
+
                 mapStore.getMap().addLayer(flow, 'mzsLabel')
             },
             remove: () => {

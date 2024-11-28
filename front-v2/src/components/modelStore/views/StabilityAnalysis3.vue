@@ -652,7 +652,22 @@ const flowLayerControl = (type, show) => {
         console.log('add lagrenge')
         flowWatcher && flowWatcher() // rm watcher
 
-        let flow = reactive(new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix))
+        let flow = reactive(
+          new FlowFieldLayer(globleVariable.lagrangeLayer,
+            globleVariable.visualizationJsonUrl,
+            globleVariable.pngPrefix,
+            false,
+            () => {
+              ElNotification({
+                title: '警告',
+                message: '流场可视化数据正在生产中，请稍后尝试',
+                type: 'warning',
+                offset: 300,
+              })
+              showFlow.value = 0
+              flowLayerControl('lagrange', false)
+            })
+        )
         flowWatcher = watch(() => flow.stepProgressRate, (newVal) => {
           hydrodynamicStore.flowFieldCurrentTimeStep = newVal
         })
@@ -1036,6 +1051,7 @@ onUnmounted(() => {
     useMapStore().getMap().remove()
     useMapStore().destroyMap()
   }
+  markLineWatcher && markLineWatcher()
 })
 
 </script>

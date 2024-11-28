@@ -217,9 +217,9 @@
 
 <script setup>
 import {
-    onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw,
+    onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw, nextTick
 } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate, onBeforeRouteLeave } from 'vue-router'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { addBankLayer, initPureScratchMap, refreshMap } from '../utils/mapUtils'
@@ -367,13 +367,12 @@ const realtimeConditionHandler = async () => {
 }
 
 
+
 let bankWarnLayer = null
 const isRunningMan = ref(false)
 const RunningManSays = ref('')
 const conditionConfigureDataResetHandler = async () => {
     console.log(window.location.pathname)
-    //// debug ////
-
 
 
     ///////////////////////  check  /////////////////////// 
@@ -387,7 +386,7 @@ const conditionConfigureDataResetHandler = async () => {
         if (!nullCheck(conditionConfigureData[key])) {
             ElMessage({
                 type: 'error',
-                offset: 120,
+                offset: 260,
                 message: '请正确配置条件！'
             })
             return
@@ -401,6 +400,19 @@ const conditionConfigureDataResetHandler = async () => {
         })
         return
     }
+
+    const benchID = conditionConfigureData.refDEM.path
+    const refID = conditionConfigureData.benchDEM.path
+    if (benchID === refID) {
+        ElMessage({
+            type: "error",
+            message: "冲淤起算地形与判别计算地形不能相同！",
+            offset: 260
+        })
+        return;
+    }
+
+
     isRunningMan.value = true
     RunningManSays.value = '模型正在运行，请稍候...'
     console.log('reset condition data!', conditionConfigureData)
@@ -441,7 +453,7 @@ const conditionConfigureDataResetHandler = async () => {
         ///////////////////// result ////////////////////////
         // 更新风险条带
         BankResourceHelper.getBankSectionGeometry(useBankNameStore().globalBankName, "short").then(res => {
-            
+
             const shortSectionFeatures = res.data
             const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result, shortSectionFeatures)
 
@@ -626,8 +638,8 @@ const runHydrodynamicModel = async () => {
         modelParams = {
             "water-qs": parseFloat(conditionConfigureData.flow),
             "tidal-level": parseFloat(conditionConfigureData.tideDif),
-            // "segment": useBankNameStore().globalBankName,
-            segment: 'Mzs', // 后端流场纹理资源生产有问题，这里用Mzs的资源  2024-11-25
+            "segment": useBankNameStore().globalBankName,
+            // segment: 'Mzs', // 后端流场纹理资源生产有问题，这里用Mzs的资源  2024-11-25
             "set": "standard",
             "year": "2023",
         }
@@ -964,12 +976,12 @@ const flowControl = (showOrHide) => {
     }
 }
 
-
 const flowControlHandler = async () => {
     if (hydrodynamicCaseID != '' && hydrodynamicRunningResult['visualization-description-json']) {
-        showFlow.value = !showFlow.value
-        flowControl(showFlow.value)
-
+        setTimeout(() => {
+            showFlow.value = !showFlow.value
+            flowControl(showFlow.value)
+        }, 1);
     } else {
         ElNotification({
             title: '警告',
@@ -998,12 +1010,29 @@ const flowControlHandler = async () => {
 
 
 
-
+onBeforeRouteLeave((to, from, next) => {
+    console.log('router leave')
+    if (isRunningMan.value) {
+        // 点击标题栏后，GlobalBankName会更改
+        // 保持GlobalBankName稳定 
+        useBankNameStore().globalBankName = from.params.id
+        next(false)
+        ElMessage.warning({
+            message: '请等待当前任务完成，请稍后...',
+            offset: 80,
+        })
+        return
+    }
+    next(true)
+})
 
 
 onBeforeRouteUpdate(async (to, from, next) => {
-
+    console.log('router update')
     if (isRunningMan.value) {
+        // 点击标题栏后，GlobalBankName会更改
+        // 保持GlobalBankName稳定 
+        useBankNameStore().globalBankName = from.params.id
         next(false)
         ElMessage.warning({
             message: '请等待当前任务完成，请稍后...',
