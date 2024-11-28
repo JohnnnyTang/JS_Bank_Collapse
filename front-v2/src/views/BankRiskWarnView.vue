@@ -550,7 +550,7 @@ const showWaterPowerFunc = async () => {
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
-
+    
     timeStep.value = 0
     // await flowControlHandler()
     mapInstance.getLayer('mapRaster') && mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')        //TODO:??
@@ -562,6 +562,7 @@ const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
+        conditionPannelShow.value = false
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
@@ -573,6 +574,7 @@ const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
+        conditionPannelShow.value = false
     } else if (showRiverBed.value === true) {
         showRiverBedFunc()
     }
@@ -1092,7 +1094,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
         mapFlyToMzs(map)
 
         addBankLayer(map, bank).then(() => {
-            //////////////////// 添加，民主沙特有的栅格图层、地形图层、潮位点图层，前两者不展示
+            //////////////////// 添加，民主沙特有的栅格图层、地形图层，前两者不展示
             addRasterLayer(map, 23032209, 'mapRaster')
             map.setLayoutProperty('mapRaster', 'visibility', 'none')
             map.addLayer(new TerrainLayer(14))
@@ -1125,7 +1127,8 @@ onBeforeRouteUpdate(async (to, from, next) => {
         mapFlyToRiver(map)
 
         addBankLayer(map, bank).then(() => {
-
+            //////////////////// 潮位点加上  20241128
+            addTideLevelPoint()
             //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer)
@@ -1198,7 +1201,7 @@ onMounted(async () => {
                 map.setLayoutProperty('mapRaster', 'visibility', 'none')
                 map.addLayer(new TerrainLayer(14))
                 map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
-                addTideLevelPoint()
+
 
                 // const chaoWeiPoint = {
                 //     type: 'FeatureCollection',
@@ -1252,8 +1255,8 @@ onMounted(async () => {
                 // )
 
 
-                //////////////////// 潮位点还是默认加上，不然其他地方要加好多判断  20241128
- 
+                //////////////////// 潮位点加上  20241128
+                addTideLevelPoint()
                 //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
                 bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
                 map.addLayer(bankWarnLayer, 'chaoWeiPoint')
@@ -1283,7 +1286,8 @@ onMounted(async () => {
             refreshMap(map)
 
             addBankLayer(map, bk).then(() => {
-
+                //////////////////// 潮位点加上  20241128
+                addTideLevelPoint()
                 //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
                 map.getLayer('岸段预警') && map.removeLayer('岸段预警')
                 bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)

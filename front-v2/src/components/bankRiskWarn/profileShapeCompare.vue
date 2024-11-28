@@ -315,7 +315,7 @@ onMounted(async () => {
 ////////////////////// HELPERS //////////
 const calculatTwoSectionView = async (dem1, dem2, sectionGeojson) => {
     if (!(dem1 && dem2 && sectionGeojson)) return null
-
+    console.log(dem1, dem2, sectionGeojson)
     return new Promise(async (resolve, reject) => {
 
         const result1 = await sectionViewModelRun(dem1.path, sectionGeojson).catch(reject)
