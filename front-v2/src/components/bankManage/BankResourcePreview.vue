@@ -572,18 +572,6 @@ onMounted(async () => {
     const _thisBankEnName = route.params.id
     await initOneBank(_thisBankEnName)
 
-    window.addEventListener('keydown', E => {
-        if (E.key === 'e') {
-            // BankResourceHelper.getBankSectionGeometry(bank.bankEnName, "short").then(res => {
-            //     console.log(res.data)
-            // })
-            ElMessage.success({
-                'offset': 100,
-                'message': 'e键按下'
-            })
-        }
-    })
-
     // for refresh
     watch(() => resourceStore.resourceInfo, (newVal, oldVal) => {
         // do refresh

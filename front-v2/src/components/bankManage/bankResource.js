@@ -777,12 +777,12 @@ export const uploadDescriptionMap = {
         'Vector': '请上传打包为ZIP的<em>ESRI Shapefile文件</em>，文件内容应至少包含shp，dbf，shx等文件'
     },
     'device': {
-        'GNSS': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
-        'MENOMETER': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
-        'STRESS': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
-        'INCLINE': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
-        'VEDIO': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段',
-        'OTHER': '请上传<em>设备配置JSON文件</em>，包含bank,aspect,deviceId,deviceName,type,longitude,latitude,elevation字段'
+        'GNSS': '请上传<em>设备配置JSON文件</em>',
+        'MENOMETER': '请上传<em>设备配置JSON文件</em>',
+        'STRESS': '请上传<em>设备配置JSON文件</em>',
+        'INCLINE': '请上传<em>设备配置JSON文件</em>',
+        'VEDIO': '请上传<em>设备配置JSON文件</em>',
+        'OTHER': '请上传<em>设备配置JSON文件</em>'
     }
 }
 

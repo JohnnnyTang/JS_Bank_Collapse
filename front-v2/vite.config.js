@@ -27,8 +27,9 @@ export default defineConfig({
         port: 5174,
         proxy: {
             '/api': {
-                target: 'http://172.21.213.243:8989/api/v1',
-                // target: 'http://172.21.212.166:8989/api/v1',
+                // target: 'http://localhost:8989/api/v1',
+                target: 'http://223.2.47.202:8989/api/v1',
+                // target: 'http://172.21.213.243:8989/api/v1',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
@@ -42,8 +43,9 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/device/, ''),
             },
-            '/api2': {
-                // target: 'http://172.21.212.166:8989/api/v2',
+            '/model/': {
+                target: 'http://223.2.47.202:8989/api/v2',
+                // target: 'http://172.21.213.243:8989/api/v2',
                 // target: 'http://localhost:8989/api/v2',
                 target: 'http://172.21.213.243:8989/api/v2',
                 changeOrigin: true,
