@@ -183,11 +183,21 @@ const handleFileUpload = (file) => {
             fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
 
 
+        // addon in 2024 11 29
+        fileInfo['year'] = fileInfo['year'] || '2024'
+        fileInfo['month'] = fileInfo['month'] || '10'
+        fileInfo['set'] = fileInfo['set'] || 'standard'
+        fileInfo['description'] = fileInfo['description'] || ''
+
+
+
         ///// build form data
         formData = new FormData()
         formData.append('file', file.file)
         formData.append('info', JSON.stringify(fileInfo))
 
+
+        console.log(fileInfo)
 
         /// http request
         if (props.subType == 'Section') {
