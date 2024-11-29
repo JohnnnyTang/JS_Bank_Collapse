@@ -73,7 +73,8 @@ flowData:
   texturePath: E:/Data/bankProjectData/flowData/flowFieldResourceArchive/
 
 modelServer:
-  url: http://172.21.212.166:8000
+#  url: http://172.21.212.131:8000
+  url: http://223.2.47.202:8000
   storageLimit: 50
   caseLimit: 50
 

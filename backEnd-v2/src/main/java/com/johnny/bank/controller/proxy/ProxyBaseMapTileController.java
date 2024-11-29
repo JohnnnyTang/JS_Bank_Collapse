@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/proxy")
 public class ProxyBaseMapTileController {
-    private String targetAddr = "http://172.21.212.166:3000";
+    private String targetAddr = "http://localhost:3000";
 
     /**
      * 代理所有请求
