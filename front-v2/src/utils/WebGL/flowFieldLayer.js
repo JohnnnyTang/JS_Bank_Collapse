@@ -118,6 +118,10 @@ export default class FlowFieldLayer {
 
     stepProgressRate = 0.0
 
+    axiosIns = axios.create({
+        baseURL: import.meta.env.BASE_URL
+    })
+
     constructor(layerID, jsonUrl, resourcePrefix, hideGUI = false, errcallback = null) {
         this.id = layerID;
         this.type = 'custom';
