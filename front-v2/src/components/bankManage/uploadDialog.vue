@@ -184,8 +184,8 @@ const handleFileUpload = (file) => {
 
 
         // addon in 2024 11 29
-        fileInfo['year'] = fileInfo['year'] || '2024'
-        fileInfo['month'] = fileInfo['month'] || '10'
+        fileInfo['year'] = fileInfo['year'] || '2023'
+        fileInfo['month'] = fileInfo['month'] || '04'
         fileInfo['set'] = fileInfo['set'] || 'standard'
         fileInfo['description'] = fileInfo['description'] || ''
 
