@@ -57,7 +57,7 @@ const handleOGMSKeyDown = (event) => {
     let result = window.confirm("确认删除所有模型CASE吗？");
     if (result) {
       // performAction();
-      axios.delete('/model/taskNode/delete/all').then(res => {
+      axios.delete(import.meta.env.VITE_APP_BACK_ADDRESS + '/taskNode/delete/all').then(res => {
         console.log(res.data)
       }).catch(e => {
         console.log(e)
