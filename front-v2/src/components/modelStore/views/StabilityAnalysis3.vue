@@ -551,7 +551,8 @@ const modelRunnning = async (type) => {
     console.log('TASK_ID ', TASK_ID)// 66a23664bec8e12b68c9ce86
 
     if (TASK_ID === 'WRONG') {
-      throw new Error()
+      showRunning.value = false
+      throw new Error("TASK_ID为WRONG")
     }
 
     modelRunnningStatusDesc.value = '运行中'
@@ -630,7 +631,7 @@ const modelRunnning = async (type) => {
     }, 500)
   } catch (error) {
     ElNotification({
-      title: '模型运行失败',
+      title: '模型运行失败，' + error.message,
       offset: 200,
       type: 'error',
     })
@@ -652,7 +653,22 @@ const flowLayerControl = (type, show) => {
         console.log('add lagrenge')
         flowWatcher && flowWatcher() // rm watcher
 
-        let flow = reactive(new FlowFieldLayer(globleVariable.lagrangeLayer, globleVariable.visualizationJsonUrl, globleVariable.pngPrefix))
+        let flow = reactive(
+          new FlowFieldLayer(globleVariable.lagrangeLayer,
+            globleVariable.visualizationJsonUrl,
+            globleVariable.pngPrefix,
+            false,
+            () => {
+              ElNotification({
+                title: '警告',
+                message: '流场可视化数据正在生产中，请稍后尝试',
+                type: 'warning',
+                offset: 300,
+              })
+              showFlow.value = 0
+              flowLayerControl('lagrange', false)
+            })
+        )
         flowWatcher = watch(() => flow.stepProgressRate, (newVal) => {
           hydrodynamicStore.flowFieldCurrentTimeStep = newVal
         })
@@ -999,14 +1015,15 @@ const updateRealtimeWaterCondition = async () => {
 }
 
 
+let tidePointWatcher = null
+let markLineWatcher = null
 
 onMounted(async () => {
   let map = await initFineMap(mapRef.value)
   mapStore.setMap(map)
   chartIns = echarts.init(tideLineChartDom.value)
 
-  let tidePointWatcher = null
-  let markLineWatcher = null
+
 
   tidePointWatcher = watch(() => hydrodynamicStore.showingOption, (newVal) => {
 
@@ -1036,6 +1053,7 @@ onUnmounted(() => {
     useMapStore().getMap().remove()
     useMapStore().destroyMap()
   }
+  markLineWatcher && markLineWatcher()
 })
 
 </script>

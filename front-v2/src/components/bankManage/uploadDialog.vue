@@ -79,7 +79,7 @@ const resourceStore = useResourceStore()
 
 watch(() => props.attachInfo, (val, oldVal) => {
     console.log('attachInfo changed', val)
-    if(val.configRadioValue) { //从配置列表中的占位行点击了上传
+    if (val.configRadioValue) { //从配置列表中的占位行点击了上传
         dialogInfo.value[props.type][props.subType][1].value = val.configRadioValue
     }
 })
@@ -183,11 +183,21 @@ const handleFileUpload = (file) => {
             fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
 
 
+        // addon in 2024 11 29
+        fileInfo['year'] = fileInfo['year'] || '2024'
+        fileInfo['month'] = fileInfo['month'] || '10'
+        fileInfo['set'] = fileInfo['set'] || 'standard'
+        fileInfo['description'] = fileInfo['description'] || ''
+
+
+
         ///// build form data
         formData = new FormData()
         formData.append('file', file.file)
         formData.append('info', JSON.stringify(fileInfo))
 
+
+        console.log(fileInfo)
 
         /// http request
         if (props.subType == 'Section') {
@@ -318,7 +328,8 @@ const parseInfoFromArray = (arr) => {
     let boundaryPath
     if (props.subType === 'Hydrodynamic') {
         try {
-            boundaryPath = resourceStore.resourceInfo['模型资源管理'][2]["resourceList"][0]["path"]
+            console.log(resourceStore.resourceInfo['模型资源管理'][1]["resourceList"][2]["path"])
+            boundaryPath = resourceStore.resourceInfo['模型资源管理'][1]["resourceList"][2]["path"]
         } catch (e) {
             ElMessage.error('请先上传岸段边界矢量文件!')
             return false

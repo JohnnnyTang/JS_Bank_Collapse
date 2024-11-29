@@ -630,7 +630,8 @@ const visulizationPrepare = async () => {
         modelParams = {
             'water-qs': params.flow,
             'tidal-level': params.tideType,
-            segment: 'Mzs', // 后端纹理资源生产有问题，这里用Mzs的资源  2024-11-25
+            // segment: 'Mzs', // 后端纹理资源生产有问题，这里用Mzs的资源  2024-11-25
+            segment: selectedBank.bankEnName,
             set: 'standard',
             year: '2023',
         }
@@ -645,11 +646,22 @@ const visulizationPrepare = async () => {
             ModelRunningMessage.value = ''
             ElNotification({
                 type: 'error',
-                title: '断面形态计算模型启动失败',
+                title: '水动力模型启动失败',
                 offset: 130
             })
         })
         const TASK_ID = response.data
+        if (TASK_ID === 'WRONG') {
+            ModelRunningShow.value = false
+            ModelRunningMessage.value = ''
+            ElNotification({
+                type: 'error',
+                title: '水动力模型启动失败',
+                offset: 130
+            })
+            throw new Error("TASK_ID is WRONG")
+        }
+
         // const TASK_ID = '1'
         console.log('TASK_ID ', TASK_ID) // 66a23664bec8e12b68c9ce86
         globleVariable.taskID = TASK_ID
@@ -757,11 +769,24 @@ const flowLayerControl = (type, show) => {
         lagrange: {
             add: () => {
                 console.log('add lagrenge')
-                let flow = new FlowFieldLayer(
+
+                let flow = reactive(new FlowFieldLayer(
                     globleVariable.lagrangeLayer,
                     globleVariable.visualizationJsonUrl,
                     globleVariable.pngPrefix,
-                )
+                    false,
+                    () => {
+                        ElNotification({
+                            title: '警告',
+                            message: '流场可视化数据正在生产中，请稍后尝试',
+                            type: 'warning',
+                            offset: 300,
+                        })
+                        showFlow.value = 0
+                        flowLayerControl('lagrange', false)
+                    }
+                ))
+
                 mapStore.getMap().addLayer(flow, 'mzsLabel')
             },
             remove: () => {
@@ -826,7 +851,6 @@ const showFlowClickHandler = async (id) => {
 
 ///////////////////// router
 const jump2Model = (value) => {
-    console.log(value == '1')
     const routeMap = {
         1: '/modelStore/stabilityAnalysis',
         2: '/modelStore/stabilityCalc',

@@ -600,7 +600,12 @@ const preccessing = {
 
         confList.findIndex(item => item.name == 'boundary') > -1 && confList.splice(confList.findIndex(item => item.name == "岸段边界文件"), 1)
         confList.findIndex(item => item.name == 'template') > -1 && confList.splice(confList.findIndex(item => item.name == "权重阈值参数"), 1)
-        confList.findIndex(item => item.name == 'PQ') > -1 && confList.splice(confList.findIndex(item => item.name == "造床流量系数"), 1)
+        // confList.findIndex(item => item.name == 'PQ') > -1 && confList.splice(confList.findIndex(item => item.name == "造床流量系数"), 1)
+        if ((confList.findIndex(item => item.name == 'PQ') > -1) || (confList.findIndex(item => item.name == 'pq') > -1)) {
+            confList.splice(confList.findIndex(item => item.name == "造床流量系数"), 1)
+        }
+
+
 
         confList.map(item => {
             if (item.name in Object.keys(actualName)) item.name = actualName[item.name]
