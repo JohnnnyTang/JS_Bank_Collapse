@@ -41,9 +41,9 @@
             </div>
         </div>
         <!-- //////////////////////////////////////////////////////////////////////////////////////////////// -->
-        <div class="raster-control-block" v-if="showControls && showRasterControl">
+        <div class="raster-control-block" v-if="showControls">
             <label class="switch">
-                <input type="checkbox" :checked="showRaster" @click="RasterControlHandler()" />
+                <input type="checkbox" :checked="showRaster" @click.prevent="RasterControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -53,7 +53,7 @@
 
         <div class="bankLine-control-block" v-if="showControls">
             <label class="switch">
-                <input type="checkbox" :checked="showBankLine" @click="BankLineControlHandler()" />
+                <input type="checkbox" :checked="showBankLine" @click.prevent="BankLineControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -63,7 +63,7 @@
 
         <div class="terrain-control-block" v-if="showControls">
             <label class="switch">
-                <input type="checkbox" :checked="showTerrain" @click="TerrainControlHandler()" />
+                <input type="checkbox" :checked="showTerrain" @click.prevent="TerrainControlHandler()" />
                 <span class="slider"></span>
             </label>
             <div class="text-block">
@@ -217,9 +217,9 @@
 
 <script setup>
 import {
-    onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw,
+    onMounted, ref, reactive, watch, onUnmounted, defineAsyncComponent, computed, toRaw, nextTick
 } from 'vue'
-import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate, onBeforeRouteLeave } from 'vue-router'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import flowTimeShower from '../components/bankRiskWarn/flowTimeShower.vue'
 import { addBankLayer, initPureScratchMap, refreshMap } from '../utils/mapUtils'
@@ -371,15 +371,15 @@ const realtimeConditionHandler = async () => {
 }
 
 
+
 let bankWarnLayer = null
 const isRunningMan = ref(false)
 const RunningManSays = ref('')
 const conditionConfigureDataResetHandler = async () => {
     console.log(window.location.pathname)
-    //// debug ////
 
-
-
+    if (showWaterPower.value === false)
+        showWaterPowerFunc()
     ///////////////////////  check  /////////////////////// 
 
     const nullCheck = (val) => {
@@ -391,7 +391,7 @@ const conditionConfigureDataResetHandler = async () => {
         if (!nullCheck(conditionConfigureData[key])) {
             ElMessage({
                 type: 'error',
-                offset: 120,
+                offset: 260,
                 message: '请正确配置条件！'
             })
             return
@@ -405,6 +405,19 @@ const conditionConfigureDataResetHandler = async () => {
         })
         return
     }
+
+    const benchID = conditionConfigureData.refDEM.path
+    const refID = conditionConfigureData.benchDEM.path
+    if (benchID === refID) {
+        ElMessage({
+            type: "error",
+            message: "冲淤起算地形与判别计算地形不能相同！",
+            offset: 260
+        })
+        return;
+    }
+
+
     isRunningMan.value = true
     RunningManSays.value = '模型正在运行，请稍候...'
     console.log('reset condition data!', conditionConfigureData)
@@ -445,7 +458,7 @@ const conditionConfigureDataResetHandler = async () => {
         ///////////////////// result ////////////////////////
         // 更新风险条带
         BankResourceHelper.getBankSectionGeometry(useBankNameStore().globalBankName, "short").then(res => {
-            
+
             const shortSectionFeatures = res.data
             const { warnLayerData, riskAreassss, finalResult } = riskWarnResultParse(result, shortSectionFeatures)
 
@@ -498,42 +511,41 @@ let defaultWarnLayerData = defaultWarnLayerDataInput
 
 
 const RasterControlHandler = () => {
-    if (showRaster.value && showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-        showRaster.value = false
-    } else if (!showRaster.value && showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
-        showRaster.value = true
-    } else if (showRaster.value && !showRasterControl.value) {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-        showRaster.value = false
-    } else {
-        mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
-    }
+    setTimeout(() => {
+        if (showRaster.value) {
+            mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')
+        } else {
+            mapInstance.setLayoutProperty('mapRaster', 'visibility', 'visible')
+        }
+        showRaster.value = !showRaster.value
+    }, 1)
 
 }
 
 const BankLineControlHandler = () => {
-    if (showBankLine.value) {
-        mapInstance.setLayoutProperty('岸段预警', 'visibility', 'none')
-    } else {
-        mapInstance.setLayoutProperty('岸段预警', 'visibility', 'visible')
-    }
-    showBankLine.value = !showBankLine.value
+    setTimeout(() => {
+        if (showBankLine.value) {
+            mapInstance.setLayoutProperty('岸段预警', 'visibility', 'none')
+        } else {
+            mapInstance.setLayoutProperty('岸段预警', 'visibility', 'visible')
+        }
+        showBankLine.value = !showBankLine.value
+    }, 1);
 }
 
 const TerrainControlHandler = () => {
-    showTerrain.value
-        ? mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'none')
-        : mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'visible')
-    showTerrain.value = !showTerrain.value
+    setTimeout(() => {
+        showTerrain.value
+            ? mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'none')
+            : mapInstance.setLayoutProperty('TerrainLayer', 'visibility', 'visible')
+        showTerrain.value = !showTerrain.value
+    }, 1);
 }
 
 
 
 
 
-const showRasterControl = ref(false)
 const showControls = ref(false)
 
 const showWaterPower = ref(false)
@@ -545,9 +557,6 @@ const showWaterPowerFunc = async () => {
     }
 
     timeStep.value = 0
-    // await flowControlHandler()
-    mapInstance.getLayer('mapRaster') && mapInstance.setLayoutProperty('mapRaster', 'visibility', 'none')        //TODO:??
-
     showWaterPower.value = !showWaterPower.value
 }
 
@@ -555,21 +564,19 @@ const showRiverBed = ref(false)
 const showRiverBedFunc = () => {
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
+        // conditionPannelShow.value = false
     } else if (showGeologyAndProject.value === true) {
         showGeologyAndProjectFunc()
     }
 
     showRiverBed.value = !showRiverBed.value
-    if (showControls.value === true) {
-        RasterControlHandler()
-    }
-    showRasterControl.value = !showRasterControl.value
 }
 
 const showGeologyAndProject = ref(false)
 const showGeologyAndProjectFunc = () => {
     if (showWaterPower.value === true) {
         showWaterPowerFunc()
+        // conditionPannelShow.value = false
     } else if (showRiverBed.value === true) {
         showRiverBedFunc()
     }
@@ -630,8 +637,8 @@ const runHydrodynamicModel = async () => {
         modelParams = {
             "water-qs": parseFloat(conditionConfigureData.flow),
             "tidal-level": parseFloat(conditionConfigureData.tideDif),
-            // "segment": useBankNameStore().globalBankName,
-            segment: 'Mzs', // 后端流场纹理资源生产有问题，这里用Mzs的资源  2024-11-25
+            "segment": useBankNameStore().globalBankName,
+            // segment: 'Mzs', // 后端流场纹理资源生产有问题，这里用Mzs的资源  2024-11-25
             "set": "standard",
             "year": "2023",
         }
@@ -968,12 +975,12 @@ const flowControl = (showOrHide) => {
     }
 }
 
-
 const flowControlHandler = async () => {
     if (hydrodynamicCaseID != '' && hydrodynamicRunningResult['visualization-description-json']) {
-        showFlow.value = !showFlow.value
-        flowControl(showFlow.value)
-
+        setTimeout(() => {
+            showFlow.value = !showFlow.value
+            flowControl(showFlow.value)
+        }, 1);
     } else {
         ElNotification({
             title: '警告',
@@ -1002,12 +1009,29 @@ const flowControlHandler = async () => {
 
 
 
-
+onBeforeRouteLeave((to, from, next) => {
+    console.log('router leave')
+    if (isRunningMan.value) {
+        // 点击标题栏后，GlobalBankName会更改
+        // 保持GlobalBankName稳定 
+        useBankNameStore().globalBankName = from.params.id
+        next(false)
+        ElMessage.warning({
+            message: '请等待当前任务完成，请稍后...',
+            offset: 80,
+        })
+        return
+    }
+    next(true)
+})
 
 
 onBeforeRouteUpdate(async (to, from, next) => {
-
+    console.log('router update')
     if (isRunningMan.value) {
+        // 点击标题栏后，GlobalBankName会更改
+        // 保持GlobalBankName稳定 
+        useBankNameStore().globalBankName = from.params.id
         next(false)
         ElMessage.warning({
             message: '请等待当前任务完成，请稍后...',
@@ -1072,7 +1096,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
         mapFlyToMzs(map)
 
         addBankLayer(map, bank).then(() => {
-            //////////////////// 添加，民主沙特有的栅格图层、地形图层、潮位点图层，前两者不展示
+            //////////////////// 添加，民主沙特有的栅格图层、地形图层，前两者不展示
             addRasterLayer(map, 23032209, 'mapRaster')
             map.setLayoutProperty('mapRaster', 'visibility', 'none')
             map.addLayer(new TerrainLayer(14))
@@ -1105,7 +1129,8 @@ onBeforeRouteUpdate(async (to, from, next) => {
         mapFlyToRiver(map)
 
         addBankLayer(map, bank).then(() => {
-
+            //////////////////// 潮位点加上  20241128
+            addTideLevelPoint()
             //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
             bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
             map.addLayer(bankWarnLayer)
@@ -1178,58 +1203,62 @@ onMounted(async () => {
                 map.setLayoutProperty('mapRaster', 'visibility', 'none')
                 map.addLayer(new TerrainLayer(14))
                 map.setLayoutProperty('TerrainLayer', 'visibility', 'none')
-                const chaoWeiPoint = {
-                    type: 'FeatureCollection',
-                    features: [
-                        {
-                            type: 'Feature',
-                            properties: {
-                                label: '潮位点',
-                            },
-                            geometry: {
-                                type: 'Point',
-                                coordinates: tideLevelPointPos.value,
-                            },
-                        },
-                    ],
-                }
-                map.addSource('chaoWeiPoint', {
-                    type: 'geojson',
-                    data: chaoWeiPoint,
-                })
-                map.addLayer({
-                    id: 'chaoWeiPoint',
-                    type: 'circle',
-                    source: 'chaoWeiPoint',
-                    paint: {
-                        'circle-radius': 7,
-                        'circle-color': 'rgb(255, 0,0)',
-                    },
-                })
-                map.addLayer(
-                    {
-                        id: 'chaoWeiPointLable',
-                        type: 'symbol',
-                        source: 'chaoWeiPoint',
-                        layout: {
-                            'text-field': ['get', 'label'],
-                            'text-font': [
-                                'Open Sans Semibold',
-                                'Arial Unicode MS Bold',
-                            ],
-                            'text-anchor': 'top',
-                            'text-offset': [0.0, 0.5],
-                            'text-size': 18,
-                            'text-allow-overlap': true,
-                        },
-                        paint: {
-                            'text-color': 'rgb(255,255,255)',
-                        },
-                    },
-                    'chaoWeiPoint',
-                )
 
 
+                // const chaoWeiPoint = {
+                //     type: 'FeatureCollection',
+                //     features: [
+                //         {
+                //             type: 'Feature',
+                //             properties: {
+                //                 label: '潮位点',
+                //             },
+                //             geometry: {
+                //                 type: 'Point',
+                //                 coordinates: tideLevelPointPos.value,
+                //             },
+                //         },
+                //     ],
+                // }
+                // map.addSource('chaoWeiPoint', {
+                //     type: 'geojson',
+                //     data: chaoWeiPoint,
+                // })
+                // map.addLayer({
+                //     id: 'chaoWeiPoint',
+                //     type: 'circle',
+                //     source: 'chaoWeiPoint',
+                //     paint: {
+                //         'circle-radius': 7,
+                //         'circle-color': 'rgb(255, 0,0)',
+                //     },
+                // })
+                // map.addLayer(
+                //     {
+                //         id: 'chaoWeiPointLable',
+                //         type: 'symbol',
+                //         source: 'chaoWeiPoint',
+                //         layout: {
+                //             'text-field': ['get', 'label'],
+                //             'text-font': [
+                //                 'Open Sans Semibold',
+                //                 'Arial Unicode MS Bold',
+                //             ],
+                //             'text-anchor': 'top',
+                //             'text-offset': [0.0, 0.5],
+                //             'text-size': 18,
+                //             'text-allow-overlap': true,
+                //         },
+                //         paint: {
+                //             'text-color': 'rgb(255,255,255)',
+                //         },
+                //     },
+                //     'chaoWeiPoint',
+                // )
+
+
+                //////////////////// 潮位点加上  20241128
+                addTideLevelPoint()
                 //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
                 bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
                 map.addLayer(bankWarnLayer, 'chaoWeiPoint')
@@ -1259,7 +1288,8 @@ onMounted(async () => {
             refreshMap(map)
 
             addBankLayer(map, bk).then(() => {
-
+                //////////////////// 潮位点加上  20241128
+                addTideLevelPoint()
                 //////////////////// 添加，断面风险条带图层，默认不展示, 模型有结果再展示
                 map.getLayer('岸段预警') && map.removeLayer('岸段预警')
                 bankWarnLayer = new BankWarnLayer(defaultWarnLayerData)
