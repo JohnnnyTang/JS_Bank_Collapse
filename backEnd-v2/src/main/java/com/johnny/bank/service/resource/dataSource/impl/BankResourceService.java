@@ -637,12 +637,8 @@ public class BankResourceService {
         String paramsJsonString = JSON.toJSONString(params);
         System.out.println(paramsJsonString);
         // 将 JSON 字符串写入文件
-        String jsonFolderPath;
-        if (type.equals("template")) {
-            jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", "RiskLevel");
-        } else {
-            jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", type);
-        }
+
+        String jsonFolderPath = String.join(File.separator, draftDataPath, "modelParam", type);
 
         // 确保目录存在
         Path path = Paths.get(jsonFolderPath);
@@ -657,17 +653,12 @@ public class BankResourceService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        String zipFileName = ZipUtil.zipFolder(new File(jsonFolderPath));
+//        String zipFileName` = ZipUtil.zipFolder(new File(jsonFolderPath));
 //        System.out.println(zipFileName);
 //
 //        System.out.println(info);
 //        modelServerService.uploadCalculateResourceData(FileUtil.convertFileToMultipartFile(new File(zipFileName)), new JSONObject(info));
-
-        String typeName = type;
-        if (Objects.equals(type, "PQ")) {
-            typeName = "pq";
-        }
-        modelServerService.uploadCalculateResourceData(ZipUtil.zipFolderAndGetAsMultipartFileV2(jsonFolderPath, typeName), JSONObject.from(info));
+        modelServerService.uploadCalculateResourceData(ZipUtil.zipFolderAndGetAsMultipartFileV2(jsonFolderPath, type), JSONObject.from(info));
 
         return "";
     }

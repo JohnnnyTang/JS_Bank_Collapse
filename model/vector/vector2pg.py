@@ -29,19 +29,24 @@ user = sys.argv[4]
 password = sys.argv[5]
 host = sys.argv[6]
 port = sys.argv[7]
+forCal = sys.argv[8]
 
 conn = psycopg2.connect(
     dbname=dbname,
     user=user,
     password=password,
     host=host,
-    port=port
+    port=port,
 )
 
 # filepath = "D:/1study/Work/2024_1_10_bank/spatialData/民主沙/mzsArea/mzs_bank_area_one.shp"
 # 读取Shapefile
 gdf = gpd.read_file(filePath)
-target_crs = 'EPSG:3857'
+if (forCal == True):
+    target_crs = 'EPSG:3857'
+else:
+    target_crs = 'EPSG:4326'
+# target_crs = 'EPSG:3857'
 gdf = gdf.to_crs(target_crs)
 srid = int(gdf.crs.to_string().split(':')[-1])
 # column_defs = ', '.join([f"{col} TEXT" for col in columns])

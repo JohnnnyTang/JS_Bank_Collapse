@@ -264,7 +264,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
             List<TaskNode> taskNodeList = ((ITaskNodeRepo)IBaseNodeRepo).getTaskNodeItemByCaseId(caseId);
             if (taskNodeList.isEmpty()) {
                 TaskNode serializationTaskNode = TaskNode.taskNodeBuilder()
-                        .paramNode(null).modelNode(null).dataNode(null).status("NONE").caseId(caseId)
+                        .paramNode(null).modelNode(null).dataNode(null).status("LOCK").caseId(caseId)
                         .modelNode(serializationModelNode.orElse(null))
                         .result(null).ifAuto(true).name(null).updateTime(LocalDateTime.now())
                         .category("ModelServerSerialization").path(",taskNode,ModelServerSerializationGroup,")
@@ -299,7 +299,7 @@ public class TaskNodeServiceV2 extends NodeService<TaskNode> {
         String paramName = paramNode.getName() + '-' + System.currentTimeMillis();
         paramNode.setName(paramName);
         TaskNode taskNodeRun = TaskNode.taskNodeBuilder()
-                .paramNode(paramNode).modelNode(modelNode.orElse(null)).dataNode(null).status("NONE")
+                .paramNode(paramNode).modelNode(modelNode.orElse(null)).dataNode(null).status("LOCK")
                 .result(null).ifAuto(false).name(modelNode.orElse(null).getName()+"-"+System.currentTimeMillis()).updateTime(LocalDateTime.now())
                 .category(modelNode.orElse(null).getCategory()).path(",taskNode,"+modelNode.orElse(null).getName()+"Group,")
                 .auth("all").build();

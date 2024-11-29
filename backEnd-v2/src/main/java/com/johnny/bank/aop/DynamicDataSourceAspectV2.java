@@ -61,8 +61,7 @@ public class DynamicDataSourceAspectV2 {
                 dataSourceBuilder.username((String) dataNode.getUsage().get("userName"));
             }
             if(dataNode.getUsage().containsKey("password")) {
-                dataSourceBuilder.password((String) dataNode.getUsage().get("password"));
-            }
+                dataSourceBuilder.password((String) dataNode.getUsage().get("password"));            }
             DataSource source = dataSourceBuilder.build();
             log.info("add datasource: "+source.toString());
             dynamicDataSource.addDataSource(hashCode4JDBC, source);

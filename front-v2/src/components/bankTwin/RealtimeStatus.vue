@@ -1227,8 +1227,6 @@ onBeforeUnmount(async () => {
 })
 
 
-
-
 const indicatorDescriptionMap = {
     'GNSS': [{
         name: 'X位移',

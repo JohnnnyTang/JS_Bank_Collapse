@@ -61,7 +61,7 @@
     </resultMap>
 
     <sql id="select-data">
-        select *``
+        select *
         <if test="tableName == 'gnss_record'">
             , round(avg(threed) OVER(ORDER BY measure_time
                 ROWS BETWEEN #{precedentNum} PRECEDING AND CURRENT ROW ), 2)
