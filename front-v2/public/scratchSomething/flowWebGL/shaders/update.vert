@@ -105,7 +105,7 @@ void simulation(vec2 resolution) {
     float speedRate = speed_rate(speed);
 
     vec2 nPos = vec2(particleInfo.xy + speed * speedFactor / resolution);
-    nPos = clamp(nPos, vec2(0.001f), vec2(0.999f));
+    // nPos = clamp(nPos, vec2(0.001f), vec2(0.999f));
     float dropped = drop(speedRate, uv) * is_in_flow_progress(resolution, nPos);
     // float dropped = is_in_flow_progress(resolution, nPos);
 
@@ -124,7 +124,7 @@ void rebirth() {
 }
 
 void main() {
-    vec2 resolution = vec2(textureSize(mask[1], 0));
+    vec2 resolution = vec2(textureSize(mask[1], 0)) - vec2(1.0);
 
     if(age < fullLife - segmentNum) {
         simulation(resolution);

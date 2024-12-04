@@ -1,7 +1,7 @@
 <template>
     <el-dialog v-model="dialogFormVisible" width="18vw" :show-close="false" ref="dialogRef" custom-class="dialog-class"
         :destroy-on-close="true">
-        <template #header="{ }">
+        <template #header="{}">
             <div class="form-header">
                 {{ dialogFormTitle }}
             </div>
@@ -11,7 +11,7 @@
                 <el-radio value="tif">tif</el-radio>
                 <el-radio value="txt">txt</el-radio>
             </el-radio-group> -->
-            <el-form-item v-for="(  item, index  ) in  dialogInfo[props.type][props.subType]  " :key="index"
+            <el-form-item v-for="(  item, index  ) in dialogInfo[props.type][props.subType]  " :key="index"
                 :label="item.label" :required="item.required">
 
                 <el-input v-if="item.type === 'input'" v-model="item.value" autocomplete="off" />
@@ -22,8 +22,8 @@
                             item.radioLabelArray[radioIndex] }} </el-radio>
                 </el-radio-group>
 
-                <el-upload v-else-if="item.type === 'file'" style="height: fit-content;" drag action="#" :multiple="false"
-                    :show-file-list="true" ref="uploadRef" :auto-upload="false" :file-list="fileList"
+                <el-upload v-else-if="item.type === 'file'" style="height: fit-content;" drag action="#"
+                    :multiple="false" :show-file-list="true" ref="uploadRef" :auto-upload="false" :file-list="fileList"
                     :on-preview="handlePreview" :on-remove="handleRemove" :on-change="handleFileChange" accept=".zip"
                     :http-request="handleFileUpload">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
@@ -179,6 +179,8 @@ const handleFileUpload = (file) => {
         // next process of fileInfo
         const [fileName, fileType] = extractFileNameAndType(file.file.name)
         fileInfo['name'] = fileName
+        if (fileInfo.type === 'PQ') { fileInfo['name'] = dialogInfo.value[props.type][props.subType][0].value }
+        console.log('dialoginfo:',dialogInfo.value)
         if (props.subType === 'DEM')
             fileInfo['fileType'] = fileType === 'txt' ? fileType : 'tiff'
 
@@ -187,7 +189,7 @@ const handleFileUpload = (file) => {
         fileInfo['month'] = fileInfo['month'] || '04'
         fileInfo['set'] = fileInfo['set'] || 'standard'
         fileInfo['description'] = fileInfo['description'] || ''
-        
+
         console.log(fileInfo)
 
 

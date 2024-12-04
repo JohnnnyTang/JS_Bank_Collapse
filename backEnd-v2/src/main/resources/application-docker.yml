@@ -59,6 +59,13 @@ staticData:
   vectorDataPath: /usr/local/resource/data/staticData/vectorData
   draftDataPath: /usr/local/resource/data/staticData/draftData
   waterConditionPath: /usr/local/resource/data/staticData/waterCondition
+  pictureDataPath: /usr/local/resource/data/staticData/pictureData
+  knowledgePath:
+    picture: /usr/local/resource/data/staticData/knowledge/picture
+    pdf: /usr/local/resource/data/staticData/knowledge/pdf
+    video: /usr/local/resource/data/staticData/knowledge/video
+    others: /usr/local/resource/data/staticData/knowledge/others
+
 
 flowData:
   texturePath: /usr/local/resource/data/flowData/flowFieldResourceArchive/
@@ -67,7 +74,7 @@ waterCondition:
   url: http://10.32.37.88:8821
 
 modelServer:
-  url: http://10.32.37.72:8000
+  url: http://10.32.37.72:18000
   storageLimit: 50
   caseLimit: 50
 

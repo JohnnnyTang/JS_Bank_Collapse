@@ -1034,7 +1034,7 @@ onMounted(async () => {
     chartIns.setOption(option)
 
     markLineWatcher = watch(() => hydrodynamicStore.flowFieldCurrentTimeStep, (newVal) => {
-      console.log('newVal::', newVal)
+      // console.log('newVal::', newVal)
       let showingOption = JSON.parse(JSON.stringify(toRaw(hydrodynamicStore.showingOption)))// deep copy
       let markLineOption = hydrodynamicStore.getMarkLineOption()
       showingOption.series[0].markLine = markLineOption

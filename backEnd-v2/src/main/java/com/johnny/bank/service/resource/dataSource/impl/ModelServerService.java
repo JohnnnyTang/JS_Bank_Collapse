@@ -261,7 +261,14 @@ public class ModelServerService implements IModelServerService {
                 .category(typeName + "DataItem").path(",DataNodeHead,"+bank+"BankNode,StaticDataGroupOf" + bank + ",ModelServerDataGroupOf" + bank + "," + typeName + "DataGroupOf" + bank + ",")
                 .build();
         DataNodeServiceV2 dataNodeServiceV2 = BeanUtil.getBean(DataNodeServiceV2.class);
+
+        System.out.println("params:");
+        System.out.println(url);
+        System.out.println(file);
+        System.out.println(info);
+
         JSONObject response = JSONObject.parseObject(InternetUtil.doPost_File(url, file, info));
+
         dataNodeBasicInfo.put("path",response.getString("directory"));
         dataNode.setBasicInfo(dataNodeBasicInfo);
         List<DataNodeV2> dataNodeListBefore = getModelServerResourceNode(dataNode.getCategory(),dataNode.getBank(),dataNode.getBasicInfo().getString("set"),dataNode.getBasicInfo().getString("year"),dataNode.getName());

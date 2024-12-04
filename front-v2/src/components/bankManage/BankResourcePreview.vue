@@ -859,7 +859,7 @@ const handleSetConfirm = async () => {
 
     if (selectedValue.value == 'PQ') {
         console.log(toRaw(PQData))
-        info.name = 'PQ'
+        info.name = 'pq'
         BankResourceHelper.handleModelParamsUpload(PQData, 'PQ', info).then(res => {
             ElMessage.success({ message: '上传成功！', offset: 100 })
             BankResourceHelper.refreshBankResource(resourceStore.resourceInfo, bank.bankEnName, 'model', 'Config')

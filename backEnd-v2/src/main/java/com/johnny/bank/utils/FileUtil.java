@@ -71,8 +71,8 @@ public class FileUtil {
             return "NOT EXIST";
         }
         try {
-//            List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
-            List<String> lines = Files.readAllLines(filePath);
+            List<String> lines = Files.readAllLines(filePath, Charset.forName("GBK"));
+//            List<String> lines = Files.readAllLines(filePath);
             return String.join(System.lineSeparator(), lines);
         } catch (IOException e) {
             return "ERROR";

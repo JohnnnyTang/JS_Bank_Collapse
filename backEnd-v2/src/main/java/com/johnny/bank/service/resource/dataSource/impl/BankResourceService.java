@@ -646,7 +646,14 @@ public class BankResourceService {
             Files.createDirectories(path);
         }
 
-        String jsonPath = String.join(File.separator, jsonFolderPath, type + ".json");
+        String fileName;
+        if (type.equals("PQ")) {
+            fileName = "pq";
+        } else {
+            fileName = "template";
+        }
+
+        String jsonPath = String.join(File.separator, jsonFolderPath, fileName + ".json");
 
         try (FileWriter fileWriter = new FileWriter(jsonPath)) {
             fileWriter.write(paramsJsonString);
@@ -659,6 +666,8 @@ public class BankResourceService {
 //        System.out.println(info);
 //        modelServerService.uploadCalculateResourceData(FileUtil.convertFileToMultipartFile(new File(zipFileName)), new JSONObject(info));
         modelServerService.uploadCalculateResourceData(ZipUtil.zipFolderAndGetAsMultipartFileV2(jsonFolderPath, type), JSONObject.from(info));
+
+        FileUtil.deleteFolder(new File(jsonFolderPath));
 
         return "";
     }
