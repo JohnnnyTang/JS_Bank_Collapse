@@ -642,7 +642,7 @@ const flytoFeature = (map, coord, zoom = 10) => {
 const loadImage = async (map, url, imageID) => {
     if (map.hasImage(imageID)) return
     return new Promise((resolve, reject) => {
-        map.loadImage(import.meta.env.BASE_URL + url, (err, img) => {
+        map.loadImage(import.meta.env.VITE_BASE + url, (err, img) => {
             if (err) throw err
             if (map.hasImage(imageID)) return
             else map.addImage(imageID, img)
@@ -774,7 +774,7 @@ const getStyleJson4base = () => {
                 ],
             },
         ],
-        glyphs: import.meta.env.BASE_URL + '/glyphs/mapbox/{fontstack}/{range}.pbf',
+        glyphs: import.meta.env.VITE_BASE + '/glyphs/mapbox/{fontstack}/{range}.pbf',
     }
     return styleJson
 }
@@ -2346,7 +2346,7 @@ const getStyleJson = () => {
                 filter: ['==', '$type', 'Polygon'],
             },
         ],
-        glyphs: import.meta.env.BASE_URL + '/glyphs/mapbox/{fontstack}/{range}.pbf',
+        glyphs: import.meta.env.VITE_BASE + '/glyphs/mapbox/{fontstack}/{range}.pbf',
     }
 
     return styleJson
@@ -6739,7 +6739,7 @@ const getHighZoomStyleJson = () => {
                 filter: ['==', '$type', 'Polygon'],
             },
         ],
-        glyphs: import.meta.env.BASE_URL + '/glyphs/mapbox/{fontstack}/{range}.pbf',
+        glyphs: import.meta.env.VITE_BASE + '/glyphs/mapbox/{fontstack}/{range}.pbf',
     }
 
     return styleJson
@@ -6766,7 +6766,7 @@ const getImageStyleJson = () => {
                 maxzoom: 14,
             },
         ],
-        glyphs: import.meta.env.BASE_URL + '/glyphs/mapbox/{fontstack}/{range}.pbf',
+        glyphs: import.meta.env.VITE_BASE + '/glyphs/mapbox/{fontstack}/{range}.pbf',
     }
 }
 

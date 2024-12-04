@@ -53,7 +53,7 @@ class UnityLayer {
     onAdd(map, gl) {
 
         // Set Unity instance configuration
-        const buildUrl = import.meta.env.BASE_URL + "/scratchSomething/unity/collapseBank/build"
+        const buildUrl = import.meta.env.VITE_BASE + "/scratchSomething/unity/collapseBank/build"
         const config = {
             frameworkUrl: buildUrl + `/${this.unityProjName}.framework.js`,
             dataUrl: buildUrl + `/${this.unityProjName}.data`,

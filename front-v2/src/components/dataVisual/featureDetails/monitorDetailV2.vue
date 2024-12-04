@@ -88,7 +88,7 @@ const show = computed(() => {
     return false
 })
 // const imgSrcPrefix = 'http://localhost:5173//device/all/'
-const imgSrcPrefix = 'http://' + window.location.host +import.meta.env.BASE_URL +  '//monitorImg/all/'
+const imgSrcPrefix = 'http://' + window.location.host +import.meta.env.VITE_BASE +  '//monitorImg/all/'
 
 console.log('imgSrcPrefix:', imgSrcPrefix)
 
