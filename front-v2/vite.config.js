@@ -26,7 +26,7 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5174,
         proxy: {
-            '/api': {
+            '/api/': {
                 // target: 'http://localhost:8989/api/v1',
                 target: 'http://223.2.47.202:8989/api/v1',
                 // target: 'http://172.21.213.243:8989/api/v1',
@@ -43,13 +43,21 @@ export default defineConfig({
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/device/, ''),
             },
-            '/model/': {
+            '/api2/': {
                 target: 'http://223.2.47.202:8989/api/v2',
                 // target: 'http://172.21.213.243:8989/api/v2',
                 // target: 'http://localhost:8989/api/v2',
                 // target: 'http://172.21.213.243:8989/api/v2',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api2/, ''),
+            },
+            '/model/': {
+                target: 'http://223.2.47.202:8989/api/v2',
+                // target: 'http://172.21.213.243:8989/api/v2',
+                // target: 'http://localhost:8989/api/v2',
+                // target: 'http://172.21.213.243:8989/api/v2',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/model/, ''),
             },
         },
         // https:{
