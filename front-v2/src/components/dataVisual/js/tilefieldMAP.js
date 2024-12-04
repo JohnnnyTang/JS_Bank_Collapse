@@ -374,7 +374,7 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('${import.meta.env.BASE_URL}/legend/shuiwenzhan.png')`,
+            'background-image': `url('${import.meta.env.VITE_BASE}/legend/shuiwenzhan.png')`,
             'transform': 'translateX(28%)',
         },
         text: '水文站点'
@@ -383,7 +383,7 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('${import.meta.env.BASE_URL}/legend/shuizha.png')`,
+            'background-image': `url('${import.meta.env.VITE_BASE}/legend/shuizha.png')`,
             'transform': 'translateX(10%) scale(0.75)',
         },
         text: '水闸工程'
@@ -392,7 +392,7 @@ const legendListt = [
         style: {
             'height': '80%',
             'width': '50%',
-            'background-image': `url('${import.meta.env.BASE_URL}/legend/bengzhan.png')`,
+            'background-image': `url('${import.meta.env.VITE_BASE}/legend/bengzhan.png')`,
             'transform': 'translateX(35%) scale(1.3)',
         },
         text: '泵站工程'
@@ -401,7 +401,7 @@ const legendListt = [
         style: {
             'height': '60%',
             'width': '50%',
-            'background-image': `url('${import.meta.env.BASE_URL}/legend/difang.png')`,
+            'background-image': `url('${import.meta.env.VITE_BASE}/legend/difang.png')`,
             'transform': 'translateX(10%)',
         },
         text: '长江干堤'
@@ -435,7 +435,7 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('${import.meta.env.BASE_URL}/legend/yijiantongdao2.png')`,
+            'background-image': `url('${import.meta.env.VITE_BASE}/legend/yijiantongdao2.png')`,
             'transform': 'scaleY(0.5) translateX(5%)'
         },
         text: '已建过江通道'
@@ -445,7 +445,7 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('${import.meta.env.BASE_URL}/legend/zaijiantongdao1.png')`,
+            'background-image': `url('${import.meta.env.VITE_BASE}/legend/zaijiantongdao1.png')`,
             'transform': 'scaleY(0.5) translateX(5%)'
         },
         text: '在建过江通道'
@@ -455,7 +455,7 @@ const legendListt = [
             'height': '50%',
             'width': '50%',
             // 'background-color': 'rgb(52, 0, 143)',
-            'background-image': `url('${import.meta.env.BASE_URL}/legend/guihuatongdao.png')`,
+            'background-image': `url('${import.meta.env.VITE_BASE}/legend/guihuatongdao.png')`,
             'transform': ' translateX(5%)'
         },
         text: '规划过江通道'
@@ -497,7 +497,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/水文站.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/水文站.png')`,
                 'transform': 'translateX(25%)',
             },
             text: '水文站点'
@@ -517,7 +517,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/河流.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/河流.png')`,
                 'background-size': 'cover',
             },
             text: '国普河流'
@@ -550,7 +550,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/水闸.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/水闸.png')`,
                 'transform': 'translateX(25%)',
             },
             text: '水闸工程'
@@ -559,7 +559,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/泵站.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/泵站.png')`,
                 'transform': 'translateX(25%)',
             },
             text: '泵站工程'
@@ -568,7 +568,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/枢纽.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/枢纽.png')`,
                 'transform': 'translateX(25%)',
             },
             text: '枢纽工程'
@@ -614,7 +614,7 @@ const legendMap = {
             style: {
                 'height': '100%',
                 'width': '100%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/堤防.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/堤防.png')`,
                 'background-size': 'cover',
                 'transform': 'scale(0.5)',
             },
@@ -624,7 +624,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/过江大桥.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/过江大桥.png')`,
                 'background-size': 'cover',
             },
             text: '过江大桥'
@@ -633,7 +633,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/码头.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/码头.png')`,
                 'background-size': 'cover',
             },
             text: '码头工程'
@@ -642,7 +642,7 @@ const legendMap = {
             style: {
                 'height': '80%',
                 'width': '50%',
-                'background-image': `url('${import.meta.env.BASE_URL}/legend/水库.png')`,
+                'background-image': `url('${import.meta.env.VITE_BASE}/legend/水库.png')`,
                 'background-size': 'cover',
             },
             text: '水库工程'

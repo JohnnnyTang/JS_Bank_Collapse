@@ -18,7 +18,7 @@ export class JsonFileParser {
     maxTextureSize = 0.0;
 
     axiosIns = axios.create({
-        baseURL: import.meta.env.BASE_URL
+        baseURL: import.meta.env.VITE_BASE
     })
 
     constructor(fileurl) {

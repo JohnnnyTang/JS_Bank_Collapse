@@ -224,7 +224,7 @@ const props = defineProps({
 })
 
 const imgSrc = computed(() => {
-    return `${import.meta.env.BASE_URL}/崩岸${props.index % 3}.png`;
+    return `${import.meta.env.VITE_BASE}/崩岸${props.index % 3}.png`;
 })
 
 

@@ -525,7 +525,7 @@ const layerAddFunctionMap = {
                     data: stress,
                 })
         }
-        await loadImage(map, import.meta.env.BASE_URL + '/geoStyle/incline-rect.png', 'incline-static')
+        await loadImage(map, import.meta.env.VITE_BASE + '/geoStyle/incline-rect.png', 'incline-static')
 
         !map.getLayer('测斜仪') &&
             map.addLayer({
@@ -575,7 +575,7 @@ const layerAddFunctionMap = {
                     data: stress,
                 })
         }
-        await loadImage(map, import.meta.env.BASE_URL + '/icons/孔隙水压力计.png', 'manometer-static')
+        await loadImage(map, import.meta.env.VITE_BASE + '/icons/孔隙水压力计.png', 'manometer-static')
 
         !map.getLayer('孔隙水压力计') &&
             map.addLayer({

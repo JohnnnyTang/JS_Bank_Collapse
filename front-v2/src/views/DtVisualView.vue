@@ -209,8 +209,8 @@ const mapContainer = ref();
 const mapStore = useMapStore();
 const activeStatus = ref([false, false]);
 const styles = [
-    { backgroundImage: `url('${import.meta.env.BASE_URL}/icons/legend.png')` },
-    { backgroundImage: `url('${import.meta.env.BASE_URL}/icons/full.png')` },
+    { backgroundImage: `url('${import.meta.env.VITE_BASE}/icons/legend.png')` },
+    { backgroundImage: `url('${import.meta.env.VITE_BASE}/icons/full.png')` },
 ]
 const featureInfo = ref({})
 const showDetail = ref(false)

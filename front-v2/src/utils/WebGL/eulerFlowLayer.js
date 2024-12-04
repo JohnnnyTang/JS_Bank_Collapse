@@ -101,7 +101,7 @@ export class EulerFlowLayer {
     stepProgressRate = 0.0
 
     axiosIns = axios.create({
-        baseURL: import.meta.env.BASE_URL,
+        baseURL: import.meta.env.VITE_BASE,
     })
 
     constructor(id, stationUrl, uvUrls, prefix) {

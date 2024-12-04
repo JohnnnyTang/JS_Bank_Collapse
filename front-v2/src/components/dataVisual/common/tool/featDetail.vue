@@ -183,7 +183,7 @@ const title = ref('')
 const data = ref({})
 const pinState = ref(false)
 const iconBackStyle = computed(() => {
-    return pinState.value ? { backgroundImage: `url('${import.meta.env.BASE_URL}/icons/pin.png')` } : { backgroundImage: `url('${import.meta.env.BASE_URL}/icons/notPin.png')` }
+    return pinState.value ? { backgroundImage: `url('${import.meta.env.VITE_BASE}/icons/pin.png')` } : { backgroundImage: `url('${import.meta.env.VITE_BASE}/icons/notPin.png')` }
 })
 
 const bankfiledDict = {

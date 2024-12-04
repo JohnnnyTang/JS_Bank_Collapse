@@ -164,14 +164,14 @@ const navList = ref([
         routerLink: '/dataVisual',
         isActive: false,
         oneRow: true,
-        iconUrl: import.meta.env.BASE_URL + '/big-data.png',
+        iconUrl: import.meta.env.VITE_BASE + '/big-data.png',
     },
     {
         name: '实时监测预警',
         routerLink: '/bankTwin',
         isActive: false,
         oneRow: true,
-        iconUrl: import.meta.env.BASE_URL + '/analysis.png',
+        iconUrl: import.meta.env.VITE_BASE + '/analysis.png',
     },
 
     {
@@ -186,14 +186,14 @@ const navList = ref([
         routerLink: '/bankWarn',
         isActive: false,
         oneRow: true,
-        iconUrl: import.meta.env.BASE_URL + '/monitoring.png',
+        iconUrl: import.meta.env.VITE_BASE + '/monitoring.png',
     },
     {
         name: '崩岸系统管理',
         routerLink: '/modelStore',
         isActive: false,
         oneRow: true,
-        iconUrl: import.meta.env.BASE_URL + '/predictive.png',
+        iconUrl: import.meta.env.VITE_BASE + '/predictive.png',
     },
 ])
 
