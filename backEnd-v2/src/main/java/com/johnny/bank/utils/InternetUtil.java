@@ -34,8 +34,8 @@ public class InternetUtil {
             connection.setRequestMethod("GET");
 
             // 设置超时时间为10s
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(10000);
+            connection.setConnectTimeout(20000);
+            connection.setReadTimeout(20000);
 
             int responseCode = connection.getResponseCode();
             StringBuilder response = new StringBuilder();
