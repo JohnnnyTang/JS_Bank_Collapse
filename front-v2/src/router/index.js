@@ -180,7 +180,7 @@ const router = createRouter({
      * createWebHashHistory 带 # 号
      * createWebHistory 不带 # 号
      */
-    history: createWebHistory('/cjbaweb/'),
+    history: createWebHistory(),
     // 下面这个 可以写成ES6的简写 routers
     routes: routes,
 })
