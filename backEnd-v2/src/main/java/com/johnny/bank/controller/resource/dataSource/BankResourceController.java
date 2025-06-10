@@ -353,7 +353,7 @@ public class BankResourceController {
         return ResponseEntity.ok(bankResourceService.deleteSection(bank, name));
     }
     // 断面信息获取
-    @GetMapping("/down/section/resource/{bank}/info/{type}")
+    @GetMapping("/down/section/resource/{bank}/{type}")
     public ResponseEntity<JSONArray> getResourceSectionInfo(@PathVariable String bank, @PathVariable String type) {
         DataNodeV2 dataNodeV2 = iDataNodeRepoV2.getNodeByCategoryAndBank("SectionDataItem", bank);
         return ResponseEntity.ok().body(bankResourceService.getSectionInfo(dataNodeV2, type));
