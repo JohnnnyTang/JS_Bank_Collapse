@@ -206,7 +206,7 @@
         <dv-border-box12 :dur="5" :color="['rgb(28, 75, 187)', 'rgb(140, 255, 255)']">
           <div class="model-content flex-center">
             <div class="flex-coloum" style="width: 18.7vw; height: 23vh;">
-              <div class="title">● 潮位过程线提取
+              <div class="title">● 流速过程线提取
                 <div class="button" @click="drawButtonClickHandler"
                   :class="{ 'forbbidden': globleVariable.status === false }">测点绘制</div>
                 <!-- <div class="button" @click="drawButtonClickHandler">测点绘制</div> -->
@@ -214,7 +214,7 @@
               <div class="content flex-center" ref="tideLineChartDom" v-show="globleVariable.status">
               </div>
               <div class="content flex-center" v-show="globleVariable.status === false">
-                <span v-if="true" style="z-index: 10;">请在计算模型后绘制潮位点以提取潮位线</span>
+                <span v-if="true" style="z-index: 10;">请在计算模型后绘制潮位点以提取流速线</span>
               </div>
             </div>
 
@@ -765,13 +765,13 @@ const drawButtonClickHandler = () => {
   if (!globleVariable.status) {
     ElNotification({
       title: '警告',
-      message: '水动力模型计算完成后方可提取潮位过程线',
+      message: '水动力模型计算完成后方可提取流速过程线',
       type: 'warning',
       offset: 200,
     })
     return
   }
-  if (runningMsg.value === '正在提取潮位线...') {
+  if (runningMsg.value === '正在提取流速线...') {
     ElNotification({
       title: '警告',
       message: '请等待当前任务完成，请稍后...',
